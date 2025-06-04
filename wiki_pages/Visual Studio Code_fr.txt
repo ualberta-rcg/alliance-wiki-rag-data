@@ -1,0 +1,127 @@
+
+
+<languages />
+[https://code.visualstudio.com/ Visual Studio Code] est un environnement de développement intégré (IDE pour <i>integrated development environment</i>) de [https://www.microsoft.com Microsoft] qui peut être utilisé pour faire du développement à distance via [[SSH/fr|SSH]] sur nos grappes. Vous pouvez installer Visual Studio Code sur votre ordinateur et vous connecter à une grappe où vous effectuerez du débogage et des tests. Visual Studio Code s'adapte à plusieurs langages de programmation, mais nous utiliserons ici [[Python/fr|Python]].
+
+Avec un environnement polyvalent et modulaire comme Visual Studio Code, il faut faire attention au type d’action que vous faites. La modification d’un script Python ou de tout autre fichier texte de taille raisonnable (quelques milliers de lignes) est un processus léger qui utilise peu de puissance de traitement ou de mémoire. Par contre, cet environnement offre plusieurs autres fonctionnalités avancées telles que la possibilité de déboguer votre script à distance. Dans ce cas, l’environnement démarre l’exécution  du script Python sur la grappe, ce qui crée une charge de calcul significative sur potentiellement plusieurs CPU si le script ou les bibliothèques qu’il utilise sont multifil.
+
+<b>Remarque :</b> Quand vous utilisez Visual Studio Code avec Python, évitez d'installer [[Anaconda|Conda et ses variantes]] en raison de leur mauvaise adaptation à l'environnement de nos grappes. Plutôt que d'utiliser Conda,  [[Python/fr#Créer_et utiliser_un_environnement_virtuel|utilisez un environnement virtuel Python]] ou utilisez un conteneur  [[Apptainer/fr|Apptainer]].
+
+=Configurer l'accès à distance=
+
+==Configuration de vos clés SSH==
+
+# Si ce n’est pas déjà fait, <b>[[SSH_Keys/fr#Générer_une_clé_SSH|générez votre clé SSH]]</b>; ici nous l’appelons  ~/.ssh/ccdb.
+# Si ce n’est pas déjà fait, <b>[[SSH_Keys/fr#Installer_une_clé|ajoutez votre clé <i>publique</i> SSH dans CCDB]]</b>.
+# <b>Copiez la clé publique</b> dans <code>~/.ssh/authorized_keys</code> sur le serveur distant; créez ce fichier s’il n’existe pas déjà. Ceci est nécessaire parce que les nœuds de connexion n'ont pas accès aux clés publiques entrées dans CCDB.
+
+==Fichier de configuration SSH==
+
+VS Code fonctionne bien avec votre [[SSH configuration file/fr|fichier de configuration SSH local]] (<code>~/.ssh/config</code>). Les options recommandées sont&nbsp;:
+{{File
+  |name=~/.ssh/config
+  |contents=
+Host *
+  ServerAliveInterval 300
+
+Host beluga cedar graham narval
+  HostName %h.alliancecan.ca
+  IdentityFile ~/.ssh/ccdb
+  User your_username
+
+Host bc????? bg????? bl?????
+  ProxyJump beluga
+  IdentityFile ~/.ssh/ccdb
+  User your_username
+
+Host cdr*
+  ProxyJump cedar
+  IdentityFile ~/.ssh/ccdb
+  User your_username
+
+Host gra1* gra2* gra3* gra4* gra5* gra6* gra7* gra8* gra9*
+  ProxyJump graham
+  IdentityFile ~/.ssh/ccdb
+  User your_username
+
+Host nc????? ng????? nl?????
+  ProxyJump narval
+  IdentityFile ~/.ssh/ccdb
+  User your_username
+}}
+==Connexion initiale==
+=== Accès à distance et modification du code ===
+https://carleton.ca/scs/2023/vscode-remote-access-and-code-editing/
+
+Puisque certaines grappes ne permettent pas l’accès à internet via les nœuds de calcul, il faut d’abord installer Visual Studio Code Server avant de se connecter à distance à un nœud de calcul. Il faut donc se connecter une première fois à un nœud de connexion. Sélectionnez la grappe sur laquelle vous voulez travailler&nbsp;:
+
+* beluga
+* cedar
+* graham
+* narval
+
+[[File:VSCode SSH Passphrase Prompt.png|thumb|Invite pour la phrase de passe SSH]]
+<b>Remarque : L’invite à entrer votre phrase de passe sera affichée à plusieurs reprises.</b>
+Si ce n'est pas le cas, copiez votre clé publique comme indiqué au point 3 de <i>Configuration de vos clés SSH</i> ci-dessus.
+
+À votre connexion initiale, VS Code Server sera installé dans <code>~/.vscode-server/</code>, ce qui peut prendre jusqu’à 5 minutes. Lorsque c’est terminé, fermez la connexion.
+
+===Se connecter avec l’authentification multifacteur===
+[[File:VSCode Detail Link.png|thumb|À la connexion, cliquez sur <i>details</i> pour faire afficher dans le terminal l’invite pour l’entrée du deuxième facteur]]
+
+Si [[Multifactor authentication/fr|l’authentification multifacteur]] est demandée, cliquez sur <i>details</i> pour faire afficher le terminal VS Code Terminal où vous pourrez entrer le second facteur.
+
+=Fermer la connexion=
+
+Lors de la fermeture de la fenêtre de VS Code locale, le processus distant de VS Code Server peut continuer à s'exécuter en arrière-plan, ce qui a tendance à accumuler des processus orphelins sur le nœud de connexion. De plus, votre prochaine connexion pourrait se faire à un nœud de connexion différent, ce qui causerait des problèmes et de la confusion. <b>Pour fermer proprement la connexion, cliquez sur le coin inférieur gauche de VS Code et sélectionnez <i>Close Remote Connection</i> dans le haut de la fenêtre.</b>
+
+=Se connecter à un nœud de calcul=
+
+Étapes à suivre :
+# Vérifiez que VS Code Server est installé comme décrit ci-dessus.
+# Dans un <b>[[SSH/fr|client SSH]]</b> externe connecté à la grappe, lancez une <b>[[Running_jobs/fr#Tâches_interactives|tâche interactive]]</b> avec <code>salloc</code>.
+## <b>Important :</b> demandez au moins 2000M de mémoire.
+## Notez le nom du nœud de calcul alloué.
+## Si vous avez besoin de travailler avec des variables d'environnement <code>SLURM_*</code> dans VS Code, sauvegardez-les toutes  dans un fichier <i>à sourcer</i>. {{Command|env {{!}} grep SLURM_ {{!}} sed -e 's/^\(.*\){{=}}\(.*\)$/export \1{{=}}"\2"/g' > slurm_var.sh}}
+# Dans VS Code, lancez une nouvelle session à distance portant le nom du nœud de calcul alloué&nbsp;:
+## Appuyez sur <code>F1</code> ou <code>Ctrl+Shift+P</code> pour faire afficher l’invite de commande <code>&gt;</code> dans la palette des commandes.
+## Commencez à écrire <i>Remote</i> et sélectionnez <i>Remote-SSH: Connect to Host... <b>&gt; Remote-SSH: Connect to Host...</i></b>
+## Entrez le nom du nœud de calcul alloué.
+### Si on vous demande quel est le système d’exploitation, sélectionnez <b>Linux</b>.
+# Si vous avez besoin de travailler avec des variables d'environnement <code>SLURM_*</code>, allez au répertoire de travail dans un terminal VS Code et <i>sourcez</i> le fichier  <code>slurm_var.sh</code>. {{Command|source slurm_var.sh}}
+
+=Dépannage=
+
+==Session à distance qui ne fonctionne plus==
+
+{{Warning
+  |title=Problèmes de connexion
+  |content=
+Les plus récentes versions de [https://code.visualstudio.com/docs/remote/linux#_remote-host-container-wsl-linux-prerequisites VS Code Server ne supportent plus CentOS 7], ce qui affecte les connexions à <b>Graham</b> et <b>Niagara</b>. Vous pouvez modifier votre version de VS Code pour 1.86.1 ou plus récente; cependant, vous recevrez des avertissements au sujet du système d'exploitation qui n'est pas supporté.
+}}
+
+* Remarque : une version moins récente de VS Code fonctionne toujours via [[JupyterHub/fr#VS_Code|JupyterHub]].
+
+Étant donné que VS Code est destiné à un usage autre que le développement directement sur nos grappes, l'exécution de plusieurs instances de VS Code Server sur différents nœuds de connexion peut entraîner des problèmes. Pour contourner ceci&nbsp;:
+
+* Connectez-vous à tous les nœuds de connexion et arrêtez (avec k<code>kill <PID></code>>) tous les processus VS Code que vous voyez dans la sortie de <code>ps aux | grep $USER</code> ou de <code>top -u $USER</code>.
+* Si le problème persiste, supprimez prudemment le contenu du répertoire code>~/.vscode-server</code>, puis reconnectez-vous pour refaire l’installation automatique de VS Code Server.
+
+* En août 2024, nous avons découvert un bogue dans l'extension Remote-SSH pour VS Code. Nous croyons que Secure Copy (SCP) ne fonctionne pas correctement. Comme il ne s'agit pas d'un de nos logiciels mais plutôt d'un produit de Microsoft, nous ferons ce qui nous est possible pour résoudre les problèmes. 
+
+Pour plus d'information sur le bogue, cliquez sur
+ https://github.com/microsoft/vscode-remote-release/issues/10174#issuecomment-2316629187
+
+Les solutions recommandées sont
+* utilisez la version VSCode 1.92 moins récente,
+
+* utilisez wget (https://github.com/microsoft/vscode-remote-release/issues/10174#issuecomment-2316093550) en ajoutant "remote.SSH.useCurlAndWgetConfigurationFiles: true" aux paramètres de Remote-SSH, ce qui remplace la fonction défectueuse de SCP,
+
+* utilisez l'extension "Remote Tunnels" en exécutant  'code tunnel' (sur Google, cherchez et téléchargez vscode cli). Avec github ou avec un compte Microsoft (OAuth), connectez-vous à un serveur vscode distant, par exemple à un nœud de connexion de Niagara. Pendant que le serveur est actif, vous n'aurez pas besoin de l'étape d'authentification multifacteur (voir [https://code.visualstudio.com/docs/remote/tunnels Developing with Remote Tunnels]).
+
+=Pour plus d'information=
+* Webinaire SHARCNET présenté par Armin Sobhani, <i>Remote Development on Clusters with VSCode</i>
+** [https://youtu.be/u9k6HikDyqk Part I]
+** [https://youtu.be/CsgBGpampvc Part II]
+* Tutoriel produit par deux de nos utilisateurs (visionnement en 720p recommandé)&nbsp;:
+** [https://youtu.be/1B0hiWaVcHY Connect VS Code to High-Performance Computing (HPC) Clusters]

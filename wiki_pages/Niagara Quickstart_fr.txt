@@ -1,0 +1,501 @@
+<languages /> 
+
+<span id="Specifications"></span>
+=Caractéristiques de la grappe=
+
+<div class="mw-translate-fuzzy">
+La grappe Niagara compte 1548 serveurs Lenovo SD350, chacun avec 40 cœurs Skylake de 2.4GHz.
+Sa performance de pointe est de 3.02 pétaflops (4.75 en théorie). En juin 2018, la grappe se classait au [https://www.top500.org/list/2018/06/?page=1 53e rang des 500 superordinateurs les plus performants].
+</div>    
+
+Chaque nœud de la grappe est de 188Gio/202Go dont un minimum de 4Gio par cœur. La grappe est conçue pour des tâches parallèles intensives avec un réseau InfiniBand EDR (''Enhanced Data Rate'') à topologie Dragonfly+ et routage dynamique. L'accès au nœuds de calcul se fait via un système de queues qui exécute des tâches d'une durée d'au moins 15 minutes et d'au plus 12 ou 24 heures en priorisant les tâches intensives.
+
+Visionnez [https://support.scinet.utoronto.ca/education/go.php/370/content.php/cid/1383/ la vidéo d'introduction à Niagara].
+
+Pour plus d'information sur les spécifications matérielles, consultez [[Niagara/fr| la page Niagara]].
+
+= Getting started on Niagara =
+
+<div class="mw-translate-fuzzy">
+Si vous êtes un nouvel utilisateur de SciNet et que vous appartenez à un groupe dont le chercheur principal ne dispose pas de ressources allouées par le concours d'allocation de ressources, vous devez [https://www.scinethpc.ca/getting-a-scinet-account/ obtenir un compte SciNet.]
+</div>  
+
+Please read this document carefully.  The [https://docs.scinet.utoronto.ca/index.php/FAQ FAQ] is also a useful resource.  If at any time you require assistance, or if something is unclear, please do not hesitate to [mailto:niagara@computecanada.ca contact us].
+
+<div class="mw-translate-fuzzy">
+= Se connecter =
+</div>
+
+# Via your browser with Open OnDemand. This is recommended for users who are not familiar with Linux or the command line. Please see our [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart quickstart guide] for more instructions on how to use Open OnDemand.
+# Terminal access with ssh. Please read the following instructions.
+
+Niagara runs CentOS 7, which is a type of Linux.  You will need to be familiar with Linux systems to work on Niagara.  If you are not it will be worth your time to review 
+the [[Linux introduction]] or to attend a local "Linux Shell" workshop. 
+
+<div class="mw-translate-fuzzy">
+Comme c'est le cas avec toutes les grappes de Calcul Canada et de SciNet, vous ne pouvez vous connecter que par SSH (''secure shell'').
+Ouvrez d'abord une fenêtre de terminal (par exemple avec [[Connecting with PuTTY/fr|PuTTY]] sous Windows ou [[Connecting with MobaXTerm/fr|MobaXTerm]]), puis connectez-vous avec SSH aux nœuds de connexion avec les informations d'identification pour votre compte Calcul Canada.
+</div> 
+
+Open a terminal window (e.g. [[Connecting with PuTTY|PuTTY]] on Windows or [[Connecting with MobaXTerm|MobaXTerm]]), then ssh into the Niagara login nodes with your CC credentials:
+
+<source lang="bash">
+$ ssh -i /path/to/ssh_private_key -Y MYCCUSERNAME@niagara.scinet.utoronto.ca</source>
+
+ou
+
+<source lang="bash">$ ssh -i /path/to/ssh_private_key -Y MYCCUSERNAME@niagara.computecanada.ca</source>
+
+Les tâches sont créées, éditées, compilées, préparées et soumises dans les nœuds de connexion.
+
+Ces nœuds de connexion ne font pas partie de la grappe Niagara, mais ils ont la même architecture et la même pile logicielle que les nœuds de calcul.
+
+Dans les commandes ci-dessus, <code>-Y</code> est optionnel, mais nécessaire pour ouvrir des fenêtres de lignes de commande sur votre serveur local.
+
+Pour utiliser les nœuds de calcul, il faut soumettre les tâches  en lot (''batch'') à l'ordonnanceur.
+
+Si vous ne pouvez vous connecter, vérifiez d'abord [https://docs.scinet.utoronto.ca l'état de la grappe].
+
+<div class="mw-translate-fuzzy">
+= Localisation de vos répertoires =
+</div>
+
+<span id="home_and_scratch"></span>
+== Répertoires /home et /scratch ==
+
+Pour localiser vos espaces /home et /scratch, utilisez
+
+<code>$HOME=/home/g/groupname/myccusername</code>
+
+<code>$SCRATCH=/scratch/g/groupname/myccusername</code>
+
+<div class="mw-translate-fuzzy">
+Par exemple,
+</div>
+<source lang="bash">nia-login07:~$ pwd
+/home/s/scinet/rzon
+nia-login07:~$ cd $SCRATCH
+nia-login07:rzon$ pwd
+/scratch/s/scinet/rzon</source>
+
+NOTE: home is read-only on compute nodes.
+
+<span id="project_and_archive"></span>
+== Espaces /project et /archive ==
+
+<div class="mw-translate-fuzzy">
+Les utilisateurs disposant de ressources allouées par le concours 2018 peuvent localiser leur répertoire projet avec
+</div>
+
+<code>$PROJECT=/project/g/groupname/myccusername</code>
+
+<code>$ARCHIVE=/archive/g/groupname/myccusername</code>
+
+<div class="mw-translate-fuzzy">
+NOTE : L'espace d'archivage n'est présentement disponible que sur [https://docs.scinet.utoronto.ca/index.php/HPSS HPSS].
+</div>
+
+'''''IMPORTANT : Mesure préventive '''''
+
+<div class="mw-translate-fuzzy">
+Puisque les chemins risquent de changer, utilisez plutôt les variables d'environnement (HOME, SCRATCH, PROJECT, ARCHIVE).
+</div>
+
+<span id="Storage_and_quotas"></span>
+=== Stockage et quotas ===
+
+You should familiarize yourself with the [[Data_management_at_Niagara#Purpose_of_each_file_system | various file systems]], what purpose they serve, and how to properly use them.  This table summarizes the various file systems.  See the [[Data_management_at_Niagara | Data management at Niagara]] page for more details.
+
+<div class="mw-translate-fuzzy">
+{| class="wikitable"
+!  
+! quota
+!align="right"| taille des blocs
+! durée
+! sauvegarde
+! sur nœuds de connexion
+! sur nœuds de calcul
+|-
+| $HOME
+| 100 Go
+|align="right"| 1 Mo
+| 
+| oui
+| oui
+| lecture seule
+|-
+| $SCRATCH
+| 25 To
+|align="right"| 16 Mo
+| 2 mois
+| non
+| oui
+| oui
+|-
+| $PROJECT
+| par groupe
+|align="right"| 16 Mo
+| 
+| oui
+| oui
+| oui
+|-
+| $ARCHIVE
+| par groupe
+|align="right"| 
+|
+| 2 copies
+| non
+| non
+|-
+| $BBUFFER
+| ?
+|align="right"| 1 Mo
+| très courte
+| non
+| ?
+| ?
+|}
+</div>
+
+=== Moving data to Niagara ===
+
+If you need to move data to Niagara for analysis, or when you need to move data off of Niagara, use the following guidelines:
+* If your data is less than 10GB, move the data using the login nodes.
+* If your data is greater than 10GB, move the data using the datamover nodes nia-datamover1.scinet.utoronto.ca and nia-datamover2.scinet.utoronto.ca .
+
+Details of how to use the datamover nodes can be found on the [[Data_management_at_Niagara#Moving_data | Data management at Niagara]] page.
+
+<span id="Loading_software_modules"></span>
+= Charger des modules =
+
+You have two options for running code on Niagara: use existing software, or [[Niagara_Quickstart#Compiling_on_Niagara:_Example | compile your own]].  This section focuses on the former.
+
+<div class="mw-translate-fuzzy">
+Mis à part les logiciels essentiels, les applications sont installées via des [[Utiliser des modules|modules]]. Les modules configurent les variables d'environnement (<code>PATH</code>, etc.). Ceci rend disponible plusieurs versions incompatibles d'un même paquet. Pour connaître les logiciels disponibles, utilisez <tt> module spider</tt>.
+</div>
+
+Common module subcommands are:
+<li><code>module load &lt;module-name&gt;</code>: use particular software</li>
+<li><code>module purge</code>: remove currently loaded modules</li>
+<li><code>module spider</code> (or <code>module spider &lt;module-name&gt;</code>): list available software packages</li>
+<li><code>module avail</code>: list loadable software packages</li>
+<li><code>module list</code>: list loaded modules</li>
+
+Along with modifying common environment variables, such as PATH, and LD_LIBRARY_PATH, these modules also create a SCINET_MODULENAME_ROOT environment variable, which can be used to access commonly needed software directories, such as /include and /lib.
+
+There are handy abbreviations for the module commands. <code>ml</code> is the same as <code>module list</code>, and <code>ml <module-name></code> is the same as <code>module load <module-name></code>.
+
+== Software stacks: NiaEnv and CCEnv ==
+
+<div class="mw-translate-fuzzy">
+Il y a en réalité deux environnements logiciels sur Niagara ː
+</div>
+
+<div class="mw-translate-fuzzy">
+<ol style="list-style-type: decimal;">
+<li><p>[[Modules specific to Niagara|La pile logicielle Niagara]] est spécifiquement adaptée à cette grappe. Elle est disponible par défaut, mais au besoin peut être chargée à nouveau avec </p>
+<source lang="bash">module load NiaEnv</source>.</li>
+<li><p>[[Available software|La pile logicielle usuelle des grappes d'usage général]] ([[Graham/fr|Graham]] et [[Cedar/fr|Cedar]]), compilée pour l'instant pour une génération précédente de CPU.  </p>
+<source lang="bash">module load CCEnv</source>
+<p>Pour charger les modules par défaut comme ceux de Cedar ou Graham, exécutez aussi <code>module load StdEnv</code>.</p></li></ol>
+</div>
+
+<span id="Tips_for_loading_software"></span>
+== Trucs pour le chargement de modules ==
+
+Il '''''n'est pas conseillé''''' de changer des modules dans votre .bashrc de Niagara. Dans certains cas, le comportement peut être très étrange. Au besoin, chargez plutôt les modules manuellement ou par un script distinct et chargez des modules requis pour l'exécution via le script de soumission de votre tâche.
+
+<div class="mw-translate-fuzzy">
+Voyez l'information sur les [https://docs.scinet.utoronto.ca/index.php/Bashrc_guidelines fichiers par défaut .bashrc et .bash_profile].
+</div>
+
+Instead, load modules by hand when needed, or by sourcing a separate script.
+
+Load run-specific modules inside your job submission script.
+
+Les noms courts sont pour les versions par défaut; par exemple, <code>intel</code> → <code>intel/2018.2</code>. Il est habituellement préférable de préciser la version pour pouvoir reproduire un cas.
+
+Certains modules requièrent le chargement préalable d'autres modules.
+
+Pour résoudre les dépendances, utilisez <code>module spider</code>.
+
+<span id="Available_compilers_and_interpreters"></span>
+= Compilateurs et interpréteurs =
+
+* For most compiled software, one should use the Intel compilers (<tt>icc</tt> for C, <tt>icpc</tt> for C++, and <tt>ifort</tt> for Fortran). Loading an <tt>intel</tt> module makes these available. 
+* The GNU compiler suite (<tt>gcc, g++, gfortran</tt>) is also available, if you load one of the <tt>gcc</tt> modules.
+* Open source interpreted, interactive software is also available:
+** [[Python]]
+** [[R]]
+** Julia
+** Octave
+  
+Please visit the [[Python]] or [[R]] page for details on using these tools.  For information on running MATLAB applications on Niagara, visit [[MATLAB| this page]].
+
+<span id="Using_Commercial_Software"></span>
+=  Applications du commerce =
+
+May I use commercial software on Niagara?
+
+<div class="mw-translate-fuzzy">
+* Vous devrez peut-être fournir votre propre licence.
+* SciNet et Compute Canada desservent des milliers d'utilisateurs de disciplines variées; il n'est pas possible d'accommoder toutes les applications préférées de chacun.
+* Ainsi, les seules applications du commerce installées sur Niagara sont d'ordre général, soit des compilateurs, des bibliothèques mathématiques et des outils de débogage. 
+* Ceci exclut Matlab, Gaussian, IDL. 
+* Des options ''open source'' sont disponibles, comme Octave, Python et R.
+* Nous vous aiderons à installer toute application du commerce pour laquelle vous détenez une licence.
+* Dans certains cas, si vous avez une licence, vous pouvez utiliser des applications de la pile logicielle de Calcul Canada.
+</div>
+
+<span id="Compiling_on_Niagara:_Example"></span>
+= Exemple de compilation =
+
+Nous voulons compiler une application à partir des deux fichiers source ''main.c'' et ''module.c'' qui utilisent GSL (Gnu Scientific Library). Nous pourrions procéder ainsi ː
+<source lang="bash">nia-login07:~$ module list
+Currently Loaded Modules:
+  1) NiaEnv/2018a (S)
+  Where:
+   S:  Module is Sticky, requires --force to unload or purge
+
+nia-login07:~$ module load intel/2018.2 gsl/2.4
+
+nia-login07:~$ ls
+appl.c module.c
+
+nia-login07:~$ icc -c -O3 -xHost -o appl.o appl.c
+nia-login07:~$ icc -c -O3 -xHost -o module.o module.c
+nia-login07:~$ icc  -o appl module.o appl.o -lgsl -mkl
+
+nia-login07:~$ ./appl
+</source>
+
+Note :
+* Les indicateurs d'optimisation <tt>-O3 -xHost</tt> permettent au compilateur Intel d'utiliser les instructions spécifiques à l'architecture CPU existante (plutôt que pour des CPU x86_64 plus génériques).
+* Il est facile de faire un lien avec cette bibliothèque quand on utilise le compilateur Intel; on n'a besoin que des indicateurs <tt>-mkl</tt>.
+* Pour compiler avec gcc, les indicateurs d'optimisation seraient <tt>-O3 -march=native</tt>. Pour faire un lien avec MKL, nous suggérons [https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor MKL link line advisor].
+
+<span id="Testing"></span>
+= Tests =
+
+Vous devriez toujours tester votre code avant de soumettre une tâche pour savoir s'il est valide et pour connaître les ressources dont vous avez besoin.
+
+<div class="mw-translate-fuzzy">
+<ul>
+<li><p>Les tâches de test courtes peuvent être exécutées sur les nœuds de connexion.</p>
+<p>En principe : quelques minutes, utilisant au plus 1-2Go de mémoire, quelques cœurs.</p></li>
+<li><p>Après <code>module load ddt</code>, vous pouvez lancer le débogueur ddt sur les nœuds de connexion.</p></li>
+<li><p>Les tests courts qui ne peuvent être exécutés sur un nœud de connexion ou qui nécessitent un nœud dédié requièrent un débogage interactif avec la commande salloc. <br />
+interactive debug job with the salloc command</p>
+<source lang="bash">nia-login07:~$ salloc -pdebug --nodes N --time=1:00:00</source>
+<p>où N est le nombre de nœuds. La session de débogage interactif ne doit pas dépasser une heure, ne doit pas utiliser plus de 4 cœurs et chaque utilisateur ne doit avoir qu'une session de débogage à la fois.</p>
+Une autre option est d'utiliser la commande
+<source lang="bash">nia-login07:~$ debugjob N</source>
+où N est le nombre de nœuds. Si N=1, la session interactive est d'une heure et si N=4 (valeur maximale) la session est de 30 minutes.
+</li></ul>
+</div>
+
+<span id="Submitting_jobs"></span>
+= Soumettre des tâches =
+
+<div class="mw-translate-fuzzy">
+<ul>
+<li><p>Niagara utilise l'ordonnanceur Slurm.</p></li>
+<li><p>À partir d'un nœud de connexion, les tâches sont soumises en passant un script à la commande sbatch :</p>
+<source lang="bash">nia-login07:~$ sbatch jobscript.sh</source></li>
+<li><p>Ceci place la tâche dans la queue; elle sera exécutée sur les nœuds de calcul à son tour. </p></li>
+<li><p>Les tâches seront comptabilisées contre l'allocation de Ressources pour les groupes de recherche; si le groupe n'a reçu aucune de ces ressources, la tâche sera comptabilisée contre le Service d'accès rapide  (autrefois ''allocation par défaut'').</p></li></ul>
+</div>
+
+Souvenez-vous ː
+
+<div class="mw-translate-fuzzy">
+<ul>
+<li><p>L'ordonnancement se fait par nœud, donc en multiples de 40 cœurs.</p></li>
+<li><p>La limite en temps réel ne doit pas dépasser 24 heures; pour les utilisateurs sans allocation, la limite est de 12 heures.</p></li>
+<li><p>L'écriture doit se faire dans votre répertoire ''scratch'' ou ''project'' (sur les nœuds de calcul, ''home'' est seulement en lecture).</p></li>
+<li><p>Les nœuds de calcul ne peuvent accéder à l'internet.</p>
+<p>Avant de commencer, téléchargez les données sur un nœud de connexion. </p></li></ul>
+</div>
+
+<div class="mw-translate-fuzzy">
+== Ordonnancement par nœud ==
+</div>
+
+<div class="mw-translate-fuzzy">
+<ul>
+<li><p>Toutes les requêtes de ressources pour les tâches sont ordonnancées en multiples de '''nœuds'''.</p></li>
+<li>Les nœuds utilisés par vos tâches sont à votre usage exclusif.
+<ul>
+<li>Aucun autre utilisateur n'y a accès.</li>
+<li>Vous pouvez accéder aux tâches avec SSH pour en faire le suivi.</li></ul>
+</li>
+<li><p>Peu importe votre requête, l'ordonnanceur la traduit en multiples de nœuds alloués à la tâche.</p></li>
+<li><p>Il est inutile de faire une requête pour une quantité de mémoire.</p>
+<p>Votre tâche obtient toujours Nx202Go de mémoire vive, où N représente le nombre de nœuds.</p></li>
+<li><p>Vous devriez essayer d'utiliser tous les cœurs des nœuds alloués à votre tâche. Puisqu'il y a 40 cœurs par nœud, votre tâche devrait utiliser Nx40 cœurs. Si ce n'est pas le cas, nous vous contacterons pour vous aider à optimiser votre travail.</p></li></ul>
+</div>
+
+<span id="Limits"></span>
+== Limites ==
+
+There are limits to the size and duration of your jobs, the number of jobs you can run and the number of jobs you can have queued.  It matters whether a user is part of a group with a [https://www.computecanada.ca/research-portal/accessing-resources/resource-allocation-competitions/ Resources for Research Group allocation] or not. It also matters in which 'partition' the jobs runs. 'Partitions' are SLURM-speak for use cases.  You specify the partition with the <tt>-p</tt> parameter to <tt>sbatch</tt> or <tt>salloc</tt>, but if you do not specify one, your job will run in the <tt>compute</tt> partition, which is the most common case. 
+
+{| class="wikitable"
+!Usage
+!Partition
+!Running jobs
+!Submitted jobs (incl. running)
+!Min. size of jobs
+!Max. size of jobs
+!Min. walltime
+!Max. walltime 
+|-
+|Compute jobs with an allocation||compute || 50 || 1000 || 1 node (40 cores) || 1000 nodes (40000 cores)|| 15 minutes || 24 hours
+|-
+|Compute jobs without allocation ("default")||compute || 50 || 200 || 1 node (40 cores) || 20 nodes (800 cores)|| 15 minutes || 24 hours
+|-
+|Testing or troubleshooting || debug || 1 || 1 || 1 node (40 cores) || 4 nodes (160 cores)|| N/A || 1 hour
+|-
+|Archiving or retrieving data in [https://docs.scinet.utoronto.ca/index.php/HPSS HPSS]|| archivelong || 2 per user (max 5 total) || 10 per user || N/A || N/A|| 15 minutes || 72 hours
+|-
+|Inspecting archived data, small archival actions in [https://docs.scinet.utoronto.ca/index.php/HPSS HPSS] || archiveshort || 2 per user|| 10 per user || N/A || N/A || 15 minutes || 1 hour
+|}
+
+Within these limits, jobs will still have to wait in the queue.  The waiting time depends on many factors such as the allocation amount, how much allocation was used in the recent past, the number of nodes and the walltime, and how many other jobs are waiting in the queue.
+
+== File Input/Output Tips ==
+
+It is important to understand the file systems, so as to perform your file I/O (Input/Output) responsibly.  Refer to the [[Data_management_at_niagara | Data management at Niagara]] page for details about the file systems.
+* Your files can be seen on all Niagara login and compute nodes.
+* $HOME, $SCRATCH, and $PROJECT all use the parallel file system called GPFS.
+* GPFS is a high-performance file system which provides rapid reads and writes to large data sets in parallel from many nodes.
+* Accessing data sets which consist of many, small files leads to poor performance on GPFS.
+* Avoid reading and writing lots of small amounts of data to disk.  Many small files on the system waste space and are slower to access, read and write.  If you must write many small files, use [https://docs.scinet.utoronto.ca/index.php/User_Ramdisk ramdisk].
+* Write data out in a binary format. This is faster and takes less space.
+* The [https://docs.scinet.utoronto.ca/index.php/Burst_Buffer Burst Buffer] is better for i/o heavy jobs and to speed up [https://docs.scinet.utoronto.ca/index.php/Checkpoints checkpoints].
+
+<span id="Example_submission_script_(MPI)"></span>
+<div class="mw-translate-fuzzy">
+== Exemple d'un script de soumission pour MPI ==
+Pour exécuter l'application [[MPI/fr|MPI]] nommée <tt>appl_mpi_ex</tt> avec 320 processus, le script serait ː
+</div>
+<source lang="bash">
+#!/bin/bash 
+#SBATCH --nodes=2
+#SBATCH --ntasks=80
+#SBATCH --time=1:00:00
+#SBATCH --job-name mpi_job
+#SBATCH --output=mpi_output_%j.txt
+#SBATCH --mail-type=FAIL
+ 
+cd $SLURM_SUBMIT_DIR
+ 
+module load intel/2018.2
+module load openmpi/3.1.0
+ 
+mpirun ./mpi_example
+# or "srun ./mpi_example"
+</source>
+<div class="mw-translate-fuzzy">
+Soumettez le script (nommé ici mpi_ex.sh) avec la commande 
+<source lang="bash">nia-login07:~$ sbatch mpi_ex.sh</source>
+<ul>
+<li><p>La première ligne mentionne qu'il s'agit d'un script bash.</p></li>
+<li><p>Les lignes qui commencent par <code>#SBATCH</code> sont pour l'ordonnanceur.</p></li>
+<li><p>sbatch interprète ces lignes comme étant une requête et la nomme <code>mpi_ex</code></p></li><li><p>Ici, l'ordonnanceur cherche 8 nœuds avec 40 cœurs pour exécuter 320 tâches, pour une durée d'une heure.</p></li>
+<li><p>Une fois le nœud trouvé, le script est exécuté ː</p>
+<ul>
+<li>redirige vers le répertoire de soumission;</li>
+<li>charge les modules;</li>
+<li>exécute l'application <code>appl_mpi_ex</code> avec mpirun (srun devrait aussi fonctionner).</li></ul>
+</li>
+<li>Pour utiliser la fonctionnalité hyperthreading, remplacez <tt>--ntasks=320</tt> par <tt>--ntasks=640</tt> et ajoutez <tt>--bind-to none</tt> à la commande mpirun (seulement avec avec OpenMPI et non IntelMPI).</li>
+</ul>
+</div>
+
+<ul>
+<li>First line indicates that this is a bash script.</li>
+<li>Lines starting with <code>#SBATCH</code> go to SLURM.</li>
+<li>sbatch reads these lines as a job request (which it gives the name <code>mpi_job</code>)</li>
+<li>In this case, SLURM looks for 2 nodes (each of which will have 40 cores) on which to run a total of 80 tasks, for 1 hour.<br>(Instead of specifying <tt>--ntasks=80</tt>, you can also ask for <tt>--ntasks-per-node=40</tt>, which amounts to the same.)</li>
+<li>Note that the mpifun flag "--ppn" (processors per node) is ignored.</li>
+<li>Once it found such a node, it runs the script:
+<ul>
+<li>Change to the submission directory;</li>
+<li>Loads modules;</li>
+<li>Runs the <code>mpi_example</code> application (SLURM will inform mpirun or srun on how many processes to run).
+</li>
+</ul>
+<li>To use hyperthreading, just change --ntasks=80 to --ntasks=160, and add --bind-to none to the mpirun command (the latter is necessary for OpenMPI only, not when using IntelMPI).
+</ul>
+
+<span id="Example_submission_script_(OpenMP)"></span>
+== Exemple d'un script de soumission pour OpenMP ==
+
+<source lang="bash">#!/bin/bash
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=40
+#SBATCH --time=1:00:00
+#SBATCH --job-name openmp_job
+#SBATCH --output=openmp_output_%j.txt
+#SBATCH --mail-type=FAIL
+ 
+cd $SLURM_SUBMIT_DIR
+ 
+module load intel/2018.2
+ 
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+ 
+./openmp_example
+# or "srun ./openmp_example".
+</source>
+<div class="mw-translate-fuzzy">
+Soumettez le script (nommé openmp_ex.sh) avec la commande <source lang="bash">nia-login07:~$ sbatch openmp_ex.sh</source>
+* La première ligne mentionne qu'il s'agit d'un script bash.
+* Les lignes qui commencent par <code>#SBATCH</code> sont pour l'ordonnanceur.
+* sbatch interprète ces lignes comme étant une requête et la nomme <code>openmp_ex</code>.
+* L'ordonnanceur cherche alors un nœud de 40 cœurs à exécuter dans une tâche, pour une durée d'une heure.
+* Une fois le nœud trouvé, le script est exécuté:
+** redirige vers le répertoire de soumission;
+** charge les modules (doit être fait aussi dans le script de soumission sur Niagara);
+** configure une variable d'environnement pour spécifier 40 fils (il n'y a pas de hyperthreading dans cet exemple);
+** exécute l'application  <code>appl_openmp_ex</code>.
+* Pour utiliser la fonctionnalité hyperthreading, remplacez <tt>--cpus-per-task=40</tt> par <tt>--cpus-per-task=80</tt>.
+</div>
+
+<span id="Monitoring_queued_jobs"></span>
+== Suivi des tâches en attente ==
+
+Une fois la tâche placée dans la queue, suivez son déroulement avec les commandes suivantes ː
+
+<div class="mw-translate-fuzzy">
+<ul>
+<li><p><code>squeue</code> ou <code>qsum</code> pour voir les tâches dans la queue (<code>squeue -u $USER</code> pour vos propres tâches);</p></li>
+<li><p><code>squeue -j JOBID</code> pour des renseignements sur une tâche en particulier</p>
+<p>(ou la version plus longue <code>scontrol show job JOBID</code>);</p></li>
+<li><p><code>squeue --start -j JOBID</code> pour une estimation de quand la tâche sera exécutée (le résultat n'est pas toujours fiable);</p></li>
+<p>
+Puisque ceci n'est pas très précis, vous pourriez vouloir savoir où se trouve votre tâche dans la queue avec la fonction bash suivante ː
+</div>
+
+<div class="mw-translate-fuzzy">
+Pour en savoir plus, consultez [[Running jobs/fr|Exécuter des tâches]].
+</div>
+
+= Visualisation =
+Pour savoir comment utiliser les outils de visualisation de Niagara, consultez [https://docs.scinet.utoronto.ca/index.php/Visualization cette page du wiki SciNet].
+
+<span id="Further_information"></span>
+= Pour plus d'information =
+
+'''Sites'''
+
+* SciNet : https://www.scinet.utoronto.ca
+* Niagara : [[Niagara/fr|page wiki Niagara]]
+* État du système : https://docs.scinet.utoronto.ca/index.php/Main_Page
+* Formation : https://support.scinet.utoronto.ca/education
+
+<b>Assistance</b>
+Contactez notre [[Technical support/fr | soutien technique]]

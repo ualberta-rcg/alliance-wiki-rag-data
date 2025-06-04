@@ -1,0 +1,212 @@
+<languages />
+[https://www.nextflow.io Nextflow] est un logiciel permettant d'exécuter des flux de travail scientifiques reproductibles. Le terme <i>Nextflow</i> est utilisé pour décrire à la fois le langage spécifique au domaine (DSL) dans lequel les pipelines sont écrits et le logiciel utilisé pour interpréter ces flux de travail.
+
+
+== Utilisation ==
+Chargez le module Nextflow avec <code>module load nextflow</code>.
+
+Bien que vous puissiez créer votre propre flux de travail, vous pouvez également utiliser les pipelines  [https://nf-co.re/ nf-core] qui sont publiés. Nous décrivons ici une configuration simple qui vous permettra d'exécuter des pipelines nf-core sur nos systèmes et vous aidera à configurer correctement Nextflow pour vos propres pipelines.
+
+Dans notre exemple, nous utilisons le pipeline  <code>nf-core/smrnaseq</code>. 
+
+==== Installation ====
+Cette procédure doit être exécutée sur un nœud de connexion. 
+
+Installez d'abord un paquet pip pour aider à la configuration; veuillez noter que les outils nf-core peuvent prendre beaucoup de temps à installer.
+<source lang="bash">
+module purge # assurez-vous que les modules déjà chargés ne polluent pas l'installation 
+module load python/3.11
+module load rust # sans rust, les installations nf-core se termineront en erreur
+module load postgresql # PostgresSQL ne sera pas utilisé ici mais certains modules Python qui ont psycopg2 comme dépendance pourraient planter
+python -m venv nf-core-env
+source nf-core-env/bin/activate
+python -m pip install nf_core==2.13
+</source>
+
+Entrez le nom du pipeline à tester et chargez Nextflow et [[Apptainer/fr|Apptainer]] (Apptainer est le successeur de [[Singularity/fr|Singularity]]). Nextflow s'intègre bien à Apptainer. 
+<source lang="bash">
+export NFCORE_PL=smrnaseq
+export PL_VERSION=2.3.1
+module load nextflow/23
+module load apptainer/1
+</source>
+Une étape importante consiste à télécharger toutes les images Apptainer qui seront utilisées pour exécuter le pipeline, en même temps que nous téléchargeons le flux de travail lui-même. Si cela n'est pas fait, Nextflow essaiera de télécharger les images à partir des nœuds de calcul, juste avant l'exécution des étapes. Cela ne fonctionnera pas sur la plupart de nos grappes car il n'y a pas de connexion internet sur les nœuds de calcul.
+
+Créez un dossier dans lequel les images seront stockées et configurez la variable d'environnement <code>NXF_SINGULARITY_CACHEDIR</code> pour y pointer. Les images des flux de travail sont souvent volumineuses; ne les stockez donc pas dans votre espace $HOME car son quota est limité. Stockez-les plutôt dans l'espace <code>/project</code>. 
+<source lang="bash">
+mkdir /project/<def-group>/NXF_SINGULARITY_CACHEDIR
+export NXF_SINGULARITY_CACHEDIR=/project/<def-group>/NXF_SINGULARITY_CACHEDIR
+</source>
+
+Partagez ce dossier avec les membres de votre groupe qui utiliseront Nextflow avec Apptainer, afin de réduire la duplication.
+De plus, vous pouvez ajouter la commande <code>export</code> à votre <code>~/.bashrc</code> pour plus de commodité.
+
+La commande suivante télécharge le pipeline <code>smrnaseq</code> dans votre répertoire /scratch et place toutes les images dans le répertoire cache.
+
+<source lang="bash">
+cd ~/scratch
+nf-core download   --container-cache-utilisation amend --container-system  singularity   --compress none -r ${PL_VERSION}  -p 6  ${NFCORE_PL}
+# Alteratively, you can run the download tool in interactive mode
+nf-core download
+# Here is what your Singularity image cache will look like after completion:
+ls  $NXF_SINGULARITY_CACHEDIR/
+depot.galaxyproject.org-singularity-bioconvert-1.1.1--pyhdfd78af_0.img
+depot.galaxyproject.org-singularity-blat-36--0.img
+depot.galaxyproject.org-singularity-bowtie-1.3.1--py310h7b97f60_6.img
+depot.galaxyproject.org-singularity-bowtie2-2.4.5--py39hd2f7db1_2.img
+depot.galaxyproject.org-singularity-fastp-0.23.4--h5f740d0_0.img
+depot.galaxyproject.org-singularity-fastqc-0.12.1--hdfd78af_0.img
+depot.galaxyproject.org-singularity-fastx_toolkit-0.0.14--hdbdd923_11.img
+depot.galaxyproject.org-singularity-mirdeep2-2.0.1.3--hdfd78af_1.img
+depot.galaxyproject.org-singularity-mirtrace-1.0.1--hdfd78af_1.img
+depot.galaxyproject.org-singularity-mulled-v2-0c13ef770dd7cc5c76c2ce23ba6669234cf03385-63be019f50581cc5dfe4fc0f73ae50f2d4d661f7-0.img
+depot.galaxyproject.org-singularity-mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1-f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0.img
+depot.galaxyproject.org-singularity-mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3-40128b496751b037e2bd85f6789e83d4ff8a4837-0.img
+depot.galaxyproject.org-singularity-multiqc-1.21--pyhdfd78af_0.img
+depot.galaxyproject.org-singularity-pigz-2.3.4.img
+depot.galaxyproject.org-singularity-r-data.table-1.12.2.img
+depot.galaxyproject.org-singularity-samtools-1.19.2--h50ea8bc_0.img
+depot.galaxyproject.org-singularity-seqcluster-1.2.9--pyh5e36f6f_0.img
+depot.galaxyproject.org-singularity-seqkit-2.6.1--h9ee0642_0.img
+depot.galaxyproject.org-singularity-ubuntu-20.04.img
+depot.galaxyproject.org-singularity-umicollapse-1.0.0--hdfd78af_1.img
+depot.galaxyproject.org-singularity-umi_tools-1.1.5--py39hf95cd2a_0.img
+quay.io-singularity-bioconvert-1.1.1--pyhdfd78af_0.img
+quay.io-singularity-blat-36--0.img
+quay.io-singularity-bowtie-1.3.1--py310h7b97f60_6.img
+quay.io-singularity-bowtie2-2.4.5--py39hd2f7db1_2.img
+quay.io-singularity-fastp-0.23.4--h5f740d0_0.img
+quay.io-singularity-fastqc-0.12.1--hdfd78af_0.img
+quay.io-singularity-fastx_toolkit-0.0.14--hdbdd923_11.img
+quay.io-singularity-mirdeep2-2.0.1.3--hdfd78af_1.img
+quay.io-singularity-mirtrace-1.0.1--hdfd78af_1.img
+quay.io-singularity-mulled-v2-0c13ef770dd7cc5c76c2ce23ba6669234cf03385-63be019f50581cc5dfe4fc0f73ae50f2d4d661f7-0.img
+quay.io-singularity-mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1-f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0.img
+quay.io-singularity-mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3-40128b496751b037e2bd85f6789e83d4ff8a4837-0.img
+quay.io-singularity-multiqc-1.21--pyhdfd78af_0.img
+quay.io-singularity-pigz-2.3.4.img
+quay.io-singularity-r-data.table-1.12.2.img
+quay.io-singularity-samtools-1.19.2--h50ea8bc_0.img
+quay.io-singularity-seqcluster-1.2.9--pyh5e36f6f_0.img
+quay.io-singularity-seqkit-2.6.1--h9ee0642_0.img
+quay.io-singularity-ubuntu-20.04.img
+quay.io-singularity-umicollapse-1.0.0--hdfd78af_1.img
+quay.io-singularity-umi_tools-1.1.5--py39hf95cd2a_0.img
+singularity-bioconvert-1.1.1--pyhdfd78af_0.img
+singularity-blat-36--0.img
+singularity-bowtie-1.3.1--py310h7b97f60_6.img
+singularity-bowtie2-2.4.5--py39hd2f7db1_2.img
+singularity-fastp-0.23.4--h5f740d0_0.img
+singularity-fastqc-0.12.1--hdfd78af_0.img
+singularity-fastx_toolkit-0.0.14--hdbdd923_11.img
+singularity-mirdeep2-2.0.1.3--hdfd78af_1.img
+singularity-mirtrace-1.0.1--hdfd78af_1.img
+singularity-mulled-v2-0c13ef770dd7cc5c76c2ce23ba6669234cf03385-63be019f50581cc5dfe4fc0f73ae50f2d4d661f7-0.img
+singularity-mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1-f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0.img
+singularity-mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3-40128b496751b037e2bd85f6789e83d4ff8a4837-0.img
+singularity-multiqc-1.21--pyhdfd78af_0.img
+singularity-pigz-2.3.4.img
+singularity-r-data.table-1.12.2.img
+singularity-samtools-1.19.2--h50ea8bc_0.img
+singularity-seqcluster-1.2.9--pyh5e36f6f_0.img
+singularity-seqkit-2.6.1--h9ee0642_0.img
+singularity-ubuntu-20.04.img
+singularity-umicollapse-1.0.0--hdfd78af_1.img
+singularity-umi_tools-1.1.5--py39hf95cd2a_0.img
+</source>
+
+Ce flux de travail télécharge 18 conteneurs pour un total d'environ 4Go et crée le dossier <code>nf-core-${NFCORE_PL}_${PL_VERSION}</code> avec les sous-dossiers <code>X_X_X</code> et <code>config</code>. Le sous-dossier <code>config</code> inclut la [https://github.com/nf-core/configs configuration pour votre établissement], tandis que le flux de travail se trouve dans l'autre sous-dossier.
+
+Un pipeline type nf-code ressemble à ceci&nbsp;:
+<source lang="bash">
+ls nf-core-${NFCORE_PL}_${PL_VERSION}/2_3_1
+assets        CITATIONS.md        docs     modules          nextflow_schema.json  subworkflows
+bin           CODE_OF_CONDUCT.md  LICENSE  modules.json     pyproject.toml        tower.yml
+CHANGELOG.md  conf                main.nf  nextflow.config  README.md             workflows
+</source>
+
+Quand le pipeline est prêt à être lancé, Nextflow examine le fichier <code>nextflow.config</code> dans ce répertoire ainsi que le fichier <code>~/.nextflow/config</code> dans /home  (s'il existe) pour contrôler l'exécution du flux de travail. Les pipelines nf-core ont tous une configuration par défaut, une configuration de test et des configurations de conteneur (singularité, podman, etc.). Vous devrez aussi fournir une configuration personnalisée pour la grappe (Narval, Béluga, Cedar ou Graham) sur laquelle les pipelines sont exécutés; une configuration simple se trouve dans la section suivante. Les pipelines Nextflow peuvent également s'exécuter sur [[Niagara/fr Niagara]] s'ils ont été conçus expressément pour cette grappe, mais nous vous déconseillons généralement d'exécuter tout pipeline Nextflow sur Niagara.
+
+==== Configuration pour nos grappes ====
+
+Vous pouvez utiliser la configuration suivante en modifiant la valeur par défaut des processus nf-core et en entrant les informations appropriées pour la grappe [[Béluga]] ou [[Narval]]. Cette configuration est enregistrée dans un bloc de profil qui sera chargé lors de l'exécution. 
+{{File
+  |name=~/.nextflow/config
+  |lang="config"
+  |contents=
+
+params {
+    config_profile_description = 'Alliance HPC config'
+    config_profile_contact = 'https://docs.alliancecan.ca/wiki/Technical_support'
+    config_profile_url = 'docs.alliancecan.ca/wiki/Nextflow'
+}
+
+
+singularity {
+  enabled = true
+  autoMounts = true
+}
+
+apptainer {
+  autoMounts = true
+}
+
+process {
+  executor = 'slurm' 
+  clusterOptions = '--account=<my-account>'
+  maxRetries = 1
+  errorStrategy = { task.exitStatus in [125,139] ? 'retry' : 'finish' }
+  memory = { check_max( 4.GB * task.attempt, 'memory' ) }
+  cpu = 1  
+  time = '3h' 
+}
+
+executor {
+  pollInterval = '60 sec'
+  submitRateLimit = '60/1min'
+  queueSize = 100 
+}
+
+profiles {
+  beluga {
+    max_memory='186G'
+    max_cpu=40
+    max_time='168h'
+  }
+  narval {
+    max_memory='249G'
+    max_cpu=64
+    max_time='168h'
+  }
+}
+}}
+Remplacez <code><my-account></code> par votre propre compte qui est semblable à <code>def-pname</code>.
+Le bit <code>singularity.autoMounts = true</code> fait en sorte que tous les systèmes de fichiers (<code>/project</code>, <code>/scratch</code>, <code>/home</code> & <code>/localscratch</code>) seront correctement montés à l'intérieur du conteneur Singularity.
+
+Cette configuration garantit qu'il n'y a pas plus de 100 tâches dans la file d'attente Slurm et que seules 60 tâches sont soumises par minute. Elle indique que les nœuds de calcul Béluga ont 40 cœurs et 186 Go de RAM avec un temps réel maximum d'exécution d'une semaine (168 heures).
+
+La configuration est liée au système sur lequel se fait l'exécution, mais elle est également liée au pipeline lui-même. Par exemple, ici <code>cpu = 1</code> est la valeur par défaut, mais certaines étapes du pipeline peuvent en utiliser plus. Cela peut devenir assez compliqué et les étiquettes dans le fichier <code>nf-core-smrnaseq_2.3.1/2_3_1/conf/base.config</code> sont utilisées par le pipeline à l'interne pour identifier une étape avec une configuration autre que celle par défaut. Nous n'abordons pas ce sujet ici, mais sachez qu'en modifiant ces étiquettes, vous pourriez observer des différences importantes dans le temps de mise en file d'attente et le temps d'exécution du pipeline.
+
+Si les tâches échouent avec les codes de retour 125 (<i>out of memory</i>) ou 139 (<i>omm killed because the process used more memory than what was allowed by cgroup</i>), les lignes <code >process.errorStrategy</code> et <code>process.memory</code> dans la configuration garantissent qu'elles sont automatiquement redémarrées avec 4Go de RAM supplémentaires.
+
+====Exécution du pipeline====
+
+Utilisez les deux profils fournis par nf-core (<i>test</i> our le'ensemble de données de test et <i>singularity</i> pour le conteneur) et le profil que nous venons de créer pour Béluga. Notez que Nextflow est principalement écrit en Java et a tendance à utiliser beaucoup de mémoire virtuelle. Sur Narval, cela ne posera pas de problème, mais avec le nœud de connexion de Béluga, vous devrez modifier la mémoire virtuelle pour exécuter la plupart des flux de travail. Pour définir la limite de mémoire virtuelle à 40Go, utilisez la commande <code>ulimit -v 40000000</code>. Nous suggérons aussi d'utiliser un [[Prolonging_terminal_sessions/fr#Multiplexeur_de_terminal|multiplexeur de terminal]], de sorte que le pipeline Nextflow fonctionnera toujours si vous êtes déconnecté, et vous pourrez ensuite vous reconnecter au processus du multiplexeur. Notez que l'exécution de Nextflow est facile sur les nœuds de connexion de Béluga et Narval, mais plus difficile sur Graham et Cedar puisque la limite de mémoire virtuelle des nœuds de connexion ne peut pas être modifiée sur ces grappes; nous vous recommandons de lancer Nextflow à partir d'un nœud de calcul, où la mémoire virtuelle n'est jamais limitée.
+<source lang="bash">
+nextflow run nf-core-${NFCORE_PL}_${PL_VERSION}/2_3_1/  -profile test,singularity,narval  --outdir ${NFCORE_PL}_OUTPUT
+</source>
+Remarque : Si votre répertoire <code>~/.aws</code> contient une configuration AWS, Nextflow pourrait vous avertir que l'ensemble de données pour le test du pipeline ne peut pas être téléchargé avec vos identifiants par défaut. 
+
+Nextflow est maintenant démarré sur le nœud de connexion. Ceci achemine les tâches à l'ordonnanceur Slurm quand elles sont prêtes à être traitées. 
+
+Vous pouvez voir la progression du pipeline. Il est aussi possible d'ouvrir une nouvelle session sur la grappe ou de vous détacher de la session tmux pour voir les tâches dans la file d'attente Slurm avec <code>squeue -u $USER</code> ou <code>sq</code>.
+
+====Problèmes connus====
+
+Des erreurs <code>SIGBUS</code> du processus principal de Nextflow ont été signalées.
+Nous soupçonnons que c'est à cause des problèmes Nextflow suivants&nbsp;:
+  * https://github.com/nextflow-io/nextflow/issues/842
+  * https://github.com/nextflow-io/nextflow/issues/2774
+Le fait de définir la variable d'environnement <code>NXF_OPTS="-Dleveldb.mmap=false"</code> à l'exécution de <code>nextflow</code> semble résoudre le problème.
+
+[[Category:Software]]

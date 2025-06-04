@@ -1,0 +1,379 @@
+<languages />
+[[Category:Software]]
+__FORCETOC__
+<translate>
+= Client-server visualization = <!--T:1-->
+
+<!--T:2-->
+'''NOTE 1:''' An important setting in ParaView's preferences is ''Render View -> Remote/Parallel Rendering Options -> Remote Render Threshold.'' If you set it to default (20MB) or similar, small rendering will be done on your computer's GPU, the rotation with a mouse will be fast, but anything modestly intensive (under 20MB) will be shipped to your computer and (depending on your connection) visualization might be slow. If you set it to 0MB, all rendering will be remote including rotation, so you will really be using the cluster resources for everything, which is good for large data processing but not so good for interactivity. Experiment with the threshold to find a suitable value.
+
+<!--T:3-->
+'''NOTE 2:''' ParaView requires the same major version on the local client and the remote host; this prevents incompatibility that typically shows as a failed handshake when establishing the client-server connection. For example, to use ParaView server version 5.10.0 on the cluster, you need client version 5.10.x on your computer.
+
+<!--T:4-->
+Please use the tabs below to select the remote system.
+
+<!--T:5-->
+<tabs>
+
+<tab name="Cedar,Graham,Béluga,Narval">
+== Client-server visualization on Cedar, Graham, Béluga and Narval == <!--T:6-->
+
+<!--T:91-->
+On [[Cedar]], [[Graham]], [[Béluga/en|Béluga]] and [[Narval/en|Narval]], you can do client-server rendering on both CPUs (in software) and GPUs (hardware acceleration). Due to additional complications with GPU rendering, we strongly recommend starting with CPU-only visualization, allocating as many cores as necessary to your rendering. The easiest way to estimate the number of necessary cores is to look at the amount of memory that you think you will need for your rendering and divide it by ~3.5 GB/core. For example, a 40GB dataset (that you load into memory at once, e.g. a single timestep) would require at least 12 cores just to hold the data. Since software rendering is CPU-intensive, we do not recommend allocating more than 4GB/core. In addition, it is important to allocate some memory for filters and data processing (e.g. a structured to unstructured dataset conversion will increase your memory footprint by ~3X); depending on your workflow, you may want to start this rendering with 32 cores or 64 cores. If your ParaView server gets killed when processing these data, you will need to increase the number of cores.
+
+=== CPU-based visualization === <!--T:10-->
+
+<!--T:11-->
+You can also do interactive client-server ParaView rendering on cluster CPUs. For some types of rendering, modern CPU-based libraries such as OSPRay and OpenSWR offer performance quite similar to GPU-based rendering. Also, since the ParaView server uses MPI for distributed-memory processing, for very large datasets one can do parallel rendering on a large number of CPU cores, either on a single node, or scattered across multiple nodes.
+
+<!--T:12-->
+1. First, install on your computer the same ParaView version as the one available on the cluster you will be using; log into Cedar or Graham and start a serial CPU interactive job.
+
+<!--T:13-->
+{{Command|salloc --time{{=}}1:00:0 --ntasks{{=}}1 --mem-per-cpu{{=}}3600 --account{{=}}def-someprof}}
+
+<!--T:14-->
+:The job should automatically start on one of the CPU interactive nodes.
+
+<!--T:15-->
+2. At the prompt that is now running inside your job, load the offscreen ParaView module and start the server.
+
+<!--T:16-->
+{{Command|module load paraview/5.13.1}}
+and then
+{{Command|pvserver --force-offscreen-rendering
+|result=
+Waiting for client...
+Connection URL: cs://cdr774.int.cedar.computecanada.ca:11111
+Accepting connection(s): cdr774.int.cedar.computecanada.ca:11111
+}}
+
+<!--T:17-->
+:Wait for the server to be ready to accept client connection.
+
+<!--T:18-->
+3. Make a note of the node (in this case cdr774) and the port (usually 11111) and in another terminal on your computer (on Mac/Linux; in Windows use a terminal emulator) link the port 11111 on your computer and the same port on the compute node (make sure to use the correct compute node).
+
+<!--T:19-->
+{{Command|prompt=[name@computer $]|ssh <username>@cedar.computecanada.ca -L 11111:cdr774:11111}}
+
+<!--T:20-->
+4. Start ParaView on your computer, go to ''File -> Connect'' (or click on the green ''Connect'' button in the toolbar) and click on ''Add Server.'' You will need to point ParaView to your local port 11111, so you can do something like name = cedar, server type = Client/Server, host = localhost, port = 11111; click ''Configure'', select ''Manual'' and click ''Save.''
+:Once the remote is added to the configuration, simply select the server from the list and click on ''Connect.'' The first terminal window that read ''Accepting connection'' will now read ''Client connected.''
+
+<!--T:21-->
+5. Open a file in ParaView (it will point you to the remote filesystem) and visualize it as usual.
+
+<!--T:22-->
+'''NOTE:''' An important setting in ParaView's preferences is ''Render View -> Remote/Parallel Rendering Options -> Remote Render Threshold.'' If you set it to default (20MB) or similar, small rendering will be done on your computer's GPU, the rotation with a mouse will be fast, but anything modestly intensive (under 20MB) will be shipped to your computer and (depending on your connection) visualization might be slow. If you set it to 0MB, all rendering will be remote including rotation, so you will really be using the cluster resources for everything, which is good for large data processing but not so good for interactivity. Experiment with the threshold to find a suitable value.
+<br>
+
+<!--T:103-->
+If you want to do parallel rendering on multiple CPUs, start a parallel job; don't forget to specify the correct maximum walltime limit.
+
+<!--T:24-->
+{{Command|salloc --time{{=}}0:30:0 --ntasks{{=}}8 --mem-per-cpu{{=}}3600 --account{{=}}def-someprof}}
+
+<!--T:25-->
+Start the ParaView server with <code>srun</code>.
+
+<!--T:26-->
+{{Commands
+|module load paraview-offscreen/5.13.1
+|srun pvserver --force-offscreen-rendering
+}}
+
+<!--T:28-->
+To check that you are doing parallel rendering, you can pass your visualization through the Process Id Scalars filter and then colour it by "process id".
+
+=== GPU-based ParaView visualization === <!--T:29-->
+
+<!--T:30-->
+Cedar and Graham have a number of interactive GPU nodes that can be used for remote client-server visualization.
+
+<!--T:31-->
+1. First, install on your computer the same version as the one available on the cluster you will be using; log into Cedar or Graham and start a serial GPU interactive job.
+
+<!--T:32-->
+{{Command|salloc --time{{=}}1:00:0 --ntasks{{=}}1 --mem-per-cpu{{=}}3600 --gres{{=}}gpu:1 --account{{=}}def-someprof}}
+
+<!--T:33-->
+:The job should automatically start on one of the GPU interactive nodes.
+2.  At the prompt that is now running inside your job, load the ParaView GPU+EGL module, change your display variable so that ParaView does not attempt to use the X11 rendering context, and start the ParaView server.
+
+<!--T:34-->
+{{Commands
+|module load paraview/5.13.1
+|unset DISPLAY
+}}
+{{Command|pvserver
+|result=
+Waiting for client...
+Connection URL: cs://cdr347.int.cedar.computecanada.ca:11111
+Accepting connection(s): cdr347.int.cedar.computecanada.ca:11111
+}}
+
+<!--T:35-->
+:Wait for the server to be ready to accept client connection.
+
+<!--T:36-->
+3. Make a note of the node (in this case ''cdr347'') and the port (usually 11111) and in another terminal on your computer (on Mac/Linux; in Windows use a terminal emulator), link the port 11111 on your computer and the same port on the compute node (make sure to use the correct compute node).
+
+<!--T:37-->
+{{Command|prompt=[name@computer $]|ssh <username>@cedar.computecanada.ca -L 11111:cdr347:11111}}
+
+<!--T:38-->
+4. Start ParaView on your computer, go to ''File -> Connect'' (or click on the green ''Connect'' button on the toolbar) and click on ''Add Server.'' You will need to point ParaView to your local port 11111, so you can do something like name = cedar, server type = Client/Server, host = localhost, port = 11111; click on ''Configure'', select ''Manual'' and click on ''Save.''
+:Once the remote is added to the configuration, simply select the server from the list and click on ''Connect.'' The first terminal window that read ''Accepting connection'' will now read ''Client connected.''
+
+<!--T:39-->
+5. Open a file in ParaView (it will point you to the remote filesystem) and visualize it as usual.
+
+=== Rendering with NVIDIA's IndeX plugin === <!--T:100-->
+
+<!--T:101-->
+NVIDIA IndeX is a 3D volumetric interactive renderer on NVIDIA GPUs enabled as a ParaView server plugin. To use IndeX, connect via client-server to ParaView 5.10 (provided by paraview-offscreen-gpu/5.10.0) running inside an interactive GPU job as described above. Then in your client go to Tools | Manage Plugins and enable the <code>pvNVIDIAIndeX</code> plugin first locally and then remotely. Loading it locally might not be necessary on all platforms, but we saw a bug in several configurations where ParaView server would crash if the local plugin was not selected first. After enabling the plugin, load your dataset and in the Representation drop-down menu select NVIDIA Index.
+
+<!--T:102-->
+Our license lets you run NVIDIA IndeX in parallel on multiple GPUs, however parallel speedup is far from perfect. Before doing any production rendering with IndeX on multiple GPUs, please test your parallel scaling and verify that using more than one GPU leads to better performance for your dataset, otherwise use a single GPU.
+
+</tab>
+<tab name="Niagara">
+== Client-server visualization on Niagara== <!--T:40-->
+
+<!--T:42-->
+Niagara does not have GPUs, therefore, you are limited to software rendering. With ParaView, you need to explicitly specify one of the mesa flags to tell it to not use OpenGL hardware acceleration, e.g.
+
+<!--T:43-->
+{{Commands
+|module load paraview
+|paraview --mesa-swr
+}}
+
+<!--T:44-->
+or use one of the flags below.
+
+<!--T:45-->
+To access [https://docs.scinet.utoronto.ca/index.php/Niagara_Quickstart#Testing interactive resources on Niagara], you will need to start a <code>debugjob</code>. Here are the steps:
+
+<!--T:46-->
+<ol>
+<li> Launch an interactive job (debugjob).</li>
+
+<!--T:47-->
+{{Command|debugjob}}
+
+<!--T:48-->
+<li> After getting a compute node, let's say niaXYZW, load the ParaView module and start a ParaView server.</li>
+
+<!--T:49-->
+{{Command
+|module load paraview
+|pvserver --mesa-swr-ax2
+}}
+
+<!--T:50-->
+The <code>--mesa-swr-avx2</code> flag has been reported to offer faster software rendering using the OpenSWR library.
+
+<!--T:51-->
+<li> Now, you have to wait a few seconds for the server to be ready to accept client connections.</li>
+
+<!--T:52-->
+{{Command|prompt=|Waiting for client...
+ Connection URL: cs://niaXYZW.scinet.local:11111
+ Accepting connection(s): niaXYZW.scinet.local:11111
+}}
+
+<!--T:53-->
+<li> Open a new terminal without closing your debugjob, and SSH into Niagara using the following command:</li>
+
+<!--T:54-->
+{{Command|prompt=[name@computer $]|ssh YOURusername@niagara.scinet.utoronto.ca -L11111:niaXYZW:11111 -N}}
+
+<!--T:55-->
+this will establish a tunnel mapping the port 11111 in your computer (<code>localhost</code>) to the port 11111 on the Niagara's compute node, <code>niaXYZW</code>, where the ParaView server will be waiting for connections.
+
+<!--T:56-->
+<li> Start ParaView on your local computer, go to ''File -> Connect'' and click on ''Add Server.''
+You will need to point ParaView to your local port <code>11111</code>, so you can do something like</li>
+ name = niagara
+ server type = Client/Server
+ host = localhost
+ port = 11111
+then click on ''Configure'', select ''Manual'' and click on ''Save.''
+
+<!--T:57-->
+<li> Once the remote server is added to the configuration, simply select the server from the list and click on ''Connect.''
+The first terminal window that read <code>Accepting connection...</code> will now read <code>Client connected</code>.
+
+<!--T:58-->
+<li> Open a file in ParaView (it will point you to the remote filesystem) and visualize it as usual.
+
+<!--T:59-->
+</ol>
+
+=== Multiple CPUs === <!--T:60-->
+
+<!--T:61-->
+For performing parallel rendering using multiple CPUs, <code>pvserver</code> should be run using <code>srun</code>, i.e. either submit a job script or request a job using
+
+<!--T:62-->
+{{Commands
+|salloc --ntasks{{=}}N*40 --nodes{{=}}N --time{{=}}1:00:00
+|module load paraview
+|srun pvserver --mesa
+}}
+
+<!--T:63-->
+:where you need to replace <code>N</code> with the number of nodes and <code>N*40</code> with the single number (the product of multiplication).
+
+</tab>
+<tab name="Cloud VM">
+== Client-server visualization on a cloud == <!--T:64-->
+
+=== Prerequisites === <!--T:66-->
+
+<!--T:67-->
+The [[Cloud Quick Start|Cloud Quick Start Guide]] explains how to launch a new virtual machine (VM). Once you log into the VM, you will need to install some additional packages to be able to compile ParaView or VisIt. For example, on a CentOS VM you can type
+
+<!--T:68-->
+{{Commands|prompt=[name@VM $]
+|sudo yum install xauth wget gcc gcc-c++ ncurses-devel python-devel libxcb-devel
+|sudo yum install patch imake libxml2-python mesa-libGL mesa-libGL-devel
+|sudo yum install mesa-libGLU mesa-libGLU-devel bzip2 bzip2-libs libXt-devel zlib-devel flex byacc
+|sudo ln -s /usr/include/GL/glx.h /usr/local/include/GL/glx.h
+}}
+
+<!--T:69-->
+If you have your own private-public SSH key pair (as opposed to the cloud key), you may want to copy the public key to the VM to simplify logins, by issuing the following command on your computer
+
+<!--T:70-->
+{{Command|prompt=[name@computer $]|cat ~/.ssh/id_rsa.pub {{!}} ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'}}
+
+=== Compiling with OSMesa === <!--T:71-->
+
+<!--T:72-->
+Since the VM does not have access to a GPU (most Arbutus VMs don't), we need to compile ParaView with OSMesa support so that it can do offscreen (software) rendering. The default configuration of OSMesa will enable OpenSWR (Intel's software rasterization library to run OpenGL). What you will end up with is a ParaView server that uses OSMesa for offscreen CPU-based rendering without X but with both <code>llvmpipe</code> (older and slower) and <code>SWR</code> (newer and faster) drivers built. We recommend using SWR.
+
+<!--T:73-->
+Back on the VM, compile <code>cmake::</code>
+
+<!--T:74-->
+{{Commands|prompt=[name@VM $]
+|wget https://cmake.org/files/v3.7/cmake-3.7.0.tar.gz
+|unpack and cd there
+|./bootstrap
+|make
+|sudo make install
+}}
+
+<!--T:75-->
+Next, compile <code>llvm</code>:
+<source lang="console">
+cd
+ wget http://releases.llvm.org/3.9.1/llvm-3.9.1.src.tar.xz
+ unpack and cd there
+ mkdir -p build && cd build
+ cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DLLVM_BUILD_LLVM_DYLIB=ON \
+  -DLLVM_ENABLE_RTTI=ON \
+  -DLLVM_INSTALL_UTILS=ON \
+  -DLLVM_TARGETS_TO_BUILD:STRING=X86 \
+  ..
+ make
+ sudo make install
+</source>
+
+<!--T:77-->
+Next, compile Mesa with OSMesa:
+<source lang="console">
+cd
+ wget ftp://ftp.freedesktop.org/pub/mesa/mesa-17.0.0.tar.gz
+ unpack and cd there
+ ./configure \
+  --enable-opengl --disable-gles1 --disable-gles2 \
+  --disable-va --disable-xvmc --disable-vdpau \
+  --enable-shared-glapi \
+  --disable-texture-float \
+  --enable-gallium-llvm --enable-llvm-shared-libs \
+  --with-gallium-drivers=swrast,swr \
+  --disable-dri \
+  --disable-egl --disable-gbm \
+  --disable-glx \
+  --disable-osmesa --enable-gallium-osmesa
+ make
+ sudo make install
+</source>
+
+<!--T:79-->
+Next, compile the ParaView server:
+<source lang="console">
+cd
+ wget http://www.paraview.org/files/v5.2/ParaView-v5.2.0.tar.gz
+ unpack and cd there
+ mkdir -p build && cd build
+ cmake \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/home/centos/paraview \
+      -DPARAVIEW_USE_MPI=OFF \
+      -DPARAVIEW_ENABLE_PYTHON=ON \
+      -DPARAVIEW_BUILD_QT_GUI=OFF \
+      -DVTK_OPENGL_HAS_OSMESA=ON \
+      -DVTK_USE_OFFSCREEN=ON \
+      -DVTK_USE_X=OFF \
+      ..
+ make
+ make install
+</source>
+
+=== Client-server mode === <!--T:81--> 
+
+<!--T:82-->
+You are now ready to start ParaView server on the VM with SWR rendering:
+<source lang="console">
+./paraview/bin/pvserver --mesa-swr-avx2
+</source>
+
+<!--T:97-->
+Back on your computer, organize an SSH tunnel from the local port 11111 to the VM's port 11111:
+<source lang="console">
+ssh centos@vm.ip.address -L 11111:localhost:11111
+</source>
+
+<!--T:86-->
+Finally, start the ParaView client on your computer and connect to localhost:11111. If successful, you should be able to open files on the remote VM. During rendering in the console you should see the message ''SWR detected AVX2.''
+</tab>
+</tabs>
+
+= Remote VNC desktop on Graham VDI nodes = <!--T:90--> 
+
+<!--T:92-->
+For small interactive visualizations requiring up to 256GB memory and 16 cores, you can use the Graham VDI nodes. Unlike client-server visualizations you will be using VNC remote desktop. Here are the basic steps:
+
+<!--T:93-->
+1. Connect to gra-vdi as described [https://docs.computecanada.ca/wiki/VNC#VDI_Nodes TigerVNC] then open a terminal window and run:
+ module load CcEnv
+
+<!--T:94-->
+2. Show the available paraview module versions:
+ module spider paraview
+
+<!--T:95-->
+3. Show how to load a specific version such as:
+ module spider paraview/5.11.0
+
+<!--T:96-->
+4. Load the required modules and start paraview:
+ module load StdEnv/2020  gcc/9.3.0  openmpi/4.0.3
+ module load paraview/5.11.0
+ paraview
+The most recent versions of ParaView require disabling the VirtualGL dynamic linker faker <code>LD_PRELOAD</code> when running the <code>paraview</code> command
+ LD_PRELOAD=${LD_PRELOAD/libdlfaker.so/} paraview
+
+= Batch rendering = <!--T:88-->
+
+<!--T:89-->
+For large-scale and automated visualization, we strongly recommend switching from interactive client-server to off-screen batch visualization. ParaView supports Python scripting, so you can script your workflow and submit it as a regular, possibly parallel production job on a cluster. If you need any help with this, please contact [[Technical support]].
+</translate>

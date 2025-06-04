@@ -1,0 +1,159 @@
+
+
+<languages />
+<translate>
+<!--T:1-->
+[https://code.visualstudio.com/ Visual Studio Code] is an integrated development environment (IDE) from [https://www.microsoft.com Microsoft] which can be used for remote development on our clusters over [[SSH]]. In this context, users can run the graphical interface of Visual Studio Code locally, on their personal computer, while connecting to a cluster where the source code is located and where the debugging and testing operations are being executed. While Visual Studio Code may be used for development in a variety of programming languages, in this page we will focus on its use with [[Python]].
+
+<!--T:2-->
+When using an IDE like Visual Studio Code, it's important to distinguish what sort of action you're performing, even if all of them take place within the context of the IDE. Editing a Python script or any other text file of reasonable size (up to a few thousand lines) is a very light-weight process which requires little processing power or memory but an IDE offers you numerous other possibilities, including the ability to debug your script, for example. In this case, the IDE is now <i>executing</i> your Python code on the remote server and until the script crashes because of a bug, it may well consume an entire CPU core or even several if the script or the libraries which it uses are multithreaded.
+
+<!--T:17-->
+Note that if you are using Visual Studio Code with Python, you should avoid installing [[Anaconda/en|Conda and its variants]] as they are poorly adapted to our cluster environment. Alternatives to the use of Conda include [[Python#Creating_and_using_a_virtual_environment|Python virtual environments]] and [[Apptainer]].
+
+=Configuring remote access= <!--T:3-->
+
+==Configuration of your SSH keys== <!--T:4-->
+
+<!--T:5-->
+# If not done already, <b>[[SSH_Keys#Generating_an_SSH_Key|generate your SSH key]]</b>. For example, we will name it <code>~/.ssh/ccdb</code>.
+# If not done already, <b>[[SSH_Keys#Installing_your_key|install your <i>public</i> SSH key on CCDB]]</b>.
+# <b>Copy the same public key</b> to <code>~/.ssh/authorized_keys</code> on the remote cluster (create this file if it does not exist). That is because compute nodes do not have access to the public keys that are installed on CCDB.
+
+==SSH configuration file== <!--T:6-->
+
+<!--T:7-->
+VS Code works well with your local [[SSH configuration file]] (<code>~/.ssh/config</code>).
+Here are the recommended options :
+</translate>
+{{File
+  |name=~/.ssh/config
+  |contents=
+Host *
+  ServerAliveInterval 300
+
+Host beluga cedar graham narval
+  HostName %h.alliancecan.ca
+  IdentityFile ~/.ssh/ccdb
+  User your_username
+
+Host bc????? bg????? bl?????
+  ProxyJump beluga
+  IdentityFile ~/.ssh/ccdb
+  User your_username
+
+Host cdr*
+  ProxyJump cedar
+  IdentityFile ~/.ssh/ccdb
+  User your_username
+
+Host gra1* gra2* gra3* gra4* gra5* gra6* gra7* gra8* gra9*
+  ProxyJump graham
+  IdentityFile ~/.ssh/ccdb
+  User your_username
+
+Host nc????? ng????? nl?????
+  ProxyJump narval
+  IdentityFile ~/.ssh/ccdb
+  User your_username
+}}
+<translate>
+==First connection with VS Code== <!--T:8-->
+=== Remote access and code editing ===
+https://carleton.ca/scs/2023/vscode-remote-access-and-code-editing/
+
+<!--T:9-->
+Because some clusters do not provide access to the internet from compute nodes,
+the installation of VS Code Server must be done prior to using a remote connection to any compute node.
+Therefore, in VS Code, a first connection to any login node is required - select either :
+
+<!--T:10-->
+* beluga
+* cedar
+* graham
+* narval
+
+<!--T:11-->
+[[File:VSCode SSH Passphrase Prompt.png|thumb|SSH Passphrase prompt]]
+Note : <b>you will be prompted many times for your SSH key passphrase.</b>
+If not, make sure to copy your SSH public key as described above in point 3 under <i>Configuration of your SSH keys</i>.
+
+<!--T:13-->
+That first connection will automatically install VS Code Server in <code>~/.vscode-server/</code>.
+The installation can take up to 5 minutes.
+Once done, close the connection.
+
+===Connection with MFA enabled=== <!--T:18-->
+[[File:VSCode Detail Link.png|thumb|When connecting, click on "details" to see the prompt for the 2nd factor in the Terminal]]
+
+<!--T:12-->
+If the [[Multifactor authentication|multifactor authentication]] is enabled,
+you will need to check the "details" of the connection, which will bring you to the
+VS Code Terminal in which you may be prompted for your 2nd factor of authentication.
+
+=Closing your connection= <!--T:19-->
+
+<!--T:20-->
+When closing the local VS Code window, the remote process of VS Code Server may keep running in the background, which tends to accumulate orphan processes on that login node. Not only that, but your next connection may connect to a different login node, which can cause issues and confusion. <b>To cleanly close a connection, click on the bottom-left corner of VS Code and select <i>Close Remote Connection</i> at the top of the window.</b>
+
+=Connection to a compute node= <!--T:14-->
+
+<!--T:15-->
+Connection procedure:
+# Make sure VS Code Server is installed as described in the previous sections.
+# In an external <b>[[SSH|SSH client]]</b> connected to the cluster, start a new <b>[[Running_jobs#Interactive_jobs|interactive job]]</b> (with <code>salloc</code>).
+## <b>Important:</b> make sure to request enough memory (at least <code>2000M</code>).
+## Take note of the allocated compute node name.
+## If you will need to work with <code>SLURM_*</code> environment variables in VS Code, save them all in a ''source'' file: {{Command|env {{!}} grep SLURM_ {{!}} sed -e 's/^\(.*\){{=}}\(.*\)$/export \1{{=}}"\2"/g' > slurm_var.sh}}
+# In VS Code, start a new remote session with the name of the allocated compute node:
+## Press <code>F1</code> or <code>Ctrl+Shift+P</code> to start the command prompt <code>&gt;</code> in the Command Palette.
+## Start typing <i>Remote</i> and select <i>Remote-SSH: Connect to Host... <b>&gt; Remote-SSH: Connect to Host...</i></b>
+## Enter the noted compute node name.
+### If you get prompted for the type of operating system, select <b>Linux</b>
+# If you need to work with <code>SLURM_*</code> environment variables, navigate to the working directory in a VS Code terminal and ''source'' the <code>slurm_var.sh</code> file: {{Command|source slurm_var.sh}}
+
+=Troubleshooting= <!--T:21-->
+
+==The remote session does not work anymore== <!--T:22-->
+
+<!--T:23-->
+{{Warning
+  |title=Connection problems
+  |content=
+The newest versions of [https://code.visualstudio.com/docs/remote/linux#_remote-host-container-wsl-linux-prerequisites VS Code Server no longer support CentOS 7], which affects connections to <b>Graham</b> and <b>Niagara</b>. Users can update their version of VS Code to 1.86.1 or later in order to connect, but will see warnings about the unsupported operating system.
+}}
+
+<!--T:24-->
+* Note: an older version of VS Code still works through [[JupyterHub#VS_Code|JupyterHub]].
+
+<!--T:25-->
+Because VS Code is intended for a different use case than developing on our clusters, having several instances of VS Code Server running on different login nodes can lead to issues. To fix them:
+
+<!--T:26-->
+* Connect to all login nodes and stop (with <code>kill <PID></code>) all VS Code processes you see in the output of <code>ps aux | grep $USER</code> or <code>top -u $USER</code>.
+* If the above does not fix the problem, carefully delete the content of the <code>~/.vscode-server</code> directory, and then reconnect for a fresh installation of VS Code Server.
+
+<!--T:27-->
+* We recently determined that in the last week of August/2024 a bug with the Remote-SSH extension for VSCode was introduced. As far as we could ascertain, scp is not working as expected. That is not our software, this is a Microsoft product, so we offer best effort support. 
+
+<!--T:28-->
+Here is some more info on the bug:
+ https://github.com/microsoft/vscode-remote-release/issues/10174#issuecomment-2316629187
+
+<!--T:31-->
+Our suggestions are
+* downgrade to VSCode 1.92
+
+<!--T:29-->
+* use wget (https://github.com/microsoft/vscode-remote-release/issues/10174#issuecomment-2316093550) by adding "remote.SSH.useCurlAndWgetConfigurationFiles: true" to Remote-SSH settings it should replace the defective scp functionality.
+
+<!--T:30-->
+* use the "Remote Tunnels" extension by running 'code tunnel' (google vscode cli and download it). Use github or a microsoft account (OAuth) and connect to a remote vscode server, such as a niagara login node. You can have all the "benefits" of not using mfa as long as your server is running. See [https://code.visualstudio.com/docs/remote/tunnels Developing with Remote Tunnels].
+
+=See also= <!--T:16-->
+* SHARCNET General Interest Webinar, "Remote Development on Clusters with VSCode", presented by Armin Sobhani:
+** [https://youtu.be/u9k6HikDyqk Part I]
+** [https://youtu.be/CsgBGpampvc Part II]
+* Tutorial video created by two users (best viewed in 720p):
+** [https://youtu.be/1B0hiWaVcHY Connect VS Code to High-Performance Computing (HPC) Clusters]
+</translate>

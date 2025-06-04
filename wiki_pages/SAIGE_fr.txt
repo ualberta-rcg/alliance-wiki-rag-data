@@ -1,0 +1,53 @@
+<languages/>
+[[Category:Software]]
+[https://saigegit.github.io/SAIGE-doc/ SAIGE] est un paquet R développé avec Rcpp pour l’étude d'associations pangénomiques avec les grands ensembles de données et les biobanques. 
+
+Cette méthode
+
+* tient compte de la parenté des échantillons sur la base des modèles mixtes généralisés;
+
+* permet l'ajustement des modèles selon une matrice de relations génétiques complète ou clairsemée (GRM);
+
+* fonctionne pour les traits quantitatifs et binaires;
+
+* gère le déséquilibre des traits binaires dans les cas témoin;
+
+* produit des calculs efficaces pour les grands ensembles de données;
+
+* effectue des tests d'association à un seul variant;
+
+* fournit une estimation de la taille de l'effet grâce à la régression logistique à biais réduit de Firth;
+
+* effectue l'analyse d'association conditionnelle.
+
+Cette page décrit l'installation du paquet 1.0.0 de SAIGE. 
+
+== Installation ==
+
+1.  Chargez les modules nécessaires.
+{{Command|module load gcc r/4.2.2 savvy superlu flexiblas}}
+2. Créez le répertoire d'installation.
+{{Commands
+|mkdir -p ~/.local/R/$EBVERSIONR/
+|export R_LIBS{{=}}~/.local/R/$EBVERSIONR/
+}}
+3. Installez les [[R/fr#Installation_des_paquets_R|dépendances de R]].
+{{Command|R -e 'install.packages(c("Rcpp", "RcppParallel", "data.table", "RcppArmadillo", "SPAtest", "RcppEigen", "BH", "optparse", "SKAT", "MetaSKAT", "qlcMatrix", "RhpcBLASctl", "RSQLite", "dplyr"), repos{{=}}"https://cloud.r-project.org/")'
+}}
+
+4. Téléchargez la version 1.0.0 de SAIGE.
+{{Commands
+|git clone --recursive https://github.com/saigegit/SAIGE.git -b 1.0.0
+|cd SAIGE/
+}}
+5. Modifiez l'installation.
+{{Commands
+|rm configure
+|sed -i 's/llapack/lflexiblas/' src/Makevars
+}}
+Supprimez d'abord le fichier <i>configure</i> pour éviter d'installer des dépendances qui sont déjà disponibles. Ensuite, modifiez le nom de la bibliothèque pour qu'elle utilise le fichier <i>Makevars</i> et que les options utilisent FlexiBLAS. Vous évitez ainsi d'obtenir le message d'erreur <i>unable to find -llapack</i> à l'installation. Pour plus d'information, lisez [[BLAS_and_LAPACK/fr| BLAS et LAPACK]].
+
+6. Compilez et installez.
+{{Command|R CMD INSTALL .}}
+7. Effectuez un test.
+{{Command|R -e 'library(SAIGE)'}}

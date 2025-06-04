@@ -1,0 +1,342 @@
+{{Draft}}
+
+Dans le but de minimiser le gaspillage de ressources dans nos grappes, nous vous présentons ici les erreurs les plus fréquentes que nous avons observées chez nos utilisateurs, ainsi que les correctifs à appliquer. Les exemples sont répartis en trois catégories: CPU, GPU et mémoire.
+
+Les différents graphiques proviennent des portails de Narval et Béluga, et sont présentés à la page suivante: [[Portail|Portail]].
+
+== CPU ==
+
+=== Demander plusieurs coeurs dans le contexte d’une tâche en série. ===
+
+Une tâche en série est une tâche qui s'exécute sur un seul processeur ou cœur de calcul à la fois, sans parallélisme. Contrairement aux tâches parallèles qui peuvent mobiliser plusieurs processeurs ou cœurs simultanément pour accélérer le traitement, les tâches en série suivent une exécution strictement  séquentielle. La mémoire est partagée par les processus et fils d’exécution.
+
+Voici un exemple de script de soumission pour une tâche en série. Un seul coeur est demandé à l'aide de l'option <code>--cpus-per-task=1</code>.
+
+{{File
+  |name=simple_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=4G
+#SBATCH --time=02:00:00
+#SBATCH --account=def-someuser
+
+module load python/3.11
+
+python3 mon_script.py
+
+}}
+
+Quelle est l’apparence d’une tâche en série dans l’interface du portail ?
+
+L'échelle verticale du graphique CPU est fixée à 1, ce qui correspond à un cœur demandé. L'utilisation est représentée en bleu et remplit entièrement le graphique, indiquant une utilisation proche de 100%.
+
+<div style="text-align: center;">
+  Le graphique CPU.
+</div>
+
+
+[[File:1_CPU.png|thumb|700px|center]]
+
+Le graphique de la mémoire représente différents paramètres. Ceux à surveiller sont la mémoire '''totale allouée''' et la mémoire '''maximale utilisée'''. Il est recommandé de prévoir une marge d'environ 20% afin d'éviter une erreur de type ''Out of memory'' (''OOM'').
+
+<div style="text-align: center;">
+  Le graphique Mémoire.
+</div>
+
+[[File:Mémoire tâche en série.png|thumb|700px|center]]
+
+Dans le contexte d'une tâche en série, le graphique '''<i>Processes and threads</i>''' indique qu'un fil d'exécution qui est actif (''Running threads''). Cette information est représentée par la ligne orange.
+
+<div style="text-align: center;">
+  Le graphique <i>Processes and threads</i>.
+</div>
+
+[[File:Processes and threads-39.png|thumb|700px|center]]
+
+<b>Que ce passe-il si vous demander plusieurs coeurs dans le contexte d’une tâche en série?</b>
+
+Voici un exemple de script de soumission pour une tâche en série qui demande 8 coeurs au lieu d'un seul (<code>--cpus-per-task=8</code>).
+
+{{File
+  |name=simple_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --cpus-per-task=8
+#SBATCH --mem-per-cpu=32G
+#SBATCH --time=03:00:00
+#SBATCH --account=def-someuser
+
+module load python/3.11
+
+python3 mon_script.py 
+}}
+
+Dans le graphique CPU, bien que l'échelle verticale représente un total de 8 coeurs, comme demandé, on observe qu'il y a seulement un seul coeur qui est actif. L'activité des différents fils d'exécution reste inférieure à l’utilisation d’un seul cœur. Dans cet exemple,  7 coeur sont gaspillés. Le correctif consisterait à demander seulement 1 coeur au lieu de 8 (<code>--cpus-per-task=1</code>). 
+
+<div style="text-align: center;">
+  Le graphique CPU.
+</div>
+
+[[File:CPU pas utilisé.png|thumb|700px|center]]
+
+On peut observer dans le graphique de la mémoire que la demande est trop élevée. Ici, on multiplie les 8 coeurs par les 32 Go, ce qui donne un total de 256 Go. Or, le graphique indique que seulement 4 Go sont réellement utilisés. La correction consisterait à demander <code>--mem-per-cpu=6G</code>.
+
+<div style="text-align: center;">
+  Le graphique Mémoire.
+</div>
+
+[[File:Mémoire font rouge série.png|thumb|700px|center]]
+
+Le graphique <b><i>Processes and threads</i></b> indique qu'un seul fil d'exécution qui est actif (ligne orange), même si 8 coeurs ont été demandés. Une tâche en série ne peut pas s'exécuter en parallèle, il est donc inutile de demander plus d'un coeur. Ce graphique est un bon indicateur pour déterminer si la tâche soumise est en série ou en parallèle: il suffit d'observer le nombre de fils d'exécution actifs.
+
+<div style="text-align: center;">
+  Le graphique <i>Processes and threads</i>.
+</div>
+
+[[File:Processes and threads-39.png|thumb|700px|center]]
+
+=== Demander plus de coeurs que nécessaire dans le contexte d’une tâche multifil. ===
+
+Une tâche multifil, ou <i>multithreaded</i> en anglais, a la capacité d'utiliser plusieurs fils d'exécution pour effectuer des opérations en parallèle.
+
+Voici un exemple de script de soumission d'une tâche multifil. Le paramètre <code>--cpus-per-task</code> sera supérieur à 1. On peut utiliser la variable d'environnement <code>$SLURM_CPUS_PER_TASK</code> pour représenter le nombre de coeurs dans notre programme. Un seul noeud est nécessaire, car seules les tâches distribuées peuvent utiliser plusieurs noeuds. Voir la section sur les tâche multiprocesseur (ajouter le lien). Les fils d'exécution partagent la mémoire allouée. Dans cet exemple, nous aurons un total de 64 Go ( 16 coeurs x 4 Go). 
+
+{{File
+  |name=simple_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --cpus-per-task=16
+#SBATCH --mem-per-cpu=4G
+#SBATCH --time=00:15:00
+#SBATCH --account=def-someuser
+
+monscript --threads $SLURM_CPUS_PER_TASK  
+}}
+
+À quoi ressemble une tâche multifil sur le portail?
+
+L'échelle verticale du graphique CPU est fixée à 16, ce qui correspond aux coeurs demandés dans le script de soumission. L'utilisation de chaque coeur est représenté par une couleur différente. Chaque coeur est utilisé à 100%, puisque la somme des utilisations remplit entièrement le graphique. 
+
+<div style="text-align: center;">
+  Le graphique CPU.
+</div>
+
+[[File:CPU multifil.png|thumb|thumb|700px|center]]
+
+On peut observer dans le graphique de la mémoire que la demande est de 64 Go. Cette valeur provient de la multiplication des 16 coeurs par 4 Go, soit un total de 64 Go. Cet exemple provient de la grappe Narval. Les noeuds les plus courants y possèdent 64 coeurs et 249 Go de mémoire, ce qui correspond à environ à 4 Go de mémoire par coeur (249 ÷ 64 ≈ 4). 
+
+Dans la tâche présentée ici, les 64 Go ne sont pas entièrement utilisés. Il serait donc possible de demander plutôt 15 Go, puisque le maximum observé est d'environ 10 Go, avec une utilisation stable dans le temps. Cette modification n'aurait aucun impact sur le CPU-équivalent, mais comme moins de mémoire serait demandée, votre tâche pourrait être soumise plus rapidement. 
+
+<div style="text-align: center;">
+  Le graphique Mémoire.
+</div>
+
+[[File:Mémoire multifil.png|thumb|thumb|700px|center]]
+
+Le graphique <b><i>Processes and threads</i></b> indique que 16 fils d'exécution sont actifs. On devrait toujours observer un nombre de fils d'exécutions actifs similaire au nombre de coeurs demandés. 
+
+<div style="text-align: center;">
+  Le graphique <i>Processes and threads</i>.
+</div>
+
+[[File:Threads multifil.png|thumb|thumb|700px|center]]
+
+<b>Comment identifier si vous demander plus de coeurs que nécessaire dans le contexte d’une tâche multifil?</b>
+
+Voici le script de soumission de la tâche multifil suivante:
+
+{{File
+  |name=simple_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --cpus-per-task=32
+#SBATCH --mem-per-cpu=1G
+#SBATCH --time=00:15:00
+#SBATCH --account=def-someuser
+
+monscript --threads $SLURM_CPUS_PER_TASK  
+}}
+
+Lorsque vous n'utilisez pas suffisamment les ressources demandées, le graphique s'affiche en rouge. On observe ici que le nombre maximum de coeurs utilisés est de 10, ce qui est bien en dessous des 32 coeurs demandés. La correction à apporter serait de demander <code>#SBATCH --cpus-per-task=10</code>. Voir le graphique <b>Processes and threads</b> à titre de référence.
+
+<div style="text-align: center;">
+  Le graphique CPU.
+</div>
+
+[[File:Trop de coeurs multifil.png|thumb|700px|center]]
+
+Dans le contexte de cette tâche, si l'on réduit le nombre de coeur à 10, il faudrait envisager d'augmenter la mémoire de <code>#SBATCH --mem-per-cpu=1</code> à <code>#SBATCH --mem-per-cpu=3</code>, pour un total de 30 Go.
+
+<div style="text-align: center;">
+  Le graphique Mémoire.
+</div>
+
+[[File:Memoire multithreading.png|thumb|700px|center]]
+
+Le graphique ''Processes and threads'' indique qu'il y a bel et bien une moyenne de 10 fils d'exécution qui sont actifs.
+
+<div style="text-align: center;">
+  Le graphique <i>Processes and threads</i>.
+</div>
+
+[[File:Processes and threads.png|thumb|700px|center]]
+
+=== Demander trop de coeurs en mode multiprocesseur. ===
+
+Une tâche multiprocesseur est une tâche qui répartit son travail entre plusieurs processus indépendants, souvent exécutés en parallèle sur plusieurs cœurs ou nœuds, afin d’accélérer le traitement.
+
+Caractéristiques d’une tâche multiprocesseur :
+
+* Utilise plusieurs processus (souvent via MPI – Message Passing Interface).
+
+* Peut s’exécuter sur plusieurs cœurs et plusieurs nœuds.
+
+* Chaque processus a sa propre mémoire (contrairement aux tâches multifil qui partagent la mémoire).
+
+Voici le script de soumission de la tâche multiprocesseur suivante:
+
+{{File
+  |name=simple_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --nodes=4
+#SBATCH --ntasks=64
+#SBATCH --mem=0
+#SBATCH --time=00:15:00
+#SBATCH --account=def-someuser
+
+srun ./mpi_program  
+}}
+
+On observe dans le graphique CPU un total de 256 coeurs (64 coeurs x 4 noeuds). Chaque coeur est utilisé à 100 %, puisque la somme des utilisations remplit entièrement le graphique. 
+
+<div style="text-align: center;">
+  Le graphique CPU.
+</div>
+
+[[File:Multiprocesseur 64 coeurs 4 noeuds.png|thumb|700px|center]]
+
+En utilisant le paramètre <code>#SBATCH --mem=0</code>, on demande à allouer toute la mémoire disponible du noeud. Cette option est valable uniquement si tous les coeurs du noeud sont également alloués et utilisés. Dans ce cas, il est possible de demander la totalité de la mémoire associée au noeud.
+
+<div style="text-align: center;">
+  Le graphique Mémoire.
+</div>
+
+[[File:Multiprocesseur memoire.png|thumb|700px|center]]
+
+Le graphique ''Processes and threads'' indique qu'il y a effectivement une moyenne de 64 fils d'exécution actifs par noeud. Toutefois, seul le noeud nc30328 est visible, car les courbes des autres noeuds sont superposés.
+
+<div style="text-align: center;">
+  Le graphique <i>Processes and threads</i>.
+</div>
+
+[[File:Threads multiprocesseur 64 coeurs.png|thumb|700px|center]]
+
+<b>Comment identifier si vous demander plus de coeurs que nécessaire dans le contexte d’une tâche multiprocesseur?</b>
+
+Voici le script de soumission de la tâche multiprocesseur suivante:
+
+{{File
+  |name=simple_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --ntasks=24
+#SBATCH --mem-per-cpu=12G
+#SBATCH --time=00:15:00
+#SBATCH --account=def-someuser
+
+srun ./mpi_program  
+}}
+
+Premièrement, dans le graphique de l'utilisation du CPU, on constate que seuls 16 cœurs sont sollicités, alors que le système en dispose de 24. Si les 24 cœurs avaient été utilisés, le graphique aurait été entièrement coloré. Le correctif à apporter serait de changer <code>#SBATCH --ntasks=24</code> pour <code>#SBATCH --ntasks=16</code>.
+
+<div style="text-align: center;">
+  Le graphique CPU.
+</div>
+
+[[File:Trop de coeurs multifil - copie.png|thumb|700px|center]]
+
+En observant le graphique de l'utilisation de la mémoire, on constate que la quantité demandée est excessive. Il serait judicieux de faire un test en réduisant la valeur à <code>#SBATCH --mem-per-cpu=1G</code>.
+
+<div style="text-align: center;">
+  Le graphique Mémoire.
+</div>
+
+[[File:MÉmoire multiprocesseur trop coeur -2.png|thumb|700px|center]]
+
+Certains points du graphique <i>Processes and threads</i> se superpose, ce qui peut rendre la lecture difficile. Toutefois, en sélectionnant chaque fil d'exécution individuellement, on peut déterminer qu'un total de 16 fils d'exécution sont actifs. Ce comptage constitue une méthode complémentaire pour estimer le nombre de coeurs réellement nécessaire à l'exécution de la tâche multiprocesseur. 
+
+<div style="text-align: center;">
+  Le graphique <i>Processes and threads</i>.
+</div>
+
+[[File:Threads multiprocesseur trop coeur-2.png|thumb|700px|center]]
+
+<div style="text-align: center;">
+  Section les Ressources.
+</div>
+
+[[File:Ressource MPI trop de coeur -2.png|thumb|1000px|center]]
+
+=== Demander --cpus-per-task=2 pour une tâche multiprocesseur qui n'est pas multifil. ===
+
+<b>Comment identifier que vous avez demandé des ressources pour une tâche multiprocesseur qui n'est pas multifil?</b>
+
+{{File
+  |name=simple_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --ntasks=32
+#SBATCH --cpus-per-task=2
+#SBATCH --mem-per-cpu=4g
+#SBATCH --time=3-00:00:00
+#SBATCH --account=def-someuser
+
+srun ./mpi_program  
+}}
+
+L’erreur provient de l’utilisation de l’option <code>#SBATCH --cpus-per-task>1</code>. Dans le cas d’une tâche multiprocesseur qui n’est pas multithreadée (c’est-à-dire qui utilise un seul fil d’exécution par processus), un seul cœur est requis par processus. Si davantage de cœurs sont alloués, ils resteront inutilisés, car chaque processus ne peut exploiter qu’un seul fil.
+
+Cela se reflète dans le graphique d’utilisation du CPU : on observe que seulement la moitié des cœurs sont actifs, car un seul des deux cœurs alloués par processus est effectivement utilisé.
+
+<div style="text-align: center;">
+  Le graphique CPU.
+</div>
+
+[[File:Cpu multiprocesseur cpu-per-task-2.png|thumb|700px|center]]
+
+Concernant la mémoire, nous pourrions réduire la valeur à <code>#SBATCH --mem-per-cpu=2g</code> afin de limiter la marge excédentaire.
+
+<div style="text-align: center;">
+  Le graphique Mémoire.
+</div>
+
+[[File:Mémoire multiprocesseur cpu-per-task-2.png|thumb|700px|center]]
+
+Une autre manière de mettre en évidence cette erreur consiste à comparer le nombre de cœurs alloués par nœud (visible dans la section Ressources du Portail) avec le nombre de fils d’exécution actifs affichés dans le graphique <i>Processes and threads</i>. Dans le cas présent, puisque l'option <code>#SBATCH --cpus-per-task=2</code> est utilisée, on constate qu'il y a deux fois moins de fils d'exécution actifs que de coeurs alloués. Cela indique que chaque processus n’utilise qu’un seul fil, laissant l’autre cœur inutilisé. Prenons par exemple le noeud '''nc30408''', où l'on retrouve 16 coeurs alloués (section Ressources du Portail), mais seulement 8 fils d'exécutions actifs (graphique <i>Processes and threads</i>).
+
+<div style="text-align: center;">
+  Le graphique <i>Processes and threads</i>.
+</div>
+
+[[File:Running threads multiprocesseur cpu-per-task-2.png|thumb|700px|center]]
+
+<div style="text-align: center;">
+  Section les Ressources.
+</div>
+
+[[File:Ressource multiprocesseur non multifil.png|thumb|1000px|center]]
+
+=== Demander des paramètres différents pour SBATCH et la variable OMP_NUM_THREADS ===
+
+== GPU ==
+
+== Mémoire ==

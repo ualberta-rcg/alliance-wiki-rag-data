@@ -1,0 +1,210 @@
+<languages />
+
+Vous trouverez ici l'information sur la migration d'instances virtuelles (ou VM pour ''virtual machines'') à partir du nuage Ouest vers le nouveau nuage Arbutus.
+Nous vous invitons à gérer vous-mêmes la migration vers Arbutus en fonction des logiciels que vous utilisez et de votre disponibilité.
+
+== Avant de commencer ==
+
+Utilisez les adresses URL suivantes pour obtenir l'interface Horizon ː
+
+'''Nuage Ouest :''' [https://west.cloud.calculcanada.ca https://west.cloud.calculcanada.ca]
+
+'''Nuage Arbutus :''' [https://arbutus.cloud.calculcanada.ca https://arbutus.cloud.calculcanada.ca]
+
+Vous pouvez utiliser les fureteurs Firefox et Chrome. Les fureteurs Safari et Edge n'ont pas été testés.
+
+Votre projet, votre réseau et votre routeur auront été créés sur Arbutus et vous aurez accès aux mêmes projets que sur le nuage Ouest.
+
+Avant de migrer vos instances, nous vous recommandons d'effectuer les étapes suivantes pour bien configurer l'environnement.
+
+# '''IMPORTANT''' : Faites une copie de sauvegarde des données importantes. Le nuage est doté de systèmes de stockage redondants, mais les instances ne sont pas sauvegardées. 
+# Connectez-vous au nuage avec les informations d'identification pour votre compte et téléchargez les fichiers RC pour configurer les variables d'environnement utilisées par les outils ligne de commande OpenStack.
+#* Ouest  : ''Compute -> Accès et Sécurité'' -> onglet ''Accès API'', cliquez sur le bouton ''Télécharger le fichier RC d’OpenStack''.
+#* Arbutus : ''Projet -> Accès API'', cliquez sur le, bouton ''Télécharger le fichier RC d’OpenStack'', sélectionnez ''Fichier OpenStack RC (Identity API v3)''.
+# Copiez les fichiers RC sur le serveur de migration ''cloudmigration.calculcanada.ca''. Pour vous connecter, utilisez le nom d’utilisateur et le mot de passe de votre compte.
+# Ouvrez deux sessions sur le serveur de migration, une pour le nuage Ouest et l’autre pour le nuage Arbutus. Nous vous recommandons d’utiliser la commande <code>screen</code> pour éviter de perdre ces sessions en cas de problème avec la connexion SSH; au besoin, consultez [https://www.google.com/search?q=screen+ssh ces tutoriels] pour la commande <code>screen</code>. Dans la session pour Ouest, faites un source du fichier RC du nuage Ouest avec <code>source oldcloudrc.sh</code>. Dans la session pour Arbutus, faites un source du fichier RC du nuage Arbutus avec <code>source newcloudrc.sh</code>. Testez la configuration avec une commande OpenStack simple, par exemple <code>openstack volume list</code>.
+# Migrez les clés SSH :
+#* Avec le tableau de bord Horizon sur le nuage Ouest, sélectionnez ''Accès et Sécurité -> Paires de clés''. Cliquez sur le nom de la paire de clés que vous voulez et copiez la valeur de la clé publique.
+#* Avec le tableau de bord Horizon sur le nuage Arbutus, sélectionnez ''Compute -> Paires de clés''. 
+#* Cliquez sur ''Importer une paire de clés'', donnez un nom à votre paire de clés et collez la clé publique dans le champ approprié du formulaire. 
+#* Votre paire de clé devrait maintenant être importée dans Arbutus. Répétez ces étapes pour toutes les clés dont vous avez besoin.
+#* Vous pouvez aussi générer de nouvelles paires de clés.
+#* Les paires de clés peuvent aussi être importées via le CLI comme suit :
+#: <code>openstack keypair create --public-key <public-keyfile> <name></code>
+# Migrez les groupes de sécurité et les règles :
+#* Sur le nuage Ouest, sélectionnez ''Compute -> Accès et Sécurité -> Groupes de sécurité'' et prenez note des groupes existants et des règles qui leur sont associées.
+#* Sur le nuage Arbutus, sélectionnez ''Réseau-> Groupes de sécurité'' et reproduisez les groupes et règles qui s’appliquent.
+#* Ne supprimez pas les règles de sécurité Egress créées par défaut pour IPv4 et IPv6; ceci pourrait créer plusieurs problèmes, entre autres empêcher vos instances d’obtenir les données de configuration du service de métadonnées OpenStack. 
+#* Les groupes et les règles peuvent aussi être créés via le CLI. Dans cet exemple, nous utilisons le port HTTP 80; modifiez les commandes selon vos besoins.
+#: <code>openstack security group create <group-name></code>
+#: <code>openstack security group rule create --proto tcp --remote-ip 0.0.0.0/0 --dst-port 80 <group-name></code>
+#* Pour voir les règles via le CLI, listez les groupes de sécurité avec <code>openstack security group list</code> et les règles du groupe avec <code>openstack security group rule list</code>. 
+# Ayez une fenêtre ouverte en cas de panne. De façon générale, le meilleur moyen d’éviter que les données soient corrompues ou non conformes après une migration est de fermer les services et ensuite fermer l’instance. Les petits volumes se copient relativement rapidement; par exemple, un volume de 10Go prendra moins de 5 minutes, mais un volume de 100Go peut prendre de 30 à 40 minutes. De plus, les adresses IP flottantes seront modifiées; assurez-vous donc que le TTL de vos enregistrements DNS est bas afin que les modifications soient propagées le plus rapidement possible. 
+
+Trois scénarios de migration sont possibles :
+* [[#Migration manuelle ou orchestrée|Migration manuelle ou orchestrée]]
+* [[#Migration_d.27instances_associées_à_des volumes|Migration d’instances associées à des volumes]]
+* [[#Migration_d.27instances_éphémères|Migration d’instances éphémères]]
+
+Dépendant de votre configuration actuelle, vous pouvez utiliser certains ou tous ces scénarios pour migrer du nuage Ouest au nuage Arbutus.
+
+== Migration manuelle ou orchestrée ==
+
+Les instances et volumes sont créés sur Arbutus avec les mêmes caractéristiques que sur le nuage Ouest. Règle générale, les grandes lignes de la procédure sont ː
+
+# Si vous utilisez des images personnalisées, copiez les images Glance du nuage Ouest à Arbutus. Vous pouvez aussi simplement commencer avec une nouvelle image de base sur Arbutus. 
+# Installez et configurez les services sur la ou les instances.
+# Copiez les données des anciennes instances vers les nouvelles instances (voir [[#Méthodes_de_copie_de_données|Méthodes de copie de données]] ci-dessous).
+# Assignez des adresses IP flottantes aux nouvelles instances et faites la mise à jour des DNS.
+# Mettez fin aux anciennes instances et supprimez les anciens volumes.
+
+Ces étapes peuvent être effectuées manuellement ou être orchestrées avec 
+[https://docs.ansible.com/ansible/2.5/modules/list_of_cloud_modules.html Ansible], 
+[https://www.terraform.io/docs/providers/openstack/ Terraform] ou
+[https://wiki.openstack.org/wiki/Heat Heat].
+Le présent document ne traite pas de ces outils; cependant, si vous les utilisez sur le nuage Ouest, ils devraient fonctionner de la même manière sur Arbutus.
+
+== Migration d'instances associées à des volumes ==
+
+Comme leur nom l’indique, chacune de ces instances est associée à un volume persistant qui contient le système d’exploitation et les données nécessaires. Une bonne pratique est de créer des volumes distincts pour le système d’exploitation et pour les données.
+
+=== Avec des images Glance ===
+
+Ce scénario est recommandé dans le cas de volumes de moins de 150Go. Pour les volumes plus grands, la [[#Migration_manuelle_ou_orchestrée|migration manuelle ou orchestrée]] est préférable.
+
+1. Ouvrez deux sessions sur le serveur de migration ''cloudmigration.calculcanada.ca'' avec le nom d’utilisateur et le mot de passe de votre compte.<br/>
+2. Dans la session pour Ouest, faites un source du fichier RC du nuage Ouest avec <code>source oldcloudrc.sh</code>. Dans la session pour Arbutus, faites un source du fichier RC du nuage Arbutus avec <code>source newcloudrc.sh</code>. Nous vous recommandons d’utiliser la commande <code>screen</code> pour éviter de perdre ces sessions en cas de problème avec la connexion SSH; au besoin, consultez [https://www.google.com/search?q=screen+ssh ces tutoriels] pour la commande <code>screen</code>. <br/>
+3. Dans l’interface utilisateur du nuage Ouest, créez une image du volume voulu par ''Compute -> Volumes'' et ''Télécharger dans l'image'' du menu déroulant. Le volume ne devrait pas être actif à ce moment, mais s’il l’est, vous pouvez utiliser l’option ''force''. Assurez-vous de sélectionner le format de disque QCOW2. Ceci peut aussi se faire en ligne de commande 
+ <code>cinder --os-volume-api-version 2 upload-to-image <volumename> <imagename> --force</code>
+4. Une fois créée, l’image sera listée sous ''Compute -> Images'' avec le nom que vous avez utilisé à l’étape précédente. Pour obtenir l’identifiant de l’image, cliquez sur son nom. <br/>
+5. Sur le serveur de migration, dans la session pour le nuage Ouest, téléchargez l’image (remplacez <filename> et <image-id> avec les valeurs appropriées):
+: <code>glance image-download --progress --file <filename> <image-id></code>
+6. Sur le serveur de migration, dans la session pour le nuage Arbutus, téléchargez l’image (remplacez <filename> par le nom donné à l’étape précédente; la valeur de <image-name> importe peu).
+: <code>glance image-create --progress --visibility private --container-format bare --disk-format qcow2 --name <imagename> --file <filename></code>
+7. Vous pouvez maintenant créer un volume à partir de l’image téléversée. Dans l’interface utilisateur du nuage Arbutus, allez à ''Compute -> Images''. L’image téléversée à l’étape précédente devrait paraître. Dans le menu déroulant pour l’image, sélectionnez l’option ''Créer le volume'' pour créer le volume à partir de l’image. Le volume ainsi créé peut maintenant être associé à des instances ou utilisé pour démarrer une nouvelle instance. <br/>
+8. Une fois que vos instances et volumes ont été migrés et testés et que tous vos enregistrements DNS ont été mis à jour, veuillez supprimer les anciens volumes et instances sur le nuage Ouest.
+
+=== Autre option avec Linux 'dd' ===
+
+# Lancez une instance sur le nuage Ouest avec le plus petit gabarit possible (par exemple p1-1.5gb). Nous pouvons considérer ceci comme étant un serveur de migration temporaire. Dans les étapes qui suivent, nous avons sélectionné CentOS 7, mais les distributions Linux avec Python et Pip devraient fonctionner de même.
+# Connectez-vous à l’instance avec SSH et installez le CLI OpenStack dans un interpréteur ''root''.
+#: <code>yum install epel-release</code>
+#: <code>yum install python-devel python-pip gcc</code>
+#: <code>pip install python-openstackclient</code>
+# Le CLI OpenStack devrait maintenant être installé. Pour vérifier, lancez la commande <code>openstack</code> en ligne de commande. Pour plus d’information sur l’installation du CLI, consultez [https://docs.openstack.org/newton/user-guide/common/cli-install-openstack-command-line-clients.html https://docs.openstack.org/newton/user-guide/common/cli-install-openstack-command-line-clients.html]
+# Copiez le fichier RC d’Arbutus vers le serveur de migration temporaire et faites un source. Pour vérifier si vous pouvez vous connecter à l’API OpenStack sur Arbutus, lancez la commande 
+#: <code>openstack image list</code>
+# Supprimez l’instance à déplacer mais NE SUPPRIMEZ PAS le volume qui y est associé.
+# Le volume peut maintenant être associé au serveur de migration temporaire que nous avons créé : sur l’interface utilisateur du nuage Ouest, allez à  ''Compute -> Volumes'', sélectionnez ''Gérer les pièces jointes'' du menu déroulant et attachez le volume au serveur de migration temporaire.
+# Prenez note de l’accélérateur auquel le volume est attaché (généralement /dev/vdb ou /dev/vdc).
+# Avec l’utilitaire <code>dd</code> créez une image à partir du disque attaché à l’instance. Dans l’exemple suivant, le nom de l’image est ''volumemigrate''. Lorsque l’opération est terminée, les détails de l’image seront affichés.
+#: <code>dd if=/dev/vdb | openstack image create --private --container-format bare --disk-format raw "volumemigrate"</code>
+# Vous devriez maintenant voir l’image en allant à ''Compute -> Images'' dans l’interface Arbutus. Cette image peut être utilisée pour lancer des instances sur Arbutus. Pour que les données soient persistantes, assurez-vous de créer un nouveau volume au lancement de l’instance. 
+# Une fois que vos instances et volumes ont été migrés et testés et que tous vos enregistrements DNS ont été mis à jour, veuillez supprimer les anciens volumes et instances sur le nuage Ouest.
+
+=== Migration de grands volumes avec Linux 'dd' ===
+Dans le cas de volumes, l'utilisation des images n'est pas recommandée. Copiez plutôt vos données dans de nouveaux volumes avec rsync ou un autre outil de copie, lorsque possible. Dans le cas contraire, par exemple pour un volume amorçable (''bootable''), vous pouvez utiliser la commande <code>dd</code> pour produire une copie identique.
+
+Sauvegardez les données importantes avant d'exécuter cette procédure.
+
+# Créez une instance temporaire sur Ouest (p1-1.5gb devrait convenir). Faites de même sur Arbutus. Utilisez le système d'exploitation CentOS 7.
+# Assignez aux deux instances des adresses IP flottantes par lesquelles vous pourrez vous connecter via SSH.
+# Dans l'instance temporaire sur Ouest, installez les paquets 
+#: <code>yum install epel-release</code>
+#: <code>yum install pv</code>
+#: <code>yum install screen</code>
+# Dans l'instance temporaire sur Arbutus,
+#: <code> chmod u+s /bin/dd </code>
+# Copiez dans l'instance temporaire Ouest la clé privée SSH qui sert à vous connecter en tant qu'utilisateur centos à l'instance temporaire Arbutus.
+# Vérifiez que les règles de sécurité SSH permettent à l'instance temporaire Ouest de se connecter à l'instance temporaire Arbutus.
+# Pour chacun des volumes à déplacer de Ouest à Arbutus :
+#* Créez un volume vide de la même taille dans Arbutus; s'il s'agit d'un volume amorçable, identifiez-le comme tel (''bootable'').
+#* Attachez ce volume à l'instance temporaire Arbutus.
+#* Attachez le volume à copier de Ouest à l'instance temporaire Ouest. Vous devrez peut-être supprimer l'instance à laquelle le volume est présentement attaché. '''Ne supprimez pas le volume.'''
+# Dans l'instance temporaire Ouest, exécutez les commandes ci-dessous. La commande <code>screen</code> est utilisée au cas où vous seriez déconnecté de la session SSH. Pour ce qui est de la seconde commande, nous supposons que le volume source /dev/vdb dans Ouest est attaché à l'instance temporaire Ouest, que la taille du volume est de 96Go, que la clé SSH pour se connecter à l'instance temporaire Arbutus est key.pem, et que le volume de destination dans Arbutus /dev/vdb est attaché à l'instance temporaire Arbutus. Remplacez l'adresse IP par celle de l'instance Arbutus à laquelle vous voulez vous connecter.
+#: <code>screen</code>
+#: <code>sudo dd bs=16M if=/dev/vdb | pv -s 96G | ssh -i key.pem centos@xxx.xx.xx.xx "dd bs=16M of=/dev/vdb"</code>
+
+Vous disposez maintenant dans Arbutus d'une copie identique du volume Ouest et vous pouvez l'utiliser pour lancer des instances dans Arbutus.
+
+== Migration d'instances éphémères ==
+
+Une instance éphémère n'est associée à aucun volume.
+
+=== Avec images et instantanés de volume Glance ===
+
+Ce scénario est recommandé dans le cas de volumes de moins de 150Go. Pour les volumes plus grands, la [[#Migration_manuelle_ou_orchestrée|migration manuelle ou orchestrée]] est préférable.
+
+Dans tous les cas, vous devez quand même copier séparément des données à partir d’un espace de stockage éphémère ne servant pas au démarrage (c’est-à-dire non monté sur <code>/mnt</code>). Consultez [[#Méthodes_de_copie_de_données|Méthodes de copie de données]] ci-dessous.
+
+# Ouvrez deux sessions sur le serveur de migration ''cloudmigration.calculcanada.ca'' avec le nom d’utilisateur et le mot de passe de votre compte.
+# Dans la session pour Ouest, faites un source du fichier RC du nuage Ouest. Dans la session pour Arbutus, faites un source du fichier RC du nuage Arbutus. Nous vous recommandons d’utiliser la commande <code>screen</code> pour éviter de perdre ces sessions en cas de problème avec la connexion SSH; au besoin, consultez [https://www.google.com/search?q=screen+ssh ces tutoriels] pour la commande <code>screen</code>. 
+# Dans l’interface utilisateur du nuage Ouest, créez un instantané de l’instance (''Compute -> Instances'' et ''Créer un instantané'' du menu déroulant). Vous pouvez aussi utiliser le CLI avec
+#: <code>nova list</code>
+#: <code>nova image-create --poll <instancename> <snapshotname></code>
+# Une fois créé, l’instantané sera listé sous ''Compute -> Images''. Pour obtenir l’identifiant de l’instantané, cliquez sur son nom.
+# Dans la session Ouest sur le serveur de migration, téléchargez l’instantané (remplacez <filename> et <imageid> par les valeurs appropriées).
+#: <code>glance image-download --progress --file <filename> <imageid></code>
+# Dans la session Arbutus sur le serveur de migration, téléversez l’instantané (remplacez <filename> par le nom donné à l’étape précédente; la valeur de <image-name> importe peu).
+#: <code>glance image-create --progress --visibility private --container-format bare --disk-format qcow2 --name <imagename> --file <filename></code>
+# Cette image peut maintenant être utilisée pour lancer des instances sur Arbutus. 
+# Une fois que vos instances et volumes ont été migrés et testés et que tous vos enregistrements DNS ont été mis à jour, veuillez supprimer les anciens volumes et instances sur le nuage Ouest.
+
+=== Autre option avec Linux 'dd' ===
+
+# Connectez-vous à l’instance active sur le nuage Ouest avec SSH. Avant de migrer une instance éphémère, il est important de fermer le plus de services possible (par exemple httpd, bases de données, etc.) et de ne garder que SSH.
+# Avec le rôle d’administrateur (''root'') installez le CLI OpenStack si ce n’est pas déjà fait.
+#: <code>yum install epel-release</code>
+#: <code>yum install python-devel python-pip gcc</code>
+#: <code>pip install python-openstackclient</code>
+# Le CLI OpenStack devrait maintenant être installé. Pour vérifier, lancez la commande <code>openstack</code>  en ligne de commande. Pour plus d’information sur l’installation du CLI, consultez [https://docs.openstack.org/newton/user-guide/common/cli-install-openstack-command-line-clients.html https://docs.openstack.org/newton/user-guide/common/cli-install-openstack-command-line-clients.html]
+# Copiez le fichier RC d’Arbutus vers l’instance et faites un source. Pour vérifier si vous pouvez vous connecter à l’API OpenStack sur Arbutus, lancez la commande 
+#: <code>openstack image list</code>
+# Le disque racine de l’instance est généralement <code>/dev/vda1</code>; vérifiez ceci en lançant la commande <code>df</code>.
+# Avec l’utilitaire <code>dd</code>, créez une image à partir du disque racine attaché à l’instance. Dans l’exemple suivant, le nom de l’image est ''ephemeralmigrate''. Lorsque l’opération est terminée, les détails de l’image seront affichés. 
+#: <code>dd if=/dev/vda | openstack image create --private --container-format bare --disk-format raw "ephemeralmigrate"</code>
+# Vous devriez maintenant voir l’image en allant à ''Compute -> Images'' dans l’interface Arbutus. Cette image peut être utilisée pour lancer des instances sur Arbutus. 
+# Une fois que vos instances et volumes ont été migrés et testés et que tous vos enregistrements DNS ont été mis à jour, veuillez supprimer les anciens volumes et instances sur le nuage Ouest.
+
+== Méthodes de copie de données ==
+
+Vous pouvez utiliser une méthode de copie avec laquelle vous êtes familier, mais nous recommandons les deux suivantes, selon la taille des volumes dans votre projet.  
+
+=== Grands volumes de données : Globus ===
+Pour les très grands volumes (plus de 5To), nous recommandons Globus.
+
+La méthode la plus simple est d'utiliser le client Globus Connect Personal avec un abonnement Globus Plus.
+# '''Abonnez-vous à Globus Connect Personal Plus.'''
+## Écrivez à globus@tech.alliancecan.ca.
+## Répondez à l'invitation Globus Personal Plus et suivez les directives.
+# '''Pour chacune des instances touchées par le transfert de données, activez Globus Connect Personal.'''
+## Prenez connaissance de [[Globus/fr#Ordinateurs_personnels | Globus, Ordinateurs personnels]] et de [https://www.globus.org/globus-connect-personal https://www.globus.org/globus-connect-personal].
+## Utilisez les directives appropriées pour installer Globus Connect Personal dans chaque instance. Pour Linux, consultez [https://docs.globus.org/how-to/globus-connect-personal-linux/ https://docs.globus.org/how-to/globus-connect-personal-linux/].
+## Modifiez la configuration de chacune des instances pour communiquer avec le service Globus.
+### Vérifiez que chaque instance possède une adresse IP externe.
+### Vérifiez que le coupe-feu des instances permet la [https://docs.globus.org/how-to/configure-firewall-gcp/ communication par les ports ]; voir aussi [[Managing_your_cloud_resources_with_OpenStack/fr#Groupes_de_sécurité | Groupes de sécurité]].
+### L'utilisateur qui exécute Globus Connect Personal doit avoir accès aux données dans les systèmes de fichiers de stockage.
+## Dans l'espace utilisateur, exécutez Globus Connect Personal en arrière-plan.
+## Comme abonné Globus Connect Personal Plus (étape 1), créez un point de chute partagé pour une ou les deux instances.
+# '''Par l'interface Globus (globus.org, globus.calculcanada.ca) accédez aux points de chute et transférez les données.'''
+## Voyez [https://docs.globus.org/how-to/get-started/ https://docs.globus.org/how-to/get-started/]
+
+Pour plus d'information sur la configuration, consultez [https://computecanada.github.io/DHSI-cloud-course/globus/ https://computecanada.github.io/DHSI-cloud-course/globus/]
+
+En cas de difficulté, contactez le [[Technical support|soutien technique]] (globus@tech.alliancecan.ca) Il est fortement suggéré de soumettre aussi une demande d’assistance au service technique.
+
+=== Petits volumes de données : rsync + ssh ===
+Pour les plus petits volumes, rsync+ssh offre de bonnes vitesses de transfert et, comme Globus, travaille de manière incrémentale. Un cas type serait :
+
+# Connectez-vous avec SSH à l’instance sur le nuage Ouest qui possède le volume principal. Prenez note du chemin absolu que vous voulez copier dans l’instance sur Arbutus.
+# Lancez rsync sur SSH. Dans l’exemple suivant, on suppose qu’il existe une connexion sans mot de passe via des [[SSH Keys/fr|clés SSH]]. Utilisez les valeurs appropriées. 
+#: <code> rsync -avzP -e 'ssh -i ~/.ssh/key.pem' /local/path/ remoteuser@remotehost:/path/to/files/ </code>
+# Vérifiez que les données ont bien été copiées dans l’instance sur Arbutus, puis supprimez les données sur le nuage Ouest.
+
+Vous pouvez aussi déplacer vos données par une autre méthode que vous connaissez bien.
+
+== Soutien technique==
+
+Pour une demande d'assistance technique, écrivez à [mailto:cloud@tech.alliancecan.ca cloud@tech.alliancecan.ca].
+
+[[Category:Cloud]]

@@ -1,0 +1,99 @@
+<languages />
+[[Category:AI and Machine Learning]]
+[https://wandb.ai Weights & Biases (wandb)] est une <i>plateforme de méta-apprentissage machine</i> qui permet de construire des modèles pour des applications concrètes. La plateforme permet de suivre, comparer, décrire et reproduire les expériences d'apprentissage machine.
+
+<span id="Using_wandb_on_Alliance_clusters"></span>
+== Utilisation sur nos grappes ==
+
+<span id="Availability_on_compute_nodes"></span>
+=== Disponibilité sur les nœuds de calcul === 
+
+
+<div class="mw-translate-fuzzy">
+Puisque wandb exige une connexion à l'internet, sa disponibilité sur les nœuds de calcul dépend de la grappe.
+</div>
+
+{| class="wikitable"
+|-
+! Grappe !! Disponibilité de wandb !! 
+|-
+| Béluga || rowspan="3"| limitée ❌ || rowspan="3"| uniquement pour les membres de MILA et autres groupes admissibles, via <tt>httpproxy</tt>
+|-
+| Narval
+|-
+| TamIA
+|-
+| Cedar || oui ✅ || <tt>httpproxy</tt> n'est pas requis
+|-
+| Graham || non ❌ || accès internet désactivé sur les nœuds de calcul 
+|-
+| Vulcan || oui ✅ || <tt>httpproxy</tt> n'est pas requis
+|}
+
+<span id="Users_from_MILA_and_other_eligible_groups"></span>
+== Membres de MILA et autres groupes admissibles ==
+
+Members of the MILA Québec AI Institute may use <tt>wandb</tt> on any of our clusters with internet access, provided that they use a valid '''Mila-org''' Weights & Biases account to log into <tt>wandb</tt>. Please see the table above for more information on modules required for using <tt>wandb</tt> on each cluster.
+
+Other groups are known to have made arrangements with Weights & Biases to bypass calls to the Google Cloud Storage API. Please contact your PI to find out if your group has made such arrangements.
+
+<span id="Béluga,_Narval_and_TamIA"></span>
+== Béluga, Narval et TamIA ==
+
+<div class="mw-translate-fuzzy">
+S'il est possible de téléverser des métriques de base pour Weights&Biases par une tâche sur Béluga, le paquet wandb téléverse automatiquement de l'information sur l'environnement utilisé vers un compartiment (<i>bucket</i>) Google Cloud Storage, ce qui cause un plantage (<i>crash</i>) au cours d'un entraînement ou à sa toute fin; présentement, il est impossible de désactiver ce comportement. Le téléversement d'artefacts avec <code>wandb.save()</code> nécessite aussi l'accès au Google Cloud Storage, ce qui n'est pas disponible sur les nœuds de calcul de Béluga.
+</div>
+
+Vous pouvez quand même utiliser wandb en activant les modes [https://docs.wandb.ai/library/cli#wandb-offline <code>offline</code>] ou [https://docs.wandb.ai/library/init#save-logs-offline <code>dryrun</code>]. Avec ces modes, wandb écrit tous les métriques, journalisations et artefacts sur le disque local, sans synchronisation avec le service internet Weights&Biases. Une fois les tâches terminées, vous pouvez faire la synchronisation avec la commande [https://docs.wandb.ai/ref/cli#wandb-sync <code>wandb sync</code>] sur le nœud de connexion.
+
+Remarquez que le produit [[Comet.ml/fr|Comet.ml]] est très semblable à Weights & Biases et qu'il fonctionne sur Béluga, Narval et TamIA.
+
+<span id="Example"></span>
+== Exemple ==
+
+<div class="mw-translate-fuzzy">
+L'exemple suivant montre comment utiliser wandb pour le suivi de l'expérimentation sur Béluga. Pour reproduire ceci sur Cedar, il n'est pas nécessaire d'activer le mode hors ligne.
+</div>
+
+{{File
+  |name=wandb-test.sh
+  |lang="bash"
+  |contents=
+#!/bin/bash
+#SBATCH --account=YOUR_ACCOUNT
+#SBATCH --cpus-per-task=2 # Nous recommandons au moins 2 CPU (un pour le processus principal et un autre pour le processus wandB)
+#SBATCH --mem=4G       
+#SBATCH --time=0-03:00
+#SBATCH --output=%N-%j.out
+
+
+module load python
+virtualenv --no-download $SLURM_TMPDIR/env
+source $SLURM_TMPDIR/env/bin/activate
+pip install --no-index wandb
+
+### sauvegardez votre clé wandb API dans votre .bash_profile ou remplacez $API_KEY par votre propre clé API. Supprimez la ligne ci-dessous et identifiez wandb offline en commentaire si vous exécutez en mode en ligne. ###
+
+#wandb login $API_KEY 
+
+wandb offline
+
+python wandb-test.py
+}}
+
+Le script wandb-test.py est un exemple simple de journalisation des métriques. Pour d'autres options, voyez [https://docs.wandb.ai la documentation complète de W&B].
+
+{{File
+  |name=wandb-test.py
+  |lang="python"
+  |contents=
+import wandb
+
+wandb.init(project="wandb-pytorch-test", settings=wandb.Settings(start_method="fork"))
+
+for my_metric in range(10):
+    wandb.log({'my_metric': my_metric})
+
+}}
+
+Après que l'entraînement a été effectué en mode hors ligne, vous aurez le nouveau répertoire <code>./wandb/offline-run*</code>. Pour envoyer les métriques au serveur, utilisez la commande <code>wandb sync ./wandb/offline-run*</code> où l'astérisque synchronise toutes les exécutions.

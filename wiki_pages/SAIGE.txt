@@ -1,0 +1,70 @@
+<languages/>
+[[Category:Software]]
+<translate>
+<!--T:1-->
+[https://saigegit.github.io/SAIGE-doc/ SAIGE]
+is an R package developed with Rcpp for genome-wide association tests in large-scale data sets and biobanks. 
+
+<!--T:2-->
+The method
+
+<!--T:3-->
+* accounts for sample relatedness based on the generalized mixed models;
+
+<!--T:4-->
+* allows for model fitting with either full or sparse genetic relationship matrix (GRM);
+
+<!--T:5-->
+* works for quantitative and binary traits;
+
+<!--T:6-->
+* handles case-control imbalance of binary traits;
+
+<!--T:7-->
+* computationally efficient for large data sets;
+
+<!--T:8-->
+* performs single-variant association tests;
+
+<!--T:9-->
+* provides effect size estimation through Firth’s Bias-Reduced Logistic Regression;
+
+<!--T:10-->
+* performs conditional association analysis.
+
+<!--T:11-->
+This page discusses how to install SAIGE package 1.0.0. 
+
+== Installing SAIGE == <!--T:12-->
+
+<!--T:13-->
+1.  Load the appropriate modules.
+{{Command|module load gcc r/4.2.2 savvy superlu flexiblas}}
+2. Create the installation directory.
+{{Commands
+|mkdir -p ~/.local/R/$EBVERSIONR/
+|export R_LIBS{{=}}~/.local/R/$EBVERSIONR/
+}}
+3. Install the [[R#Installing_R_packages|R dependencies]].
+{{Command|R -e 'install.packages(c("Rcpp", "RcppParallel", "data.table", "RcppArmadillo", "SPAtest", "RcppEigen", "BH", "optparse", "SKAT", "MetaSKAT", "qlcMatrix", "RhpcBLASctl", "RSQLite", "dplyr"), repos{{=}}"https://cloud.r-project.org/")'
+}}
+
+<!--T:14-->
+4. Download SAIGE version 1.0.0.
+{{Commands
+|git clone --recursive https://github.com/saigegit/SAIGE.git -b 1.0.0
+|cd SAIGE/
+}}
+5. Patch the installation.
+{{Commands
+|rm configure
+|sed -i 's/llapack/lflexiblas/' src/Makevars
+}}
+First, remove the <i>configure</i> file to avoid installing already available dependencies. Then, change the library name to correctly link to the <i>Makevars</i> file to make sure that the linking options will use FlexiBLAS. Doing so will prevent the i>unable to find -llapack</i> error message displayed at installation. Read more information on [[BLAS_and_LAPACK|FlexiBLAS, BLAS and LAPACK]].
+
+<!--T:15-->
+6. Compile and install.
+{{Command|R CMD INSTALL .}}
+7. Test that it is available.
+{{Command|R -e 'library(SAIGE)'}}
+</translate>

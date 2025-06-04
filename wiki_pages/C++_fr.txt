@@ -1,0 +1,50 @@
+<languages />
+
+C++ est un langage de programmation multiparadigme et généraliste de haut niveau créé en 1979 chez Bell Labs par Bjarne Stroustrup, dans le but d'apporter certaines améliorations au langage C. Des normes ISO ont été établies en 1998 (C++98), 2003 (C++03), 2011 (C++11), 2014 (C++14) et 2020 (C++2020). Le comité ISO pour les normes C++ met à jour les normes aux trois ans; après celles de 2020, les prochaines seront établies en 2023.
+
+La documentation complète et à jour est disponible sur la page Wiki [http://en.cppreference.com/w/ cppreference].
+
+Il faut se rappeler que les langages C et C++ ne sont pas identiques. Si beaucoup de code C peut être utilisé tel quel avec C++, les différences affectent quelquefois la compilation ou l'exécution du programme. Si vous compilez votre code C en C++, mentionnez-le quand vous demandez du soutien technique.
+
+==Meilleurs modèles de mémoire et de concurrence==
+
+Ces modèles sont apparus avec la norme ISO de 2011; il n'y avait au préalable aucune gestion des accès concurrents à la mémoire en lecture et en écriture et cet aspect n'est pas toujours documenté par le fournisseur du compilateur. '''Il est donc préférable de compiler en C++11 ou plus'''.
+
+Une autre raison d'utiliser la plus récente version du compilateur et des normes du code C++ est de profiter pleinement des optimisations rendues possibles par des fonctionnalités telles que <tt>constexpr</tt>. Avec une nouvelle norme, en plus des ajouts, les définitions sont revues et améliorent l'exactitude du code et l'optimisation. En utilisant une version moins récente que celle qui est disponible, vous ne profitez pas de ces avantages.
+
+==Compilateurs==
+===Spécificités des langages===
+Les compilateurs ne traitent pas les langages de la même manière. Plusieurs versions de compilateurs ne supportent que partiellement une norme C++ en particulier, ce qui est parfois décevant. Consultez [http://en.cppreference.com/w/cpp/compiler_support ce tableau] pour la liste des versions correspondant aux fonctionnalités du langage ainsi que des liens vers les sites Web de chaque compilateur.
+
+===Bibliothèque standard=== 
+Plusieurs compilateurs C++ sous Linux ne fournissent pas leur propre implémentation de la bibliothèque C++ standard avec certains systèmes d'exploitation (surtout Linux). Ces compilateurs utilisent la bibliothèque qui est installée; la bibliothèque libstdc++ de GCC est donc typiquement utilisée.
+
+'''Note :''' Il ne faut pas vous inquiéter; ceci explique pourquoi les compilateurs C++ autres que ceux de GCC doivent être configurés par un administrateur afin qu'une version particulière de libstdc++ puisse être utilisée, car plusieurs versions de GCC (et donc de libstdc++) sont installées sur nos systèmes. Une configuration incorrecte peut apporter des problèmes. Pour cette raison également, pour compiler leurs applications, il ne faut pas coder en dur (''hard code'') les chemins vers les bibliothèques installées par les administrateurs.
+
+La documentation GCC comprend une section sur [https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html les composantes de la bibliothèque standard supportées par libstdc++].
+
+==Sources d'information==
+
+Un point de départ pour se familiariser avec C++ est la page [https://isocpp.org/get-started Get Started];   tous les ouvrages qui y sont mentionnés sont excellents.
+
+== Pièges == 
+=== Mot-clé <tt>volatile</tt> ===
+Le modificateur <tt>volatile</tt> a un sens très particulier en C et C++ comme vous le constaterez en lisant [http://en.cppreference.com/w/cpp/language/cv cette page]. L'emploi de ce modificateur est toutefois rare. Dans le code de calcul haute performance, <tt>volatile</tt> peut être utilisé pour déclarer une variable indiquant au compilateur de ne pas optimiser les effets du chargement et du stockage reliés à cette variable. Ceci dit, '''n'utilisez jamais''' <tt>volatile</tt> pour faire la synchronisation, mais plutôt les opérations atomiques et les verrous de C++ et C++11. Dans les autres langages de programmation (par exemple Java), <tt>volatile</tt> est souvent différent que dans C/C++ et devrait être implémenté avec un outil de synchronisation.
+
+=== Compilateurs===
+====GCC====
+=====O3=====
+L'option -O3 comprend des améliorations possiblement dangereuses pour certains codes, par exemple ceux comprenant des fonctions de crénelage (''aliasing''). En cas de doute, utilisez plutôt l'option -O2. Si vous avez le temps, lisez la page man (par exemple <tt>man g++</tt>) et cherchez -O3; vous pouvez ainsi désactiver les paramètres qui ne sont pas sûrs.
+
+=====Liens avec des binaires déjà compilés=====
+Une modification importante a été introduite à l'interface binaire-programme (ABI) entre les versions 4.9 et 5.1 du GCC. Aucun problème ne survient si tout le code source incluant les bibliothèques dépendantes est compilé avec la même version du compilateur. Par contre, l'utilisation de versions différentes peut empêcher les liens de se faire correctement en raison de cette modification, surtout si les liens se font vers des bibliothèques précompilées offertes par les produits de fournisseurs externes. Dans un tel cas, utilisez la fonction Dual ABI<ref>Free Software Foundation. The GNU C++ Library, Chapter 3. https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html</ref> pour que les liens se fassent de façon appropriée avec l'ancienne interface ABI. Il faudrait donc par exemple passer <code>-D_GLIBCXX_USE_CXX11_ABI=0</code> au GCC si vous utilisez une version supérieure à 5.1.
+
+La page [[GCC C++ Dual ABI/fr|GCC C++ Dual ABI]] présente un exemple de l'effet sur l'ABI de diverses options de commandes de ligne GCC.
+
+De façon générale, l'ABI (''application binary interface'') de C++ est mise à jour régulièrement. On peut supposer que chaque version majeure du compilateur endommage l'ABI assez pour que les binaires puissent difficilement lier le code C++. La solution est généralement de rester avec le même compilateur ou de recompiler les binaires anciens à partir de la source avec le nouveau compilateur. GCC peut contrôler ces options (voir [https://gcc.gnu.org/onlinedocs/gcc/C_002b_002b-Dialect-Options.html cette page] sur <tt>-fabi-version</tt>).
+
+====Intel==== 
+Les compilateurs C et C++ d'Intel risquent de causer des difficultés dans le cas d'opérations avec virgule flottante.  Prenez connaissance des pages man Intel (par exemple <tt>man icpc</tt>) et utilisez les options <tt>-fp-model precise</tt> ou <tt>-fp-model source</tt> pour respecter les normes ANSI, ISO et IEEE. Pour plus d'information, consultez [https://software.intel.com/sites/default/files/article/326703/fp-control-2012-08.pdf ce document].
+
+==Références==
+<references/>

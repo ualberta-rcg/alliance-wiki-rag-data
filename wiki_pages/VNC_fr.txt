@@ -1,0 +1,329 @@
+<languages />
+
+[[File:Matlab-vnc.png|400px|thumb|MATLAB exécuté dans VNC]]
+
+Pour certains paquets complexes (par exemple [[MATLAB/fr|MATLAB]]), il est parfois utile de démarrer à distance l'interface utilisateur graphique. Pour ce faire, on utilise généralement [[SSH/fr|SSH]] avec redirection X11, mais la performance est souvent trop lente, tout comme avec [[Connecting_with_MobaXTerm/fr| MobaXTerm]] ou [[Connecting_with_PuTTY/fr|Putty]]. Une meilleure option est d'utiliser [https://fr.wikipedia.org/wiki/Virtual_Network_Computing VNC] pour se connecter à un ordinateur à distance.
+
+<span id="Setup"></span>
+= Configuration =
+
+Pour vous connecter au serveur VNC, vous devez d'abord installer un client VNC sur votre ordinateur. Nous recommandons le paquet [http://tigervnc.org/ TigerVNC] disponible pour Windows, macOS et pour la plupart des distributions Linux (voir ci-dessous). Nous abordons ici le téléchargement, l'installation et la configuration de TigerVNC de manière sécuritaire pour chaque système d'exploitation. Les étapes de configuration du certificat ne sont requises que pour se connecter aux nœuds VDI afin que l'autorité de signature présentée par vncserver soit connue. Si un message est affiché rapportant un problème avec un certificat, soit qu'il n'est pas configuré correctement, soit que la connexion à notre serveur n'est pas faite; n'entrez pas votre mot de passe.
+
+== Windows ==
+
+Téléchargez et exécutez la plus récente version stable de l'installateur <tt>vncviewer64-x.y.z.exe</tt> à partir de [https://sourceforge.net/projects/tigervnc/files/stable/ la page officielle], par exemple <code>vncviewer64-1.15.0.exe</code> (depuis avril 2025). Vérifiez que vous avez bien téléchargé VNC Viewer et non le serveur. Pour créer des tunnels sécuritaires entre votre ordinateur et vncserver comme décrit ci-dessous, vous devez ouvrir une fenêtre de terminal et exécuter la commande SSH, ce qui peut être fait avec le standard PowerShell de Windows 10, à partir de la mise à jour 1809.
+
+<span id="MacOS"></span>
+== macOS ==
+
+Installez le plus récent paquet DMG stable à partir de [https://sourceforge.net/projects/tigervnc/files/stable/ la page officielle de téléchargement] et cliquez sur le bouton vert <i>Download Latest Version</i> pour TigerVNC-1.15.0.dmg (depuis avril 2025). Quand le fichier DMG est téléchargé, faites un double-clic dessus pour l'ouvrir.  Une fenêtre contextuelle est affichée avec l'icône de TigerVNC Viewer ainsi que les fichiers LICENSE.TXT et README.rst. Glissez l'icône  tigervnc dans le dossier Applications et/ou dans le [https://support.apple.com/en-ca/guide/mac-help/mh35859/mac Dock]. Pour supprimer la fenêtre contextuelle, vous devez démonter le fichier  DMG. Pour ce faire, ouvrez une fenêtre de New Finder; assurez-vous que <code>View->ShowSidebar</code> est sélectionné. Dans le menu de gauche, cliquez sur la petite flèche vers le haut près de <code>TigerVNC-1.15.0</code>; et fermez la fenêtre de Finder. Avec macOS Monterey 12.2, [https://github.com/TigerVNC/tigervnc/issues/1423 si TigerVNC plante], utilisez plutôt la dernière version.
+
+== Linux ==
+
+Installez TigerVNC Viewer pour votre version de Linux :
+
+{| class="wikitable"
+! Version
+! Commande
+|-
+| Debian, Ubuntu
+| <code>sudo apt-get install tigervnc-viewer</code>
+|-
+| Fedora, CentOS, or RHEL
+| <code>sudo yum install tigervnc</code>
+|-
+| Gentoo
+| <code>emerge -av net-misc/tigervnc</code>
+|}
+
+Lancez TigerVNC par le menu des applications ou en entrant <code>vncviewer</code> en ligne de commande. Dans la fenêtre <i>VNC Viewer: Connection Details</i>, cliquez sur <i>Options -> Security</i> et cochez toutes les cases sauf <i>Excryption None</i>. Entrez le chemin approprié dans le champ <i>Path to X509 CA Certificate</i>.  
+
+{| class="wikitable"
+! Version
+! Path to X509 CA Certificate
+|-
+| Debian, Ubuntu
+| /etc/ssl/certs/ca-certificates.crt
+|-
+| Fedora, CentOS, or RHEL
+| /etc/pki/tls/certs/ca-bundle.crt
+|-
+| Gentoo
+| /etc/ssl/certs/ca-certificates.crt
+|}
+Cliquez sur <i>OK</i>, puis sur <i>Connect</i>; les paramètres ne sont pas sauvegardés si vous ne cliquez pas sur <i>Connect</i>.
+
+<span id="Connect"></span>
+= Connexion =
+
+Vous avez maintenant besoin d'un serveur VNC auquel vous connecter. Il peut s'agir d'un vncserver persistant sur un nœud VDI dédié de [[Graham/fr|Graham]] ou d'un vncserver que vous démarrez sur un nœud de calcul. Comme VNC n'est pas un serveur pour des tâches lourdes, vous pouvez certainement ouvrir une session légère sur un nœud de connexion.
+
+<span id="VDI_nodes"></span>
+== Nœuds VDI ==
+
+[[File:TigerVNC-GrahamDesktop.png|400px|thumb|right|'''gra-vdi.alliancecan.ca''']]
+
+Graham possède deux nœuds VDI (<i>Virtual Desktop Infrastructure</i>) dédiés, collectivement connus sous le nom de gra-vdi. Ces nœuds fournissent un environnement de bureau à distance équipé d'OpenGL accéléré. Ils sont destinés aux tâches graphiques interactives les plus exigeantes et les plus complexes. Les nœuds VDI partagent les systèmes de fichiers <code>/home, /project</code> et <code>/scratch</code> de Graham. Par conséquent, tous les fichiers de données ou les répertoires créés sur Graham à l'exécution des tâches dans la file d'attente seront immédiatement accessibles sur gra-vdi à des fins de visualisation et de post-traitement sans qu'il soit nécessaire de les transférer.
+
+Pour vous connecter à gra-vdi, démarrez VNC (tigervnc) sur votre ordinateur et entrez code>VNC server: '''gra-vdi.alliancecan.ca'''</code>. Un écran de connexion sera affiché où vous pourrez entrer les identifiants pour votre compte avec l'Alliance. Une session sur gra-vdi3 ou gra-vdi4 peut alors être lancée aléatoirement sur votre bureau.
+
+Vous pouvez aussi vous connecter directement à l'une ou l'autre des machines en spécifiant <code>VNC server: '''gra-vdi3.sharcnet.ca'''</code> ou en entrant <code>VNC server: '''gra-vdi4.sharcnet.ca'''</code>. Cela peut être utile si vous constatez qu'une machine est surchargée et donc peu réactive; ou si vous voulez systématiquement utiliser le répertoire local $SCRATCH (défini comme /local/tmp/$USER) sur un serveur mais pas sur l'autre. Notez que $SCRATCH est défini différemment sur les grappes (comme /scratch/$USER) quand il est partagé par tous les nœuds. Cependant, comme sur les grappes, toutes les données laissées sur $SCRATCH de gra-vdi seront éventuellement supprimées car l'espace disque est limité. Veuillez ne pas prévoir de stocker de fichiers sur $SCRATCH pour plus de 60 jours.
+
+Enfin, n'oubliez pas que les nœuds VDI sont une ressource partagée qui est destinée aux tâches de visualisation. Si vous devez effectuer des calculs de longue durée dans une application qui utilise une interface graphique (GUI), déconnectez-vous de gra-vdi et connectez-vous plutôt à un nœud de calcul sur n'importe quelle grappe comme décrit dans la section <b>Nœuds de calcul</b> ci-dessous. Cela fait en sorte que les ressources de mémoire et de processeurs sur gra-vdi restent entièrement disponibles pour que d'autres puissent effectuer leurs propres tâches graphiques, sans impact notable sur la performance.
+
+<span id="Login_nodes"></span>
+== Nœuds de connexion ==
+
+Pour utiliser sur votre ordinateur à distance une application peu exigeante qui requiert peu de mémoire, de temps CPU ou de GPU (puisque les nœuds de connexion imposent des limites), vous pouvez démarrer un serveur VNC sur un nœud de connexion  et vous y connecter avec vncviewer. Connectez-vous d'abord avec SSH comme démontré ci-dessous.
+
+ [<b>laptop</b>:~] ssh graham.alliancecan.ca
+
+Lancez ensuite <code>vncserver -list</code> pour savoir si d'autres vncservers dont vous n'avez plus besoin sont toujours actifs; si c'est le cas, tuez-les avec
+
+ [<b>gra-login2</b>:~] <code>pkill Xvnc -u $USER</code>
+
+1) La commande vncserver de l'environnement StdEnv/2023 est basée sur [https://turbovnc.org turbovnc].  Lorsque vous lancez un nouveau vncserver sur un nœud de connexion, ajoutez l'option <code>-idletimeout seconds</code>. Ceci fait en sorte que <code>vncserver</code> se terminera éventuellement (une fois qu'un nombre S de secondes se sont écoulées sans connexion d'un VNC viewer) si votre session vncviewer n'est pas terminée en cliquant <code>System -> Log out</code> sur le bureau de vnc. La première fois que vous lancez vncserver, vous devrez créer un mot de passe [https://docs.alliancecan.ca/wiki/VNC/fr#Mot_de_passe que vous pourrez changer plus tard].  Ce mot de passe sera nécessaire pour établir la connexion à distance entre votre bureau et un vcnclient (tel que vncviewer). Le même mot de passe servira aussi pour  [https://docs.alliancecan.ca/wiki/VNC/fr#Connexions_multiples établir des connexions multiples] en supposant que vncserver a été lancé avec l'option <code>-alwaysshared</code>; notez que les crochets font que la quantité est optionnelle.
+
+ [<b>gra-login2</b>:~] vncserver -idletimeout 86400 [-alwaysshared]
+ Would you like to enter a view-only password (y/n)? n
+ Desktop 'TurboVNC: gra-login2:2 (username)' started on display gra-login2:2
+ Starting applications specified in /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/xstartup.turbovnc
+ Log file is /home/username/.vnc/gra-login2:2.log
+
+2) Déterminez quel est le port qui écoute le nouveau vncserver (dans cet exemple, il s'agit de 5903).
+
+ [<b>gra-login2</b>:~]  grep -iE "\sport|kill" /home/username/.vnc/gra-login2:2.log
+ 03/09/2024 17:48:40 Listening for VNC connections on TCP port <span style="Color:blue">5903</span>
+
+ [<b>gra-login2</b>:~] exit
+
+3) Sur votre ordinateur, lancez un tunnel SSH pour envoyer un port arbitraire (5901 dans notre exemple)  au serveur VNC.
+
+  [<b>laptop</b>:~] ssh graham.computecanada.ca -L <span style="Color:red">5901</span>:<b>gra-login2</b>:<span style="Color:blue">5903</span>
+
+4) Sur votre ordinateur, connectez-vous une autre fois au port avec vncviewer.
+
+  [<b>laptop</b>:~] vncviewer localhost:<span style="Color:red">5901</span>
+
+Sous macOS ou Windows, cliquez sur l'icône de l'application <i>TigerVNC Viewer</i> qui se trouve sur votre ordinateur et entrez '''localhost:<span style="Color:red">5901</span>''' dans <i>Connection Details</i>. Tenez compte des limites imposées sur les nœuds de connexion en termes d'utilisation de la mémoire et du temps de CPU. Sur Graham, ces limites sont de 8Go de mémoire et de 1&nbsp;heure d'utilisation de CPU par processus, selon <code>ulimit -t -v</code>; ceci peut varier dépendant de la grappe. Si vous avez besoin de plus de ressources, lancez votre serveur VNC sur un nœud de calcul ou sur un nœud VDI, comme décrit ci-dessus et ci-dessous.
+
+<span id="Compute_nodes"></span>
+== Nœuds de calcul ==
+
+Si aucun nœud VDI n'est disponible, vous pouvez démarrer un serveur VNC dans un nœud de calcul puis vous y connecter à partir de votre ordinateur par redirection de port. Vous obtenez ainsi un accès dédié au serveur sans toutefois bénéficier de toutes les fonctionnalités graphiques ou de OpenGL accéléré.
+
+<b>1) Démarrer un serveur VNC</b>
+
+Avant de démarrer votre serveur VNC, connectez-vous à une grappe (par exemple Cedar) et créez une allocation sur un nœud de connexion avec la commande <code>salloc</code> (limite de 24 heures). Par exemple, pour demander une [[Running_jobs/fr#Tâches_interactives|tâche interactive]] qui utilise 4 CPU et 16Go de mémoire, vous pourriez utiliser
+
+<source lang="bash">
+[username@cedar5:~/project] salloc --time=1:00:00 --cpus-per-task=4 --mem=16000 --account=def-username
+salloc: Pending job allocation 20067316
+salloc: job 20067316 queued and waiting for resources
+salloc: job 20067316 has been allocated resources
+salloc: Granted job allocation 20067316
+salloc: Waiting for resource configuration
+salloc: Nodes cdr768 are ready for job
+[username@cdr768:~/project]
+</source>
+
+Une fois la tâche interactive démarrée, il faut définir une variable d'environnement pour éviter certaines erreurs répétitives.
+
+<source lang="bash">
+[username@cdr768:~/project] export XDG_RUNTIME_DIR=${SLURM_TMPDIR}
+</source> 
+
+Ensuite, démarrez un serveur VNC avec <code>vncserver</code>. Portez attention au nœud dans lequel la tâche est exécutée; en cas de doute, utilisez la commande <code>hostname</code> pour vérifier de quel nœud il s'agit. Si vous faites ceci pour la première fois, une invite demandera un mot de passe pour votre serveur VNC. <b>VOUS DEVEZ ENTRER UN MOT DE PASSE</b> que vous pourrez changer par la suite avec la commande <code>vncpasswd</code>. Revenons à l'exemple :
+
+<source lang="bash">
+[username@cdr768:~/project] vncserver
+You will require a password to access your desktops.
+Password:
+Verify:
+Would you like to enter a view-only password (y/n)? n
+xauth:  file /home/username/.Xauthority does not exist
+New 'cdr768.int.cedar.computecanada.ca:1 (username)' desktop is cdr768.int.cedar.computecanada.ca:1
+Creating default startup script /home/username/.vnc/xstartup
+Creating default config /home/username/.vnc/config
+Starting applications specified in /home/username/.vnc/xstartup
+Log file is /home/username/.vnc/cdr768.int.cedar.computecanada.ca:1.log
+</source>
+
+Identifiez le port utilisé par le serveur VNC en consultant le fichier journal.
+
+ [username@cdr768:~/project] grep -iE "\sport|kill" /home/username/.vnc/cdr768.int.cedar.computecanada.ca:1.log
+ vncext:      Listening for VNC connections on all interface(s), port <b>5901</b>
+
+<b>2) Établissez un tunnel SSH vers le serveur VNC</b>
+
+Une fois le serveur VNC démarré, il faut créer un pont pour que votre ordinateur puisse se connecter directement au nœud de calcul. Cette connexion se fait par un [[SSH tunnelling/fr|tunnel SSH]]. Les tunnels sont créés sur votre ordinateur avec la commande SSH usuelle à laquelle une option est ajoutée; le format de la commande est <code>ssh user@host -L port:compute_node:port</code>.
+
+Voici un exemple d'une commande de tunnel SSH exécutée sur un ordinateur pour établir une connexion avec un serveur VNC situé sur le nœud cdr768 de Graham avec le port 5901.
+
+ [name@local_computer]$ ssh username@cedar.computecanada.ca -L 5902:cdr768:<b>5901</b>
+
+Le tunnel SSH fonctionne comme une session SSH normale et il peut servir entre autres à lancer des commandes. Souvenez-vous cependant que cette session SSH est aussi votre connexion au serveur VNC; si vous terminez la session SSH, vous perdrez votre connexion au serveur VNC. Pour plus d'information, consultez la page  [[SSH tunnelling/fr|Tunnels SSH]].
+
+<b>3) Connectez-vous au serveur VNC</b>
+
+Sous Linux, ouvrez une nouvelle fenêtre de terminal et connectez votre client VNC à <b>localhost:port</b>. Dans le prochain exemple, la commande <code>vncviewer</code> de TigerVNC établit la connexion au serveur VNC actif sur cdr768. Vous devrez entrer le mot de passe que vous avez défini précédemment.
+
+
+{{Command
+|vncviewer localhost:5902
+|prompt=[name@local_computer]$ 
+|result=
+ 
+TigerVNC Viewer 64-bit v1.8.0
+Built on: 2018-06-13 10:56
+Copyright (C) 1999-2017 TigerVNC Team and many others (see README.txt)
+See http://www.tigervnc.org for information on TigerVNC.
+
+Tue Jul 10 17:40:24 2018
+ DecodeManager: Detected 8 CPU core(s)
+ DecodeManager: Creating 4 decoder thread(s)
+ CConn:       connected to host localhost port 5902
+ CConnection: Server supports RFB protocol version 3.8
+ CConnection: Using RFB protocol version 3.8
+ CConnection: Choosing security type VeNCrypt(19)
+ CVeNCrypt:   Choosing security type TLSVnc (258)
+
+Tue Jul 10 17:40:27 2018
+ CConn:       Using pixel format depth 24 (32bpp) little-endian rgb888
+ CConn:       Using Tight encoding
+ CConn:       Enabling continuous updates
+}}
+
+Sous macOS ou Windows, cliquez sur l'icône de l'application <i>TigerVNC Viewer</i> et entrez l'information sur le <b>localhost:port</b>. Dans le cas de notre exemple, nous avons ainsi 
+[[File:VNCviewerConnect.png|400px|thumb<b>Mac Tiger VNC Viewer Connection Details Dialogue Box</b>]]
+
+
+Le numéro du port (ici 5902) doit correspondre au port local (le premier nombre) que vous avez défini à la création du tunnel SSH. Le port VNC par défaut est le 5900. Si vous avez défini 5900 comme étant le port local pour le tunnel SSH, vous pourriez l'omettre quand vous invoquez <code>vncviewer</code>. Cependant, il peut être impossible sous Windows de définir un tunnel SSH avec le port local 5900. Une fois la connexion établie, le [https://mate-desktop.org/ bureau Linux MATE] sera affiché. 
+
+Pour lancer un terminal, cliquez sur <i>Applications->System Tools->MATE Terminal</i> dans le menu du haut. Vous pouvez ajouter un raccourci au menu du haut en faisant un clic droit sur <i>MATE Terminal</i> puis en cliquant sur <i>Add this launcher to panel</i>. Enfin, pour démarrer un programme, lancez la commande comme vous le feriez dans une session <code>bash</code>, par exemple avec <code>xclock</code>. Pour les programmes plus complexes comme MATLAB, chargez le module et lancez la commande <code>matlab</code>.
+
+<span id="More_information"></span>
+= Autres points importants =
+
+<span id="Vncserver_password"></span>
+== Mot de passe ==
+
+Pour réinitialiser votre mot de passe, utilisez la commande
+
+<source lang="bash">
+[gra-login1:~] vncpasswd
+Password:
+Verify:
+Would you like to enter a view-only password (y/n)? n
+</source>
+
+Vous pouvez choisir de supprimer définitivement votre configuration VNC incluant votre mot de passe en supprimant votre répertoire <code>~/.vnc</code>. La prochaine fois que vous lancerez <code>vncserver</code>, une invite vous demandera de définir un nouveau mot de passe.
+
+<span id="Killing_vncserver"></span>
+== Tuer le vncserver ==
+
+Si un vncserver actif n'est plus nécessaire, tuez-le avec <code>vncserver -kill :DISPLAY#</code> comme démontré ci-dessous.
+
+ [gra-login1:~] vncserver -list
+ TurboVNC sessions:
+ X DISPLAY #	PROCESS ID	NOVNC PROCESS ID
+ :<span style="color:red">44</span>	        27644
+ [gra-login1:~] vncserver -kill :<span style="color:red">44</span>
+ Killing Xvnc process ID 27644
+
+Si vous avez plusieurs vncservers actifs sur un nœud, vous pouvez les tuer tous du même coup avec
+ [gra-login1:~] pkill Xvnc -u $USER
+
+<span id="Multiple_connections"></span>
+== Connexions multiples ==
+
+Tous les vncservers exécutés sous votre nom d'utilisateur (sur un nœud de connexion ou de calcul) peuvent être listés avec <code>vncserver -list</code>. Si un vncserver a été démarré avec l'option supplémentaire <code>-AlwaysShared</code>, plusieurs connexions peuvent être établies en créant un nouveau tunnel et un nouveau vncviewer à partir de n'importe quel emplacement distant. Ainsi, on peut laisser vncviewer exécuté sur un ordinateur au bureau, puis se reconnecter à nouveau depuis chez soi pour accéder au même ordinateur et ensuite, par exemple, continuer à travailler de manière transparente avec les mêmes applications sans avoir à les fermer. Si toutefois un vncserver n'a pas été démarré avec <code>vncserver -AlwaysShared</code>, une seule connexion vncviewer sera possible et les tentatives de connexion supplémentaires échoueront immédiatement.
+
+<span id="Failures_to_connect"></span>
+== Échecs de connexion ==
+
+Des échecs répétés à établir une nouvelle connexion vncserver/vncviewer pourraient être causés par un tunnel SSH existant sur votre ordinateur qui bloquerait les ports. Pour déterminer la présence de tels tunnels et les tuer, ouvrez une fenêtre de terminal sur votre ordinateur et lancez la commande <code>ps ux | grep ssh</code> suivie de <code>kill PID</code>.
+
+<span id="Unlock_screensaver"></span>
+== Déverrouiller l'écran de veille ==
+
+Si votre écran de veille VNC s'éteint en raison du délai d'affichage et qu'un mot de passe vous est demandé, entrez le mot de passe de votre compte sur la grappe et non le mot de passe vncserver. 
+Si le bureau MATE est en cours d'exécution et que l'écran de veille ne se déverrouille pas, essayez avec la commande <code>killall -9 .mate-screensaver</code>. Ceci ne devrait plus se produire car l'écran de veille VNC a été désactivé sur nos grappes.
+
+<span id="Software"></span>
+= Logiciels =
+
+Les nœuds VDI permettent les connexions directes avec vncviewer ainsi que l'accélération graphique avec OpenGL pour les applications qui sont configurées en conséquence. Dans l'environnement SnEnv, les nœuds VDI ont aussi une couche de modules logiciels locaux en plus, semblables aux environnements StdEnv de toutes nos grappes.<br><br>
+Sur les nœuds de connexion réguliers, un environnement logiciel standard et certains modules par défaut sont chargés automatiquement quand vous vous connectez, ce qui n'est pas le cas avec un nœud vdi et vous verrez
+
+{{Command|prompt=[name@gra-vdi4]$
+|module list
+|result=
+No modules loaded
+}}
+
+Donc, avant d'utiliser un logiciel graphique sur gra-vdi, chargez un des environnements suivants.   
+
+== StdEnv ==
+
+La plupart d'entre vous trouverez suffisant de charger le module StdEnv sur gra-vdi. Cela permettra d'accéder aux mêmes modules logiciels que ceux chargés par défaut sur les grappes&nbsp;:
+
+{{Commands|prompt=[name@gra-vdi4]$ 
+|module load CcEnv StdEnv/2023
+|module avail
+}}
+
+
+== SnEnv ==
+
+Dans certains cas plutôt rares, vous devrez charger un ou des modules installés localement sur gra-vdi. Pour ce faire, il faut d'abord charger <code>SnEnv</code> avec
+
+{{Commands|prompt=[name@gra-vdi4]$ 
+|module load SnEnv
+|module avail
+}}
+
+== NIX ==
+
+Plutôt que de charger SnEnv ou StEnv, vous pouvez aussi charger le module <code>nix</code> qui offre des logiciels libres optimisés pour l'utilisation de OpenGL accéléré, lorsque possible. Ce module est seulement disponible sur Graham et gra-vdi et peut être chargé avec
+
+{{Commands|prompt=[name@gra-vdi4]$ 
+|module load nix
+}}
+
+Les commandes nix et nix-env seront alors dans votre chemin pour gérer les paquets logiciels via nix dans votre environnement personnel nix.
+
+<b>Installation</b>
+
+Pour installer un paquet nix dans votre environnement, cliquez sur l'icône du terminal dans la barre de menu supérieure ou sélectionnez <i>Applications -> System Tools -> Terminal</i>. Vous pouvez maintenant chercher des programmes avec la commande <code>nix search <regexp></code> et les installer avec  <code>nix-env --install --attr <attribute></code>. Par exemple, pour installer [https://qgis.org QGIS], utilisez
+
+{{Commands|prompt=[name@gra-vdi4]$ 
+|nix search qgis
+|result=
+Attribute name: nixpkgs.qgis
+Package name: qgis
+Version: 2.18.20
+Description: User friendly Open Source Geographic Information System
+}}
+{{Commands|prompt=[name@gra-vdi4]$ 
+|nix-env --install --attr nixpkgs.qgis
+}}
+
+Votre environnement nix persiste entre vos connexions; vous n'avez donc qu'à lancer une fois la commande d'installation.
+
+{{Commands|prompt=[name@gra-vdi4]$ 
+|module load nix
+|qgis}}
+
+Avec cette commande, les logiciels installés aujourd'hui seront encore disponibles la prochaine fois que vous chargez le module nix.
+
+<b>Applications OpenGL</b>
+
+Pour qu'OpenGL accéléré fonctionne, il est nécessaire d'ajuster les binaires compilés pour précharger vglfaker.so à partir de VirtualGL. Ce niveau de personnalisation est automatiquement effectué pour vous sur gra-vdi lorsque vous installez un logiciel basé sur OpenGL avec nix. C'est cependant quelque chose qui doit être fait manuellement après avoir téléchargé et installé un logiciel extérieur à nix. Pour ce faire, nous vous suggérons d'utiliser <code>patchelf</code> pour ajuster le binaire final. Il peut être installé dans nix avec <code>nix-env --install --attr nixpkgs.patchelf</code> s'il n'est pas déjà sur le système. Ensuite, une fois que vous avez construit votre application OpenGL avec les bibliothèques système et que vous l'avez par exemple installée sous ''~/.local/bin/myglapp'', vous pouvez ajouter la bibliothèque système VirtualGL ''/usr/lib64/VirtualGL/libvglfaker.so'' avec
+
+{{Commands|prompt=[name@gra-vdi4]$ 
+|module load nix
+|patchelf --add-needed /usr/lib64/VirtualGL/libvglfaker.so ~/.local/bin/myglapp
+}}
+
+Il est aussi possible de précharger vglfaker.so via la variable d'environnement <code>LD_PRELOAD</code>, ce qui n'est généralement pas une bonne idée car ceci s'applique à tous les binaires sans exception.  Ceux qui requièrent un vglfaker.so différent de celui défini dans <code>LD_PRELOAD</code> vont donc échouer. Dans certains cas cependant, ceci peut être utilisé de façon sécuritaire dans des scripts encapsuleurs (<i>wrapper scripts</i>).

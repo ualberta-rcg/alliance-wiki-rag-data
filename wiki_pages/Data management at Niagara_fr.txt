@@ -1,0 +1,238 @@
+<languages />
+
+Pour travailler de façon optimale et faire bon usage des ressources, il faut bien connaître les divers systèmes de fichiers. Nous donnons ici des renseignements sur comment les utiliser correctement.
+
+==Performance==
+À l'exception d'<code>archive</code>, les systèmes de fichiers hautement performants de SciNet sont de type [http://en.wikipedia.org/wiki/IBM_General_Parallel_File_System GPFS]; ils permettent des opérations parallèles de lecture et d'écriture rapides avec de grands ensembles de données, à partir de plusieurs nœuds. Par contre, de par sa conception, sa performance laisse beaucoup à désirer quand il s'agit d'accéder à des ensembles de données composés de plusieurs petits fichiers. En effet, il est beaucoup plus rapide de lire un fichier de 16Mo que 400 fichiers de 40Ko. Rappelons que dans ce dernier cas, autant de petits fichiers n'est pas une utilisation efficace de l'espace puisque la [https://en.wikipedia.org/wiki/Block_(data_storage) capacité des blocs] est de 16Mo pour les systèmes <code>scratch</code> et <code>project</code>. Tenez compte de ceci dans votre stratégie de lecture/écriture.
+
+Par exemple, pour exécuter une tâche multiprocessus, le fait que chaque processus écrive dans son propre fichier n'est pas une solution I/O flexible; le répertoire est bloqué par le premier processus qui l'accède et les suivants doivent attendre. Non seulement cette solution rend-elle le code considérablement moins parallèle, mais le système de fichiers sera arrêté en attendant le prochain processus et votre programme se terminera mystérieusement.<br> 
+Utilisez plutôt MPI-IO (partie du standard MPI-2) qui permet à des processus différents d'ouvrir simultanément des fichiers, ou encore un processus I/O dédié qui écrit dans un seul fichier toutes les données envoyées par les autres processus.
+
+== Utilisation des systèmes de fichiers ==
+Certains des systèmes de fichiers ne sont pas disponibles à tous les utilisateurs.
+
+=== /home ($HOME)===
+* Utilisé d'abord pour les fichiers d'un utilisateur, les logiciels communs ou les petits ensembles de données partagés par le groupe d'utilisateurs, pourvu que le quota de l'utilisateur ne soit pas dépassé; dans le cas contraire utilisez plutôt /scratch ou /project.
+* En lecture seulement sur les nœuds de calcul.
+
+=== /scratch ($SCRATCH) ===
+* Utilisé d'abord pour les fichiers temporaires, les résultats de calcul et de simulations, et le matériel qui peut être obtenu ou recréé facilement. Peut aussi être utilisé pour une étape intermédiaire dans votre travail pourvu que cela ne cause pas trop d'opérations I/O ou trop de petits fichiers pour cette solution de stockage sur disque, auquel cas vous devriez utiliser /bb (''burst buffer''). Une fois que vous avez obtenu les résultats que vous voulez conserver à long terme, vous pouvez les transférer à /project ou /archive.
+* Purgé régulièrement; aucune copie de sauvegarde n'est faite.
+
+=== /project ($PROJECT) ===
+/project est destiné aux logiciels de groupe courants, aux grands ensembles de données statiques ou à tout contenu très coûteux à acquérir ou à régénérer par le groupe. <font color=red>Le contenu de /project est censé rester relativement immuable au fil du temps.</font> Les fichiers temporaires ou transitoires doivent être conservés sur /scratch plutôt que sur /project. Les mouvements fréquents de données engendrent une surcharge et une consommation inutile des bandes sur le système de sauvegarde TSM, longtemps après leur suppression, et ceci en raison des politiques de conservation des sauvegardes et des versions supplémentaires conservées du même fichier. Le simple fait de renommer les répertoires principaux suffit à tromper le système et à lui faire croire qu'une arborescence de répertoires entièrement nouvelle a été créée et que l'ancienne a été supprimée. Réfléchissez donc soigneusement à vos conventions de nommage et respectez-les. Si vous abusez du système de fichiers /projet et l'utilisent comme /scratch, nous vous demanderons de procéder autrement. Notez que sur Niagara, /project est uniquement accessible aux groupes disposant de ressources allouées par concours.
+
+=== /bb ($BBUFFER) ===
+* [https://docs.scinet.utoronto.ca/index.php/Burst_Buffer Burst buffer] est une alternative très rapide et performante à /scratch, is a very fast, sur disque SSD. Utilisez cette ressource si vous prévoyez beaucoup d'opérations I/O ou si vous remarquez une faible performance d'une tâche sur /scratch ou /project en raison d'un goulot d'étranglement des opérations I/O.
+* Plus d'information sur la  [https://docs.scinet.utoronto.ca/index.php/Burst_Buffer page wiki de SciNet].
+
+=== /archive ($ARCHIVE) ===
+* Espace de stockage ''nearline'' pour une copie temporaire de matériel semi-actif du contenu des systèmes de fichiers décrits plus haut. En pratique, les utilisateurs déchargent et rappellent du matériel dans le cours de leur travail ou quand les quotas sont atteints sur /scratch ou /project. Ce matériel peut demeurer sur HPSS de quelques mois jusqu'à quelques années.
+* Réservé aux groupes qui ont obtenu une allocation par suite des concours.
+
+=== /dev/shm (RAM) ===
+* Les nœuds ont un [https://docs.scinet.utoronto.ca/index.php/User_Ramdisk ramdisk] plus rapide qu'un disque réel et que ''burst buffer''. Jusqu'à 70% du RAM du nœud (202Go) peut être utilisé comme système de fichiers '''local''' temporaire. Ceci est très utile dans les premières étapes de migration de programmes d'un ordinateur personnel vers une plateforme de CHP comme Niagara, particulièrement quand le code utilise beaucoup d'opérations I/O. Dans ce cas, un goulot d'étranglement se forme, surtout avec les systèmes de fichiers parallèles comme GPFS (utilisé sur Niagara), puisque les fichiers sont synchronisés sur l'ensemble du réseau.
+
+=== $SLURM_TMPDIR (RAM) ===
+*Comme c'est le cas avec les grappes d'usage général Cedar et Graham, la variable d'environnement $SLURM_TMPDIR sera utilisée pour les tâches de calcul. Elle pointera sur RAMdisk et non sur les disques durs locaux. Le répertoire $SLURM_TMPDIR est vide lorsque la tâche commence et son contenu est supprimé après que la tâche est complétée. 
+
+=== Per-job temporary burst buffer space ($BB_JOB_DIR) ===
+For every job on Niagara, the scheduler creates a temporary directory on the burst buffer called <tt>$BB_JOB_DIR</tt>.  The <tt>$BB_JOB_DIR</tt> directory will be empty when your jobs starts and its content gets deleted after the job has finished.  This directory is accessible from all nodes of a job.
+
+<tt>$BB_JOB_DIR</tt> est un emplacement pour les applications qui génèrent plusieurs petits fichiers temporaires ou encore des fichiers qui sont fréquemment utilisés (c'est-à-dire avec des IOPS élevées), mais qui ne peuvent pas être contenus sur disque virtuel.
+
+Il est important de noter que si ramdisk peut contenir les fichiers temporaires, c'est généralement un meilleur endroit que le ''burst buffer'' parce que la bande passante et le IOPS y sont beaucoup plus grands. Pour utiliser ramdisk, vous pouvez soit accéder /dev/shm directement, soit utiliser la variable d'environnement <tt>$SLURM_TMPDIR</tt>. 
+
+Les nœuds de calcul de Niagara n'ont pas de disques locaux; <tt>$SLURM_TMPDIR</tt> est en mémoire (ramdisk), contrairement aux grappes généralistes Cedar et Graham où cette variable pointe vers un répertoire sur le disque SSD d'un nœud local.
+
+= Quotas et purge =
+Familiarisez-vous avec les différents systèmes de fichiers, leur utilité et leur utilisation correcte. Ce tableau récapitule les points principaux.  
+
+{| class="wikitable"
+! système de fichiers
+!colspan="2"| quota
+!align="right"| taille des blocs
+! durée
+! sauvegarde
+! sur nœuds de connexion
+! sur nœuds de calcul
+|-
+| $HOME
+|colspan="2"| 100Go par utilisateur
+|align="right"| 1Mo
+| 
+| oui
+| oui
+| lecture seule
+|-
+|rowspan="6"| $SCRATCH
+|colspan="2"| 25To par utilisateur pourvu que le quota du groupe ne soit pas atteint
+|align="right" rowspan="6" | 16Mo
+|rowspan="6"| 2 mois
+|rowspan="6"| non
+|rowspan="6"| oui
+|rowspan="6"| oui
+|-
+|align="right"|groupes de 4 utilisateurs ou moins
+|align="right"|50To pour le groupe
+|-
+|align="right"|groupes de 11 utilisateurs ou moins
+|align="right"|125To pour le groupe
+|-
+|align="right"|groupes de 28 utilisateurs ou moins
+|align="right"|250To pour le groupe
+|-
+|align="right"|groupes de 60 utilisateurs ou moins
+|align="right"|400To pour le groupe
+|-
+|align="right"|groupes de plus de 60 utilisateurs
+|align="right"|500To pour le groupe
+|-
+| $PROJECT
+|colspan="2"| allocation de groupe
+|align="right"| 16Mo
+| 
+| oui
+| oui
+| oui
+|-
+| $ARCHIVE
+|colspan="2"| allocation de groupe
+|align="right"| 
+|
+| 2 copies
+| non
+| non
+|-
+| $BBUFFER
+|colspan="2"| 10To par utilisateur
+|align="right"| 1Mo
+| très court
+| non
+| oui
+| oui
+|}
+
+<ul>
+<li>[https://docs.scinet.utoronto.ca/images/9/9a/Inode_vs._Space_quota_-_v2x.pdf Inode vs. Space quota (PROJECT and SCRATCH)]</li>
+<li>[https://docs.scinet.utoronto.ca/images/0/0e/Scratch-quota.pdf dynamic quota per group (SCRATCH)]</li>
+<li>Compute nodes do not have local storage.</li>
+<li>Archive space is on [https://docs.scinet.utoronto.ca/index.php/HPSS HPSS], and is not accessible on the Niagara login, compute, or datamover nodes.</li>
+<li>Backup means a recent snapshot, not an achive of all data that ever was.</li>
+<li><p><code>$BBUFFER</code> stands for [https://docs.scinet.utoronto.ca/index.php/Burst_Buffer Burst Buffer], a faster parallel storage tier for temporary data.</p></li></ul>
+
+==How much disk space do I have left?==
+The <tt>'''/scinet/niagara/bin/diskUsage'''</tt> command, available on the login nodes and datamovers, provides information in a number of ways on the home, scratch, project and archive filesystems. For instance, how much disk space is being used by yourself and your group (with the -a option), or how much your usage has changed over a certain period ("delta information") or you may generate plots of your usage over time. Please see the usage help below for more details.
+<pre>
+Usage: diskUsage [-h|-?| [-a] [-u <user>]
+       -h|-?: help
+       -a: list usages of all members on the group
+       -u <user>: as another user on your group
+</pre>
+
+Utilisez les commandes suivantes pour vérifier l'espace qui vous reste :
+* <tt>/scinet/niagara/bin/topUserDirOver1000list</tt> pour identifier les répertoires qui contiennent plus de 1000 fichiers,
+* <tt>/scinet/niagara/bin/topUserDirOver1GBlist</tt> pour identifier les répertoires qui contiennent plus de 1Go de matériel.
+
+NOTE : L'information sur l'utilisation et les quotas est mise à jour aux trois heures.
+
+==Scratch disk purging policy==
+In order to ensure that there is always significant space available for running jobs '''we automatically delete files in /scratch that have not been accessed or modified for more than 2 months by the actual deletion day on the 15th of each month'''. Note that we recently changed the cut out reference to the ''MostRecentOf(atime,ctime)''. This policy is subject to revision depending on its effectiveness. More details about the purging process and how users can check if their files will be deleted follows. If you have files scheduled for deletion you should move them to more permanent locations such as your departmental server or your /project space or into HPSS (for PIs who have either been allocated storage space by the RAC on project or HPSS).
+
+On the '''first''' of each month, a list of files scheduled for purging is produced, and an email notification is sent to each user on that list. You also get a notification on the shell every time your login to Niagara. Furthermore, at/or about the '''12th''' of each month a 2nd scan produces a more current assessment and another email notification is sent. This way users can double check that they have indeed taken care of all the files they needed to relocate before the purging deadline. Those files will be automatically deleted on the '''15th''' of the same month unless they have been accessed or relocated in the interim. If you have files scheduled for deletion then they will be listed in a file in /scratch/t/todelete/current, which has your userid and groupid in the filename. For example, if user xxyz wants to check if they have files scheduled for deletion they can issue the following command on a system which mounts /scratch (e.g. a scinet login node): '''ls -1 /scratch/t/todelete/current |grep xxyz'''. In the example below, the name of this file indicates that user xxyz is part of group abc, has 9,560 files scheduled for deletion and they take up 1.0TB of space:
+
+<pre>
+ [xxyz@nia-login03 ~]$ ls -1 /scratch/t/todelete/current |grep xxyz
+ -rw-r----- 1 xxyz     root       1733059 Jan 17 11:46 3110001___xxyz_______abc_________1.00T_____9560files
+</pre>
+
+Le fichier lui-même contient une liste de tous les fichiers programmés pour la suppression (dans la dernière colonne) et peut être visualisé avec des commandes standard comme more/less/cat - par exemple '''more /scratch/t/todelete/current/3110001___xxyz_______abc_________1.00T_____9560files'''
+
+De même, vous pouvez vérifier tous les autres membres de votre groupe en utilisant la commande <code>ls</code> avec <code>grep</code> pour votre groupe. Par exemple, <b>ls -1 /scratch/t/todelete/current |grep abc</b> listera les autres membres dont fait partie xxyz et dont les fichiers doivent être purgés le 15 du mois. Les membres d'un même groupe ont accès au contenu des autres.
+
+'''NOTE:''' Preparing these assessments takes several hours. If you change the access/modification time of a file in the interim, that will not be detected until the next cycle. A way for you to get immediate feedback is to use the ''''ls -lu'''' command on the file to verify the ctime and ''''ls -lc'''' for the mtime. If the file atime/ctime has been updated in the meantime, coming the purging date on the 15th it will no longer be deleted.
+
+= Déplacer des données = 
+Data for analysis and final results need to be moved to and from Niagara. There are several ways to accomplish this. 
+
+== Avec rsync/scp ==
+'''''Déplacer moins de 10Go par les nœuds de connexion'''''
+
+* Les nœuds de connexion et de copie sont visibles de l'extérieur de SciNet.
+* Utilisez scp ou rsync pour vous connecter à niagara.scinet.utoronto.ca ou niagara.computecanada.ca (aucune différence).
+* Il y aura interruption dans le cas de plus d'environ 10Go.
+
+'''''Déplacer plus de 10Go par les nœuds de copie'''''
+
+* À partir d'un nœud de connexion, utilisez ssh vers <code>nia-datamover1</code> ou  <code>nia-datamover2</code>; de là, vous pouvez transférer de ou vers Niagara.
+* Vous pouvez aussi aller aux nœuds de copie de l'extérieur en utilisant login/scp/rsync.
+  nia-datamover1.scinet.utoronto.ca
+  nia-datamover2.scinet.utoronto.ca
+* Si vous faites souvent ceci, considérez utiliser [[Globus/fr| Globus]], un outil web pour le transfert de données.
+
+== Utiliser Globus ==
+Pour la documentation, consultez la [[globus/fr | page wiki de Calcul Canada]] et la [https://docs.scinet.utoronto.ca/index.php/Globus page wiki de SciNet].
+
+Le point de chute Globus est 
+* ''computecanada#niagara'' pour Niagara
+* ''computecanada#hpss'' pour HPSS.
+
+== Déplacer des données vers HPSS/Archive/Nearline ==
+HPSS est conçu pour le storage de longue durée.
+
+*[https://docs.scinet.utoronto.ca/index.php/HPSS HPSS] est une solution de stockage sur bandes employée comme espace ''nearline'' par SciNet.
+*L'espace de stockage sur HPSS est alloué dans le cadre du [https://www.computecanada.ca/page-daccueil-du-portail-de-recherche/acces-aux-ressources/concours-dallocation-des-ressources/?lang=fr concours d'allocation de ressources].
+
+= File ownership management and access control lists =
+* By default, at SciNet, users within the same group already have read permission to each other's files (not write)
+* You may use access control list ('''ACL''') to allow your supervisor (or another user within your group) to manage files for you (i.e., create, move, rename, delete), while still retaining your access and permission as the original owner of the files/directories. You may also let users in other groups or whole other groups access (read, execute) your files using this same mechanism. 
+
+===Using mmputacl/mmgetacl===
+* You may use gpfs' native '''mmputacl''' and '''mmgetacl''' commands. The advantages are that you can set "control" permission and that [http://publib.boulder.ibm.com/infocenter/clresctr/vxrx/index.jsp?topic=%2Fcom.ibm.cluster.gpfs.doc%2Fgpfs31%2Fbl1adm1160.html POSIX or NFS v4 style ACL] are supported. You will need first to create a /tmp/supervisor.acl file with the following contents:
+<pre>
+user::rwxc
+group::----
+other::----
+mask::rwxc
+user:[owner]:rwxc
+user:[supervisor]:rwxc
+group:[othegroup]:r-xc
+</pre>
+
+Lancez ensuite les deux commandes
+<pre>
+1) $ mmputacl -i /tmp/supervisor.acl /project/g/group/[owner]
+2) $ mmputacl -d -i /tmp/supervisor.acl /project/g/group/[owner]
+   (every *new* file/directory inside [owner] will inherit [supervisor] ownership by default as well as 
+   [owner] ownership, ie, ownership of both by default, for files/directories created by [supervisor])
+
+$ mmgetacl /project/g/group/[owner]
+   (to determine the current ACL attributes)
+
+$ mmdelacl -d /project/g/group/[owner]
+   (to remove any previously set ACL)
+
+$ mmeditacl /project/g/group/[owner]
+   (to create or change a GPFS access control list)
+   (for this command to work set the EDITOR environment variable: export EDITOR=/usr/bin/vi)
+</pre>
+
+NOTES:
+* There is no option to recursively add or remove ACL attributes using a gpfs built-in command to existing files. You'll need to use the -i option as above for each file or directory individually. [https://docs.scinet.utoronto.ca/index.php/Recursive_ACL_script Here is a sample bash script you may use for that purpose]]
+
+* mmputacl will not overwrite the original linux group permissions for a directory when copied to another directory already with ACLs, hence the "#effective:r-x" note you may see from time to time with mmgetacf. If you want to give rwx permissions to everyone in your group you should simply rely on the plain unix 'chmod g+rwx' command. You may do that before or after copying the original material to another folder with the ACLs.
+
+* Dans le cas de PROJECT, la personne responsable de votre groupe devra définir l'ACL appropriée au niveau /project/G/GROUP afin de permettre aux utilisateurs d'autres groupes d'accéder à vos fichiers.
+
+* ACL ne vous permet pas d'accorder des permissions pour des fichiers ou des répertoires qui ne vous appartiennent pas.
+
+* Nous vous recommandons vivement de ne jamais accorder d'autorisation d'écriture à d'autres personnes au niveau supérieur de votre répertoire personnel (/home/G/GROUP/[owner]), car cela compromettrait gravement votre confidentialité, et de désactiver l'authentification par clé SSH, entre autres. Si nécessaire, créez des sous-répertoires spécifiques sous votre répertoire personnel afin que d'autres puissent y accéder et manipuler les fichiers.
+
+* Just a reminder: setfacl/getfacl only works on cedar/graham, since they have lustre. On niagara you have to use the mm* command just for GPFS: mmputacl, mmgetacl, mmdelacl, mmeditacl 
+
+Pour plus d'information, consultez [https://www.ibm.com/support/knowledgecenter/SSFKCN_4.1.0/com.ibm.cluster.gpfs.v4r1.gpfs100.doc/bl1adm_mmputacl.htm <tt>mmputacl</tt>] et [https://www.ibm.com/support/knowledgecenter/SSFKCN_4.1.0/com.ibm.cluster.gpfs.v4r1.gpfs100.doc/bl1adm_mmgetacl.htm <tt>mmgetacl</tt>].
+
+===Script ACL récursif===
+Vous pouvez utiliser et adapter [https://docs.scinet.utoronto.ca/index.php/Recursive_ACL_script cet exemple de script bash] pour ajouter ou supprimer récursivement des attributs ACL à l'aide des commandes intégrées de GPFS.
+
+Gracieuseté de Agata Disks (http://csngwinfo.in2p3.fr/mediawiki/index.php/GPFS_ACL).

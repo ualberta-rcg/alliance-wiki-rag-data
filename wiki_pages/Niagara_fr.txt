@@ -1,0 +1,107 @@
+<languages />
+
+{| class="wikitable"
+|-
+| Disponible depuis avril 2018
+|-
+| Nœud de connexion : '''niagara.alliancecan.ca'''
+|-
+| Point de chute Globus : '''computecanada.ca#niagara'''
+|-
+| Nœuds de copie (rsync, scp, ...) : '''nia-dm2, nia-dm2''', voir [[Data management at Niagara/fr#Déplacer_des_données|Déplacer des données]]
+|-
+| État des systèmes : '''https://docs.scinet.utoronto.ca'''
+|-
+| Portail : https://my.scinet.utoronto.ca
+|}
+
+Niagara est une grappe homogène, propriété de [https://www.utoronto.ca/ l'Université de Toronto], et opérée par [https://www.scinethpc.ca/ SciNet]. Capable d'accommoder des tâches parallèles de 1040 cœurs et plus, elle est conçue pour gérer efficacement des débits intensifs générés par une variété d'applications scientifiques à hauts volumes de données. Ses fonctions de réseau et de stockage offrent des performances excellentes et une grande capacité. Niagara démontre en plus une efficacité énergétique appréciable. 
+
+En général, l'environnement est semblable à celui de Cedar ou Graham, avec quelques différences mineures. Voir les particularités dans [[Niagara Quickstart/fr| Niagara ː Guide de démarrage]].  
+
+Des GPU sont disponibles sur la grappe [https://docs.scinet.utoronto.ca/index.php/Mist Mist]; voir la documentation préliminaire sur le [https://docs.scinet.utoronto.ca/index.php/Mist site  de SciNet].
+
+Cette grappe fait partie des ressources allouées dans le cadre du [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/resource-allocation-competition/?lang=fr concours pour l'allocation de ressources]. 
+
+Vidéo ː [https://youtu.be/EpIcl-iUCV8 Présentation de Niagara au SciNet User Group Meeting du 14 février 2018]
+
+Vidéo ː [https://www.youtube.com/watch?v=RgSvGGzTeoc  Installation du matériel]
+
+
+==Spécifications techniques==
+
+* 2024 nœuds avec chacun 40 cœurs Intel Skylake 2.4GHz ou 40 cœurs Intel Cascadelake 2.5GHz, pour un total de 80&nbsp;640 cœurs
+* mémoire vive de 202Go (188 Gio) par nœud
+* réseau InfiniBand EDR (''Enhanced Data Rate'') à topologie ''Dragonfly+''
+* espace /scratch de 12.5Po, espace projet de 3.5Po (système de fichiers parallèle Spectrum Scale d'IBM, autrefois connu sous l'appellation ''GPFS'')
+* mémoire tampon d'accès en rafale (''burst buffer'') de 256To, Excelero + Spectrum Scale d'IBM
+* aucun disque local
+* aucun GPU
+* Performanche théorique (Rpeak) de 6.25Pflops
+* Performance mesurée (Rmax) de 3.6Pflops
+* consommation électrique 920kW
+
+==Stockage==
+{| class="wikitable sortable"
+|-
+| '''espace /home''' <br />volume total 200To <br />système de fichiers parallèle (Spectrum Scale d'IBM)||
+* sauvegardé sur bandes
+* persistant
+|-
+| '''espace /scratch'''<br />12.5Po (~100Go/s en écriture; ~120Go/s en lecture)<br />système de fichiers parallèle (Spectrum Scale d'IBM)||
+* les données inactives sont purgées
+|-
+| '''mémoire tampon d'accès en rafale (''burst buffer'')'''<br />232To (~90Go/s en écriture; ~154Go/s en lecture) <br />système de fichiers parallèle extra haute performance (Excelero+Spectrum Scale d'IBM)||
+* les données inactives sont purgées
+|-
+|'''espace /project'''<br />3.5Po (~100Go/s en écriture; ~120Go/s en lecture)<br /> système de fichiers parallèle haute performance (Spectrum Scale d'IBM)||
+* sauvegardé sur bandes
+* alloué via le [https://alliancecan.ca/fr/services/calcul-informatique-de-pointe/acces-aux-ressources/concours-pour-lallocation-de-ressources concours pour l'allocation de ressources]
+* persistant
+|-
+| '''espace /archive'''<br />volume total 20Po<br />stockage haute performance (HPSS d'IBM)||
+* HSM sauvegardé sur bandes
+* alloué via le [https://alliancecan.ca/fr/services/calcul-informatique-de-pointe/acces-aux-ressources/concours-pour-lallocation-de-ressources concours pour l'allocation de ressources]
+* persistant
+|}
+
+==Réseautique haute performance==
+
+La grappe Niagara offre un réseau InfiniBand EDR (''Enhanced Data Rate'') à topologie dite ''Dragonfly̝+'' de cinq ailes. Chacune des ailes d'un maximum de 432 nœuds chacune (pour 17280 cœurs) possèdent des connecteurs 1-1. La communication entre les ailes se fait par routage adaptatif, évitant ainsi la congestion et offrant un ratio de blocage 2ː1 entre les nœuds des différentes ailes.
+
+==Caractéristiques des nœuds==
+
+* CPU : 2 sockets avec 20 cœurs Skylake d'Intel (2.4GHz, AVX512), pour un total de 40 cœurs par nœud
+* Puissance de calcul : 3.07 TFlops (pointe théorique maximale)
+* Connexion réseau : 100Go/s EDR Dragonfly̟
+* Mémoire vive : 202Go (188 Gio), soit un peu plus que 4Gio par cœur
+* Disque local : aucun
+* GPU/accélérateurs ː aucun
+* Système d'exploitation : Linux, CentOS 7
+
+==Ordonnancement==
+
+L'ordonnancement des tâches se fait avec [[Running jobs/fr|Slurm]] et les commandes de base sont les mêmes qu'avec Cedar et Graham. Il faut cependant noter les différences suivantes ː
+
+* L'ordonnancement se fait seulement par nœud; les tâches doivent toujours demander des multiples de 40 cœurs par tâche. 
+* Il n'est pas nécessaire et non recommandé de demander une quantité spécifique de mémoire; la quantité de mémoire est égale pour chacun des nœuds (202Go/188Gio moins la mémoire utilisée par le système d'exploitation)
+
+Les détails d'utilisation seront communiqués dès que disponibles.
+
+==Logiciel==
+
+*Les logiciels sont installés à partir de modules.
+*Les logiciels usuels sur les grappes de l'Alliance ainsi que les logiciels spécifiques à Niagara sont disponibles.
+*Contrairement aux grappes Cedar et Graham, aucun module n'est chargé par défaut sur Niagara, ceci pour éviter les conflits de versions. Pour charger la pile logicielle de Cedar ou Graham, utilisez le module CCEnv comme discuté dans [[Niagara Quickstart]].
+
+== Accès ==
+L'accès à Niagara n'est pas automatiquement disponible à tous les détenteurs d'un compte avec l'Alliance, mais si vous détenez un compte, l'accès peut être activé. 
+Si vous avez un compte actif, mais n'avez pas encore accès à Niagara (par exemple, parce que vous êtes un nouvel utilisateur et que vous appartenez à un groupe dont le chercheur principal ne dispose pas de ressources allouées par [https://alliancecan.ca/fr/services/calcul-informatique-de-pointe/acces-aux-ressources/concours-pour-lallocation-de-ressources concours]), rendez-vous sur la [https://ccdb.computecanada.ca/services/opt_in page des services disponibles] dans CCDB et cliquez sur <i>Se joindre</i>. L'accès vous sera habituellement accordé dans les deux jours ouvrables.  
+
+Si vous avez besoin d'assistance, n'hésitez pas à [mailto:niagara@tech.alliancecan.ca nous contacter].
+
+=== Guide de démarrage ===
+
+Veuillez lire attentivement la page [[Niagara Quickstart/fr|Niagara ː Guide de démarrage]]. 
+
+[[Category:Pages with video links]]

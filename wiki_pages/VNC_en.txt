@@ -1,0 +1,311 @@
+<languages />
+
+[[File:Matlab-vnc.png|400px|thumb|MATLAB running via VNC.]]
+
+It is often necessary to remotely start the graphical user interface for complex software packages such as [[MATLAB]]. The most common way to do this is with [[SSH]] and X11 forwarding. However the performance of SSH+X11 is often too slow similar to [https://docs.computecanada.ca/wiki/Connecting_with_MobaXTerm MobaXTerm] or [https://docs.computecanada.ca/wiki/Connecting_with_PuTTY Putty]. A much better alternative is to use [https://en.wikipedia.org/wiki/Virtual_Network_Computing VNC] to connect to a remote desktop.
+
+= Setup =
+
+First you will need to install a VNC client on your machine to connect to the VNC server.  We recommend using [http://tigervnc.org/ TigerVNC].  A TigerVNC package is available for Windows, MacOS and most Linux distributions.  The following shows how to download, install and configure TigerVNC securely for each operating system.  The certificate configuration steps are only required for connecting to VDI nodes so the signing authority of the certificate presented by the vncserver is known. If a popup about a certificate issue occurs, either you have not configured it properly or you are not connected to our server and should not enter your password.
+
+== Windows ==
+
+Download and run the latest stable vncviewer64-x.y.z.exe version package installer from [https://sourceforge.net/projects/tigervnc/files/stable/ the official download page] for example <code>vncviewer64-1.15.0.exe</code> (as of April 2025).  Make sure you download the viewer and not the server.  To create secure tunnels from your desktop to the vncserver as described in the sections below, you will need to open a terminal window and run the SSH command.  This may be done using PowerShell standard on Windows 10 since the 1809 update.
+
+== MacOS ==
+
+Install the latest stable DMG package by going to [https://sourceforge.net/projects/tigervnc/files/stable/ the official download page] and click the green <b>Download Latest Version</b> button for <code>TigerVNC-1.15.0.dmg</code> (as of April 2025). Once the download is complete double click the DMG file to open it.  A TigerVNC Viewer icon should appear in a popup window along with a LICENSE.TXT and README.rst file.  To complete the installation, drag the tigervnc icon that appears into the Applications folder and/or the lower [https://support.apple.com/en-ca/guide/mac-help/mh35859/mac app dock].   To remove the popup you will need to unmount the DMG file.  To do this open a New Finder Window, verify <code>View->ShowSidebar</code> is selected, click the small up arrow beside <code>TigerVNC-1.15.0</code> in the left side menu and lastly close the finder window.  If you are running macOS Monterey 12.2 and [https://github.com/TigerVNC/tigervnc/issues/1423 TigerVNC crashes] then you must upgrade to this latest version.
+
+== Linux ==
+
+First install TigerVNC viewer with the package manager for your Linux version:
+
+{| class="wikitable"
+! Linux Version
+! Install Command
+|-
+| Debian, Ubuntu
+| <code>sudo apt-get install tigervnc-viewer</code>
+|-
+| Fedora, CentOS, or RHEL
+| <code>sudo yum install tigervnc</code>
+|-
+| Gentoo
+| <code>emerge -av net-misc/tigervnc</code>
+|}
+
+Next, start TigerVNC by either finding it in the applications menu or running <code>vncviewer</code> on the command line.  In the "VNC Viewer: Connection Details" window that appears click "Options -> Security" then tick all boxes except "Encryption None" and enter one of the following paths in the "Path to X509 CA Certificate" field.  
+
+{| class="wikitable"
+! Linux Version
+! Path to X509 CA Certificate
+|-
+| Debian, Ubuntu
+| /etc/ssl/certs/ca-certificates.crt
+|-
+| Fedora, CentOS, or RHEL
+| /etc/pki/tls/certs/ca-bundle.crt
+|-
+| Gentoo
+| /etc/ssl/certs/ca-certificates.crt
+|}
+To save the settings click OK and then click Connect.  If Connect is not clicked, the settings will not be saved.
+
+= Connect =
+
+Now you need a VNC server to connect to.  This can be either a persistent vncserver running on dedicated VDI nodes which are part of [[Graham]], or a temporary vncserver you start on a cluster compute node.  VNC is not a heavyweight server, so you can certainly run lightweight sessions on cluster login nodes.
+
+== VDI nodes ==
+
+[[File:TigerVNC-GrahamDesktop.png|400px|thumb|right|'''gra-vdi.alliancecan.ca''']]
+
+Graham has two dedicated VDI (aka Virtual Desktop Infrastructure) nodes collectively known as gra-vdi.  These nodes provide a remote desktop environment equipped with accelerated OpenGL.  They are intended for the most demanding and complex interactive graphical tasks.  The VDI nodes share Graham's <code>/home, /project,</code> and <code>/scratch</code> filesystems.  As a result, any data files or directories created on graham by running jobs in the queue will immediately be accessible on gra-vdi for visualization and post-processing purposes without the need to transfer them over.
+
+To connect to gra-vdi, start VNC viewer (tigervnc) on your laptop and enter <code>VNC server: '''gra-vdi.alliancecan.ca'''</code>. This will bring up a login screen where you can enter your Alliance credentials.  A desktop session will then be started on either gra-vdi3 or gra-vdi4 using a round robin algorithm.
+
+Users can also connect directly to either machine by specifying <code>VNC server: '''gra-vdi3.sharcnet.ca'''</code> or enter <code>VNC server: '''gra-vdi4.sharcnet.ca'''</code>.   This may be useful if you find one machine is overloaded (oversubscribed) and thus not very responsive; or if you consistently want to use the local $SCRATCH directory (defined as /local/tmp/$USER) on one server but not the other.   Notice that $SCRATCH is defined differently on the clusters (as /scratch/$USER) where it is shared by all nodes.  Similar to the clusters however, any data left on $SCRATCH on gra-vdi will eventually be deleted since the disc space is limited.  Please do not plan to store any files on $SCRATCH for more than 60 days!
+
+Lastly, please keep in mind the VDI nodes are a shared resource and intended for visualization tasks.  If you need to perform long-running computations within an application which uses a GUI (graphical user interface), then please log out of gra-vdi and instead connect to a compute node on any cluster as described in the <b>Compute Nodes</b> section below.  This will ensure the memory and CPU resources on gra-vdi remain fully available for other users to conduct their own simultaneous graphical work without any noticeable performance impacts.
+
+== Login nodes ==
+
+You may run a lightweight application (one that does not require much memory, cputime or a gpu since login node limits will apply here) in a remote VNC desktop by starting a VNC server on a cluster login node and then connecting to it with the vncviewer.  To get started connect with ssh as follows:
+
+ [<b>laptop</b>:~] ssh graham.alliancecan.ca
+
+Next run <code>vncserver -list</code> to check if you have an old unused vncserver(s) still running.  If you do then kill them off by running:
+
+ [<b>gra-login2</b>:~] <code>pkill Xvnc -u $USER</code>
+
+1) The vncserver command provided by StdEnv/2023 is based on [https://turbovnc.org turbovnc].  When starting a new vncserver on a login node the <code>-idletimeout seconds</code> option should be added.  Doing so will ensure your <code>vncserver</code> eventually terminates (once S seconds has elapsed with no VNC viewer connections) if your vncviewer session is not ended by clicking <code>System -> Log out</code> in the vnc desktop. The first time you start vncserver you will be required to set a password which can be [https://docs.alliancecan.ca/wiki/VNC#Vncserver_password changed] later.  The password will be required to remotely connect to your desktop with a vncclient (such as vncviewer). The same password will be required when making [https://docs.alliancecan.ca/wiki/VNC#Multiple_connections multiple connections] assuming you started your vncserver with the <code>-alwaysshared</code> option where the square brackets imply the quantity inside is optional:
+
+ [<b>gra-login2</b>:~] vncserver -idletimeout 86400 [-alwaysshared]
+ Would you like to enter a view-only password (y/n)? n
+ Desktop 'TurboVNC: gra-login2:2 (username)' started on display gra-login2:2
+ Starting applications specified in /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/xstartup.turbovnc
+ Log file is /home/username/.vnc/gra-login2:2.log
+
+2) Determine the port your new vncserver is listening to (5903 in this example):
+
+ [<b>gra-login2</b>:~]  grep -iE "\sport|kill" /home/username/.vnc/gra-login2:2.log
+ 03/09/2024 17:48:40 Listening for VNC connections on TCP port <span style="Color:blue">5903</span>
+
+ [<b>gra-login2</b>:~] exit
+
+3) On your desktop start a SSH tunnel to forward an arbitrary port (5901 in this example) to the VNC server:
+
+  [<b>laptop</b>:~] ssh graham.computecanada.ca -L <span style="Color:red">5901</span>:<b>gra-login2</b>:<span style="Color:blue">5903</span>
+
+4) Again on your desktop connect with vncviewer to the forwarded port:
+
+  [<b>laptop</b>:~] vncviewer localhost:<span style="Color:red">5901</span>
+
+Mac or Windows users should click the <i>TigerVNC Viewer</i> application icon on their desktop and enter '''localhost:<span style="Color:red">5901</span>''' in the "Connection Details" dialogue box that appears.  Keep in mind that strict memory and cputime limits apply on cluster login nodes. On Graham, these are 8GB and 1 cpu-hour per process according to <code>ulimit -t -v</code>; other clusters may vary.  If you require more resources, then run your VNC server on a cluster compute node or VDI as described below/above respectively.
+
+== Compute nodes ==
+
+Where VDI login nodes are unavailable you can start a VNC server on a compute node, and with suitable port forwarding, connect to it from your desktop.  This gives you dedicated access to the server, but does not provide a full graphical desktop or hardware-accelerated OpenGL.
+
+<b>1) Start a VNC server</b>
+
+Before starting your VNC server, log in to a cluster (such as Cedar) and create an allocation on a compute node using the <code>salloc</code> command (a 24hr maximum time limit applies). For example, to request an [[Running_jobs#Interactive_jobs|interactive job]] using 4 CPUs and 16GB of memory you could use the command:
+
+<source lang="bash">
+[username@cedar5:~/project] salloc --time=1:00:00 --cpus-per-task=4 --mem=16000 --account=def-username
+salloc: Pending job allocation 20067316
+salloc: job 20067316 queued and waiting for resources
+salloc: job 20067316 has been allocated resources
+salloc: Granted job allocation 20067316
+salloc: Waiting for resource configuration
+salloc: Nodes cdr768 are ready for job
+[username@cdr768:~/project]
+</source>
+
+Once your interactive job has started, one environment variable must be set in order to avoid some repetitive desktop errors:
+
+<source lang="bash">
+[username@cdr768:~/project] export XDG_RUNTIME_DIR=${SLURM_TMPDIR}
+</source> 
+
+Then, start a VNC server with <code>vncserver</code>. Take note of which node your job is running on. If unsure, you can use the <code>hostname</code> command to check. The first time you do this you will be prompted to set a password for your VNC server. '''DO NOT LEAVE THIS BLANK'''. You may change it later using the <code>vncpasswd</code> command.  Continuing with the example:
+
+<source lang="bash">
+[username@cdr768:~/project] vncserver
+You will require a password to access your desktops.
+Password:
+Verify:
+Would you like to enter a view-only password (y/n)? n
+xauth:  file /home/username/.Xauthority does not exist
+New 'cdr768.int.cedar.computecanada.ca:1 (username)' desktop is cdr768.int.cedar.computecanada.ca:1
+Creating default startup script /home/username/.vnc/xstartup
+Creating default config /home/username/.vnc/config
+Starting applications specified in /home/username/.vnc/xstartup
+Log file is /home/username/.vnc/cdr768.int.cedar.computecanada.ca:1.log
+</source>
+
+Determine which port the VNC server is using by examining the log file:
+
+ [username@cdr768:~/project] grep -iE "\sport|kill" /home/username/.vnc/cdr768.int.cedar.computecanada.ca:1.log
+ vncext:      Listening for VNC connections on all interface(s), port <b>5901</b>
+
+<b>2) Set up a SSH tunnel to the VNC server</b>
+
+Once your VNC server has been started, create a "bridge" to allow your local desktop computer to connect to the compute node directly. This bridge connection is created using an [[SSH tunnelling|SSH tunnel]]. SSH tunnels are created on your computer in a new local terminal window using the same SSH connection command as usual, with an extra option added which follows the format <code>ssh user@host -L port:compute_node:port</code>.
+
+An example of an SSH tunnel command run on your computer to connect to a VNC server running on Cedar's cdr768 node and port 5901 would be the following:
+
+ [name@local_computer]$ ssh username@cedar.computecanada.ca -L 5902:cdr768:<b>5901</b>
+
+The SSH tunnel operates like a normal SSH session: You may run commands over it, ''etc.'' However, keep in mind that this SSH session is also your connection to the VNC server. If you terminate the SSH session, your connection to the VNC server will be lost! For more information, please see [[SSH tunnelling]].
+
+<b>3) Connect to the VNC server</b>
+
+If you have a Linux desktop, open a new local terminal window and tell your VNC client to connect to '''localhost:port'''. The following example uses the TigerVNC <code>vncviewer</code> command to connect to the running VNC server on cdr768. You will be prompted for the VNC password that you set up earlier in order to connect.
+
+{{Command
+|vncviewer localhost:5902
+|prompt=[name@local_computer]$ 
+|result=
+ 
+TigerVNC Viewer 64-bit v1.8.0
+Built on: 2018-06-13 10:56
+Copyright (C) 1999-2017 TigerVNC Team and many others (see README.txt)
+See http://www.tigervnc.org for information on TigerVNC.
+
+Tue Jul 10 17:40:24 2018
+ DecodeManager: Detected 8 CPU core(s)
+ DecodeManager: Creating 4 decoder thread(s)
+ CConn:       connected to host localhost port 5902
+ CConnection: Server supports RFB protocol version 3.8
+ CConnection: Using RFB protocol version 3.8
+ CConnection: Choosing security type VeNCrypt(19)
+ CVeNCrypt:   Choosing security type TLSVnc (258)
+
+Tue Jul 10 17:40:27 2018
+ CConn:       Using pixel format depth 24 (32bpp) little-endian rgb888
+ CConn:       Using Tight encoding
+ CConn:       Enabling continuous updates
+}}
+
+If you are on a Mac or Windows desktop, click the <i>TigerVNC Viewer</i> application icon and enter the '''localhost:port''' information.  For our example it becomes: [[File:VNCviewerConnect.png|400px|thumb'''Mac Tiger VNC Viewer Connection Details Dialogue Box''']]
+
+
+Please note the port number in '''localhost:port''' specified above (5902) must match the local port (the first number) you specified when you set up the SSH tunnel. The default VNC port is 5900. If you specified 5900 for the local port of the SSH tunnel, you could omit it when you invoke <code>vncviewer</code>. However, Windows users may find that they cannot set up an SSH tunnel on local port 5900.  Once connected, you will be presented with a [https://mate-desktop.org/ Linux MATE desktop]. To launch a terminal, click on the top menu on "Applications -> System Tools -> MATE Terminal". You may also add a shortcut to the top menu by right-clicking on "MATE Terminal" and by clicking on "Add this launcher to panel". Finally, to launch a program, invoke the command as you would normally within a <code>bash</code> session, for example <code>xclock</code>. To start a more complicated program like MATLAB, load the module and then run the <code>matlab</code> command.
+
+= More information =
+
+== Vncserver password ==
+
+To reset your VNC server password, use the <code>vncpasswd</code> command:
+
+<source lang="bash">
+[gra-login1:~] vncpasswd
+Password:
+Verify:
+Would you like to enter a view-only password (y/n)? n
+</source>
+
+Optionally you can completely remove your VNC configuration (including your password) by deleting your <code>~/.vnc</code> directory. The next time you run <code>vncserver</code> you will be prompted to set a new password.
+
+== Killing vncserver ==
+
+If a running vncserver is no longer needed, terminate it with <code>vncserver -kill :DISPLAY#</code> for example:
+
+ [gra-login1:~] vncserver -list
+ TurboVNC sessions:
+ X DISPLAY #	PROCESS ID	NOVNC PROCESS ID
+ :<span style="color:red">44</span>	        27644
+ [gra-login1:~] vncserver -kill :<span style="color:red">44</span>
+ Killing Xvnc process ID 27644
+
+If you have multiple vncservers running on a node, you may kill them all instantly by running:
+ [gra-login1:~] pkill Xvnc -u $USER
+
+== Multiple connections ==
+
+All vncserver(s) running under your username (on a login or compute node) can be displayed with <code>vncserver -list</code>.  If a vncserver was started with the additional <code>-AlwaysShared</code> option then multiple connections to it can be made by establishing a new tunnel and vncviewer from any remote location.  Thus one could leave vncviewer running at the office and then re-connect again from home to access the same desktop and then for example seamlessly continue working with the same applications without closing them.  If however a vncserver was not started with <code>vncserver -AlwaysShared</code> then only one vncviewer connection will be possible and additional connection attempts will immediately fail.
+
+== Failures to connect ==
+
+Repeated failing attempts to establish a new vncserver/vncviewer connection may be due to an old SSH tunnel still running on your desktop tying up ports.  To identify and kill any such tunnels, open a terminal window on your desktop and run <code>ps ux | grep ssh</code> followed by <code>kill PID</code>.
+
+== Unlock screensaver ==
+
+If your VNC screensaver times out and requests a password, enter your cluster account password to unlock it (not your vncserver password).  If you are running the MATE desktop and the screensaver will not unlock, try running <code>killall -9 .mate-screensaver</code>.  This should no longer be a problem on our clusters as the VNC screensaver has been disabled.
+
+= Software =
+
+The VDI nodes support direct vncviewer connections and GPU-accelerated OpenGL graphics for appropriately-configured software applications. The VDI nodes also provide an extra set of software modules in the SnEnv environment, analogous to the StdEnv environments available on all our clusters.<br><br>
+On regular login nodes, a standard software environment and some default modules are automatically loaded when you log in.  This is not so on a VDI node, thus you will see:
+
+{{Command|prompt=[name@gra-vdi4]$
+|module list
+|result=
+No modules loaded
+}}
+
+Therefore, before running any graphical software on gra-vdi you must first manually load one of the following   
+
+== StdEnv ==
+
+Most users will find it sufficient to load the StdEnv module on gra-vdi.  Doing so will provide access to the same software modules that are loaded by default on the clusters:
+
+{{Commands|prompt=[name@gra-vdi4]$ 
+|module load CcEnv StdEnv/2023
+|module avail
+}}
+
+
+== SnEnv ==
+
+In some rare cases users will need to load a locally installed module(s) on gra-vdi.  To do this the <code>SnEnv</code> must first be loaded:
+
+{{Commands|prompt=[name@gra-vdi4]$ 
+|module load SnEnv
+|module avail
+}}
+
+== NIX ==
+
+Instead of loading SnEnv or StdEnv users may want to load the <code>nix</code> module which provides open-source software that is optimized to use accelerated OpenGL whenever possible. This module is only available on graham and gra-vdi and can be loaded as follows:
+
+{{Commands|prompt=[name@gra-vdi4]$ 
+|module load nix
+}}
+
+The nix and nix-env commands will now be in your path to manage software packages via NIX within your personal nix environment.
+
+<b>Installing software</b>
+
+To install a nix package into your environment, click the black terminal icon on the top menu bar or select <i>Applications -> System Tools -> Terminal</i>.  Once a terminal window appears, run <code>module load nix</code>.  You can now search for programs using the <code>nix search <regexp></code> command and install them in your environment using the <code>nix-env --install --attr <attribute></code> command.  As an example, to install [https://qgis.org QGIS] do the following:
+
+{{Commands|prompt=[name@gra-vdi4]$ 
+|nix search qgis
+|result=
+Attribute name: nixpkgs.qgis
+Package name: qgis
+Version: 2.18.20
+Description: User friendly Open Source Geographic Information System
+}}
+{{Commands|prompt=[name@gra-vdi4]$ 
+|nix-env --install --attr nixpkgs.qgis
+}}
+
+Your nix environment persists from one login to the next, so you only need to run an install command once. For example:
+
+{{Commands|prompt=[name@gra-vdi4]$ 
+|module load nix
+|qgis}}
+
+works!  In summary whatever software you install today will be available next time you load the nix module.
+
+<b>OpenGL applications</b>
+
+For accelerated OpenGL to work, it is necessary to adjust compiled binaries to pre-load "vglfaker.so" from VirtualGL.  This level of customization is automatically done for you on gra-vdi when you install any OpenGL based software package with nix.  It is however something that must be done manually after you download and install any software from outside of nix.  To do this we suggest using the <code>patchelf</code> utility to adjust the final binary.  It can be installed into nix with <code>nix-env --install --attr nixpkgs.patchelf</code> if it's not already on the system.  Then once you have built your OpenGL application against the system libraries and for example installed it as ''~/.local/bin/myglapp'' you can add the VirtualGL system library ''/usr/lib64/VirtualGL/libvglfaker.so'' by running:
+
+{{Commands|prompt=[name@gra-vdi4]$ 
+|module load nix
+|patchelf --add-needed /usr/lib64/VirtualGL/libvglfaker.so ~/.local/bin/myglapp
+}}
+
+Note that it is also possible to preload ''vglfaker.so'' via the <code>LD_PRELOAD</code> environment variable.  This is generally a bad idea as it applies indiscriminately to all binaries, and those that require a different ''vglfaker.so'' than that set in <code>LD_PRELOAD</code> will then fail.  It can be used safely in some cases in wrapper scripts.

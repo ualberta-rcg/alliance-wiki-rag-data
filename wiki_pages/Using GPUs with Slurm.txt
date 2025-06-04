@@ -1,0 +1,259 @@
+<languages />
+<translate>
+
+= Introduction = <!--T:56-->
+
+<!--T:57-->
+To request one or more GPUs for a Slurm job, use this form:
+  --gpus-per-node=[type:]number
+
+<!--T:58-->
+The square-bracket notation means that you must specify the number of GPUs, and you may optionally specify the GPU type.  Valid types are listed in the <i>Available GPUs</i> table below, in the column headed "Slurm type specifier".  Here are two examples:
+  --gpus-per-node=2
+  --gpus-per-node=v100:1
+
+<!--T:59-->
+The first line requests two GPUs per node, of any type available on the cluster.  The second line requests one GPU per node, with the GPU being of the V100 type.
+
+<!--T:60-->
+The following form can also be used:
+  --gres=gpu[[:type]:number]
+This is older, and we expect it will no longer be supported in some future release of Slurm.  We recommend that you replace it in your scripts with the above <code>--gpus-per-node</code> form.
+
+<!--T:61-->
+There are a variety of other directives that you can use to request GPU resources: <code>--gpus</code>, <code>--gpus-per-socket</code>, <code>--gpus-per-task</code>, <code>--mem-per-gpu</code>, and <code>--ntasks-per-gpu</code>.  Please see the Slurm documentation for [https://slurm.schedmd.com/sbatch.html sbatch] for more about these.  Our staff did not test all the combinations; if you don't get the result you expect, [[Technical support|contact technical support]].
+
+<!--T:15-->
+For general advice on job scheduling, see [[Running jobs]].
+
+= Available GPUs = <!--T:1-->
+These are the GPUs currently available:
+
+<!--T:2-->
+{| class="wikitable"
+|-
+! rowspan=2|Cluster !! rowspan=2| # of nodes !! rowspan=2|Slurm type<br>specifier !! colspan=3|Per node !! rowspan=2|GPU model  !! rowspan=2|Compute<br>Capability(*) !! rowspan=2|GPU mem<br>(GiB) !! rowspan=2|Notes
+|-
+!                              CPU cores !! CPU memory !! GPUs 
+|-
+| Béluga            || 172 ||  v100 ||  40 || 191000M ||  4 || V100-16gb || 70 || 16 || All GPUs associated with the same CPU socket, connected via NVLink and SXM2
+|-
+| rowspan=3|Cedar   || 114 ||  p100 ||  24 || 128000M ||  4 || P100-12gb || 60 || 12 || Two GPUs per CPU socket, connected via PCIe
+|-
+|                      32  || p100l ||  24 || 257000M ||  4 || P100-16gb || 60 || 16 || All GPUs associated with the same CPU socket, connected via PCIe
+|-
+|                      192 || v100l ||  32 || 192000M ||  4 || V100-32gb || 70 || 32 || Two GPUs per CPU socket; all GPUs connected via NVLink and SXM2
+|-
+| rowspan=5|Graham  || 160 ||  p100 ||  32 || 127518M ||  2 || P100-12gb || 60 || 12 || One GPU per CPU socket, connected via PCIe
+|-
+|                      7   || v100(**)     ||  28 || 183105M ||  8 || V100-16gb || 70 || 16 || See [[Graham#Volta_GPU_nodes_on_Graham|Graham: Volta GPU nodes]]
+|-
+|                      2   || v100(***) ||  28 || 183105M ||  8 || V100-32gb || 70 || 32 || See [[Graham#Volta_GPU_nodes_on_Graham|Graham: Volta GPU nodes]]
+|-
+|                      30  ||  t4   ||  44 || 192000M ||  4 || T4-16gb   || 75 || 16 || Two GPUs per CPU socket
+|-
+|                      6   ||  t4   ||  16 || 192000M ||  4 || T4-16gb   || 75 || 16 || &nbsp;
+|-
+| Mist              || 54  || (none) || 32 ||  256GiB ||  4 || V100-32gb || 70 || 32 || See [https://docs.scinet.utoronto.ca/index.php/Mist#Specifications Mist specifications]
+|- 
+| Narval            || 159 || a100   || 48 || 510000M ||  4 || A100-40gb || 80 || 40 || Two GPUs per CPU socket; all GPUs connected via NVLink 
+|-
+| Arbutus           ||  colspan=8 | Cloud resources are not schedulable via Slurm. See [[Cloud resources]] for details of available hardware.
+|}
+
+<!--T:55-->
+(*) <b>Compute Capability</b> is a technical term created by NVIDIA as a compact way to describe what hardware functions are available on some models of GPU and not on others. 
+It is not a measure of performance and is relevant only if you are compiling your own GPU programs.  See the page on [[CUDA#.22Compute_Capability.22|CUDA programming]] for more.
+
+<!--T:64-->
+(**) To access the 16GB flavor of V100 on Graham, use the following arguments in your sbatch/salloc command: <code>--constraint=skylake,v100</code>.
+
+<!--T:70-->
+(***) To access the 32GB flavor of V100 on Graham, use the following arguments in your sbatch/salloc command: <code>--constraint=cascade,v100</code>.
+
+== Mist == <!--T:38-->
+[https://docs.scinet.utoronto.ca/index.php/Mist Mist] is a cluster comprised of IBM Power9 CPUs (not Intel x86!) and NVIDIA V100 GPUs.  
+Users with access to Niagara can also access Mist.  To specify job requirements on Mist, 
+please see the specific instructions on the [https://docs.scinet.utoronto.ca/index.php/Mist#Submitting_jobs SciNet website].
+
+== Multi-Instance GPU (MIG) on Narval == <!--T:71-->
+MIG, a technology that allows to partition a GPU into multiple instances, is currently activated on Narval cluster as a pilot project. For more information on 
+how to use the MIGs on Narval please see [[Multi-Instance_GPU]].
+
+= Selecting the type of GPU to use = <!--T:16-->
+
+<!--T:37-->
+Some clusters have more than one GPU type available ([[Cedar]], [[Graham]]), and some clusters only have GPUs on certain nodes ([[Béluga/en|Béluga]], [[Cedar]], [[Graham]]). 
+
+<!--T:40-->
+If you do not supply a type specifier, Slurm may send your job to a node equipped with any type of GPU.  
+For certain workflows this may be undesirable; for example, molecular dynamics code requires high double-precision performance, for which T4 GPUs are not appropriate.
+In such a case, make sure you include a type specifier.
+
+= Examples = <!--T:62-->
+
+== Single-core job == <!--T:3-->
+If you need only a single CPU core and one GPU:
+{{File
+  |name=gpu_serial_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --account=def-someuser
+#SBATCH --gpus-per-node=1
+#SBATCH --mem=4000M               # memory per node
+#SBATCH --time=0-03:00
+./program                         # you can use 'nvidia-smi' for a test
+}}
+
+== Multi-threaded job == <!--T:4-->
+For a GPU job which needs multiple CPUs in a single node:
+{{File
+  |name=gpu_threaded_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --account=def-someuser
+#SBATCH --gpus-per-node=1         # Number of GPU(s) per node
+#SBATCH --cpus-per-task=6         # CPU cores/threads
+#SBATCH --mem=4000M               # memory per node
+#SBATCH --time=0-03:00
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+./program
+}}
+
+<!--T:63-->
+For each GPU requested, we recommend
+* on Béluga, no more than 10 CPU cores;
+* on Cedar, 
+** no more than 6 CPU cores per P100 GPU (p100 and p100l);
+** no more than 8 CPU cores per V100 GPU (v100l);
+* on Graham, no more than 16 CPU cores.
+
+== MPI job == <!--T:5-->
+{{File
+  |name=gpu_mpi_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --account=def-someuser
+#SBATCH --gpus=8                  # total number of GPUs
+#SBATCH --ntasks-per-gpu=1        # total of 8 MPI processes
+#SBATCH --cpus-per-task=6         # CPU cores per MPI process
+#SBATCH --mem-per-cpu=5G          # host memory per CPU core
+#SBATCH --time=0-03:00            # time (DD-HH:MM)
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+srun --cpus-per-task=$SLURM_CPUS_PER_TASK ./program
+}}
+
+== Whole nodes == <!--T:6-->
+If your application can efficiently use an entire node and its associated GPUs, you will probably experience shorter wait times if you ask Slurm for a whole node. Use one of the following job scripts as a template. 
+
+=== Requesting a GPU node on Graham === <!--T:7-->
+{{File
+  |name=graham_gpu_node_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --gpus-per-node=p100:2
+#SBATCH --ntasks-per-node=32
+#SBATCH --mem=127000M
+#SBATCH --time=3:00
+#SBATCH --account=def-someuser
+nvidia-smi
+}}
+
+=== Requesting a P100 GPU node on Cedar === <!--T:8-->
+{{File
+  |name=cedar_gpu_node_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --gpus-per-node=p100:4
+#SBATCH --ntasks-per-node=24
+#SBATCH --exclusive
+#SBATCH --mem=125G
+#SBATCH --time=3:00
+#SBATCH --account=def-someuser
+nvidia-smi
+}}
+
+=== Requesting a P100-16G GPU node on Cedar === <!--T:9-->
+
+<!--T:10-->
+There is a special group of GPU nodes on [[Cedar]] which have four Tesla P100 16GB cards each (Other P100 GPUs on the cluster have 12GB and the V100 GPUs have 32G). The GPUs in a P100L node all use the same PCI switch, so the inter-GPU communication latency is lower, but bandwidth between CPU and GPU is lower than on the regular GPU nodes. The nodes also have 256GB RAM. You may only request these nodes as whole nodes, therefore you must specify <code>--gres=gpu:p100l:4</code>. P100L GPU jobs up to 28 days can be run on Cedar.
+
+<!--T:11-->
+{{File
+  |name=p100l_gpu_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --nodes=1 
+#SBATCH --gpus-per-node=p100l:4   
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24    # There are 24 CPU cores on P100 Cedar GPU nodes
+#SBATCH --mem=0               # Request the full memory of the node
+#SBATCH --time=3:00
+#SBATCH --account=def-someuser
+hostname
+nvidia-smi
+}}
+
+===Packing single-GPU jobs within one SLURM job=== <!--T:12-->
+
+<!--T:13-->
+If you need to run four single-GPU programs or two 2-GPU programs for longer than 24 hours, [[GNU Parallel]] is recommended. A simple example is:
+<pre>
+cat params.input | parallel -j4 'CUDA_VISIBLE_DEVICES=$(({%} - 1)) python {} &> {#}.out'
+</pre>
+In this example, the GPU ID is calculated by subtracting 1 from the slot ID {%} and {#} is the job ID, starting from 1.
+
+<!--T:14-->
+A <code>params.input</code> file should include input parameters in each line, like this:
+<pre>
+code1.py
+code2.py
+code3.py
+code4.py
+...
+</pre>
+With this method, you can run multiple tasks in one submission. The <code>-j4</code> parameter means that GNU Parallel can run a maximum of four concurrent tasks, launching another as soon as one ends. CUDA_VISIBLE_DEVICES is used to ensure that two tasks do not try to use the same GPU at the same time.
+
+== Profiling GPU tasks == <!--T:65-->
+
+<!--T:66-->
+On [[Béluga/en|Béluga]] and [[Narval/en|Narval]], the
+[https://developer.nvidia.com/dcgm NVIDIA Data Center GPU Manager (DCGM)]
+needs to be disabled, and this must be done while doing your job submission.
+Based on the simplest example in this page, the <code>--export</code>
+parameter is used to set the <code>DISABLE_DCGM</code> environment variable:
+
+<!--T:67-->
+{{File
+  |name=gpu_profiling_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --account=def-someuser
+#SBATCH --export=ALL,DISABLE_DCGM=1
+#SBATCH --gpus-per-node=1
+#SBATCH --mem=4000M               # memory per node
+#SBATCH --time=0-03:00
+
+<!--T:68-->
+# Wait until DCGM is disabled on the node
+while [ ! -z "$(dcgmi -v {{!}} grep 'Hostengine build info:')" ]; do
+  sleep 5;
+done
+
+<!--T:69-->
+./profiler arg1 arg2 ...          # Edit this line. Nvprof can be used
+}}
+For more details on profilers, see [[Debugging and profiling]].
+
+<!--T:54-->
+[[Category:SLURM]]
+</translate>
