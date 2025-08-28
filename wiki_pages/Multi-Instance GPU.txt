@@ -29,56 +29,46 @@ GPU jobs requiring many CPU cores may also require a full GPU instead of an inst
 
 <!--T:6-->
 = Available configurations =
-As of Dec. 2024, Narval A100 nodes offer all types of GPU instances.
-While there are [https://docs.nvidia.com/datacenter/tesla/mig-user-guide/index.html#supported-mig-profiles many possible MIG configurations and profiles], only the following profiles have been implemented:
-* <code>1g.5gb</code>
-* <code>2g.10gb</code>
-* <code>3g.20gb</code>
-* <code>4g.20gb</code>
+While there are [https://docs.nvidia.com/datacenter/tesla/mig-user-guide/index.html#supported-mig-profiles many possible MIG configurations and profiles], the supported profiles are system dependant:
+* [[Narval/en#GPU_instances|Narval, with NVIDIA A100-40gb GPUs]]
+* [[Rorqual/en#GPU_instances|Rorqual, with NVIDIA H100-80gb GPUs]]
 
 <!--T:7-->
 The profile name describes the size of the instance.
-For example, a <code>3g.20gb</code> instance has 20 GB of RAM and offers 3/8 of the computing performance of a full A100-40gb GPU. Using less powerful profiles will have a lower impact on your allocation and priority.
+For example, a <code>3g.20gb</code> instance has 20 GB of GPU memory and offers 3/8<sup>th</sup> of the computing performance of a full GPU. Using less powerful profiles will have a lower impact on your allocation and priority.
+
+<!--T:25-->
+To list all the flavours of MIGs (plus the full size GPU names) available on a given cluster, one can run the following command:
+
+<!--T:26-->
+{{Command|sinfo -o "%G"{{!}}grep gpu{{!}}sed 's/gpu://g'{{!}}sed 's/,/\n/g'{{!}}cut -d: -f1{{!}}sort{{!}}uniq}}
 
 <!--T:8-->
-On Narval, the recommended maximum number of CPU cores and amount of system memory per instance are:
-* <code>1g.5gb</code>: maximum 2 cores and 15GB
-* <code>2g.10gb</code>: maximum 3 cores and 31GB
-* <code>3g.20gb</code>: maximum 6 cores and 62GB
-* <code>4g.20gb</code>: maximum 6 cores and 62GB
-
-<!--T:9-->
-To request an instance of a certain profile, your job submission must include the <code>--gres</code> parameter:
-* <code>1g.5gb</code>: <code>--gres=gpu:a100_1g.5gb:1</code>
-* <code>2g.10gb</code>: <code>--gres=gpu:a100_2g.10gb:1</code>
-* <code>3g.20gb</code>: <code>--gres=gpu:a100_3g.20gb:1</code>
-* <code>4g.20gb</code>: <code>--gres=gpu:a100_4g.20gb:1</code>  
-
-<!--T:21-->
-Note: For the job scheduler on Narval, the prefix <code>a100_</code> is required at the beginning of the profile name.
+The recommended maximum number of CPU cores and amount of system memory per instance are listed in the [[Allocations_and_compute_scheduling#Ratios_in_bundles|table of ratios in bundles]].
 
 = Job examples = <!--T:10-->
 
 <!--T:11-->
 * Requesting an instance of power 3/8 and size 20GB for a 1-hour interactive job:
+
 </translate> 
-
 {{Command2
-|salloc --account{{=}}def-someuser --gres{{=}}gpu:a100_3g.20gb:1 --cpus-per-task{{=}}2 --mem{{=}}40gb --time{{=}}1:0:0
+|prompt=[name@narval ~]$
+|salloc --account{{=}}def-someuser --gpus{{=}}a100_3g.20gb:1 --cpus-per-task{{=}}2 --mem{{=}}40gb --time{{=}}1:0:0
 }}
+<translate>
 
-<translate> 
 <!--T:12-->
 * Requesting an instance of power 4/8 and size 20GB for a 24-hour batch job using the maximum recommended number of cores and system memory:
-</translate> 
 
+</translate>
 {{File
   |name=a100_4g.20gb_mig_job.sh
   |lang="sh"
   |contents=
 #!/bin/bash
 #SBATCH --account=def-someuser
-#SBATCH --gres=gpu:a100_4g.20gb:1 
+#SBATCH --gpus=a100_4g.20gb:1 
 #SBATCH --cpus-per-task=6    # There are 6 CPU cores per 3g.20gb and 4g.20gb on Narval.
 #SBATCH --mem=62gb           # There are 62GB GPU RAM per 3g.20gb and 4g.20gb on Narval.
 #SBATCH --time=24:00:00
@@ -86,7 +76,6 @@ Note: For the job scheduler on Narval, the prefix <code>a100_</code> is required
 hostname
 nvidia-smi
 }}
-
 <translate>
 
 = Finding which of your jobs should use an instance = <!--T:13-->

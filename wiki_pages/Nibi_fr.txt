@@ -3,39 +3,103 @@
 
 {| class="wikitable"
 |-
-| Disponibilité : Printemps de 2025
+| Disponibilité : 31 juillet 2025
 |-
-| Nœud de connexion : nibi.sharcnet.ca (pour les tests)
+| Nœud de connexion SSH : nibi.sharcnet.ca
 |-
-| Point de chute Globus : à déterminer
+| Interface web : [https://ondemand.sharcnet.ca ondemand.sharcnet.ca]
+|-
+| Collection Globus : computecanada#graham-globus
 |-
 | Nœud de copie (rsync, scp, sftp, etc.) : utiliser les nœuds de connexion
 |-
-| Portail : à déterminer
+| Portail : [https://portal.nibi.sharcnet.ca portal.nibi.sharcnet.ca]
 |}
 
-Dans la langue anishinaabe, Nibi est un terme qui désigne l'eau. Cette nouvelle grappe polyvalente remplacera Graham d'ici au 1er juillet 2025. Conçue par [https://www.hypertec.com/ Hypertec] et hébergée et exploitée par [https://www.sharcnet.ca/ SHARCNET] à l'Université de Waterloo, la grappe possède 134 400 cœurs CPU et 288 GPU NVIDIA H100.
+Dans la langue anishinaabe, Nibi est un terme qui désigne l'eau. Cette nouvelle grappe d'usage général remplace Graham et elle offre 134&nbsp;400&nbsp;CPU et 288&nbsp;GPU H100 de NVIDIA. Conçue par [https://www.hypertec.com/ Hypertec] Nibi est hébergée et exploitée par [https://www.sharcnet.ca/ SHARCNET] à l'Université de Waterloo.
+
+<!--Tout comme Cedar et Fir, Nibi permet l'accès à Internet à partir des nœuds de calcul; aucune autorisation de pare-feu spéciale ni aucun serveur mandataire (<i>proxy</i>) n'est nécessaire.
+-->
 
 =Stockage=
-Stockage parallèle : 25Po, [https://fr.wikipedia.org/wiki/SSD SSD (Solid-State Drive)] de [https://www.vastdata.com/ VAST Data] pour /home, /project et /scratch (même que sur miniGraham).
+Stockage parallèle : 25&nbsp;Po, [https://fr.wikipedia.org/wiki/SSD SSD (Solid-State Drive)] de [https://www.vastdata.com/ VAST Data] pour /home, /project et /scratch.
+Ce stockage est aussi utilisé par miniGraham, alors /home, /project, etc. sont les mêmes.
+
+Notez que Vast comptabilise différemment l'espace utilisé pour calculer les quotas. La taille apparente de vos fichiers est prise en compte alors que certaines configurations de Lustre compressent les fichiers de manière transparente et comptabilisent l'espace utilisé après compression.
+
+Notez également que Nibi utilise un nouveau mécanisme expérimental pour gérer /scratch. Comme sur tous les systèmes, vous disposez d'une limite souple et d'une limite stricte, mais sur Nibi, la limite souple est basse (1&nbsp;TB) et vous disposez d'un délai de grâce de 60&nbsp;jours. Après l'expiration de ce délai, la limite souple est imposée (plus aucune création ni extension de fichier). Pour résoudre ce problème, votre utilisation doit revenir sous la limite souple.
 
 =Interconnexion=
-* ethernet Nokia, 200/400G 
-** bande passante pour nœuds CPU, 200Gbit/s
-** bande passante non blocante pour tous les nœuds GPU Nvidia, 400Gbit/s
-** bande passante pour tous les nœuds GPU AMD, 200Gbit/s
-** connexion aux nœuds de stockage VAST, 24x100Gbit/s
-** liaisons montantes (<i>uplinks</i>) pour tous les nœuds,  400Gbit/s; blocage 2:1
+* ethernet Nokia, 200/400&nbsp;G 
+** bande passante pour nœuds CPU, 200&nbsp;Gbit/s
+** bande passante non bloquante pour tous les nœuds GPU Nvidia, 200&nbsp;Gbit/s
+** bande passante pour tous les nœuds GPU AMD, 200&nbsp;Gbit/s
+** connexion aux nœuds de stockage VAST, 24x100&nbsp;Gbit/s
+** liaisons montantes (<i>uplinks</i>) pour tous les nœuds,  400&nbsp;Gbit/s; blocage 2:1
 
 = Caractéristiques des nœuds =
 {| class="wikitable sortable"
-! nœuds !! cœurs !! mémoire disponible !! CPU !! GPU
+! nœuds !! cœurs !! mémoire disponible !! stockage local au nœud || CPU !! GPU
 |-
-| 700 || 192 || 768GB DDR5 ||2 x Intel 6972P @ 2.4 GHz, cache L3 384Mo ||
+| 700 || 192 || 754&nbsp;GB DDR5|| 3&nbsp;T || 2 x Intel 6972P @ 2.4&nbsp;GHz, cache L3 384&nbsp;Mo ||
 |-
-|  10 || 192 || 6TB DDR5 ||2 x Intel 6972P @ 2.4 GHz, cache L3 384Mo ||
+|  10 || 192 || 5859&nbsp;G DDR5 || 3&nbsp;T || 2 x Intel 6972P @ 2.4&nbsp;GHz, cache L3 384&nbsp;Mo ||
 |-
-|  36 || 112 || 2To DDR5 || 1 x Intel 8570 @ 2.1 GHz, cache L3 300Mo || 8 x Nvidia H100 SXM (mémoire de 80Go)
+|  36 || 112 || 2014&nbsp;G DDR5|| 11&nbsp;T || 2 x Intel 8570 @ 2.1&nbsp;GHz, cache L3 300&nbsp;Mo || 8 x Nvidia H100 SXM (mémoire de 80&nbsp;Go)
 |-
-|   6 ||  96 || 512GB || 4 x AMD MI300A @ 2.1 GHz || 4 x AMD CDNA 3 (mémoire unifiée: 512Go HBM3 au total)
+|   6 ||  96 || 501&nbsp;GB HBM || 3&nbsp;T || 4 x AMD MI300A @ 2.1&nbsp;GHz || 4 x Zen4+CDNA3 (mémoire unifiée)
 |}
+
+=Particularités=
+==Accès à l'internet==
+Tous les nœuds ont accès à Internet; aucune autorisation de pare-feu spéciale ou proxy n'est nécessaire.
+
+==Espace /project==
+Les répertoires des utilisateurs ne sont plus créés par défaut dans /project. Vous pouvez toujours créer vos propres répertoires dans l'espace /project du groupe à l'aide de <code>mkdir</code>. Ceci permet aux groupes de décider de l'organisation de leur espace /project pour le partage de données entre les membres. 
+
+==Quota pour l'espace /scratch==
+Un quota souple de 1&nbsp;TB sur /scratch s'applique à chaque utilisateur. Ce quota souple peut être dépassé pendant 60&nbsp;jours maximum, après quoi aucun fichier supplémentaire ne peut être écrit sur /scratch. Les fichiers peuvent être réécrits une fois que l'utilisateur a supprimé suffisamment de fichiers pour ramener son utilisation /scratch totale sous 1&nbsp;TB. Pour plus d'information, voir [[Storage and file management/fr|Stockage et gestion de fichiers]].
+
+==Accès via Open OnDemand (OOD)==
+Il est possible d'accéder à la grappe Nibi simplement via un navigateur web. Nibi utilise Open OnDemand (OOD), une plateforme web qui simplifie l'accès en fournissant une interface web aux nœuds de connexion et un environnement de bureau à distance. Pour vous connecter à Nibi, rendez-vous sur https://ondemand.sharcnet.ca/ et connectez-vous avec l'authentification multifacteur. Une interface conviviale s'affichera, proposant des options pour ouvrir un terminal Bash ou lancer une session de bureau à distance.
+
+==Utilisation de JupyterLab via OOD (<i>Open OnDemand</i>)==
+[[File:nibi-desktop-running.png|thumb]]
+Vous pouvez exécuter JupyterLab de manière interactive dans une session sur votre bureau avec OOD. Après vous être connecté au [https://ondemand.sharcnet.ca portail Nibi Open OnDemand], cliquez sur ''Compute'' dans le menu supérieur, puis sélectionnez ''Nibi Desktop''. Une page s'ouvrira avec un formulaire vous permettant de demander une nouvelle session sur votre bureau.
+
+Après avoir rempli le formulaire avec les détails de votre demande, cliquez sur ''Launch'' pour soumettre votre demande. Après quelques instants, vous verrez l'état demandé passer de ''Queued'' à ''Starting and Running''. Cliquez ensuite sur ''Launch Nibi Desktop'' pour vous connecter au bureau. Un bureau Linux apparaîtra.
+
+Sur le bureau Nibi, faites un clic droit dans une zone vide. Dans le menu contextuel qui apparaît, sélectionnez ''Open in Terminal'' pour ouvrir une fenêtre de terminal où vous pourrez créer et/ou activer votre [[Python/fr#Créer_et_utiliser_un_environnement_virtuel|environnement virtuel Python]] dans lequel JupyterLab est installé. 
+
+Si vous n'avez pas déjà installé JupyterLab dans un environnement virtuel, vous pouvez l'installer en ligne de commande.
+Par exemple, utilisez <code>pip</code> pour installer JupyterLab dans un environnement virtuel Python avec la commande :
+{{Commands2
+|prompt=(your_python_ENV) [username@<node>.nibi]$
+|pip install --no-index jupyterlab
+}} 
+
+Vous pouvez lancer JupyterLab à partir de votre environnement virtuel Python avec
+{{Commands2
+|prompt=(your_python_ENV) [username@<node>.nibi]$
+|jupyter-lab --no-browser
+}}
+
+Une fois JuptyerLab lancé, l'URL de l'instance JupyterLab sur l'hôte local s'affiche. Vous pouvez maintenant ouvrir un navigateur web sur le bureau Nibi pour vous connecter à l'URL de JupyterLab. Copiez-collez l'URL dans le navigateur pour accéder à JupyterLab. L'URL devrait être au format suivant&nbsp;:
+<pre>
+http://localhost:8888/lab?token=953a895492dfa929b5649385f907d50833306e4aa46b8262
+</pre>
+
+Notez que vous devez ouvrir un navigateur pour utiliser JupyterLab. D'ici à ce qu'un module de navigateur web soit disponible sur le système, vous pouvez télécharger Firefox pour Linux 64&nbsp;bits et téléverser ce paquet sur votre compte Nibi. Par exemple, si le fichier s'appelle ''firefox-xxx.tar.xz'', il peut être décompressé et exécuté dans une autre fenêtre de terminal sur le bureau avec les commandes suivantes&nbsp;:
+
+{{Commands2
+|prompt=[username@<node>.nibi Desktop]$
+|tar -xf /path/to/firefox-xxx.tar.xz
+|prompt=[username@<node>.nibi Desktop]$
+|cd firefox
+|prompt=[username@<node>.nibi Desktop]$
+|./firefox --private-window <JupyterLab URL>
+
+}}
+
+==Prise en charge de VDI via OOD==
+Contrairement à Graham, Nibi n'offre pas VDI (Virtual Desktop Infrastructure). Il fournit désormais un environnement de bureau à distance via le portail [https://ondemand.sharcnet.ca/] d'Open OnDemand (OOD), offrant des performances matérielles et une prise en charge logicielle améliorées.

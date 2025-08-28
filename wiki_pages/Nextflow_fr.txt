@@ -125,8 +125,9 @@ bin           CODE_OF_CONDUCT.md  LICENSE  modules.json     pyproject.toml      
 CHANGELOG.md  conf                main.nf  nextflow.config  README.md             workflows
 </source>
 
-Quand le pipeline est prêt à être lancé, Nextflow examine le fichier <code>nextflow.config</code> dans ce répertoire ainsi que le fichier <code>~/.nextflow/config</code> dans /home  (s'il existe) pour contrôler l'exécution du flux de travail. Les pipelines nf-core ont tous une configuration par défaut, une configuration de test et des configurations de conteneur (singularité, podman, etc.). Vous devrez aussi fournir une configuration personnalisée pour la grappe (Narval, Béluga, Cedar ou Graham) sur laquelle les pipelines sont exécutés; une configuration simple se trouve dans la section suivante. Les pipelines Nextflow peuvent également s'exécuter sur [[Niagara/fr Niagara]] s'ils ont été conçus expressément pour cette grappe, mais nous vous déconseillons généralement d'exécuter tout pipeline Nextflow sur Niagara.
+Quand le pipeline est prêt à être lancé, Nextflow examine le fichier <code>nextflow.config</code> dans ce répertoire ainsi que le fichier <code>~/.nextflow/config</code> dans /home  (s'il existe) pour contrôler l'exécution du flux de travail. Les pipelines nf-core ont tous une configuration par défaut, une configuration de test et des configurations de conteneur (singularité, podman, etc.). Vous devrez aussi fournir une configuration personnalisée pour la grappe (Narval, Béluga, Cedar ou Graham) sur laquelle les pipelines sont exécutés; une configuration simple se trouve dans la section suivante. Les pipelines Nextflow peuvent également s'exécuter sur [[Niagara/fr|Niagara]] s'ils ont été conçus expressément pour cette grappe, mais nous vous déconseillons généralement d'exécuter tout pipeline Nextflow sur Niagara.
 
+<span id="A_configuration_for_our_clusters"></span>
 ==== Configuration pour nos grappes ====
 
 Vous pouvez utiliser la configuration suivante en modifiant la valeur par défaut des processus nf-core et en entrant les informations appropriées pour la grappe [[Béluga]] ou [[Narval]]. Cette configuration est enregistrée dans un bloc de profil qui sera chargé lors de l'exécution. 
@@ -189,9 +190,10 @@ La configuration est liée au système sur lequel se fait l'exécution, mais ell
 
 Si les tâches échouent avec les codes de retour 125 (<i>out of memory</i>) ou 139 (<i>omm killed because the process used more memory than what was allowed by cgroup</i>), les lignes <code >process.errorStrategy</code> et <code>process.memory</code> dans la configuration garantissent qu'elles sont automatiquement redémarrées avec 4Go de RAM supplémentaires.
 
+<span id="Running_the_pipeline"></span>
 ====Exécution du pipeline====
 
-Utilisez les deux profils fournis par nf-core (<i>test</i> our le'ensemble de données de test et <i>singularity</i> pour le conteneur) et le profil que nous venons de créer pour Béluga. Notez que Nextflow est principalement écrit en Java et a tendance à utiliser beaucoup de mémoire virtuelle. Sur Narval, cela ne posera pas de problème, mais avec le nœud de connexion de Béluga, vous devrez modifier la mémoire virtuelle pour exécuter la plupart des flux de travail. Pour définir la limite de mémoire virtuelle à 40Go, utilisez la commande <code>ulimit -v 40000000</code>. Nous suggérons aussi d'utiliser un [[Prolonging_terminal_sessions/fr#Multiplexeur_de_terminal|multiplexeur de terminal]], de sorte que le pipeline Nextflow fonctionnera toujours si vous êtes déconnecté, et vous pourrez ensuite vous reconnecter au processus du multiplexeur. Notez que l'exécution de Nextflow est facile sur les nœuds de connexion de Béluga et Narval, mais plus difficile sur Graham et Cedar puisque la limite de mémoire virtuelle des nœuds de connexion ne peut pas être modifiée sur ces grappes; nous vous recommandons de lancer Nextflow à partir d'un nœud de calcul, où la mémoire virtuelle n'est jamais limitée.
+Utilisez les deux profils fournis par nf-core (<i>test</i> pour l'ensemble de données de test et <i>singularity</i> pour le conteneur) et le profil que nous venons de créer pour Béluga. Notez que Nextflow est principalement écrit en Java et a tendance à utiliser beaucoup de mémoire virtuelle. Sur Narval, cela ne posera pas de problème, mais avec le nœud de connexion de Béluga, vous devrez modifier la mémoire virtuelle pour exécuter la plupart des flux de travail. Pour définir la limite de mémoire virtuelle à 40Go, utilisez la commande <code>ulimit -v 40000000</code>. Nous suggérons aussi d'utiliser un [[Prolonging_terminal_sessions/fr#Multiplexeur_de_terminal|multiplexeur de terminal]], de sorte que le pipeline Nextflow fonctionnera toujours si vous êtes déconnecté, et vous pourrez ensuite vous reconnecter au processus du multiplexeur. Notez que l'exécution de Nextflow est facile sur les nœuds de connexion de Béluga et Narval, mais plus difficile sur Graham et Cedar puisque la limite de mémoire virtuelle des nœuds de connexion ne peut pas être modifiée sur ces grappes; nous vous recommandons de lancer Nextflow à partir d'un nœud de calcul, où la mémoire virtuelle n'est jamais limitée.
 <source lang="bash">
 nextflow run nf-core-${NFCORE_PL}_${PL_VERSION}/2_3_1/  -profile test,singularity,narval  --outdir ${NFCORE_PL}_OUTPUT
 </source>
@@ -201,8 +203,20 @@ Nextflow est maintenant démarré sur le nœud de connexion. Ceci achemine les t
 
 Vous pouvez voir la progression du pipeline. Il est aussi possible d'ouvrir une nouvelle session sur la grappe ou de vous détacher de la session tmux pour voir les tâches dans la file d'attente Slurm avec <code>squeue -u $USER</code> ou <code>sq</code>.
 
-====Problèmes connus====
+<span id="Known_issues"></span>
+==Problèmes connus==
 
+==== "unable to create native thread" ====
+
+Nous avons constaté l'erreur suivante&nbsp;:
+<source>
+java.lang.OutOfMemoryError: unable to create native thread: possibly out of memory or process/resource limits reached
+[error][gc,task] GC Failed to create worker thread
+</source>
+Nous croyons que l'erreur se produit quand Java tente de créer autant de fils que le nombre de cœurs physiques de l'ordinateur.
+Il semble que l'erreur est résolue quand <code>nextflow</code> est exécuté avec <code>export NXF_OPTS='-XX:ActiveProcessorCount=1'</code>.
+
+==== SIGBUS ====
 Des erreurs <code>SIGBUS</code> du processus principal de Nextflow ont été signalées.
 Nous soupçonnons que c'est à cause des problèmes Nextflow suivants&nbsp;:
   * https://github.com/nextflow-io/nextflow/issues/842

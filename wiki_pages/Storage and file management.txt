@@ -32,6 +32,7 @@ Unlike your personal computer, our systems will typically have several storage s
 * <b>HOME:</b> While your home directory may seem like the logical place to store all your files and do all your work, in general this isn't the case; your home normally has a relatively small quota and doesn't have especially good performance for writing and reading large amounts of data. The most logical use of your home directory is typically source code, small parameter files and job submission scripts. 
 * <b>PROJECT:</b> The project space has a significantly larger quota and is well adapted to [[Sharing data | sharing data]] among members of a research group since it, unlike the home or scratch, is linked to a professor's account rather than an individual user. The data stored in the project space should be fairly static, that is to say the data are not likely to be changed many times in a month. Otherwise, frequently changing data, including just moving and renaming directories, in project can become a heavy burden on the tape-based backup system. 
 * <b>SCRATCH</b>: For intensive read/write operations on large files (> 100 MB per file), scratch is the best choice. However, remember that important files must be copied off scratch since they are not backed up there, and older files are subject to [[Scratch purging policy|purging]]. The scratch storage should therefore be used for temporary files: checkpoint files, output from jobs and other data that can easily be recreated. <b>Do not regard SCRATCH as your normal storage!  It is for transient files that you can afford to lose.</b>
+* <b>NEARLINE</b>: Nearline is a tape-based filesystem intended for inactive data. Datasets which you do not expect to access for months are good candidates to be stored in <tt>/nearline</tt>. For more information, see [[Using nearline storage]].
 * <b>SLURM_TMPDIR</b>: While a job is running, the environment variable <code>$SLURM_TMPDIR</code> holds a unique path to a temporary folder on a fast, local filesystem on each compute node allocated to the job. When the job ends, the directory and its contents are deleted, so <code>$SLURM_TMPDIR</code> should be used for temporary files that are only needed for the duration of the job. Its advantage, compared to the other networked filesystem types above, is increased performance due to the filesystem being local to the compute node. It is especially well-suited for large collections of small files (for example, smaller than a few megabytes per file). Note that this filesystem is shared between all jobs running on the node, and that the available space depends on the compute node type. A more detailed discussion of using <code>$SLURM_TMPDIR</code> is available at [[Using_$SLURM_TMPDIR | this page]].
 
 ==Project space consumption per user== <!--T:23-->                                                            
@@ -51,6 +52,16 @@ lfs find <path to the directory> -type f | wc -l
 <!--T:9-->
 == Best practices ==
 * Regularly clean up your data in the scratch and project spaces, because those filesystems are used for huge data collections.
+** Document your files with [[README files]].
+** For any set of files that could be deleted:
+**# Create a temporary directory <code>toDelete</code>
+**# Move the files to be deleted to this directory
+**# <b>Verify</b> the contents of <code>toDelete</code>
+**# Delete <code>toDelete</code> recursively.
+** If possible, avoid using <code>*</code> and <code>/</code> characters in your <code>rm</code> commands.
+*** Navigate to the parent directory that contains the item(s) to be deleted. Double-check you are in the correct directory.
+*** If the directory has a [[Make|Makefile]], it may use <code>*</code> and <code>/</code> in <code>rm</code> commands, but these commands have to be well tested.
+** In shell scripts, if environment variables are used in <code>rm</code> commands, each variable has to be tested before use: empty or undefined variables can cause catastrophic errors, and any input value has to be checked against malicious or erroneous use of the script.
 * Only use text format for files that are smaller than a few megabytes.
 * As far as possible, use scratch and local storage for temporary files. For local storage you can use the temporary directory created by the [[Running jobs|job scheduler]] for this, named <code>$SLURM_TMPDIR</code>.
 * If your program must search within a file, it is fastest to do it by first reading it completely before searching.
@@ -67,7 +78,7 @@ By default on our clusters, each user has access to the home and scratch spaces,
 
 <!--T:12-->
 <tabs>
-<tab name="Cedar">
+<tab name="Cedar, Fir">
 {| class="wikitable" style="font-size: 95%; text-align: center;"
 |+Filesystem Characteristics 
 ! Filesystem
@@ -111,9 +122,9 @@ By default on our clusters, each user has access to the home and scratch spaces,
 |No
 |}
 <references />
-Starting April 1, 2024, new Rapid Access Service (RAS) policies will allow larger quotas for the project and nearline spaces. For more details, see the "Storage" section at [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/rapid-access-service Rapid Access Service].  Quota changes larger than those permitted by RAS will require an application to the annual [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/resource-allocation-competition Resource Allocation Competition (RAC)]. 
+Since April 1, 2024, new Rapid Access Service (RAS) policies allow larger quotas for the project and nearline spaces. For more details, see the "Storage" section at [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/rapid-access-service Rapid Access Service].  Quota changes larger than those permitted by RAS will require an application to the annual [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/resource-allocation-competition Resource Allocation Competition (RAC)]. 
 </tab>
-<tab name="Graham">
+<tab name="Graham, Nibi">
 {| class="wikitable" style="font-size: 95%; text-align: center;"
 |+Filesystem Characteristics 
 ! Filesystem
@@ -133,7 +144,7 @@ Starting April 1, 2024, new Rapid Access Service (RAS) policies will allow large
 |Yes
 |-
 |Scratch Space
-|20 TB hard / 1TB soft and 1M files per user<ref>An 1 TB soft quota on scratch applies to each researcher.  This soft quota can be exceeded for up to 60 days after which no additional files may be written to scratch.  Files may be written again once the researcher has removed or deleted enough files to bring their total scratch use under 1 TB.</ref>
+|20 TB hard / 1TB soft and 1M files per user<ref>An 1 TB soft quota on scratch applies to each researcher.  This soft quota can be exceeded for up to 60 days after which no additional files may be written to scratch.  Files may be written again once the researcher has removed or deleted enough files to bring their total scratch use under 1 TB. See [[Scratch purging policy]] for more information.</ref>
 |No
 |No
 |No
@@ -157,9 +168,9 @@ Starting April 1, 2024, new Rapid Access Service (RAS) policies will allow large
 |No
 |}
 <references />
-Starting April 1, 2024, new Rapid Access Service (RAS) policies will allow larger quotas for project and nearline spaces. For more details, see the "Storage" section at [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/rapid-access-service Rapid Access Service].  Quota changes larger than those permitted by RAS will require an application to the annual [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/resource-allocation-competition Resource Allocation Competition (RAC)].  
+Since April 1, 2024, new Rapid Access Service (RAS) policies allow larger quotas for project and nearline spaces. For more details, see the "Storage" section at [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/rapid-access-service Rapid Access Service].  Quota changes larger than those permitted by RAS will require an application to the annual [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/resource-allocation-competition Resource Allocation Competition (RAC)].  
 </tab>
-<tab name="Béluga and Narval">
+<tab name="Béluga, Narval and Rorqual">
 {| class="wikitable" style="font-size: 95%; text-align: center;"
 |+Filesystem Characteristics 
 ! Filesystem
@@ -203,7 +214,7 @@ Starting April 1, 2024, new Rapid Access Service (RAS) policies will allow large
 |No
 |}
 <references />
-Starting April 1, 2024, new Rapid Access Service (RAS) policies will allow larger quotas for project and nearline spaces. For more details, see the "Storage" section at [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/rapid-access-service Rapid Access Service].  Quota changes larger than those permitted by RAS will require an application to the annual [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/resource-allocation-competition Resource Allocation Competition (RAC)].  
+Since April 1, 2024, new Rapid Access Service (RAS) policies allow larger quotas for project and nearline spaces. For more details, see the "Storage" section at [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/rapid-access-service Rapid Access Service].  Quota changes larger than those permitted by RAS will require an application to the annual [https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/resource-allocation-competition Resource Allocation Competition (RAC)].  
 </tab>
 <tab name="Niagara">
 {| class="wikitable"

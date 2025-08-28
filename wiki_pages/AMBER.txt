@@ -1,29 +1,52 @@
 <languages />
 [[Category:Software]][[Category:BiomolecularSimulation]]
 <translate>
-==Introduction== <!--T:1-->
+<!--T:1-->
+==Introduction==
 [https://ambermd.org/ Amber] is the collective name for a suite of programs that allow users to perform molecular dynamics simulations, particularly on biomolecules. None of the individual programs carry this name, but the various parts work reasonably well together, and provide a powerful framework for many common calculations.
 
-== Amber vs. AmberTools == <!--T:20-->
-We have modules for both Amber and AmberTools available in our [[Available software|software stack]].
+<!--T:20-->
+== Amber modules ==
+We provide modules for Amber, AmberTools, and Amber-PMEMD in our [[Available software|software stack]].
 
 <!--T:21-->
-* The [https://ambermd.org/AmberTools.php AmberTools] (module <code>ambertools</code>) contains a number of tools for preparing and analyzing simulations, as well as <code>sander</code> to perform molecular dynamics simulations, all of which are free and open source.
-* [https://ambermd.org/AmberMD.php Amber] (module <code>amber</code>) contains everything that is included in <code>ambertools</code>, but adds the advanced <code>pmemd</code> program for molecular dynamics simulations.
+* '''[https://ambermd.org/AmberTools.php AmberTools]''' (module <code>ambertools</code>) - Tools for preparing/analyzing simulations, <code>QUICK</code> for GPU-accelerated DFT calculations and <code>sander</code> for molecular dynamics. Free and open source.
+* '''[https://ambermd.org/AmberMD.php Amber]''' (module <code>amber</code>) -  Everything included in AmberTools, plus the advanced `pmemd` program for high-performance molecular dynamics simulations. 
+* '''Amber-PMEMD''' (module <code>amber-pmemd</code>, Amber 24+) – High-performance MD engine <code>pmemd</code>, optimized for CPU and GPU. <br> Provides the high-performance MD engine <code>pmemd</code> (optimized for CPU/GPU) as a '''standalone module'''. This change was made because starting with Amber 24, <code>pmemd</code> no longer requires AmberTools for compilation. <br> '''Note:''' The <code>amber-pmemd</code> module does not include AmberTools. To use both, load the <code>ambertools</code> module as well.
 
 <!--T:22-->
 To see a list of installed versions and which other modules they depend on, you can use the <code>module spider</code> [[Using modules#Sub-command_spider|command]] or check the [[Available software]] page.
 
-== Loading modules == <!--T:42-->
+== Using AMBER on H100 GPU Clusters == <!--T:71-->
+
+<!--T:72-->
+'''Key Update:''' Older AMBER modules are incompatible with NVIDIA H100 GPUs. For GPU-accelerated runs, use the newly installed modules below.
+
+<!--T:73-->
+=== Module Requirements: ===
+<pre>
+ambertools/25.0 or amber-pmemd/24.3
+</pre>
+These modules include H100-specific CUDA kernels (compiled with CUDA 12+ for the Hopper architecture).
+
+<!--T:74-->
+'''Important:''' Do not use legacy AMBER modules for GPU jobs — they will fail on H100 nodes.
+
+<!--T:42-->
+== Loading modules ==
 <tabs>
 <tab name="StdEnv/2023">
 {| class="wikitable sortable"
 |-
 ! AMBER version !! modules for running on CPUs !! modules for running on GPUs (CUDA) !! Notes
 |-
-| amber/22.5-23.5 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 amber/22.5-23.5</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 amber/22.5-23.5</code> || GCC, FlexiBLAS & FFTW
+| amber-pmemd/24.3 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 amber-pmemd/24.3</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 amber-pmemd/24.3</code> || H100 compatible
 |-
-| ambertools/23.5 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 ambertools/23.5</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 ambertools/23.5</code> || GCC, FlexiBLAS & FFTW
+| amber/22.5-23.5 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 amber/22.5-23.5</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 amber/22.5-23.5</code> ||  
+|-
+| ambertools/25.0 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 ambertools/25.0</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 ambertools/25.0</code> || H100 compatible, with PLUMED/2.9.0 
+|-
+| ambertools/23.5 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 ambertools/23.5</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 ambertools/23.5</code> ||  
 |-
 |}</tab>
 <tab name="StdEnv/2020">
@@ -57,26 +80,30 @@ To see a list of installed versions and which other modules they depend on, you 
 <!--T:43-->
 </tabs>
 
-==Using modules== <!--T:23-->
+<!--T:23-->
+==Using modules==
 ===AmberTools 21=== 
 Currently, AmberTools 21 module is available on all clusters. AmberTools provide the following MD engines: sander, sander.LES, sander.LES.MPI, sander.MPI, sander.OMP, sander.quick.cuda, and sander.quick.cuda.MPI. After loading the module set AMBER environment variables:
 
  <!--T:44-->
 source $EBROOTAMBERTOOLS/amber.sh
 
-===Amber 20=== <!--T:30-->
+<!--T:30-->
+===Amber 20===
 There are two versions of amber/20 modules: 20.9-20.15 and 20.12-20.15. The first one uses MKL and cuda/11.0, while the second uses FlexiBLAS and cuda/11.4. MKL libraries do not perform well on AMD CPU, and FlexiBLAS solves this problem. It detects CPU type and uses libraries optimized for the hardware. cuda/11.4 is required for running simulations on A100 GPUs installed on Narval. 
 
 <!--T:45-->
 CPU-only modules provide all MD programs available in AmberTools/20 plus pmemd (serial) and pmemd.MPI (parallel). GPU modules add pmemd.cuda (single GPU), and pmemd.cuda.MPI (multi - GPU).
 
-=== Known issues === <!--T:41-->
+<!--T:41-->
+=== Known issues ===
 1. Module amber/20.12-20.15 does not have MMPBSA.py.MPI executable.
 
 <!--T:46-->
 2. MMPBSA.py from amber/18-10-18.11 and amber/18.14-18.17 modules cannot perform PB calculations. Use more recent amber/20 modules for this type of calculations.
 
-==Job submission examples== <!--T:37-->
+<!--T:37-->
+==Job submission examples==
 === Single GPU job ===
 For GPU-accelerated simulations on Narval, use amber/20.12-20.15. Modules compiled with CUDA version < 11.4 do not work on A100 GPUs. Below is an example submission script for a single-GPU job with amber/20.12-20.15.
 {{File
@@ -193,7 +220,8 @@ srun pmemd.MPI -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r re
 }}</tab>
 </tabs>
 
-=== QM/MM distributed multi-GPU job === <!--T:48-->
+<!--T:48-->
+=== QM/MM distributed multi-GPU job ===
 The example below requests eight GPUs.
 {{File
   |name=quick_MPI_job.sh
@@ -213,7 +241,8 @@ module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 ambertools/23.5
 srun sander.quick.cuda.MPI -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r restart.rst7
 }}
 
-=== Parallel MMPBSA job === <!--T:6-->
+<!--T:6-->
+=== Parallel MMPBSA job ===
 The example below uses 32 MPI processes. MMPBSA scales linearly because each trajectory frame is processed independently. 
 {{File
   |name=mmpbsa_job.sh

@@ -9,9 +9,7 @@
 === Disponibilité sur les nœuds de calcul === 
 
 
-<div class="mw-translate-fuzzy">
-Puisque wandb exige une connexion à l'internet, sa disponibilité sur les nœuds de calcul dépend de la grappe.
-</div>
+L'utilisation de toutes les fonctionnalités de <tt>wandb</tt> sur les nœuds de calcul nécessite un accès Internet ainsi qu'un accès à Google Cloud Storage, qui peuvent tous deux ne pas être disponibles selon la grappe&nbsp;:
 
 {| class="wikitable"
 |-
@@ -21,7 +19,9 @@ Puisque wandb exige une connexion à l'internet, sa disponibilité sur les nœud
 |-
 | Narval
 |-
-| TamIA
+| Rorqual
+|-
+|TamIA
 |-
 | Cedar || oui ✅ || <tt>httpproxy</tt> n'est pas requis
 |-
@@ -33,27 +33,23 @@ Puisque wandb exige une connexion à l'internet, sa disponibilité sur les nœud
 <span id="Users_from_MILA_and_other_eligible_groups"></span>
 == Membres de MILA et autres groupes admissibles ==
 
-Members of the MILA Québec AI Institute may use <tt>wandb</tt> on any of our clusters with internet access, provided that they use a valid '''Mila-org''' Weights & Biases account to log into <tt>wandb</tt>. Please see the table above for more information on modules required for using <tt>wandb</tt> on each cluster.
+Les membres de l'Institut québécois d’intelligence artificielle Mila peuvent utiliser <tt>wandb</tt> sur n'importe laquelle de nos grappes offrant un accès Internet, à condition d'utiliser un compte <b>Mila-org</b> valide pour se connecter à la plateforme. Veuillez consulter le tableau ci-dessus pour plus d'informations sur les modules requis pour utiliser <tt>wandb</tt> sur chaque grappe.
 
-Other groups are known to have made arrangements with Weights & Biases to bypass calls to the Google Cloud Storage API. Please contact your PI to find out if your group has made such arrangements.
+D'autres groupes ont pris des dispositions avec Weights & Biases pour contourner les appels à l'API Google Cloud Storage. Contactez votre chercheuse principale ou votre chercheur principal pour savoir si c'est le cas pour votre groupe.
 
-<span id="Béluga,_Narval_and_TamIA"></span>
-== Béluga, Narval et TamIA ==
+<span id="Béluga,_Narval,_Rorqual_and_TamIA"></span>
+== Béluga, Narval, Rorqual et TamIA ==
 
-<div class="mw-translate-fuzzy">
-S'il est possible de téléverser des métriques de base pour Weights&Biases par une tâche sur Béluga, le paquet wandb téléverse automatiquement de l'information sur l'environnement utilisé vers un compartiment (<i>bucket</i>) Google Cloud Storage, ce qui cause un plantage (<i>crash</i>) au cours d'un entraînement ou à sa toute fin; présentement, il est impossible de désactiver ce comportement. Le téléversement d'artefacts avec <code>wandb.save()</code> nécessite aussi l'accès au Google Cloud Storage, ce qui n'est pas disponible sur les nœuds de calcul de Béluga.
-</div>
+Bien qu'il soit possible de télécharger des métriques de base vers Weights&Biases lors d'une tâche sur Béluga, Narval, Rorqual et TamIA, le package wandb tentera automatiquement de télécharger les informations relatives à votre environnement vers un bucket Google Cloud Storage, ce qui n'est pas autorisé sur les nœuds de calcul de ces grappes et qui causera un plantage pendant ou à la toute fin d'une tâche. Votre tâche peut également se bloquer jusqu'à ce qu'elle atteigne son temps mort, gaspillant ainsi des ressources. Il n'est actuellement pas possible de désactiver ce comportement. Notez que le téléchargement d'artefacts vers W&B avec <code>wandb.save()</code> nécessite également un accès à Google Cloud Storage et bloquera ou fera planter votre tâche.
 
 Vous pouvez quand même utiliser wandb en activant les modes [https://docs.wandb.ai/library/cli#wandb-offline <code>offline</code>] ou [https://docs.wandb.ai/library/init#save-logs-offline <code>dryrun</code>]. Avec ces modes, wandb écrit tous les métriques, journalisations et artefacts sur le disque local, sans synchronisation avec le service internet Weights&Biases. Une fois les tâches terminées, vous pouvez faire la synchronisation avec la commande [https://docs.wandb.ai/ref/cli#wandb-sync <code>wandb sync</code>] sur le nœud de connexion.
 
-Remarquez que le produit [[Comet.ml/fr|Comet.ml]] est très semblable à Weights & Biases et qu'il fonctionne sur Béluga, Narval et TamIA.
+Remarquez que le produit [[Comet.ml/fr|Comet.ml]] est très semblable à Weights & Biases et qu'il fonctionne sur Béluga, Narval, Rorqual et TamIA.
 
 <span id="Example"></span>
 == Exemple ==
 
-<div class="mw-translate-fuzzy">
-L'exemple suivant montre comment utiliser wandb pour le suivi de l'expérimentation sur Béluga. Pour reproduire ceci sur Cedar, il n'est pas nécessaire d'activer le mode hors ligne.
-</div>
+Voici un exemple d'utilisation de wandb pour faire le suivi d'expériences en mode hors ligne. Pour exécuter en ligne, chargez le module <tt>httpproxy</tt> sur les grappes et tenez compte des commentaires dans le script ci-dessous.
 
 {{File
   |name=wandb-test.sh

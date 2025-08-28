@@ -40,14 +40,17 @@ soumet le script présenté plus haut en limitant la durée à 30 minutes. Les f
 
 L'exécution d'un script qui soumet plusieurs tâches à de courts intervalles risque d'affecter la disponibilité de l'ordonnanceur Slurm pour les autres utilisateurs et utilisatrices (voir l'information sur le message d'erreur [[Frequently_Asked_Questions/fr#sbatch:_error:_Batch_job_submission_failed:_Socket_timed_out_on_send/recv_operation|Batch job submission failed: Socket timed out on send/recv operation]]). Utilisez plutôt un [[Running jobs/fr#Redémarrage_avec_des_vecteurs_de_tâches|vecteur de tâches]] ou espacez les appels à <code>sbatch</code> de une seconde ou plus avec la commande <code>sleep</code>.
 
+<span id="Memory"></span>
 === Mémoire ===
 
 La quantité de mémoire peut être demandée avec <code>--mem-per-cpu</code> (mémoire par cœur) ou <code>--mem</code> (mémoire par nœud). Avec les grappes d'usage général, 256Mo par cœur sont alloués par défaut. Avec [[Niagara/fr|Niagara]], il n'est pas nécessaire de spécifier la quantité de mémoire car seuls les nœuds entiers sont alloués avec toute la mémoire disponible.
 
 Une source commune de confusion est qu'une certaine quantité de la mémoire du nœud n'est pas disponible pour la tâche, étant réservée pour le système d'exploitation, etc.  Chaque type de nœud a donc une quantité maximum à la disposition des tâches; par exemple, les nœuds de 128Go sont configurés de façon à offrir 125Go pour l'exécution des tâches soumises. Si vous demandez plus que cette quantité, votre tâche devra être exécutée avec des nœuds de plus de mémoire qui pourraient être moins nombreux.
 
-Pour compliquer davantage, K, M, G, etc. sont interprétés par Slurm comme étant des [https://fr.wikipedia.org/wiki/Pr%C3%A9fixe_binaire préfixes binaires]; ainsi <code>--mem=125G</code> équivaut à <code>--mem=128000M</code>. La quantité de mémoire que vous pouvez demander est indiquée dans le tableau <i>Caractéristiques des nœuds</i> pour [[Béluga#Caractéristiques_des_nœuds|Béluga]], [[Cedar/fr#Caractéristiques_des_nœuds|Cedar]], [[Graham/fr#Caractéristiques_des_nœuds|Graham]] et [[Narval#Caractéristiques_des_nœuds|Narval]].
+Pour compliquer davantage, K, M, G, etc. sont interprétés par Slurm comme étant des [https://fr.wikipedia.org/wiki/Pr%C3%A9fixe_binaire préfixes binaires]; ainsi <code>--mem=125G</code> équivaut à <code>--mem=128000M</code>. La quantité de mémoire que vous pouvez demander est indiquée dans le tableau <i>Caractéristiques des nœuds</i> pour [[Béluga#Caractéristiques_des_nœuds|Béluga]], [[Cedar/fr#Caractéristiques_des_nœuds|Cedar]], [[Graham/fr#Caractéristiques_des_nœuds|Graham]],  [[Narval#Caractéristiques_des_nœuds|Narval]]
+et [[Rorqual#Caractéristiques_des_nœuds|Rorqual]].
 
+<span id="Use_squeue_or_sq_to_list_jobs"></span>
 ==Lister les tâches avec <code>squeue</code> ou <code>sq</code>==
 
 La commande utilisée pour vérifier le statut des tâches Slurm est <code>squeue</code>; par défaut, elle fournit l'information sur <b>toutes</b> les tâches. La forme courte <code>sq</code> ne listera que vos propres tâches.
@@ -65,6 +68,7 @@ Pour plus d'information sur les résultats fournis par <code>sq</code> et <code>
 
 <b>N'exécutez pas</b> à plusieurs reprises et à de courts intervalles les commandes <code>squeue</code> ou <code>sq</code> à partir d'un script ou d'une application. Ceci surcharge Slurm et risque fort de nuire à sa performance ou à son bon fonctionnement. Pour savoir quand une tâche commence et se termine, voyez plutôt [[Running jobs/fr#Obtenir_des_renseignements_par_courriel | Obtenir des renseignements par courriel]] ci-dessous.
 
+<span id="Where_does_the_output_go?"></span>
 ==Enregistrer le résultat==
 
 Par défaut, le résultat est écrit dans un fichier dont le nom commence par <i>slurm-</i>, suivi de l'ID de la tâche et du suffixe <i>.out</i>, par exemple <code>slurm-123456.out</code>. La présence de l'ID dans le nom du fichier s'avère pratique pour le débogage. Le fichier est placé dans le répertoire à partir duquel la tâche a été soumise.
@@ -75,6 +79,7 @@ Le nom du fichier peut contenir certains symboles de remplacement, par exemple l
 
 Les erreurs paraissent normalement dans le même fichier que le résultat standard en sortie, tout comme si les commandes étaient données interactivement. Pour diriger le canal standard d'erreurs (stderr pour <i>standard error</i>) vers un autre fichier, utilisez <code>--error</code>.
 
+<span id="Accounts_and_projects"></span>
 ==Comptes et projets==
 
 Chaque tâche doit être associée à un nom de compte correspondant à un [[Frequently_Asked_Questions_about_the_CCDB/fr#Qu.27est-ce_qu.27un_RAP.3F|RAP (pour <i>Resource Allocation Project</i>]]). Si vous êtes membre d'un seul compte, l'ordonnanceur associe automatiquement vos tâches à ce compte.
@@ -95,7 +100,7 @@ Dans ce cas, utilisez la directive <code>--account</code> pour spécifier un des
 
 Pour connaître le nom du compte correspondant à un projet, 
 connectez-vous à [https://ccdb.alliancecan.ca CCDB] 
-et cliquez sur <i>Mon compte -> Mes ressources et allocations</i> pour faire afficher la liste des projets dont vous êtes membre. Le deuxième champ (<i>Nom du groupe</i>) 
+et cliquez sur <i>Mes projets --> Mes ressources et allocations</i> pour faire afficher la liste des projets dont vous êtes membre. Le deuxième champ (<i>Nom du groupe</i>) 
 contient la chaîne de caractères à utiliser avec la directive <code>--account</code>. Sachez qu'un projet qui a reçu une allocation de ressources  
 peut être associé à une grappe en particulier (ou à un groupe de grappes) et qu'il se peut
 qu'il ne puisse être transféré de cette grappe à une autre. 
@@ -113,6 +118,7 @@ Slurm utilisera dans le script la valeur de <code>SBATCH_ACCOUNT</code> plutôt 
 
 <code>SLURM_ACCOUNT</code> joue le même rôle que <code>SBATCH_ACCOUNT</code>, mais pour la commande <code>srun</code> plutôt que <code>sbatch</code>. Il en est de même pour <code>SALLOC_ACCOUNT</code>.
 
+<span id="Examples_of_job_scripts"></span>
 == Exemples de scripts ==
 
 ===Tâches séquentielles===
@@ -149,6 +155,7 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 ./ompHello
 }}
 
+<span id="MPI_job"></span>
 === Tâche MPI ===
 
 Le prochain script lance quatre processus MPI, chacun nécessitant 1024Mo de mémoire. Le temps d'exécution est limité à cinq minutes. 
@@ -191,8 +198,10 @@ Pour démarrer une session interactive sur un nœud de calcul, utilisez [https:/
 
 Il est aussi possible d'exécuter des applications graphiques en mode interactif sur un nœud de calcul en ajoutant l'indicateur <b>--x11</b> à la commande <code>salloc</code>. Pour ce faire, il faut d'abord activer la redirection X11 (<i>Enable X11 forwarding</i>); consultez la page [[SSH/fr|SSH]]. Prenez note qu'une tâche interactive d'une durée de moins de trois (3) heures est susceptible d'être lancée peu de temps après sa soumission puisque nous leur avons dédié des nœuds de test. Les tâches de plus de trois (3) heures sont exécutées sur les nœuds réguliers d'une grappe et peuvent être en attente pour plusieurs heures et même plusieurs jours avant d'être lancées à un moment imprévisible et possiblement inopportun.
 
+<span id="Monitoring_jobs"></span>
 == Suivi des tâches ==
 
+<span id="Current_jobs"></span>
 === Tâches en cours ===
 
 Par défaut, [https://slurm.schedmd.com/squeue.html squeue] montre toutes les tâches gérées à ce moment par l'ordonnanceur. Le résultat sera plus rapide si vous demandez uniquement vos propres tâches avec
@@ -209,6 +218,7 @@ Pour connaître les détails d'une tâche en particulier, utilisez [https://slur
 
 <b>N'exécutez pas</b> la commande <code>squeue</code> à plusieurs reprises et à de courts intervalles à partir d'un script ou d'une application. Cette commande surcharge Slurm et risque fort de nuire à sa performance ou à son bon fonctionnement. 
 
+<span id="Email_notification"></span>
 ==== Obtenir des renseignements par courriel ====
 
 Pour recevoir par courriel certains renseignements sur une tâche, utilisez les diverses options avec  
@@ -219,12 +229,14 @@ Il arrive que nos fournisseurs de service (Google, Yahoo, etc.) limitent le nomb
 
 Pour la liste des options pour <code>--mail-type</code>, consultez [https://slurm.schedmd.com/sbatch.html#OPT_mail-type la documentation de SchedMD].
 
+<span id="Output_buffering"></span>
 ==== Résultats en mémoire tampon ====
 
 Normalement, les résultats d'une tâche non interactive sont mis en mémoire tampon (<i>buffered</i>), ce qui veut dire qu'il y a habituellement un temps d'attente entre le moment où les données de la tâche sont enregistrées et celui où vous pouvez voir les résultats dans un nœud de connexion. Ce temps d'attente dépend de l'application que vous utilisez et de la charge exercée sur le système de fichiers; il peut varier de moins d'une seconde à jusqu'à ce que la tâche se termine.
 
 Il existe des façons de réduire ou même d'éliminer ce temps d'attente, mais elles ne sont pas recommandées parce que l'utilisation de la mémoire tampon assure la bonne performance générale du système de fichiers. Si vous avez besoin de faire le suivi des résultats d'une tâche <i>en temps réel</i>, utilisez plutôt une [[#Tâches_interactives|tâche interactive]], comme décrit ci-dessus.
 
+<span id="Completed_jobs"></span>
 === Tâches terminées ===
 
 La commande <code>seff</code> permet d'obtenir un sommaire de l'efficacité en CPU et mémoire pour une tâche terminée.
@@ -270,6 +282,7 @@ Les processus lancés avec <code>srun</code> partagent les ressources utilisées
 
 <b>Note ː</b> Dans les exemples précédents, <code>srun</code> fonctionne uniquement sur des tâches soumises avec <code>sbatch</code>. Pour faire le suivi d'une tâche interactive, ouvrez plusieurs fenêtres avec <code>tmux</code> et démarrez les processus dans des fenêtres distinctes.
 
+<span id="Cancelling_jobs"></span>
 == Annuler une tâche ==
 
 Pour annuler une tâche, spécifiez son identifiant ainsi
@@ -281,6 +294,7 @@ Annulez toutes vos tâches ou uniquement vos tâches qui sont en attente ainsi
  $ scancel -u $USER
  $ scancel -t PENDING -u $USER
 
+<span id="Resubmitting_jobs_for_long-running_computations"></span>
 ==Resoumettre une tâche pour un calcul de longue durée==
 
 Pour les calculs nécessitant une durée plus longue que la limite de temps du système, l'application doit pouvoir gérer des [[Points_de_contr%C3%B4le|points de contrôle]]
@@ -294,6 +308,7 @@ Les deux méthodes recommandées sont
 
 Consultez l'information sur le [[Tutoriel_Apprentissage_machine#Morcellement_d'une_longue_tâche | morcellement d'une longue tâche]] dans notre [[Tutoriel Apprentissage machine|tutoriel en apprentissage machine]].
 
+<span id="Restarting_using_job_arrays"></span>
 === Redémarrage avec des vecteurs de tâches===
 
 La syntaxe <code>--array=1-100%10</code> permet de soumettre une collection de tâches identiques en n'exécutant qu'une tâche à la fois.
@@ -340,6 +355,7 @@ echo "Job finished with exit code $? at: `date`"
 # ---------------------------------------------------------------------
 }}
 
+<span id="Resubmission_from_the_job_script"></span>
 ===Resoumettre à partir d'un script ===
 
 Dans le prochain exemple, la tâche exécute la première partie du calcul et enregistre un point de contrôle. 
@@ -397,14 +413,17 @@ Les outils suivants sont disponibles sur nos grappes&nbsp;:
 * [[GNU Parallel/fr | GNU Parallel]]
 * [[GLOST/fr | GLOST]]
 
+<span id="Do_not_specify_a_partition"></span>
 === Ne pas spécifier de partition ===
 
 Avec certains paquets logiciels comme [https://github.com/alekseyzimin/masurca Masurca], les tâches sont soumises à Slurm de façon automatique et le logiciel s'attend à ce qu'une partition soit spécifiée pour chacune des tâches. Ceci est contraire à nos meilleures pratiques qui veulent que l'ordonnanceur assigne les tâches de lui-même, selon les ressources requises. Si vous utilisez un tel logiciel, vous pouvez le configurer afin qu'il utilise <code>--partition=default</code> pour que le script l'interprète comme si aucune partition n'est spécifiée.
 
+<span id="Cluster_particularities"></span>
 == Particularités de certaines grappes ==
 
 Les politiques d'ordonnancement ne sont pas les mêmes sur toutes nos grappes.
 
+<div class="mw-translate-fuzzy">
 <tabs>
 <tab name="Béluga">
 La durée maximale d'une tâche est de 168 heures (7 jours) et le nombre maximum de tâches en exécution ou en attente dans la queue est de 1000 par utilisateur. La durée d'une tâche en production devrait être d'au moins une heure. 
@@ -412,15 +431,9 @@ La durée maximale d'une tâche est de 168 heures (7 jours) et le nombre maximum
 <tab name="Cedar">
 Les tâches ne peuvent pas être exécutées à partir de répertoires du système de fichiers <code>/home</code>; ceci a pour but de diminuer la charge et d'améliorer le temps de réponse en mode interactif. La durée maximale d'une tâche est de 28 jours. Si la commande <code>readlink -f $(pwd) | cut -d/ -f2</code> retourne le message <code>you are not permitted to submit jobs from that directory</code>, transférez les fichiers vers un répertoire <code>/project</code> ou <code>/scratch</code> et soumettez la tâche à partir du nouvel emplacement.
 </tab>
+</div>
 
-<tab name="Graham">
-La durée maximale d'une tâche est de 168 heures (7 jours) et le nombre maximum de tâches en exécution ou en attente dans la queue est de 1000 par utilisateur. La durée d'une tâche en production devrait être d'au moins une heure. 
-</tab>
-
-<tab name="Narval">
-La durée maximale d'une tâche est de 168 heures (7 jours) et le nombre maximum de tâches en exécution ou en attente dans la queue est de 1000 par utilisateur. La durée d'une tâche en production devrait être d'au moins une heure. 
-</tab>
-
+<div class="mw-translate-fuzzy">
 <tab name="Niagara">
 <ul>
 <li><p>L'ordonnancement se fait par nœud, donc en multiples de 40 cœurs.</p></li>
@@ -429,8 +442,10 @@ La durée maximale d'une tâche est de 168 heures (7 jours) et le nombre maximum
 <li><p>Les nœuds de calcul n'ont pas d'accès internet.</p>
 <p>[[Data management at Niagara/fr#Déplacer_des_données|Déplacez vos données]] vers Niagara avant de soumettre votre tâche.</p></li></ul>
 </tab>
+</div>
 </tabs>
 
+<span id="Troubleshooting"></span>
 == Dépannage ==
 
 ==== Pour éviter les caractères cachés ====
@@ -496,6 +511,7 @@ Par défaut, une tâche hérite des variables d’environnement de l’interpré
 
 Les problèmes sont quelquefois difficiles à diagnostiquer quand les paramètres de l'environnement sont hérités de l'interpréteur qui soumet la tâche; la directive <code>--export=none</code> empêche ce type d'héritage.
 
+<span id="Job_hangs_/_no_output_/_incomplete_output"></span>
 ==== Tâche gèle / pas de résultats / résultats incomplets ====
 
 Il arrive qu'aucun résultat (ou seulement une partie) ne soit enregistré dans le fichier <code>.out</code> pour une tâche qui a été soumise, et qu'il semble qu'elle soit arrêtée. Ceci se produit surtout parce que la [[#Résultats_en_mémoire_tampon|mise en mémoire tampon]] effectuée par l'ordonnanceur Slurm est agressive, car il regroupe plusieurs lignes de résultat avant de les acheminer vers le fichier, et souvent celui-ci n'est produit que quand la tâche se termine. Pire encore, si une tâche est annulée ou manque de temps, une partie des résultats peut être perdue. Si vous voulez suivre le progrès de la tâche en cours au fur et à mesure de son exécution, vous pouvez le faire avec une [[#Tâches_interactives|tâche interactive]]. C'est aussi une bonne façon d'observer combien de temps la tâche a besoin.

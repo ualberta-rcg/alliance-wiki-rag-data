@@ -36,7 +36,28 @@ Find collections by clicking where the page says <i>Search</i> and entering a co
 You can start typing a collection name to select it. For example, if you want to transfer data to or from the Béluga cluster, type <i>beluga</i>, wait two seconds for a list of matching sites to appear, and select <code>computecanada#beluga-dtn</code>. 
 
 
-All resources have names prefixed with <code>computecanada#</code>. For example, [https://globus.alliancecan.ca/file-manager?origin_id=278b9bfe-24da-11e9-9fa2-0a06afd4a22e <code>computecanada#beluga-dtn</code>], [https://globus.alliancecan.ca/file-manager?origin_id=8dec4129-9ab4-451d-a45f-5b4b8471f7a3 <code>computecanada#cedar-globus</code>],  [https://globus.alliancecan.ca/file-manager?origin_id=07baf15f-d7fd-4b6a-bf8a-5b5ef2e229d3 <code>computecanada#graham-globus</code>], [https://globus.alliancecan.ca/file-manager?origin_id=885f1a95-b2f6-4f8b-a09a-252553ae390e <code>alliancecan#niagara</code>] or [https://globus.alliancecan.ca/file-manager?origin_id=c55ce750-19d6-4a42-9c30-6a58f06bec7a <code>alliancecan#hpss</code>] (note that 'dtn' stands for <i>data transfer node</i>).
+All clusters have a Globus collection name specified in the table on top of their respective wiki page:
+
+{| class="wikitable"
+|-
+! General-purpose !! Large parallel !! AI oriented
+|-
+|
+* [[Béluga/en|Béluga]]
+* [[Cedar|Cedar]]
+* [[Fir|Fir]]
+* [[Graham|Graham]]
+* [[Narval/en|Narval]]
+* [[Nibi|Nibi]]
+* [[Rorqual/en|Rorqual]]
+|
+* [[Niagara|Niagara]]
+* [[Trillium|Trillium]]
+|
+* [[Killarney|Killarney]]
+* [[TamIA/en|TamIA]]
+* [[Vulcan|Vulcan]]
+|}
 
 
 You may be prompted to authenticate to access the collection, depending on which site it is hosted. For example, if you are activating a collection hosted on Graham, you will be asked for your Alliance username and password.  The authentication of a collection remains valid for some time, typically one week for CC collections, while personal collections do not expire.
@@ -111,31 +132,29 @@ Globus sharing makes collaboration with your colleagues easy. Sharing enables pe
 
 === Creating a shared collection ===
 
-To share a file or folder on an endpoint first requires that the system hosting the files has sharing enabled.
+==== Step 1 - Prepare a directory to be shared ====
 
-{{Panel
-  |panelstyle=callout
-  |title=Globus sharing is disabled on Niagara.
-  |content=
-}}
+Verify in the table below that the system hosting your files has sharing enabled.
 
-{{Panel
-  |panelstyle=callout
-  |title=Project requires permission to share
-  |content=
-To create sharing on /project for our other clusters, the PI will need to contact [mailto:globus@tech.alliancecan.ca globus@tech.alliancecan.ca] with:
+{| class="wikitable" style="margin: auto;"
+|-
+! scope="col"| System
+! scope="col"| Sharing enabled
+|-
+| [[Niagara]]
+| No.
+|-
+| [[National_systems#Compute_clusters|General-purpose clusters]]
+| In: <ul><li><code>/home</code>, yes.</li><li><code>/scratch</code>, no (except on Beluga, Narval, and Rorqual).</li><li><code>/project</code>, on demand (see below).</li></ul>
+|}
+
+On [[National_systems#Compute_clusters|general-purpose clusters]], Globus sharing is enabled for the <code>/home</code> directory, and on the Beluga, Narval, and Rorqual clusters also the <code>/scratch</code> directory. If you would like to test a Globus share you can create one in your <code>/home</code> directory.
+
+By default, we disable sharing on <code>/project</code> to prevent users accidentally sharing other users' files. To enable sharing on <code>/project</code>, <b>the PI needs to contact [mailto:globus@tech.alliancecan.ca globus@tech.alliancecan.ca] with</b>:
 
 * confirmation that Globus sharing should be enabled, 
 * the path to enable, 
 * whether the sharing will be read only, or sharing if it can be read and write.
-
-Data to be shared will need to be moved or copied to this path. Creating a symbolic link to the data will not allow access to the data.
-
-Otherwise you will receive the error: 
-
-:: <i>The backend responded with an error: You do not have permission to create a shared endpoint on the selected path. The administrator of this endpoint has disabled creation of shared endpoints on the selected path.</i>
-
-Globus sharing is enabled for the /home directory. By default, we disable sharing on /project to prevent users accidentally sharing other users' files. If you would like to test a Globus share you can create one in your /home directory.
 
 We suggest using a path that makes it clear to everyone that files in the directory might be shared such as:
 
@@ -151,10 +170,17 @@ and
 
 Create a different Globus Share for each and share them with different users.
 
-If you would like to have a Globus Share created on /project for one of these systems please email globus@tech.alliancecan.ca.
-}}
+==== Step 2 - Prepare the data to be shared ====
 
-Log into [https://globus.alliancecan.ca the Alliance Globus portal] with your Globus credentials. Once you are logged in, you will see a transfer window. In the <i>endpoint</i> field, type the endpoint identifier for the endpoint you wish to share from (e.g. computecanada#beluga-dtn, computecanada#cedar-dtn, computecanada#graham-globus, alliancecan#niagara etc.) and activate the endpoint if asked to.
+If not done already, the data to be shared needs to be moved or copied to the chosen path. Creating a symbolic link to the data will not allow access to the data.
+
+Otherwise you will receive the error: 
+
+:: <i>The backend responded with an error: You do not have permission to create a shared endpoint on the selected path. The administrator of this endpoint has disabled creation of shared endpoints on the selected path.</i>
+
+==== Step 3 - Configure a shared collection on Globus ====
+
+Log into [https://globus.alliancecan.ca the Alliance Globus portal] with your Globus credentials. Once you are logged in, you will see a transfer window. In the <i>endpoint</i> field, type the endpoint identifier for the endpoint you wish to share from (e.g. computecanada#beluga-dtn, computecanada#cedar-globus, computecanada#graham-globus, alliancecan#niagara etc.) and activate the endpoint if asked to.
 
 [[File:Globus SharedEndpoint1-1024x607.png|thumbnail|Open the <i>Share</i> option (click on image to enlarge)]]
 Select a folder that you wish to share, then click the <i>Share</i> button to the right of the folder list.

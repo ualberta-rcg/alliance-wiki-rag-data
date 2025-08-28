@@ -4,10 +4,12 @@
 :<i>The Vienna ab initio Simulation Package (VASP) is a computer program for atomic scale materials modelling, e.g. electronic structure calculations and quantum mechanical molecular dynamics, from first principles.</i> 
 : Reference: [https://www.vasp.at/ VASP website]
 
-== Licensing == <!--T:2-->
+<!--T:2-->
+== Licensing ==
 VASP is commercial software which can only be licensed to groups that are hired by a single legal entity, which is incompatible with the way we operate. We have tried to negotiate an agreement with the licensor which would let us install the software everywhere on our infrastructure, but without success. For that reason you may have to install VASP yourself (though see <i>Site exceptions</i> below). Please read the terms of your own license, as you are likely subject to the same restriction. This limits the support we are allowed to offer to users who need help installing the software. Please see [[#Building VASP yourself|<i>Building VASP yourself</i>]] below for instructions on installing the software. 
 
-=== Site exceptions === <!--T:37-->
+<!--T:37-->
+=== Site exceptions ===
 Simon Fraser University, the University of Waterloo, and the University of Toronto own [[Cedar]], [[Graham]], and [[Niagara]], respectively, and have a license with VASP. Some of their employees are therefore allowed to access and install specific versions of VASP on those clusters and provide limited support. 
 
 <!--T:3-->
@@ -27,9 +29,19 @@ If you are licensed for version 5 you may also use version 4, but a version 4 li
 == Using prebuilt VASP == <!--T:6-->
 
 <!--T:29-->
-Prebuilt VASP binary files have been installed only on Cedar, Graham, and Niagara. According to our license agreement, we are not allowed to install VASP centrally on other computer clusters. However,  users may want to install VASP on their own home directory. Please have a look at [[VASP#Building VASP yourself|<i>Building VASP yourself</i>]]. To load prebuilt VASP on Graham and Cedar, please do the following: 
+Prebuilt VASP binary files have been installed only on Fir, Nibi, and Trillium (replacing Cedar, Graham, and Niagara). According to our license agreement, we are not allowed to install VASP centrally on other computer clusters. However,  users may want to install VASP on their own home directory. Please have a look at [[VASP#Building VASP yourself|<i>Building VASP yourself</i>]]. To load prebuilt VASP on Fir and Nibi, please do the following: 
 
-<!--T:7-->
+<!--T:49-->
+For vasp/5.4.4 
+ module load arch/avx2
+ module load StdEnv/2023  intel/2023.2.1  openmpi/4.1.5
+ module load vasp/5.4.4
+For vasp/6.4.2
+ module load arch/avx512
+ module load StdEnv/2023 intel/2023.2.1 intelmpi/2021.9.0
+ module load vasp/6.4.2
+
+<!--T:50-->
 # Run <code>module spider vasp</code> to see which versions are available.
 # Choose your version and run <code>module spider vasp/<version></code> to see which dependencies you need to load for this particular version.
 # Load the dependencies and the VASP module, for example:
@@ -39,8 +51,18 @@ See [[Using modules]] for more information.
 <!--T:41-->
 To use VASP on Niagara, please see [https://docs.scinet.utoronto.ca/index.php/VASP the SciNet VASP wiki page]. Note that Niagara nodes do not have GPUs, so GPU versions are not available on that system.
 
+<!--T:51-->
+To use VASP on Trillium, modules may be loaded as follows:
 
-=== Pseudopotential files === <!--T:8-->
+<!--T:52-->
+For vasp/6.4.2
+ module load StdEnv/2023 intel/2023.2.1 intelmpi/2021.9.0 hdf5/1.14.2
+ module use /opt/software/commercial/modules
+ module load vasp/6.4.2
+For general usage of Trillium, please see [https://docs.alliancecan.ca/wiki/Trillium_Quickstart#Submitting_Jobs_on_the_CPU_Subcluster the Trillium Quickstart page].
+
+<!--T:8-->
+=== Pseudopotential files ===
 All pseudopotentials have been downloaded from the official VASP website and untarred. They are all located in <code> $EBROOTVASP/pseudopotentials/</code> on Cedar and Graham and can be accessed once the VASP module is loaded.
 
 === Executable programs === <!--T:9-->
@@ -70,7 +92,8 @@ Two extensions have also been incorporated:
 <!--T:11-->
 If you need a version of VASP that does not appear here, you can either build it yourself (see below) or [[Technical support | write to us]] and ask that it be built and installed.
 
-== Vasp-GPU == <!--T:25-->
+<!--T:25-->
+== Vasp-GPU ==
 [[File:VASP benchmark ENG.png|400px|thumb| Fig.1 Simulation time as a function of the number of CPUs for GPU=0, 1, and 2]]
 Vasp-GPU executable files run on both GPUs and CPUs of a node. Basically, calculation on a GPU is much more expensive than on a CPU, therefore we highly recommend to perform a benchmark using one or 2 GPUs to make sure they are getting a maximum performance from the GPU use. Fig.1 shows a benchmark of Si crystal which contains 256 Si-atoms in the simulation box. Blue, black and red lines show simulation time as a function of Number of CPU for GPU=0, 1, and 2 respectively. It shows the performance for GPU=1,2 and CPU=1 is more than 5 times better compared to GPU=0 and CPU=1. However, a comparison of calculations with GPU=1 and GPU=2 indicates that there is not much performance gain from GPU=1 to GPU=2. In fact, use for GPU=2 is around 50% in our monitoring system. Therefore we recommend users to first perform a benchmark like this for their own system to make sure they are not wasting any computer resources.
 
@@ -133,39 +156,200 @@ If you want to use 32 or more cores, please read about [[Job_scheduling_policies
 == Building VASP yourself == <!--T:12-->
 
 <!--T:31-->
-If you are licensed to use VASP and have access to VASP source code, you can install VASP-5.4.4, 6.1.2, 6.2.1 and 6.3.0 in your /home directory on all our clusters (except Niagara) using one of the following [[EasyBuild]] commands. The VASP build will be the same as the ones on Cedar and Graham, and will include the Transition State Tools and VASPsol extensions.
+If you are licensed to use VASP and have access to VASP source code, you can install various versions of VASP in your /home directory on all our clusters (except Niagara) using the following [[EasyBuild]] commands. The VASP build will be the same as the ones on Cedar and Graham.
 
-<!--T:42-->
-For 2020 environment,  <code> StdEnv/2020 </code>
+<!--T:46-->
+<code> eb -f [RECIPE NAME] --sourcepath=[SOURCEPATH] </code>
 
-<!--T:32-->
-<code> eb -f VASP-5.4.4-iimpi-2020a.eb --sourcepath=SOURCEPATH </code>
-
-<!--T:33-->
-<code> eb -f VASP-6.1.2-iimpi-2020a.eb --sourcepath=SOURCEPATH </code>
-
-<!--T:34-->
-<code> eb -f VASP-6.2.1-iimpi-2020a.eb --sourcepath=SOURCEPATH </code>
-
-<!--T:35-->
-<code> eb -f VASP-6.3.0-iimpi-2020a.eb --sourcepath=SOURCEPATH </code>
-
-
-<!--T:43-->
-For 2023 environment, <code> StdEnv/2023 </code>
-
-<!--T:44-->
-<code> eb -f VASP-5.4.4-iofb-2023a.eb --sourcepath=SOURCEPATH </code>
-
-<!--T:45-->
-<code> eb -f VASP-6.4.2-iofb-2023a.eb  --sourcepath=SOURCEPATH </code>
-
-<!--T:38-->
-where SOURCEPATH is the path to the VASP source file. The source files for vasp-5.4.4, 6.1.2, 6.2.1, and 6.3.0 are <code> vasp.5.4.4.pl2.tgz </code>, <code> vasp.6.1.2_patched.tgz </code>, <code> vasp.6.2.1.tgz </code> and <code> vasp.6.3.0.tgz </code>  respectively. You may download the source code from the [https://www.vasp.at/ VASP website]. Running the command will take some time, perhaps more than an hour. Once it is done, you will be able to load and run VASP using <code>module</code> commands just as explained above in [[VASP#Using_prebuilt_VASP|Using prebuilt VASP]].
+<!--T:47-->
+where [SOURCEPATH] is the directory containing the VASP source code and [RECIPE NAME] is the name of the recipe. The first tab of table bellow shows the list of available recipes along with the corresponding required source files. In this table VTSTtools and  vaspSOL are Transition State Tools and VASPsol extensions respectively. Second tabs of this table shows the list of the libraries that are included to vasp. You may download the source code from the [https://www.vasp.at/ VASP website]. Running the command will take some time, perhaps more than an hour. Once it is done, you will be able to load and run VASP using <code>module</code> commands just as explained above in [[VASP#Using_prebuilt_VASP|Using prebuilt VASP]].
 
 <!--T:14-->
 Alternatively to build a custom version of VASP, please see [[Installing software in your home directory]] and 
 [https://www.vasp.at/wiki/index.php/Installing_VASP.5.X.X Installing VASP 5] or [https://www.vasp.at/wiki/index.php/Installing_VASP.6.X.X Installing VASP 6].
+
+<!--T:48-->
+<tabs>
+<tab name="Recipe specification and implementation">
+{| class="wikitable"
+|-
+! Recipe Name
+! Version
+! Environment
+! Source file
+! CPU/GPU
+! VTSTtools
+! vaspSOL
+|-
+| VASP-5.4.4-iimpi-2020a.eb
+| 5.4.4
+| StdEnv/2020
+| vasp.5.4.4.pl2.tgz
+| CPU
+| yes
+| yes
+|-
+| VASP-6.1.2-iimpi-2020a.eb
+| 6.1.2
+| StdEnv/2020
+| vasp.6.1.2_patched.tgz
+| CPU
+| yes
+| yes
+|-
+| VASP-6.2.1-iimpi-2020a.eb
+| 6.2.1
+| StdEnv/2020
+| vasp.6.2.1.tgz
+| CPU
+| yes
+| yes
+|-
+| VASP-6.3.0-iimpi-2020a.eb
+| 6.3.0
+| StdEnv/2020
+| vasp.6.3.0.tgz
+| CPU
+| yes
+| yes
+|-
+| VASP-6.3.1-iimpi-2020a.eb
+| 6.3.1
+| StdEnv/2020
+| vasp.6.3.1.tgz
+| CPU
+| yes
+| yes
+|-
+| VASP-6.4.2-iimpi-2023a.eb
+| 6.4.2
+| StdEnv/2023
+| vasp.6.4.2.tar
+| CPU
+| yes
+| yes
+|-
+| VASP-6.4.3-iimpi-2023a.eb
+| 6.4.3
+| StdEnv/2023
+| vasp.6.4.3.tar
+| CPU
+| yes
+| yes
+|-
+| VASP-6.5.0-iimpi-2023a.eb
+| 6.5.0
+| StdEnv/2023
+| vasp.6.5.0.tgz
+| CPU
+| No
+| No
+|-
+| VASP-6.5.1-iimpi-2023a.eb
+| 6.5.1
+| StdEnv/2023
+| vasp.6.5.1.tgz
+| CPU
+| No
+| No
+|-  
+|}
+</tab>
+<tab name="Included Libraries">
+{| class="wikitable"
+|-
+! Recipe Name
+! Wannier Function
+! Beef
+! HDF5
+! LibXC
+! ELPA
+! Libmbd
+! dft4
+|-
+| VASP-5.4.4-iimpi-2020a.eb
+| Yes
+| Yes
+| No
+| No
+| No
+| No
+| No
+|-
+| VASP-6.1.2-iimpi-2020a.eb
+| Yes
+| Yes
+| No
+| No
+| No
+| No
+| No
+|-
+| VASP-6.2.1-iimpi-2020a.eb
+| Yes
+| Yes
+| No
+| No
+| No
+| No
+| No
+|- 
+| VASP-6.3.0-iimpi-2020a.eb
+| Yes
+| Yes
+| Yes
+| Yes
+| No
+| No
+| No
+|-
+| VASP-6.3.1-iimpi-2020a.eb
+| Yes
+| Yes
+| Yes
+| Yes
+| No
+| No
+| No
+|-
+| VASP-6.4.2-iimpi-2023a.eb
+| Yes
+| Yes
+| Yes
+| Yes
+| No
+| No
+| No
+|-
+| VASP-6.4.3-iimpi-2023a.eb
+| Yes
+| Yes
+| Yes
+| Yes
+| No
+| No
+| Yes
+|-
+| VASP-6.5.0-iimpi-2023a.eb
+| Yes 
+| Yes
+| Yes
+| Yes
+| Yes
+| Yes
+| Yes
+|-
+| VASP-6.5.1-iimpi-2023a.eb
+| Yes 
+| Yes
+| Yes
+| Yes
+| Yes
+| Yes
+| Yes
+|-
+</tab>
+</tabs>
 
 = External links = <!--T:39-->
 

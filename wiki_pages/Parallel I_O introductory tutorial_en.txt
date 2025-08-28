@@ -2,30 +2,29 @@
 
 {{Draft}}
 
-This self-study tutorial will discuss issues in handling large amount of data in HPC and also discuss a variety of parallel I/O strategies for doing large-scale Input/Output (I/O) with parallel jobs. In particular we will focus on using MPI-IO and then introduce parallel I/O libraries such as NetCDF, HDF5 and ADIOS.
+This tutorial will discuss issues in handling large amounts of data in HPC, and a variety of parallel I/O strategies for doing large-scale input/output (I/O) with parallel jobs. In particular we will describe the use of MPI-IO, and of parallel I/O libraries such as NetCDF and HDF5.
 
-=HPC I/O Issues & Goal=
+=Issues & goal=
 
-Many today’s problems are increasingly computationally expensive, requiring large parallel runs on large distributed-memory machines (clusters). There would be basically three big I/O activities in these types of jobs. First is the HPC application requires to read initial dataset or conditions from the designated file. Secondly, mostly at the end of a calculation, data need to be stored on disk for follow-up runs or post-processing. As you may guess, parallel applications commonly need to write distributed arrays to disk  Thirdly, the application state needs to be written into a file for restarting the application in case of a system failure  The figure below shows a simple sketch of I/O bottleneck problem when using many cpus or nodes in a parallel job. As Amdahl’s law says, the speedup of a parallel program is limited by the time needed for the sequential fraction of the program. So, if the I/O part in the application works sequentially as shown, the performance of the code would be not as scalable as desired.
+Many of today’s problems require large parallel runs on large distributed-memory machines (clusters). Broadly there are three important I/O activities in these calculations.  
+# The application must read the initial dataset or conditions from one or more files.
+# The application state may need to be written to a file for restarting the application in case of some kind of failure.  This is called [[Points_de_contrôle/en|checkpointing]]. 
+# Results need to be stored for follow-up runs or post-processing.  
 
-* Reading initial conditions or datasets for processing
-* Writing numerical data from simulations for later analysis
-* Checkpointing to files
-
+The figure below shows a simple sketch of the I/O bottleneck problem when using many CPUs in a parallel job.  [https://en.wikipedia.org/wiki/Amdahl%27s_law Amdahl’s law] says the speedup of a parallel program is limited by the time needed for the sequential fraction of the program.  So if the I/O part in the application works sequentially as shown, the performance of the code will be not as great as desired.
 
 [[File:hpc_IO.png|400px|center]]
 
-''Efficient I/O without stressing out the HPC system is challenging''
+''Efficient I/O without stressing out the storage system--- even a high-performance storage system--- is challenging.''
 
-We will go over the physical problem and limitation in handling data with memory or hard-disk but it is simply expected that load/store operation from memory or hard-disk takes much more time than multiply operations in CPU. Commonly, the total execution time consists of computation time in CPU, communication tim in inter-connection or network and I/O time. So, the efficient I/O handling in high performance computing is a key factor to get best performance.
-
-* Load and store operations are more time-consuming than multiply operations
 * '''Total Execution Time  = Computation Time + Communication Time + I/O time'''
-* Optimize all the components of the equation above to get best performance!!
+* Optimize all the components of the equation above to get best performance!
+* Individual load and store operations are more time-consuming than individual arithmetic operations.
+* In some cases, total execution time is dominated by I/O time.  That is our focus in this article.
 
 ==Disk access rates over time==
 
-An HPC system, I/O related systems are typically slow as compared to its other parts. The figure in this slide shows how the internal drive access rate has been improved over the time. From 1960 to 2014 top supercomputer speed increased by 11 orders of magnitude. However, as shown in the figure, a Single hard disk drive capacity in the same period of time grew by 6 orders and furthermore average internal drive access rate which we can store data at grew by 3-4 orders of magnitude. So, this discrepancy explains that we are producing much more data which we cannot possibly store it at the proportional rate and hence we need to pay special attention to how to store the data appropriately.
+In HPC systems, I/O-related systems are often slow as compared to other parts. The figure below shows how the relative speed of two important components changed over several decades.  From 1956 to 2014 the speed of storage (the purple line) increased by a little over 4 orders of magnitude.  In less than half that time (1993 to 2014) the speed of the top supercomputers in the world (the green line) increased by over five orders of magnitude.  This discrepancy explains can produce data at a rate much, much faster than we can store it.  Therefore we need to pay special attention to how to store the data appropriately.
 
 [[File:Diskaccess3.png|400px|center]]
 
@@ -230,15 +229,11 @@ For example, parallel middleware such as MPI-IO has a few different types of coo
 
 =Parallel I/O techniques=
 
-It is a part of MPI-2 standard. So, MPI-IO is good for writing a raw binary file. As you may read in this slide, the high-end libraries such as HDF5, NetCDF and ADIOS are all built on top of MPI-IO. Therefore, you should have MPI-IO anyway. BTW, ADIOS is not part of the official software stack on our systems simply because there are not much demand in our community.
+It is a part of MPI-2 standard. So, MPI-IO is good for writing a raw binary file. As you may read in this slide, the high-end libraries such as HDF5 and NetCDF are built on top of MPI-IO. Therefore, you should have MPI-IO anyway.
 
 *MPI-IO: parallel I/O part of the MPI-2 standard (1996) 
 *HDF5 (Hierarchical Data Format), built on top of MPI-IO 
 *Parallel NetCDF (Network Common Data Format), built on top of MPI-IO 
-*Adaptable IO System (ADIOS), built on top of MPI-IO 
-**actively developed (OLCF, Sandia NL, GeorgiaTech) and used on largest HPC systems (Jaguar, Blue Gene/P) 
-**external to the code XML file describing the various elements 
-**can work with HDF/NetCDF 
 
 ==MPI-IO==
 

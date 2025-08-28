@@ -7,7 +7,7 @@ VASP est un logiciel commercial dont la licence est seulement accordée à des g
 === Exception pour certains sites ===
 L'Université Simon-Fraser ([[Cedar/fr|Cedar]]), l'Université de Waterloo ([[Graham/fr|Graham]]) et l'Université de Toronto [[Niagara]] possèdent une licence VASP, ce qui permet à certains de leurs employés d'avoir accès à des versions spécifiques, de les installer et d'offrir une assistance limitée. 
 
-Pour utiliser les binaires VASP disponibles sur les grappes [[Cedar/fr|Cedar]] [[Graham/fr|Graham]] et/ou [[Niagara]], écrivez au [[Technical support/fr|soutien technique]] et indiquez&nbsp;:
+Pour utiliser les binaires VASP disponibles sur les grappes [[Cedar/fr|Cedar]], [[Graham/fr|Graham]] et/ou [[Niagara]], écrivez au [[Technical support/fr|soutien technique]] et indiquez&nbsp;:
 * les renseignements sur le détenteur de la licence (votre chercheur principal) :
 ** nom;
 ** courriel;
@@ -19,22 +19,44 @@ Pour utiliser les binaires VASP disponibles sur les grappes [[Cedar/fr|Cedar]] [
 
 La licence pour la version 5 vous permet d'utiliser aussi la version 4; par contre, la licence pour la version 4 ne vous permet pas d'utiliser la version 5. De même pour la version 6, vous pouvez utiliser les versions 5 et 4.
 
+<span id="Using_prebuilt_VASP"></span>
 ==Utilisation des modules VASP==
 
-Des fichiers binaires VASP préconstruits sont installés sur Cedar, Graham et Niagara uniquement. Notre entente ne nous permet pas d'installer VASP pour en permettre l'accès sur nos autres grappes. Vous pouvez cependant installer VASP dans votre répertoire /home avec les directives de la section [[VASP/fr#Construire_VASP_par_vous-même|<i>Construire VASP par vous-même</i>]] ci-dessous. Pour charger une version préconstruite de VASP, les directives sont&nbsp;: 
+<div class="mw-translate-fuzzy">
+Des fichiers binaires VASP préconstruits sont installés sur Cedar, Graham et Niagara uniquement. Notre entente ne nous permet pas d'installer VASP pour en permettre l'accès sur nos autres grappes. Vous pouvez cependant installer VASP dans votre répertoire /home avec les directives de la section [[VASP/fr#Construire_VASP_par_vous-même|<i>Construire VASP par vous-même</i>]] ci-dessous. Pour charger une version préconstruite de VASP, les directives sont&nbsp;:
+</div> 
 
-#Pour connaître les versions disponibles, lancez <code>module spider vasp</code>.
-#Sélectionnez votre version et lancez <code>module spider vasp/<version></code> pour connaître les dépendances qui doivent être chargées avec cette version.
-#Chargez les dépendances et le module VASP, par exemple
-  module load intel/2020.1.217  intelmpi/2019.7.217 vasp/5.4.4
-Pour plus d'information, consultez [[Utiliser_des_modules|Utiliser des modules]].
+<div class="mw-translate-fuzzy">
+Pour vasp/5.4.4 
+ module load arch/avx2
+ module load StdEnv/2023  intel/2023.2.1  openmpi/4.1.5
+ module load vasp/5.4.4
+Pour vasp/6.4.2
+ module load arch/avx2
+ module load StdEnv/2023 intel/2023.2.1 intelmpi/2021.9.0
+ module load vasp/6.4.2
+</div>
+
+# Run <code>module spider vasp</code> to see which versions are available.
+# Choose your version and run <code>module spider vasp/<version></code> to see which dependencies you need to load for this particular version.
+# Load the dependencies and the VASP module, for example:
+ module load intel/2020.1.217  intelmpi/2019.7.217 vasp/5.4.4
+See [[Using modules]] for more information.
 
 Pour l'utilisation sur Niagara, voir [https://docs.scinet.utoronto.ca/index.php/VASP la page wiki de SciNet sur VASP]. Puisque les nœuds de Niagara n'ont pas de GPU, les versions pour GPU ne sont donc pas offertes.
 
+To use VASP on Trillium, modules may be loaded as follows:
+
+For vasp/6.4.2
+ module load StdEnv/2023 intel/2023.2.1 intelmpi/2021.9.0 hdf5/1.14.2
+ module use /opt/software/commercial/modules
+ module load vasp/6.4.2
+For general usage of Trillium, please see [https://docs.alliancecan.ca/wiki/Trillium_Quickstart#Submitting_Jobs_on_the_CPU_Subcluster the Trillium Quickstart page].
 
 === Pseudopotentiels ===
 Tous les pseudopotentiels ont été téléchargés à partir du site officiel de VASP sans être décompressés. Ils sont situés dans <code> $EBROOTVASP/pseudopotentials/</code> sur Cedar et Graham. Le module VASP doit être chargé pour que vous puissiez avoir accès aux pseudopotentiels.
 
+<span id="Executable_programs"></span>
 === Programmes exécutables ===
 
 <b>Pour VASP 4.6</b>, les fichiers exécutables disponibles sont&nbsp;: 
@@ -61,6 +83,7 @@ Si la version de VASP que vous voulez utiliser n'est pas offerte, vous pouvez so
 [[File:VASP benchmark ENG.png|400px|thumb| Fig.1 Durée des simulations en fonction du nombre de CPU]]
 Les fichiers exécutables Vasp-GPU peuvent être utilisés sur les CPU et les GPU. Comme il est beaucoup plus coûteux de faire des calculs de base sur GPU, nous recommandons fortement d’effectuer des essais (<i>benchmarking</i>)  avec un ou deux GPU pour vous assurer que leur utilisation est optimale. Dans la figure 1 nous avons l’exemple de Si cristallin qui contient 256 atomes dans une boîte de simulation. Les lignes illustrent la durée de la simulation en fonction du nombre de CPU utilisés&nbsp;: bleue avec 0 GPU, noire avec 1 GPU et rouge avec 2 GPU. Nous remarquons qu’avec 1 CPU, la performance avec 1 ou 2 GPU est au-delà de 5 fois meilleure que sans GPU. Cependant, entre 1 et 2 GPU, la performance varie peu; en fait, l'utilisation de 2 GPU est d'environ 50&nbsp;% dans notre système de monitorage. Il est donc recommandé d’effectuer ce type de test sur l’ordinateur que vous utiliserez afin d’économiser les ressources de calcul.
 
+<span id="Example_of_a_VASP_job_script"></span>
 == Exemple de script ==
 
 Le script de tâche suivant exécute VASP en parallèle avec l'ordonnanceur Slurm.
@@ -108,32 +131,201 @@ Si vous ignorez combien de mémoire votre tâche nécessite, préparez tous vos 
 
 Si vous voulez utiliser 32 cœurs ou plus, consultez la [[Job_scheduling_policies/fr|politique d'ordonnancement des tâches]], section <i>Nœuds entiers ou cœurs</i>.
 
+<span id="Building_VASP_yourself"></span>
 == Construire VASP par vous-même ==
 
-Si vous disposez d'une licence VASP et que vous avez accès à du code source VASP, vous pouvez installer VASP-5.4.4, 6.1.2,  6.2.1 ou 6.3.0 dans votre répertoire /home sur toutes nos grappes (à l'exception de Niagara) avec les commandes [[EasyBuild/fr|EasyBuild]] suivantes. VASP sera construit de la même manière que sur Cedar et Graham et inclura aussi les extensions Transition State Tools et VASPsol.
+Si vous disposez d'une licence VASP et que vous avez accès à du code source VASP, vous pouvez installer plusieurs versions dans votre répertoire /home sur toutes nos grappes (à l'exception de Niagara) avec les commandes [[EasyBuild/fr|EasyBuild]] suivantes. VASP sera construit de la même manière que sur Cedar et Graham.
 
-<b>Pour l'environnement  <code> StdEnv/2020 </code></b>
+<code> eb -f [RECIPE NAME] --sourcepath=[SOURCEPATH] </code>
 
-<code> eb -f VASP-5.4.4-iimpi-2020a.eb --sourcepath=SOURCEPATH </code>
-
-<code> eb -f VASP-6.1.2-iimpi-2020a.eb --sourcepath=SOURCEPATH </code>
-
-<code> eb -f VASP-6.2.1-iimpi-2020a.eb --sourcepath=SOURCEPATH </code>
-
-<code> eb -f VASP-6.3.0-iimpi-2020a.eb --sourcepath=SOURCEPATH </code>
-
-
-<b>Pour l'environnement  <code> StdEnv/2023 </code></b>
-
-<code> eb -f VASP-5.4.4-iofb-2023a.eb --sourcepath=SOURCEPATH </code>
-
-<code> eb -f VASP-6.4.2-iofb-2023a.eb  --sourcepath=SOURCEPATH </code>
-
-où SOURCEPATH est le chemin vers le fichier source VASP. Les fichiers sources respectifs pour vasp-5.4.4, 6.1.2, 6.2.1 et 6.3.0 sont respectivement <code> vasp.5.4.4.pl2.tgz </code>, <code> vasp.6.1.2_patched.tgz </code>, <code> vasp.6.2.1.tgz </code> et <code> vasp.6.3.0.tgz </code>. Vous pouvez télécharger le code source à partir du [https://www.vasp.at/ site Web de VASP]. La commande peut prendre quelque temps, peut-être plus d'une heure. Quand elle aura terminé, vous pouvez charger et lancer VASP avec les commandes <code>module</code> décrites dans [[VASP/fr#Utilisation_des_modules_VASP|Utilisation des modules VASP]].
+où [SOURCEPATH] est le répertoire contenant le code source de VASP et [RECIPE NAME] est le nom de la recette. Le premier onglet du tableau ci-dessous affiche la liste des recettes disponibles ainsi que les fichiers sources requis correspondants. Dans ce tableau, VTSTtools et vaspSOL correspondent respectivement aux extensions Transition State Tools et VASPsol. Le deuxième onglet affiche la liste des bibliothèques incluses dans VASP. Vous pouvez télécharger le code source depuis le site web de VASP [https://www.vasp.at/]. L'exécution de la commande peut prendre plus d'une heure. Une fois l'opération terminée, vous pourrez charger et exécuter VASP à l'aide des commandes <code>module</code>, comme expliqué précédemment dans [[VASP/fr#Utilisation_des_modules_VASP|Utilisation des modules VASP]].
 
 Pour construire une version personnalisée de VASP, voir [[Installing software in your home directory/fr| Installation de logiciels dans votre répertoire /home]], 
 [https://www.vasp.at/wiki/index.php/Installing_VASP.5.X.X Installing VASP 5] ou [https://www.vasp.at/wiki/index.php/Installing_VASP.6.X.X Installing VASP 6].
 
+<tabs>
+<tab name="Spécification et implémentation de recettes">
+{| class="wikitable"
+|-
+! Nom de la recette
+! Version
+! Environnement
+! Fichier source
+! CPU/GPU
+! VTSTtools
+! vaspSOL
+|-
+| VASP-5.4.4-iimpi-2020a.eb
+| 5.4.4
+| StdEnv/2020
+| vasp.5.4.4.pl2.tgz
+| CPU
+| oui
+| oui
+|-
+| VASP-6.1.2-iimpi-2020a.eb
+| 6.1.2
+| StdEnv/2020
+| vasp.6.1.2_patched.tgz
+| CPU
+| oui
+| oui
+|-
+| VASP-6.2.1-iimpi-2020a.eb
+| 6.2.1
+| StdEnv/2020
+| vasp.6.2.1.tgz
+| CPU
+| oui
+| oui
+|-
+| VASP-6.3.0-iimpi-2020a.eb
+| 6.3.0
+| StdEnv/2020
+| vasp.6.3.0.tgz
+| CPU
+| oui
+| oui
+|-
+| VASP-6.3.1-iimpi-2020a.eb
+| 6.3.1
+| StdEnv/2020
+| vasp.6.3.1.tgz
+| CPU
+| oui
+| oui
+|-
+| VASP-6.4.2-iimpi-2023a.eb
+| 6.4.2
+| StdEnv/2023
+| vasp.6.4.2.tar
+| CPU
+| oui
+| oui
+|-
+| VASP-6.4.3-iimpi-2023a.eb
+| 6.4.3
+| StdEnv/2023
+| vasp.6.4.3.tar
+| CPU
+| oui
+| oui
+|-
+| VASP-6.5.0-iimpi-2023a.eb
+| 6.5.0
+| StdEnv/2023
+| vasp.6.5.0.tgz
+| CPU
+| non
+| non
+|-
+| VASP-6.5.1-iimpi-2023a.eb
+| 6.5.1
+| StdEnv/2023
+| vasp.6.5.1.tgz
+| CPU
+| non
+| non
+|-  
+|}
+</tab>
+<tab name="Bibliothèques incluses">
+{| class="wikitable"
+|-
+! Nom de la recette
+! Fonction de Wannier
+! Beef
+! HDF5
+! LibXC
+! ELPA
+! Libmbd
+! dft4
+|-
+| VASP-5.4.4-iimpi-2020a.eb
+| oui
+| oui
+| non
+| non
+| non
+| non
+| non
+|-
+| VASP-6.1.2-iimpi-2020a.eb
+| oui
+| oui
+| non
+| non
+| non
+| non
+| non
+|-
+| VASP-6.2.1-iimpi-2020a.eb
+| oui
+| oui
+| non
+| non
+| non
+| non
+| non
+|- 
+| VASP-6.3.0-iimpi-2020a.eb
+| oui
+| oui
+| oui
+| oui
+| non
+| non
+| non
+|-
+| VASP-6.3.1-iimpi-2020a.eb
+| oui
+| oui
+| oui
+| oui
+| non
+| non
+| non
+|-
+| VASP-6.4.2-iimpi-2023a.eb
+| oui
+| oui
+| oui
+| oui
+| non
+| non
+| non
+|-
+| VASP-6.4.3-iimpi-2023a.eb
+| oui
+| oui
+| oui
+| oui
+| non
+| non
+| oui
+|-
+| VASP-6.5.0-iimpi-2023a.eb
+| oui
+| oui
+| oui
+| oui
+| oui
+| oui
+| oui
+|-
+| VASP-6.5.1-iimpi-2023a.eb
+| oui
+| oui
+| oui
+| oui
+| oui
+| oui
+| oui
+|-
+</tab>
+</tabs>
+
+<span id="External_links"></span>
 = Références =
 
 * [https://www.vasp.at/tutorials/latest/part1/ Getting Started], guide sur le site Web de l'équipe de développement.

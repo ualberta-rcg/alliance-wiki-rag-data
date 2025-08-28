@@ -4,7 +4,8 @@
 [https://www.nextflow.io Nextflow] is software for running reproducible scientific workflows. The term <i>Nextflow</i> is used to describe both the domain-specific-language (DSL) the pipelines are written in, and the software used to interpret those workflows.
 
 
-== Usage == <!--T:2-->
+<!--T:2-->
+== Usage ==
 On our systems, Nextflow is provided as a module you can load with <code>module load nextflow</code>.
 
 <!--T:3-->
@@ -13,7 +14,8 @@ While you can build your own workflow, you can also rely on the published [https
 <!--T:4-->
 Our example uses the <code>nf-core/smrnaseq</code> pipeline. 
 
-==== Installation ==== <!--T:5-->
+<!--T:5-->
+==== Installation ====
 The following procedure is to be run on a login node. 
 
 <!--T:6-->
@@ -227,9 +229,21 @@ So now you have started Nextflow on the login node. This process sends jobs to S
 <!--T:24-->
 You can see the progression of the pipeline. You can also open a new session on the cluster or detach from the tmux session to have a look at the jobs in the Slurm queue with <code>squeue -u $USER</code> or <code>sq</code>
 
-==== Known issues ==== <!--T:25-->
+== Known issues == <!--T:25-->
+
+==== "unable to create native thread" ==== <!--T:28-->
+
+<!--T:29-->
+The following error has been observed:
+<source>
+java.lang.OutOfMemoryError: unable to create native thread: possibly out of memory or process/resource limits reached
+[error][gc,task] GC Failed to create worker thread
+</source>
+We believe this is due to Java trying to create threads to match the number of physical cores on a machine.
+Setting <code>export NXF_OPTS='-XX:ActiveProcessorCount=1'</code> when executing <code>nextflow</code> is reported to solve the problem.
 
 <!--T:26-->
+==== SIGBUS ====
 Some users have reported getting a <code>SIGBUS</code> error from the Nextflow main process.
 We suspect this is connected with these Nextflow issues:
  * https://github.com/nextflow-io/nextflow/issues/842

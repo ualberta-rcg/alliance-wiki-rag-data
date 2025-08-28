@@ -1,21 +1,25 @@
 <languages />
 {| class="wikitable"
 |-
-| Disponibilité : juillet 2025
+| Disponibilité : 7 août 2025
 |-
-| Nœud de connexion : <i>à déterminer</i>
+| Nœud de connexion : '''trillium.alliancecan.ca''' et '''trillium-gpu.alliancecan.ca'''
 |-
-| Point de chute Globus: <i>à déterminer</i>
+| Collections Globus :  '''alliancecan#trillium_home''', '''alliancecan#trillium_scratch''', '''alliancecan#trillium_project''' (pour l'instant, disponible uniquement si vous aviez accès à Niagara)
 |-
-| Nœud de copie (rsync, scp, sftp ...) : <i>à déterminer</i>
+| Nœud de copie (rsync, scp, sftp ...) :  '''tri-dm2.scinet.utoronto.ca''' (disponible bientôt)
 |-
-| Portail : <i>à déterminer</i>
+| Portail : '''<nowiki>https://my.scinet.utoronto.ca</nowiki>'''
 |}
 
 La grappe Trillium est conçue pour prendre en charge des tâches massivement parallèles. Construite par Lenovo Canada, elle est hébergée par SciNet à l'Université de Toronto.
 
+L'utilisation de Trillum est semblable à celle des autres grappes nationales  avec cependant certaines particularités. Pour les détails, voir [[Trillium Quickstart|Trillium&nbsp;: Guide de démarrage]].
+
+Si vous aviez accès à Niagara nous vous encourageons fortement de prendre connaissance de la page [[Transition from Niagara to Trillium/fr|Transition de Niagara à Trillium]].
+
 =Installation et transition=
-En raison de la capacité d'alimentation électrique et de refroidissement, une portion importante de la grappe Niagara sera fermée pendant une période intermédiaire afin d'effecuer les tests d'acceptation et la transition vers le nouveau système. Nous vous tiendrons au courant lorsque nous aurons une meilleure idée du calendrier d'installation de Trillium.
+En raison de la capacité d'alimentation électrique et de refroidissement, une portion importante de la grappe Niagara sera fermée pendant une période intermédiaire afin d'effectuer les tests d'acceptation et la transition vers le nouveau système. Nous vous tiendrons au courant lorsque nous aurons une meilleure idée du calendrier d'installation de Trillium.
 
 =Stockage=
 Stockage parallèle : 29 pétaoctets, SSD NVMe de VAST Data.
@@ -30,7 +34,40 @@ Stockage parallèle : 29 pétaoctets, SSD NVMe de VAST Data.
 {| class="wikitable sortable"
 ! nœuds!! cœurs!! mémoire disponible !! CPU !! GPU
 |-
-| 1224 || 192 || 768Go DDR5 ||2 x AMD EPYC 9655 (Zen 5) @ 2.6 GHz, cache L3 de 384Mo  ||
+| 1224 || 192 || 750GB DDR5 ||2 x AMD EPYC 9655 (Zen 5) @ 2.6 GHz, cache L3 de 384MB  ||
 |-
-|  60 || 96 || 768G DDR5 || 1 x AMD EPYC 9654 (Zen 4) @ 2.4 GHz, cache L3 de 384Mo  || 4 x NVidia H100 SXM (80Go de mémoire)
+|  61 || 96 || 750GB DDR5 || 1 x AMD EPYC 9654 (Zen 4) @ 2.4 GHz, cache L3 de 384MB  || 4 x NVidia H100 SXM (80GB de mémoire)
 |}
+
+<span id="Technical_details"></span>
+= Données techniques =
+
+<span id="Cooling_and_energy_efficiency"></span>
+== Refroidissement et efficacité énergétique ==
+
+Le refroidissement se fait par une eau de 35 à 40&nbsp;°C, ce qui a les effets suivants%nbsp;:
+
+* indicateur d'efficacité énergétique (PUE) sous 1.03; 
+* refroidisseurs à sec en circuit fermé, sans tours d'évaporation et consommation de nouvelle eau;
+* excédent de chaleur utilisé par des installations voisines pour minimiser l'empreinte énergétique.
+
+<span id="Storage_system"></span>
+==Système de stockage==
+
+Le système de fichiers VAST haute performance est composé d'un pool de stockage unifié de 29PB soutenu par NVMe avec les caractéristiques suivantes&nbsp;:
+
+* capacité effective de 29PB (dédupliquée via VAST);
+* capacité de mémoire flash brute de 16.7PB;
+* bande passante de 714GB/s en lecture et de 275GB/s en écriture;
+* 10 millions d'IOPS en lecture et 2 millions d'IOPS en écriture;
+* protocoles d'accès POSIX et S3 sous un espace de nommage unifié;
+* 48 CBoxes et 14 DBoxes pour les services de données.
+
+<span id="Backup_and_archive_storage"></span>
+== Sauvegarde et archivage ==
+
+L'archivage sur ruban /nearline HPSS dispose de 114PB additionnels.
+
+* Archivage en deux copies dans des bibliothèques géographiquement distinctes;
+* utilisé à des fins de sauvegarde et d'archivage;
+* sauvegardes gérées par le logiciel Atempo.

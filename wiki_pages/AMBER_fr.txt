@@ -3,13 +3,27 @@
 ==Introduction==
 [https://ambermd.org/ Amber] désigne un ensemble d'applications pour effectuer des simulations de dynamique moléculaire,  particulièrement avec les biomolécules. Chacune des applications porte un nom différent, mais l'ensemble fonctionne plutôt bien et constitue un outil puissant pour effectuer plusieurs calculs usuels.
 
-== AmberTools et Amber ==
-Les modules pour AmberTools et pour Amber [[Available software/fr|sont disponibles sur nos grappes]].
+== Modules Amber ==
+Nous fournissons les modules pour Amber, AmberTools et Amber-PMEMD dans notre [[Available software/fr|pile logicielle]].
 
+* '''[https://ambermd.org/AmberMD.php Amber]''' (module <code>amber</code>) : comprend tout ce qui se trouve dans AmberTools, plus le programme avancé <i>pmemd</i> pour les simulations de dynamique moléculaire haute performance (<code>QUICK</code> pour les calculs de DFT avec GPU et <code>sander</code> pour la dynamique moléculaire). 
+* '''Amber-PMEMD''' (module <code>amber-pmemd</code>, Amber 24+) : Moteur <code>pmemd</code> haute performance optimisé pour CPU et GPU. <br> Le moteur <code>pmemd</code> (optimized for CPU/GPU) est un module distinct depuis Amber24 parce que <code>pmemd</code> n'est plus compilé avec AmberTools. <br> '''Remarque :''' Le module <code>amber-pmemd</code> n'inclut pas AmberTools. Pour utliser les deux applications, chargez les deux modules.
 * Le module <code>ambertools</code> pour [https://ambermd.org/AmberTools.php AmberTools] offre des outils pour préparer et analyser les simulations. L'application <code>sander</code> est utilisée pour les simulations de dynamique moléculaire. Tous ces outils sont gratuits et <i>open source</i>.
-* Le module <code>amber</code> pour [https://ambermd.org/AmberMD.php Amber] contient tout ce qui est offert par <code>ambertools</code>, mais ajoute <code>pmemd</code>, une application plus avancée pour les simulations de dynamique moléculaire.
 
 Pour la liste des versions installées et de leurs modules dépendants, lancez [[Utiliser des modules#Sous_commande_spider|la commande <code>module spider</code>]] ou consultez la page [[Available software/fr|Logiciels disponibles]].
+
+<span id="Using_AMBER_on_H100_GPU_Clusters"></span>
+== Utiliser AMBER sur les grappes de GPU H100 ==
+
+'''ATTENTION :''' Les anciens modules AMBER ne prennent pas en charge les GPU H100 de NVIDIA. Utilisez plutôt les modules listés dans le tableau ci-dessous.
+
+=== Modules requis ===
+<pre>
+ambertools/25.0 or amber-pmemd/24.3
+</pre>
+Ces modules offrent des noyaux (<i>kernels</i>) CUDA pour les H-100 (compilés avec CUDA 12+ pour l'architecture Hopper).
+
+'''Important :''' Pour les tâches avec GPU, n'utilisez pas les anciens modules AMBER; ils ne fonctionnent pas sur les nœuds H100.
 
 == Charger des modules ==
 <tabs>
@@ -18,9 +32,11 @@ Pour la liste des versions installées et de leurs modules dépendants, lancez [
 |-
 ! Version !! avec CPU !! avec GPU (CUDA) !! Notes
 |-
-| amber/22.5-23.5 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 amber/22.5-23.5</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 amber/22.5-23.5</code> || GCC, FlexiBLAS & FFTW
+| amber-pmemd/24.3 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 amber-pmemd/24.3</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 amber-pmemd/24.3</code> || H100 pris en charge
 |-
-| ambertools/23.5 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 ambertools/23.5</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 ambertools/23.5</code> || GCC, FlexiBLAS & FFTW
+| amber/22.5-23.5 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 amber/22.5-23.5</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 amber/22.5-23.5</code> ||  
+|-
+| ambertools/25.0 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 ambertools/25.0</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 ambertools/25.0</code> || H100 pris en charge, avec PLUMED/2.9.0 
 |-
 |}</tab>
 <tab name="StdEnv/2020">
@@ -90,6 +106,7 @@ module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 amber/22
 pmemd.cuda -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r restart.rst7
 }}
 
+<span id="CPU-only_parallel_MPI_job"></span>
 === Tâche MPI parallèle avec CPU ===
 
 <tabs>
@@ -212,6 +229,7 @@ srun MMPBSA.py.MPI -O -i mmpbsa.in -o mmpbsa.dat -sp solvated_complex.parm7 -cp 
 }}
 Les scripts peuvent être modifiés selon les besoins en ressources de calcul de vos tâches (consultez [[Running_jobs/fr|Exécuter des tâches]]).
 
+<span id="Performance_and_benchmarking"></span>
 ==Performance et étalonnage <i>benchmarking</i>==
 
 Le guide <i>[https://mdbench.ace-net.ca/mdbench/ Molecular Dynamics Performance Guide]</i> a été créé par une équipe [https://www.ace-net.ca/ d'ACENET]. Le guide décrit les conditions optimales pour exécuter aussi des tâches sur nos grappes avec GROMACS, NAMD et OpenMM.

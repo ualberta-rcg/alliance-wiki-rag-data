@@ -6,7 +6,7 @@
 = Licence=
 La suite Ansys est hébergée sur nos grappes, mais nous n'avons pas une licence qui permet un accès généralisé. Toutefois, plusieurs établissements, facultés et départements possèdent des licences qui peuvent être utilisées sur nos grappes; vérifiez l'aspect légal de son utilisation. En ce qui a trait à l'aspect technique, nos nœuds de calcul doivent pouvoir communiquer avec votre serveur de licence. Si ce n'est pas déjà fait, notre équipe technique coordonnera ceci avec votre gestionnaire de licence. Quand tout sera en place, vous pourrez charger le module Ansys qui localisera de lui-même la licence. En cas de difficulté, communiquez avec le [[Technical support/fr| soutien technique]].
 
-== Configurer votre propre fichier de licence == 
+== Configurez votre propre fichier de licence ==
 Notre module Ansys cherche l'information sur la licence à différents endroits, dont votre répertoire /home.
 Pour indiquer votre propre serveur de licence, créez un fichier nommé <code>$HOME/.licenses/ansys.lic</code> qui contient les deux lignes ci-dessous, où vous remplacez FLEXPORT, INTEPORT et LICSERVER par les valeurs de votre serveur. 
 
@@ -20,6 +20,7 @@ Pour indiquer votre propre serveur de licence, créez un fichier nommé <code>$H
 
 Les valeurs correspondant aux serveurs de licence CMC et SHARCNET se trouvent dans le tableau ci-dessous. Pour utiliser un différent serveur, voir [[Ansys/fr#Serveurs_de_licence_locaux|Serveurs de licence locaux]] ci-dessous.
 
+<div class="mw-translate-fuzzy">
 {| class="wikitable"
 |+ style="text-align:left; background-color:#F2F2F2; font-size:110%" | TABLEAU : Serveurs de licence préconfigurés
 ! Licence
@@ -63,12 +64,12 @@ Les valeurs correspondant aux serveurs de licence CMC et SHARCNET se trouvent da
 | aucune
 |-
 | SHARCNET
-| beluga/cedar/graham/gra-vdi/narval
+| beluga/cedar/graham/gra-vdi/nibi/narval/rorqual
 | <code>license3.sharcnet.ca</code>
 | <code>1055</code>
 | <code>2325</code>
-| s.o.
-| aucune
+| n/a
+| None
 |-
 | SHARCNET
 | niagara
@@ -78,13 +79,16 @@ Les valeurs correspondant aux serveurs de licence CMC et SHARCNET se trouvent da
 | <code>1793</code>
 | aucune
 |}
+</div>
 
 Si vous avez obtenu une licence de CMC, vous devez faire parvenir le nom d'utilisateur associé à votre compte avec l'Alliance à <cmcsupport@cmc.ca>, autrement la licence ne fonctionnera pas. Pour connaître le nombre de cœurs que vous pouvez utiliser avec une licence CMC, voyez les sections <I>Other Tricks and Tips</i> des  [https://www.cmc.ca/?s=Other+Tricks+and+Tips&lang=en/  guides Ansys Electronics Desktop et Ansys Mechanical/Fluids].
 
+<span id="Local_license_servers"></span>
 === Serveurs de licence locaux ===
 
 Avant que le serveur de licence de votre établissement puisse être utilisé, les coupe-feu des deux parties doivent être configurés. Dans plusieurs cas, ce travail est déjà fait; suivez les directives dans le paragraphe <i>Prêt à utiliser</i> ci-dessous. Autrement, référez-vous au paragraphe <i>Configuration requise</i> un peu plus bas.
 
+<span id="Ready_to_use"></span>
 ==== Prêt à utiliser ====
 
 Pour utiliser un serveur de licence ANSYS déjà configuré pour être utilisé sur la grappe où vous allez soumettre des tâches, contactez votre administrateur de serveur de licences Ansys et obtenez les trois éléments d'information suivants&nbsp;:
@@ -93,6 +97,7 @@ Pour utiliser un serveur de licence ANSYS déjà configuré pour être utilisé 
  3) le port d'interconnexion (INTEPORT), habituellement 2325
 Une fois les trois éléments d'information collectés, configurez votre fichier <code>~/.licenses/ansys.lic</code> en entrant les valeurs de LICSERVER, FLEXPORT et INTEPORT dans le modèle <code>FILE: ansys.lic</code> ci-dessus.
 
+<span id="Setup_required"></span>
 ==== Configuration requise ====
 
 Si votre serveur de licence Ansys local n'a jamais été configuré pour être utilisé sur la ou les grappes où vous allez soumettre des tâches, en plus des 3 éléments ci-dessus, vous devrez ÉGALEMENT obtenir les éléments suivants auprès de l'administrateur&nbsp;:
@@ -102,27 +107,43 @@ où <servername> peut être trouvé dans la première ligne du fichier de licenc
 
 Envoyez les éléments 1 à 4 par courriel au  [[Technical support/fr|soutien technique]] et indiquez sur quelles grappes vous souhaitez exécuter les tâches Ansys. Nos administrateurs de système procéderont ensuite à l'ouverture du pare-feu afin que les demandes de retrait de licence puissent atteindre votre serveur de licence à partir des nœuds de calcul du ou des grappes spécifiées. En retour, vous recevrez une plage d'adresses IP à transmettre à votre administrateur de serveur, qui pourra alors ouvrir le pare-feu local pour autoriser les connexions de licence Ansys entrantes à partir de la ou les grappes sur CHACUN des ports définis par FLEXPORT, INTEPORT et VENDPORT.
 
+<span id="Checking_license"></span>
 == Vérifier la licence ==
 
-Pour vérifier si <code>ansys.lic</code> est bien configuré et fonctionne correctement, exécutez les commandes suivantes sur la grappe où vous voulez soumettre des tâches.
-{{Commands2
-| salloc --time{{=}}1:0:0 --nodes{{=}}1 --mem{{=}}1G --ntasks{{=}}1 --account{{=}}def-youruserid
-| module load ansys/2023R2
-| $EBROOTANSYS/v232/licensingclient/linx64/lmutil lmstat -c $ANSYSLMD_LICENSE_FILE 1> /dev/null && echo Success {{!}}{{!}} echo Fail
-Success
-}}
+Pour vérifier si <code>ansys.lic</code> est bien configuré et fonctionne correctement, copiez et collez la séquence de commandes suivantes sur la grappe où vous voulez soumettre des tâches. La seule différence est de spécifier YOURUSERID. Si le logiciel n’est pas à jour sur le serveur de licence distant, un problème peut survenir si la dernière version du module Ansys est chargée pour effectuer des tests. Pour que la licence fonctionne quand des tâches sont soumises, assurez-vous que la même version du module Ansys qui est chargé par votre script est utilisée dans les commandes ci-dessous.
+ [gra-login:~] cd /tmp
+ [gra-login:~] salloc --time{{=}}1:0:0 --mem{{=}}1000M --account{{=}}def-YOURUSERID
+ [gra-login:~] module load StdEnv/2023; module load ansys/2023R2
+ [gra-login:~] $EBROOTANSYS/v$(echo ${EBVERSIONANSYS:2:2}${EBVERSIONANSYS:5:1})/licensingclient/linx64/lmutil lmstat -c $ANSYSLMD_LICENSE_FILE 1> /dev/null && echo Success {{!}}{{!}} echo Fail
 
-Si le résultat est <code>Success</code>, la licence devrait fonctionner quand des tâches sont soumises. Par contre si le résultat est <code>Fail</code>, écrivez au [[technical support/fr|soutien technique]] en indiquant les commandes que vous avez utilisées ainsi que le nom du nœud de calcul. Remarque&nbsp;: Si vous chargez une version autre que celle qui se trouve ci-dessus, il faut modifier le chemin pour <code>lmutil</code> en conséquence.
+Si le résultat est <code>Success</code>, la licence devrait fonctionner quand des tâches sont soumises. <br>
+Par contre si le résultat est <code>Fail</code>, écrivez au [[technical support/fr|soutien technique]].
 
+<span id="Version_compatibility"></span>
 = Compatibilité des versions =
 
-== Plateformes supportées ==
-La page [https://www.ansys.com/it-solutions/platform-support <i>Platform Support</i>] mentionne que la version actuelle a été testée pour lire et ouvrir les bases de données des cinq versions précédentes. Cela signifie que les simulations développées à l'aide d'anciennes versions d'Ansys devraient généralement fonctionner avec des versions de module plus récentes (compatibilité en aval pour 5 versions). L'inverse ne peut cependant pas être présumé. Le lien <i>Platform Support</i> fournit également des informations de compatibilité logicielle et matérielle basées sur la version pour déterminer l'infrastructure de plateforme optimale (prise en charge) sur laquelle Ansys peut être exécuté. Les fonctionnalités prises en charge sous Windows VS Linux peuvent être affichées en cliquant sur <i>Platform Support by Application/Product</i>. Des informations similaires pour toutes les versions ci-dessus peuvent être trouvées en cliquant sur <I>Previous Releases</I> dans le coin inférieur gauche de la page <i>Platform Support</i>.
+<div class="mw-translate-fuzzy">
+Les simulations Ansys sont typiquement compatibles avec des versions postérieures, mais <span style="color:red">ce n'est pas le cas</span> avec les versions antérieures. Ceci signifie que des simulations faites avec une moins récente version de Ansys devrait pouvoir être chargées et exécutées sans problème avec une version plus récente.  Par exemple, une simulation créée et sauvegardée avec ansys/2022R2 devrait fonctionner avec ansys/2023R2, mais  <span style="color:red">pas dans l'autre sens</span>.  Il est toujours possible de lancer une simulation créée avec une version antérieure, mais il est fort possible que la simulation plante ou que vous obteniez des messages d'erreur. Quant aux simulations Fluent, si vous ne vous souvenez pas du numéro de la version Ansys que vous avez utilisée  pour créer le fichier cas, vous trouverez des indices avec les lignes suivantes.
+</div>
 
+ $ grep -ia fluent combustor.cas
+   (0 "fluent15.0.7  build-id: 596")
+
+ $ grep -ia fluent cavity.cas.h5
+   ANSYS_FLUENT 24.1 Build 1018
+
+<span id="Platform_support"></span>
+== Plateformes prises en charge ==
+
+== ANSYS Fluent ==
+Voici la procédure habituelle pour utiliser Fluent avec les grappes de Calcul Canada :
+
+<span id="What&#039;s_new"></span>
 == Nouveautés ==
 
-Ansys publie régulièrement des <i>service packs</i> pour regrouper plusieurs mises-à-jour apportant différents correctifs et améliorations à ses versions majeures. Des informations similaires pour les versions précédentes peuvent généralement être trouvées sur [https://www.ansys.com/blog le blog Ansys], en utilisant la barre de recherche FILTERS. Par exemple, la recherche de <code>What’s New Fluent 2024 gpu</code> affichera le document <code>[https://www.ansys.com/blog/fluent-2024-r1 What’s New for Ansys Fluent in 2024 R1?]</code> qui contient une multitude d'informations sur la prise en charge des GPU. Spécifier un numéro de version dans le champ de recherche [https://www.ansys.com/news-center/press-releases Press Release] est également un bon moyen de trouver des informations sur les nouvelles versions. Depuis janvier 2025, Ansys 2024R2 est la dernière version et sera installée lorsque l'intérêt sera exprimé ou qu'il sera nécessaire de prendre en charge du nouveau matériel ou des fonctionnalités plus récentes. Pour demander l'installation d'une nouvelle version, écrivez au [[Technical support/fr|soutien technique]].
+Ansys publie régulièrement des <i>service packs</i> pour regrouper plusieurs mises-à-jour apportant différents correctifs et améliorations à ses versions majeures. Des informations similaires pour les versions précédentes peuvent généralement être trouvées sur [https://www.ansys.com/blog le blog Ansys], en utilisant la barre de recherche FILTERS. Par exemple, la recherche de <code>What’s New Fluent 2024 gpu</code> affichera le document <code>[https://www.ansys.com/blog/fluent-2024-r1 What’s New for Ansys Fluent in 2024 R1?]</code> qui contient une multitude d'informations sur la prise en charge des GPU. Spécifier un numéro de version dans le champ de recherche [https://www.ansys.com/news-center/press-releases Press Release] est également un bon moyen de trouver des informations sur les nouvelles versions. Le module <code>ansys/2025R1.02</code> pour la dernière version de Ansys a été installé récemment; pour l'utiliser cependant, vous avez besoin d'un serveur de licence comme celui de CMC. La mise à jour du serveur de licence de SHARCNET est en cours et tant que ce travail ne sera pas terminé, seules les versions <code>ansys/2024R2.04</code> ou moins récentes seront prises en charge. Si un module pose problème ou pour demander l'installation d'une nouvelle version, écrivez au [[Technical support/fr|soutien technique]].
 
+<span id="Service_packs"></span>
 == Correctifs ==
 
 À partir d'Ansys 2024, un module Ansys distinct sera identifié avec une décimale et deux chiffres après le numéro de version, chaque fois qu'un <i>service pack</i> est installé pour la version initiale. Par exemple, la version initiale pour 2024 sans aucun <i>service pack</i> peut être chargée en exécutant <code>module load ansys/2024R1</code> tandis qu'un module avec le <i>service pack</i> 3 peut être chargé avec <code>module load ansys/2024R1.03</code>. Si un <i>service pack</i> est déjà disponible au moment où une nouvelle version doit être installée, il est fort probable que seulement un module pour ce numéro de <i>service pack</i> sera installé, à moins qu'une demande soit faite pour l'installation de la version initiale.
@@ -143,13 +164,17 @@ La procédure suivante est habituellement utilisée pour exécuter Fluent sur un
 # S'il arrive fréquemment que les tâches ne démarrent pas en raison d'un manque de licence (et que de les soumettre de nouveau manuellement ne convient pas), vous pouvez modifier votre script pour que votre tâche soit remise en file d'attente (au plus 4 fois) comme c'est le cas pour le script sous l'onglet <i>Plusieurs nœuds (par cœur + remise en attente)</i> plus loin. Cependant, ceci remet aussi en attente les simulations qui ont échoué pour d'autres raisons que l'absence de licence (par exemple la divergence), gaspillant ainsi du temps de calcul. Il est donc fortement recommandé de vérifier les fichiers de sortie de l'ordonnanceur pour savoir si chaque tentative de remise en attente est ou non due à un problème de licence. Si vous découvrez que la remise en attente est due à un problème avec la simulation, annulez immédiatement la tâche avec <code>scancel jobid</code> et corrigez le problème.
 # Lorsque la  [[Running_jobs/fr|tâche est terminée]], vous pouvez télécharger le fichier de données et le retourner dans Fluent avec <i>File > Import > Data…</i>.
 
+<span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===
 
+<span id="General_purpose"></span>
 ==== Utilisation générale ====
 
+<div class="mw-translate-fuzzy">
 La plupart des tâches Fluent devraient utiliser le script <i>par nœud</i> ci-dessous pour minimiser le temps d'attente et maximiser la performance en utilisant le moins de nœuds possible. Les tâches demandant beaucoup de cœurs CPU pourraient attendre moins longtemps dans la queue avec le script <i>par cœur</i>, mais le démarrage d’une tâche utilisant plusieurs nœuds peut prendre beaucoup plus de temps, ce qui en diminue l'intérêt. Il faut aussi tenir compte du fait qu'exécuter des tâches intensives sur un nombre indéterminé de nœuds pouvant être très élevé fait en sorte que ces tâches seront beaucoup plus susceptibles de planter si un des nœuds de calcul fait défaut pendant la simulation. Les scripts suivants utilisent la mémoire partagée pour les tâches utilisant un seul nœud et la mémoire distribuée (avec MPI et l’interconnexion CHP appropriée) pour les tâches en utilisant plusieurs.
 
 Les deux onglets pour Narval peuvent fournir une alternative plus robuste si Fluent plante pendant la phase initiale de partitionnement automatique du maillage lors de l'utilisation des scripts Intel standards avec le solveur parallèle. L'autre option serait d'effectuer manuellement le partitionnement du maillage dans l'interface graphique de Fluent, puis d'essayer d'exécuter à nouveau la tâche sur la grappe avec les scripts Intel. Ainsi, vous pouvez inspecter les statistiques de partitionnement et spécifier la méthode pour obtenir un résultat optimal. Le nombre de partitions de maillage doit être un multiple entier du nombre de cœurs; pour une efficacité optimale, assurez-vous d'avoir au moins 10&nbsp;000 cellules par cœur.
+</div>
 
 <tabs>
 
@@ -196,6 +221,7 @@ slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
 
 if [ "$SLURM_NNODES" == 1 ]; then
+ #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
 else
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
@@ -246,6 +272,7 @@ slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
 
 if [ "$SLURM_NNODES" == 1 ]; then
+ #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
 else
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
@@ -390,6 +417,7 @@ fi
 
 </tabs>
 
+<span id="License_requeue"></span>
 ==== Remise en file d'attente pour obtenir la licence ====
 
 Les scripts suivants ne doivent être utilisés qu'avec des tâches Fluent qui sont connues pour se terminer normalement sans générer d'erreurs en sortie, mais qui nécessitent généralement plusieurs tentatives de remise en file d'attente pour obtenir les licences. Ils ne sont pas recommandés pour les tâches Fluent qui peuvent 1) s'exécuter pendant une longue période avant de planter 2) s'exécuter jusqu'à la fin mais contenir des avertissements de journalisation; dans les deux cas, les simulations seront répétées depuis le début jusqu'à ce que le nombre maximal de tentatives de remise en file d'attente spécifié par la valeur <code>array</code> soit atteint. Pour ces types de tâches, les scripts à usage général (ci-dessus) doivent être utilisés.
@@ -439,6 +467,7 @@ slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
 
 if [ "$SLURM_NNODES" == 1 ]; then
+ #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
 else
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
@@ -501,6 +530,7 @@ slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
 
 if [ "$SLURM_NNODES" == 1 ]; then
+ #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
 else
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
@@ -520,6 +550,7 @@ fi
 </tab>
 </tabs>
 
+<span id="Solution_restart"></span>
 ==== Redémarrage ====
 
 Les deux scripts suivants automatisent le redémarrage de tâches intensives qui exigent plus que le maximum de sept jours d'exécution permis sur la plupart des grappes. Le redémarrage se fait à partir des fichiers de valeur de pas de temps les plus récemment sauvegardés. Une exigence de base est que le premier pas puisse être terminé avant la fin du temps demandé dans le vecteur de tâches (défini dans le haut du script) quand une simulation est lancée à partir d'un champ initialisé. Nous supposons que la valeur du pas est fixe. Pour commencer, un groupe de <i>sample.cas</i>, <i>sample.dat</i> et <i>sample.jou</i> doit être présent. Modifiez le fichier <i>sample.jou</i> pour qu'il contienne <code>/solve/dual-time-iterate 1</code> et <code>/file/auto-save/data-frequency 1</code>. Créez ensuite un fichier de journalisation avec <code>cp sample.jou sample-restart.jou</code> et modifiez le fichier <i>sample-restart.jou</i> pour qu'il contienne <code>/file/read-cas-data sample-restart</code> plutôt que <code>/file/read-cas-data sample</code> et mettez en commentaire la ligne pour l'initialisation en la précédant d’un point-virgule, par exemple <code>;/solve/initialize/initialize-flow</code>. Si votre deuxième pas et les pas qui suivent sont exécutés deux fois plus vite que le pas initial, modifiez <i>sample-restart.jou</i> en spécifiant <code>/solve/dual-time-iterate 2</code>. De cette façon, la solution ne sera redémarrée qu'après que les deux pas suivant le pas initial soient terminés. Un fichier de résultats pour chaque pas sera enregistré dans le sous-répertoire de sortie. La valeur 2 est arbitraire, mais elle devrait être utilisée pour que la durée de deux pas soit moindre que la durée allouée au vecteur de tâches. Ceci limitera le nombre de redémarrages, ce qui consomme beaucoup de ressources. Si le premier pas de <i>sample.jou</i> est fait à partir d'une solution précédente, choisissez 1 plutôt que 2 puisque tous les pas auront probablement besoin du même temps d'exécution. En supposant que 2 est choisi, la durée totale de la simulation sera 1*Dt+2*Nrestart*Dt où Nrestart est le nombre de redémarrages défini dans le script Slurm. Le nombre total de pas (de même que le nombre de fichiers de résultats générés) sera ainsi 1+2*Nrestart. La valeur pour le temps demandé devrait être choisie afin que le pas initial et les pas suivants se terminent dans la fenêtre de temps de Slurm, qui peut aller jusqu'à <code>#SBATCH --time=07-00:00</code> jours.
@@ -572,6 +603,7 @@ NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
 
 # Specify 2d, 2ddp, 3d or 3ddp and replace sample with your journal filename …
 if [ "$SLURM_NNODES" == 1 ]; then
+  #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
     fluent -g 2ddp -t $NCORES -affinity=0 -i $MYJOUFILE
   else
@@ -651,6 +683,7 @@ slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
 
 if [ "$SLURM_NNODES" == 1 ]; then
+  #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
     fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -I $MYFILEJOU
   else
@@ -684,6 +717,7 @@ fi
 </tab>
 </tabs>
 
+<span id="Journal_files"></span>
 === Fichiers de journalisation ===
 
 Les fichiers de journalisation peuvent contenir toutes les commandes de l'interface TUI (''Text User Interface'') de Fluent; elles peuvent être utilisées pour modifier des paramètres de simulation comme la température, la pression ou la vitesse du flux. Vous pouvez ainsi effectuer une série de simulations sous différentes conditions simplement en modifiant les paramètres du fichier de journalisation. Consultez le guide d'utilisation de Fluent pour plus d'information ainsi que pour connaître la liste des commandes. Les fichiers qui suivent sont configurés avec <code>/file/cff-file no</code> pour utiliser les formats de fichiers .cas/.dat qui sont les formats par défaut pour les modules jusqu'à 2019R3. Pour utiliser les formats .cas.h5/.dat.h5 plus efficaces des versions à partir de 2020R1, la configuration est 
@@ -825,16 +859,19 @@ exit
 
 </tabs>
 
+<span id="UDFs"></span>
 === Fonctions UDF ===
 
 La première étape est de transférer vers la grappe votre UDF (<i> User-Defined Function</i>), soit le fichier source sampleudf.c et tous les fichiers de dépendance supplémentaires. Lors du téléchargement à partir d'une machine Windows, assurez-vous que le mode texte de votre client de transfert est utilisé, sinon Fluent ne pourra pas lire correctement le fichier sur la grappe qui elle exécute Linux. L'UDF doit être placée dans le répertoire où résident vos fichiers de journalisation, cas et dat. Ajoutez ensuite l'une des commandes suivantes dans votre fichier de journalisation avant les commandes qui lisent vos fichiers de simulation cas/dat. Que vous utilisiez l'approche UDF interprétée ou compilée, avant de télécharger votre fichier de cas, vérifiez que les boîtes de dialogue <i>Interpreted UDFs</i> et <i>UDF Library Manager</i> ne sont pas configurées pour utiliser un UDF; ceci garantira que lorsque les tâches sont soumises, seules les commandes du fichier de journalisation auront le contrôle.
 
+<span id="Interpreted"></span>
 ==== Interpreté ====
 
 Pour indiquer à Fluent d'interpréter votre UDF au moment de l'exécution, ajoutez la ligne de commande suivante dans votre fichier journal avant que les fichiers cas/dat ne soient lus ou initialisés. Remplacez le nom de fichier sampleudf.c par le nom de votre fichier source. La commande reste la même, que la simulation soit exécutée séquentiellement ou en parallèle. Pour vous assurer que l'UDF se trouve dans le même répertoire que le fichier de journalisation, ouvrez votre fichier cas dans l'interface graphique Fluent, supprimez toutes les définitions gérées et réenregistrez-le. Cela garantira que seule la commande/méthode suivante est en contrôle lors de l'exécution de Fluent. Pour utiliser une UDF interprétée avec des tâches parallèles, elle devra être parallélisée comme décrit dans la section ci-dessous.
 
  define/user-defined/interpreted-functions "sampleudf.c" "cpp" 10000 no
 
+<span id="Compiled"></span>
 ==== Compilé ====
 
 Pour utiliser cette approche, votre UDF doit être compilée sur une de nos grappes au moins une fois. Cela créera une structure de sous-répertoire libudf contenant la bibliothèque partagée <code>libudf.so</code> requise. Le répertoire libudf ne peut pas être simplement copié d'un système distant (comme votre ordinateur portable) vers l'Alliance car les dépendances de la bibliothèque partagée ne seront pas satisfaites, ce qui fera planter Fluent au démarrage. Cela dit, une fois que vous avez compilé votre UDF sur une de nos grappes, vous pouvez transférer la libudf nouvellement créée vers n'importe quel autre de nos grappes, à condition que votre compte charge la même version du module d'environnement StdEnv. Une fois copiée, l'UDF peut être utilisée en supprimant le commentaire de la deuxième ligne (load) libudf ci-dessous dans votre fichier de journalisation quand une tâche est soumise. Les deux lignes libudf (compile et load) ne doivent pas être laissées sans commentaire lors de la soumission de tâches, sinon votre UDF sera automatiquement (re)compilée pour chaque tâche. Non seulement cette méthode est très inefficace, mais elle peut également entraîner des conflits de build de type « racetime » si plusieurs tâches sont exécutées à partir du même répertoire. Outre la configuration de votre fichier de journalisation pour construire votre UDF, l'interface graphique de Fluent (exécutée sur n'importe quel nœud de calcul ou sur gra-vdi) peut également être utilisée. Pour ce faire, ajoutez le fichier source UDF dans la boîte de dialogue <i>Compiled UDFs</i>, et cliquez sur <i>Build</i>. Lorsque vous utilisez une UDF compilée avec des tâches parallèles, votre fichier source doit être parallélisé comme indiqué dans la section ci-dessous.
@@ -845,6 +882,7 @@ et/ou
 
  define/user-defined/compiled-functions load libudf
 
+<span id="Parallel"></span>
 ==== Parallèle ====
 
 Avant qu'une UDF puisse être utilisée avec une tâche parallèle Fluent (SMP à nœud unique et MPI à nœuds multiples), elle doit être parallélisée. En procédant ainsi, nous contrôlons comment/quels processus (hôte et/ou calcul) exécutent des parties spécifiques du code UDF lorsque Fluent est exécuté en parallèle sur la grappe. La procédure d'instrumentation consiste à ajouter des directives de compilation, des prédicats et des macros de réduction dans votre UDF séquentielle. Si vous ne le faites pas, Fluent fonctionnera lentement au mieux ou plantera immédiatement au pire. Le résultat final sera une UDF unique qui s'exécute efficacement lorsque Fluent est utilisé à la fois en mode séquentiel et en mode parallèle. Le sujet est décrit en détail dans <I>Fluent Customization Manual, Part I: Chapter 7: Parallel Considerations</I> qui se trouve dans la [[Ansys/fr#Documentation_en_ligne|Documentation en ligne]].
@@ -865,7 +903,10 @@ notant que les fichiers d'injection pour les simulations DPM sont généralement
 
 == Ansys CFX ==
 
+<span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===
+
+Le résumé des options de ligne de commande peut être affiché avec <b>cfx5solve -help</b>. La version du module chargée dans votre script pour l'ordonnanceur doit d'abord être chargée manuellement. Par défaut, cfx5solve s'exécute en simple précision (''-single''). Pour exécuter cfx5solve en double précision, ajoutez l'option <code>-double</code>, sachant que cela doublera également les besoins en mémoire. Par défaut, cfx5solve prend en charge les maillages jusqu'à 80 millions d'éléments structurés ou 200 millions d'éléments non structurés. Pour les maillages plus grands (jusqu'à 2 milliards d'éléments), ajoutez l'option <code>-large</code>. Différentes combinaisons de ces options peuvent être uitilisées pour le partitionneur, l'interpolateur ou le solveur. Consultez le guide d'ANSYS CFX-Solver Manager pour plus de détails.
 
 <tabs>
 <tab name="Nœud simple">
@@ -878,12 +919,15 @@ notant que les fichiers d'injection pour les simulations DPM sont généralement
 #SBATCH --account=def-group   # Specify account name
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify single compute node (do not change)
-#SBATCH --ntasks-per-node=4   # Specify number cores (maximum values: graham 32 or 44, cedar 32 or 48, beluga 40, narval 64)
+#SBATCH --ntasks-per-node=4   # Specify number cores (maximum: graham 44, cedar 32 or 48, beluga 40, narval 64)
 #SBATCH --mem=16G             # Specify node memory (optionally set to 0 to allocate all node memory)
 #SBATCH --cpus-per-task=1     # Do not change
 
-module load StdEnv/2023       # Applies to: beluga, cedar, graham, narval
-module load ansys/2023R2      # Specify 2021R1 or newer module versions
+#module load StdEnv/2020      # Uncomment to use (deprecated)     
+#module load 2021R2           # Specify 2021R2 only
+
+module load StdEnv/2023
+module load ansys/2023R2      # Specify 2022R2 or newer module versions
 
 # append additional cfx5solve command line options as required
 if [[ "$CC_CLUSTER" = narval ]]; then
@@ -903,12 +947,15 @@ fi
 #SBATCH --account=def-group   # Specify account name
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=2             # Specify multiple compute nodes (2 or more)
-#SBATCH --ntasks-per-node=64  # Specify all cores per node (graham 32 or 44, cedar 32 or 48, beluga 40, narval 64)
+#SBATCH --ntasks-per-node=64  # Specify all cores per node (maximum: graham 44, 48, beluga 40, narval 64)
 #SBATCH --mem=0               # Use all memory per compute node (do not change)
 #SBATCH --cpus-per-task=1     # Do not change
 
-module load StdEnv/2023       # Applies to: beluga, cedar, graham, narval
-module load ansys/2023R2      # Specify 2021R1 or newer module versions
+#module load StdEnv/2020      # Uncomment to use (deprecated)     
+#module load 2021R2           # Specify 2021R2 only
+
+module load StdEnv/2023
+module load ansys/2023R2      # Specify 2022R2 or newer module versions
 
 NNODES=$(slurm_hl2hl.py --format ANSYS-CFX)
 
@@ -916,6 +963,8 @@ NNODES=$(slurm_hl2hl.py --format ANSYS-CFX)
 if [[ "$CC_CLUSTER" = narval ]]; then
   cfx5solve -def YOURFILE.def -start-method "Open MPI Distributed Parallel" -par-dist $NNODES
 else
+  export I_MPI_HYDRA_BOOTSTRAP=ssh
+  unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
   cfx5solve -def YOURFILE.def -start-method "Intel MPI Distributed Parallel" -par-dist $NNODES
 fi
 
@@ -936,14 +985,15 @@ Initialisez le fichier de projet avant de le soumettre pour la première fois.<b
 
 Pour ne pas écrire la solution quand une tâche en cours se termine avec succès sur une grappe,  enlevez <code>;Save(Overwrite=True)</code> de la dernière ligne du script Slurm. Il sera ainsi plus facile d'effectuer plusieurs tâches de test (pour une mise à l'échelle quand vous changez ntasks) puisque la solution initialisée ne sera pas écrasée à chaque fois et donc n'aura pas besoin d'être réinitialisée entre les tâches. Ou encore, vous pouvez sauvegarder une copie du fichier initialisé YOURPROJECT.wbpj et du sous-répertoire YOURPROJECT_files avant que chaque tâche soit soumise et les restaurer ensuite une fois que la solution est écrite.
 
+<span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===
 
-Pour soumettre un fichier de projet à la queue, personnaliser les scripts suivants et lancer la commande <code>sbatch script-wbpj.sh</code>.
+Pour soumettre un fichier de projet à la queue, personnaliser les scripts suivants et lancer la commande  <code>sbatch script-wbpj-202X.sh</code>.
 
 <tabs>
-<tab name="Nœud simple (StdEnv/2020)">
+<tab name="Single node (StdEnv/2023)">
 {{File
-|name=script-wbpj-2020.sh
+|name=script-wbpj-2023.sh
 |lang="bash"
 |contents=
 #!/bin/bash
@@ -956,12 +1006,12 @@ Pour soumettre un fichier de projet à la queue, personnaliser les scripts suiva
 ##SBATCH --exclusive                   # Uncomment for scaling testing
 ##SBATCH --constraint=broadwell        # Applicable to graham or cedar
 
-module load StdEnv/2020 ansys/2021R2   # OR newer Ansys modules
+module load StdEnv/2023 ansys/2023R2   # OR newer Ansys module versions (untested)
 
 if [ "$SLURM_NNODES" == 1 ]; then
-  MEMPAR=0                               # Set to 0 for SMP (shared memory parallel)
+  MEMPAR=0                             # Set to 0 for SMP (shared memory parallel)
 else
-  MEMPAR=1                               # Set to 1 for DMP (distributed memory parallel)
+  MEMPAR=1                             # Set to 1 for DMP (distributed memory parallel)
 fi
 
 rm -fv *_files/.lock
@@ -973,7 +1023,44 @@ sed -i "s!UserConfigured=\"0\"!UserConfigured=\"1\"!g" "$MWFILE"
 export KMP_AFFINITY=disabled
 export I_MPI_HYDRA_BOOTSTRAP=ssh
 
-runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
+runwb2 -B -E "Update()" -F YOURPROJECT.wbpj
+#runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
+}}
+</tab>
+<tab name="Single node (StdEnv/2020)">
+{{File
+|name=script-wbpj-2020.sh
+|lang="bash"
+|contents=
+#!/bin/bash
+
+#SBATCH --account=def-account
+#SBATCH --time=00-03:00                # Time (DD-HH:MM)
+#SBATCH --mem=16G                      # Total Memory (set to 0 for all node memory)
+#SBATCH --ntasks=4                     # Number of cores
+#SBATCH --nodes=1                      # Do not change (multi-node not supported)
+##SBATCH --exclusive                   # Uncomment for scaling testing (optional)
+##SBATCH --constraint=broadwell        # Uncomment on graham or cedar (optional)
+
+module load StdEnv/2020 ansys/2021R2   # OR newer Ansys module versions
+
+if [ "$SLURM_NNODES" == 1 ]; then
+  MEMPAR=0                             # Set to 0 for SMP (shared memory parallel)
+else
+  MEMPAR=1                             # Set to 1 for DMP (distributed memory parallel)
+fi
+
+rm -fv *_files/.lock
+MWFILE=~/.mw/Application\ Data/Ansys/`basename $(find $EBROOTANSYS/v* -maxdepth 0 -type d)`/SolveHandlers.xml
+sed -re "s/(.AnsysSolution>+)[a-zA-Z0-9]*(<\/Distribute.)/\1$MEMPAR\2/" -i "$MWFILE"
+sed -re "s/(.Processors>+)[a-zA-Z0-9]*(<\/MaxNumber.)/\1$SLURM_NTASKS\2/" -i "$MWFILE"
+sed -i "s!UserConfigured=\"0\"!UserConfigured=\"1\"!g" "$MWFILE"
+
+export KMP_AFFINITY=disabled
+export I_MPI_HYDRA_BOOTSTRAP=ssh
+
+runwb2 -B -E "Update()" -F YOURPROJECT.wbpj
+#runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 }}
 </tab>
 </tabs>
@@ -982,174 +1069,146 @@ runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 
 Le fichier d'entrée peut être généré dans votre session interactive Workbench Mechanical en cliquant sur <i>Solution -> Tools -> Write Input Files</i> et en spécifiant <code>File name:</code> pour YOURAPDLFILE.inp et <code>Save as type:</code> pour les fichiers APDL en entrée (*.inp).  Les tâches APDL peuvent ensuite être soumises à la queue avec la commande <code>sbatch script-name.sh</code>.
 
+<span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===
 
-Les modules Ansys dans les scripts suivants ont été testés sur Graham et devraient fonctionner sans problème (supprimez les marques de commentaire).  S'il y a lieu, ils seront mis à jour une fois qu'ils auront été testés sur d'autres grappes.
+Les scripts suivants ont été testés sur Graham, Narval, Cedar et Béluga. Les lignes qui commencent par <code>##SBATCH</code> sont suivies d'un commentaire.
 
 <tabs>
-<tab name="Nœud simple (StdEnv/2020)">
+<tab name="Shared Memory Parallel (cpu)">
 {{File
-|name=script-smp-2020.sh
+|name=script-smp-2023-cpu.sh
 |lang="bash"
 |contents=
 #!/bin/bash
-#SBATCH --account=def-account  # Specify your account
-#SBATCH --time=00-03:00        # Specify time (DD-HH:MM)
-#SBATCH --mem=16G              # Specify memory for all cores
-#SBATCH --ntasks=8             # Specify number of cores (1 or more)
-#SBATCH --nodes=1              # Specify one node (do not change)
+#SBATCH --account=def-account   # Specify your account
+#SBATCH --time=00-03:00         # Specify time (DD-HH:MM)
+#SBATCH --mem=32G               # Specify memory for all cores
+#SBATCH --nodes=1               # Do not change
+#SBATCH --tasks=8               # Specify number of cores
+#SBATCH --cpus-per-task=1       # Do not change
 
-unset SLURM_GTIDS
+module load StdEnv/2023
+#module load ansys/2023R2
+module load ansys/2024R1.03
 
-module load StdEnv/2020
+mkdir outdir-$SLURM_JOBID
+[[ "$CC_CLUSTER" = cedar ]] && export LD_LIBRARY_PATH=$EBROOTGCC/../lib/gcc
 
-#module load ansys/2021R2
-#module load ansys/2022R1
-module load ansys/2022R2
-
-mapdl -smp -b nolist -np $SLURM_NTASKS -dir $SLURM_TMPDIR -I YOURAPDLFILE.inp
-
-rm -rf results-*
-mkdir results-$SLURM_JOB_ID
-cp -a --no-preserve=ownership $SLURM_TMPDIR/* results-$SLURM_JOB_ID
+mapdl -smp -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp
 }}
 </tab>
-<tab name="Script pour plusieurs nœuds  (StdEnv/2020)">
+<tab name="Distributed Memory Parallel (cpu)">
 {{File
-|name=script-dis-2020.sh
+|name=script-dmp-2023-cpu.sh
 |lang="bash"
 |contents=
 #!/bin/bash
-#SBATCH --account=def-account  # Specify your account
-#SBATCH --time=00-03:00        # Specify time (DD-HH:MM)
-#SBATCH --mem-per-cpu=2G       # Specify memory per core
-#SBATCH --ntasks=8             # Specify number of cores (2 or more)
-##SBATCH --nodes=2             # Specify number of nodes (optional)
-##SBATCH --ntasks-per-node=4   # Specify cores per node (optional)
+#SBATCH --account=def-account   # Specify your account
+#SBATCH --time=00-03:00         # Specify time (DD-HH:MM)
+#SBATCH --mem-per-cpu=4G        # Specify memory per core
+##SBATCH --nodes=2              # Specify number of nodes (optional)
+#SBATCH --ntasks=8              # Specify number of cores
+##SBATCH --ntasks-per-node=4    # Specify cores per node (optional)
+#SBATCH --cpus-per-task=1       # Do not change
 
-unset SLURM_GTIDS
+module load StdEnv/2023
+#module load ansys/2023R2
+module load ansys/2024R1.03
 
-module load StdEnv/2020
+mkdir outdir-$SLURM_JOBID
+if [[ "$CC_CLUSTER" = cedar ]]; then
+ ln -s $EBROOTGCC/../lib/gcc/libstdc++.so.6.0.29 $PWD/outdir-$SLURM_JOBID/libstdc++.so.6.0.29
+ export LD_LIBRARY_PATH=$PWD/outdir-$SLURM_JOBID
+fi
 
-module load ansys/2022R2
+if [[ "$CC_CLUSTER" = beluga  ]]; then
+  export KMP_AFFINITY=none
+  mapdl -dis -mpi intelmpi -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp
+else
+  mapdl -dis -mpi openmpi -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp
+fi
+}}
+</tab>
+<tab name="Shared Memory Parallel (gpu)">
+{{File
+|name=script-smp-2023-gpu.sh
+|lang="bash"
+|contents=
+#!/bin/bash
+#SBATCH --account=def-account    # Specify your account
+#SBATCH --time=00-03:00          # Specify time (DD-HH:MM)
+#SBATCH --mem=32G                # Specify memory for all cores
+#SBATCH --ntasks=8               # Specify number of cores
+#SBATCH --nodes=1                # Do not change
+#SBATCH --cpus-per-task=1        # Do not change
+#SBATCH --gpus-per-node=1        # Specify [gputype:]quantity
+##SBATCH --gpus-per-node=h100:1  # Temporarily required on mini-graham
+##SBATCH --partition=debug       # Temporarily required on mini-graham
 
-mapdl -dis -mpi openmpi -b nolist -np $SLURM_NTASKS -dir $SLURM_TMPDIR -I YOURAPDLFILE.inp
+module load StdEnv/2023
+#module load ansys/2023R2
+module load ansys/2024R1.03
 
-rm -rf results-*
-mkdir results-$SLURM_JOB_ID
-cp -a --no-preserve=ownership $SLURM_TMPDIR/* results-$SLURM_JOB_ID
+mkdir outdir-$SLURM_JOBID
+[[ "$CC_CLUSTER" = cedar ]] && export LD_LIBRARY_PATH=$EBROOTGCC/../lib/gcc
+
+export ANSGPU_PRINTDEVICES=1
+mapdl -smp -acc nvidia -na $SLURM_GPUS_ON_NODE -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID  -i YOURAPDLFILE.inp
+}}
+</tab>
+<tab name="Mémoire parallèle distribuée (GPU)">
+{{File
+|name=script-dmp-2023-gpu.sh
+|lang="bash"
+|contents=
+#!/bin/bash
+#SBATCH --account=def-account    # Specify your account
+#SBATCH --time=00-03:00          # Specify time (DD-HH:MM)
+#SBATCH --mem-per-cpu=4G         # Specify memory per core
+#SBATCH --nodes=1                # Specify number of nodes
+#SBATCH --ntasks-per-node=8      # Specify cores per node
+#SBATCH --cpus-per-task=1        # Do not change
+#SBATCH --gpus-per-node=1        # Specify [gputype:]quantity
+##SBATCH --gpus-per-node=h100:1  # Temporarily required on mini-graham
+##SBATCH --partition=debug       # Temporarily required on mini-graham
+
+module load StdEnv/2023
+#module load ansys/2023R2
+module load ansys/2024R1.03
+
+mkdir outdir-$SLURM_JOBID
+if [[ "$CC_CLUSTER" = cedar ]]; then
+ ln -s $EBROOTGCC/../lib/gcc/libstdc++.so.6.0.29 $PWD/outdir-$SLURM_JOBID/libstdc++.so.6.0.29
+ export LD_LIBRARY_PATH=$PWD/outdir-$SLURM_JOBID
+fi
+
+export ANSGPU_PRINTDEVICES=1
+if [[ "$CC_CLUSTER" = beluga  ]]; then 
+  export KMP_AFFINITY=none
+  mapdl -dis -acc nvidia -na $SLURM_GPUS_ON_NODE -mpi intelmpi -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp
+else
+  mapdl -dis -acc nvidia -na $SLURM_GPUS_ON_NODE -mpi openmpi -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp
+fi
 }}
 </tab>
 </tabs>
 
 Par défaut, Ansys alloue aux tâches APDL 1024Mo de mémoire totale et 1024Mo de mémoire pour les bases de données. Ces valeurs peuvent être définies manuellement (ou modifiées) avec l'ajout des arguments <code>-m 1024</code> et/ou <code>-db 1024</code> sur la dernière ligne de commande mapdl des scripts ci-dessus. Si vous utilisez à distance un serveur de licence de votre établissement qui a plusieurs licences Ansys, il pourrait être nécessaire d'ajouter des arguments comme <code>-p aa_r</code> ou <code>-ppf anshpc</code>, selon le module que vous utilisez. Comme d'habitude, effectuez des tests détaillés de mise à l'échelle avant de lancer des tâches en production pour vous assurer que vous utilisez le nombre optimal de cœurs et la bonne quantité minimale de mémoire. Les scripts pour nœud simple avec mémoire parallèle partagée (SMP pour <i>Shared Memory Parallel</i>) offriront une meilleure performance que les scripts pour plusieurs nœuds avec mémoire parallèle distribuée (DMP pour <i>Distributed Memory Parallel</i>) et devraient être utilisés autant que possible.  Pour prévenir les problèmes de compatibilité, le module qui est chargé dans votre script devrait idéalement correspondre à la version employée pour générer le fichier en entrée.
 
-  [gra-login2:~/ansys/mechanical/demo] cat YOURAPDLFILE.inp | grep version
+  [gra-login2:~/testcase] cat YOURAPDLFILE.inp | grep version
  ! ANSYS input file written by Workbench version 2019 R3
-
-== Ansys EDT ==
-
-Ansys EDT peut être exécuté de manière interactive en mode <i>batch</i> (sans interface graphique) en démarrant d'abord une session salloc avec les options <code>salloc --time=3:00:00 --tasks=8 --mem=16G --account=def- compte</code>; copiez-collez ensuite la commande <code>ansysedt</code> complète donnée à la dernière ligne de <i>script-local-cmd.sh</i> en vous assurant de spécifier manuellement $YOUR_AEDT_FILE.
-
-=== Scripts pour l'ordonnanceur Slurm ===
-
-Les tâches Ansys Electronic Desktop peuvent être soumises à la file d'attente d'une grappe avec la commande <code>sbatch script-name.sh</code> en utilisant l'un des scripts Slurm pour nœud simple ci-dessous. En date de janvier 2023, ces scripts n'ont été testés que sur Graham et pourraient donc être mis à jour à l'avenir si nécessaire pour fonctionner avec d'autres grappes. Avant de les utiliser, spécifiez le temps de simulation, la mémoire, le nombre de cœurs et remplacez YOUR_AEDT_FILE par le nom de votre fichier d'entrée. Une liste complète des options de ligne de commande ansysedt peut être obtenue en démarrant Ansys EDT en [[Ansys/fr#Mode_graphique|mode graphique]] avec les commandes <code>ansysedt -help</code> ou <code>ansysedt -Batchoptionhelp</code> pour obtenir des fenêtres contextuelles graphiques déroulantes.  
-
-<tabs>
-<tab name="Nœud simple (ligne de commande)">
-{{File
-|name=script-local-cmd.sh
-|lang="bash"
-|contents=
-#!/bin/bash
-
-#SBATCH --account=account      # Specify your account (def or rrg)
-#SBATCH --time=00-01:00        # Specify time (DD-HH:MM)
-#SBATCH --mem=16G              # Specify memory (set to 0 to use all compute node memory)
-#SBATCH --ntasks=8             # Specify cores (beluga 40, cedar 32 or 48, graham 32 or 44, narval 64)
-#SBATCH --nodes=1              # Request one node (Do Not Change)
-
-module load StdEnv/2020
-module load ansysedt/2021R2
-
-# Uncomment next line to run a test example:
-cp -f $EBROOTANSYSEDT/AnsysEM21.2/Linux64/Examples/HFSS/Antennas/TransientGeoRadar.aedt .
-
-# Specify input file such as:
-YOUR_AEDT_FILE="TransientGeoRadar.aedt"
-
-# Remove previous output:
-rm -rf $YOUR_AEDT_FILE.* ${YOUR_AEDT_FILE}results
-
-# ---- do not change anything below this line ---- #
-
-echo -e "\nANSYSLI_SERVERS= $ANSYSLI_SERVERS"
-echo "ANSYSLMD_LICENSE_FILE= $ANSYSLMD_LICENSE_FILE"
-echo -e "SLURM_TMPDIR= $SLURM_TMPDIR on $SLURMD_NODENAME\n"
-
-export KMP_AFFINITY=disabled
-ansysedt -monitor -UseElectronicsPPE -ng -distributed -machinelist list=localhost:1:$SLURM_NTASKS \
--batchoptions "TempDirectory=$SLURM_TMPDIR HPCLicenseType=pool HFSS/EnableGPU=0" -batchsolve "$YOUR_AEDT_FILE"
-}}
-</tab>
-<tab name="Nœud simple (fichier d'options)">
-{{File
-|name=script-local-opt.sh
-|lang="bash"
-|contents=
-#!/bin/bash
-
-#SBATCH --account=account      # Specify your account (def or rrg)
-#SBATCH --time=00-01:00        # Specify time (DD-HH:MM)
-#SBATCH --mem=16G              # Specify memory (set to 0 to allocate all compute node memory)
-#SBATCH --ntasks=8             # Specify cores (beluga 40, cedar 32 or 48, graham 32 or 44, narval 64)
-#SBATCH --nodes=1              # Request one node (Do Not Change)
-
-module load StdEnv/2020
-module load ansysedt/2021R2
-
-# Uncomment next line to run a test example:
-cp -f $EBROOTANSYSEDT/AnsysEM21.2/Linux64/Examples/HFSS/Antennas/TransientGeoRadar.aedt .
-
-# indiquer un fichier en entrée comme
-YOUR_AEDT_FILE="TransientGeoRadar.aedt"
-
-# Remove previous output:
-rm -rf $YOUR_AEDT_FILE.* ${YOUR_AEDT_FILE}results
-
-# Specify options filename:
-OPTIONS_TXT="Options.txt"
-
-# Write sample options file
-rm -f $OPTIONS_TXT
-cat > $OPTIONS_TXT <<EOF
-\$begin 'Config'
-'TempDirectory'='$SLURM_TMPDIR'
-'HPCLicenseType'='pool'
-'HFSS/EnableGPU'=0
-\$end 'Config'
-EOF
-
-# ---- do not change anything below this line ---- #
-
-echo -e "\nANSYSLI_SERVERS= $ANSYSLI_SERVERS"
-echo "ANSYSLMD_LICENSE_FILE= $ANSYSLMD_LICENSE_FILE"
-echo -e "SLURM_TMPDIR= $SLURM_TMPDIR on $SLURMD_NODENAME\n"
-
-export KMP_AFFINITY=disabled
-ansysedt -monitor -UseElectronicsPPE -ng -distributed -machinelist list=localhost:1:$SLURM_NTASKS \
--batchoptions $OPTIONS_TXT -batchsolve "$YOUR_AEDT_FILE"
-}}
-</tab>
-</tabs>
 
 == Ansys ROCKY ==
 
 En plus de pouvoir exécuter des simulations en mode graphique (comme indiqué dans la section <i>Mode graphique</i> ci-dessous), [https://www.ansys.com/products/fluids/ansys-rocky Ansys Rocky] peut également exécuter des simulations en mode non graphique. Les deux modes prennent en charge l'exécution de Rocky avec des processeurs uniquement ou avec des processeurs et [https://www.ansys.com/blog/mastering-multi-gpu-ansys-rocky-software-enhancing-its-performance des GPU]. Dans la section ci-dessous, deux exemples de scripts sont fournis où chacun serait soumis à la file d'attente de Graham avec la commande habituelle <code>sbatch</code>. Au moment de la rédaction de cet article, aucun des deux scripts n'a été testé et des modifications seraient probablement nécessaires. Il est important de noter que ces scripts ne sont utilisables que sur Graham puisque le module Rocky qu'ils chargent tous les deux n'est (pour le moment) installé que sur Graham localement.
 
+<span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===
 
-Pour obtenir une liste complète des options de ligne de commande, exécutez <code>Rocky -h</code> sur la ligne de commande après avoir chargé un module Rocky (seul rocky/2023R2 est présentement disponible sur Graham). En ce qui concerne l'utilisation de Rocky avec des GPU pour résoudre des problèmes couplés, le nombre de CPU que vous devez demander (sur le même nœud) doit être augmenté au maximum jusqu'à ce que la limite de scalabilité de l'application couplée soit atteinte. D'autre part, si Rocky est exécuté avec des GPU pour résoudre des problèmes découplés autonomes, seul un nombre minimal de CPU doit être demandé, ce qui permettra à Rocky de fonctionner de manière optimale; par exemple, seuls 2 ou éventuellement 3 CPU peuvent être nécessaires. Enfin, lorsque Rocky est exécuté avec plus de 4 CPU, des licences <I>rocky_hpc</I> seront nécessaires, ce que fournit la licence SHARCNET.
+<div class="mw-translate-fuzzy">
+Pour obtenir une liste complète des options de ligne de commande, exécutez <code>Rocky -h</code> sur la ligne de commande après avoir chargé un module Rocky (seul ansysrocky/2023R2 est présentement disponible sur Graham). En ce qui concerne l'utilisation de Rocky avec des GPU pour résoudre des problèmes couplés, le nombre de CPU que vous devez demander (sur le même nœud) doit être augmenté au maximum jusqu'à ce que la limite de scalabilité de l'application couplée soit atteinte. D'autre part, si Rocky est exécuté avec des GPU pour résoudre des problèmes découplés autonomes, seul un nombre minimal de CPU doit être demandé, ce qui permettra à Rocky de fonctionner de manière optimale; par exemple, seuls 2 ou éventuellement 3 CPU peuvent être nécessaires. Enfin, lorsque Rocky est exécuté avec 4 ou plus CPU, des licences <I>rocky_hpc</I> seront nécessaires, ce que fournit la licence SHARCNET.
+</div>
 
 <tabs>
 <tab name="CPU seulement">
@@ -1165,10 +1224,11 @@ Pour obtenir une liste complète des options de ligne de commande, exécutez <co
 #SBATCH --cpus-per-task=6      # Specify cores (graham 32 or 44 to use all cores)
 #SBATCH --nodes=1              # Request one node (do not change)
 
-module load StdEnv/2023
-module load rocky/2023R2 ansys/2023R2   # only available on graham (do not change)   
+# the rocky2023R2 module on graham was renamed to ansysrocky/2023R2   Apr24/2025
+#module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2       # only avail on graham
+module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04   # only avail on graham
 
-Rocky --simulate “mysim.rocky” --resume=0 --ncpus=$SLURM_CPUS_PER_TASK --use-gpu=0
+Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use-gpu=0
 }}
 </tab>
 <tab name="GPU based">
@@ -1185,34 +1245,42 @@ Rocky --simulate “mysim.rocky” --resume=0 --ncpus=$SLURM_CPUS_PER_TASK --use
 #SBATCH --gres=gpu:v100:2      # Specify gpu type : gpu quantity
 #SBATCH --nodes=1              # Request one node (do not change)
 
-module load StdEnv/2023
-module load rocky/2023R2 ansys/2023R2   # only available on graham (do not change)
+# the rocky2023R2 module on graham was renamed to ansysrocky/2023R2   Apr24/2025
+#module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2       # only avail on graham
+module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04   # only avail on graham
 
-Rocky --simulate “mysim.rocky” --resume=0 --ncpus=$SLURM_CPUS_PER_TASK --use-gpu=1 --gpu-num=$SLURM_GPUS_ON_NODE
+Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use-gpu=1 --gpu-num=$SLURM_GPUS_ON_NODE
 }}
 </tab>
 </tabs>
 
+<span id="Graphical_use"></span>
 = Mode graphique =
 
 Les programmes Ansys fonctionnent interactivement en mode graphique sur les nœuds de calcul des grappes ou sur les nœuds VDI de Graham.
 
+<span id="Compute_nodes"></span>
 == Nœuds de calcul == 
 
 Ansys peut être exécuté interactivement sur un nœud de calcul simple pour une durée pouvant aller jusqu'à 24 heures. C'est l'approche idéale pour tester des simulations intensives puisque tous les cœurs et la mémoire peuvent être demandés avec salloc comme décrit dans [[VNC/fr#Nœuds _de_calcul|TigerVNC]]. Une fois la connexion faite avec vncviewer, toutes les versions suivantes peuvent être lancées après que les modules requis ont été chargés.
 
+<div class="mw-translate-fuzzy">
 === Fluids ===
 ::: <code>module load StdEnv/2020</code>
 ::: <code>module load ansys/2021R1</code> (ou versions plus récentes)
 ::: <code>fluent -mpi=intel</code>, ou
 ::: <code>QTWEBENGINE_DISABLE_SANDBOX=1 cfx5</code>
+</div>
 
+<div class="mw-translate-fuzzy">
 === Mapdl ===
 ::: <code>module load StdEnv/2020</code>
 ::: <code>module load ansys/2021R2</code> (ou versions plus récentes)
 ::: <code>mapdl -g</code>, ou via le démarreur,
 ::: <code>launcher</code> --> cliquer sur le bouton RUN
+</div>
 
+<div class="mw-translate-fuzzy">
 === Workbench ===
 ::: <code>module load StdEnv/2020</code>
 ::: <code>module load ansys/2021R2</code> (ou versions plus récentes)
@@ -1221,20 +1289,9 @@ Ansys peut être exécuté interactivement sur un nœud de calcul simple pour un
 ::: <code>runwb2</code>
 ::: <br>
 ::: Remarques : Quand vous exécutez en parallèle un programme d'analyse comme  Mechanical or Fluent sur un nœud simple, ne cochez pas la case <i>Distributed</i> et indiquez un nombre de cœurs égal à votre  <b>session salloc, moins 1</b>. Les menus déroulants du Ansys Mechanical Workbench ne répondent pas correctement. Comme solution, lancez <code>xfwm4 --replace</code> sur la ligne de commande avant de démarrer Workbench. Pour avoir xfwm4 par défaut, modifiez <code>$HOME/.vnc/xstartup</code> et remplacez <code>mate-session</code> par <code>xfce4-session</code>. Enfin, Fluent dans ansys/2022R2 ne fonctionne pas en ce moment sur les nœuds de calcul; utilisez une autre version.
+</div>
 
-=== Ansys EDT ===
-::: Lancez une session interactive avec le format suivant de la commande salloc (pour spécifier les cœurs et la mémoire disponible) :
-::: <code>salloc --time=3:00:00 --nodes=1 --cores=8 --mem=16G --account=def-group</code>
-::: <code>xfwm4 --replace &</code> (appuyez deux fois sur Enter)
-::: <code>module load StdEnv/2020 ansysedt/2021R2</code>, ou
-::: <code>module load StdEnv/2020 ansysedt/2023R2</code>, ou
-::: <code>module load StdEnv/2023 ansysedt/2023R2</code> ou plus récente
-::: <code>ansysedt</code>
-::: o Cliquez sur <code>Tools -> Options -> HPC and Analysis Options -> Edit</code>, puis
-:::: 1) supprimez la coche de la case Use Automatic Settings (nécessaire une fois seulement)
-:::: 2) sous l'onglet Machines, ne modifiez pas Cores (détecté automatiquement à partir de Slurm)
-::: o Pour exécuter l'analyse interactive, cliquez sur  <code>Project -> Analyze All</code>
-
+<div class="mw-translate-fuzzy">
 === Ensight ===
 ::: <code>module load StdEnv/2020 ansys/2022R2; A=222; B=5.12.6</code>, ou
 ::: <code>module load StdEnv/2020 ansys/2022R1; A=221; B=5.12.6</code>, ou
@@ -1243,27 +1300,31 @@ Ansys peut être exécuté interactivement sur un nœud de calcul simple pour un
 ::: <code>export LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib</code>
 ::: <code>ensight -X</code>
 Remarque : ansys/2022R2 Ensight a été peu testé sur les nœuds de calcul; veuillez nous faire part des problèmes que vous rencontrez.
+</div>
 
 === Rocky ===
-::: <code>module load rocky/2023R2 ansys/2023R2</code> (ou versions plus récentes)
-::: <code>Rocky</code> (se lit ~/licenses/ansys.lic si le module est présent, affiche autrement le serveur SHARCNET en ligne de commande), ou<br>
-::: <code>Rocky-int</code> (sélectionner interactivement le serveur CMC ou SHARCNET server; se lit aussi ~/licenses/ansys.lic, gui use)<br>
-::: <code>RockySolver</code> (exécuter Rocky à partir de la ligne de commande; ceci n'a pas été testé mais vous pouvez entrer "-h" pour <i>help</i>)
-::: <code>RockySchedular</code> (gestionnaire de ressources pour soumettre plusieurs tâches sur le nœud courant)
-::: o Rocky est présentement disponible uniquement sur gra-vdi et la grappe Graham (workbench ne prend pas en charge linux)
-::: o La documentation se trouve sur /opt/software/rocky/2023R2/docs (que vous pouvez lire avec <code>mupdf</code>)
-::: o Rocky prend en charge le calcul avec GPU accélérés (par contre, aucun test n'a été effectué)
-::: o Pour travailler interactivement sur un nœud de calcul sur Graham pour une durée de 8 heures avec 4 CPU et 1 GPU, la commande est
+::: <code>module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2</code>
+::: <code>module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04</code>
+::: <code>module load StdEnv/2023 ansys/2025R1</code>
+::: <code>Rocky</code> Le module Ansys lit le ~/licenses/ansys.lic.<br>
+::: <code>Rocky-gui</code> Cette option des modules locaux ansysrocky permet de sélectionner un serveur CMC ou SHARCNET.<br>
+::: <code>RockySolver</code> Lance le solveur directement de la ligne de commande (l'ajout de -h pour ''help'' n'est pas testé).
+::: <code>RockySchedular</code>, gestionnaire de ressources pour soumettre plusieurs tâches sur le nœud courant (non testé).
+::: o Les versions 2024R2 ou moins récentes ne fonctionnent que sur gra-vdi et Graham; l'installation sur les autres grappes est prévue pour juin.
+::: o Les versions 2025R1 et plus récentes sont fournies dans le module Ansys sur toutes les grappes (pas encore pris en charge par le serveur de licence SHARCNET).
+::: o Le serveur de licence SHARCNET inclut Rocky; son utilisation est gratuite pour la recherche.
+::: o Rocky prend en charge le calcul accéléré avec GPU (non testé, non documenté).
+::: o Pour demander un nœud de calcul sur Graham pour utilisation interactive avec 4 CPU et 1 GPU pour un maximum de 8 heures, lancez
 :::   <code>salloc --time=08:00:00 --nodes=1 --cpus-per-task=4 --gres=gpu:v100:1 --mem=32G --account=someaccount</code>
-::: o La licence SHARCNET comprend maintenant Rocky (utilisation gratuite pour la recherche)
 
+<span id="VDI_nodes"></span>
 == Nœuds VDI ==
 
 Les programmes Ansys peuvent être exécutés jusqu'à 7&nbsp;jours sur les nœuds Graham VDI (gra-vdi.alliancecan.ca) en utilisant un maximum de 8&nbsp;cœurs (maximum de 16&nbsp;cœurs) et 128 Go&nbsp;de mémoire. Le système VDI fournit une accélération GPU OpenGL, ce qui est idéal pour les  graphiques à haute performance. On peut utiliser VDI pour créer ou modifier des fichiers d'entrée de simulation, post-traiter des données ou visualiser des résultats de simulation. Connectez-vous d'abord à gra-vdi.computecanada.ca avec [[VNC/fr#Nœuds_VDI|TigerVNC]] puis ouvrez une nouvelle fenêtre de terminal et démarrez l'une des <b>versions de programme prises en charge</b> montrées ci-dessous. La barre verticale <code>|</code> est utilisée pour séparer les commandes. La taille maximale d'une tâche parallèle exécutée sur gra-vdi doit être limitée à 16&nbsp;cœurs pour éviter de surcharger les serveurs et de nuire aux autres utilisateurs. Pour exécuter deux tâches simultanées (16&nbsp;cœurs maximum chacune), utilisez deux sessions VCN distinctes. Pour la première session, connectez-vous avec VNC à gra-vdi3.sharcnet.ca. Pour la deuxième session, connectez-vous à gra-vdi4.sharecnet.ca aussi avec VNC. Dans chacune des sessions, démarrez Ansys en mode graphique et faites exécuter la simulation. Notez que les simulations simultanées doivent en général être exécutées dans des répertoires différents pour éviter les conflits de fichiers. Contrairement aux connexions VNC des nœuds de calcul (qui imposent des limites Slurm via salloc), il n'y a pas de contrainte de limite de temps sur gra-vdi lors de l'exécution des simulations.
 
 === Fluids ===
-::: <code>module load CcEnv StdEnv/2020</code>
-::: <code>module load ansys/2021R1</code> (ou versions plus récentes)
+::: <code>module load CcEnv StdEnv/2023</code>
+::: <code>module load ansys/2024R2.04</code> (ou versions moins récentes)
 ::: <code>unset SESSION_MANAGER</code>
 ::: <code>fluent | cfx5 | icemcfd</code>
 ::: o La commande <code>unset SESSION_MANAGER</code> permet d'éviter le message d'erreur suivant au lancement de Fluent.
@@ -1275,87 +1336,82 @@ Les programmes Ansys peuvent être exécutés jusqu'à 7&nbsp;jours sur les nœu
 ::: L'erreur ne devrait pas se produire quand vous démarrez de nouveau icemcfd.
 
 === Mapdl ===
-::: <code>module load CcEnv StdEnv/2020</code>
-::: <code>module load ansys/2021R1</code> (ou versions plus récentes)
-::: <code>mapdl -g</code>, or via launcher,
-::: <code>unset SESSION_MANAGER; launcher</code> --> cliquez sur le bouton RUN
+::: <code>module load CcEnv StdEnv/2023</code>
+::: <code>ansys/2024R2.04</code> (or older versions)
+::: <code>mapdl -g</code> (to start the gui directly), or,
+::: <code>unset SESSION_MANAGER; launcher -> click RUN button</code>
 
 === Workbench ===
+
+<div class="mw-translate-fuzzy">
 ::: <code>module load SnEnv</code>
-::: <code>module load ansys/2020R2</code> (ou versions plus récentes)
-::: <code>export HOOPS_PICTURE=opengl</code>
-::: <code>runwb2</code>
-::: o La ligne <code>export HOOPS_PICTURE=opengl</code> permet d'éviter le message suivant au lancement de Fluid.
-:::: [<span style="Color:#ff7f50">Software rasterizer found, hardware acceleration will be disabled.</span>]
-::: La variable HOOPS_PICTURE peut aussi être configurée dans Workbench avec
-:::: Fluent Launcher --> Environment Tab --> HOOPS_PICTURE=opengl (sans la commande export)
+::: <code>module load ansys/2024R.04</code> (or older versions)
+::: <code>runwb2</code> or <code>runwb2-gui</code>  (see NOTE1 below)
+::: ------------------------------------------------------------------
+</div>
 
-::: REMARQUE 1 : Lorsque vous exécutez Mechanical dans Workbench sur gra-vdi, assurez-vous de cocher <i>Distributed</I> dans le panneau <i>Solver</i> du ruban supérieur et de spécifier une valeur maximale de <b>24&nbsp;cœurs</b>. Lorsque vous exécutez Fluent sur gra-vdi, ne cochez pas <i>Distributed</I> et spécifiez une valeur maximale de <b>12&nbsp;cœurs</b>. N'essayez pas d'utiliser plus de 128Go de mémoire, sinon Ansys atteindra la limite et sera arrêté. Si vous avez besoin de plus de cœurs ou de mémoire, utilisez un nœud de calcul sur une grappe pour exécuter votre session graphique (comme décrit dans la section <i>Nœuds de calcul</i> ci-dessus). Lorsque vous effectuez une ancienne tâche de prétraitement ou de post-traitement avec Ansys sur gra-vdi et que vous n'exécutez pas de calcul, utilisez uniquement <b>4&nbsp;cœurs</b>, sinon les licences HPC seront extraites inutilement.
-::: REMARQUE 2 : Dans de très rares cas, l'interface graphique de Workbench se bloque ou cesse de répondre pour quelconque raison. Si cela se produit, ouvrez une nouvelle fenêtre de terminal et exécutez <code>pkill -9 -e -u $USER -f "ansys|fluent|mwrpcss|mwfwrapper|ENGINE|mono"</code> pour arrêter complètement Ansys. De même, si Ansys plante ou si vncviewer se déconnecte avant qu'Ansys ne puisse être arrêté correctement, essayez d'exécuter la commande <code>pkill</code> si Ansys ne fonctionne pas normalement par la suite. En général, si Ansys ne se comporte pas correctement et que vous soupçonnez l'une des causes ci-dessus, essayez <code>pkill</code> avant de faire une demande d'assistance.
+<div class="mw-translate-fuzzy">
+::: <code>module load CcEnv StdEnv/2023</code>
+::: <code>module load ansys/2025R1</code> (ou versions plus récentes)
+::: <code>runwb2</code>  (non disponible sur le serveur de licence SHARCNET avant sa mise à jour)
+::: ------------------------------------------------------------------
+</div>
 
-=== Ansys EDT ===
-::: Ouvrez une fenêtre de terminal et chargez le module avec
-:::: <code>module load SnEnv ansysedt/2023R2</code>, ou
-:::: <code>module load SnEnv ansysedt/2021R2</code>
-::: Dans le terminal, entrez <code>ansysedt</code> et attendez que l'interface s'affiche.
-::: Ceci doit être fait une seule fois :
-:::: sélectionnez <i>Tools -> Options -> HPC and Analysis Options -> Options</i>
-:::: dans le menu déroulant, changez <i>HPC License</i> pour <i><b>Pool</b></i> (pour utiliser plus de 4 cœurs)
-:::: cliquez sur <i>OK</i>
-::: ----------   EXEMPLES  ----------
-::: Pour copier dans votre compte les exemples Antennas de 2023R2 :
-:::: connectez-vous à une grappe (par exemple Graham)
-:::: <code>module load ansysedt/2023R2</code>
-:::: <code>mkdir -p ~/Ansoft/$EBVERSIONANSYSEDT; cd ~/Ansoft/$EBVERSIONANSYSEDT; rm -rf Antennas</code>
-:::: <code>cp -a $EBROOTANSYSEDT/v232/Linux64/Examples/HFSS/Antennas ~/Ansoft/$EBVERSIONANSYSEDT</code>
-::: Pour faire exécuter un exemple :
-:::: ouvrez un fichier .aedt et cliquez sur <i>HFSS -> Validation Check</i>
-:::: (si la validation produit une erreur, fermez et ouvrez de nouveau la simulation autant de fois que nécessaire)
-:::: pour lancer la simulation, cliquez sur <i>Project -> Analyze All</i>
-:::: pour quitter sans sauvegarder la solution, cliquez sur <i>File -> Close -> No </i>
-::: si le programme plante et ne repart pas, essayez les commandes suivantes :
-:::: <code>pkill -9 -u $USER -f "ansys*|mono|mwrpcss|apip-standalone-service"</code>
-:::: <code>rm -rf ~/.mw</code> (au lancement, ansysedt utilisera la configuration initiale)
+<div class="mw-translate-fuzzy">
+::: REMARQUE 1 : Pour les modules Ansys installés localement, la commande <code>runwb2</code> de <code>SnEnv</code> utilise par défaut le serveur de licence SHARCNET, tel que défini dans le fichier du module Ansys que vous chargez. Pour utiliser un serveur distant, lancez plutôt Workbench avec <code>runwb2-gui</code>, car ce script enveloppant (<i>wrapper</i>) lira votre fichier <code>~/.licenses/ansys.lic</code> comme les modules disponibles sous <code>StdEnv/2023</code>. De plus, l'option interactive d'utilisation du serveur CMC (acheminé via le serveur SHARCNET CMC CadPASS) sera proposée, éliminant ainsi la nécessité de le configurer dans votre fichier ansys.lic.
+::: REMARQUE 2 : Lorsque vous démarrez Fluent à partir de Workbench avec la version 2025R1, avant de cliquer sur le bouton ''Start'', cliquez sur l'onglet <i>Environment</i> du panneau de lancement de <i>Fluent Launcher</i> et copiez/collez HOOPS_PICTURE=opengl dans le champ de saisie vide. Vous pouvez aussi définir <code>export HOOPS_PICTURE=opengl</code> dans votre environnement avant de démarrer Workbench. L'une ou l'autre de ces actions empêchera le message suivant, qui apparaîtrait dans les messages de démarrage de l'interface utilisateur : [<span style="Color:#ff7f50">Warning: Software rasterizer found, hardware acceleration will be disabled.</span>]
+::: REMARQUE 3 : Lorsque vous exécutez Mechanical dans Workbench sur gra-vdi, assurez-vous de cocher <i>Distributed</I> dans le panneau <i>Solver</i> du ruban supérieur et de spécifier une valeur maximale de <b>24&nbsp;cœurs</b>. Lorsque vous exécutez Fluent sur gra-vdi, ne cochez pas <i>Distributed</I> et spécifiez une valeur maximale de <b>12&nbsp;cœurs</b>. N'essayez pas d'utiliser plus de 128Go de mémoire, sinon Ansys atteindra la limite et sera arrêté. Si vous avez besoin de plus de cœurs ou de mémoire, utilisez un nœud de calcul sur une grappe pour exécuter votre session graphique (comme décrit dans la section <i>Nœuds de calcul</i> ci-dessus). Lorsque vous effectuez une ancienne tâche de prétraitement ou de post-traitement avec Ansys sur gra-vdi et que vous n'exécutez pas de calcul, utilisez uniquement <b>4&nbsp;cœurs</b>, sinon les licences HPC seront extraites inutilement.
+::: REMARQUE 4 : Dans de très rares cas, l'interface graphique de Workbench ou de certains programmes qu'il exécute se bloquent ou ne démarrent pas correctement, notamment si vnsviewer se déconnecte avant que Ansys soit fermé correctement. En général, si Ansys ne fonctionne pas correctement, ouvrez une nouvelle fenêtre de terminal sur gra-vdi et exécutez <code>pkill -9 -e -u $USER -f "ansys|fluent|mwrpcss|mwfwrapper|ENGINE|mono"</code> pour arrêter complètement tous les processus Ansys. Si le problème persiste et que vous utilisiez l'interface graphique sur des nœuds de calcul avant de travailler sur gra-vdi, essayez d'exécuter <code>rm -rf .ansys</code>. Si le problème concerne /home, /project ou /scratch (la commande df bloque), il est fort probable qu'Ansys recommence à fonctionner normalement une fois le problème de stockage résolu.
+</div>
 
 === Ensight ===
-::: <code>module load SnEnv ansys/2019R2</code> (ou version plus récente)
+::: <code>module load SnEnv</code>
+::: <code>ansys/2024R2.04</code> (or older versions back to 2021R2)
 ::: <code>ensight</code><br>
 
 === Rocky ===
-::: <code>module load clumod rocky/2023R2 CcEnv StdEnv/2020 ansys/2023R2</code> (ou versions plus récentes)
-::: <code>Rocky</code> (s'il existe, lit  ~/licenses/ansys.lic, autrement utilise le serveur SHARCNET par défaut), ou<br>
-::: <code>Rocky-int</code> (sélectionnez interactivement le serveur CMC ou SHARCNET; lit aussi ~/licenses/ansys.lic)<br>
-::: <code>RockySolver</code> (lancez Rocky à partir de la ligne de commande; ceci n'a pas été testé mais vous pouvez entrer "-h" pour <i>help</i>)
-::: <code>RockySchedular</code> (gestionnaire de ressources pour soumettre plusieurs tâches sur le nœud courant)
-::: o Rocky est présentement disponible uniquement sur gra-vdi et la grappe Graham (Workbench n'est pas supporté par linux)
-::: o La documentation se trouve sur /opt/software/rocky/2023R2/docs (que vous pouvez lire avec <code>mupdf</code>)	
+::: <code>module load clumod ansysrocky/2023R2 CcEnv StdEnv/2020 ansys/2023R2</code>, ou
+::: <code>module load clumod ansysrocky/2024R2.0 CcEnv StdEnv/2023 ansys/2024R2.04</code>, ou
+::: <code>module load CcEnv StdEnv/2023 ansys/2025R1</code>
+::: <code>Rocky</code> Le module Ansys lit ~/licenses/ansys.lic<br>
+::: <code>Rocky-gui</code> Fournit par les modules ansysrocky locaux la sélection des serveurs CMC ou SHARCNET<br>
+::: <code>RockySolver</code> Exécute le solveur rocky à partir de la ligne de commande  (l'ajout de -h pour <i>help</i> n'est pas testé)
+::: <code>RockySchedular</code> Lance l'interface graphique pour soumettre et exécuter des tâches sur le nœud courant (non testé)
+::: o Rocky pour 2024R2 et moins récentes est disponible uniquement sur gra-vdi et Graham clusters; l'installation sur toutes les grappes est prévue pour juin
+::: o Rocky pour 2025R1 et plus récentes est fourni sur toutes les grappes par le module ansys (pas pris en charge par le serveur de licence SHARCNET)
 ::: o Rocky ne peut utiliser que des CPU sur gra-vdi puisqu'il n'y a présentement qu'un seul GPU dédié aux graphiques
 ::: o La licence SHARCNET inclut maintenant Rocky dont l'utilisation est sans frais pour la recherche
+::: o Voir la page [https://innovationspace.ansys.com/ais-rocky/ https://innovationspace.ansys.com/ais-rocky/ Rocky Innovation Space]
+::: o Pour des détails voir  [https://innovationspace.ansys.com/knowledge/forums/topic/ansys-rocky-2024-r2-release-highlights/ Ansys Rocky 2024 R2 Release Highlights] et [https://innovationspace.ansys.com/knowledge/forums/topic/ansys-rocky-2025-r1-release-highlights/ Ansys Rocky 2025 R1 Release Highlights]
 
 == Problèmes avec SSH==
-:::Certains programmes d'interface graphique ANSYS peuvent être exécutés à distance sur un nœud de calcul d'une de nos grappes par redirection X via SSH vers votre ordinateur local. Contrairement à VNC, cette approche n'est ni testée ni prise en charge car elle repose sur un serveur d'affichage X correctement configuré pour votre système d'exploitation particulier OU sur la sélection, l'installation et la configuration d'un paquet d'émulateur client X approprié tel que MobaXterm. La plupart d'entre vous trouverez les temps de réponse interactifs inacceptables pour les tâches de menu de base, sans parler de l'exécution de tâches plus complexes telles que celles nécessitant du rendu graphique. Les temps d'attente pour démarrer des programmes avec interface graphique peuvent également être très longs, dépendant de votre connexion Internet. Dans un test par exemple, il a fallu 40&nbsp;minutes pour démarrer complètement <i>ansysedt</I> sur SSH alors que vncviewer n'a pris que 34&nbsp;secondes. Malgré la lenteur potentielle lors de la connexion via SSH pour exécuter des programmes avec interface graphique, cela peut toujours être intéressant si votre seul objectif est d'ouvrir une simulation et d'effectuer des opérations de menu de base ou d'exécuter des calculs. Ces étapes de base sont un point de départ : 1) ssh -Y username@graham.computecanada.ca; 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task =4 [--gpus-per-node=1] --account=def-mygroup; 3) une fois connecté à un nœud de calcul, essayez d'exécuter <code>xclock</code>. Si l'horloge apparaît sur votre bureau, chargez le module Ansys souhaité et essayez d'exécuter le programme.
+:::Certains programmes d'interface graphique ANSYS peuvent être exécutés à distance sur un nœud de calcul d'une de nos grappes par redirection X via SSH vers votre ordinateur local. Contrairement à VNC, cette approche n'est ni testée ni prise en charge car elle repose sur un serveur d'affichage X correctement configuré pour votre système d'exploitation particulier OU sur la sélection, l'installation et la configuration d'un paquet d'émulateur client X approprié tel que MobaXterm. La plupart d'entre vous trouverez les temps de réponse interactifs inacceptables pour les tâches de menu de base, sans parler de l'exécution de tâches plus complexes telles que celles nécessitant du rendu graphique. Les temps d'attente pour démarrer des programmes avec interface graphique peuvent également être très longs, dépendant de votre connexion Internet. Dans un test par exemple, il a fallu 40&nbsp;minutes pour obtenir l'interface graphique avec SSH alors que vncviewer n'a pris que 34&nbsp;secondes. Malgré la lenteur potentielle lors de la connexion via SSH pour exécuter des programmes avec interface graphique, cela peut toujours être intéressant si votre seul objectif est d'ouvrir une simulation et d'effectuer des opérations de menu de base ou d'exécuter des calculs. Ces étapes de base sont un point de départ : 1) ssh -Y username@graham.computecanada.ca; 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task =4 [--gpus-per-node=1] --account=def-mygroup; 3) une fois connecté à un nœud de calcul, essayez d'exécuter <code>xclock</code>. Si l'horloge apparaît sur votre bureau, chargez le module Ansys souhaité et essayez d'exécuter le programme.
 
+<span id="Site-specific_usage"></span>
 = Particularités selon le site d'utilisation =
 
+<span id="SHARCNET_license"></span>
 == Licence SHARCNET ==
 
-La licence Ansys de SHARCNET est gratuite pour une utilisation académique par les chercheurs et chercheuses de l'Alliance sur les systèmes de l'Alliance. Le logiciel installé n'a pas de limites de solveur ou de géométrie. La licence SHARCNET peut  <b>uniquement</b> être utilisée à des fins de <b><i>recherche universitaire publiable</i></b>; la production de résultats à des fins commerciales privées est strictement interdite. La licence a été mise à niveau de CFD vers MCS (Multiphysics Campus Solution) en mai 2020 et inclut les produits suivants&nbsp;: HF, EM, Electronics HPC, Mechanical et CFD  [https://www.ansys.com/academic/educator-tools/academic-product-portfolio comme décrit ici]. En 2023 Rocky pour Linux a été ajouté, mais sans prise en charge pour Workbench. Puisque toutes nos grappes fonctionnent avec Linux, SpaceClaim ne peut pas être utilisé. La licence SHARCNET n'inclut pas LS-DYNA et Lumerical, mais ceux-ci peuvent être achetés  but could purchased as an add-on that would work with the existing hpc licenses. Ni LS-DYNA ni Lumerical ne sont inclus. En juillet 2021, 1024 licences anshpc supplémentaires ont été ajoutées au groupe de 512. Avant d'exécuter de grands travaux parallèles, des tests de scalabilité doivent être exécutés pour une simulation donnée. Les tâches parallèles qui n'atteignent pas au moins 50% d'utilisation CPU peuvent être portées à l'attention de notre équipe technique par le système.
+<div class="mw-translate-fuzzy">
+La licence Ansys de SHARCNET est gratuite pour une utilisation académique par les chercheurs et chercheuses de l'Alliance sur les systèmes de l'Alliance. Le logiciel installé n'a pas de limites de solveur ou de géométrie. La licence SHARCNET peut  <b>uniquement</b> être utilisée à des fins de <b><i>recherche universitaire publiable</i></b>; la production de résultats à des fins commerciales privées est strictement interdite, comme stipulé par la licence. La licence Ansys a été mise à niveau selon la Multiphysics Campus Solution en mai 2020 et inclut les produits suivants&nbsp;: HF, EM, Electronics HPC, Mechanical et CFD  [https://www.ansys.com/academic/educator-tools/academic-product-portfolio comme décrit ici]. 
+Rocky et LS-DYNA sont aussi maintenant inclus dans la licence SHARCNET. Lumerical acquis par ANSYS en 2020 n'est pas disponible en ce moment, mais est installé avec les modules Ansys récents et peut donc être utilisé  avec d'autres serveurs Ansys configurés en conséquence.  SpaceClaim sous Linux n'est pas installé sur nos systèmes, mais peut techniquement être utilisé avec la licence SHARCNET]. Un groupe de licences anshpc de 1986 est inclus dans la licence SHARCNET pour prendre en charge les grandes tâches parallèles avec la plupart des produits Ansys.  Avant d'exécuter de longues tâches, il est préférable d'effectuer des tests de scalabilité. Les tâches parallèles qui utilisent moins de 50% en CPU seront probablement signalées par le système et examinées par notre équipe technique.
+</div>
 
+<div class="mw-translate-fuzzy">
 Depuis décembre 2022, chaque utilisateur peut exécuter 4 travaux en utilisant un total de 252 anshpc (plus 4 anshpc par tâche). Ainsi, les combinaisons de taille de tâches uniformes suivantes sont possibles : une tâche de 256 cœurs, deux tâches de 130 cœurs, trois tâches de 88 cœurs ou quatre tâches de 67 cœurs selon ( (252 + 4* nombre de tâches) / nombre de tâches). MISE À JOUR%nbsp;: En octobre 2024, la limite a été portée à 8 tâches et 512 cœurs HPC par utilisateur (collectivement sur toutes les grappes pour toutes les applications) pour une période de test afin de permettre plus de flexibilité pour l'exploration de paramètres et l'exécution de problèmes de plus grande envergure. Comme la licence sera beaucoup moins utilisée, certains cas d'échec de tâche au démarrage pourront rarement se produire, mais les tâches devront être soumises à nouveau. Néanmoins, en supposant que la plupart continuent à exécuter une ou deux tâches en utilisant 128 cœurs en moyenne au total, cela ne devrait pas poser de problème. Cela dit, il sera utile de fermer les applications Ansys immédiatement après l'achèvement de toute tâche liée à l'interface graphique afin de libérer toutes les licences qui peuvent être consommées pendant que l'application est inactive, pour que d'autres puissent les utiliser.
+</div>
 
-Étant donné que les meilleures performances parallèles sont généralement obtenues en utilisant tous les cœurs sur des nœuds de calcul (également appelés nœuds complets), on peut déterminer le nombre de nœuds complets en divisant le nombre total de cœurs anshpc par la taille du nœud de calcul. Par exemple, prenons Graham qui possède de nombreux nœuds de calcul à 32&nbsp;cœurs (Broadwell) et certains à 44&nbsp;cœurs (Cascade). Le nombre maximal de nœuds pouvant être demandés lors de l'exécution de tâches de différentes tailles sur des nœuds à 32&nbsp;cœurs en supposant une limite de 252&nbsp;cœurs pour exécuter respectivement 1, 2, 3 ou 4 tâches simultanées serait <br>
-256/32=8, 130/32=~4, 88/32=~2 ou 67/32=~2. Pour exprimer cela sous forme d'équation, pour une taille de nœud de calcul donnée sur n'importe quelle grappe, le nombre de nœuds de calcul peut être calculé par
-( 252 + (4*num_tâches) ) / (num_tâches*cœurs par nœud) ) puis arrondir à l'inférieur et enfin déterminer le nombre total de cœurs à demander en multipliant le nombre pair de nœuds par le nombre de cœurs par nœud.
-
-La licence de SHARCNET est disponible selon le principe du premier arrivé, premier servi. Si un nombre anormalement élevé de tâches Ansys était soumis un jour donné, certaines tâches pourraient échouer au démarrage si le nombre de licences disponibles est insuffisant.  Ces événements sont cependant devenus très rares compte tenu de l'augmentation récente des licences anshpc. Si votre recherche nécessite plus de licences que SHARCNET ne peut fournir, une licence dédiée peut être achetée (et hébergée) sur un serveur de licences Ansys dans votre établissement local. Cependant, si la demande est forte, nous pourrions éventuellement acquérir une licence offrant plus d'accès.
-
+<div class="mw-translate-fuzzy">
 Vous pouvez aussi acheter votre propre licence Ansys auprès de [https://www.cmc.ca/subscriptions/ CMC] et utiliser leurs serveurs de licences distants. Ceci présente plusieurs avantages&nbsp;:
 * un serveur de licences institutionnel local n'est pas nécessaire,
 * une licence physique n'a pas besoin d'être obtenue à chaque renouvellement,
 * la licence peut être utilisée [https://www.cmc.ca/ansys- campus-solutions-cmc-00200-04847/ presque n'importe où], y compris à la maison, dans des établissements ou dans toutes les grappes de l'Alliance,
 * les directives de téléchargement et d'installation pour la version Windows d'Ansys sont fournies afin de permettre l'exécution de spaceclaim sur votre propre ordinateur (ceci n'est pas possible sur nos systèmes qui sont basés sur Linux).
 Il existe cependant une limitation potentiellement sérieuse à prendre en compte&nbsp;: selon [https://www.cmc.ca/qsg-ansys-cadpass-r20/ Ansys Quick Start Guides], il pourrait avoir une limite de 64 cœurs par utilisateur.
+</div>
 
+<span id="License_file"></span>
 ==== Fichier du serveur de licence ====
 
 Pour utiliser la licence de SHARCNET sur nos grappes, configurez votre fichier <code>ansys.lic</code> comme suit :
@@ -1365,7 +1421,8 @@ setenv("ANSYSLMD_LICENSE_FILE", "1055@license3.sharcnet.ca")
 setenv("ANSYSLI_SERVERS", "2325@license3.sharcnet.ca")
 </source>
 
-==== Interroger le serveur de licence  ====
+<span id="License_query"></span>
+==== Licence  ====
 
 Pour connaître le nombre de licences utilisées qui sont associées à votre nom d'utilisateur et le nombre de licences utilisées par tous les utilisateurs, lancez
 
@@ -1377,12 +1434,14 @@ lmutil lmstat -c $ANSYSLMD_LICENSE_FILE -a | grep "Users of\|$USER"
 
 Si vous remarquez que des licences sont utilisées sans justification avec votre nom d'utilisateur (ce qui peut se produire si Ansys n'a pas été correctement fermé sur gra-vdi), connectez-vous au nœud en cause, ouvrez une fenêtre de terminal et mettez fin au processus avec <code>pkill -9 -e -u $USER -f "ansys"</code> pour libérer vos licences.  Prenez note que gra-vdi possède deux nœuds (gra-vdi3 et gra-vdi4) qui vous sont assignés au hasard quand vous vous connectez avec tigervnc; ainsi, avant de lancer <tt>pkill</tt>, il est nécessaire d'indiquer le nom complet de l'hôte (gra-vdi3.sharcnet.ca ou grav-vdi4.sharcnet.ca) quand vous vous connectez.
 
-=== Modules VDI locaux ===
+<span id="Local_modules"></span>
+=== Modules locaux ===
 
+<div class="mw-translate-fuzzy">
 Lors de l'utilisation de gra-vdi, vous avez le choix de charger des modules Ansys à partir de notre environnement global (après avoir chargé CcEnv) ou de charger des modules Ansys installés localement sur la machine elle-même (après avoir chargé SnEnv). Les modules locaux peuvent être intéressants, car ils incluent certains programmes et versions d'Ansys non encore pris en charge par notre environnement standard. Lors du démarrage de programmes à partir de modules Ansys locaux, vous pouvez sélectionner le serveur de licences CMC ou accepter le serveur de licences SHARCNET par défaut. Les paramètres de <code>~/.licenses/ansys.lic</code> ne sont présentement pas utilisés par les modules Ansys locaux, sauf lors du démarrage de <code>runwb2</code> où ils remplacent les paramètres par défaut du serveur de licences SHARCNET. L'utilisation appropriée des programmes Ansys sur gra-vdi comprend&nbsp;: l'exécution interactive d'une seule tâche de test avec jusqu'à 8 cœurs et/ou 128Go de RAM; la création ou la modification de fichiers d'entrée pour la simulation; le post-traitement; ou la visualisation de données.
+</div>
 
-==== Modules Ansys ====
-
+<div class="mw-translate-fuzzy">
 # Connectez-vous à gra-vdi.computecanada.ca avec [[VNC/fr#Nœuds_VDI|TigerVNC]].
 # Ouvrez une fenêtre de terminal et chargez le module &nbsp;:
 #; <code>module load SnEnv ansys/2021R2</code>, ou
@@ -1394,29 +1453,24 @@ Lors de l'utilisation de gra-vdi, vous avez le choix de charger des modules Ansy
 #; <code>runwb2|fluent|<b>cfx5</b>|icemcfd|apdl</code>
 # Appuyez sur <code>y</code> et <code>Enter</code> pour accepter les conditions.
 # Appuyez sur <code>Enter</code> pour accepter l'option <code>n</code> et utilisez le serveur de licence par défaut SHARCNET (dans le cas de runwb2, <i>~/.licenses/ansysedt.lic</i> sera utilisé si trouvé, autrement ANSYSLI_SERVERS et ANSYSLMD_LICENSE_FILE seront utilisés s'ils sont configurés dans votre environnement, pour un autre serveur de licences distant, par exemple).   Pour utiliser le serveur de licence de CMC, changez <code>n</code> pour <code>y</code> et appuyez sur <code>Enter</code>.
+</div>
 
+<div class="mw-translate-fuzzy">
 où <code><b>cfx5</b></code> de l'étape 3 ci-dessus donne l'option de démarrer les composantes suivantes&nbsp;:
     1) CFX-Launcher  (cfx5 -> cfx5launch)
     2) CFX-Pre       (cfx5pre)
     3) CFD-Post      (cfdpost -> cfx5post)
     4) CFX-Solver    (cfx5solve)
+</div>
 
-==== Modules ansysedt ====
+Les préférences des fonctionnalités de licence précédemment configurées avec <i>anslic_admin</i> ne sont plus prises en charge depuis le 9&nbsp;septembre 2021. Si un problème de licence survient, essayez de supprimer le répertoire <code>~/.ansys</code> de votre compte /home pour effacer les paramètres. Si les problèmes persistent, veuillez contacter notre [[Technical support/fr|soutien technique]] et fournir le contenu de votre fichier <code>~/.licenses/ansys.lic</code>.
 
-# Connectez-vous à gra-vdi.computecanada.ca avec [[VNC/fr#Nœuds_VDI|TigerVNC]].
-# Ouvrez une nouvelle fenêtre de terminal et chargez un module
-#; <code>module load SnEnv ansysedt/2021R2</code>, ou
-#; <code>module load SnEnv ansysedt/2021R1</code>
-# Lancez Ansys Electromagnetics Desktop avec la commande <code>ansysedt</code>.
-# Appuyez sur <code>y</code> et <code>Enter</code> pour accepter les conditions. 
-# Appuyez sur <code>enter</code> pour accepter l'option <code>n</code> et utiliser le serveur de licences SHARCNET par défaut (si présente,  <i>~/.licenses/ansysedt.lic</i> sera utilisée, autrement ANSYSLI_SERVERS et ANSYSLMD_LICENSE_FILE seront utilisés s'ils sont configurés dans votre environnement, par exemple pour un autre serveur à distance).  Si vous remplacez <code>n</code> par <code>y</code> et appuyez sur <code>Enter</code>, le serveur de licences CMC sera utilisé.
-
-Les préférences des fonctionnalités de licence précédemment configurées avec <i>anslic_admin</i> ne sont plus prises en charge suite à la mise à jour du serveur de licences SHARCNET du 9 septembre 2021. Si un problème de licence survient, essayez de supprimer le répertoire <code>~/.ansys</code> de votre compte /home pour effacer les paramètres. Si les problèmes persistent, veuillez contacter notre [[Technical support/fr|soutien technique]] et fournir le contenu de votre fichier <code>~/.licenses/ansys.lic</code>.
-
+<span id="Additive_Manufacturing"></span>
 = Additive Manufacturing  =
 
 Configurez d'abord votre fichier <code>~/.licenses/ansys.lic</code> pour l'orienter vers le serveur de licence où se trouve une licence valide pour Ansys Mechanical.  Vous devez faire ceci sur tous les systèmes où vous utiliserez le logiciel.  
 
+<span id="Enable_Additive"></span>
 == Activer Additive ==
 
 Nous décrivons ici comment obtenir l'extension ACT de Ansys Additive Manufacturing pour l'utiliser dans votre projet. Les étapes suivantes doivent être effectuées pour chaque version de module Ansys sur chacune des grappes où l'extension sera utilisée. Les extensions nécessaires à votre projet doivent aussi être installées sur la ou les grappes, tel que décrit ci-dessous. Si vous recevez des avertissements à l'effet que des extensions dont vous n'avez pas besoin sont manquantes, par exemple ANSYSMotion, désinstallez-les à partir de votre projet.
@@ -1445,6 +1499,7 @@ Nous décrivons ici comment obtenir l'extension ACT de Ansys Additive Manufactur
 * Cliquez pour désélectionner la boîte AdditiveWizard, ce qui supprime l'extension pour la session en cours.
 * Cliquez sur la flèche dans le coin droit au bas de la boîte AdditiveWizard et sélectionnez <I>Do not load as default</i>, ce qui empêche le chargement de l'extension pour les futures sessions.
 
+<span id="Run_Additive"></span>
 == Exécuter Additive ==
 
 === Gra-vdi ===
@@ -1463,6 +1518,7 @@ Vérifiez l'utilisation :
 
 Veuillez noter que des processus persistants peuvent bloquer les licences entre les sessions de connexion gra-vdi ou provoquer d'autres erreurs inhabituelles lors de la tentative de démarrage de l'interface graphique sur gra-vdi. Bien que cela soit rare, un processus peut rester en mémoire si une session d'interface graphique Ansys (Fluent, Workbench, etc.) n'est pas correctement terminée avant que vncviewer ne soit terminé manuellement ou de manière inattendue, par exemple en raison d'une panne de réseau temporaire ou d'un système de fichiers bloqué. Dans ce dernier cas, les processus peuvent ne pas être tués tant que l'accès normal au disque n'est pas rétabli.
 
+<span id="Cluster"></span>
 === Grappe ===
 
 Préparation du projet
@@ -1493,10 +1549,13 @@ Tests de scalabilité
 
 Une fois la tâche complétée, son ''Job Wall-clock time'' peut être obtenu avec <code>seff jobid</code>. Cette valeur peut être utilisée pour effectuer des tests de scalabilité en soumettant de courtes tâches d'abord puis en doublant le nombre de cœurs. Tant que le Wall-clock time  diminue d'environ 50%, vous pouvez continuer de doubler le nombre de cœurs.
 
+<span id="Help_resources"></span>
 = Aide =
 
+<span id="Online_documentation"></span>
 == Documentation en ligne ==
-Ansys documentation, tutorial and videos (for any Ansys version back to 19.2) can be accessed by following these steps:
+
+A publicly accessible online version of the [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/prod_page.html?pn=Fluent&pid=Fluent&lang=en Ansys Help site] with full Documentation, Tutorial and Videos for the <b>LATEST</b> Ansys release version.  Developer documentation is available [https://developer.ansys.com/docs here] also without login. To access documentation for Ansys versions 2024R1, 2024R2 AND 2025R1 you however WILL need to login [https://ansyshelp.ansys.com/ here].  There is documentation for Multiphysics System Coupling versions 2023R1 ---> 202R2 available [https://ansysapi.ansys.com here] where again login will be required.   To access the Ansys Help for a specific version such as 2023R2 perform the below steps precisely which should work for any module installed under StdEnv/2023 (thus back to 2022R2) and **NOT** require login:
 # Connect to <b>gra-vdi.computecanada.ca</b> with tigervnc as described [[VNC#VDI_Nodes|here]].
 # If the Firefox browser or the Ansys Workbench is open, close it now.
 # Start Firefox by clicking <I>Applications -> Internet -> Firefox</I>.

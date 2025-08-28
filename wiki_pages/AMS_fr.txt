@@ -15,19 +15,26 @@ Tous les produits du module SCM sont disponibles&nbsp;:
 *QE-GUI
 *NBO6
 
+<div class="mw-translate-fuzzy">
 ==Utiliser AMS sur Graham==
 Le module <code>ams</code> est seulement installé sur [[Graham/fr|Graham]] en raison de restrictions liées à l'octroi des licences. SHARCNET est propriétaire de cette licence qui est réservée aux centres de calcul universitaires; cette licence ne peut être utilisée pour des services de consultation ou pour tout autre usage de nature commerciale. Pour connaître les versions disponibles, lancez la commande
+</div>
 
  [name@server $] module spider ams
 
 Pour les commandes en rapport avec les modules, voyez [[Utiliser des modules|Utiliser des modules]].
 
+<span id="Job_submission"></span>
 ===Soumettre une tâche===
 
+<div class="mw-translate-fuzzy">
 Les tâches soumises sur Graham sont ordonnancées par Slurm; pour les détails, consultez [[Running jobs/fr|Exécuter des tâches]].
+</div>
 
+<div class="mw-translate-fuzzy">
 ====Exemples de scripts pour une tâche adf ====
 Le script H2O_adf.sh utilise un nœud entier.
+</div>
 {{File
   |name=H2O_adf.sh
   |lang="bash"
@@ -35,13 +42,13 @@ Le script H2O_adf.sh utilise un nœud entier.
 #!/bin/bash
 #SBATCH --account=def-pi
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=32          # 1 node with all 32 cpus, MPI job
-#SBATCH --mem=0                       # request all memory on node
+#SBATCH --ntasks-per-node=32          # 32 cpus on 1 node, MPI job
+#SBATCH --mem-per-cpu=3G              # memory per cpu
 #SBATCH --time=00-01:00               # time (DD-HH:MM)
 #SBATCH --output=H2O_adf-%j.log       # output .log file
 
 module unload openmpi
-module load ams/2024.102
+module load ams/2025.102
 export SCM_TMPDIR=$SLURM_TMPDIR      # use the local disk
 bash H2O_adf.run                    # run the input script
 }}
@@ -82,6 +89,7 @@ AMS_JOBNAME=H2O_adf $AMSBIN/ams <<eor
 eor
 }}
 
+<span id="Example_scripts_for_a_band_job"></span>
 ====Exemples de scripts pour une tâche band ====
 
 {{File
@@ -131,22 +139,23 @@ EndEngine
 eor
 }}
 
+<div class="mw-translate-fuzzy">
 Le script suivant est semblable à H2O_adf.sh, sauf qu'il n'utilise pas un nœud entier.
+</div> 
 {{File
   |name=SnO_EFG_band.sh
   |lang="bash"
   |contents=
 #!/bin/bash
 #SBATCH --account=def-pi
-#SBATCH --nodes=1 
-#SBATCH --ntasks-per-node=16     # a 16 cpus MPI job
+#SBATCH --nodes=2                # number of nodes 
+#SBATCH --ntasks-per-node=16     # cpus per node
 #SBATCH --mem-per-cpu=3G         # memory; 3G per cpu in this example
 #SBATCH --time=00-10:00          # time (DD-HH:MM)
 #SBATCH --output=SnO_EFG_band-%j.log
 
 module unload openmpi
-module load ams/2024.102
-export SCM_TMPDIR=$SLURM_TMPDIR       # use the local disk
+module load ams/2025.102
 bash SnO_EFG_band.run                 # run the input file
 }}
 

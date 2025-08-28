@@ -5,6 +5,7 @@
 Beaucoup de travail peut être accompli sur nos grappes en [[Running jobs/fr|soumettant des tâches]] qui ne spécifient que le nombre de cœurs requis et la durée maximale d'exécution.
 Si par contre vous voulez soumettre plusieurs tâches ou des tâches qui nécessitent une grande quantité de ressources, vous gagnerez sans doute en productivité avec une bonne connaissance de notre politique d'ordonnancement.
 
+<span id="Priority_and_fair-share"></span>
 ===Priorisation selon la juste part===
 
 Les tâches sont traitées en ordre de '''priorité''' déterminée par l'algorithme [https://slurm.schedmd.com/fair_tree.html Fair Tree]. <ref>Lisez une description détaillée de l'algorithme dans https://slurm.schedmd.com/SC14/BYU_Fair_Tree.pdf qui présente un exemple avec les Beatles et Elvis Presley.</ref>
@@ -47,6 +48,7 @@ Un projet pour lequel la cible est utilisée de façon régulière verra sa vale
 
 '''Voir aussi''' [[Allocations and compute scheduling/fr|Allocation et ordonnancement des tâches de calcul]].
 
+<span id="Whole_nodes_versus_cores"></span>
 === Nœuds entiers ou cœurs ===
 
 Les calculs en parallèle pouvant utiliser de façon efficace 32 cœurs ou plus pourraient être mieux servis avec des nœuds entiers. Une partie de chacune des grappes est réservée pour les tâches nécessitant un ou plusieurs nœuds entiers. Pour plus d'information et des exemples de scripts, voyez la section [[Advanced_MPI_scheduling/fr#N.C5.93uds_entiers|Nœuds entiers]] de la page [[Advanced_MPI_scheduling/fr|Contrôle de l'ordonnancement avec MPI]].
@@ -55,10 +57,14 @@ Prenez note que le fait de demander un nombre inefficace de processeurs dans le 
 
 Si vous avez une grande quantité de tâches en série et que vous pouvez bien utiliser [[GNU Parallel/fr|GNU Parallel]], [[GLOST/fr|GLOST]] ou [https://docs.scinet.utoronto.ca/index.php/Running_Serial_Jobs_on_Niagara d'autres techniques] pour rassembler ces tâches pour un seul nœud, nous vous invitons à le faire.
 
+<span id="Time_limits"></span>
 === Durée maximale ===
 
-[[Niagara/fr|Niagara]] peut accommoder des tâches avec des temps d'exécution pouvant aller jusqu'à 24 heures. La durée maximale avec [[Béluga]], [[Graham/fr|Graham]] et [[Narval]] est de 7 jours et avec [[Cedar/fr|Cedar]] de 28 jours. 
+<div class="mw-translate-fuzzy">
+[[Trillium/fr|Trillium]] peut accommoder des tâches avec des temps d'exécution pouvant aller jusqu'à 24 heures. La durée maximale avec [[Narval]], [[Nibi/fr|Nibi]] et [[Rorqual]] est de 7 jours et avec [[Fir/fr|Fir]] de 28 jours.
+</div>
 
+<div class="mw-translate-fuzzy">
 Avec les grappes d'usage général, les tâches de longue durée ne peuvent utiliser qu'une portion de la grappe par partitionnement. Il y a des partitions pour des tâches ayant des temps d'exécution de 
 * 3 heures ou moins,
 * 12 heures ou moins,
@@ -67,9 +73,9 @@ Avec les grappes d'usage général, les tâches de longue durée ne peuvent util
 * 7 jours ou moins et
 * 28 jours ou moins.
 Un temps d'exécution de 3 heures étant plus court que 12 heures ou plus, les tâches aux durées plus courtes peuvent toujours être exécutées dans les partitions ayant les durées maximales plus grandes. Une tâche plus courte sera donc susceptible d'être ordonnancée plus rapidement qu'une tâche plus longue dont les autres caractéristiques sont identiques.
+</div>
 
-Avec Béluga, les tâches doivent être d'une durée de plus d'une heure.
-
+<span id="Backfilling"></span>
 === Remplissage (''backfilling'') ===
 
 L'ordonnanceur optimise l'utilisation des ressources avec le [https://slurm.schedmd.com/sched_config.html backfilling].
@@ -79,7 +85,7 @@ Sans remplissage, chaque partition est ordonnancée strictement par priorité, c
 Le remplissage avantage les tâches dont la durée maximale est plus courte, soit moins de 3 heures.
 
 == Pourcentages des nœuds disponibles ==
-Nous présentons ici une description du partitionnement des grappes d'usage général Cedar et Graham. 
+Nous présentons ici une description du partitionnement des grappes d'usage général (Fir, Narval, Nibi et Rorqual). 
 
 D'abord, il y a quatre catégories de nœuds :
 * les nœuds de type ''base'' (4 à 8Go de mémoire par cœur)
@@ -160,6 +166,7 @@ L'utilitaire <code>partition-stats</code> ne donne aucun renseignement sur le no
 
 Le fait d'exécuter <code>partition-stats</code> exige beaucoup de l'ordonnanceur. Évitez donc de faire des appels automatiques de façon répétitive dans vos scripts. Si vous croyez qu'il serait avantageux d'utiliser <code>partition-stats</code>, contactez le [[Technical support/fr|soutien technique]] pour savoir comment procéder.
 
+<span id="Number_of_jobs"></span>
 == Nombre de tâches ==
 
 Il est possible qu'une limite soit imposée au nombre de tâches exécutées au même moment.  

@@ -10,24 +10,26 @@ Chapel a une base d'utilisateurs relativement petite, donc de nombreuses bibliot
 
 Pour plus d'information, voyez [https://westgrid.github.io/trainingMaterials/programming/#chapel nos webinaires Chapel].
 
+<span id="Single-locale_Chapel"></span>
 == Calculs simples ==
 
 Le module <code>chapel-multicore</code> est utilisé sur nos grappes d'usage général avec un nœud unique et une mémoire partagée seulement. Vous pouvez utiliser <code>salloc</code> pour tester si votre code fonctionne en séquentiel.
 {{Commands
-|module load gcc/12.3 chapel-multicore/2.3.0
+|module load gcc/12.3 chapel-multicore/2.4.0
 |salloc --time{{=}}0:30:0 --ntasks{{=}}1 --mem-per-cpu{{=}}3600 --account{{=}}def-someprof
 |chpl test.chpl -o test
 |./test
 }}
 ou avec plusieurs cœurs sur un même nœud&nbsp;:
 {{Commands
-|module load gcc/12.3 chapel-multicore/2.3.0
+|module load gcc/12.3 chapel-multicore/2.4.0
 |salloc --time{{=}}0:30:0 --ntasks{{=}}1 --cpus-per-task{{=}}3 --mem-per-cpu{{=}}3600 --account{{=}}def-someprof
 |chpl test.chpl -o test
 |./test
 }}
 Pour les tâches de production, veuillez préparer un [[Running jobs/fr|script de soumission de tâche]] et le soumettre avec <code>sbatch</code>.
 
+<span id="Multi-locale_Chapel"></span>
 == Calculs distribués ==
 
 Pour des tâches avec plusieurs nœuds et une mémoire hybride (partagée et distribuée) sur nos grappes InfiniBand, chargez le module <code>chapel-ofi</code>.
@@ -51,7 +53,7 @@ for loc in Locales do
 
 Pour exécuter ce code sur june grappe InfiniBand, vous devez charger le module<code>chapel-ucx</code>.
 {{Commands 
-|module load gcc/12.3 chapel-ucx/2.3.0
+|module load gcc/12.3 chapel-ucx/2.4.0
 |salloc --time{{=}}0:30:0 --nodes{{=}}4 --cpus-per-task{{=}}3 --mem-per-cpu{{=}}3500 --account{{=}}def-someprof
 }}
 
@@ -63,6 +65,7 @@ Une fois que la [[Running_jobs/fr#Tâches_interactives|] tâche interactive] est
 
 Pour les tâches de production, veuillez préparer un [[Running jobs/fr|script de soumission de tâche]] et soumettre la tâche avec <code>sbatch</code>.
 
+<span id="Multi-locale_Chapel_with_NVIDIA_GPU_support"></span>
 == Calcul distribué avec les GPU NVIDIA ==
 
 Pour utiliser un GPU, chargez le module <code>chapel-ucx-cuda</code> qui supporte les GPU NVIDIA sur nos grappes InfiniBand.
@@ -93,9 +96,9 @@ stopGpuDiagnostics();
 writeln(getGpuDiagnostics());
 }}
 
-Pour exécuter ce code sur une grappe InfiniBand, vhsrgez le module <code>chapel-ucx-cuda</code>.
+Pour exécuter ce code sur une grappe InfiniBand, chargez le module <code>chapel-ucx-cuda</code>.
 {{Commands 
-|module load gcc/12.3 cuda/12.2 chapel-ucx-cuda/2.3.0
+|module load gcc/12.3 cuda/12.2 chapel-ucx-cuda/2.4.0
 |salloc --time{{=}}0:30:0 --mem-per-cpu{{=}}3500 --gpus-per-node{{=}}1 --account{{=}}def-someprof
 }}
 

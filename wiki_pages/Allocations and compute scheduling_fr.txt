@@ -3,6 +3,7 @@
 
 <i>Page enfant de [[Job scheduling policies/fr|Politique d'ordonnancement des tâches]]</i>
 
+<span id="Allocations_for_high-performance_computing"></span>
 =Allocations pour le calcul haute performance=
 
 <b>Une <i>allocation</i> est l’attribution d’une quantité de ressources à un groupe de recherche pour une période donnée, habituellement un an.</b> Il s'agit soit d'un maximum comme dans le cas du stockage, soit d'une moyenne d'utilisation sur une période donnée comme c'est le cas pour les ressources partagées que sont les cœurs de calcul.
@@ -13,18 +14,21 @@ La durée de l’allocation est une valeur de référence utilisée pour calcule
 
 Notons qu’une allocation de cœurs-année et de GPU-année en ressources partagées considère la moyenne d’utilisation cible dans le temps; un groupe est donc plus susceptible d’atteindre et même de dépasser ses cibles en utilisant ses ressources de façon régulière sur la période qu’en soumettant des tâches en rafale (''burst'') ou en les reportant à plus tard.
 
+<span id="From_compute_allocations_to_job_scheduling"></span>
 ==De l'allocation à l'ordonnancement par priorité==
 
 Les ressources de calcul par cœurs-année et par GPU-année reçoivent des tâches qui sont immédiatement prises en charge par l’ordonnanceur. Rappelons qu’une tâche se compose d’une application logicielle et de la liste des ressources pour l’exécuter. L’ordonnanceur est aussi une application logicielle dont le rôle est de calculer la priorité de chaque tâche et de lui attribuer les ressources nécessaires selon leur disponibilité et en accord avec les règles de priorisation.
 
 À l’aide d’algorithmes spécialisés, l’ordonnanceur tient compte des cibles de chaque groupe et compare la consommation récente du groupe à l’utilisation qui lui était allouée. Un des facteurs déterminants est la consommation à l’intérieur de la période. Le facteur qui possède cependant le plus de poids est la consommation (ou la non-consommation) récente, ceci en vue d’offrir une opération plus stable aux groupes dont l’utilisation réelle se rapproche des ressources qui leur étaient allouées. Cette façon de procéder assure une meilleure répartition du parc de ressources pour l’ensemble des groupes et fait en sorte qu’il est théoriquement possible pour tous les groupes d’atteindre leurs cibles.
 
+<span id="Consequences_of_overusing_a_CPU_or_GPU_allocation"></span>
 ==Conséquences d'une surutilisation d'une allocation CPU ou GPU==
 
 Si vous avez des tâches en attente et qu’à ce moment la demande en ressources de calcul est basse, l’ordonnanceur pourrait faire exécuter vos tâches même si vous dépassez la quantité cible de votre allocation. Tout ce qui peut se produire alors serait que les prochaines tâches que vous soumettrez se voient attribuer un plus bas niveau de priorité que celles soumises par des groupes qui n’ont pas encore atteint leur niveau cible d’utilisation. Aucune tâche soumise à l’ordonnanceur n’est refusée en raison d’une surutilisation de ressources et votre utilisation moyenne de ressources sur la période d’allocation devrait se situer proche de la cible qui vous a été allouée.
 
 Il se pourrait qu’au cours d’un mois ou d’une année vous puissiez accomplir plus de travail que votre allocation ne semblerait le permettre, mais ce scénario est peu probable puisque la demande est plus élevée que la quantité de ressources dont nous disposons.
 
+<span id="Reference_GPU_Units_(RGUs)"></span>
 =Unités GPU de référence (UGR)=
 
 La performance des GPU a considérablement augmenté ces dernières années et continue sa progression. Par le passé et jusqu'au concours de 2023, nous considérions tous les GPU comme étant équivalents les uns aux autres. Ceci posait des problèmes à la fois dans le processus d'attribution et lors de l'exécution des tâches. Pour contrer ceci, nous avons créé pour l'année 2024 l'unité GPU de référence (UGR) qui permet de classer tous les modèles de GPU en production. Pour la période d'allocation de 2025-2026, nous devrons tenir compte de [[Multi-Instance GPU/fr|la technologie des GPU multi-instances]] qui rend la situation un peu plus complexe.
@@ -39,10 +43,10 @@ Parce qu'environ la moitié des tâches utilisent principalement des opérations
 ! scope="row"| score FP32 <small>(matrices denses sur les cœurs GPU réguliers)</small>
 | 40%
 |-
-! scope="row"| FP16 score <small>(matrices denses sur les <em>[https://www.techspot.com/article/2049-what-are-tensor-cores/| cœurs Tensor]</em>)</small>
+! scope="row"| score FP16 <small>(matrices denses sur les <em>[https://www.techspot.com/article/2049-what-are-tensor-cores/| cœurs Tensor]</em>)</small>
 | 40%
 |-
-! scope="row"| GPU memory score
+! scope="row"| score mémoire GPU
 | 20%
 |}
 
@@ -75,7 +79,7 @@ Nous utilisons le GPU <b>A100-40gb</b> de NVidia comme modèle de référence, a
 | 1.00 || 1.00 || 2.0 ||  4.8 || non ||    ? || non 
 |-
 ! scope="row"| A100-40gb
-| <b>1.00</b> || <b>1.00</b> || <b>1.0</b> || <b>4.0</b> || Yes || Yes || Yes
+| <b>1.00</b> || <b>1.00</b> || <b>1.0</b> || <b>4.0</b> || oui  || oui || oui 
 |-
 ! scope="row"| V100-32gb
 | 0.81 || 0.40 || 0.8 || 2.6 || oui ||  ? || non 
@@ -105,6 +109,12 @@ Le tableau suivant montre les modèles de GPU ou instances que vous pouvez séle
 ! scope="row"| A100-40gb
 | GPU entier ⇒ 100% || 4.0
 |-
+! scope="row"| A100-1g.5gb 
+| max(1g/7g, 5GB/40GB) ⇒ 14% || 0.6
+|-
+! scope="row"| A100-2g.10gb 
+| max(2g/7g, 10GB/40GB) ⇒ 28% || 1.1
+|-
 ! scope="row"| A100-3g.20gb
 | max(3g/7g, 20GB/40GB) ⇒ 50% || 2.0
 |-
@@ -124,11 +134,12 @@ Le tableau suivant montre les modèles de GPU ou instances que vous pouvez séle
 | max(3g/7g, 40GB/80GB) ⇒ 50% || 6.1
 |-
 ! scope="row"| H100-4g.40gb 
-| max(4g/7g, 40GB/80GB) ⇒ 57% || 7.0
+| max(4g/7g, 40GB/80GB) ⇒ 57% || 7.0 (obsolète)
 |}
 
-Remarque : Une instance GPU ayant le profil <b>1g</b> vaut un septième (1/7) d'un GPU A100 ou H100. Le profil <b>3g</b> tient compte de la quantité de mémoire additionnelle par <b>g</b>.
+Remarque : Une instance GPU ayant le profil <b>1g</b> vaut un septième (1/7) d'un GPU A100 ou H100. Le profil <b>3g</b> tient compte de la quantité de mémoire additionnelle par <b>g</b>.  H100-4g.40gb est rendu obsolète, principalement pour simplifier l'ordonnancement.
 
+<span id="Choosing_GPU_models_for_your_project"></span>
 ==Choisir les modèles de GPU pour votre projet==
 
 Les scores relatifs du précédent tableau devraient vous aider à sélectionner les modèles les plus convenables. Les exemples suivants présentent des cas extrêmes.
@@ -136,11 +147,13 @@ Les scores relatifs du précédent tableau devraient vous aider à sélectionner
 * Si vos applications font surtout des opérations FP32, le modèle A100-40gb devrait être deux fois plus rapide que le P100-12gb, mais l'utilisation des ressources sera considérée comme étant quatre fois plus grande. En conséquence, pour le même nombre d'UGR, le modèle P100-12gb devrait vous permettre d'exécuter deux fois plus de calculs. 
 * Si vos applications font surtout des opérations FP16 (ce qui est le cas en intelligence artificielle et avec les opérations à précision mixte ou utilisant [https://en.wikipedia.org/wiki/Bfloat16_floating-point_format d'autres formats à virgule flottante]), l'utilisation d'un A100-40gb sera calculée comme utilisant quatre fois les ressources d'un P100-12gb, mais pourra faire ~30 fois plus de calculs dans la même période, ce qui vous permettrait d'exécuter ~7.5 fois plus de calculs.
 
+<span id="RAC_awards_hold_RGU_values_constant"></span>
 ==Constance des allocations en UGR==
 
 * Dans le cadre du concours pour l'allocation de ressources, toute demande de GPU doit spécifier le modèle de GPU préféré pour le projet. Ensuite, dans le formulaire CCDB, la quantité d'unités GPU de référence (UGR) sera automatiquement calculée à partir de la quantité demandée de GPU-année par année de projet.
 ** Par exemple, si vous sélectionnez la ressource <i>narval-gpu</i> et demandez 13 GPU-année du modèle A100-40gb, la quantité correspondante en UGR serait de 13 * 4,0 = 52. Le comité d’allocation des ressources attribuerait alors jusqu'à 52 UGR en fonction du score de la proposition. Si votre allocation doit être déplacée vers une autre grappe, le comité attribuera des GPU-année à cette autre ressource tout en conservant la même quantité en UGR.
 
+<span id="Detailed_effect_of_resource_usage_on_priority"></span>
 =Effet détaillé de l'utilisation des ressources sur la priorité=
 
 Le principe gouverneur dans notre façon de déterminer la priorité des tâches de calcul se base sur les ressources qu’une tâche rend <b>non disponibles aux autres utilisateurs</b> plutôt que sur les ressources effectivement utilisées.
@@ -149,6 +162,7 @@ Le cas de cœurs non utilisés qui influent sur le calcul des priorités se prod
 
 Un autre cas fréquent de cœurs non utilisés se pose lorsqu’une tâche exige plus de mémoire que celle demandée pour un cœur. Sur une grappe où chaque cœur serait doté de 4Go de mémoire, une tâche qui demanderait un seul cœur et 8Go de mémoire bloquerait donc 2 cœurs et le deuxième cœur ne serait pas disponible pour les tâches des autres groupes de recherche
 
+<span id="Cores_equivalent_used_by_the_scheduler"></span>
 ==Équivalents-cœurs utilisés par l'ordonnanceur==
 
 Un équivalent-cœur se compose d’'''un cœur simple et d’une certaine quantité de mémoire'''; pour le nommer, nous utilisons le terme ''bundle''. En plus du cœur, le bundle contient aussi la mémoire considérée comme étant associée à ce cœur. 
@@ -171,9 +185,10 @@ Examinons le cas où nous avons un bundle composé de 1 cœur et 4Go de mémoire
 * [[File:Two_and_a_half_core_equivalents.png|frame|Figure 3 – <i>2.5 équivalents-cœur</i>]] La mémoire est comptabilisée si un groupe utilise plus de  mémoire que le ratio de 1 cœur/4Go.
 *:Dans la figure 3, on demande 2 cœurs et 5Go par cœur pour une mémoire totale de 10Go; la tâche exige 2.5 bundles pour les cœurs. Pour calculer la priorité, l’ordonnanceur évalue la demande à 2.5 équivalents-cœurs. <br clear=all>
 
+<span id="Reference_GPU_unit_equivalent_used_by_the_scheduler"></span>
 ==Équivalents-UGR utilisés par l'ordonnanceur==
 
-L’utilisation des GPU et leurs ressources associées suit les mêmes principes que ceux décrits pour les équivalents-coeurs, sauf qu’une UGR est ajoutée au bundle avec de la mémoire et plusieurs cœurs. Ceci signifie que la comptabilisation de l’utilisation de la cible pour l’allocation de GPU doit inclure l’UGR. Tout comme le système de points utilisé dans l’expression de l’utilisation de la ressource en équivalents-cœurs, nous utilisons aussi un système de points pour les équivalents-UGR.
+L’utilisation des GPU et leurs ressources associées suit les mêmes principes que ceux décrits pour les équivalents-cœurs, sauf qu’une UGR est ajoutée au bundle avec de la mémoire et plusieurs cœurs. Ceci signifie que la comptabilisation de l’utilisation de la cible pour l’allocation de GPU doit inclure l’UGR. Tout comme le système de points utilisé dans l’expression de l’utilisation de la ressource en équivalents-cœurs, nous utilisons aussi un système de points pour les équivalents-UGR.
 
 Le calcul de priorité se fait en fonction du nombre maximum de bundles UGR-coeurs-mémoire demandés. Examinons le cas où nous avons un bundle de 1 UGR, 3 cœurs et 4Go de mémoire.
 [[File:EquivalentG1.png|thumb|upright=1.1|center|Figure 4 - ''1 équivalent-UGR'']] <br clear=all>
@@ -187,156 +202,203 @@ Le calcul de priorité se fait en fonction du nombre maximum de bundles UGR-coeu
 * La mémoire est comptabilisée si un groupe utilise plus de mémoire que de UGR OU de cœurs par bundle avec GPU. Dans la figure 7, on demande 1 GPU de 1 UGR, 2 cœurs et 6Go; la requête exige donc 1.5 bundle avec GPU pour la mémoire, mais un seul bundle pour les GPU et 0.66 pour les cœurs. Pour calculer la priorité, l’ordonnanceur évalue la demande à 1.5 équivalents-GPU.
 [[File:EquivalentsG1.5_(memoire).png|thumb|center|Figure 7 – ''1.5 équivalents-GPU (mémoire)'']] <br clear=all>
 
-* Sur la même grappe fictive, un bundle comprenant un GPU V100-32gb, 7.8 cœurs et 10.4 Go de mémoire-vive vaudrait 2.6 équivalents-UGR :
+* Sur la même grappe fictive, un bundle comprenant un GPU V100-32gb, 7.8 cœurs et 10.4 Go de mémoire vive vaudrait 2.6 équivalents-UGR :
 [[File:EquivalentsG2.6_V100-32gb.png|thumb|upright=2.1|center|Figure 8 - ''2.6 équivalents-UGR, basés sur le GPU V100-32gb'']] <br clear=all>
 
-* Sur la même grappe fictive, un bundle comprenant un GPU A100-40gb, 12 cœurs et 16 Go de mémoire-vive vaudrait 4.0 équivalents-UGR :
+* Sur la même grappe fictive, un bundle comprenant un GPU A100-40gb, 12 cœurs et 16 Go de mémoire vive vaudrait 4.0 équivalents-UGR :
 [[File:EquivalentsG4_A100-40gb.png|thumb|upright=2.66|center|Figure 9 - ''4.0 équivalents-UGR, basés sur le GPU A100-40gb'']] <br clear=all>
 
 ===Ratios dans les bundles===
-Les différents bundles UGR-coeur-mémoire et GPU-coeur-mémoire des systèmes de l'Alliance ont les caractéristiques suivantes :
+Les différents bundles UGR-coeur-mémoire et GPU-coeur-mémoire des systèmes de l'Alliance ont les caractéristiques suivantes (un seul ratio par grappe)&nbsp;:
+
+{| class="wikitable" style="margin: auto; text-align: center;"
+|-
+! scope="col"| Grappe
+! scope="col"| Cœurs par UGR
+! scope="col"| Mémoire par UGR (en GB)
+|-
+! scope="row"| [[Béluga#Caractéristiques_des_nœuds|Béluga]]*
+| 4.55
+| 21.1
+|-
+! scope="row"| [[Cedar/fr#Caractéristiques_des_nœuds|Cedar]]*
+| 3.08
+| 25.0
+|-
+! | [[Fir/fr#Caractéristiques_des_nœuds|Fir]]
+| 0.98
+| 23.6
+|-
+! scope="row"| [[Graham/fr#Caractéristiques_des_nœuds|Graham]]*
+| 9.70
+| 43.0
+|-
+! scope="row"| [[Narval#Caractéristiques_des_nœuds|Narval]]
+| 3.00
+| 31.1
+|-
+! scope="row"| [[Nibi/fr#Caractéristiques_des_nœuds|Nibi]]
+| 1.15
+| 20.5
+|-
+! scope="row"| [[Rorqual#Caractéristiques_des_nœuds|Rorqual]]
+| 1.31
+| 10.2
+|-
+! [[Trillium/fr#Caractéristiques_des_nœuds|Trillium]]
+| 1.97
+| 15.4
+|}
+
+Caractéristiques des bundles
 
 {| class="wikitable" style="margin: auto; text-align: center;"
 |-
 ! scope="col"| Grappe
 ! scope="col"| Modèle ou instance
 ! scope="col"| UGR par GPU
-! scope="col"| Bundle par UGR
 ! scope="col"| Bundle par GPU
+! scope="col"| Recommendation par GPU
 |-
 ! scope="row"| [[Béluga#Caractéristiques_des_nœuds|Béluga]]*
 | V100-16gb
 | 2.2
-| 4.5 cœurs, 21 Go
-| 10 cœurs, 46.5 Go
+| 10 cœurs, 46.5GB
+| 10 cœurs, 46GB
 |-
 ! rowspan="3"| [[Cedar/fr#Caractéristiques_des_nœuds|Cedar]]*
 | P100-12gb
 | 1.0
-| rowspan="3"|3.1 cœurs, 25 Go
-| 3.1 cœurs, 25 Go
+| 3.08 cœurs, 25GB
+| 3 cœurs, 25GB
 |-
 | P100-16gb
 | 1.1
-| 3.4 cœurs, 27 Go
+| 3.4 cœurs, 27.5GB
+| 3 cœurs, 27GB
 |-
 | V100-32gb
 | 2.6
-| 8.0 cœurs, 65 Go
+| 8.0 cœurs, 65GB
+| 8 cœurs, 46GB
 |-
-! rowspan="5"| [[Fir/fr#Caractéristiques_des_nœuds|Fir]]
+! rowspan="4"| [[Fir/fr#Caractéristiques_des_nœuds|Fir]]
 | <b>H100-80gb</b>
 | <b>12.2</b>
-| rowspan="5"| 0.98 cœur, 20.5 Go
-| <b>12 cœurs, 250 Go</b>
+| <b>12 cœurs, 288GB</b>
+| <b>12 cœurs, 280GB</b>
 |-
 | H100-1g.10gb
-| 1.7
-| 1.6 cœurs, 34.8 Go
+| 1.74
+| 1.7 cœurs, 41GB
+| 1 cœurs, 35GB
 |-
 | H100-2g.20gb
-| 3.5
-| 3.4 cœurs, 71.7 Go
+| 3.48
+| 3.4 cœurs, 82GB
+| 3 cœurs, 70GB
 |-
 | H100-3g.40gb
 | 6.1
-| 6 cœurs, 125 Go
+| 6 cœurs, 144GB
+| 6 cœurs, 140GB
 |-
-| H100-4g.40gb
-| 7.0
-| 6.9 cœurs, 143 Go
-|-
-! rowspan="5"| [[Graham/fr#Caractéristiques_des_nœuds|Graham]]*
-| P100-12gb
-| 1.0
-| rowspan="5"| 9.7 cœurs, 43 Go
-| 9.7 cœurs, 43 Go
-|-
+! rowspan="3"| [[Graham/fr#Caractéristiques_des_nœuds|Graham]]*
 | T4-16gb
 | 1.3
-| 12.6 cœurs, 56 Go
-|-
-| V100-16gb
-| 2.2
-| 21.3 cœurs, 95 Go
+| 12.6 cœurs, 56GB
+| 4 ou 11 cœurs, 46GB
 |-
 | V100-32gb
 | 2.6
-| 25.2 cœurs, 112 Go
+| 25.2 cœurs, 112GB
+| 5 cœurs, 47GB
 |-
-| A100-80gb
-| 4.8
-| 46.6 cœurs, 206 Go
+| A100-40gb
+| 4.0
+| 38.8 cœurs, 172GB
+| 8 ou 16 cœurs, 60GB
 |-
-! rowspan="5"| [[Nibi/fr#Caractéristiques_des_nœuds|Nibi]]
-| <b>H100-80gb</b>
-| <b>12.2</b>
-| rowspan="5"| 1.3 cœurs, 15.3 Go
-| <b>12 cœurs, 187 Go</b>
-|-
-| H100-1g.10gb
-| 1.7
-| 1.6 cœurs, 26 Go
-|-
-| H100-2g.20gb
-| 3.5
-| 3.4 cœurs, 53.5 Go
-|-
-| H100-3g.40gb
-| 6.1
-| 6 cœurs, 93.5 Go
-|-
-| H100-4g.40gb
-| 7.0
-| 6.9 cœurs, 107 Go
-|-
-! rowspan="3"| [[Narval#Caractéristiques_des_nœuds|Narval]]
+! rowspan="5"| [[Narval#Caractéristiques_des_nœuds|Narval]]
 | <b>A100-40gb</b>
 | <b>4.0</b>
-| rowspan="3"| 3.0 cœurs, 31 Go
-| <b>12 cœurs, 124.5 Go</b>
+| <b>12 cœurs, 124.5GB</b>
+| <b>12 cœurs, 124GB</b>
+|-
+| A100-1g.5gb
+| 0.57
+| 1.7 cœurs, 17.7GB
+| 1 cœur, 15GB
+|-
+| A100-2g.10gb
+| 1.14
+| 3.4 cœurs, 35.4GB
+| 3 cœurs, 31GB
 |-
 | A100-3g.20gb
 | 2.0
-| 6 cœurs, 62.3 Go
+| 6.0 cœurs, 62.2GB
+| 6 cœurs, 62GB
 |-
 | A100-4g.20gb
 | 2.3
-| 6.9 cœurs, 71.5 Go
+| 6.9 cœurs, 71.5GB
+| 6 cœurs, 62GB
 |-
-! rowspan="5"| [[Rorqual#Caractéristiques_des_nœuds|Rorqual]]
+! rowspan="4"| [[Nibi/fr#Caractéristiques_des_nœuds|Nibi]]
 | <b>H100-80gb</b>
 | <b>12.2</b>
-| rowspan="5"| 1.3 cœurs, 10.2 Go
-| <b>16 cœurs, 124.5 Go</b>
+| <b>14 cœurs, 250GB</b>
+| <b>14 cœurs, 250GB</b>
 |-
 | H100-1g.10gb
-| 1.7
-| 2.2 cœurs, 17.4 Go
+| 1.74
+| 2 cœurs, 35.7GB
+| 2 cœurs, 31GB
 |-
 | H100-2g.20gb
-| 3.5
-| 4.5 cœurs, 35.8 Go
+| 3.48
+| 4 cœurs, 71.4GB
+| 4 cœurs, 62GB
 |-
 | H100-3g.40gb
 | 6.1
-| 8 cœurs, 62.3 Go
+| 7 cœurs, 125GB
+| 6 cœurs, 124GB
 |-
-| H100-4g.40gb
-| 7.0
-| 9.1 cœurs, 71.5 Go
+! rowspan="4"| [[Rorqual#Caractéristiques_des_nœuds|Rorqual]]
+| <b>H100-80gb</b>
+| <b>12.2</b>
+| <b>16 cœurs, 124.5GB</b>
+| <b>16 cœurs, 124GB</b>
+|-
+| H100-1g.10gb
+| 1.74
+| 2.3 cœurs, 17.7GB
+| 2 cœurs, 15GB
+|-
+| H100-2g.20gb
+| 3.48
+| 4.5 cœurs, 35.4GB
+| 4 cœurs, 31GB
+|-
+| H100-3g.40gb
+| 6.1
+| 8 cœurs, 62.2GB
+| 8 cœurs, 62GB
 |-
 ! [[Trillium/fr#Caractéristiques_des_nœuds|Trillium]]
 | <b>H100-80gb</b>
 | <b>12.2</b>
-| 1.97 cœurs, 15.4 Go
-| <b>24 cœurs, 188 Go</b>
+| <b>24 cœurs, 188GB</b>
+| <b>24 cœurs, 188GB</b>
 |}
 
-(*) Toutes les ressources GPU de cette grappe ne sont pas allouées par la voie du concours annuel d'allocation des ressources.
+(*) Ce ne sont pas toutes les ressources GPU de cette grappe qui sont allouées via le concours annuel d'allocation des ressources.
 
 <b>Remarque :</b> Si l'ordonnanceur établit la priorité sur la base de l'utilisation calculée avec les bundles, une demande de plusieurs GPU sur un même nœud doit aussi tenir compte des ratios physiques.
 
+<span id="Viewing_resource_usage_in_the_portal"></span>
 =Visionner l'utilisation des ressources dans le portail=
 
 [[File:Slurm portal land edit.png|thumb|alt=usage portal landing view|Page d'accueil du portail (cliquer deux fois sur l'image pour agrandir)]]
@@ -353,7 +415,7 @@ Si vous avez accès à plusieurs [[Running_jobs/fr#Comptes_et_projets|comptes Sl
 
 ==Options de la légende==
 [[File:Slurm portal legend edit.png|thumb|alt=figure legend|Légende de l'image]]
-La légende propose des options d'affichage, plus précisément, des variables supplémentaires qui peuvent être activées ou désactivées. Outre l'affichage de la couleur de chaque utilisateur, la légende permet d'afficher l'utilisation brute SLURM, les parts brutes SLURM, l'allocation CCDB, les ressources en attente pour les tâches en file d'attente et le total quotidien. L'utilisation brute SLURM (<i>SLURM Raw Usage</i>) et les parts brutes SLURM (<i>SLURM Raw Shares</i>) sont obtenues à partir des parts pour chaque compte sur les grappes. L'allocation  (<i>CCDB allocation</i>) correspond à la représentation des parts brutes SLURM dans le profil du compte dans CCDB. Les fines barres grises des colonnes des ressources en attente pour les tâches en file d'attente (<i>Queued jobs</i>) représente la quantité de ressources pour les tâches dans la file d'attente, par jour. Le texte en haut de chaque barre indique le total quotidien par tous les utilisateurs pour la journée. Un simple clic sur un élément de la légende permet de l'activer ou le désactiver. Un double-clic permet d'activer ou de désactiver tous les autres éléments.
+La légende propose des options d'affichage, plus précisément, des variables supplémentaires qui peuvent être activées ou désactivées. Outre l'affichage de la couleur de chaque utilisateur, la légende permet d'afficher l'utilisation brute SLURM, les parts brutes SLURM, l'allocation CCDB, les ressources en attente pour les tâches en file d'attente et le total quotidien. L'utilisation brute SLURM (<i>SLURM Raw Usage</i>) et les parts brutes SLURM (<i>SLURM Raw Shares</i>) sont obtenues à partir des parts pour chaque compte sur les grappes. L'allocation  (<i>CCDB allocation</i>) correspond à la représentation des parts brutes SLURM dans le profil du compte dans CCDB. Les fines barres grises des colonnes des ressources en attente pour les tâches en file d'attente (<i>Queued jobs</i>) représentent la quantité de ressources pour les tâches dans la file d'attente, par jour. Le texte en haut de chaque barre indique le total quotidien par tous les utilisateurs pour la journée. Un simple clic sur un élément de la légende permet de l'activer ou le désactiver. Un double-clic permet d'activer ou de désactiver tous les autres éléments.
 
 ==Cible d'allocation et ressources en  attente==
 [[File:Slurm portal account usage queued edit 2.png|thumb|alt=target and queued use|Cible d'allocation et ressources en  attente]]
@@ -362,7 +424,7 @@ Lorsqu'un seul compte a été sélectionné, les parts brutes Slurm sont affich�
 Pour faire afficher l'utilisation des ressources demandées pour les tâches en attente, cliquez sur <i>Queued jobs</i> dans la légende en haut à droite.
 <br clear=all>
 
-==Options graphique==
+==Options graphiques==
 [[File:Slurm portal hover total plotly edit.png|thumb|alt=mouse hover|Options graphiques avec la souris]]
 Les options natives de Plotly apparaissent en haut à droite lorsque le pointeur de la souris survole l'image. Les icônes <i>Download plot as a png</i>, <i>Zoom</i>, <i>Pan</i>, <i>Box Select</i>, <i>Lasso Select</i>, <i>Zoom in</i>, <i>Zoom out</i>, <i>Autoscale</i>et <i>Reset axes</i> permettent de modifier la sélection et l'échelle. Lorsque vous survolez une partie de la barre, un texte indique le nom de l'utilisateur, la journée et la quantité d'utilisation de l'élément pointé (notez que cela montre la quantité d'utilisation pour l'utilisateur spécifique et non la somme pour les utilisateurs pour cette journée).
 
@@ -397,6 +459,7 @@ Dans le menu <i>Include running jobs</i>, cliquez sur <i>No</i> pour faire affic
 Le graphique montre comment un compte s'écarte de sa part cible dans la période sélectionnée. Les valeurs utilisées sont la somme cumulée sur plusieurs jours à partir de la vue de sommation totale de l'utilisation et la cible d'allocation. Lorsqu'une tâche soumise  demande plus que la part cible du compte, on s'attend que la somme cumulée de l'utilisation oscille au-dessus et en dessous de la part cible si l'ordonnanceur gère correctement le principe de la juste part. Étant donné que l'ordonnanceur utilise une période de décroissance pour l'utilisation passée, un bon intervalle pour déterminer sa performance dans le maintien de la juste part est de faire afficher les 30 derniers jours. 
 <br clear=all>
 
+<span id="Viewing_resource_usage_in_CCDB"></span>
 =Visionner l'utilisation des ressources dans CCDB=
 
 [[File:Select view group usage fr edit.png|thumb|Onglet <i>Mon compte</i>, option <i>Utilisation par le groupe</i>]]
@@ -413,6 +476,7 @@ La première barre d’onglets offre les vues suivantes&nbsp;:
 :  <b>Utilisation du stockage</b>; voyez [[Storage and file management/fr|Stockage et gestion des fichiers]].
 <br clear=all>
 
+<span id="Usage_by_compute_resource"></span>
 ==Utilisation par ressource de calcul==
 
 Cette vue montre l’utilisation par ressource de calcul par grappe, pour tous les groupes desquels vous êtes propriétaire ou membre, pour l’année d’allocation en cours qui commence le 1er avril. Les données représentent l’utilisation à jour et supposent que cette utilisation restera la même jusqu’à la fin de l’année d’allocation. 

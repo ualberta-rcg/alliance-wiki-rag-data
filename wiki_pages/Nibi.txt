@@ -5,30 +5,43 @@
 <!--T:1-->
 {| class="wikitable"
 |-
-| Availability: Spring 2025
+| Availability: since 31 July 2025
 |-
-| Login node: nibi.sharcnet.ca (for testing)
+| SSH login node: nibi.sharcnet.ca
 |-
-| Globus endpoint: to be determined
+| Web interface: [https://ondemand.sharcnet.ca ondemand.sharcnet.ca]
+|-
+| Globus collection: computecanada#graham-globus
 |-
 | Data transfer node (rsync, scp, sftp,...): use login nodes 
 |-
-| Portal: to be determined
+| Portal: [https://portal.nibi.sharcnet.ca portal.nibi.sharcnet.ca]
 |}
 
 <!--T:2-->
-Nibi, the Anishinaabemowin word for water, is the successor of Graham and a general purpose cluster of 134,400 CPU cores and 288 H100 NVIDIA GPUs built by [https://www.hypertec.com/ Hypertec], hosted and operated by [https://www.sharcnet.ca/ SHARCNET] at University of Waterloo. It is expected that Nibi will come online by July 1, 2025.
+Nibi, the Anishinaabemowin word for water, is the successor of Graham and a general purpose cluster of 134,400 CPU cores and 288 H100 NVIDIA GPUs. Built by [https://www.hypertec.com/ Hypertec], the cluster is hosted and operated by [https://www.sharcnet.ca/ SHARCNET] at University of Waterloo.
+
+<!--T:3-->
+<!--
+Note that Nibi, like Cedar and Fir, does provide internet access from compute nodes; no special firewall permission or proxying is necessary.
+-->
 
 <!--T:4-->
 =Storage=
 Parallel storage: 25 petabytes, all [https://en.wikipedia.org/wiki/Solid-state_drive SSD] from [https://www.vastdata.com/ VAST Data] for <code>/home</code>, <code>/project</code> and <code>/scratch</code>.
-This is the same storage as being used by miniGraham.
+This storage is also being used by miniGraham - so your /home, /project, etc are the same.
+
+<!--T:8-->
+Note that Vast implements space accounting for quotas differently: you are "charged" for the apparent size of your files.  This is in contrast to some Lustre configurations, which transparently compress files, and charge for the space used after compression.
+
+<!--T:9-->
+Note also that Nibi is using a new, experimental mechanism for handling /scratch.  As on all systems, you have a soft and hard limit, but on Nibi, the soft limit is low (1TB), and you have a 60d grace period.  After the grace period expires, the soft limit is enforced (no further file creation/expansion).  To fix this, your usage must drop below the soft limit.
 
 <!--T:5-->
 =Interconnect fabric=
 * Nokia 200/400G ethernet
 ** 200 Gbit/s network bandwidth for CPU nodes.
-** 400 Gbit/s non-blocking network bandwidth between all Nvidia GPU nodes.
+** 200 Gbit/s non-blocking network bandwidth between all Nvidia GPU nodes.
 ** 200 Gbit/s network bandwidth between all AMD GPU nodes.
 ** 24x100 Gbit/s connection to the VAST storage nodes.
 ** 2:1 blocking at 400 Gbit/s uplinks for all compute nodes.
@@ -36,14 +49,82 @@ This is the same storage as being used by miniGraham.
 <!--T:6-->
 =Node characteristics=
 {| class="wikitable sortable"
-! nodes !! cores !! available memory !! CPU !! GPU
+! nodes !! cores !! available memory !! node-local storage || CPU !! GPU
 |-
-| 700 || 192 || 768GB DDR5 ||2 x Intel 6972P @ 2.4 GHz, 384MB cache L3 ||
+| 700 || 192 || 754G DDR5 || 3T || 2 x Intel 6972P @ 2.4 GHz, 384MB cache L3 ||
 |-
-|  10 || 192 || 6TB DDR5 ||2 x Intel 6972P @ 2.4 GHz, 384MB cache L3 ||
+|  10 || 192 || 5859G DDR5 || 3T || 2 x Intel 6972P @ 2.4 GHz, 384MB cache L3 ||
 |-
-|  36 || 112 || 2TB DDR5 || 1 x Intel 8570 @ 2.1 GHz, 300MB cache L3 || 8 x Nvidia H100 SXM (80 GB memory)
+|  36 || 112 || 2014G DDR5 || 11T || 2 x Intel 8570 @ 2.1 GHz, 300MB cache L3 || 8 x Nvidia H100 SXM (80 GB)
 |-
-|   6 ||  96 || 512GB || 4 x AMD MI300A @ 2.1GHz || 4 x AMD CDNA 3 (unified memory: 512 GB HBM3 total)
+|   6 ||  96 || 501G HBM || 3T || 4 x AMD MI300A @ 2.1GHz || 4 x Zen4+CDNA3 (unified memory)
 |}
+
+<!--T:7-->
+=Site specifics=
+==Internet access==
+All nodes on nibi have Internet access, no special firewall permission or proxying is necessary.
+
+<!--T:10-->
+==Project space==
+User directories are no longer created by default on <code>/project</code>. User's can always create their own directories in the group's <code>/project</code> using <code>mkdir</code>. This allows groups to decide how their <code>/project</code> is organized for sharing data amongst group members. 
+
+<!--T:11-->
+==Scratch quota==
+An 1 TB soft quota on scratch applies to each user. This soft quota can be exceeded for up to 60 days after which no additional files may be written to scratch. Files may be written again once the user has removed or deleted enough files to bring their total scratch use under 1 TB. See the [[Storage and file management]] for more information.
+
+<!--T:12-->
+==Access through Open OnDemand (OOD)==
+One can now access the Nibi cluster simply through a web browser. Nibi uses Open OnDemand (OOD), a web based platform that simplifies cluster access by providing a web interface to the login nodes and a remote desktop environment. To login to Nibi, go to https://ondemand.sharcnet.ca/, sign in with MFA, you will see a user friendly interface offering options to open a Bash shell terminal or launch a remote desktop session.
+
+<!--T:13-->
+==Use of Jupyterlab via OOD==
+[[File:nibi-desktop.png|thumb]]
+You can run JupyterLab interactively within a desktop session on OOD. After logging in to the Nibi Open OnDemand [https://ondemand.sharcnet.ca portal], click “Compute” from the top menu and select “Nibi Desktop.” This will open a page with a form where you can request a new desktop session.
+
+<!--T:14-->
+After completing the form of request with your requirement details, click “Launch” to submit your request. You will see, in a few moments, the status of requested Nibi desktop changes from Queued to Starting and Running. Then click “Launch Nibi Desktop” to connect to the desktop. A Linux desktop will appear.
+
+<!--T:15-->
+On the Nibi desktop, right-click the mouse in any blank area, a shortcut menu appears; select "Open in Terminal" to open a terminal window, where you can create and/or activate your [[Python#Creating_and_using_a_virtual_environment|Python virtual environment]] that has JupyterLab installed. 
+
+<!--T:16-->
+If you do not have JupyterLab installed in a virtual environment, you may do so from the command line. 
+For example, use <code>pip</code> to install JupyterLab in a Python virtual environment with the command:
+{{Commands2
+|prompt=(your_python_ENV) [username@<node>.nibi]$
+|pip install --no-index jupyterlab
+}} 
+
+<!--T:17-->
+You can launch JupyterLab from your Python virtual environment with the command:
+{{Commands2
+|prompt=(your_python_ENV) [username@<node>.nibi]$
+|jupyter-lab --no-browser
+}}
+
+<!--T:18-->
+Once JuptyerLab is launched, a URL of the JupyterLab instance on the local host is displayed. You can now run a web browser on the Nibi desktop to connect to the JupyterLab URL, i.e. copy and paste the URL into the web browser to access JupyterLab, and the URL should be in a format similar to this example:
+<pre>
+http://localhost:8888/lab?token=953a895492dfa929b5649385f907d50833306e4aa46b8262
+</pre>
+
+<!--T:19-->
+Note that you need to run a browser use the JupyterLab. Before a web browser module is available on the system, you can download [https://www.firefox.com/en-CA/download/all/desktop-release/linux64/en-CA/ Firefox for Linux 64-bit] and upload the package to your account on Nibi. For example, if the package is named `firefox-xxx.tar.xz`, it can be unpacked and run with the following commands on another terminal window on the Desktop:
+
+<!--T:20-->
+{{Commands2
+|prompt=[username@<node>.nibi Desktop]$
+|tar -xf /path/to/firefox-xxx.tar.xz
+|prompt=[username@<node>.nibi Desktop]$
+|cd firefox
+|prompt=[username@<node>.nibi Desktop]$
+|./firefox --private-window <JupyterLab URL>
+
+<!--T:21-->
+}}
+
+<!--T:24-->
+==Support for VDI via OOD==
+Unlike its predecessor Graham, Nibi no longer offers Virtual Desktop Infrastructure (VDI). Instead, it now provides a remote desktop environment through the [https://ondemand.sharcnet.ca/ portal] of Open OnDemand (OOD), offering improved hardware performance and software support.
 </translate>

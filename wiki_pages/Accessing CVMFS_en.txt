@@ -124,6 +124,14 @@ For backward compatibility reasons, if no library is found under <code>/usr/lib6
 Defining <code>RSNT_CUDA_DRIVER_VERSION=0.0</code> will hide all versions of CUDA.
 
 ==== <code>RSNT_LOCAL_MODULEPATHS</code> ====
+{{Warning|title=Warning|content=This environment variable is intended to be used only for hierarchical module trees which are installed via EasyBuild, so that they follow the same hierarchical structure as our modules.
+
+If you want to add a local path to a flat tree, instead add the command *after* sourcing our scripts
+{{Command|module use --priority 1 /path/to/your/flat/module/tree}}
+if you want your module tree to have higher priority than ours, or 
+{{Command|module use --priority -1 /path/to/your/flat/module/tree}}
+if you want your module tree to have lower priority than ours.
+}}
 This environment variable allows to define locations for local module trees, which will be automatically mesh into our central tree. To use it, define
 {{Command|export RSNT_LOCAL_MODULEPATHS{{=}}/opt/software/easybuild/modules}}
 and then install your [[EasyBuild]] recipe using 
@@ -170,13 +178,34 @@ On our systems, a number of commercial software packages are made available to a
 == CUDA location ==
 For CUDA-enabled software packages, our software environment relies on having driver libraries installed in the path <code>/usr/lib64/nvidia</code>. However on some platforms, recent NVidia drivers will install libraries in <code>/usr/lib64</code> instead. Because it is not possible to add <code>/usr/lib64</code> to the <code>LD_LIBRARY_PATH</code> without also pulling in all system libraries (which may have incompatibilities with our software environment), we recommend that you create symbolic links in <code>/usr/lib64/nvidia</code> pointing to the installed NVidia libraries. The script below will install the drivers and create the symbolic links that are needed (adjust the driver version that you want) 
 
-{{File|name=script.sh|contents=
+{{File|name=script_for_redhat.sh|contents=
 NVIDIA_DRV_VER="410.48"
 nv_pkg=( "nvidia-driver" "nvidia-driver-libs" "nvidia-driver-cuda" "nvidia-driver-cuda-libs" "nvidia-driver-NVML" "nvidia-driver-NvFBCOpenGL" "nvidia-modprobe" )
 yum -y install ${nv_pkg[@]/%/-${NVIDIA_DRV_VER{{)}}{{)}}
 for file in $(rpm -ql ${nv_pkg[@]}); do
   [ "${file%/*}" = '/usr/lib64' ] && [ ! -d "${file}" ] && \ 
   ln -snf "$file" "${file%/*}/nvidia/${file##*/}"
+done
+}}
+
+{{File|name=script_for_ubuntu.sh|contents=
+#! /usr/bin/bash
+# Use the 'major series' number for the package name
+VER="570"
+nv_pkg=( "libnvidia-cfg1-${VER}-server:amd64"
+    		"libnvidia-compute-${VER}-server:amd64"
+		"libnvidia-decode-${VER}-server:amd64"
+		"libnvidia-encode-${VER}-server:amd64"
+		"libnvidia-extra-${VER}-server:amd64"
+		"libnvidia-fbc1-${VER}-server:amd64"
+		"libnvidia-gl-${VER}-server:amd64"
+		"xserver-xorg-video-nvidia-${VER}-server" )
+# apt --no-install-recommends install ${nv_pkg[*]}
+[ -d "/usr/lib64/nvidia/" ] {{!}}{{!}} mkdir "/usr/lib64/nvidia/"
+for file in $(dpkg --listfiles "${nv_pkg[@]}"); do
+	[ "${file%/*}" = '/usr/lib/x86_64-linux-gnu' ] && \
+	[ ! -d "${file}" ] && \
+	ln -snf "$file" "/usr/lib64/nvidia/${file##*/}"
 done
 }}
 

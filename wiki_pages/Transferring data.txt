@@ -7,13 +7,15 @@ Please use <b>data transfer nodes</b>, also called <b>data mover nodes</b>, inst
 <!--T:31-->
 [[Globus]] automatically uses data transfer nodes.
 
-==To and from your personal computer== <!--T:1-->
+<!--T:1-->
+==To and from your personal computer==
 You will need software that supports secure transfer of files between your computer and our machines. The commands <code>scp</code> and <code>sftp</code> can be used in a command-line environment on <b>Linux</b> or <b>Mac</b> OS X computers. On <b>Microsoft Windows</b> platforms, [https://docs.computecanada.ca/wiki/Connecting_with_MobaXTerm/en MobaXterm] offers both a graphical file transfer function and a [[Linux introduction|command-line]] interface via [[SSH]], while [http://winscp.net/eng/index.php WinSCP] is another free program that supports file transfer. Setting up a connection to a machine using SSH keys with WinSCP can be done by following the steps in this [https://www.exavault.com/blog/import-ssh-keys-winscp link]. [https://docs.computecanada.ca/wiki/Connecting_with_PuTTY/en PuTTY] comes with <code>pscp</code> and <code>psftp</code> which are essentially the same as the Linux and Mac command line programs.
 
 <!--T:2-->
 If it takes more than one minute to move your files to or from our servers, we recommend you install and try [[Globus#Personal_Computers|Globus Personal Connect]]. [[Globus]] transfers can be set up and will run in the background.
 
-==Between resources== <!--T:3-->
+<!--T:3-->
+==Between resources==
 [[Globus]] is the preferred tool for transferring data between systems, and if it can be used, it should.
 
 <!--T:4-->
@@ -34,13 +36,16 @@ then perform the copy:
 [USERNAME@cedar5 ~]$ scp file USERNAME@niagara.alliancecan.ca:/scratch/g/group/USERNAME/
 </pre>
 
-==From the World Wide Web== <!--T:5-->
+<!--T:5-->
+==From the World Wide Web==
 The standard tool for downloading data from websites is [https://en.wikipedia.org/wiki/Wget wget]. Another often used is [https://curl.haxx.se/ curl]. Their similarities and differences are compared in several places such as this StackExchange [https://unix.stackexchange.com/questions/47434/what-is-the-difference-between-curl-and-wget article] or [https://draculaservers.com/tutorials/wget-and-curl-for-files/ here].  While the focus here is transferring data on Alliance Linux systems this [https://www.techtarget.com/searchnetworking/tutorial/Use-cURL-and-Wget-to-download-network-files-from-CLI tutorial] also addresses Mac and Windows machines.   Both [https://www.thegeekstuff.com/2009/09/the-ultimate-wget-download-guide-with-15-awesome-examples/ wget] and [https://www.thegeekstuff.com/2012/04/curl-examples/ curl] can resume interrupted downloads by rerunning them with the [https://www.cyberciti.biz/tips/wget-resume-broken-download.html -c] and [https://www.cyberciti.biz/faq/curl-command-resume-broken-download/ -C -] command line options respectively. When getting data from various cloud services such as Google cloud storage, Google Drive and Google Photos, consider using the [https://rclone.org/ rclone] tool instead.  All of these tools (wget, curl, rclone) are available on every Alliance cluster by default (without loading a module).  For a detailed listing of command line options check the man page for each tool or run them with <code>--help</code> or simply <code>-h</code> on the cluster.
 
-==Synchronizing files== <!--T:6-->
+<!--T:6-->
+==Synchronizing files==
 To synchronize or <i>sync</i> files (or directories) stored in two different locations means to ensure that the two copies are the same. Here are several different ways to do this.
 
-===Globus transfer=== <!--T:7-->
+<!--T:7-->
+===Globus transfer===
 We find Globus usually gives the best performance and reliability.
 
 <!--T:8-->
@@ -68,7 +73,8 @@ For more information about Globus please see [[Globus]].
 <!--T:37-->
 <br clear="all"/>
 
-===Rsync=== <!--T:12-->
+<!--T:12-->
+===Rsync===
 [https://en.wikipedia.org/wiki/Rsync Rsync] is a popular tool for ensuring that two separate datasets are the same but can be quite slow if there are a lot of files or there is a lot of latency between the two sites, i.e. they are geographically apart or on different networks. Running <code>rsync</code> will check the modification time and size of each file, and will only transfer the file if one or the other does not match. If you expect modification times not to match on the two systems, you can use the <code>-c</code> option, which will compute checksums at the source and destination, and transfer only if the checksums do not match. 
 
 <!--T:26-->
@@ -86,7 +92,8 @@ where somedir will be created if it doesn't already exist before copying LOCALNA
 {{Command|cp -rv --preserve{{=}}"mode,timestamps" LOCALNAME ~/projects/def-professor/someuser/somedir/}}
 however unlike rsync, if LOCALNAME is a directory, it will be renamed to somedir if somedir does not exist.
 
-===Using checksums to check if files match=== <!--T:13-->
+<!--T:13-->
+===Using checksums to check if files match===
 If Globus is unavailable between the two systems being synchronized and Rsync is taking too long, then you can use a  [https://en.wikipedia.org/wiki/Checksum checksum] utility on both systems to determine if the files match. In this example we use <code>sha1sum</code>.
 
 <!--T:14-->
@@ -118,7 +125,8 @@ It is possible that the <code>find</code> command will crawl through the directo
 |sort -k2 checksum-dtn.log -o checksum-dtn.log
 }}
 
-==SFTP== <!--T:21-->
+<!--T:21-->
+==SFTP==
 [https://en.wikipedia.org/wiki/SSH_File_Transfer_Protocol SFTP] (Secure File Transfer Protocol) uses the SSH protocol to transfer files between machines which encrypts data being transferred.
 
 <!--T:22-->
@@ -189,6 +197,11 @@ Before initiating any transfer, make sure you can read all the contents of the d
 
 <!--T:43-->
 * Double-check the <b>[[Storage_and_file_management#Overview|storage usage]]</b> and make sure enough space and enough files are available.
+** On some clusters, the filesystem automatically compresses your files and reports the space usage by the disk usage of the compressed data. On other clusters, the space usage is reported by the apparent size of your files. Therefore, 1 TB of compressed data on one cluster may become 2 TB of data on the next cluster.
+** Before transferring a dataset, it is possible to get its apparent size with the option <code>-b</code> of the <code>du</code> command:
+{{Command|du dataset; du -b dataset
+|result=443087696       dataset  # Size of the compressed data
+1048576000      dataset  # Apparent size of the data}}
 * Double-check the <b>[[Sharing_data|filesystem permissions]]</b> and make sure you have the write permission at the location where you are trying to transfer new files.
 
 <!--T:20-->

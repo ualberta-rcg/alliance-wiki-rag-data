@@ -2,7 +2,8 @@
 [[Category:Software]]
 <translate>
 
-== Description == <!--T:1-->
+<!--T:1-->
+== Description ==
 [http://www.python.org/ Python] is an interpreted programming language with a design philosophy stressing the readability of code. Its syntax is simple and expressive. Python has an extensive, easy-to-use standard library.
 
 <!--T:2-->
@@ -13,10 +14,12 @@ The following sections discuss the Python interpreter, and how to install and us
 
 == Loading an interpreter == <!--T:4-->
 
-===Default Python version=== <!--T:70-->
+<!--T:70-->
+===Default Python version===
 When you log into our clusters, a default Python version will be available, but that is generally not the one that you should use, especially if you need to install any Python packages. You should try to find out which version of Python is required to run your Python programs and load the appropriate [[Utiliser des modules/en | module]]. If you are not sure which version you need, then it is reasonable to use the latest version available.
 
-===Loading a Python module=== <!--T:5-->
+<!--T:5-->
+===Loading a Python module===
 To discover the versions of Python available:
 {{Command|module avail python}}
 
@@ -24,7 +27,8 @@ To discover the versions of Python available:
 You can then load the version of your choice using <code>module load</code>. For example, to load Python 3.10 you can use the command
 {{Command|module load python/3.10}}
 
-===Python version supported=== <!--T:88-->
+<!--T:88-->
+===Python version supported===
 In general in the Python ecosystem, the transition to more modern versions of python is accelerating, with many packages only supporting the latest few versions of Python 3.x. In our case, we provide prebuilt Python packages in our [[Available Python wheels|wheelhouse]] only for the 3 most recent Python versions available on the systems. This will result in dependencies issues when trying to install those packages with older versions of Python. See [[Python#Package_.27X.27_requires_a_different_Python:_X.Y.Z_not_in_.27.3E.3DX.Y.27|Troubleshooting]]. 
 
 <!--T:90-->
@@ -143,6 +147,9 @@ To see where the <code>pip</code> command is installing a python package from, d
 
 === Creating virtual environments inside of your jobs === <!--T:36-->
 
+<!--T:123-->
+'''Note''': On Trillium it is recommended to create virtual environments from a login node in <code>HOME</code> and source it in your job script.
+
 <!--T:66-->
 Parallel filesystems such as the ones used on our clusters are very good at reading or writing large chunks of data, but can be bad for intensive use of small files. Launching a software and loading libraries, such as starting Python and loading a virtual environment, can be slow for this reason. 
 
@@ -156,11 +163,11 @@ As a workaround for this kind of slowdown, and especially for single-node Python
   |contents=
 #!/bin/bash
 #SBATCH --account=def-someuser
-#SBATCH --mem-per-cpu=1.5G      # increase as needed
+#SBATCH --mem-per-cpu=1500M      # increase as needed
 #SBATCH --time=1:00:00
 
 <!--T:38-->
-module load python/3.10
+module load python/3.11
 virtualenv --no-download $SLURM_TMPDIR/env
 source $SLURM_TMPDIR/env/bin/activate
 pip install --no-index --upgrade pip
@@ -173,7 +180,7 @@ python ...
 }}
 where the <code>requirements.txt</code> file will have been created from a test environment. For example, if you want to create an environment for [[TensorFlow]], you would do the following on a login node :
 {{Commands
-|module load python/3.10
+|module load python/3.11
 |ENVDIR{{=}}/tmp/$RANDOM
 |virtualenv --no-download $ENVDIR
 |source $ENVDIR/bin/activate
@@ -268,7 +275,8 @@ EOF
 3. Use <tt>srun</tt> to run your script
 <syntaxhighlight lang="bash">srun python myscript.py;</syntaxhighlight>
 
-==== Example (multi-nodes) ==== <!--T:110-->
+<!--T:110-->
+==== Example (multi-nodes) ====
 {{File
   |name=submit-nnodes-venv.sh
   |lang="bash"
@@ -302,14 +310,16 @@ source $SLURM_TMPDIR/env/bin/activate;
 srun python myscript-mpi.py; 
 }}
 
-=== Available wheels === <!--T:23-->
+<!--T:23-->
+=== Available wheels ===
 Currently available wheels are listed on the [[Available Python wheels]] page. You can also run the command <code>avail_wheels</code> on the cluster.
 By default, it will:
 * only show you the <b>latest version</b> of a specific package (unless versions are given);
 * only show you versions that are compatible with the python module (if one loaded) or virtual environment (if activated), otherwise all versions will be shown;
 * only show you versions that are compatible with the CPU architecture and software environment (StdEnv) that you are currently running on.
 
-==== Names ==== <!--T:77-->
+<!--T:77-->
+==== Names ====
 To list wheels containing <code>cdf</code> (case insensitive) in its name:
 {{Command
 |avail_wheels "*cdf*"
@@ -334,7 +344,8 @@ numpy   1.23.0     cp38      generic
 numpy   1.23.0     cp310     generic
 }}
 
-==== Version ==== <!--T:79-->
+<!--T:79-->
+==== Version ====
 To list a specific version, you can use the same format as with `pip`:
 {{Command
 |avail_wheels numpy{{=}}{{=}}1.23
@@ -382,7 +393,8 @@ netCDF4   1.5.4      cp37      avx2
 netCDF4   1.5.4      cp36      avx2
 }}
 
-==== Python ==== <!--T:80-->
+<!--T:80-->
+==== Python ====
 You can list a specific version of Python:
 {{Command
 |avail_wheels 'numpy<1.23' --python 3.9
@@ -393,7 +405,8 @@ numpy   1.22.2     cp39      generic
 }}
 The <i>python</i> column tells us for which version the wheel is available, where <code>cp39</code> stands for <code>cpython 3.9</code>.
 
-==== Requirements file ==== <!--T:81-->
+<!--T:81-->
+==== Requirements file ====
 One can list available wheels based on a <code>requirements.txt</code> file with:
 {{Command
 |avail_wheels -r requirements.txt 
@@ -427,7 +440,7 @@ Here is how to pre-download a package called <code>tensorboardX</code> on a logi
 == Parallel programming with the Python <code>multiprocessing</code> module == <!--T:45-->
 
 <!--T:67-->
-Doing parallel programming with Python can be an easy way to get results faster. An usual way of doing so is to use the [https://sebastianraschka.com/Articles/2014_multiprocessing.html <code>multiprocessing</code>] module. Of particular interest is the <code>Pool</code> class of this module, since it allows one to control the number of processes started in parallel, and apply the same calculation to multiple data. As an example, suppose we want to calculate the <code>cube</code> of a list of numbers. The serial code would look like this : 
+Doing parallel programming with Python can be an easy way to get results faster. A usual way of doing so is to use the [https://sebastianraschka.com/Articles/2014_multiprocessing.html <code>multiprocessing</code>] module. Of particular interest is the <code>Pool</code> class of this module, since it allows one to control the number of processes started in parallel, and apply the same calculation to multiple data. As an example, suppose we want to calculate the <code>cube</code> of a list of numbers. The serial code would look like this : 
 <tabs>
 <tab name="Using a loop">
 {{File
@@ -561,10 +574,12 @@ Note that in the above example, the function <code>cube</code> itself is sequent
 <!--T:60-->
 Note that the <code>multiprocessing</code> module is restricted to using a single compute node, so the speedup achievable by your program is usually limited to the total number of CPU cores in that node.  If you want to go beyond this limit and use multiple nodes, consider using mpi4py or [[Apache Spark/en#PySpark|PySpark]].  Other methods of parallelizing Python (not all of them necessarily supported on our clusters) are listed [https://wiki.python.org/moin/ParallelProcessing here]. Also note that you can greatly improve  the performance of your Python program by ensuring it is written efficiently, so that should be done first before parallelizing.  If you are not sure if your Python code is efficient, please contact [[technical support]] and have them look at your code.
 
-== Anaconda == <!--T:21-->
+<!--T:21-->
+== Anaconda ==
 Please see [[Anaconda/en|Anaconda]].
 
-== Jupyter == <!--T:22-->
+<!--T:22-->
+== Jupyter ==
 Please see [[Jupyter]].
 
 == Troubleshooting == <!--T:72-->
@@ -585,14 +600,16 @@ You can also inspect a python process while the job is running, without modifyin
 # Run <code>py-spy top --pid PID</code> to see live feedback about where your code is spending time
 # Run <code>py-spy dump --pid PID</code> to get a traceback of where your code is currently at.
 
-=== Package 'X' requires a different Python: X.Y.Z not in '>=X.Y'  === <!--T:82-->
+<!--T:82-->
+=== Package 'X' requires a different Python: X.Y.Z not in '>=X.Y'  ===
 When installing packages, you may encounter an error similar to:
 <code>ERROR: Package 'X' requires a different Python: 3.6.10 not in '>=3.7'</code>.
 
 <!--T:83-->
 The current python module loaded (3.6.10 in this case) is not supported by that package. You can update to a more recent version, such as the latest available module. Or install an older version of package 'X'.
 
-=== Package has requirement X, but you'll have Y which is incompatible  === <!--T:84-->
+<!--T:84-->
+=== Package has requirement X, but you'll have Y which is incompatible  ===
 When installing packages, you may encounter an error similar to:
 <code>ERROR: Package has requirement X, but you'll have Y which is incompatible.</code>.
 
@@ -603,7 +620,8 @@ Upgrade <code>pip</code> to the latest version or higher than <code>[[https://pi
 |pip install --no-index --upgrade pip}}
 Then rerun your install command.
 
-=== No matching distribution found for X === <!--T:86-->
+<!--T:86-->
+=== No matching distribution found for X ===
 When installing packages, you may encounter an error similar to:
 {{Command
 |prompt=(ENV) [name@server ~]
@@ -619,7 +637,8 @@ Note also that <code>manylinux_x_y</code> wheels are discarded.
 <!--T:87-->
 You can also verify that the package is available from the wheelhouse with the [[Python#Available_wheels|avail_wheels]] command or by searching on [[Available Python wheels]] page.
 
-=== Installing many packages  === <!--T:91-->
+<!--T:91-->
+=== Installing many packages  ===
 When installing multiple packages, it is best to install them in one command when possible:
 {{Commands
 |prompt=(ENV) [name@server ~]
@@ -628,7 +647,8 @@ When installing multiple packages, it is best to install them in one command whe
 }}
 as this helps <code>pip</code> resolve dependencies issues.
 
-=== My virtual environment was working yesterday but not anymore === <!--T:92-->
+<!--T:92-->
+=== My virtual environment was working yesterday but not anymore ===
 Packages are often updated and this leads to a non-reproducible virtual environment.
 
 <!--T:100-->
@@ -643,7 +663,8 @@ To remedy that, freeze the specific packages and their versions with
 }}
 and then create a [[Python#Creating_virtual_environments_inside_of_your_jobs|requirements file]] that will be used to install the required packages in your job.
 
-=== X is not a supported wheel on this platform === <!--T:93-->
+<!--T:93-->
+=== X is not a supported wheel on this platform ===
 When installing a package, you may encounter the following error: <code>ERROR: package-3.8.1-cp311-cp311-manylinux_2_28_x86_64.whl is not a supported wheel on this platform.</code>
 
 <!--T:94-->
@@ -655,7 +676,8 @@ Two common cases are:
 <!--T:95-->
 Some <code>manylinux</code> package can be made available through the [[Available Python wheels|wheelhouse]].
 
-=== AttributeError: module ‘numpy’ has no attribute ‘X’ === <!--T:96-->
+<!--T:96-->
+=== AttributeError: module ‘numpy’ has no attribute ‘X’ ===
 When installing <code>numpy</code> without specifying a version number, the latest available version will be installed.
 In Numpy v1.20, many attributes were set for deprecation and are now [https://numpy.org/devdocs/release/1.24.0-notes.html#expired-deprecations expired in v1.24].
 
@@ -665,7 +687,8 @@ This may result in an error, depending on the attribute accessed.  For example, 
 <!--T:98-->
 This can be solved by installing a previous version of Numpy: <code>pip install --no-index 'numpy<1.24'</code>.
 
-=== ModuleNotFoundError: No module named 'X' === <!--T:115-->
+<!--T:115-->
+=== ModuleNotFoundError: No module named 'X' ===
 When trying to import a Python module, it may not be found. Some common causes are:
 * the package is not installed or is not visible to the python interpreter;
 * the name of the module to import is not the same as the name of the package that provides it;

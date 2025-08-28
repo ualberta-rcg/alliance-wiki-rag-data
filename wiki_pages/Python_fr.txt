@@ -8,6 +8,7 @@ Les capacités du langage Python peuvent être étendues à l'aide de paquets d�
 
 Les sections suivantes présentent l'interpréteur Python et expliquent comment installer et utiliser les paquets.
 
+<span id="Loading_an_interpreter"></span>
 == Charger l'interpréteur ==
 
 ===Version par défaut===
@@ -51,6 +52,7 @@ Le tableau suivant montre les dates auxquelles nous avons cessé de construire d
 | 2020-01
 |}
 
+<span id="SciPy_stack"></span>
 === Pile logicielle SciPy===
 
 En plus du module Python de base, le paquet [https://www.scipy.org/ SciPy] est aussi disponible comme [[Utiliser des modules|module d'environnement]]. Le module <code>scipy-stack</code> comprend
@@ -70,6 +72,7 @@ Pour utiliser un de ces paquets, chargez une version de Python, puis <code>modul
 
 Pour la liste et les numéros de version des paquets contenus dans <code>scipy-stack</code>, lancez <code>module spider scipy-stack/2020a</code> (en remplaçant <code>2020a</code> par la version que vous voulez).
 
+<span id="Creating_and_using_a_virtual_environment"></span>
 == Créer et utiliser un environnement virtuel ==
 
 Avec chaque version de Python vient l'outil [http://pypi.python.org/pypi/virtualenv virtualenv] qui permet de créer des environnements virtuels à l'intérieur desquels vous pourrez installer facilement vos paquets Python. Ces environnements permettent par exemple d'installer plusieurs versions d'un même paquet, ou encore de compartimenter les installations en fonction des besoins ou des expériences à réaliser. Vous créeriez habituellement vos environnements virtuels Python dans votre répertoire /home ou dans un de vos répertoires /project. Pour une troisième option, voyez ci-dessous la section ''Créer un environnement virtuel dans vos tâches''.
@@ -97,6 +100,7 @@ Pour réutiliser l'environnement virtuel :
 # Chargez les mêmes modules d'environnement que vous avez chargés quand l'environnement virtuel a été créé, soit <code>module load python scipy-stack</code>.
 # Activez l'environnement avec <code>source ENV/bin/activate</code>.
 
+<span id="Installing_packages"></span>
 === Installer des paquets ===
 
 Une fois que vous avez chargé un environnement virtuel, vous pouvez lancer la commande [http://www.pip-installer.org/ pip]. Cette commande prend en charge la compilation et l'installation de la plupart des paquets Python et de leurs dépendances. Consultez  [https://pypi.python.org/pypi l'index complet des paquets Python].
@@ -119,7 +123,10 @@ Si vous omettez l'option <code>--no-index</code>, <code>pip</code> cherchera les
 
 Pour savoir d'où provient le paquet Python installé par <code>pip</code>, ajoutez l'option <code>-vvv</code>. Lorsque vous installez plusieurs paquets Python, il est préférable de les installer en une seule étape, puisque <code>pip</code> peut alors résoudre les dépendances croisées.
 
+<span id="Creating_virtual_environments_inside_of_your_jobs"></span>
 ===Créer un environnement virtuel dans vos tâches===
+
+<b>Attention :</b> Sur Trillium, il est recommandé de créer un environnement virtuel sur un nœud de connexion dans /home et d'activer cet environnement (avec <code>source</code>) dans le script de la tâche.
 
 Les systèmes de fichiers parallèles comme ceux qui sont installés sur nos grappes sont très efficaces lorsqu'il s'agit de lire ou d'écrire de grandes portions de données, mais pas pour une utilisation intensive de petits fichiers. Pour cette raison, le lancement d'un logiciel et le chargement de bibliothèques peuvent être lents, ce qui se produit quand on lance Python et qu'on charge un environnement virtuel. 
 
@@ -130,18 +137,21 @@ Pour contrer ce genre de ralentissement, particulièrement pour les tâches Pyth
   |lang="sh"
   |contents=
 #!/bin/bash
-#SBATCH --account=def-someuser
-#SBATCH --mem-per-cpu=1.5G      # increase as needed
+#SBATCH --account=def-compte
+#SBATCH --mem-per-cpu=1500M     # à augmenter au besoin
 #SBATCH --time=1:00:00
 
+<div class="mw-translate-fuzzy">
 module load python/3.10
 virtualenv --no-download $SLURM_TMPDIR/env
 source $SLURM_TMPDIR/env/bin/activate
 pip install --no-index --upgrade pip
+</div>
 
 pip install --no-index -r requirements.txt
 python ...
 
+<div class="mw-translate-fuzzy">
 }}
 où le fichier <code>requirements.txt</code> aura été créé dans un environnement de test. Par exemple, pour créer un environnement pour [[TensorFlow/fr|TensorFlow]], utilisez les commandes suivantes dans un nœud de connexion :
 {{Commands
@@ -155,6 +165,7 @@ où le fichier <code>requirements.txt</code> aura été créé dans un environne
 |deactivate
 |rm -rf $ENVDIR
 }}
+</div>
 
 Ceci produit le fichier <code>requirements.txt</code> dont le contenu ressemble à ceci :
 {{File
@@ -207,6 +218,7 @@ Ce fichier fait en sorte que votre environnement puisse être reproduit pour les
 
 Remarquez que les directives ci-dessus exigent que tous les paquets dont vous avez besoin soient disponibles dans les wheels Python que nous fournissons. Si ce n'est pas le cas, vous pouvez le prétélécharger (voir Prétélécharger des paquets ci-dessous). Si vous croyez que les wheels devraient être fournis, faites-en la demande au [[Technical support/fr|soutien technique]]
 
+<span id="Creating_virtual_environments_inside_of_your_jobs_(multi-nodes)"></span>
 ==== Créer un environnement virtuel dans vos tâches (plusieurs nœuds)====
 
 Pour que vos scripts utilisent plusieurs nœuds, chacun doit avoir son propre environnement activé.
@@ -372,6 +384,7 @@ pip
 tabulate   0.8.10     py3       generic
 }}
 
+<span id="Pre-downloading_packages"></span>
 === Prétélécharger des paquets ===
 
 La procédure suivante prétélécharge le paquet <code>tensorboardX</code> sur un nœud de connexion et l'installe sur un nœud de calcul :
@@ -380,6 +393,7 @@ La procédure suivante prétélécharge le paquet <code>tensorboardX</code> sur 
 # Si le nom du fichier ne se termine pas pas <code>none-any</code>, mais par <code>linux_x86_64</code> ou <code>manylinux*_x86_64</code>, il est possible que le wheel ne fonctionnera pas correctement. Contactez le [[Technical support/fr|soutien technique]] pour que nous compilions le wheel et le rendre disponible sur nos superordinateurs.
 # À l'installation, utilisez le chemin du fichier <code>pip install tensorboardX-1.9-py2.py3-none-any.whl</code>.
 
+<span id="Parallel_programming_with_the_Python_multiprocessing_module"></span>
 == Programmation parallèle avec le module <code>multiprocessing</code> ==
 
 La programmation parallèle avec Python est un moyen facile d'obtenir des résultats plus rapidement, ce qui est habituellement accompli avec l'utilisation du module [https://sebastianraschka.com/Articles/2014_multiprocessing.html <code>multiprocessing</code>]. La classe <code>Pool</code> de ce module est particulièrement intéressante car elle permet de contrôler le nombre de processus lancés en parallèle pour exécuter le même calcul avec des données multiples. Supposons que nous voulons calculer le <codet>cube</code> d'une liste de nombres; le code série serait semblable à : 
@@ -507,8 +521,10 @@ Voir la page sur [[Anaconda/fr|Anaconda]].
 == Jupyter ==
 Voir la page sur [[JupyterNotebook/fr|Jupyter Notebook]].
 
+<span id="Troubleshooting"></span>
 == Dépannage ==
 
+<span id="Python_script_is_hanging"></span>
 === Script gelé ===
 
 Avec le module [https://docs.python.org/3.8/library/faulthandler.html faulthandler], vous pouvez modifier votre script pour qu'une trace de l'origine du problème soit fournie après une certaine durée; voir l'information sur la commande <tt>faulthandler.dump_traceback_later(timeout, repeat=False, file=sys.stderr, exit=False)</tt>.
@@ -610,6 +626,7 @@ Si vous avez ce problème,
 
 Dans le doute, recommencez avec un nouvel environnement.
 
+<span id="ImportError:_numpy.core.multiarray_failed_to_import"></span>
 === Message ImportError: numpy.core.multiarray failed to import ===
 
 Ce message peut survenir quand vous tentez d'importer un module Python qui dépend de Numpy.

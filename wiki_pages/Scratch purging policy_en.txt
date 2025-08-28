@@ -4,7 +4,15 @@
 
 The scratch filesystem on our clusters is intended as temporary, fast storage for data being used during job execution.  Data needed for long-term storage and reference should be kept in either [[Project layout|<code>/project</code>]] or other archival storage areas. In order to ensure adequate space on scratch, files older than 60 days are periodically deleted according to the policy outlined in this page.  Note that the purging of a file is based on its age, not its location within scratch; simply moving a file from one directory in scratch to another directory in scratch will not in general prevent it from being purged.
 
-'''Please note: on Graham, the scratch filesystem does not explicitly expire, but uses quota to enforce transient use.'''  
+'''Please note: on Graham and Nibi, the scratch filesystem does not explicitly expire, but uses quota to enforce transient use.'''
+These clusters share a single storage system, and on their /scratch, it works like this:
+* If your usage is under 1T, you never have to do anything (no expiration, etc).
+* when you exceed this "soft limit", you trigger an over-quota condition, which includes a 60-day grace period.
+* when the grace period expires, over-quota enforcement starts, disallowing any new allocation.  (This implies that your files at that point are still accessible, but adding files or increasing file sizes will fail with an error.)
+* to resolve this, you must bring your usage under the soft limit (which "resets" the clock).
+* there is also a hard quota of 20T.
+
+This quota-based mechanism has the advantage of being fully user-controlled, and avoids the case where specific files in a collection disappear due to slightly different age.
 
 ==Expiration procedure==
 

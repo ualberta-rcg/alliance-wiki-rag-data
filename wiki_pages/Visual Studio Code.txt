@@ -58,7 +58,8 @@ Host nc????? ng????? nl?????
   User your_username
 }}
 <translate>
-==First connection with VS Code== <!--T:8-->
+<!--T:8-->
+==First connection with VS Code==
 === Remote access and code editing ===
 https://carleton.ca/scs/2023/vscode-remote-access-and-code-editing/
 
@@ -83,7 +84,8 @@ That first connection will automatically install VS Code Server in <code>~/.vsco
 The installation can take up to 5 minutes.
 Once done, close the connection.
 
-===Connection with MFA enabled=== <!--T:18-->
+<!--T:18-->
+===Connection with MFA enabled===
 [[File:VSCode Detail Link.png|thumb|When connecting, click on "details" to see the prompt for the 2nd factor in the Terminal]]
 
 <!--T:12-->
@@ -114,43 +116,42 @@ Connection procedure:
 
 =Troubleshooting= <!--T:21-->
 
+==Cannot connect to Béluga== <!--T:32-->
+
+<!--T:33-->
+In the second week of June 2025, VS Code Server got a new version (1.101) that no longer works ''out of the box'' on the [[Béluga/en|Béluga]] cluster. After a first download and install of VS Code Server, the connection process will request your credentials again and redo the download and install again, and repeat endlessly.
+
+<!--T:34-->
+The solution is to install the previous version of VS Code.
+
+<!--T:35-->
+# [https://code.visualstudio.com/docs/supporting/faq#_how-do-i-opt-out-of-vs-code-autoupdates Disable automatic updates] by setting the "update mode" to "none".
+# Then, install VS Code [https://code.visualstudio.com/updates/v1_100 version 1.100.3].
+
+<!--T:36-->
+A future version of VS Code may fix the problem, but this is not guaranteed.
+
+<!--T:38-->
+==Cannot connect to Cedar==
+One of our users reported that he found a workaround that does not require reverting to a previous version of VS code. Setting the environment variable NODE_OPTIONS="--disable-wasm-trap-handler" in the .bashrc file fixed the issue. All this does is remove an optimization in Node.js, trading efficiency for vastly reduced virtual memory usage. The source for this fix can be found [https://github.com/microsoft/vscode/issues/251777#issuecomment-3056373130 here].
+
+<!--T:39-->
+This may work for the other clusters. Please give it a try.
+
 ==The remote session does not work anymore== <!--T:22-->
 
 <!--T:23-->
-{{Warning
-  |title=Connection problems
-  |content=
-The newest versions of [https://code.visualstudio.com/docs/remote/linux#_remote-host-container-wsl-linux-prerequisites VS Code Server no longer support CentOS 7], which affects connections to <b>Graham</b> and <b>Niagara</b>. Users can update their version of VS Code to 1.86.1 or later in order to connect, but will see warnings about the unsupported operating system.
-}}
+The newest versions of [https://code.visualstudio.com/docs/remote/linux#_remote-host-container-wsl-linux-prerequisites VS Code Server no longer support CentOS 7], which affects connections to <b>Graham</b> and <b>Niagara</b>.
 
 <!--T:24-->
-* Note: an older version of VS Code still works through [[JupyterHub#VS_Code|JupyterHub]].
+If you really need VS Code for debugging purpose, the recommendation is to use the version available through [[JupyterHub#VS_Code|JupyterHub]]. Otherwise, you may consider:
 
-<!--T:25-->
-Because VS Code is intended for a different use case than developing on our clusters, having several instances of VS Code Server running on different login nodes can lead to issues. To fix them:
+<!--T:37-->
+* Using a different cluster.
+* Develop and test your programs locally on your computer. Once a program appears to be stable, import it to the cluster. You may use [[Transferring_data|data transfer tools]] or [[Version_control|version control tools]].
 
-<!--T:26-->
-* Connect to all login nodes and stop (with <code>kill <PID></code>) all VS Code processes you see in the output of <code>ps aux | grep $USER</code> or <code>top -u $USER</code>.
-* If the above does not fix the problem, carefully delete the content of the <code>~/.vscode-server</code> directory, and then reconnect for a fresh installation of VS Code Server.
-
-<!--T:27-->
-* We recently determined that in the last week of August/2024 a bug with the Remote-SSH extension for VSCode was introduced. As far as we could ascertain, scp is not working as expected. That is not our software, this is a Microsoft product, so we offer best effort support. 
-
-<!--T:28-->
-Here is some more info on the bug:
- https://github.com/microsoft/vscode-remote-release/issues/10174#issuecomment-2316629187
-
-<!--T:31-->
-Our suggestions are
-* downgrade to VSCode 1.92
-
-<!--T:29-->
-* use wget (https://github.com/microsoft/vscode-remote-release/issues/10174#issuecomment-2316093550) by adding "remote.SSH.useCurlAndWgetConfigurationFiles: true" to Remote-SSH settings it should replace the defective scp functionality.
-
-<!--T:30-->
-* use the "Remote Tunnels" extension by running 'code tunnel' (google vscode cli and download it). Use github or a microsoft account (OAuth) and connect to a remote vscode server, such as a niagara login node. You can have all the "benefits" of not using mfa as long as your server is running. See [https://code.visualstudio.com/docs/remote/tunnels Developing with Remote Tunnels].
-
-=See also= <!--T:16-->
+<!--T:40-->
+=See also=
 * SHARCNET General Interest Webinar, "Remote Development on Clusters with VSCode", presented by Armin Sobhani:
 ** [https://youtu.be/u9k6HikDyqk Part I]
 ** [https://youtu.be/CsgBGpampvc Part II]

@@ -15,7 +15,8 @@ On our clusters, the job scheduler is the
 [https://en.wikipedia.org/wiki/Slurm_Workload_Manager Slurm Workload Manager].
 Comprehensive [https://slurm.schedmd.com/documentation.html documentation for Slurm] is maintained by SchedMD. If you are coming to Slurm from PBS/Torque, SGE, LSF, or LoadLeveler, you might find this table of [https://slurm.schedmd.com/rosetta.pdf corresponding commands] useful.
 
-==Use <code>sbatch</code> to submit jobs== <!--T:56-->
+<!--T:56-->
+==Use <code>sbatch</code> to submit jobs==
 The command to submit a job is [https://slurm.schedmd.com/sbatch.html <code>sbatch</code>]:
 <source lang="bash">
 $ sbatch simple_job.sh
@@ -56,7 +57,7 @@ Memory may be requested with <code>--mem-per-cpu</code> (memory per core) or <co
 A common source of confusion comes from the fact that some memory on a node is not available to the job (reserved for the OS, etc.).  The effect of this is that each node type has a maximum amount available to jobs; for instance, nominally "128G" nodes are typically configured to permit 125G of memory to user jobs.  If you request more memory than a node-type provides, your job will be constrained to run on higher-memory nodes, which may be fewer in number.
 
 <!--T:163-->
-Adding to this confusion, Slurm interprets K, M, G, etc., as [https://en.wikipedia.org/wiki/Binary_prefix binary prefixes], so <code>--mem=125G</code> is equivalent to <code>--mem=128000M</code>.  See the <i>Available memory</i> column in the <i>Node characteristics</i> table for each GP cluster for the Slurm specification of the maximum memory you can request on each node: [[Béluga/en#Node_characteristics|Béluga]], [[Cedar#Node_characteristics|Cedar]], [[Graham#Node_characteristics|Graham]], [[Narval/en#Node_characteristics|Narval]].
+Adding to this confusion, Slurm interprets K, M, G, etc., as [https://en.wikipedia.org/wiki/Binary_prefix binary prefixes], so <code>--mem=125G</code> is equivalent to <code>--mem=128000M</code>.  See the <i>Available memory</i> column in the <i>Node characteristics</i> table for each GP cluster for the Slurm specification of the maximum memory you can request on each node: [[Béluga/en#Node_characteristics|Béluga]], [[Cedar#Node_characteristics|Cedar]], [[Graham#Node_characteristics|Graham]], [[Narval/en#Node_characteristics|Narval]], [[Rorqual/en#Node_characteristics|Rorqual]].
 
 ==Use <code>squeue</code> or <code>sq</code> to list jobs== <!--T:60-->
 
@@ -119,7 +120,7 @@ In this case, use the <code>--account</code> directive to specify one of the acc
 <!--T:68-->
 To find out which account name corresponds
 to a given Resource Allocation Project, log in to [https://ccdb.alliancecan.ca CCDB] 
-and click on <i>My Account -> My Resources and Allocations</i>. You will see a list of all the projects 
+and click on <i>My Projects -> My Resources and Allocations</i>. You will see a list of all the projects 
 you are a member of. The string you should use with the <code>--account</code> for 
 a given project is under the column <i>Group Name</i>. Note that a Resource 
 Allocation Project may only apply to a specific cluster (or set of clusters) and therefore
@@ -144,10 +145,12 @@ Slurm will use the value of <code>SBATCH_ACCOUNT</code> in place of the <code>--
 
 == Examples of job scripts == <!--T:17-->
 
-=== Serial job === <!--T:146-->
+<!--T:146-->
+=== Serial job ===
 A serial job is a job which only requests a single core. It is the simplest type of job. The "simple_job.sh" which appears above in [[#Use_sbatch_to_submit_jobs|Use sbatch to submit jobs]] is an example.
 
-=== Array job === <!--T:27-->
+<!--T:27-->
+=== Array job ===
 Also known as a <i>task array</i>, an array job is a way to submit a whole set of jobs with one command. The individual jobs in the array are distinguished by an environment variable, <code>$SLURM_ARRAY_TASK_ID</code>, which is set to a different value for each instance of the job. The following example will create 10 tasks, with values of <code>$SLURM_ARRAY_TASK_ID</code> ranging from 1 to 10:
 
 <!--T:147-->
@@ -165,7 +168,8 @@ Also known as a <i>task array</i>, an array job is a way to submit a whole set o
 <!--T:142-->
 For more examples, see [[Job arrays]]. See [https://slurm.schedmd.com/job_array.html Job Array Support] for detailed documentation.
 
-=== Threaded or OpenMP job === <!--T:21-->
+<!--T:21-->
+=== Threaded or OpenMP job ===
 This example script launches a single process with eight CPU cores. Bear in mind that for an application to use OpenMP it must be compiled with the appropriate flag, e.g. <code>gcc -fopenmp ...</code> or <code>icc -openmp ...</code>
 
 <!--T:22-->
@@ -205,14 +209,16 @@ Large MPI jobs, specifically those which can efficiently use whole nodes, should
 <!--T:23-->
 For more on writing and running parallel programs with OpenMP, see [[OpenMP]].
 
-=== GPU job === <!--T:24-->
+<!--T:24-->
+=== GPU job ===
 There are many options involved in requesting GPUs because 
 * the GPU-equipped nodes at [[Cedar]] and [[Graham]] have different configurations,
 * there are two different configurations at Cedar, and 
 *there are different policies for the different Cedar GPU nodes. 
 Please see [[Using GPUs with Slurm]] for a discussion and examples of how to schedule various job types on the available GPU resources.
 
-== Interactive jobs == <!--T:28-->
+<!--T:28-->
+== Interactive jobs ==
 Though batch submission is the most common and most efficient way to take advantage of our clusters, interactive jobs are also supported. These can be useful for things like:
 * Data exploration at the command line
 * Interactive console tools like R and iPython
@@ -307,7 +313,8 @@ Use the MaxRSS accounting field to determine how much memory a job needed. The v
 <!--T:53-->
 The [https://slurm.schedmd.com/sstat.html sstat] command works on a running job much the same way that [https://slurm.schedmd.com/sacct.html sacct] works on a completed job.
 
-=== Attaching to a running job === <!--T:130-->
+<!--T:130-->
+=== Attaching to a running job ===
 It is possible to connect to the node running a job and execute new processes there. You might want to do this for troubleshooting or to monitor the progress of a job.
 
 <!--T:131-->
@@ -468,7 +475,8 @@ echo "Job finished with exit code $? at: `date`"
 <!--T:143-->
 <b>Please note:</b> The test to determine whether to submit a follow-up job, abbreviated as <code>work_should_continue</code> in the above example, should be a <i>positive test</i>. There may be a temptation to test for a stopping condition (e.g. is some convergence criterion met?) and submit a new job if the condition is <i>not</i> detected. But if some error arises that you didn't foresee, the stopping condition might never be met and your chain of jobs may continue indefinitely, doing nothing useful.
 
-== Automating job submission == <!--T:174-->
+<!--T:174-->
+== Automating job submission ==
 As described earlier, [[#Array job|array jobs]] can be used to automate job submission. We provide a few other (more advanced) tools designed to facilitate running a large number of related serial, parallel, or GPU calculations. This practice is sometimes called <i>farming</i>, <i>serial farming</i>, or <i>task farming</i>. In addition to automating the workflow, these tools can also improve computational efficiency by bundling up many short computations into fewer tasks of longer duration.
 
 <!--T:175-->
@@ -489,37 +497,22 @@ There are certain differences in the job scheduling policies from one of our clu
 
 <!--T:156-->
 <tabs>
-<tab name="Beluga">
-On Beluga, no jobs are permitted longer than 168 hours (7 days) and there is a limit of 1000 jobs, queued and running, per user. Production jobs should have a duration of at least an hour. 
-</tab>
-<tab name="Cedar">
-Jobs may not be submitted from directories on the /home filesystem on Cedar; the maximum duration for a job is 28 days. This is to reduce the load on that filesystem and improve the responsiveness for interactive work. If the command <code>readlink -f $(pwd) | cut -d/ -f2</code> returns <code>home</code>, you are not permitted to submit jobs from that directory. Transfer the files from that directory either to a /project or /scratch directory and submit the job from there.
-</tab>
-
-<!--T:179-->
-<tab name="Graham">
-On Graham, no jobs are permitted longer than 168 hours (7 days) and there is a limit of 1000 jobs, queued and running, per user. Production jobs should have a duration of at least an hour. 
-</tab>
-
-<!--T:180-->
-<tab name="Narval">
-On Narval, no jobs are permitted longer than 168 hours (7 days) and there is a limit of 1000 jobs, queued and running, per user. Production jobs should have a duration of at least an hour. 
+<tab name="Beluga, Fir, Narval, Nibi, Rorqual">
+On these clusters, no jobs are permitted longer than 168 hours (7 days) and there is a limit of 1000 jobs, queued and running, per user. Production jobs should have a duration of at least an hour. 
 </tab>
 
 <!--T:181-->
-<tab name="Niagara">
-<ul>
-<li><p>Scheduling is by node, so in multiples of 40-cores.</p></li>
-<li><p> Your job's maximum walltime is 24 hours.</p></li>
-<li><p>Jobs must write to your scratch or project directory (home is read-only on compute nodes).</p></li>
-<li><p>Compute nodes have no internet access.</p>
-<p>[[Data_Management_at_Niagara#Moving_data | Move your data]] to Niagara before you submit your job.</p></li></ul>
+<tab name="Trillium">
+See [[Trillium_Quickstart#Trillium_specific_restrictions]].
 </tab>
+</translate>
 </tabs>
+<translate>
 
 == Troubleshooting == <!--T:42-->
 
-==== Avoid hidden characters in job scripts ==== <!--T:43-->
+<!--T:43-->
+==== Avoid hidden characters in job scripts ====
 Preparing a job script with a word processor instead of a text editor is a common cause of trouble. Best practice is to prepare your job script on the cluster using an editor such as nano, vim, or emacs. If you prefer to prepare or alter the script off-line, then:
 * '''Windows users:''' 
 ** Use a text editor such as Notepad or [https://notepad-plus-plus.org/ Notepad++].
@@ -527,10 +520,12 @@ Preparing a job script with a word processor instead of a text editor is a commo
 * '''Mac users:'''
 ** Open a terminal window and use an editor such as nano, vim, or emacs.
 
-==== Cancellation of jobs with dependency conditions which cannot be met ==== <!--T:109-->
+<!--T:109-->
+==== Cancellation of jobs with dependency conditions which cannot be met ====
 A job submitted with <code>--dependency=afterok:<jobid></code> is a <i>dependent job</i>. A dependent job will wait for the parent job to be completed. If the parent job fails (that is, ends with a non-zero exit code) the dependent job can never be scheduled and so will be automatically cancelled. See [https://slurm.schedmd.com/sbatch.html#OPT_dependency sbatch] for more on dependency.
 
-==== Job cannot load a module ==== <!--T:116-->
+<!--T:116-->
+==== Job cannot load a module ====
 It is possible to see an error such as:
 
 <!--T:117-->
@@ -588,7 +583,8 @@ More information
 <!--T:127-->
 In this case adding the line <code>module load nixpkgs/16.09 intel/2016.4 openmpi/2.1.1</code> to your job script before loading quantumespresso/6.1 will solve the problem.
 
-==== Jobs inherit environment variables ==== <!--T:128-->
+<!--T:128-->
+==== Jobs inherit environment variables ====
 By default a job will inherit the environment variables of the shell where the job was submitted. The [[Using modules|module]] command, which is used to make various software packages available, changes and sets environment variables. Changes will propagate to any job submitted from the shell and thus could affect the job's ability to load modules if there are missing prerequisites. It is best to include the line <code>module purge</code> in your job script before loading all the required modules to ensure a consistent state for each job submission and avoid changes made in your shell affecting your jobs.
 
 <!--T:152-->
@@ -599,11 +595,13 @@ Inheriting environment settings from the submitting shell can sometimes lead to 
 <!--T:166-->
 Sometimes a submitted job writes no output to the log file for an extended period of time, looking like it is hanging. A common reason for this is the aggressive [[#Output_buffering|buffering]] performed by the Slurm scheduler, which will aggregate many output lines before flushing them to the log file. Often the output file will only be written after the job completes; and if the job is cancelled (or runs out of time), part of the output may be lost. If you wish to monitor the progress of your submitted job as it runs, consider running an [[#Interactive_jobs|interactive job]]. This is also a good way to find how much time your job needs.
 
-== Job status and priority == <!--T:103-->
+<!--T:103-->
+== Job status and priority ==
 * For a discussion of how job priority is determined and how things like time limits may affect the scheduling of your jobs at Cedar and Graham, see [[Job scheduling policies]].
 * If jobs ''within your research group'' are competing with one another, please see [[Managing_Slurm_accounts|Managing Slurm accounts]].
 
-== Further reading == <!--T:44-->
+<!--T:44-->
+== Further reading ==
 * Comprehensive [https://slurm.schedmd.com/documentation.html documentation] is maintained by SchedMD, as well as some [https://slurm.schedmd.com/tutorials.html tutorials].
 ** [https://slurm.schedmd.com/sbatch.html sbatch] command options
 * There is also a [https://slurm.schedmd.com/rosetta.pdf "Rosetta stone"] mapping commands and directives from PBS/Torque, SGE, LSF, and LoadLeveler, to SLURM.

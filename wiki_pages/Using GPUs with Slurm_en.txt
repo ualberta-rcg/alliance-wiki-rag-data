@@ -24,33 +24,40 @@ These are the GPUs currently available:
 
 {| class="wikitable"
 |-
-! rowspan=2|Cluster !! rowspan=2| # of nodes !! rowspan=2|Slurm type<br>specifier !! colspan=3|Per node !! rowspan=2|GPU model  !! rowspan=2|Compute<br>Capability(*) !! rowspan=2|GPU mem<br>(GiB) !! rowspan=2|Notes
+! Cluster !! Specifications !! Slurm type<br>specifier !! GPU model  !! Compute<br>Capability(*) !! Notes
 |-
-!                              CPU cores !! CPU memory !! GPUs 
+| Béluga           || [[Béluga/en#Node_characteristics|<b>Details</b>]]
+|| <code>v100</code>  || V100-16gb || 70 || All GPUs associated with the same CPU socket, connected via NVLink and SXM2
 |-
-| Béluga            || 172 ||  v100 ||  40 || 191000M ||  4 || V100-16gb || 70 || 16 || All GPUs associated with the same CPU socket, connected via NVLink and SXM2
+| rowspan=3|Cedar  || rowspan=3|[[Cedar#Node_characteristics|<b>Details</b>]]
+|| <code>p100</code>  || P100-12gb || 60 || Two GPUs per CPU socket, connected via PCIe
 |-
-| rowspan=3|Cedar   || 114 ||  p100 ||  24 || 128000M ||  4 || P100-12gb || 60 || 12 || Two GPUs per CPU socket, connected via PCIe
+|  <code>p100l</code> || P100-16gb || 60 || All GPUs associated with the same CPU socket, connected via PCIe
 |-
-|                      32  || p100l ||  24 || 257000M ||  4 || P100-16gb || 60 || 16 || All GPUs associated with the same CPU socket, connected via PCIe
+|  <code>v100l</code> || V100-32gb || 70 || Two GPUs per CPU socket; all GPUs connected via NVLink and SXM2
 |-
-|                      192 || v100l ||  32 || 192000M ||  4 || V100-32gb || 70 || 32 || Two GPUs per CPU socket; all GPUs connected via NVLink and SXM2
+| rowspan=3|Graham || rowspan=3|[[Graham#Node_characteristics|<b>Details</b>]]
+|| <code>v100</code>(**)  || V100-16gb || 70 || See [[Graham#Volta_GPU_nodes_on_Graham|Graham: Volta GPU nodes]]
 |-
-| rowspan=5|Graham  || 160 ||  p100 ||  32 || 127518M ||  2 || P100-12gb || 60 || 12 || One GPU per CPU socket, connected via PCIe
+|  <code>v100</code>(***) || V100-32gb || 70 || See [[Graham#Volta_GPU_nodes_on_Graham|Graham: Volta GPU nodes]]
 |-
-|                      7   || v100(**)     ||  28 || 183105M ||  8 || V100-16gb || 70 || 16 || See [[Graham#Volta_GPU_nodes_on_Graham|Graham: Volta GPU nodes]]
+|  <code>t4</code>        || T4-16gb   || 75 || Two GPUs per CPU socket
 |-
-|                      2   || v100(***) ||  28 || 183105M ||  8 || V100-32gb || 70 || 32 || See [[Graham#Volta_GPU_nodes_on_Graham|Graham: Volta GPU nodes]]
-|-
-|                      30  ||  t4   ||  44 || 192000M ||  4 || T4-16gb   || 75 || 16 || Two GPUs per CPU socket
-|-
-|                      6   ||  t4   ||  16 || 192000M ||  4 || T4-16gb   || 75 || 16 || &nbsp;
-|-
-| Mist              || 54  || (none) || 32 ||  256GiB ||  4 || V100-32gb || 70 || 32 || See [https://docs.scinet.utoronto.ca/index.php/Mist#Specifications Mist specifications]
+| Mist             || [https://docs.scinet.utoronto.ca/index.php/Mist#Specifications <b>Details</b>]
+|| (none)    || V100-32gb || 70
 |- 
-| Narval            || 159 || a100   || 48 || 510000M ||  4 || A100-40gb || 80 || 40 || Two GPUs per CPU socket; all GPUs connected via NVLink 
+| Narval           || [[Narval/en#Node_characteristics|<b>Details</b>]]
+|| [[Narval/en#GPU_instances|<b>Options</b>]] || A100-40gb || 80 || Two GPUs per CPU socket; all GPUs connected via NVLink 
+|- 
+| rowspan=2|Nibi   || rowspan=2|[[Nibi#Node_characteristics|<b>Details</b>]] || rowspan=2|[[Multi-Instance_GPU#Available_configurations|<b>Options</b>]]
+|| H100-80gb    || 90   || Two GPUs per CPU socket; all GPUs connected via NVLink
 |-
-| Arbutus           ||  colspan=8 | Cloud resources are not schedulable via Slurm. See [[Cloud resources]] for details of available hardware.
+|| MI300A-128gb || N.A. || Unified memory between CPU and GPU
+|- 
+| Rorqual          || [[Rorqual/en#Node_characteristics|<b>Details</b>]]
+|| [[Rorqual/en#GPU_instances|<b>Options</b>]] || H100-80gb || 90 || Two GPUs per CPU socket; all GPUs connected via NVLink
+|-
+| Arbutus || colspan=4|Cloud resources are not schedulable via Slurm. See [[Cloud resources]] for details of available hardware.
 |}
 
 (*) <b>Compute Capability</b> is a technical term created by NVIDIA as a compact way to describe what hardware functions are available on some models of GPU and not on others. 
@@ -76,6 +83,10 @@ Some clusters have more than one GPU type available ([[Cedar]], [[Graham]]), and
 If you do not supply a type specifier, Slurm may send your job to a node equipped with any type of GPU.  
 For certain workflows this may be undesirable; for example, molecular dynamics code requires high double-precision performance, for which T4 GPUs are not appropriate.
 In such a case, make sure you include a type specifier.
+
+= Requesting CPU cores and system memory =
+
+Along with each GPU instance, your job should have a number of CPU cores (default is <code>1</code>) and some amount of system memory. The recommended maximum numbers of CPU cores and gigabytes of system memory per GPU instance are listed in the [[Allocations_and_compute_scheduling#Ratios_in_bundles|table of bundle characteristics]].
 
 = Examples =
 
@@ -209,27 +220,13 @@ With this method, you can run multiple tasks in one submission. The <code>-j4</c
 On [[Béluga/en|Béluga]] and [[Narval/en|Narval]], the
 [https://developer.nvidia.com/dcgm NVIDIA Data Center GPU Manager (DCGM)]
 needs to be disabled, and this must be done while doing your job submission.
-Based on the simplest example in this page, the <code>--export</code>
-parameter is used to set the <code>DISABLE_DCGM</code> environment variable:
+Based on the simplest example in this page, set the <code>DISABLE_DCGM</code> environment variable:
 
-{{File
-  |name=gpu_profiling_job.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --account=def-someuser
-#SBATCH --export=ALL,DISABLE_DCGM=1
-#SBATCH --gpus-per-node=1
-#SBATCH --mem=4000M               # memory per node
-#SBATCH --time=0-03:00
+{{Command|DISABLE_DCGM{{=}}1 salloc --account{{=}}def-someuser --gpus-per-node{{=}}1 --mem{{=}}4000M --time{{=}}03:00}}
 
-# Wait until DCGM is disabled on the node
-while [ ! -z "$(dcgmi -v {{!}} grep 'Hostengine build info:')" ]; do
-  sleep 5;
-done
+then, when you get your interactive node, wait until DCGM is disabled on the node: 
+{{Command|while [ ! -z "$(dcgmi -v {{!}} grep 'Hostengine build info:')" ]; do  sleep 5; done}}
 
-./profiler arg1 arg2 ...          # Edit this line. Nvprof can be used
-}}
-For more details on profilers, see [[Debugging and profiling]].
+then launch your profiler. For more details on profilers, see [[Debugging and profiling]].
 
 [[Category:SLURM]]

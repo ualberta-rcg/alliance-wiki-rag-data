@@ -6,6 +6,7 @@
 [https://julialang.org Julia] est un langage de programmation conçu 
 pour être performant, facile d'utilisation et portable. Sur nos grappes, vous pouvez l'utiliser en installant un [[Utiliser_des_modules | module]].
 
+<span id="Installing_packages"></span>
 = Installer des paquets =
 
 La première fois que vous ajoutez un paquet à un projet Julia (avec <code>Pkg.add</code> ou en mode paquet), le paquet ajouté sera téléchargé, installé dans <code>~/.julia</code> et précompilé. Le même paquet peut être ajouté à plusieurs projets, auquel cas les données dans <code>~/.julia</code> seront réutilisées. Des versions différentes d'un même paquet peuvent être ajoutées à des projets différents; les versions requises des paquets coexisteront dans <code>~/.julia</code>. En comparaison avec Python, les projets Julia remplacent les environnements virtuels en évitant la duplication du code.
@@ -26,6 +27,7 @@ En supprimant la ligne <code>Libdl.DL_LOAD_PATH</code> dans cet exemple, il n'y 
 
 Notez que le paquet JLD que nous utilisons ici a été remplacé par [https://juliapackages.com/p/jld2 JLD2] qui ne nécessite plus une bibliothèque HDF5 installée sur le système, ce qui le rend plus portable.
 
+<span id="The_Narval_cluster"></span>
 == Sur la grappe Narval ==
 
 <div style="color: red; border: 1px dashed #2f6fab">
@@ -38,6 +40,7 @@ Sur Narval, il arrive parfois que Julia plante quand un paquet est installé dan
 
 Jusqu'à ce que ce problème soit résolu, nous vous recommandons d'utiliser le répertoire /project pour votre <i>dépôt</i> Julia.
 
+<span id="Changing_the_depot_path"></span>
 == Modifier le chemin du dépôt ==
 
 Un grand nombre de fichiers sont créés quand vous installez un paquet Julia dans votre répertoire /home. Par exemple, dans un répertoire <code>~/.julia</code> vide (sans paquet installé), le seul fait d'installer le paquet de traçage <code>Gadfly.jl</code> occupe environ 96Mo avec près de 37000 fichiers, soit 7&nbsp;%  de la quantité maximale de fichiers permise par votre quota. Si vous installez plusieurs paquets Julia, vous pourriez donc dépasser votre quota.
@@ -52,32 +55,7 @@ Ceci utilisera de préférence le répertoire <code>/project/def-bob/alice/julia
 
 Vous pouvez aussi créer une image [[Apptainer/fr | Apptainer]] avec une version particulière de Julia et un choix de paquets, tout en redirigeant JULIA_DEPOT_PATH dans le conteneur. Vous perdez ainsi l’avantage offert par les modules Julia que nous avons optimisés, par contre la performance des entrées/sorties sera potentiellement meilleure puisque le fichier du conteneur (.sif) rassemble un très grand nombre de petits fichiers. La reproductibilité est aussi améliorée car le conteneur fonctionnera tel quel, n’importe où. De plus, puisque vous avez plein contrôle sur la création du conteneur, vous pourrez tester les versions construites chaque soir (<i>nightly builds</i>) sans devoir modifier votre installation locale de Julia ou encore rassembler vos propres dépendances.
 
-= Versions disponibles = 
-
-Nous avons retiré les versions antérieures à 1.0 parce que l'ancien gestionnaire de paquets créait plusieurs petits fichiers, ce qui affectait la performance des systèmes de fichiers parallèles. Veuillez utiliser Julia 1.4.1 ou une version plus récente.
-
-{{Command
-|module spider julia
-|result=
---------------------------------------------------------
-  julia: julia/1.4.1
---------------------------------------------------------
-[...]
-    You will need to load all module(s) on any one of the lines below before the "julia/1.4.1" module is available to load.
-
-      nixpkgs/16.09  gcc/7.3.0
-[...]
-}}
-{{Command
-|module load gcc/7.3.0 julia/1.4.1
-}}
-
-== Porter du code de Julia 0.x à 1.x ==
-
-Les développeurs de Julia ont stabilisé l'API et supprimé des fonctionnalités obsolètes; ces modifications se retrouvent dans la version 1.0 lancée à l'été 2018. 
-La version 0.7.0 a aussi été lancée pour faciliter la mise à jour des programmes.
-Julia 0.7.0 contient toutes les fonctionnalités de  1.0 en plus des fonctionnalités obsolètes des versions 0.x; des avertissements de [https://fr.wikipedia.org/wiki/D%C3%A9pr%C3%A9ciation_(informatique) dépréciation] sont produits à l'utilisation. Le code qui est exécuté sans avertissement par Julia 0.7 devrait être compatible avec Julia 1.0.
-
+<span id="Using_PyCall.jl_to_call_Python_from_Julia"></span>
 = Appeler Python avec PyCall.jl =
 
 Le paquet PyCall.jl peut servir d'interface entre Julia et Python; dans ce cas, la variable d'environnement <code>PYTHON</code> doit être définie comme étant l'exécutable Python dans votre environnement virtuel Python. Sur nos grappes, nous recommandons [[Python/fr#Créer_et_utiliser_un_environnement_virtuel | l'utilisation d'environnements Python]]. Une fois qu'un environnement est activé, vous pouvez l'utiliser dans PyCall.jl.
@@ -95,6 +73,7 @@ Prenez note que si vous ne créez pas un environnement virtuel comme décrit ci-
 
 Pour plus d'information, voir [https://github.com/JuliaPy/PyCall.jl la documentation pour PyCall.jl]
 
+<span id="Running_Julia_with_multiple_processes_on_clusters"></span>
 = Travailler avec plusieurs processus sur une grappe =
 
 Dans l'exemple suivant, du code parallèle Julia est utilisé pour calculer <tt>pi</tt> avec 100 cœurs sur les nœuds d'une grappe.
@@ -123,6 +102,7 @@ génère une liste des noms des nœuds alloués et ajoute cette liste au fichier
 
 démarre un processus Julia principal et 100 processus de travail sur les   nœuds spécifiés dans <tt>hostfile</tt> et lance le programme <tt>pi_p.jl</tt> en parallèle.
 
+<span id="Running_Julia_with_MPI"></span>
 = Interface MPI =
 
 Assurez-vous que la MPI de Julia est configurée pour utiliser nos bibliothèques MPI. Si vous utilisez Julia MPI 0.19 et précédentes, employez le code suivant&nbsp;:
@@ -221,6 +201,7 @@ Pour tester l'installation, lancez
   3
   4
 
+<span id="Videos"></span>
 = Plus d'information =
 
 Webinaires produits par SHARCNET :

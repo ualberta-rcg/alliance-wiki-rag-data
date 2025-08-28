@@ -3,13 +3,26 @@
 ==Introduction==
 [https://ambermd.org/ Amber] is the collective name for a suite of programs that allow users to perform molecular dynamics simulations, particularly on biomolecules. None of the individual programs carry this name, but the various parts work reasonably well together, and provide a powerful framework for many common calculations.
 
-== Amber vs. AmberTools ==
-We have modules for both Amber and AmberTools available in our [[Available software|software stack]].
+== Amber modules ==
+We provide modules for Amber, AmberTools, and Amber-PMEMD in our [[Available software|software stack]].
 
-* The [https://ambermd.org/AmberTools.php AmberTools] (module <code>ambertools</code>) contains a number of tools for preparing and analyzing simulations, as well as <code>sander</code> to perform molecular dynamics simulations, all of which are free and open source.
-* [https://ambermd.org/AmberMD.php Amber] (module <code>amber</code>) contains everything that is included in <code>ambertools</code>, but adds the advanced <code>pmemd</code> program for molecular dynamics simulations.
+* '''[https://ambermd.org/AmberTools.php AmberTools]''' (module <code>ambertools</code>) - Tools for preparing/analyzing simulations, <code>QUICK</code> for GPU-accelerated DFT calculations and <code>sander</code> for molecular dynamics. Free and open source.
+* '''[https://ambermd.org/AmberMD.php Amber]''' (module <code>amber</code>) -  Everything included in AmberTools, plus the advanced `pmemd` program for high-performance molecular dynamics simulations. 
+* '''Amber-PMEMD''' (module <code>amber-pmemd</code>, Amber 24+) – High-performance MD engine <code>pmemd</code>, optimized for CPU and GPU. <br> Provides the high-performance MD engine <code>pmemd</code> (optimized for CPU/GPU) as a '''standalone module'''. This change was made because starting with Amber 24, <code>pmemd</code> no longer requires AmberTools for compilation. <br> '''Note:''' The <code>amber-pmemd</code> module does not include AmberTools. To use both, load the <code>ambertools</code> module as well.
 
 To see a list of installed versions and which other modules they depend on, you can use the <code>module spider</code> [[Using modules#Sub-command_spider|command]] or check the [[Available software]] page.
+
+== Using AMBER on H100 GPU Clusters ==
+
+'''Key Update:''' Older AMBER modules are incompatible with NVIDIA H100 GPUs. For GPU-accelerated runs, use the newly installed modules below.
+
+=== Module Requirements: ===
+<pre>
+ambertools/25.0 or amber-pmemd/24.3
+</pre>
+These modules include H100-specific CUDA kernels (compiled with CUDA 12+ for the Hopper architecture).
+
+'''Important:''' Do not use legacy AMBER modules for GPU jobs — they will fail on H100 nodes.
 
 == Loading modules ==
 <tabs>
@@ -18,9 +31,13 @@ To see a list of installed versions and which other modules they depend on, you 
 |-
 ! AMBER version !! modules for running on CPUs !! modules for running on GPUs (CUDA) !! Notes
 |-
-| amber/22.5-23.5 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 amber/22.5-23.5</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 amber/22.5-23.5</code> || GCC, FlexiBLAS & FFTW
+| amber-pmemd/24.3 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 amber-pmemd/24.3</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 amber-pmemd/24.3</code> || H100 compatible
 |-
-| ambertools/23.5 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 ambertools/23.5</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 ambertools/23.5</code> || GCC, FlexiBLAS & FFTW
+| amber/22.5-23.5 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 amber/22.5-23.5</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 amber/22.5-23.5</code> ||  
+|-
+| ambertools/25.0 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 ambertools/25.0</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 ambertools/25.0</code> || H100 compatible, with PLUMED/2.9.0 
+|-
+| ambertools/23.5 || <code> StdEnv/2023 gcc/12.3 openmpi/4.1.5 ambertools/23.5</code> || <code>StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 ambertools/23.5</code> ||  
 |-
 |}</tab>
 <tab name="StdEnv/2020">

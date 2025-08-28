@@ -7,14 +7,17 @@ Avec un environnement polyvalent et modulaire comme Visual Studio Code, il faut 
 
 <b>Remarque :</b> Quand vous utilisez Visual Studio Code avec Python, évitez d'installer [[Anaconda|Conda et ses variantes]] en raison de leur mauvaise adaptation à l'environnement de nos grappes. Plutôt que d'utiliser Conda,  [[Python/fr#Créer_et utiliser_un_environnement_virtuel|utilisez un environnement virtuel Python]] ou utilisez un conteneur  [[Apptainer/fr|Apptainer]].
 
+<span id="Configuring_remote_access"></span>
 =Configurer l'accès à distance=
 
+<span id="Configuration_of_your_SSH_keys"></span>
 ==Configuration de vos clés SSH==
 
 # Si ce n’est pas déjà fait, <b>[[SSH_Keys/fr#Générer_une_clé_SSH|générez votre clé SSH]]</b>; ici nous l’appelons  ~/.ssh/ccdb.
 # Si ce n’est pas déjà fait, <b>[[SSH_Keys/fr#Installer_une_clé|ajoutez votre clé <i>publique</i> SSH dans CCDB]]</b>.
 # <b>Copiez la clé publique</b> dans <code>~/.ssh/authorized_keys</code> sur le serveur distant; créez ce fichier s’il n’existe pas déjà. Ceci est nécessaire parce que les nœuds de connexion n'ont pas accès aux clés publiques entrées dans CCDB.
 
+<span id="SSH_configuration_file"></span>
 ==Fichier de configuration SSH==
 
 VS Code fonctionne bien avec votre [[SSH configuration file/fr|fichier de configuration SSH local]] (<code>~/.ssh/config</code>). Les options recommandées sont&nbsp;:
@@ -71,10 +74,12 @@ Si ce n'est pas le cas, copiez votre clé publique comme indiqué au point 3 de 
 
 Si [[Multifactor authentication/fr|l’authentification multifacteur]] est demandée, cliquez sur <i>details</i> pour faire afficher le terminal VS Code Terminal où vous pourrez entrer le second facteur.
 
+<span id="Closing_your_connection"></span>
 =Fermer la connexion=
 
 Lors de la fermeture de la fenêtre de VS Code locale, le processus distant de VS Code Server peut continuer à s'exécuter en arrière-plan, ce qui a tendance à accumuler des processus orphelins sur le nœud de connexion. De plus, votre prochaine connexion pourrait se faire à un nœud de connexion différent, ce qui causerait des problèmes et de la confusion. <b>Pour fermer proprement la connexion, cliquez sur le coin inférieur gauche de VS Code et sélectionnez <i>Close Remote Connection</i> dans le haut de la fenêtre.</b>
 
+<span id="Connection_to_a_compute_node"></span>
 =Se connecter à un nœud de calcul=
 
 Étapes à suivre :
@@ -90,38 +95,45 @@ Lors de la fermeture de la fenêtre de VS Code locale, le processus distant de V
 ### Si on vous demande quel est le système d’exploitation, sélectionnez <b>Linux</b>.
 # Si vous avez besoin de travailler avec des variables d'environnement <code>SLURM_*</code>, allez au répertoire de travail dans un terminal VS Code et <i>sourcez</i> le fichier  <code>slurm_var.sh</code>. {{Command|source slurm_var.sh}}
 
+<span id="Troubleshooting"></span>
 =Dépannage=
 
+<span id="Cannot_connect_to_Béluga"></span>
+==Échec de connexion à Béluga==
+
+La version 1.101 de VS Code Server ne fonctionne pas sur [[Béluga]]. Une fois que VS Code Server est téléchargé et installé, le processus de connexion redemande vos identifiants et répète le téléchargement et l'installation sans arrêt.
+
+La solution est d'installer la version précédente de VS Code.
+
+# [https://code.visualstudio.com/docs/supporting/faq#_how-do-i-opt-out-of-vs-code-autoupdates Désactivez les mises à jour automatiques] en sélectionnant <i>none</i> pour <i>update mode</i>.
+# Installez ensuite  [https://code.visualstudio.com/updates/v1_100 VS Code version 1.100.3].
+
+Une prochaine version de VS Code pourrait résoudre le problème; cependant, aucune garantie n'est donnée.
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+==Cannot connect to Cedar==
+One of our users reported that he found a workaround that does not require reverting to a previous version of VS code. Setting the environment variable NODE_OPTIONS="--disable-wasm-trap-handler" in the .bashrc file fixed the issue. All this does is remove an optimization in Node.js, trading efficiency for vastly reduced virtual memory usage. The source for this fix can be found [https://github.com/microsoft/vscode/issues/251777#issuecomment-3056373130 here].
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+This may work for the other clusters. Please give it a try.
+</div>
+
+<span id="The_remote_session_does_not_work_anymore"></span>
 ==Session à distance qui ne fonctionne plus==
 
-{{Warning
-  |title=Problèmes de connexion
-  |content=
-Les plus récentes versions de [https://code.visualstudio.com/docs/remote/linux#_remote-host-container-wsl-linux-prerequisites VS Code Server ne supportent plus CentOS 7], ce qui affecte les connexions à <b>Graham</b> et <b>Niagara</b>. Vous pouvez modifier votre version de VS Code pour 1.86.1 ou plus récente; cependant, vous recevrez des avertissements au sujet du système d'exploitation qui n'est pas supporté.
-}}
+Les plus récentes versions de [https://code.visualstudio.com/docs/remote/linux#_remote-host-container-wsl-linux-prerequisites VS Code Server ne supportent plus CentOS 7], ce qui affecte les connexions à <b>Graham</b> et <b>Niagara</b>.
 
-* Remarque : une version moins récente de VS Code fonctionne toujours via [[JupyterHub/fr#VS_Code|JupyterHub]].
+Si vous avez besoin de VS Code pour du débogage, notre recommandation est d'utiliser la version disponible via [[JupyterHub/fr#VS_Code|JupyterHub]]. Autrement,
 
-Étant donné que VS Code est destiné à un usage autre que le développement directement sur nos grappes, l'exécution de plusieurs instances de VS Code Server sur différents nœuds de connexion peut entraîner des problèmes. Pour contourner ceci&nbsp;:
+* utilisez une autre grappe, ou
+* développez et testez vos programmes localement, sur votre ordinateur; quand un programme semble stable, importez-le sur la grappe de votre choix à l'aide d'un outil de [[Transferring_data/fr|transfert de données]] ou de [[Version_control/fr|contrôle de version]].
 
-* Connectez-vous à tous les nœuds de connexion et arrêtez (avec k<code>kill <PID></code>>) tous les processus VS Code que vous voyez dans la sortie de <code>ps aux | grep $USER</code> ou de <code>top -u $USER</code>.
-* Si le problème persiste, supprimez prudemment le contenu du répertoire code>~/.vscode-server</code>, puis reconnectez-vous pour refaire l’installation automatique de VS Code Server.
-
-* En août 2024, nous avons découvert un bogue dans l'extension Remote-SSH pour VS Code. Nous croyons que Secure Copy (SCP) ne fonctionne pas correctement. Comme il ne s'agit pas d'un de nos logiciels mais plutôt d'un produit de Microsoft, nous ferons ce qui nous est possible pour résoudre les problèmes. 
-
-Pour plus d'information sur le bogue, cliquez sur
- https://github.com/microsoft/vscode-remote-release/issues/10174#issuecomment-2316629187
-
-Les solutions recommandées sont
-* utilisez la version VSCode 1.92 moins récente,
-
-* utilisez wget (https://github.com/microsoft/vscode-remote-release/issues/10174#issuecomment-2316093550) en ajoutant "remote.SSH.useCurlAndWgetConfigurationFiles: true" aux paramètres de Remote-SSH, ce qui remplace la fonction défectueuse de SCP,
-
-* utilisez l'extension "Remote Tunnels" en exécutant  'code tunnel' (sur Google, cherchez et téléchargez vscode cli). Avec github ou avec un compte Microsoft (OAuth), connectez-vous à un serveur vscode distant, par exemple à un nœud de connexion de Niagara. Pendant que le serveur est actif, vous n'aurez pas besoin de l'étape d'authentification multifacteur (voir [https://code.visualstudio.com/docs/remote/tunnels Developing with Remote Tunnels]).
-
-=Pour plus d'information=
-* Webinaire SHARCNET présenté par Armin Sobhani, <i>Remote Development on Clusters with VSCode</i>
+<div lang="en" dir="ltr" class="mw-content-ltr">
+=See also=
+* SHARCNET General Interest Webinar, "Remote Development on Clusters with VSCode", presented by Armin Sobhani:
 ** [https://youtu.be/u9k6HikDyqk Part I]
 ** [https://youtu.be/CsgBGpampvc Part II]
-* Tutoriel produit par deux de nos utilisateurs (visionnement en 720p recommandé)&nbsp;:
+* Tutorial video created by two users (best viewed in 720p):
 ** [https://youtu.be/1B0hiWaVcHY Connect VS Code to High-Performance Computing (HPC) Clusters]
+</div>

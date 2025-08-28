@@ -45,7 +45,7 @@ Memory may be requested with <code>--mem-per-cpu</code> (memory per core) or <co
 
 A common source of confusion comes from the fact that some memory on a node is not available to the job (reserved for the OS, etc.).  The effect of this is that each node type has a maximum amount available to jobs; for instance, nominally "128G" nodes are typically configured to permit 125G of memory to user jobs.  If you request more memory than a node-type provides, your job will be constrained to run on higher-memory nodes, which may be fewer in number.
 
-Adding to this confusion, Slurm interprets K, M, G, etc., as [https://en.wikipedia.org/wiki/Binary_prefix binary prefixes], so <code>--mem=125G</code> is equivalent to <code>--mem=128000M</code>.  See the <i>Available memory</i> column in the <i>Node characteristics</i> table for each GP cluster for the Slurm specification of the maximum memory you can request on each node: [[Béluga/en#Node_characteristics|Béluga]], [[Cedar#Node_characteristics|Cedar]], [[Graham#Node_characteristics|Graham]], [[Narval/en#Node_characteristics|Narval]].
+Adding to this confusion, Slurm interprets K, M, G, etc., as [https://en.wikipedia.org/wiki/Binary_prefix binary prefixes], so <code>--mem=125G</code> is equivalent to <code>--mem=128000M</code>.  See the <i>Available memory</i> column in the <i>Node characteristics</i> table for each GP cluster for the Slurm specification of the maximum memory you can request on each node: [[Béluga/en#Node_characteristics|Béluga]], [[Cedar#Node_characteristics|Cedar]], [[Graham#Node_characteristics|Graham]], [[Narval/en#Node_characteristics|Narval]], [[Rorqual/en#Node_characteristics|Rorqual]].
 
 ==Use <code>squeue</code> or <code>sq</code> to list jobs==
 
@@ -95,7 +95,7 @@ In this case, use the <code>--account</code> directive to specify one of the acc
 
 To find out which account name corresponds
 to a given Resource Allocation Project, log in to [https://ccdb.alliancecan.ca CCDB] 
-and click on <i>My Account -> My Resources and Allocations</i>. You will see a list of all the projects 
+and click on <i>My Projects -> My Resources and Allocations</i>. You will see a list of all the projects 
 you are a member of. The string you should use with the <code>--account</code> for 
 a given project is under the column <i>Group Name</i>. Note that a Resource 
 Allocation Project may only apply to a specific cluster (or set of clusters) and therefore
@@ -409,28 +409,12 @@ Certain software packages such as [https://github.com/alekseyzimin/masurca Masur
 There are certain differences in the job scheduling policies from one of our clusters to another and these are summarized by tab in the following section:
 
 <tabs>
-<tab name="Beluga">
-On Beluga, no jobs are permitted longer than 168 hours (7 days) and there is a limit of 1000 jobs, queued and running, per user. Production jobs should have a duration of at least an hour. 
-</tab>
-<tab name="Cedar">
-Jobs may not be submitted from directories on the /home filesystem on Cedar; the maximum duration for a job is 28 days. This is to reduce the load on that filesystem and improve the responsiveness for interactive work. If the command <code>readlink -f $(pwd) | cut -d/ -f2</code> returns <code>home</code>, you are not permitted to submit jobs from that directory. Transfer the files from that directory either to a /project or /scratch directory and submit the job from there.
+<tab name="Beluga, Fir, Narval, Nibi, Rorqual">
+On these clusters, no jobs are permitted longer than 168 hours (7 days) and there is a limit of 1000 jobs, queued and running, per user. Production jobs should have a duration of at least an hour. 
 </tab>
 
-<tab name="Graham">
-On Graham, no jobs are permitted longer than 168 hours (7 days) and there is a limit of 1000 jobs, queued and running, per user. Production jobs should have a duration of at least an hour. 
-</tab>
-
-<tab name="Narval">
-On Narval, no jobs are permitted longer than 168 hours (7 days) and there is a limit of 1000 jobs, queued and running, per user. Production jobs should have a duration of at least an hour. 
-</tab>
-
-<tab name="Niagara">
-<ul>
-<li><p>Scheduling is by node, so in multiples of 40-cores.</p></li>
-<li><p> Your job's maximum walltime is 24 hours.</p></li>
-<li><p>Jobs must write to your scratch or project directory (home is read-only on compute nodes).</p></li>
-<li><p>Compute nodes have no internet access.</p>
-<p>[[Data_Management_at_Niagara#Moving_data | Move your data]] to Niagara before you submit your job.</p></li></ul>
+<tab name="Trillium">
+See [[Trillium_Quickstart#Trillium_specific_restrictions]].
 </tab>
 </tabs>
 

@@ -6,8 +6,8 @@ Pour transférer des données à partir ou en direction des grappes, veuillez ut
 
 ==Entre un ordinateur personnel et nos équipements==
 Pour télécharger ou téléverser des fichiers entre votre ordinateur et notre infrastructure, vous devez utiliser un logiciel offrant une fonctionnalité de transfert sécuritaire.
-*Dans un environnement de lignes de commandes sous Linux ou Mac OS X, utilisez les commandes <code>scp</code> et <code>sftp</code>.
-*Sous Windows, [[Connecting with MobaXTerm/fr|MobaXterm]] offre des fonctions de transfert de fichiers et une interface lignes de commandes via  [[SSH/fr|SSH]]; un autre programme gratuit pour le transfert de données est [https://winscp.net/eng/docs/lang:fr WinSCP]. Pour configurer une connexion via clés SSH avec WinSCP, voyez [https://www.exavault.com/blog/import-ssh-keys-winscp ces directives].
+*Dans un environnement ligne de commande sous Linux ou Mac OS X, utilisez les commandes <code>scp</code> et <code>sftp</code>.
+*Sous Windows, [[Connecting with MobaXTerm/fr|MobaXterm]] offre des fonctions de transfert de fichiers et une interface ligne de commande via  [[SSH/fr|SSH]]; un autre programme gratuit pour le transfert de données est [https://winscp.net/eng/docs/lang:fr WinSCP]. Pour configurer une connexion via clés SSH avec WinSCP, voyez [https://www.exavault.com/blog/import-ssh-keys-winscp ces directives].
 Les commandes <code>pscp</code> et <code>psftp</code> de [[Connecting with PuTTY/fr|PuTTY]] fonctionnent sensiblement comme les commandes sous Linux et Mac.
 
 S'il faut plus d'une minute pour transférer des fichiers entre votre ordinateur et nos serveurs, nous vous suggérons d'installer <i>Globus Connect Personal</i> et d'en faire l'essai; consultez la section [[Globus/fr#Ordinateurs_personnels|Ordinateurs personnels]]. Le transfert avec Globus peut être configuré et fonctionner en arrière-plan, sans intervention.
@@ -159,8 +159,10 @@ L'option <code>-r</code> permet de faire un transfert récursif d'un groupe de r
 |scp -i /path/to/key foo.txt username@beluga.alliancecan.ca:work/
 }}
 
+<span id="Prevention_and_Troubleshooting"></span>
 ==Mesures préventives et dépannage==
 
+<span id="Unable_to_read_data"></span>
 ===Problème de lecture===
 
 Assurez-vous que vous pouvez lire tout le contenu des répertoires <b><u>avant de les transférer</b></u>. Sous Linux, la commande suivante liste tous les éléments que vous n'avez pas en lecture.
@@ -169,9 +171,15 @@ Assurez-vous que vous pouvez lire tout le contenu des répertoires <b><u>avant d
 |find <directory_name> ! -readable -ls
 }}
 
+<span id="Unable_to_write_new_data"></span>
 ===Problème d'écriture de nouvelles données===
 
 * Vérifiez encore <b>[[Storage_and_file_management/fr#Introduction|l'utilisation du stockage]]</b> pour vous assurer qu'assez d'espace et assez de fichiers sont disponibles.
+** Sur certaines grappes, le système de fichiers compresse les données automatiquement et indique l'espace disque utilisé par les données compressées. Sur d'autres grappes, l'espace disque utilisé représente la taille apparente des fichiers. Ceci explique pourquoi 1To de données compressées sur une grappe devient 2To de données sur une autre grappe.
+** Avant de transférer un ensemble de données, vous pouvez connaître sa taille apparente avec l'option <code>-b</code> de la commande <code>du</code>.
+{{Command|du dataset; du -b dataset
+|result=443087696       dataset  # Size of the compressed data
+1048576000      dataset  # Apparent size of the data}}
 * Vérifiez encore <b>[[Sharing_data/fr|les permissions des systèmes de fichiers]]</b> pour vous assurer que vous avez la permission d'écriture à l'endroit où vous transférez les nouveaux fichiers.
 
 [[Category:Se connecter]]

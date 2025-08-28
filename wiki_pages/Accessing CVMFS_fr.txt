@@ -78,6 +78,7 @@ Pour configurer un client, voir [https://cvmfs.readthedocs.io/en/stable/cpt-quic
 
 Le répertoire <code>soft.computecanada.ca</code> est fourni  avec la configuration et vous pouvez ainsi y accéder; vous pouvez l'inclure dans votre configuration client <code>CVMFS_REPOSITORIES</code>.
 
+<span id="Testing"></span>
 == Test ==
 
 * Assurez-vous d'abord que les répertoires à tester se trouvent dans <code>CVMFS_REPOSITORIES</code>.
@@ -132,10 +133,17 @@ Si aucune bibliothèque ne se trouve dans <code>/usr/lib64/nvidia</code>, nous s
 Définir la variable d’environnement <code>RSNT_CUDA_DRIVER_VERSION=0.0</code> cache toutes les versions de CUDA.
 
 ==== <code>RSNT_LOCAL_MODULEPATHS</code> ====
-Cette variable identifie les endroits où se trouvent les arbres de modules locaux et les intègre à notre arborescence centrale. Définissez d’abord
-{{Command|export RSNT_LOCAL_MODULEPATHS{{=}}/opt/software/easybuild/modules}}
+{{Warning|title=ATTENTION|content=Cette variable d'environnement doit être utilisée uniquement avec des arbres de modules hiérarchiques qui sont installés via EasyBuild, pour que leur structure soit comme celle de nos modules.
 
-et installez ensuite votre recette [[EasyBuild/fr|EasyBuild]] avec
+Pour ajouter un chemin local à un arbre plat, placez la commande *après* l'appel du script. 
+{{Command|module use --priority 1 /path/to/your/flat/module/tree}}
+Ici, <code>--priority 1</code> fera en sorte que votre arbre de modules aura la priorité sur notre arborescence.<br>
+Pour que notre arborescence soit prioritaire, utilisez <code>--priority -1</code>
+{{Command|module use --priority -1 /path/to/your/flat/module/tree}}
+}}
+Cette variable identifie les endroits où se trouvent les arbres de modules locaux et les intègre à notre arborescence centrale. Définissez d'abord
+{{Command|export RSNT_LOCAL_MODULEPATHS{{=}}/opt/software/easybuild/modules}}
+et installez ensuite votre recette [[EasyBuild/fr|EasyBuild]] avec 
 {{Command|eb --installpath /opt/software/easybuild <your recipe>.eb}}
 
 Notre nomenclature de modules sera employée pour installer localement votre recette qui sera utilisée dans la hiérarchie des modules. Par exemple, si la recette utilise la chaîne de compilation <code>iompi,2018.3</code>, le module sera disponible après que les modules <code>intel/2018.3</code> et <code>openmpi/3.1.2</code> auront été chargés.
@@ -179,7 +187,7 @@ Nous mettons plusieurs logiciels du commerce à la disposition des utilisateurs,
 == Localisation de CUDA  ==
 Dans le cas des paquets CUDA, notre environnement logiciel utilise des bibliothèques de pilotes installées dans  <code>/usr/lib64/nvidia</code>. Cependant, avec certaines plateformes, les récents pilotes NVidia installent les bibliothèques  <code>/usr/lib64</code> dans <code>LD_LIBRARY_PATH</code> sans emprunter de toutes les bibliothèques du système, ce qui pourrait créer des incompatibilités avec notre environnement logiciel; nous vous recommandons donc de créer des liens symboliques dans <code>/usr/lib64/nvidia</code> pour rediriger vers les bibliothèques NVidia qui sont installées. Le script suivant sert à installer les pilotes et créer les liens symboliques (remplacez le numéro de version par celui que vous désirez). 
 
-{{File|name=script.sh|contents=
+{{File|name=script_for_redhat.sh|contents=
 NVIDIA_DRV_VER="410.48"
 nv_pkg=( "nvidia-driver" "nvidia-driver-libs" "nvidia-driver-cuda" "nvidia-driver-cuda-libs" "nvidia-driver-NVML" "nvidia-driver-NvFBCOpenGL" "nvidia-modprobe" )
 yum -y install ${nv_pkg[@]/%/-${NVIDIA_DRV_VER{{)}}{{)}}
@@ -189,8 +197,29 @@ for file in $(rpm -ql ${nv_pkg[@]}); do
 done
 }}
 
+{{File|name=script_for_ubuntu.sh|contents=
+#! /usr/bin/bash
+# Use the 'major series' number for the package name
+VER="570"
+nv_pkg=( "libnvidia-cfg1-${VER}-server:amd64"
+    		"libnvidia-compute-${VER}-server:amd64"
+		"libnvidia-decode-${VER}-server:amd64"
+		"libnvidia-encode-${VER}-server:amd64"
+		"libnvidia-extra-${VER}-server:amd64"
+		"libnvidia-fbc1-${VER}-server:amd64"
+		"libnvidia-gl-${VER}-server:amd64"
+		"xserver-xorg-video-nvidia-${VER}-server" )
+# apt --no-install-recommends install ${nv_pkg[*]}
+[ -d "/usr/lib64/nvidia/" ] {{!}}{{!}} mkdir "/usr/lib64/nvidia/"
+for file in $(dpkg --listfiles "${nv_pkg[@]}"); do
+	[ "${file%/*}" = '/usr/lib/x86_64-linux-gnu' ] && \
+	[ ! -d "${file}" ] && \
+	ln -snf "$file" "/usr/lib64/nvidia/${file##*/}"
+done
+}}
+
 == <code>LD_LIBRARY_PATH</code> ==
-Notre environnement est conçu  pour utiliser [https://en.wikipedia.org/wiki/Rpath RUNPATH]. Il n’est pas recommandé de définir <code>LD_LIBRARY_PATH</code> puisque l'environnement  [https://gms.tf/ld_library_path-considered-harmful.html pourrait causer des problèmes]. 
+ is [https://gms.tf/ld_library_path-considered-harmful.html Il n'est pas recommandé d'utiliser <code>LD_LIBRARY_PATH</code>] ce qui pourrait nuire au fonctionnement de l'environnement. 
 
 == Bibliothèques introuvables ==
 Puisque nous ne définissons pas <code>LD_LIBRARY_PATH</code> et que nos bibliothèques ne sont pas installées dans des localisations Linux par défaut, les paquets binaires comme Anaconda ont souvent de la difficulté à trouver les bibliothèques dont ils ont besoin. Consultez notre [[Installing_software_in_your_home_directory/fr#Installer_des_paquets_binaires|documentation sur l’installation de paquets binaires]].
