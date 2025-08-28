@@ -6,7 +6,7 @@ import json
 URL = "https://explora.alliancecan.ca/events"
 OUTPUT_DIR = Path("wiki_pages")
 OUTPUT_DIR.mkdir(exist_ok=True)
-OUTPUT_FILE = OUTPUT_DIR / "events.json"
+OUTPUT_FILE = OUTPUT_DIR / "events.txt"
 
 def fetch_events():
     resp = requests.get(URL)
