@@ -10,6 +10,7 @@ De par sa nature temporaire, <code>$SLURM_TMPDIR</code> est plus compliqué à u
 Les données en entrée doivent être copiées du réseau à <code>$SLURM_TMPDIR</code> avant qu'elles puissent être lues
 et les données en sortie doivent être copiées de <code>$SLURM_TMPDIR</code> au réseau avant que la tâche soit terminée pour que ces données soient conservées.  
 
+<span id="Input"></span>
 = Données en entrée =
 
 Pour pouvoir <i>lire</i> les données contenues dans <code>$SLURM_TMPDIR</code>, vous devez d'abord y copier les données.  
@@ -21,12 +22,14 @@ cp /project/def-someone/you/input.files.* $SLURM_TMPDIR/
 Cependant, ceci pourrait ne pas fonctionner avec une grande quantité de données ou dans le cas où les données doivent être lues par des processus exécutés sur des nœuds différents.
 Pour plus d'information, voir [[Using node-local storage/fr#Tâches_utilisant_plusieurs_nœuds|Tâches utilisant plusieurs nœuds]] et [[Using node-local storage/fr#Espace_disponible|Espace disponible</i>]] ci-dessous.
 
+<span id="Executable_files_and_libraries"></span>
 == Bibliothèques et fichiers exécutables ==
 
 Un cas particulier se présente avec du code comme donnée en entrée. Pour exécuter une application, l'interpréteur (<i>shell</i>) démarré par Slurm doit ouvrir au moins un des fichiers de cette application dont la lecture s'effectue généralement sur l'espace de stockage du réseau. Il est rare qu'une application ne soit lancée qu'avec un seul fichier; en effet, la plupart des applications font aussi appel à plusieurs fichiers, par exemple des bibliothèques.
 
 Nous remarquons en particulier que les applications exécutées dans un environnement virtuel [[Python/fr|Python]] génèrent un très grand nombre de transactions I/O, plus qu'il n'en faut d'ailleurs pour créer l'environnement virtuel lui-même. C'est pourquoi notre recommandation est de [[Python/fr#Créer_un_environnement_virtuel_dans vos_tâches|créer un environnement virtuel dans vos tâches]] avec <code>$SLURM_TMPDIR</code>.
 
+<span id="Output"></span>
 = Données en sortie =
 
 Les données en sortie doivent être copiées de  <code>$SLURM_TMPDIR</code> vers un espace de stockage permanent avant que la tâche ne se termine. Si une tâche s'arrête par manque de temps, les dernières lignes du script ne seront peut-être pas exécutées. 
@@ -35,6 +38,7 @@ Les solutions suivantes sont possibles&nbsp;:
 * placer des [[points de contrôle]] dans l'espace de stockage sur le réseau et pas dans <code>$SLURM_TMPDIR</code>;
 * écrire une fonction pour intercepter un signal.
 
+<span id="Signal_trapping"></span>
 == Intercepter un signal ==
 
 Vous pouvez demander à Slurm d'envoyer un signal à la tâche peu avant qu'elle n'atteigne sa limite de temps pour que celle-ci copie le résultat de <code>$SLURM_TMPDIR</code> vers l'espace de stockage sur le réseau. Ceci est utile si votre estimé du temps d'exécution est incertain ou que vous enchaînez plusieurs tâches Slurm pour effectuer un long calcul.
@@ -43,15 +47,18 @@ Pour ce faire, écrivez une fonction pour l'interpréteur (<i>shell</i>) afin qu
 
 Avec cette méthode, le contenu de <code>$SLURM_TMPDIR</code> ne sera pas conservé si un noeud tombe en panne ou si le système de fichiers réseau connaît un problème.
 
+<span id="Multinode_jobs"></span>
 = Tâches utilisant plusieurs nœuds =
 
 Si une tâche est répartie sur plusieurs nœuds et que chacun d'eux doit utiliser les données, <code>cp</code> ou <code>tar -x</code> ne sont pas suffisants.
 
+<span id="Copy_files"></span>
 == Copier des fichiers ==
 
 Pour copier un ou plusieurs fichiers sur <code>SLURM_TMPDIR</code> de chacun des nœuds alloués, utilisez
 {{Command|srun --ntasks{{=}}$SLURM_NNODES --ntasks-per-node{{=}}1 cp file [files...] $SLURM_TMPDIR}}
 
+<span id="Compressed_archives"></span>
 == Archives compressées ==
 
 === ZIP ===
@@ -63,12 +70,16 @@ Pour extraire vers <code>SLURM_TMPDIR</code> :
 Pour extraire vers <code>SLURM_TMPDIR</code> :
 {{Command|srun --ntasks{{=}}$SLURM_NNODES --ntasks-per-node{{=}}1 tar -xvf archive.tar.gz -C $SLURM_TMPDIR}}
 
+<span id="Amount_of_space"></span>
 = Espace disponible=
 
+<div class="mw-translate-fuzzy">
 Dans le cas de [[Niagara/fr|Niagara]], <tt>$SLURM_TMPDIR</tt> est implémenté comme <i>RAMdisk</i>; l'espace disponible est donc limité par la mémoire du  nœud, moins la capacité de RAM utilisée par votre application; voyez  [[Data_management_at_Niagara/fr#.24SLURM_TMPDIR_.28RAM.29|la note à cet effet]].
+</div>
 
 Pour les grappes d'usage général, la quantité d'espace disponible dépend de la grappe et du nœud auquel votre tâche est assignée.
 
+<div class="mw-translate-fuzzy">
 {| class="wikitable sortable"
 ! grappe !! capacité $SLURM_TMPDIR !! capacité disque
 |-
@@ -80,9 +91,14 @@ Pour les grappes d'usage général, la quantité d'espace disponible dépend de 
 |-
 | [[Narval]]  || 800G || 960G
 |}
+</div>
 
+<div class="mw-translate-fuzzy">
 La capacité indiquée pour $SLURM_TMPDIR est celle du <i>plus petit nœud </i> de chaque grappe.   
 Si votre tâche réserve des [[Advanced_MPI_scheduling/fr#N.C5.93uds_entiers|nœuds entiers]], il est raisonnable de penser qu'autant d'espace $SLURM_TMPDIR sera disponible sur chaque nœud.
 Par contre, si votre tâche demande moins qu'un nœud entier, les autres tâches pourront aussi écrire dans le même système de fichiers (mais non dans le même répertoire) et ainsi limiter l'espace disponible pour votre tâche.
+</div>
 
+<div class="mw-translate-fuzzy">
 À chacun des sites, certains nœuds ont plus d'espace disque local qu'indiqué dans le tableau; voyez la section <i>Caractéristiques des nœuds</i> pour chacune des grappes ([[Béluga]], [[Cedar/fr|Cedar]], [[Graham/fr|Graham]] et [[Narval]]).
+</div>

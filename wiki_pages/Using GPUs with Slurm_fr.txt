@@ -22,6 +22,7 @@ Pour l'information générale sur l'ordonnancement des tâches, consultez [[Runn
 = GPU disponibles =
 Le tableau suivant liste les GPU qui sont présentement disponibles.
 
+<div class="mw-translate-fuzzy">
 {| class="wikitable"
 |-
 ! Grappe !! Caractéristiques !! Type <br>de GPU !! Modèle  !! Compute<br>Capability(*) !! Remarques
@@ -59,16 +60,10 @@ Le tableau suivant liste les GPU qui sont présentement disponibles.
 |-
 | Arbutus || colspan=4|Les ressources infonuagiques ne sont pas ordonnancées. Voir [[Cloud resources/fr|Ressources infonuagiques]] pour l'information sur le matériel.
 |}
+</div>
 
 (*) Le terme <i>Compute Capability</i> est utilisé par NVIDIA pour indiquer les fonctionnalités matérielles spécifiques à un GPU particulier et n'a aucun rapport avec la performance des dispositifs. Cet attribut n'est utile que si vous compilez vos propres programmes GPU. Pour plus d'information, voir [[CUDA/fr#Attribut_.22compute_capability.22|la page CUDA]].
 
-(**) Pour avoir accès à un gabarit pour un nœud V100 de 16Go sur Graham, utilisez les arguments suivants dans la commande sbatch/salloc&nbsp;: <code>--constraint=skylake,v100</code>.
-
-(**) Pour avoir accès à un gabarit pour un nœud V100 de 32Go sur Graham, utilisez les arguments suivants dans la commande sbatch/salloc&nbsp;:  <code>--constraint=cascade,v100</code>.
-
-== Mist ==
-[https://docs.scinet.utoronto.ca/index.php/Mist Mist] est une grappe qui comprend des CPU IBM Power9 (et non des Intel x86) et des GPU NVIDIA V100.  
-Si vous avez accès à Niagara, vous avez aussi  accès à Mist; voyez les directives sur [https://docs.scinet.utoronto.ca/index.php/Mist#Submitting_jobs le site web de SciNet].
 
 == GPU multi-instances sur Narval ==
 La technologie MIG permettant de partitionner un GPU en plusieurs instances est présentement disponible sur Narval comme projet pilote. Pour plus d'information, consultez la page [[Multi-Instance_GPU/fr|GPU multi-instances]].
@@ -76,9 +71,11 @@ La technologie MIG permettant de partitionner un GPU en plusieurs instances est 
 <span id="Selecting_the_type_of_GPU_to_use"></span>
 = Indiquer le type de GPU à utiliser =
 
+<div class="mw-translate-fuzzy">
 Certaines grappes possèdent plus d'un type de GPU; c'est le cas de [[Cedar/fr|Cedar]] et [[Graham/fr|Graham]].
 </br>
-Sur [[Béluga]], [[Cedar/fr|Cedar]] et [[Graham/fr|Graham]] les GPU sont uniquement disponibles sur certains nœuds. 
+Sur [[Béluga]], [[Cedar/fr|Cedar]] et [[Graham/fr|Graham]] les GPU sont uniquement disponibles sur certains nœuds.
+</div> 
 
 Si le type de GPU n'est pas spécifié, Slurm pourrait acheminer aléatoirement votre tâche vers un nœud équipé avec n'importe quel type de GPU. Dans certains cas, ceci pourrait ne pas être souhaitable. Assurez-vous donc de spécifier le type de GPU.
 
@@ -120,12 +117,14 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 ./program
 }}
 
+<div class="mw-translate-fuzzy">
 Pour chaque GPU demandé, nous recommandons
 * sur Béluga, un maximum de 10 cœurs CPU;
 * sur Cedar,
 ** un maximum de 6 cœurs CPU par GPU de type P100 (p100 et p100l)
 ** un maximum de 8 cœurs CPU par GPU de type V100 (v100l)
 * sur Graham, un maximum de 16 cœurs CPU
+</div>
 
 == Tâches MPI ==
 {{File
@@ -145,60 +144,6 @@ srun --cpus-per-task=$SLURM_CPUS_PER_TASK ./program
 
 == Nœuds entiers  ==
 Si votre application peut utiliser efficacement un nœud entier et ses GPU associés, vous pouvez probablement réduire le temps d'attente si vous demandez un nœud entier. Utilisez les scripts suivants comme modèle. 
-
-=== Demander un nœud GPU sur Graham ===
-{{File
-  |name=graham_gpu_node_job.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=1
-#SBATCH --gpus-per-node=p100:2
-#SBATCH --ntasks-per-node=32
-#SBATCH --mem=127000M
-#SBATCH --time=3:00
-#SBATCH --account=def-someuser
-nvidia-smi
-}}
-
-=== Demander un nœud GPU P100 sur Cedar ===
-{{File
-  |name=cedar_gpu_node_job.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=1
-#SBATCH --gpus-per-node=p100:4
-#SBATCH --ntasks-per-node=24
-#SBATCH --exclusive
-#SBATCH --mem=125G
-#SBATCH --time=3:00
-#SBATCH --account=def-someuser
-nvidia-smi
-}}
-
-<span id="Requesting_a_P100-16G_GPU_node_on_Cedar"></span>
-=== Demander un nœud P100-16G sur Cedar ===
-
-Sur [[Cedar/fr|Cedar]] se trouve un groupe particulier de nœuds qui ont chacun quatre cartes Tesla P100 16Go, alors que les autres GPU P100 sont de 12Go et les GPU V100 de 32Go.
-Les GPU des nœuds P100L utilisent le même connecteur PCI, ce qui fait que la latence dans les communications entre GPU est plus faible; cependant, la bande passante entre CPU et GPU est plus basse qu'avec des nœuds GPU réguliers. De plus, la mémoire vive des nœuds est de 256Go.
-Pour utiliser ces nœuds, il faut demander des nœuds entiers et indiquer <code>--gres=gpu:p100l:4</code>. Le temps d'exécution maximal pour les tâches sur GPU P100L est de 28 jours.
-
-{{File
-  |name=p100l_gpu_job.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=1 
-#SBATCH --gpus-per-node=p100l:4     
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=24    # il y a 24 cœurs CPU sur les nœuds GPU P100 de Cedar
-#SBATCH --mem=0               # demandez toute la mémnoire du nœud
-#SBATCH --time=3:00
-#SBATCH --account=def-someuser
-hostname
-nvidia-smi
-}}
 
 <span id="Packing_single-GPU_jobs_within_one_SLURM_job"></span>
 ===Regroupement de tâches pour un seul GPU===
@@ -222,10 +167,12 @@ Vous pouvez ainsi soumettre plusieurs tâches. Le paramètre <code>-j4</code> fa
 <span id="Profiling_GPU_tasks"></span>
 == Profilage des tâches avec GPU ==
 
+<div class="mw-translate-fuzzy">
 Sur [[Béluga]] et [[Narval]], 
 [https://developer.nvidia.com/dcgm DCGM (NVIDIA Data Center GPU Manager)]
 doit être désactivé, et ce lorsque vous soumettez la tâche. 
 Selon l'exemple, configurez la variable d'environnement  <code>DISABLE_DCGM</code>.
+</div>
 
 {{Command|DISABLE_DCGM{{=}}1 salloc --account{{=}}def-someuser --gpus-per-node{{=}}1 --mem{{=}}4000M --time{{=}}03:00}}
 
