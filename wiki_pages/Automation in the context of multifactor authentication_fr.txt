@@ -44,12 +44,11 @@ Avant d’ajouter la clé SSH dans [https://ccdb.alliancecan.ca/ssh_authorized_k
 
 = Nœuds d'automatisation, par grappe =
 Pour vous connecter à un nœud d'automatisation, utilisez les adresses suivantes&nbsp;:
-* Béluga : robot.beluga.alliancecan.c
-* Cedar : robot.cedar.alliancecan.ca
-* Graham : robot.graham.alliancecan.ca
+* Fir : robot.fir.alliancecan.c
 * Narval : robot.narval.alliancecan.ca
-* Niagara : robot.niagara.alliancecan.ca (vous pouvez aussi utiliser robot1.niagara.alliancecan.ca et robot2.niagara.alliancecan.ca)
+* Nibi : ''(disponible sous peu)''
 * Rorqual : robot.rorqual.alliancecan.ca
+* Trillium : ''(disponible sous peu)''
 
 = Ne pas se tromper de clé =
 Si vous avez plusieurs clés, assurez-vous d'utiliser la bonne. Ceci peut se faire avec des paramètres passés à la commande, comme dans les exemples ci-dessous. 
@@ -92,19 +91,19 @@ Si vous entrez le masque IPv4 ''199.241.166.*''' pour la clé SSH dans CCDB et q
 === Comment identifier le problème ===
 
 Si la connexion SSH à un nœud d'automatisation ne se fait pas, faites un test avec la commande 
- ssh -i ~/.ssh/automation_key -vvv username@robot.graham.alliancecan.ca "ls -l" 
+ ssh -i ~/.ssh/automation_key -vvv username@robot.rorqal.alliancecan.ca "ls -l" 
 
-Ceci essaie d'établir la connexion avec le nœud d'automatisation sur Graham et d'exécuter la commande <code>ls -l</code> avec la clé SSH 
+Ceci essaie d'établir la connexion avec le nœud d'automatisation sur Rorqual et d'exécuter la commande <code>ls -l</code> avec la clé SSH 
 <code>~/.ssh/automation_key</code>.
-La liste des fichiers contenus dans votre répertoire /home sur Graham est ensuite affichée.
+La liste des fichiers contenus dans votre répertoire /home sur Rorqual est ensuite affichée.
 
 Cette commande produit beaucoup d'information de débogage à cause de l'option  <code>-vvv</code> (<i>Very Very Verbose</i>).
 Si le message dans <i>Connecting to...</i> ressemble à
- debug1: Connecting to robot.graham.alliancecan.ca [199.241.166.5] port 22.
+ debug1: Connecting to robot.rorqual.alliancecan.ca [199.241.166.5] port 22.
 
 l'adressage se fait avec IPv4.
 Si le message ressemble plutôt à
- debug1: Connecting to robot.graham.alliancecan.ca [2620:123:7002:4::5] port 22.
+ debug1: Connecting to robot.rorqual.alliancecan.ca [2620:123:7002:4::5] port 22.
 
 l'adressage se fait avec IPv6.
 
@@ -113,8 +112,8 @@ l'adressage se fait avec IPv6.
 
 * <b>Forcer le client SSH à utiliser IPv4 ou IPv6</b> avec les options <code>-4</code> et <code>-6</code> selon le format utilisé dans CCDB pour la clé.
 
-* <b>Pointer au nœud d'automatisation avec l'adresse IP du nœud</b> plutôt qu'avec son nom; par exemple, sur Graham 
-: <code>ssh -i ~/.ssh/automation_key -vvv username@199.241.166.5 "ls -l"</code>
+* <b>Pointer au nœud d'automatisation avec l'adresse IP du nœud</b> plutôt qu'avec son nom; par exemple, sur Rorqual 
+: <code>ssh -i ~/.ssh/automation_key -vvv username@132.219.138.79 "ls -l"</code>
 : pour forcer SSH à utiliser les adresses IPv4.
 
 * <b>Désactiver l'adressage IPv6 sur votre ordinateur</b> pour faire en sorte que IP4v soit utilisé.
@@ -136,7 +135,7 @@ import paramiko
 key = paramiko.Ed25519Key.from_private_key_file("/home/username/.ssh/cc_allowed")
 
 user = "username"
-host = "robot.graham.alliancecan.ca"
+host = "robot.rorqual.alliancecan.ca"
 
 ssh = paramiko.SSHClient()
 
@@ -153,7 +152,7 @@ print("".join(stdout.readlines()))
 ssh.close()
 # ====================================================================================================
 </source>
-Ceci établit la connexion au nœud d'automatisation de '''Graham''' avec une clé inscrite dans le portail CCDB et exécute la commande <code>ls -l</code> pour obtenir la liste des fichiers.
+Ceci établit la connexion au nœud d'automatisation de '''Rorqual''' avec une clé inscrite dans le portail CCDB et exécute la commande <code>ls -l</code> pour obtenir la liste des fichiers.
 La liste est ensuite affichée à l'écran.
 
 Remarquez qu'il est important <b>d'installer Paramiko</b> avec la commande 

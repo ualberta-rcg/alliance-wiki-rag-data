@@ -2,7 +2,7 @@
 
 <translate>
 <!--T:30-->
-Please use <b>data transfer nodes</b>, also called <b>data mover nodes</b>, instead of login nodes whenever you are transferring data to and from our clusters. If a data transfer node is available, its URL will be given near the top of the main page for each cluster: [[Béluga/en|Béluga]], [[Narval/en|Narval]], [[Cedar]], [[Graham]] and [[Niagara]].
+Please use <b>data transfer nodes</b>, also called <b>data mover nodes</b>, instead of login nodes whenever you are transferring data to and from our clusters. If a data transfer node is available, its URL will be given near the top of the main page for each cluster, which you can find in the sidebar on the left.
 
 <!--T:31-->
 [[Globus]] automatically uses data transfer nodes.
@@ -25,15 +25,15 @@ However, other common tools can also be found for transferring data both inside 
 * [[Transferring_data#Rsync | rsync]]
 
 <!--T:35-->
-Note: If you want to transfer files between another of our clusters and Niagara use the SSH agent forwarding flag <code>-A</code> when logging into another cluster. For example, to copy files to Niagara from Cedar, use:
+Note: If you want to transfer files between another of our clusters and Trillium use the SSH agent forwarding flag <code>-A</code> when logging into another cluster. For example, to copy files to Trillium from Fir, use:
 
 <!--T:36-->
 <pre>
-ssh -A USERNAME@cedar.alliancecan.ca
+ssh -A USERNAME@fir.alliancecan.ca
 </pre>
 then perform the copy:
 <pre>
-[USERNAME@cedar5 ~]$ scp file USERNAME@niagara.alliancecan.ca:/scratch/g/group/USERNAME/
+[USERNAME@fir2 ~]$ scp file USERNAME@trillium.alliancecan.ca:
 </pre>
 
 <!--T:5-->
@@ -79,13 +79,13 @@ For more information about Globus please see [[Globus]].
 
 <!--T:26-->
 When transferring files into the <code>/project</code> file systems, do not use <code>-p</code> and <code>-g</code> flags since the quotas in <code>/project</code> are enforced based on group ownership, and thus preserving the group ownership will lead to the [[Frequently_Asked_Questions#Disk_quota_exceeded_error_on_.2Fproject_filesystems | Disk quota exceeded]] error message.  Since <code>-a</code> includes <code>-p</code> and <code>-g</code> by default, the <code>--no-g --no-p</code> options should be added, like so
-{{Command|rsync -avzh --no-g --no-p LOCALNAME someuser@graham.alliancecan.ca:projects/def-professor/someuser/somedir/}}
+{{Command|rsync -avzh --no-g --no-p LOCALNAME someuser@nibi.alliancecan.ca:projects/def-professor/someuser/somedir/}}
 where LOCALNAME can be a directory or file preceded by its path location and somedir will be created if it doesn't exist.  The <code>-z</code> option compresses files (not in the default file suffixes <code>--skip-compress</code> list) and requires additional cpu resources while the <code>-h</code> option makes transferred file sizes human readable.  If you are transferring very large files add the <code>--partial</code> option so interrupted transfers maybe restarted:
-{{Command|rsync -avzh --no-g --no-p --partial --progress LOCALNAME someuser@graham.alliancecan.ca:projects/def-professor/someuser/somedir/}}
+{{Command|rsync -avzh --no-g --no-p --partial --progress LOCALNAME someuser@nibi.alliancecan.ca:projects/def-professor/someuser/somedir/}}
 The <code>--progress</code> option will display the percent progress of each file as its transferred.  If you are transferring very many smaller files, then it maybe more desirable to display a single progress bar that represents the transfer progress of all files:
-{{Command|rsync -azh --no-g --no-p --info{{=}}progress2 LOCALNAME someuser@graham.alliancecan.ca:projects/def-professor/someuser/somedir/}}
+{{Command|rsync -azh --no-g --no-p --info{{=}}progress2 LOCALNAME someuser@nibi.alliancecan.ca:projects/def-professor/someuser/somedir/}}
 The above rsync examples all involve transfers from a local system into a project directory on a remote system.  Rsync transfers from a remote system into a project directory on a local system work in much the same way, for example:
-{{Command|rsync -avzh --no-g --no-p someuser@graham.alliancecan.ca:REMOTENAME ~/projects/def-professor/someuser/somedir/}}
+{{Command|rsync -avzh --no-g --no-p someuser@nibi.alliancecan.ca:REMOTENAME ~/projects/def-professor/someuser/somedir/}}
 where REMOTENAME can be a directory or file preceded by its path location and somedir will be created if it doesn't already exist.  In its simplest incarnation rsync can also be used locally within a single system to transfer a directory or file (from home or scratch) into project by dropping the cluster name:
 {{Command|rsync -avh --no-g --no-p LOCALNAME ~/projects/def-professor/someuser/somedir/}}
 where somedir will be created if it doesn't already exist before copying LOCALNAME into it.  For comparison purposes, the copy command can similarely be used to transfer LOCALNAME from home to project by doing:
@@ -162,11 +162,11 @@ There are also a number of graphical programs available for Windows, Linux and M
 <!--T:28-->
 SCP stands for [https://en.wikipedia.org/wiki/Secure_copy <i>Secure Copy Protocol</i>]. Like SFTP it uses the SSH protocol to encrypt data being transferred. It does not support synchronization like [[Globus]] or [[Transferring_data#Rsync|rsync]]. Some examples of the most common use of SCP include 
 {{Command
-|scp foo.txt username@beluga.alliancecan.ca:work/
+|scp foo.txt username@rorqual.alliancecan.ca:work/
 }}
-which will copy the file <code>foo.txt</code> from the current directory on my local computer to the directory <code>$HOME/work</code> on the cluster [[Béluga/en|Béluga]]. To copy a file, <code>output.dat</code> from my project space on the cluster [[Cedar]] to my local computer I can use a command like
+which will copy the file <code>foo.txt</code> from the current directory on my local computer to the directory <code>$HOME/work</code> on the cluster [[Rorqual/en|Rorqual]]. To copy a file, <code>output.dat</code> from my project space on the cluster [[Fir]] to my local computer I can use a command like
 {{Command
-|scp username@cedar.alliancecan.ca:projects/def-jdoe/username/results/output.dat .
+|scp username@fir.alliancecan.ca:projects/def-jdoe/username/results/output.dat .
 }}
 Many other examples of the use of SCP are shown [http://www.hypexr.org/linux_scp_help.php here]. Note that you always execute this <code>scp</code> command on your local computer, not the remote cluster - the SCP connection, regardless of whether you are transferring data to or from the remote cluster, should always be initiated from your local computer. 
 
@@ -178,7 +178,7 @@ SCP supports the option <code>-r</code> to recursively transfer a set of directo
 
 <!--T:34-->
 {{Command
-|scp -i /path/to/key foo.txt username@beluga.alliancecan.ca:work/
+|scp -i /path/to/key foo.txt username@rorqual.alliancecan.ca:work/
 }}
 
 ==Prevention and Troubleshooting== <!--T:38-->

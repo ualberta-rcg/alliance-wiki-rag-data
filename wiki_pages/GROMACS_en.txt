@@ -134,7 +134,7 @@ The following versions have been installed:
 </tabs>
 
 '''Notes:'''
-* [[File:Warning sign 16px.png|frameless|warning]] GROMACS versions 2020.0 up to and including 2021.5 contain a bug when used on GPUs of Volta or newer generations (i.e. V100, T4 and A100) with <code>mdrun</code> option <code>-update gpu</code> that could have perturbed the virial calculation and, in turn, led to incorrect pressure coupling. The GROMACS developers state in the 2021.6 Release Notes:<ref>"Fix missing synchronization in CUDA update kernels" in GROMACS 2021.6 Release Notes [https://manual.gromacs.org/2021.6/release-notes/2021/2021.6.html#fix-missing-synchronization-in-cuda-update-kernels]</ref> <blockquote>''The GPU update is not enabled by default, so the error can only appear in simulations where it [the <code>-update gpu</code> option] was manually selected, and even in this case the error might be rare since we have not observed it in practice in the testing we have performed.''</blockquote> Further discussion of this bug can be found in the GitLab issue #4393 of the GROMACS project.<ref>Issue #4393 in GROMACS Project on GitLab.com [https://gitlab.com/gromacs/gromacs/-/issues/4393]</ref>
+* [[File:Warning sign 16px.png|frameless|warning]] GROMACS versions 2020.0 up to and including 2021.5 contain a bug when used on GPUs of Volta or newer generations (i.e. V100, T4, A100, and H100) with <code>mdrun</code> option <code>-update gpu</code> that could have perturbed the virial calculation and, in turn, led to incorrect pressure coupling. The GROMACS developers state in the 2021.6 Release Notes:<ref>"Fix missing synchronization in CUDA update kernels" in GROMACS 2021.6 Release Notes [https://manual.gromacs.org/2021.6/release-notes/2021/2021.6.html#fix-missing-synchronization-in-cuda-update-kernels]</ref> <blockquote>''The GPU update is not enabled by default, so the error can only appear in simulations where it [the <code>-update gpu</code> option] was manually selected, and even in this case the error might be rare since we have not observed it in practice in the testing we have performed.''</blockquote> Further discussion of this bug can be found in the GitLab issue #4393 of the GROMACS project.<ref>Issue #4393 in GROMACS Project on GitLab.com [https://gitlab.com/gromacs/gromacs/-/issues/4393]</ref>
 * Version 2020.4 and newer have been compiled for the new [[Standard software environments|Standard software environment]] <code>StdEnv/2020</code>.
 * Version 2018.7 and newer have been compiled with GCC compilers and the MKL-library, as they run a bit faster.
 * Older versions have been compiled with either with GCC compilers and FFTW or Intel compilers, using Intel MKL and Open MPI 2.1.1 libraries from the default environment as indicated in the table above.
@@ -204,62 +204,9 @@ cluster’s compute nodes. See section [[GROMACS#Performance_and_benchmarking|Pe
 On clusters with a large number of CPU cores (e.g. 192) per compute node, domain decomposition can become a limiting factor when choosing <code>--ntasks-per-node</code>. The larger a system is, the more it can be divided into smaller regions, allowing larger <code>--ntasks-per-node</code> values. If GROMACS reports an error about domain decomposition being impossible given the system size and requested number of domains, halve <code>--ntasks-per-node</code> and double <code>--cpus-per-task</code>.
 
 <tabs>
-<tab name="Graham">
-{{File
-  |name=gromacs_whole_node_graham.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=1                # number of nodes
-#SBATCH --ntasks-per-node=16     # request 16 MPI tasks per node
-#SBATCH --cpus-per-task=2        # 2 OpenMP threads per MPI task => total: 16 x 2 = 32 CPUs/node
-#SBATCH --mem-per-cpu=2000M      # memory per CPU (in MB)
-#SBATCH --time=0-01:00           # time limit (D-HH:MM)
-module purge  
-module load  StdEnv/2023  gcc/12.3  openmpi/4.1.5  gromacs/2024.4
-export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
-
-srun --cpus-per-task=$OMP_NUM_THREADS gmx_mpi mdrun -deffnm md
-}}</tab>
-<tab name="Cedar">
-{{File
-  |name=gromacs_whole_node_cedar.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=1                        # number of nodes
-#SBATCH --ntasks-per-node=24             # request 24 MPI tasks per node
-#SBATCH --cpus-per-task=2                # 2 OpenMP threads per MPI task => total: 24 x 2 = 48 CPUs/node
-#SBATCH --constraint="[skylake{{!}}cascade]" # restrict to AVX512 capable nodes.
-#SBATCH --mem-per-cpu=2000M              # memory per CPU (in MB)
-#SBATCH --time=0-01:00                   # time limit (D-HH:MM)
-module purge
-module load arch/avx512   # switch architecture for up to 30% speedup
-module load  StdEnv/2023  gcc/12.3  openmpi/4.1.5  gromacs/2024.4
-export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
- 
-srun --cpus-per-task=$OMP_NUM_THREADS gmx_mpi mdrun -deffnm md
-}}</tab>
-<tab name="Béluga">
-{{File
-  |name=gromacs_whole_node_beluga.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=1                # number of nodes
-#SBATCH --ntasks-per-node=20     # request 20 MPI tasks per node
-#SBATCH --cpus-per-task=2        # 2 OpenMP threads per MPI task => total: 20 x 2 = 40 CPUs/node
-#SBATCH --mem-per-cpu=2000M      # memory per CPU (in MB)
-#SBATCH --time=0-01:00           # time limit (D-HH:MM)
-module purge  
-module load  StdEnv/2023  gcc/12.3  openmpi/4.1.5  gromacs/2024.4
-export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
- 
-srun --cpus-per-task=$OMP_NUM_THREADS gmx_mpi mdrun -deffnm md
-}}</tab>
 <tab name="Narval">
 {{File
-  |name=gromacs_whole_node_beluga.sh
+  |name=gromacs_whole_node_narval.sh
   |lang="sh"
   |contents=
 #!/bin/bash
@@ -269,24 +216,6 @@ srun --cpus-per-task=$OMP_NUM_THREADS gmx_mpi mdrun -deffnm md
 #SBATCH --mem-per-cpu=2000M      # memory per CPU (in MB)
 #SBATCH --time=0-01:00           # time limit (D-HH:MM)
 module purge  
-module load  StdEnv/2023  gcc/12.3  openmpi/4.1.5  gromacs/2024.4
-export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
- 
-srun --cpus-per-task=$OMP_NUM_THREADS gmx_mpi mdrun -deffnm md
-}}</tab>
-<tab name="Niagara">
-{{File
-  |name=gromacs_whole_node_niagara.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=1                # number of nodes
-#SBATCH --ntasks-per-node=10     # request 10 MPI tasks per node
-#SBATCH --cpus-per-task=4        # 4 OpenMP threads per MPI task => total: 10 x 4 = 40 CPUs/node
-#SBATCH --mem-per-cpu=2000M      # memory per CPU (in MB)
-#SBATCH --time=0-01:00           # time limit (D-HH:MM)
-module purge --force
-module load CCEnv
 module load  StdEnv/2023  gcc/12.3  openmpi/4.1.5  gromacs/2024.4
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
  
@@ -388,7 +317,7 @@ gmx mdrun -ntomp ${SLURM_CPUS_PER_TASK:-1} -deffnm md
 Note that using more than a single GPU usually leads to poor efficiency. Carefully test and compare multi-GPU and single-GPU performance before deciding to use more than one GPU for your simulations.
 
 * [[File:Warning sign 16px.png|frameless|warning]] GROMACS versions 2020.0 up to and including 2021.5 contain a bug when used on GPUs of Volta or newer generations (i.e. V100, T4 and A100) with <code>mdrun</code> option <code>-update gpu</code> that could have perturbed the virial calculation and, in turn, led to incorrect pressure coupling. The GROMACS developers state in the 2021.6 Release Notes:<ref>"Fix missing synchronization in CUDA update kernels" in GROMACS 2021.6 Release Notes [https://manual.gromacs.org/2021.6/release-notes/2021/2021.6.html#fix-missing-synchronization-in-cuda-update-kernels]</ref> <blockquote>''The GPU update is not enabled by default, so the error can only appear in simulations where it was manually selected, and even in this case the error might be rare since we have not observed it in practice in the testing we have performed.''</blockquote> Further discussion of this bug can be found in the GitLab issue #4393 of the GROMACS project.<ref>Issue #4393 in GROMACS Project on GitLab.com [https://gitlab.com/gromacs/gromacs/-/issues/4393]</ref>
-* Our clusters (Beluga, Cedar, Graham and Narval) have differently configured GPU nodes.<br>On the page [[Using GPUs with Slurm#Available GPUs]] you can find more information about the different node configurations (GPU models and number of GPUs and CPUs per node).
+* Our clusters have differently configured GPU nodes.<br>On the page [[Using GPUs with Slurm#Available GPUs]] you can find more information about the different node configurations (GPU models and number of GPUs and CPUs per node).
 * GROMACS imposes a number of constraints for choosing the number of GPUs, tasks (MPI ranks) and OpenMP threads.<br>For GROMACS 2018.2 the constraints are:
 ::* The number of <code>--tasks-per-node</code> always needs to be the same as, or a multiple of the number of GPUs (<code>--gpus-per-node</code>).
 ::* GROMACS will not run GPU runs with only 1 OpenMP thread unless forced by setting the <code>-ntomp</code> option.<br>According to GROMACS developers, the optimum number of <code>--cpus-per-task</code> is between 2 and 6.
@@ -719,33 +648,7 @@ matches the number of CPU cores in a compute node.
 
 == CPU architecture ==
 
-GROMACS uses optimized kernel functions to compute the real-space portion of short-range, non-bonded interactions. Kernel functions are available for a variety of SIMD instruction sets, such as AVX, AVX2, and AVX512. Kernel functions are chosen when compiling GROMACS, and should match the capabilities of the CPUs that will be used to run the simulations. This is done for you by the Compute Canada team: when you load a GROMACS module into your environment, an appropriate AVX/AVX2/AVX512 version is chosen depending on the architecture of the cluster. GROMACS reports what SIMD instruction set it supports in its log file, and will warn you if the selected kernel function is suboptimal.
-
-However, certain clusters contain a mix of CPUs that have different levels of SIMD support. When that is the case, the smallest common denominator is used. For instance, if the cluster has Skylake (AVX/AVX2/AVX512) and Broadwell (AVX/AVX2) CPUs, as Cedar currently (May 2020) does, a version of GROMACS compiled for the AVX2 instruction set will be used. This means that you may end up with a suboptimal choice of kernel function, depending on which compute nodes the scheduler allocates for your job.
-
-You can explicitly request nodes that support AVX512 with the <code>--constraint="[cascade|skylake]"</code> SLURM option on clusters that offer these node types. 
-This will make sure that your job will be assigned to nodes based on either the "Cascade Lake" or the "Skylake" architecture (but not a mix of both types).
-If working on the command line, make sure to not forget the quotation marks (<code>"</code>) to protect the special characters <code>[</code>, <code>|</code> and <code>]</code>. 
-You can then explicitly request AVX512 software using <code>module load arch/avx512</code> before loading any other module. 
-
-For example, a simple job script could look like the following:
-
- {{File
-  |name=gromacs_job_cedar_avx512.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=4
-#SBATCH --ntasks-per-node=48
-#SBATCH --constraint="[skylake{{!}}cascade]"
-#SBATCH --time=24:00:00
-module load arch/avx512
-module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 gromacs/2024.4
-export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
-srun gmx_mpi mdrun
-}}
-
-In our measurements, going from AVX2 to AVX512 on Skylake or Cascade nodes resulted in a 20−30% performance increase. However, you should also consider that restricting yourself to only AVX512-capable nodes will result in longer wait times in the queue.
+GROMACS uses optimized kernel functions to compute the real-space portion of short-range, non-bonded interactions. Kernel functions are available for a variety of SIMD instruction sets, such as AVX, AVX2, and AVX512. Kernel functions are chosen when compiling GROMACS, and should match the capabilities of the CPUs that will be used to run the simulations. This is done for you by our team: when you load a GROMACS module into your environment, an appropriate AVX/AVX2/AVX512 version is chosen depending on the architecture of the cluster. GROMACS reports what SIMD instruction set it supports in its log file, and will warn you if the selected kernel function is suboptimal.
 
 == GPUs ==
 
@@ -760,7 +663,7 @@ Tips on how to use GPUs efficiently will be added soon.
 ''GROMACS'' contains a large number of tools that can be used for common tasks of post-processing and analysis. 
 The ''GROMACS'' manual contains a [https://manual.gromacs.org/current/user-guide/cmdline.html#commands-by-topic list of available commands organized by topic] as well as [https://manual.gromacs.org/current/user-guide/cmdline.html#commands-by-name organized by name] that give a short description and link to the corresponding command reference.
 
-These commands will typically read the trajectory (in the ''XTC'', ''TNG'' or ''TRR'' format) as well as a coordinate file (''GRO'', ''PDB'', ''TPR'', etc.) and write plots in the [https://manual.gromacs.org/current/reference-manual/file-formats.html#xvg ''XVG'' format] which can be used for inputs for the [https://plasma-gate.weizmann.ac.il/Grace/ plotting tool Grace] (module: <code>grace/5.99.0</code>; command <code>xmgrace</code>; [https://plasma-gate.weizmann.ac.il/Grace/doc/UsersGuide.html Grace User Guide]). As ''XVG'' files are simple text files, they can also be processed with scripts or imported into other spreadsheet programs.
+These commands will typically read the trajectory (in the ''XTC'', ''TNG'' or ''TRR'' format) as well as a coordinate file (''GRO'', ''PDB'', ''TPR'', etc.) and write plots in the [https://manual.gromacs.org/current/reference-manual/file-formats.html#xvg ''XVG'' format] which can be used for inputs for the [https://plasma-gate.weizmann.ac.il/Grace/ plotting tool Grace] (command <code>xmgrace</code>; [https://plasma-gate.weizmann.ac.il/Grace/doc/UsersGuide.html Grace User Guide]). As ''XVG'' files are simple text files, they can also be processed with scripts or imported into other spreadsheet programs.
 
 == VMD ==
 [[VMD]] is a molecular visualization program for displaying, animating, and analyzing large biomolecular systems using 3-D graphics and built-in scripting.  It can be used to visually inspect GROMACS trajectories and also offers a large number of built-in and external plugins for analysis.

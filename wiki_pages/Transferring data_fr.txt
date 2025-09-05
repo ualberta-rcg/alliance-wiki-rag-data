@@ -1,6 +1,6 @@
 <languages />
 
-Pour transférer des données à partir ou en direction des grappes, veuillez utiliser les nœuds de copie plutôt que les nœuds de connexion. Pour connaître l'adresse URL d'un nœud de copie, consultez le tableau au haut des pages pour [[Béluga]], [[Narval]], [[Cedar/fr|Cedar]], [[Graham/fr|Graham]] et [[Niagara/fr|Niagara]].
+Pour transférer des données à partir ou en direction des grappes, veuillez utiliser les nœuds de copie plutôt que les nœuds de connexion. Pour connaître l'adresse URL d'un nœud de copie, consultez le tableau au haut des pages pour chacune des grappes (cliquez sur le nom de la grappe dans la barre de gauche de la fenêtre principale).
 
 [[Globus/fr|Globus]] utilise automatiquement les nœuds de copie.
 
@@ -20,14 +20,14 @@ D'autres outils de transfert connus peuvent être utilisés pour des transferts 
 * [[Transferring_data/fr#SCP|SCP]] ou Secure Copy Protocol
 * [[Transferring_data/fr#rsync|rsync]]
 
-Remarque : Pour transférer des fichiers entre une autre grappe et Niagara, utilisez l'indicateur SSH <code>-A</code> en vous connectant à l'autre grappe. Par exemple, pour copier des fichiers de Cedar à Niagara, la commande serait
+Remarque : Pour transférer des fichiers entre une autre grappe et Trilloium, utilisez l'indicateur SSH <code>-A</code> en vous connectant à l'autre grappe. Par exemple, pour copier des fichiers de Fir à Trillium, la commande serait
 
 <pre>
-ssh -A USERNAME@cedar.alliancecan.ca
+ssh -A USERNAME@fir.alliancecan.ca
 </pre>
-Effectuez ensuite la copie avec
+ensuite, effectuez la copie
 <pre>
-[USERNAME@cedar5 ~]$ scp file USERNAME@niagara.alliancecan.ca:/scratch/g/group/USERNAME/
+[USERNAME@fir2 ~]$ scp file USERNAME@trillium.alliancecan.ca:
 </pre>
 
 ==À partir du web==
@@ -67,13 +67,13 @@ L'utilitaire [https://fr.wikipedia.org/wiki/Rsync rsync] vérifie la similitude 
 Si les dates de modification sont susceptibles de différer, l'option <code>-c</code> analyse les checksums à la source et à la destination et transfère uniquement les fichiers dont les valeurs ne concordent pas. 
 
 Quand vous transférez des données vers les systèmes de fichiers <code>/project</code>, n'utilisez pas les indicateurs <code>-p</code> et <code>-g</code>. Les quotas pour <code>/project</code> sont calculés selon la propriété de groupe et le fait de conserver la même propriété pourrait produire le message d'erreur [[Frequently_Asked_Questions/fr#Message_Disk_quota_exceeded| <i>Disk quota exceeded</i>]]. Puisque <code>-a</code> inclut par défaut à la fois <code>-p</code> et <code>-g</code>, il faut ajouter les options <code>--no-g --no-p</code> comme suit
-{{Command|rsync -avzh --no-g --no-p LOCALNAME someuser@graham.alliancecan.ca:projects/def-professor/someuser/somedir/}}
+{{Command|rsync -avzh --no-g --no-p LOCALNAME someuser@nibi.alliancecan.ca:projects/def-professor/someuser/somedir/}}
 où LOCALNAME est un répertoire ou un fichier précédés par leur chemin et où somedir sera créé s'il n'existe pas déjà.  L'option <code>-z</code> compresse les fichiers (dont les suffixes ne sont pas dans la liste  pour l'option <code>--skip-compress</code>) et exige des ressources CPU additionnelles, alors que l'option <code>-h</code> permet de simplifier les chiffres qui représentent la taille des fichiers.  Si vous transférez de très gros fichiers, ajoutez l'option <code>--partial</code> pour que les transferts interrompus soient redémarrés. 
-{{Command|rsync -avzh --no-g --no-p --partial --progress LOCALNAME someuser@graham.alliancecan.ca:projects/def-professor/someuser/somedir/}}
+{{Command|rsync -avzh --no-g --no-p --partial --progress LOCALNAME someuser@nibi.alliancecan.ca:projects/def-professor/someuser/somedir/}}
 L'option <code>--progress</code> affiche la progression du transfert de chaque fichier. Pour le transfert de plusieurs petits fichiers, il est préférable d'afficher la progression du transfert de l'ensemble des fichiers.
-{{Command|rsync -azh --no-g --no-p --info{{=}}progress2 LOCALNAME someuser@graham.alliancecan.ca:projects/def-professor/someuser/somedir/}}
+{{Command|rsync -azh --no-g --no-p --info{{=}}progress2 LOCALNAME someuser@nibi.alliancecan.ca:projects/def-professor/someuser/somedir/}}
 Les exemples ci-dessus sont tous des transferts à partir d'un système local à destination d'un système à distance. Les transferts à partir d'un système à distance à destination du répertoire /project d'un système local fonctionnent de la même manière, par exemple
-{{Command|rsync -avzh --no-g --no-p someuser@graham.alliancecan.ca:REMOTENAME ~/projects/def-professor/someuser/somedir/}}
+{{Command|rsync -avzh --no-g --no-p someuser@nibi.alliancecan.ca:REMOTENAME ~/projects/def-professor/someuser/somedir/}}
 où REMOTENAME est un répertoire ou un fichier précédés par leur chemin et où somedir sera créé s'il n'existe pas déjà. 
 Plus simplement, pour transférer localement un répertoire ou un fichier (à partir de /home ou /scratch) à destination de /project dans le même système, n'indiquez pas le nom de la grappe.
 {{Command|rsync -avh --no-g --no-p LOCALNAME ~/projects/def-professor/someuser/somedir/}}
@@ -143,11 +143,11 @@ Des applications graphiques sont aussi disponibles :
 
 SCP est l'abréviation de [https://fr.wikipedia.org/wiki/Secure_copy <i>secure copy protocol</i>]. Comme SFTP, SCP utilise le protocole SSH pour chiffrer les données qui sont transférées. Contrairement à [https://docs.alliancecan.ca/wiki/Globus/fr Globus] ou [https://docs.alliancecan.ca/wiki/Transferring_data/fr#rsync rsync], SCP ne gère pas la synchronisation. Les cas d'utilisation de SCP suivants sont parmi les plus fréquents :
 {{Command	
-|scp foo.txt username@beluga.alliancecan.ca:work/
+|scp foo.txt username@rorqual.alliancecan.ca:work/
 }}	
-Cette commande transfère le fichier <code>foo.txt</code> qui se trouve dans le répertoire courant de mon ordinateur vers le répertoire <code>$HOME/work</code> de la grappe [[Béluga]]. Pour transférer le fichier <code>output.dat</code> qui se trouve dans mon espace /project de la grappe [[Cedar/fr|Cedar]] vers mon ordinateur local, je pourrais utiliser une commande comme
+Cette commande transfère le fichier <code>foo.txt</code> qui se trouve dans le répertoire courant de mon ordinateur vers le répertoire <code>$HOME/work</code> de la grappe [[Rorqual]]. Pour transférer le fichier <code>output.dat</code> qui se trouve dans mon espace /project de la grappe [[Fir/fr|Fir]] vers mon ordinateur local, je pourrais utiliser une commande comme
 {{Command	
-|scp username@cedar.alliancecan.ca:projects/def-jdoe/username/results/output.dat .	
+|scp username@fir.alliancecan.ca:projects/def-jdoe/username/results/output.dat .	
 }}	
 [http://www.hypexr.org/linux_scp_help.php Voyez d'autres exemples]. Prenez note que vous lancez toujours la commande <code>scp</code> à partir de votre ordinateur et non à partir de la grappe&nbsp;: la connexion SCP doit toujours être initiée à partir de votre ordinateur, peu importe la direction dans laquelle vous transférez les données. 
 
@@ -156,7 +156,7 @@ L'option <code>-r</code> permet de faire un transfert récursif d'un groupe de r
 <b><big>***Attention :***</big></b> si vous utilisez un nom de clé SSH personnalisé, <i>c'est-à-dire</i> autre chose que les noms par défaut <code>id_dsa</code>, <code>id_ecdsa</code>, <code>id_ed25519</code> et <code>id_rsa</code>, vous devez utiliser l'option scp <code>-i</code>, suivie du chemin vers votre clé privée ainsi
 
 {{Command
-|scp -i /path/to/key foo.txt username@beluga.alliancecan.ca:work/
+|scp -i /path/to/key foo.txt username@rorqual.alliancecan.ca:work/
 }}
 
 <span id="Prevention_and_Troubleshooting"></span>

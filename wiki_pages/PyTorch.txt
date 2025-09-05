@@ -40,9 +40,6 @@ The preferred option is to install it using the Python [https://pythonwheels.com
 <!--T:672-->
 {{Note|With H100 gpus, torch 2.3 and higher is required.}}
 
-<!--T:546-->
-<b>Note:</b> There are known issues with PyTorch 1.10 on our clusters (except for Narval). If you encounter problems while using distributed training, or if you get an error containing <code>c10::Error</code>, we recommend installing PyTorch 1.9.1 using <code>pip install --no-index torch==1.9.1</code>.
-
 <!--T:21-->
 ====Extra====
 In addition to <code>torch</code>, you can install <code>torchvision</code>, <code>torchtext</code> and <code>torchaudio</code>:
@@ -60,8 +57,8 @@ Here is an example of a job submission script using the python wheel, with a vir
   |contents=
 #!/bin/bash
 #SBATCH --gres=gpu:1       # Request GPU "generic resources"
-#SBATCH --cpus-per-task=6  # Cores proportional to GPUs: 6 on Cedar, 16 on Graham.
-#SBATCH --mem=32000M       # Memory proportional to GPUs: 32000 Cedar, 64000 Graham.
+#SBATCH --cpus-per-task=6  # Cores proportional to GPUs.
+#SBATCH --mem=32000M       # Memory proportional to GPUs.
 #SBATCH --time=0-03:00
 #SBATCH --output=%N-%j.out
 
@@ -73,6 +70,9 @@ pip install torch --no-index
 python pytorch-test.py
 }}
 <translate>
+
+<!--T:690-->
+See https://docs.alliancecan.ca/wiki/Allocations_and_compute_scheduling#Ratios_in_bundles for more information on the appropriate number of CPUs and Memory per GPU for each cluster.
 
 <!--T:29-->
 The Python script <code>pytorch-test.py</code> has the form
@@ -107,7 +107,7 @@ You can then submit a PyTorch job with:
 On version 1.7.0 PyTorch has introduced support for [https://blogs.nvidia.com/blog/2020/05/14/tensorfloat-32-precision-format/ Nvidia's TensorFloat-32 (TF32) Mode], which in turn is available only on Ampere and later Nvidia GPU architectures. This mode of executing tensor operations has been shown to yield up to 20x speed-ups compared to equivalent single precision (FP32) operations and is enabled by default in PyTorch versions 1.7.x up to 1.11.x. However, such gains in performance come at the cost of potentially decreased accuracy in the results of operations, which may become problematic in cases such as when dealing with ill-conditioned matrices, or when performing long sequences of tensor operations as is common in deep learning models. Following calls from its user community, TF32 is now <b>disabled by default for matrix multiplications</b>, but still <b>enabled by default for convolutions</b> starting with PyTorch version 1.12.0.
 
 <!--T:549-->
-On clusters equipped with A100 or H100 GPUs, users should be cognizant of the following:
+On clusters equipped with A100, H100, or newer Nvidia GPUs, users should be cognizant of the following:
 # You may notice a significant slowdown when running the exact same GPU-enabled code with <code>torch < 1.12.0</code> and <code>torch >= 1.12.0</code>.
 # You may get different results when running the exact same GPU-enabled code with <code>torch < 1.12.0</code> and <code>torch >= 1.12.0</code>.
 
@@ -985,24 +985,6 @@ All numbers are images per second '''per GPU''', using <code>DistributedDataPara
  -->
 
 = Troubleshooting = <!--T:23-->
-
-<!--T:30-->
-== Memory leak ==
-On AVX512 hardware (Béluga, Skylake or V100 nodes), older versions of Pytorch (less than v1.0.1) using older libraries (cuDNN < v7.5 or MAGMA < v2.5) may considerably leak memory resulting in an out-of-memory exception and death of your tasks. Please upgrade to the latest <code>torch</code> version.
-
-== c10::Error == <!--T:542-->
-
-<!--T:543-->
-There are cases where we get this kind of error:
-
-<!--T:544-->
-  terminate called after throwing an instance of 'c10::Error'
-    what():  Given groups=1, weight of size [256, 1, 3, 3], expected input[16, 10, 16, 16] to have 1 channels, but got 10 channels instead
-  Exception raised from check_shape_forward at /tmp/coulombc/pytorch_build_2021-11-09_14-57-01/avx2/python3.8/pytorch/aten/src/ATen/native/Convolution.cpp:496 (most recent call first):
-  ...
-
-<!--T:545-->
-A C++ exception is thrown instead of a Python exception. This might happen when programming in C++ with libtorch, but it is unexpected when programming in Python. We cannot see the Python traceback, which makes it difficult to pinpoint the cause of the error in our python script. On Graham, it has been observed that using PyTorch 1.9.1 (instead of PyTorch 1.10.x) helps: it allows to get the Python traceback.
 
 == CUDA error: no kernel image is available for execution on the device == <!--T:673-->
 

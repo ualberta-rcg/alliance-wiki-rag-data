@@ -1,94 +1,249 @@
-
-
 <languages />
-[https://code.visualstudio.com/ Visual Studio Code] is an integrated development environment (IDE) from [https://www.microsoft.com Microsoft] which can be used for remote development on our clusters over [[SSH]]. In this context, users can run the graphical interface of Visual Studio Code locally, on their personal computer, while connecting to a cluster where the source code is located and where the debugging and testing operations are being executed. While Visual Studio Code may be used for development in a variety of programming languages, in this page we will focus on its use with [[Python]].
 
-When using an IDE like Visual Studio Code, it's important to distinguish what sort of action you're performing, even if all of them take place within the context of the IDE. Editing a Python script or any other text file of reasonable size (up to a few thousand lines) is a very light-weight process which requires little processing power or memory but an IDE offers you numerous other possibilities, including the ability to debug your script, for example. In this case, the IDE is now <i>executing</i> your Python code on the remote server and until the script crashes because of a bug, it may well consume an entire CPU core or even several if the script or the libraries which it uses are multithreaded.
+[https://code.visualstudio.com/ Visual Studio Code] is an integrated development environment (IDE) from [https://www.microsoft.com Microsoft] which can be used for local development with numerous extensions and is highly customizable.
 
-Note that if you are using Visual Studio Code with Python, you should avoid installing [[Anaconda/en|Conda and its variants]] as they are poorly adapted to our cluster environment. Alternatives to the use of Conda include [[Python#Creating_and_using_a_virtual_environment|Python virtual environments]] and [[Apptainer]].
+{{Warning
+|title=Resources eager
+|content=Vs Code is notable for misbehaving on the login nodes. Whenever possible '''strictly''' use it locally or see to configure it below.
+}}
 
-=Configuring remote access=
+{{Warning
+|title=Running or debugging your code
+|content=If Visual Studio Code is connected to remote systems, avoid running or debugging your code, as this will execute code on the login nodes, which can lead to performance issues or system disruptions. Instead, use the <tt>code-server</tt> environment, which provides a safer and more appropriate context for debugging tasks.
+}}
 
-==Configuration of your SSH keys==
+* Use VS Code locally and avoid connecting it to the systems. Save your changes to your project files with Git, and pull the changes onto the systems when ready to test.
+* Use nano or vim to edit files directly on the systems.
+* For debugging and quick testing, you can load the <tt>code-server</tt> module.
+* When all the above are not possible, one can configure VS Code for remote connections.
 
-# If not done already, <b>[[SSH_Keys#Generating_an_SSH_Key|generate your SSH key]]</b>. For example, we will name it <code>~/.ssh/ccdb</code>.
-# If not done already, <b>[[SSH_Keys#Installing_your_key|install your <i>public</i> SSH key on CCDB]]</b>.
-# <b>Copy the same public key</b> to <code>~/.ssh/authorized_keys</code> on the remote cluster (create this file if it does not exist). That is because compute nodes do not have access to the public keys that are installed on CCDB.
+__FORCETOC__
 
-==SSH configuration file==
+= Local usage =
+== Why Local Usage ==
+* Speed & Stability: Running VS Code locally means fewer network interruptions and faster performance—ideal for iterative development.
+* Direct Access: You can interact with files, extensions, and terminals directly on your machine with zero latency.
+* Offline Capability: You’re not tied to an internet connection or remote server, so you can code anytime, anywhere.
 
-VS Code works well with your local [[SSH configuration file]] (<code>~/.ssh/config</code>).
-Here are the recommended options :
+It is recommended to develop locally with VS Code. You are then able to customize and extend VS Code with your preferred extensions and language.
+
+Once you are ready to test your project onto the systems, you can save your changes into a Git repository, push them to a remote host like Github or Gitlab, then connect to the system and pull your changes to test.
+
+To learn more on how to work with source control, please see: [https://code.visualstudio.com/docs/sourcecontrol/overview VS Code Source Control].
+
+Once you have saved and pushed your changes to your remote repository, connect to the system via the terminal:
+{{Command|ssh <username>@<hostname>.alliancecan.ca}}
+
+Then clone your repository (if it does not exists):
+{{Command|git clone git@github.com:username/reponame.git}}
+or change directory to your repository and pull the changes:
+{{Commands
+|cd myrepo
+|git pull
+}}
+
+You can then test your changes in a short (with minimal resources) [https://docs.alliancecan.ca/wiki/Running_jobs#Interactive_jobs interactive job].
+
+= File Edition on the Systems =
+While Visual Studio Code is great for local development, sometimes you need direct access to files on a remote system. In such cases, terminal-based editors like <tt>nano</tt> or <tt>vim</tt> offer a lightweight and efficient way to edit files directly from the command line.
+
+If you prefer a graphical interface, the [https://docs.alliancecan.ca/wiki/JupyterLab JupyterLab] text editor provides a versatile alternative. It supports Markdown, Python scripts, and other formats.
+
+= Debugging and Testing =
+If you need to debug or test your code on the systems, you can start a [[JupyterLab#VS_Code|<tt>code-server</tt> instance from Jupyter Lab]].
+
+* Access one of the [[JupyterLab#Launching_JupyterLab|options to launch JupyterLab]].
+* Select minimal resources and start an interactive JupyterLab job.
+* On the Launcher tab, click on the VS Code launcher button.
+
+{{Note|The <tt>code-server</tt> instance you are accessing is running in a compute job that '''do not''' have internet access.}}
+The <tt>code-server</tt> module has several common extensions already available but we can add more upon request.
+
+== Custom extension installation ==
+TBD...
+
+= Configuration of VS Code for remote connection =
+If none the above works for your case, one can configure VS Code to connect to a remote host with the Remote SSH extension.
+
+== SSH configuration ==
+If not done already, [[SSH_Keys#Generating_an_SSH_Key|generate your SSH key]] and [[SSH_Keys#Installing_your_key|add your <i>public</i> SSH key on the CCDB]].
+
+Then create (or add) an SSH configuration file to your local computer:
+
 {{File
   |name=~/.ssh/config
   |contents=
 Host *
-  ServerAliveInterval 300
+  ServerAliveInterval 30
+  User your_username
 
-Host beluga cedar graham narval
+Host rorqual narval nibi fir
   HostName %h.alliancecan.ca
-  IdentityFile ~/.ssh/ccdb
-  User your_username
+}}
 
-Host bc????? bg????? bl?????
-  ProxyJump beluga
-  IdentityFile ~/.ssh/ccdb
-  User your_username
+== Local configuration ==
+1. In VS Code, open the Command Palette: Press <tt>Ctrl+Shift+P</tt> (Windows/Linux) or <tt>Cmd+Shift+P</tt> (macOS).
 
-Host cdr*
-  ProxyJump cedar
-  IdentityFile ~/.ssh/ccdb
-  User your_username
+2. Open the user settings (<tt>Preferences: Open User Settings (JSON)</tt>) and paste (or merge) the following configuration:
+{{File
+  |name=local-settings.json
+  |contents=
+{
+  // file-watch + search
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+  },
+  "search.exclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+  },
+  "search.maxThreads": 2,
+  "search.ripgrep.maxThreads": 2,
+  "search.useIgnoreFiles": true,
 
-Host gra1* gra2* gra3* gra4* gra5* gra6* gra7* gra8* gra9*
-  ProxyJump graham
-  IdentityFile ~/.ssh/ccdb
-  User your_username
+  // extensions & updates
+  "remote.extensionKind": {
+    "*": [
+      "ui"
+    ],
+    "ms-python.python": [
+      "ui"
+    ]
+  },
+  "remote.defaultExtensionsIfInstalledLocally": [
+    "GitHub.vscode-pull-request-github"
+  ],
 
-Host nc????? ng????? nl?????
+  // remote-ssh
+  "remote.SSH.showLoginTerminal": false,
+  "remote.SSH.enableDynamicForwarding": false,
+  "remote.SSH.enableServerAutoShutdown": 30,
+
+  "workbench.startupEditor": "none",
+}
+}}
+
+3. Save it and restart VS Code.
+
+== Remote System Configuration ==
+1. Log in to the system via an external terminal:
+{{Command|ssh <username>@<host>.alliancecan.ca}}
+
+2. Create the directory:
+{{Command|mkdir -p ~/.vscode-server/data/Machine/}}
+
+3. Create the <tt>settings.json</tt> machine configuration:
+{{Command|nano ~/.vscode-server/data/Machine/settings.json }}
+
+4. Copy the configuration below. You may need to merge manually settings with your own if any already.
+{{File
+  |name=system-settings.json
+  |contents=
+{
+  // file-watch + search
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "/**": true,
+  },
+  "search.exclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "/**": true,
+  },
+  "search.followSymlinks": false,
+  "search.maxThreads": 2,
+  "search.ripgrep.maxThreads": 2,
+  "search.useIgnoreFiles": true,
+  "search.searchOnType": false,
+
+  // extensions & updates
+  "extensions.autoCheckUpdates": false,
+  "extensions.autoUpdate": false,
+  "update.mode": "none",
+  "remote.extensionKind": {
+    "*": [
+      "ui"
+    ],
+    "ms-python.python": [
+      "ui"
+    ]
+  },
+
+  // Copilot
+  "chat.agent.enabled": false,
+  "github.copilot.enable": {
+    "*": false,
+  },
+  "remote.defaultExtensionsIfInstalledLocally": [
+    "GitHub.vscode-pull-request-github"
+  ],
+
+  // telemetry & git
+  "telemetry.enableTelemetry": false,
+  "telemetry.enableCrashReporter": false,
+  "telemetry.telemetryLevel": "off",
+  "telemetry.feedback.enabled": false,
+  "git.autofetch": false,
+  "git.enableStatusBarSync": false,
+
+  // remote-ssh
+  "remote.SSH.showLoginTerminal": false,
+  "remote.SSH.enableDynamicForwarding": false,
+  "remote.SSH.enableServerAutoShutdown": 30,
+
+  "workbench.startupEditor": "none",
+}
+}}
+
+== Connecting ==
+# Open the Command Palette in VS Code: Press <tt>Ctrl+Shift+P</tt> (Windows/Linux) or <tt>Cmd+Shift+P</tt> (macOS).
+# Type <tt>remote</tt> and then select <tt>Connect to Host...</tt>
+# Choose the host (remote system) and confirm.
+
+You'll now be connected to a '''login node'''.
+
+{{Warning|title=Login Node|content=Do ''not'' test, debug or run your code as it runs on the login node!}}
+
+== Closing your connection ==
+# Open the Command Palette in VS Code: Press <tt>Ctrl+Shift+P</tt> (Windows/Linux) or <tt>Cmd+Shift+P</tt> (macOS).
+# Type <tt>remote</tt> and then select <tt>Remote-SSH: Kill VS Code Server on Host...</tt>
+# Choose the host (remote system) and confirm.
+# Open the File menu, and select <tt>Close Remote Connection</tt>.
+
+== Advanced - Connecting to a interactive compute node ==
+The following is only needed for advanced usage.
+
+Update your ssh configuration to add the following lines:
+<tabs>
+<tab name="Narval">
+{{File
+  |name=~/.ssh/config
+  |contents=
+Host nc* ng* nl*
   ProxyJump narval
-  IdentityFile ~/.ssh/ccdb
   User your_username
 }}
-==First connection with VS Code==
-=== Remote access and code editing ===
-https://carleton.ca/scs/2023/vscode-remote-access-and-code-editing/
+</tab>
+<tab name="Rorqual">
+{{File|name=~/.ssh/config
+  |contents=
+Host rc* rg* rl*
+  ProxyJump rorqual
+  User your_username
+}}
+</tab>
+</tabs>
 
-Because some clusters do not provide access to the internet from compute nodes,
-the installation of VS Code Server must be done prior to using a remote connection to any compute node.
-Therefore, in VS Code, a first connection to any login node is required - select either :
-
-* beluga
-* cedar
-* graham
-* narval
-
-[[File:VSCode SSH Passphrase Prompt.png|thumb|SSH Passphrase prompt]]
-Note : <b>you will be prompted many times for your SSH key passphrase.</b>
-If not, make sure to copy your SSH public key as described above in point 3 under <i>Configuration of your SSH keys</i>.
-
-That first connection will automatically install VS Code Server in <code>~/.vscode-server/</code>.
-The installation can take up to 5 minutes.
-Once done, close the connection.
-
-===Connection with MFA enabled===
-[[File:VSCode Detail Link.png|thumb|When connecting, click on "details" to see the prompt for the 2nd factor in the Terminal]]
-
-If the [[Multifactor authentication|multifactor authentication]] is enabled,
-you will need to check the "details" of the connection, which will bring you to the
-VS Code Terminal in which you may be prompted for your 2nd factor of authentication.
-
-=Closing your connection=
-
-When closing the local VS Code window, the remote process of VS Code Server may keep running in the background, which tends to accumulate orphan processes on that login node. Not only that, but your next connection may connect to a different login node, which can cause issues and confusion. <b>To cleanly close a connection, click on the bottom-left corner of VS Code and select <i>Close Remote Connection</i> at the top of the window.</b>
-
-=Connection to a compute node=
-
-Connection procedure:
-# Make sure VS Code Server is installed as described in the previous sections.
-# In an external <b>[[SSH|SSH client]]</b> connected to the cluster, start a new <b>[[Running_jobs#Interactive_jobs|interactive job]]</b> (with <code>salloc</code>).
-## <b>Important:</b> make sure to request enough memory (at least <code>2000M</code>).
-## Take note of the allocated compute node name.
+# In an external terminal, connected to the system via an ssh connection, start a new <b>[[Running_jobs#Interactive_jobs|interactive job]]</b> (with <code>salloc</code>) with at least 2000M of memory.
+## Note the allocated compute node name.
 ## If you will need to work with <code>SLURM_*</code> environment variables in VS Code, save them all in a ''source'' file: {{Command|env {{!}} grep SLURM_ {{!}} sed -e 's/^\(.*\){{=}}\(.*\)$/export \1{{=}}"\2"/g' > slurm_var.sh}}
 # In VS Code, start a new remote session with the name of the allocated compute node:
 ## Press <code>F1</code> or <code>Ctrl+Shift+P</code> to start the command prompt <code>&gt;</code> in the Command Palette.
@@ -96,37 +251,3 @@ Connection procedure:
 ## Enter the noted compute node name.
 ### If you get prompted for the type of operating system, select <b>Linux</b>
 # If you need to work with <code>SLURM_*</code> environment variables, navigate to the working directory in a VS Code terminal and ''source'' the <code>slurm_var.sh</code> file: {{Command|source slurm_var.sh}}
-
-=Troubleshooting=
-
-==Cannot connect to Béluga==
-
-In the second week of June 2025, VS Code Server got a new version (1.101) that no longer works ''out of the box'' on the [[Béluga/en|Béluga]] cluster. After a first download and install of VS Code Server, the connection process will request your credentials again and redo the download and install again, and repeat endlessly.
-
-The solution is to install the previous version of VS Code.
-
-# [https://code.visualstudio.com/docs/supporting/faq#_how-do-i-opt-out-of-vs-code-autoupdates Disable automatic updates] by setting the "update mode" to "none".
-# Then, install VS Code [https://code.visualstudio.com/updates/v1_100 version 1.100.3].
-
-A future version of VS Code may fix the problem, but this is not guaranteed.
-
-==Cannot connect to Cedar==
-One of our users reported that he found a workaround that does not require reverting to a previous version of VS code. Setting the environment variable NODE_OPTIONS="--disable-wasm-trap-handler" in the .bashrc file fixed the issue. All this does is remove an optimization in Node.js, trading efficiency for vastly reduced virtual memory usage. The source for this fix can be found [https://github.com/microsoft/vscode/issues/251777#issuecomment-3056373130 here].
-
-This may work for the other clusters. Please give it a try.
-
-==The remote session does not work anymore==
-
-The newest versions of [https://code.visualstudio.com/docs/remote/linux#_remote-host-container-wsl-linux-prerequisites VS Code Server no longer support CentOS 7], which affects connections to <b>Graham</b> and <b>Niagara</b>.
-
-If you really need VS Code for debugging purpose, the recommendation is to use the version available through [[JupyterHub#VS_Code|JupyterHub]]. Otherwise, you may consider:
-
-* Using a different cluster.
-* Develop and test your programs locally on your computer. Once a program appears to be stable, import it to the cluster. You may use [[Transferring_data|data transfer tools]] or [[Version_control|version control tools]].
-
-=See also=
-* SHARCNET General Interest Webinar, "Remote Development on Clusters with VSCode", presented by Armin Sobhani:
-** [https://youtu.be/u9k6HikDyqk Part I]
-** [https://youtu.be/CsgBGpampvc Part II]
-* Tutorial video created by two users (best viewed in 720p):
-** [https://youtu.be/1B0hiWaVcHY Connect VS Code to High-Performance Computing (HPC) Clusters]

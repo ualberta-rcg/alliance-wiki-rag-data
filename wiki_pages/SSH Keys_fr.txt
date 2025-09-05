@@ -2,6 +2,7 @@
 
 <i>Page enfant de [[SSH/fr|SSH]]</i>
 
+<span id="What_are_SSH_keys?"></span>
 == Qu'est-ce qu'une clé SSH? ==
 
 SSH utilise [https://fr.wikipedia.org/wiki/Cryptographie_asym%C3%A9trique la cryptographie à clé publique (CP) ou ''cryptographie asymétrique''] pour sécuriser les connexions.
@@ -31,8 +32,10 @@ Quand une paire de clés est générée, vous devez entrer une phrase de passe; 
 La procédure pour générer une paire de clés SSH varie selon votre système d'exploitation. Pour les clients Windows PuTTY ou MobaXterm, voyez [[Generating SSH keys in Windows/fr|Générer des clés sous Windows]]. Pour les environnements Linux (Linux, Mac, Windows Subsystem for Linux ou Cygwin), voyez [[Using SSH keys in Linux/fr|Utiliser des clés SSH sous Linux]]. 
 De plus, si vous utilisez un nuage, OpenStack offre une méthode pour créer des paires de clés; voyez [[Cloud_Quick_Start/fr#Paires_de_clés_SSH|Paires de clés SSH]].
 
+<span id="Installing_your_key"></span>
 == Installer une clé ==
 
+<span id="Using_CCDB"></span>
 === Via CCDB ===
 
 Pour installer la clé, le système cible (la destination) doit connaître la partie publique de votre clé. En date de mars 2021, nous avons ajouté un moyen simple pour faire cela. 
@@ -41,7 +44,7 @@ Les étapes à suivre sont :
 
 <b>ÉTAPE 1</b> - Connectez-vous à CCDB avec 
 
- https://ccdb.computecanada.ca/ssh_authorized_keys
+ https://ccdb.alliancecan.ca/ssh_authorized_keys
 <br>
 ou par le menu suivant dans CCDB
 <br>
@@ -63,7 +66,7 @@ Dans les deux cas, vous devriez obtenir une longue suite de caractères comme
  A+F0tPH7J+xox1vUoXGAI0cNv+s/nlVRuOZoZjhk6s7tLXeVcToc+Y9Wqx8fdL7D4FegWwB9lsVhpfC4NaA9R8Ao
  OfJUwHSNqUc6SfIt7w== user@machine
 
-Prenez note que vous devez générer votre propre paire de clés (publique et privée); vous ne pouvez pas copier et utiliser l'exemple ci-dessus. Si le format est différent, ce qui est le cas par exemple quand la clé est générée avec PuTTY, vous pouvez ouvrir PuTTY Key Generator ou MobaxTerm SSH Key Generator et sous <i>File</i>, sélectionner <i>Load private key</i> puis copier le contenu sous <i>Public key for pasting into OpenSSH authorized_keys</i> comme [https://docs.computecanada.ca/wiki/File:Puttygen2.png illustré ici].
+Prenez note que vous devez générer votre propre paire de clés (publique et privée); vous ne pouvez pas copier et utiliser l'exemple ci-dessus. Si le format est différent, ce qui est le cas par exemple quand la clé est générée avec PuTTY, vous pouvez ouvrir PuTTY Key Generator ou MobaxTerm SSH Key Generator et sous <i>File</i>, sélectionner <i>Load private key</i> puis copier le contenu sous <i>Public key for pasting into OpenSSH authorized_keys</i> comme [https://docs.alliancecan.ca/wiki/File:Puttygen2.png illustré ici].
 
 Voici l'exemple avec une clé publique en format PEM qui doit être convertie avant de passer à l'étape 3&nbsp;:
  -----BEGIN RSA PUBLIC KEY-----
@@ -92,6 +95,7 @@ Les modifications aux clés publiques sont souvent propagées aux grappes en que
 
 Remarque : Les clés publiques au format RFC4716 et PKCS8 ressemblent à celles en format PEM, mais présentent des différences dans l'en-tête et le bas de page.
 
+<span id="Using_the_authorized_keys_file"></span>
 === Par le fichier authorized_keys ===
 
 {{Warning|title=AVERTISSEMENT
@@ -99,15 +103,16 @@ Remarque : Les clés publiques au format RFC4716 et PKCS8 ressemblent à celles 
 
 Le fait d'enregistrer votre clé publique dans CCDB la rend disponible sur toutes nos grappes, ce qui est pratique et souvent souhaitable.
 
-Cependant, dans certains cas vous pourriez vouloir installer une clé sur juste une grappe particulière. Pour ce faire, ajoutez la clé dans un fichier de votre répertoire /home sur cette grappe. Par exemple, pour une clé qui fonctionne uniquement sur Cedar, copiez votre clé publique dans le fichier <code>~/.ssh/authorized_keys</code> sur Cedar.  
-Ceci vous permettra de vous connecter aux nœuds de connexion de Cedar avec le CP.  
+Cependant, dans certains cas vous pourriez vouloir installer une clé sur juste une grappe particulière. Pour ce faire, ajoutez la clé dans un fichier de votre répertoire /home sur cette grappe. Par exemple, pour une clé qui fonctionne uniquement sur Fir, copiez votre clé publique dans le fichier <code>~/.ssh/authorized_keys</code> sur Fir.  
+Ceci vous permettra de vous connecter aux nœuds de connexion de Fir avec le CP.  
 Sur nos grappes (et toute autre grappe avec OpenSSH), la commande <code>ssh-copy-id</code> est la façon la plus pratique de procéder.
-  ssh-copy-id -i computecanada-key username@cedar.computecanada.ca 
+   ssh-copy-id -i alliance-key username@fir.alliancecan.ca 
 
 Le mécanisme <code>authorized_keys</code> est standard et utilisé presque partout sur l'internet, mais il est quelque peu fragile. 
 En particulier, SSH est très sensible aux permissions pour le fichier <code>authorized_keys</code>, ainsi que pour votre répertoire /home et sous-répertoire  <code>.ssh</code>.
 Pour plus d'information, voyez [[Using_SSH_keys_in_Linux/fr|Utiliser des clés SSH sous Linux]].
 
+<span id="Using_a_key_agent"></span>
 == Agent d'authentification ==
 
 Il est important que votre clé privée soit protégée par l'emploi d'une phrase de passe, mais il est peu pratique d'avoir à entrer la phrase de passe à chaque fois que vous utilisez votre clé. Plutôt que de laisser votre clé non chiffrée, nous vous recommandons fortement d'employer un agent SSH. Vous entrez votre phrase de passe au lancement de l'agent et ce dernier fournit la clé privée pour vos nouvelles connexions. Ainsi, vous évitez de conserver une clé privée non chiffrée dans un espace de stockage permanent où elle peut facilement être copiée ou volée.
@@ -163,6 +168,7 @@ Voyez aussi [https://www.youtube.com/watch?v=mRdqM1dgf3Q&feature=youtu.be ces co
 
 [[Category:Connecting]]
 
+<span id="Revoked_SSH_Keys"></span>
 == Clés SSH révoquées ==
 
 Il y a plusieurs raisons pour lequelles une clé SSH est <b>révoquée</b>, par exemple si nous constatons qu'une clé est utilisée par plus d'une personne ou s'il est possible que la clé privée soit compromise.

@@ -167,9 +167,9 @@ Un autre cas fréquent de cœurs non utilisés se pose lorsqu’une tâche exige
 
 Un équivalent-cœur se compose d’'''un cœur simple et d’une certaine quantité de mémoire'''; pour le nommer, nous utilisons le terme ''bundle''. En plus du cœur, le bundle contient aussi la mémoire considérée comme étant associée à ce cœur. 
 
-[[File:EquivalentCoeur.png|frame|Figure 1 – ''Équivalent-cœur sur Cedar et Graham'']]
+[[File:EquivalentCoeur.png|frame|Figure 1 – ''Équivalent-cœur'']]
 
-Cedar et Graham offrent surtout des cœurs de 4Go et dans leur cas, l’équivalent-cœur est un bundle de 4 Go (voir Figure 1). Pour sa part, Niagara offre surtout des cœurs de 4.8Go, donc des bundles de 4.8Go. L’utilisation des ressources par une tâche est comptabilisée à raison de 4Go ou 4.8Go par cœur, comme mentionné ci-dessus.
+Présentement, nos grappes offrent surtout des cœurs de 4Go puisque ceci est le ratio mémoire:cœur pour le type de noeuds le plus commun. L’utilisation des ressources par une tâche est comptabilisée à raison de 4Go par cœur, comme mentionné ci-dessus (voir la Figure 1).
 
 Le suivi des cibles s’avère relativement simple quand les ressources demandées sont des cœurs et des quantités de mémoire qui correspondent à un équivalent-cœur entier, plutôt qu’à une portion d’équivalent-cœur. Les choses se compliquent parce que l’utilisation de portions d’équivalents-cœur risque d’augmenter le pointage servant au calcul de la juste part du groupe de recherche. En pratique, la méthode appliquée résout le problème d'équité ou de perception d'équité, mais cette méthode n’est pas intuitive au début.
 
@@ -217,21 +217,9 @@ Les différents bundles UGR-coeur-mémoire et GPU-coeur-mémoire des systèmes d
 ! scope="col"| Cœurs par UGR
 ! scope="col"| Mémoire par UGR (en GB)
 |-
-! scope="row"| [[Béluga#Caractéristiques_des_nœuds|Béluga]]*
-| 4.55
-| 21.1
-|-
-! scope="row"| [[Cedar/fr#Caractéristiques_des_nœuds|Cedar]]*
-| 3.08
-| 25.0
-|-
 ! | [[Fir/fr#Caractéristiques_des_nœuds|Fir]]
 | 0.98
 | 23.6
-|-
-! scope="row"| [[Graham/fr#Caractéristiques_des_nœuds|Graham]]*
-| 9.70
-| 43.0
 |-
 ! scope="row"| [[Narval#Caractéristiques_des_nœuds|Narval]]
 | 3.00
@@ -260,28 +248,6 @@ Caractéristiques des bundles
 ! scope="col"| Bundle par GPU
 ! scope="col"| Recommendation par GPU
 |-
-! scope="row"| [[Béluga#Caractéristiques_des_nœuds|Béluga]]*
-| V100-16gb
-| 2.2
-| 10 cœurs, 46.5GB
-| 10 cœurs, 46GB
-|-
-! rowspan="3"| [[Cedar/fr#Caractéristiques_des_nœuds|Cedar]]*
-| P100-12gb
-| 1.0
-| 3.08 cœurs, 25GB
-| 3 cœurs, 25GB
-|-
-| P100-16gb
-| 1.1
-| 3.4 cœurs, 27.5GB
-| 3 cœurs, 27GB
-|-
-| V100-32gb
-| 2.6
-| 8.0 cœurs, 65GB
-| 8 cœurs, 46GB
-|-
 ! rowspan="4"| [[Fir/fr#Caractéristiques_des_nœuds|Fir]]
 | <b>H100-80gb</b>
 | <b>12.2</b>
@@ -302,22 +268,6 @@ Caractéristiques des bundles
 | 6.1
 | 6 cœurs, 144GB
 | 6 cœurs, 140GB
-|-
-! rowspan="3"| [[Graham/fr#Caractéristiques_des_nœuds|Graham]]*
-| T4-16gb
-| 1.3
-| 12.6 cœurs, 56GB
-| 4 ou 11 cœurs, 46GB
-|-
-| V100-32gb
-| 2.6
-| 25.2 cœurs, 112GB
-| 5 cœurs, 47GB
-|-
-| A100-40gb
-| 4.0
-| 38.8 cœurs, 172GB
-| 8 ou 16 cœurs, 60GB
 |-
 ! rowspan="5"| [[Narval#Caractéristiques_des_nœuds|Narval]]
 | <b>A100-40gb</b>
@@ -394,15 +344,13 @@ Caractéristiques des bundles
 | <b>24 cœurs, 188GB</b>
 |}
 
-(*) Ce ne sont pas toutes les ressources GPU de cette grappe qui sont allouées via le concours annuel d'allocation des ressources.
-
 <b>Remarque :</b> Si l'ordonnanceur établit la priorité sur la base de l'utilisation calculée avec les bundles, une demande de plusieurs GPU sur un même nœud doit aussi tenir compte des ratios physiques.
 
 <span id="Viewing_resource_usage_in_the_portal"></span>
 =Visionner l'utilisation des ressources dans le portail=
 
 [[File:Slurm portal land edit.png|thumb|alt=usage portal landing view|Page d'accueil du portail (cliquer deux fois sur l'image pour agrandir)]]
-Le portail [https://portal.alliancecan.ca/slurm portal.alliancecan.ca/slurm] offre une interface qui montre l'utilisation des ressources par les tâches soumises sur nos grappes nationales. Par défaut, l'image sur la page d'accueil affiche les jours CPU utilisés par tous vos projets sur Cedar. Si vous n'utilisez pas Cedar, le message <i>No Data or usage too small to have a meaningful plot</i> est affiché. Pour modifier l'image, sélectionnez des options dans les panneaux de gauche. 
+Le portail [https://portal.alliancecan.ca/slurm portal.alliancecan.ca/slurm] offre une interface qui montre l'utilisation des ressources par les tâches soumises sur nos grappes nationales. Par défaut, l'image sur la page d'accueil affiche les jours CPU utilisés par tous vos projets sur une grappe quelconque. Si vous n'utilisez pas cette grappe, le message <i>No Data or usage too small to have a meaningful plot</i> est affiché. Pour modifier l'image, sélectionnez des options dans les panneaux de gauche. 
 * Select system and dates
 * Parameters
 * SLURM account 

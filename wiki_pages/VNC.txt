@@ -101,13 +101,13 @@ Next run <code>vncserver -list</code> to check if you have an old unused vncserv
 1) Now you may start your vncserver on the login node as shown here:
 
 <!--T:164-->
- [<b>l4</b>(login node):~] vncserver -idletimeout 86400 [-alwaysshared]<br>
+ [<b>l4</b>(login node):~] vncserver -idletimeout 86400<br>
  Desktop 'TurboVNC: l4.nibi.sharcnet:1 (yourusername)' started on display <b>l4</b>.nibi.sharcnet:1<br>
  Starting applications specified in /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/xstartup.turbovnc
  Log file is /home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log
 
 <!--T:46-->
-Note that the vncserver command provided by StdEnv/2023 is based on [https://turbovnc.org turbovnc].  When starting a new vncserver on a login node <code>-idletimeout seconds</code> should be added as shown above.  Doing so will ensure your <code>vncserver</code> eventually terminates (once S seconds has elapsed with no VNC viewer connections) if your vncviewer session is not ended by clicking <code>System -> Log out</code> in the vnc desktop. The first time you start vncserver you will be required to set a password which can be [https://docs.alliancecan.ca/wiki/VNC#Vncserver_password changed] later.  The password will be required to remotely connect to your desktop with a vncclient (such as vncviewer). The same password will be required when making [https://docs.alliancecan.ca/wiki/VNC#Multiple_connections multiple connections] assuming you started your vncserver with the <code>-alwaysshared</code> option where the square brackets imply the quantity inside is optional:
+Note that the vncserver command provided by StdEnv/2023 is based on [https://turbovnc.org turbovnc].  When starting a new vncserver on a login node <code>-idletimeout seconds</code> should be added as shown above.  Doing so will ensure your <code>vncserver</code> eventually terminates (once S seconds has elapsed with no VNC viewer connections) should you forget to terminate your vncviewer session by clicking <code>System -> Log out</code> in the vnc desktop.  The first time you start vncserver you will be required to set a password which can be [https://docs.alliancecan.ca/wiki/VNC#Vncserver_password changed] later.  The password will be required to remotely connect to your desktop with a vncclient (such as vncviewer). The same password will be required when making [https://docs.alliancecan.ca/wiki/VNC#Multiple_connections multiple connections] assuming you started your vncserver by appending the additional <code>-alwaysshared</code> option.
 
 <!--T:175-->
 2) Now determine which port your vncserver is listening on (5901 for this example) by running grep on the log file:
@@ -265,21 +265,30 @@ Optionally you can completely remove your VNC configuration (including your pass
 If a running vncserver is no longer needed, terminate it with <code>vncserver -kill :DISPLAY#</code> for example:
 
 <!--T:172-->
- [gra-login1:~] vncserver -list
+ [gra-login1:~] vncserver -list | grep -v ^$
  TurboVNC sessions:
  X DISPLAY #	PROCESS ID	NOVNC PROCESS ID
- :<span style="color:red">44</span>	        27644
+ :<span style="color:red">44</span>	        27644<br>
  [gra-login1:~] vncserver -kill :<span style="color:red">44</span>
  Killing Xvnc process ID 27644
 
 <!--T:100-->
-If you have multiple vncservers running on a node, you may kill them all instantly by running:
+If you have multiple vncservers running on a node, you may kill them ALL instantly by running:
  [gra-login1:~] pkill Xvnc -u $USER
 
 == Multiple connections == <!--T:200-->
 
 <!--T:101-->
-All vncserver(s) running under your username (on a login or compute node) can be displayed with <code>vncserver -list</code>.  If a vncserver was started with the additional <code>-AlwaysShared</code> option then multiple connections to it can be made by establishing a new tunnel and vncviewer from any remote location.  Thus one could leave vncviewer running at the office and then re-connect again from home to access the same desktop and then for example seamlessly continue working with the same applications without closing them.  If however a vncserver was not started with <code>vncserver -AlwaysShared</code> then only one vncviewer connection will be possible and additional connection attempts will immediately fail.
+All vncserver(s) running under your username (on a login or compute node) can be displayed with <code>vncserver -list</code>.  If a vncserver was started with the additional <code>-AlwaysShared</code> option then multiple connections to it can be made by establishing a new tunnel and vncviewer from any remote location.  For example:
+
+ <!--T:218-->
+[<b>l4</b>(login node):~] vncserver -idletimeout 86400 -alwaysshared | grep -v ^$
+ Desktop 'TurboVNC: l4.nibi.sharcnet:1 (yourusername)' started on display <b>l4</b>.nibi.sharcnet:1
+ Starting applications specified in /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/xstartup.turbovnc
+ Log file is /home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log
+
+<!--T:219-->
+Thus one could start a vncserver running while at the office and then go home, establish new tunnels to the login or compute node where the vncserver is still running, and re-connect again with vncviewer to access the same desktop and seamlessly continue working.  If however your vncserver was not started with <code>vncserver -AlwaysShared</code> then only one vncviewer connection will be possible and you would need to close down all applications running in the desktop then shut down your vncserver, all before going home.  Then later once home you would need to restart a whole new desktop from scratch and all applications just to finally continue working.
 
 == Failures to connect == <!--T:102-->
 

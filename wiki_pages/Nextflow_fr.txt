@@ -125,12 +125,12 @@ bin           CODE_OF_CONDUCT.md  LICENSE  modules.json     pyproject.toml      
 CHANGELOG.md  conf                main.nf  nextflow.config  README.md             workflows
 </source>
 
-Quand le pipeline est prêt à être lancé, Nextflow examine le fichier <code>nextflow.config</code> dans ce répertoire ainsi que le fichier <code>~/.nextflow/config</code> dans /home  (s'il existe) pour contrôler l'exécution du flux de travail. Les pipelines nf-core ont tous une configuration par défaut, une configuration de test et des configurations de conteneur (singularité, podman, etc.). Vous devrez aussi fournir une configuration personnalisée pour la grappe (Narval, Béluga, Cedar ou Graham) sur laquelle les pipelines sont exécutés; une configuration simple se trouve dans la section suivante. Les pipelines Nextflow peuvent également s'exécuter sur [[Niagara/fr|Niagara]] s'ils ont été conçus expressément pour cette grappe, mais nous vous déconseillons généralement d'exécuter tout pipeline Nextflow sur Niagara.
+Quand le pipeline est prêt à être lancé, Nextflow examine le fichier <code>nextflow.config</code> dans ce répertoire ainsi que le fichier <code>~/.nextflow/config</code> dans /home  (s'il existe) pour contrôler l'exécution du flux de travail. Les pipelines nf-core ont tous une configuration par défaut, une configuration de test et des configurations de conteneur (singularité, podman, etc.). Vous devrez aussi fournir une configuration personnalisée pour la grappe sur laquelle les pipelines sont exécutés; une configuration simple se trouve dans la section suivante. Les pipelines Nextflow peuvent également s'exécuter sur [[Trillium/fr|Trillium]] s'ils ont été conçus expressément pour cette grappe, mais nous vous déconseillons généralement d'exécuter tout pipeline Nextflow sur Trillium.
 
 <span id="A_configuration_for_our_clusters"></span>
 ==== Configuration pour nos grappes ====
 
-Vous pouvez utiliser la configuration suivante en modifiant la valeur par défaut des processus nf-core et en entrant les informations appropriées pour la grappe [[Béluga]] ou [[Narval]]. Cette configuration est enregistrée dans un bloc de profil qui sera chargé lors de l'exécution. 
+Vous pouvez utiliser la configuration suivante en modifiant la valeur par défaut des processus nf-core et en entrant les informations appropriées pour la grappe que vous utilisez. Cette configuration est enregistrée dans un bloc de profil qui sera chargé lors de l'exécution. 
 {{File
   |name=~/.nextflow/config
   |lang="config"
@@ -169,9 +169,14 @@ executor {
 }
 
 profiles {
-  beluga {
-    max_memory='186G'
-    max_cpu=40
+  fir {
+    max_memory='750G'
+    max_cpu=192
+    max_time='168h'
+  }
+  nibi {
+    max_memory='750G'
+    max_cpu=192
     max_time='168h'
   }
   narval {
@@ -179,12 +184,17 @@ profiles {
     max_cpu=64
     max_time='168h'
   }
+  rorqual {
+    max_memory='750G'
+    max_cpu=192
+    max_time='168h'
+  }
 }
 }}
 Remplacez <code><my-account></code> par votre propre compte qui est semblable à <code>def-pname</code>.
 Le bit <code>singularity.autoMounts = true</code> fait en sorte que tous les systèmes de fichiers (<code>/project</code>, <code>/scratch</code>, <code>/home</code> & <code>/localscratch</code>) seront correctement montés à l'intérieur du conteneur Singularity.
 
-Cette configuration garantit qu'il n'y a pas plus de 100 tâches dans la file d'attente Slurm et que seules 60 tâches sont soumises par minute. Elle indique que les nœuds de calcul Béluga ont 40 cœurs et 186 Go de RAM avec un temps réel maximum d'exécution d'une semaine (168 heures).
+Cette configuration garantit qu'il n'y a pas plus de 100 tâches dans la file d'attente Slurm et que seules 60 tâches sont soumises par minute. Elle indique que les nœuds de calcul Rorqual ont 192&nbsp;cœurs et 750&nbsp;G de RAM avec un temps réel maximum d'exécution d'une semaine (168&nbsp;heures).
 
 La configuration est liée au système sur lequel se fait l'exécution, mais elle est également liée au pipeline lui-même. Par exemple, ici <code>cpu = 1</code> est la valeur par défaut, mais certaines étapes du pipeline peuvent en utiliser plus. Cela peut devenir assez compliqué et les étiquettes dans le fichier <code>nf-core-smrnaseq_2.3.1/2_3_1/conf/base.config</code> sont utilisées par le pipeline à l'interne pour identifier une étape avec une configuration autre que celle par défaut. Nous n'abordons pas ce sujet ici, mais sachez qu'en modifiant ces étiquettes, vous pourriez observer des différences importantes dans le temps de mise en file d'attente et le temps d'exécution du pipeline.
 
@@ -193,7 +203,7 @@ Si les tâches échouent avec les codes de retour 125 (<i>out of memory</i>) ou 
 <span id="Running_the_pipeline"></span>
 ====Exécution du pipeline====
 
-Utilisez les deux profils fournis par nf-core (<i>test</i> pour l'ensemble de données de test et <i>singularity</i> pour le conteneur) et le profil que nous venons de créer pour Béluga. Notez que Nextflow est principalement écrit en Java et a tendance à utiliser beaucoup de mémoire virtuelle. Sur Narval, cela ne posera pas de problème, mais avec le nœud de connexion de Béluga, vous devrez modifier la mémoire virtuelle pour exécuter la plupart des flux de travail. Pour définir la limite de mémoire virtuelle à 40Go, utilisez la commande <code>ulimit -v 40000000</code>. Nous suggérons aussi d'utiliser un [[Prolonging_terminal_sessions/fr#Multiplexeur_de_terminal|multiplexeur de terminal]], de sorte que le pipeline Nextflow fonctionnera toujours si vous êtes déconnecté, et vous pourrez ensuite vous reconnecter au processus du multiplexeur. Notez que l'exécution de Nextflow est facile sur les nœuds de connexion de Béluga et Narval, mais plus difficile sur Graham et Cedar puisque la limite de mémoire virtuelle des nœuds de connexion ne peut pas être modifiée sur ces grappes; nous vous recommandons de lancer Nextflow à partir d'un nœud de calcul, où la mémoire virtuelle n'est jamais limitée.
+Utilisez les deux profils fournis par nf-core (<i>test</i> pour l'ensemble de données de test et <i>singularity</i> pour le conteneur) et le profil que nous venons de créer pour Narval. Notez que Nextflow est principalement écrit en Java et a tendance à utiliser beaucoup de mémoire virtuelle. Sur certtaines grappes, ceci peut causer un problème si l'exécution se fait à partir d'un nœud de connexion.
 <source lang="bash">
 nextflow run nf-core-${NFCORE_PL}_${PL_VERSION}/2_3_1/  -profile test,singularity,narval  --outdir ${NFCORE_PL}_OUTPUT
 </source>

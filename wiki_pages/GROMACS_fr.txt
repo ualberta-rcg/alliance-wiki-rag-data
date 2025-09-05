@@ -132,7 +132,7 @@ Les versions suivantes sont disponibles :
 </tabs>
 
 <b>Remarques</b>
-* * [[File:Warning sign 16px.png|frameless|warning]] Les versions 2020.0 jusqu'à 2021.5 inclusivement contiennent un bogue quand elles sont utilisées avec des GPU de génération Volta ou plus récentes (V100, T4 et A100) avec l'option <code>-update gpu</code> de <code>mdrun</code> qui aurait pu perturber le calcul viriel et ainsi fausser le raccord de pression. Dans les notes de mise à jour de la version 2021.6 on peut lire :<ref>"Fix missing synchronization in CUDA update kernels" in GROMACS 2021.6 Release Notes [https://manual.gromacs.org/2021.6/release-notes/2021/2021.6.html#fix-missing-synchronization-in-cuda-update-kernels]</ref> <blockquote>[traduction libre] <i>La mise à jour  n'est pas activée par défaut sur le GPU et donc l'erreur ne peut se produire que dans les simulations où l'option <code>-update gpu</code> a été explicitement sélectionnée; même dans ce cas, l'erreur peut être rare car nous ne l'avons pas observée en pratique dans les tests que nous avons effectués.</i></blockquote> Vous trouverez plus d'information dans GitLab, au sujet  #4393 du projet GROMACS.<ref>Issue #4393 in GROMACS Project on GitLab.com [https://gitlab.com/gromacs/gromacs/-/issues/4393]</ref>
+* * [[File:Warning sign 16px.png|frameless|warning]] Les versions 2020.0 jusqu'à 2021.5 inclusivement contiennent un bogue quand elles sont utilisées avec des GPU de génération Volta ou plus récentes ( V100, T4, A100 et H100) avec l'option <code>-update gpu</code> de <code>mdrun</code> qui aurait pu perturber le calcul viriel et ainsi fausser le raccord de pression. Dans les notes de mise à jour de la version 2021.6 on peut lire :<ref>"Fix missing synchronization in CUDA update kernels" in GROMACS 2021.6 Release Notes [https://manual.gromacs.org/2021.6/release-notes/2021/2021.6.html#fix-missing-synchronization-in-cuda-update-kernels]</ref> <blockquote>[traduction libre] <i>La mise à jour  n'est pas activée par défaut sur le GPU et donc l'erreur ne peut se produire que dans les simulations où l'option <code>-update gpu</code> a été explicitement sélectionnée; même dans ce cas, l'erreur peut être rare car nous ne l'avons pas observée en pratique dans les tests que nous avons effectués.</i></blockquote> Vous trouverez plus d'information dans GitLab, au sujet  #4393 du projet GROMACS.<ref>Issue #4393 in GROMACS Project on GitLab.com [https://gitlab.com/gromacs/gromacs/-/issues/4393]</ref>
 *Les versions depuis 2020.4 ont été compilées pour [[Standard software environments/fr|l'environnement logiciel standard]]  <code>StdEnv/2020</code>.
 *Les versions 2018.7 et suivantes ont été compilées avec les compilateurs GCC et la bibliothèque MKL puisqu’ils améliorent légèrement la performance.
 *Les versions antérieures ont été compilées avec soit des compilateurs GCC et FFTW, soit avec des compilateurs Intel MKL avec des bibliothèques Open MPI 2.1.1 à partir de l'environnement par défaut, comme indiqué dans le tableau ci-dessus.
@@ -200,62 +200,9 @@ Le produit de <code>--ntasks-per-node=</code> par <code>--cpus-per-task</code> d
 On clusters with a large number of CPU cores (e.g. 192) per compute node, domain decomposition can become a limiting factor when choosing <code>--ntasks-per-node</code>. The larger a system is, the more it can be divided into smaller regions, allowing larger <code>--ntasks-per-node</code> values. If GROMACS reports an error about domain decomposition being impossible given the system size and requested number of domains, halve <code>--ntasks-per-node</code> and double <code>--cpus-per-task</code>.
 
 <tabs>
-<tab name="Graham">
-{{File
-  |name=gromacs_whole_node_graham.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=1                # number of nodes
-#SBATCH --ntasks-per-node=16     # request 16 MPI tasks per node
-#SBATCH --cpus-per-task=2        # 2 OpenMP threads per MPI task => total: 16 x 2 = 32 CPUs/node
-#SBATCH --mem-per-cpu=2000M      # memory per CPU (in MB)
-#SBATCH --time=0-01:00           # time limit (D-HH:MM)
-module purge  
-module load  StdEnv/2023  gcc/12.3  openmpi/4.1.5  gromacs/2024.4
-export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
-
-srun --cpus-per-task=$OMP_NUM_THREADS gmx_mpi mdrun -deffnm md
-}}</tab>
-<tab name="Cedar">
-{{File
-  |name=gromacs_whole_node_cedar.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=1                        # number of nodes
-#SBATCH --ntasks-per-node=24             # request 24 MPI tasks per node
-#SBATCH --cpus-per-task=2                # 2 OpenMP threads per MPI task => total: 24 x 2 = 48 CPUs/node
-#SBATCH --constraint="[skylake{{!}}cascade]" # restrict to AVX512 capable nodes.
-#SBATCH --mem-per-cpu=2000M              # memory per CPU (in MB)
-#SBATCH --time=0-01:00                   # time limit (D-HH:MM)
-module purge
-module load arch/avx512   # switch architecture for up to 30% speedup
-module load  StdEnv/2023  gcc/12.3  openmpi/4.1.5  gromacs/2024.4
-export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
- 
-srun --cpus-per-task=$OMP_NUM_THREADS gmx_mpi mdrun -deffnm md
-}}</tab>
-<tab name="Béluga">
-{{File
-  |name=gromacs_whole_node_beluga.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=1                # number of nodes
-#SBATCH --ntasks-per-node=20     # request 20 MPI tasks per node
-#SBATCH --cpus-per-task=2        # 2 OpenMP threads per MPI task => total: 20 x 2 = 40 CPUs/node
-#SBATCH --mem-per-cpu=2000M      # memory per CPU (in MB)
-#SBATCH --time=0-01:00           # time limit (D-HH:MM)
-module purge  
-module load  StdEnv/2023  gcc/12.3  openmpi/4.1.5  gromacs/2024.4
-export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
- 
-srun --cpus-per-task=$OMP_NUM_THREADS gmx_mpi mdrun -deffnm md
-}}</tab>
 <tab name="Narval">
 {{File
-  |name=gromacs_whole_node_beluga.sh
+  |name=gromacs_whole_node_narval.sh
   |lang="sh"
   |contents=
 #!/bin/bash
@@ -265,24 +212,6 @@ srun --cpus-per-task=$OMP_NUM_THREADS gmx_mpi mdrun -deffnm md
 #SBATCH --mem-per-cpu=2000M      # memory per CPU (in MB)
 #SBATCH --time=0-01:00           # time limit (D-HH:MM)
 module purge  
-module load  StdEnv/2023  gcc/12.3  openmpi/4.1.5  gromacs/2024.4
-export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
- 
-srun --cpus-per-task=$OMP_NUM_THREADS gmx_mpi mdrun -deffnm md
-}}</tab>
-<tab name="Niagara">
-{{File
-  |name=gromacs_whole_node_niagara.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=1                # number of nodes
-#SBATCH --ntasks-per-node=10     # request 10 MPI tasks per node
-#SBATCH --cpus-per-task=4        # 4 OpenMP threads per MPI task => total: 10 x 4 = 40 CPUs/node
-#SBATCH --mem-per-cpu=2000M      # memory per CPU (in MB)
-#SBATCH --time=0-01:00           # time limit (D-HH:MM)
-module purge --force
-module load CCEnv
 module load  StdEnv/2023  gcc/12.3  openmpi/4.1.5  gromacs/2024.4
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
  
@@ -386,13 +315,7 @@ gmx mdrun -ntomp ${SLURM_CPUS_PER_TASK:-1} -deffnm md
 Il faut noter que le fait d'utiliser plus qu'un GPU cause habituellement une pauvre efficacité. Avant d'utiliser plusieurs GPU pour vos simulations, effectuez des tests comparatifs avec un seul et avec plusieurs pour évaluer la performance
 
 * [[File:Warning sign 16px.png|frameless|warning]] Les versions 2020.0 jusqu'à 2021.5 inclusivement contiennent un bogue quand elles sont utilisées avec des GPU de génération Volta ou plus récentes (V100, T4 et A100) avec l'option <code>-update gpu</code> de <code>mdrun</code> qui aurait pu perturber le calcul viriel et ainsi fausser le raccord de pression. Dans les notes de mise à jour de la version 2021.6 on peut lire :<ref>"Fix missing synchronization in CUDA update kernels" in GROMACS 2021.6 Release Notes [https://manual.gromacs.org/2021.6/release-notes/2021/2021.6.html#fix-missing-synchronization-in-cuda-update-kernels]</ref> <blockquote>[traduction libre] ''La mise à jour  n'est pas activée par défaut sur le GPU et donc l'erreur ne peut se produire que dans les simulations où l'option <tt>-update gpu</tt> a été explicitement sélectionnée; même dans ce cas, l'erreur peut être rare car nous ne l'avons pas observée en pratique dans les tests que nous avons effectués.''</blockquote> Vous trouverez plus d'information dans GitLab, au sujet  #4393 du projet GROMACS.<ref>Issue #4393 in GROMACS Project on GitLab.com [https://gitlab.com/gromacs/gromacs/-/issues/4393]</ref>
-* Les nœuds GPU sont configurés différemment sur nos grappes.
-::* Cedar offre 4 GPU et 24 cœurs CPU par nœud
-::* Graham offre 2 GPU et 32 cœurs CPU par nœud. 
-::Les paramètres sont différents si vous voulez utiliser tous les GPU et cœurs CPU d'un nœud.  
-::* Cedar :  <code>--gres=gpu:p100:4  --ntasks-per-node=4 --cpus-per-task=6</code> 
-::* Graham : <code>--gres=gpu:p100:2  --ntasks-per-node=4 --cpus-per-task=8</code>
-::Bien entendu, le système simulé doit être assez grand pour utiliser toutes les ressources.
+* Les nœuds GPU sont configurés différemment sur nos grappes.<br> Voir [[Using GPUs with Slurm/fr#GPU_disponibles|GPU disponibles]] you can find more information about the different node configurations (GPU models and number of GPUs and CPUs per node).
 * GROMACS impose certaines contraintes dans le choix du nombre de GPU, de tâches (rang MPI) et de fils OpenMP.
 Pour la version 2018.2, les contraintes sont&nbsp;:
 ::* <code>--tasks-per-node</code> doit être un multiple du nombre de GPU (<code>--gres=gpu:</code>)
@@ -668,32 +591,7 @@ Surtout dans les cas où la méthode PME n'est pas employée, il n'est pas néce
 <span id="CPU_architecture"></span>
 == Architecture des CPU ==
 
-GROMACS utilise des fonctions optimisées (''kernel functions'') pour calculer la portion réelle des interactions non liées à courte portée. Ces fonctions sont disponibles pour une variété de jeux d’instructions SIMD tels qu’AVX, AVX2 ou AVX512. Ces fonctions sont choisies lors de la compilation de GROMACS, et devraient correspondre aux capacités des CPU qui exécuteront les simulations. Cela est fait pour vous par l’équipe de Calcul Canada : quand vous ajoutez à votre environnement un module pour GROMACS, une version pour AVX/AVX2/AVX512 est choisie en fonction de l’architecture de la grappe de calculs. GROMACS indique quel jeu d’instructions SIMD il supporte dans le fichier du journal (log) et vous avertira si la fonction choisie est sous-optimale.
-
-Toutefois, certaines grappes de calcul contiennent une variété de CPU ayant différents niveaux de support SIMD. Dans ce cas, le plus petit commun dénominateur est choisi. Par exemple, si la machine a des CPU Skylake (AVX/AVX2/AVX512) et Broadwell (AVX/AVX2), comme c’est le cas présentement (mai 2020) pour Cedar, une version de GROMACS pour AVX2 sera choisie. Cela implique que vous pouvez obtenir une fonction sous-optimale, dépendamment des nœuds de calculs alloués à votre tâche.
-
-Vous pouvez demander explicitement des nœuds de calcul supportant AVX512 avec l’option SLURM <code>--constraint=cascade|skylake</code> sur les grappes qui offrent ces types de nœuds. Ceci fera en sorte que votre tâche sera assignée soit à des nœuds dans une architecture Cascade Lake, soit à des nœuds dans une architecture Skylake, mais non distribuée sur les deux architectures.
-
-Si vous travaillez en ligne de commande, n'oubliez pas les guillemets (<code>"--constraint=cascade|skylake"</code>) pour protéger les caractères spéciaux <code>[</code> et <code>]</code>. Vous pouvez ensuite demander explicitement les logiciels pour AVX512 avec <code>module load arch/avx512</code>, avant d’ajouter les autres modules. 
-
-Voici un exemple de script pour une tâche simple&nbsp;:
-
- {{File
-  |name=gromacs_job_cedar_avx512.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=4
-#SBATCH --ntasks-per-node=48
-#SBATCH --constraint="[skylake{{!}}cascade]"
-#SBATCH --time=24:00:00
-module load arch/avx512
-module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 gromacs/2024.4
-export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
-srun gmx_mpi mdrun
-}}
-
-Nos bancs d’essai suggèrent que passer d’AVX2 à AVX512 sur les nœuds Skylake ou Cascade résulte en un gain de performance de 20 à 30%. Toutefois, considérez également que vous restreindre aux nœuds supportant AVX512 mènera à plus de temps d’attente dans la file.
+GROMACS utilise des fonctions optimisées (''kernel functions'') pour calculer la portion réelle des interactions non liées à courte portée. Ces fonctions sont disponibles pour une variété de jeux d’instructions SIMD tels qu’AVX, AVX2 ou AVX512. Ces fonctions sont choisies lors de la compilation de GROMACS, et devraient correspondre aux capacités des CPU qui exécuteront les simulations. Cela est fait pour vous par notre équipe&nbsp;: quand vous ajoutez à votre environnement un module pour GROMACS, une version pour AVX/AVX2/AVX512 est choisie en fonction de l’architecture de la grappe de calculs. GROMACS indique quel jeu d’instructions SIMD il supporte dans le fichier du journal (log) et vous avertira si la fonction choisie est sous-optimale.
 
 <span id="GPUs"></span>
 == GPU ==
@@ -711,7 +609,7 @@ Nos bancs d’essai suggèrent que passer d’AVX2 à AVX512 sur les nœuds Skyl
 ''GROMACS'' offre beaucoup d'outils pouvant être utilisés pour des tâches communes de post-traitement et d'analyse. 
 Le manuel de ''GROMACS'' contient [https://manual.gromacs.org/current/user-guide/cmdline.html#commands-by-topic une liste des commandes disponibles selon le sujet] et aussi [https://manual.gromacs.org/current/user-guide/cmdline.html#commands-by-name selon le nom]; chaque commande est accompagnée d'une courte description et un lien conduit à l'information de référence.
 
-Typiquement, ces commandes lisent la trajectoire (au format ''XTC'', ''TNG'' ou ''TRR''), un fichier de coordonnées (''GRO'', ''PDB'', ''TPR'', etc.) et produit un graphique  [https://manual.gromacs.org/current/reference-manual/file-formats.html#xvg au format ''XVG''] qui peut être utilisé par [https://plasma-gate.weizmann.ac.il/Grace/ l'outil de traçage Grace] (module <code>grace/5.99.0</code>; commande <code>xmgrace</code>; voyez  [https://plasma-gate.weizmann.ac.il/Grace/doc/UsersGuide.html Grace User Guide]). Comme les fichiers ''XVG'' sont des fichiers texte, ils peuvent être analysés par des scripts ou importés dans des feuilles de calcul.
+Typiquement, ces commandes lisent la trajectoire (au format ''XTC'', ''TNG'' ou ''TRR''), un fichier de coordonnées (''GRO'', ''PDB'', ''TPR'', etc.) et produit un graphique  [https://manual.gromacs.org/current/reference-manual/file-formats.html#xvg au format ''XVG''] qui peut être utilisé par [https://plasma-gate.weizmann.ac.il/Grace/ l'outil de traçage Grace]; voir  [https://plasma-gate.weizmann.ac.il/Grace/doc/UsersGuide.html Grace User Guide]. Comme les fichiers ''XVG'' sont des fichiers texte, ils peuvent être analysés par des scripts ou importés dans des feuilles de calcul.
 
 == VMD ==
 [[VMD/fr|VMD]] est un programme de visualisation moléculaire pour afficher, animer et analyser de grands systèmes biomoléculaires à l'aide de graphiques 3D et de scripts intégrés.  Il peut être utilisé pour inspecter visuellement les trajectoires GROMACS et offre également un grand nombre de plugiciels intégrés et externes pour l'analyse.

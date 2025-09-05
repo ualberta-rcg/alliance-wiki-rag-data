@@ -280,20 +280,33 @@ Vous pouvez choisir de supprimer définitivement votre configuration VNC incluan
 
 Si un vncserver actif n'est plus nécessaire, tuez-le avec <code>vncserver -kill :DISPLAY#</code> comme démontré ci-dessous.
 
+<div class="mw-translate-fuzzy">
  [gra-login1:~] vncserver -list
  TurboVNC sessions:
  X DISPLAY #	PROCESS ID	NOVNC PROCESS ID
  :<span style="color:red">44</span>	        27644
  [gra-login1:~] vncserver -kill :<span style="color:red">44</span>
  Killing Xvnc process ID 27644
+</div>
 
+<div class="mw-translate-fuzzy">
 Si vous avez plusieurs vncservers actifs sur un nœud, vous pouvez les tuer tous du même coup avec
  [gra-login1:~] pkill Xvnc -u $USER
+</div>
 
 <span id="Multiple_connections"></span>
 == Connexions multiples ==
 
+<div class="mw-translate-fuzzy">
 Tous les vncservers exécutés sous votre nom d'utilisateur (sur un nœud de connexion ou de calcul) peuvent être listés avec <code>vncserver -list</code>. Si un vncserver a été démarré avec l'option supplémentaire <code>-AlwaysShared</code>, plusieurs connexions peuvent être établies en créant un nouveau tunnel et un nouveau vncviewer à partir de n'importe quel emplacement distant. Ainsi, on peut laisser vncviewer exécuté sur un ordinateur au bureau, puis se reconnecter à nouveau depuis chez soi pour accéder au même ordinateur et ensuite, par exemple, continuer à travailler de manière transparente avec les mêmes applications sans avoir à les fermer. Si toutefois un vncserver n'a pas été démarré avec <code>vncserver -AlwaysShared</code>, une seule connexion vncviewer sera possible et les tentatives de connexion supplémentaires échoueront immédiatement.
+</div>
+
+ [<b>l4</b>(login node):~] vncserver -idletimeout 86400 -alwaysshared | grep -v ^$
+ Desktop 'TurboVNC: l4.nibi.sharcnet:1 (yourusername)' started on display <b>l4</b>.nibi.sharcnet:1
+ Starting applications specified in /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/xstartup.turbovnc
+ Log file is /home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log
+
+Thus one could start a vncserver running while at the office and then go home, establish new tunnels to the login or compute node where the vncserver is still running, and re-connect again with vncviewer to access the same desktop and seamlessly continue working.  If however your vncserver was not started with <code>vncserver -AlwaysShared</code> then only one vncviewer connection will be possible and you would need to close down all applications running in the desktop then shut down your vncserver, all before going home.  Then later once home you would need to restart a whole new desktop from scratch and all applications just to finally continue working.
 
 <span id="Failures_to_connect"></span>
 == Échecs de connexion ==

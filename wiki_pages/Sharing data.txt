@@ -47,7 +47,8 @@ You can alter these permissions using the command <code>chmod</code> in conjunct
 {{Command|chmod 770 name_of_file}} 
 means that everyone in your group now has the right to read, write and execute this file. Naturally, you can only modify the permissions of a file or directory you own. You can also alter the group by means of the command <code>chgrp</code>.
 
-===The sticky bit=== <!--T:13-->
+<!--T:13-->
+===The sticky bit===
 When dealing with a shared directory where multiple users have read, write and execute permission, as would be common in the [[Project_layout | project space]] for a professor with several active students and collaborators, the issue of ensuring that an individual cannot delete the files or directories of another can arise. For preventing this kind of behaviour, the Unix filesystem developed the concept of the [https://en.wikipedia.org/wiki/Sticky_bit sticky bit] by means of which the filesystem permissions for a directory can be restricted so that a file in that directory can only be renamed or deleted by the file's owner or the directory's owner. Without this sticky bit, users with write and execute permission for that directory can rename or delete any files that it may contain even if they are not the file's owner. The sticky bit can be set using the command <code>chmod</code>, for example
 {{Command|chmod +t <directory name>}}
 or if you prefer to use the octal notation discussed above by using the mode 1000, hence
@@ -66,8 +67,9 @@ or via octal notation,
 {{Command|chmod 0774 <directory name>}}
 In the context of the project space, the directory owner will be the PI who sponsors the roles of the students and collaborators.
 
-=== Set Group ID bit === <!--T:16-->
-When creating files and directories within a parent directory, it is often useful to match the group ownership of the new files or directories to the parent directory's owner or group automatically. This is key to the operation of the [[Project layout|Project]] filesystems at Graham and Cedar for example, since storage quotas in Project spaces are enforced by group. 
+<!--T:16-->
+=== Set Group ID bit ===
+When creating files and directories within a parent directory, it is often useful to match the group ownership of the new files or directories to the parent directory's owner or group automatically. 
 
 <!--T:18-->
 If the <code>setGID</code> bit is enabled for a directory, new files and directories in that directory will be created with the same group ownership as the directory. To illustrate the use of this mode, let us walk through an example.
@@ -117,7 +119,8 @@ Finally, it can be important to note the difference between <code>S</code> (uppe
 drwxrS---  3 someuser   def-someuser       4096 Oct 13 19:39 dirTest
 </source>
 
-=== Set User ID bit === <!--T:47-->
+<!--T:47-->
+=== Set User ID bit ===
 The <code>setUID</code> bit <b>will not work</b> on our clusters.
 Its usual behaviour is completely disabled, for security reasons.
 
@@ -126,8 +129,8 @@ Its usual behaviour is completely disabled, for security reasons.
 <!--T:40-->
 Default filesystem permissions are defined by something called the [https://en.wikipedia.org/wiki/Umask <code>umask</code>]. There is a default value that is defined on any Linux system. To display the current value in your session, you can run the command
 {{Command|umask -S}}
-For example, on Graham, you would get
-{{Command|prompt=[user@gra-login1]$|umask -S
+For example, on our clusters, you would get
+{{Command|umask -S
 |result=u=rwx,g=rx,o=}}
 This means that, by default, new files that you create can be read, written and executed by yourself, they can be read and executed by members of the group of the file, and they cannot be accessed by other people. <b>The <code>umask</code> only applies to new files. Changing the <code>umask</code> does not change the access permissions of existing files.</b> 
 
@@ -159,25 +162,11 @@ The umask is not the only thing that determines who can access a file.
 * You can explicitly change the permissions on a file or directory after it is created, using <code>chmod</code>.
 * Access Control Lists (ACLs) also determine who can access a file. 
 
-=== Change of the default <code>umask</code> on Cedar, Béluga and Niagara === <!--T:44-->
-In the summer 2019, we discovered that the default <code>umask</code> was not the same on all our servers. On October 16th, 2019, we changed the default <code>umask</code> on these three servers to match the one from Graham. The default <code>umask</code> changed as follows: 
-{| class="wikitable"
-|-
-! Cluster !! <code>umask</code> before the change !! <code>umask</code> after the change
-|-
-| Béluga || 002 || 027
-|-
-| Cedar || 002 || 027
-|-
-| Niagara || 022 || 027
-|-
-|}
-This means that more restrictive permissions are enforced on newly created files. If you need more permissive permissions for your workflow, you can change your default <code>umask</code> in your <code>.bashrc</code>. Our general advice is however to keep the default permissions. 
-
 <!--T:45-->
 Note that this change does <i>not</i> mean that your files have been inappropriately exposed in the past. Restrictive access permissions have been set on your home, project, and scratch directories since the beginning.  Unless the permissions were changed to give <i>execute</i> permission to other users on these folders, they still cannot be accessed by them.
 
-=== Changing the permissions of existing files === <!--T:46-->
+<!--T:46-->
+=== Changing the permissions of existing files ===
 If you want to change the permissions of existing files to match the new default permissions, you can use the <code>chmod</code> command as follow:
 {{Command|chmod g-w,o-rx <file>}}
 or, if you want to do it for a whole directory, you can run 
@@ -192,7 +181,8 @@ The file permissions discussed above have been available in Unix-like operating 
 * <code>getfacl</code> to see the ACL permissions, and 
 * <code>setfacl</code> to alter them. 
 
-==== Sharing a single file ==== <!--T:19-->
+<!--T:19-->
+==== Sharing a single file ====
 To allow a single person with username <code>smithj</code> to have read and execute permission on the file <code>my_script.py</code>, use:
 <source lang="console">
 $ setfacl -m u:smithj:rx my_script.py
@@ -219,7 +209,8 @@ In order for this method to work the following things need to be in place:
 * Parent directories (and parents of parents, etc.) of the one you are trying to share must allow execute permission to the user you are trying to share with. This can be supplied with <code>setfacl -m u:smithj:X ...</code> in this example, or it can be supplied by allowing everyone entry, i.e. <code>chmod o+x ...</code>. They do not need to have public read permission. In particular you will need to grant execute permission on the project directory (<code>/projects/def-<PI></code>) either for everyone, or one-by-one to all the people you are trying to share your data with.
 * When sharing a directory in the project filesystem, you must provide your collaborators with a path that starts with <code>/project</code>, <b>not</b> with <code>/home/<user>/projects</code>. The latter contains symbolic links (symlinks, or shortcuts) to the physical directories in <code>/project</code>, and these symlinks will not be reachable by your collaborators unless they also have access to your home directory. You can get the physical path a symlink points to using the <code>realpath</code> command. For example, <code>realpath /home/smithj/projects/def-smithj/shared_data</code> could return <code>/project/9041430/shared_data</code>. The physical path to a project directory is not the same on all clusters. If you wish to share a project directory on more than one cluster, check its physical path with <code>realpath</code> on each cluster.
 
-==== Removing ACL ==== <!--T:48-->
+<!--T:48-->
+==== Removing ACL ====
 To remove all extended ACL attributes from a directory recursively, use:
 <source lang="console">
 setfacl -bR /home/<user>/projects/def-<PI>/shared_data

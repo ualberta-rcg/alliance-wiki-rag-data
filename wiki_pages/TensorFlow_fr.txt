@@ -4,6 +4,7 @@
 
 Si vous voulez porter un programme TensorFlow sur une de nos grappes, nous vous recommandons de prendre connaissance du [[Tutoriel Apprentissage machine|tutoriel sur l'apprentissage machine]].
 
+<span id="Installing_TensorFlow"></span>
 ==Installation==
 
 Les directives suivantes servent à installer TensorFlow dans votre répertoire <i>home</i> à l'aide des ([http://pythonwheels.com/ <i>wheels</i> Python ]) qui se trouvent dans <code>/cvmfs/soft.computecanada.ca/custom/python/wheelhouse/</code>. 
@@ -24,7 +25,7 @@ Activez le nouvel environnement.
 
 Installez TensorFlow dans votre nouvel environnement virtuel en utilisant la commande suivante.
 {{Command2|prompt=(tensorflow) [name@server ~]$
-|pip install --no-index tensorflow{{=}}{{=}}2.8}}
+|pip install --no-index tensorflow}}
 </tab>
 <tab name="TF 1.x">
 
@@ -44,6 +45,7 @@ Installez TensorFlow dans votre nouvel environnement virtuel en utilisant une de
 
 <b>N'installez pas</b> le paquet <code>tensorflow</code> sans le suffixe <code>_cpu</code> ou <code>_gpu</code> car il existe des problèmes de compatibilité avec d'autres bibliothèques.
 
+<span id="CPU-only"></span>
 === CPU seulement ===
 {{Command2|prompt=(tensorflow) [name@server ~]$
 |pip install --no-index tensorflow_cpu{{=}}{{=}}1.15.0}}
@@ -55,6 +57,7 @@ Installez TensorFlow dans votre nouvel environnement virtuel en utilisant une de
 </tabs>
 
 
+<span id="R_package"></span>
 === Le paquet R  ===
 
 Pour utiliser TensorFlow en R, suivez les directives données ci-dessus pour créer un environnement virtuel et y installer TensorFlow. Suivez ensuite cette procédure ː
@@ -88,7 +91,7 @@ Le script contient
   |contents=
 #!/bin/bash
 #SBATCH --gres=gpu:1        # request GPU "generic resource"
-#SBATCH --cpus-per-task=6   # maximum CPU cores per GPU request: 6 on Cedar, 16 on Graham.
+#SBATCH --cpus-per-task=6   # maximum CPU cores per GPU request. See https://docs.alliancecan.ca/wiki/Allocations_and_compute_scheduling#Ratios_in_bundles
 #SBATCH --mem=32000M        # memory per node
 #SBATCH --time=0-03:00      # time (DD-HH:MM)
 #SBATCH --output=%N-%j.out  # %N for node name, %j for jobID
@@ -127,12 +130,14 @@ print(sess.run(node1 + node2))
 </tab>
 </tabs>
 
+<div class="mw-translate-fuzzy">
 Une fois la tâche terminée, ce qui devrait nécessiter moins d'une minute, un fichier de sortie avec un nom semblable à <code>cdr116-122907.out</code> devrait être généré. Le contenu de ce fichier serait similaire à ce qui suit; il s'agit d'exemples de messages TensorFlow et il est possible que vous en ayez d'autres.
+</div>
 
 <tabs>
 <tab name="TF 2.x">
 {{File
-  |name=cdr116-122907.out
+  |name=node_id-job_id.out
   |lang="text"
   |contents=
 2017-07-10 12:35:19.491097: I tensorflow/core/common_runtime/gpu/gpu_device.cc:961] DMA: 0
@@ -144,7 +149,7 @@ tf.Tensor(7.0, shape=(), dtype=float32)
 </tab>
 <tab name="TF 1.x">
 {{File
-  |name=cdr116-122907.out
+  |name=node_id-job_id.out
   |lang="text"
   |contents=
 2017-07-10 12:35:19.491097: I tensorflow/core/common_runtime/gpu/gpu_device.cc:961] DMA: 0
@@ -157,8 +162,11 @@ Tensor("Const:0", shape=(), dtype=float32) Tensor("Const_1:0", shape=(), dtype=f
 </tabs>
 
 
+<div class="mw-translate-fuzzy">
 TensorFlow fonctionne sur tous les types de nœuds GPU. Pour la recherche de grande envergure en apprentissage profond ou en apprentissage machine, il est fortement recommandé d'utiliser le type de nœuds <i>GPU large</i> de Cedar. Ces nœuds sont équipés de  4 x P100-PCIE-16Go avec [http://developer.download.nvidia.com/devzone/devcenter/cuda/docs/GPUDirect_Technology_Overview.pdf GPUDirect P2P] entre chaque paire. Pour plus d'information, consultez [[Using GPUs with Slurm/fr|cette page]].
+</div>
 
+<span id="Monitoring"></span>
 ==Suivi==
 
 Il est possible de se connecter à un nœud sur lequel une tâche est en cours pour y exécuter des processus. On peut ainsi faire le suivi des ressources utilisées par TensorFlow et visualiser le déroulement de l'entraînement. Pour des exemples, consultez [[Running jobs/fr#Surveillance_d'une_tâche_en_cours|Surveillance d'une tâche en cours]].
@@ -181,83 +189,23 @@ Pour créer la connexion, lancez la commande sur votre ordinateur local.
 {{Command2|prompt=[name@my_computer ~]$
 |ssh -N -f -L localhost:6006:computenode:6006 userid@cluster.computecanada.ca}}
 
+<div class="mw-translate-fuzzy">
 Remplacez <code>computenode</code> par le <i>hostname</i> obtenu à l'étape précédente; <code>userid</code> par votre nom d'utilisateur de l'Alliance et; <code>cluster</code> par le <i>hostname</i> de la grappe, soit <code>beluga</code>, <code>cedar</code>, <code>graham</code>, etc. Si le port 6006 était déjà utilisé, tensorboard va en utiliser un autre (p. ex. 6007, 6008...).
+</div>
 
 Une fois que la connexion est établie, allez à [http://localhost:6006 http://localhost:6006].
 
+<span id="TensorFlow_with_multi-GPUs"></span>
 ==Utiliser plusieurs GPU==
 
-===TensorFlow 1.x===
-Il existe plusieurs méthodes de gestion des variables, les plus communes étant <i>Parameter Server</i> et <i>Replicated</i>. 
-*Nous allons utiliser [https://github.com/tensorflow/benchmarks ce code] pour illustrer les diverses méthodes; vous pouvez l'adapter à vos besoins spécifiques.
-====Parameter Server====
-La copie maîtresse des variables est enregistrée sur un serveur de paramètres. En entraînement distribué, les serveurs de paramètres sont des processus distincts dans chacun des appareils. À chaque étape, chacune des tours obtient du serveur de paramètres une copie des variables et y retourne ses gradients.
-
-Les paramètres peuvent être enregistrés sur un CPU 
-<pre>
-python tf_cnn_benchmarks.py --variable_update=parameter_server --local_parameter_device=cpu
-</pre>
-ou sur un GPU
-<pre>
-python tf_cnn_benchmarks.py --variable_update=parameter_server --local_parameter_device=gpu
-</pre>
-
-====Replicated====
-Chaque GPU possède sa propre copie des variables. Les gradients sont copiés sur toutes les tours par agrégation du contenu des appareils ou par un algorithme <i>all reduce</i> (dépendant de la valeur du paramètre all_reduce_spec).
-
-Avec la méthode ''all reduce'' par défaut ː 
-<pre>
-python tf_cnn_benchmarks.py --variable_update=replicated
-</pre>
-Xring --- utilisez un ''global ring reduction'' pour tous les tenseurs :
-<pre>
-python tf_cnn_benchmarks.py --variable_update=replicated --all_reduce_spec=xring
-</pre>
-Pscpu --- utilisez CPU ''at worker 0'' pour réduire tous les tenseurs :
-<pre>
-python tf_cnn_benchmarks.py --variable_update=replicated --all_reduce_spec=pscpu
-</pre>
-NCCL --- utilisez NCCL pour réduire localement tous les tenseurs :
-<pre>
-python tf_cnn_benchmarks.py --variable_update=replicated --all_reduce_spec=nccl
-</pre>
-Les méthodes se comportent différemment selon les modèles; nous vous recommandons fortement de tester vos modèles avec toutes les méthodes sur les différents types de nœuds GPU.
-
-====Étalonnage (''benchmarks'')====
-Les résultats ont été obtenus avec TensorFlow v1.5 (CUDA9 et cuDNN 7) sur Graham et Cedar avec un seul GPU et plusieurs GPU et des méthodes différentes de gestion des variables; voyez  [https://github.com/tensorflow/benchmarks TensorFlow Benchmarks]. 
-*ResNet-50
-Lots de 32 par GPU et parallélisation des données (les résultats sont en images par seconde).
-{| class="wikitable"
-|-
-! Type de nœud !! 1 GPU !! Nombre de GPU !! ps,cpu  !! ps, gpu !! répliqué !! répliqué, xring !! répliqué, pscpu !! répliqué, nccl
-|-
-| Graham, <i>GPU base</i>|| 171.23||2 || 93.31 || <b>324.04</b> || 318.33  || 316.01 || 109.82 || 315.99
-|-
-| Cedar <i>GPU Base</i>  || 172.99|| 4 || <b>662.65</b>  ||595.43  || 616.02 || 490.03|| 645.04 || 608.95
-|-
-| Cedar, <i>GPU Large</i>  || 205.71 ||4 || 673.47 || 721.98 || <b>754.35</b>  || 574.91 || 664.72 || 692.25
-|}
-
-*VGG-16
-Lots de 32 par GPU et parallélisation des données (les résultats sont en images par seconde).
-
-{| class="wikitable"
-|-
-! Type de nœud !! 1 GPU !! Nombre de GPU !! ps,cpu  !! ps, gpu !! répliqué !! répliqué, xring !! répliqué, pscpu !! répliqué, nccl
-|-
-| Graham, <i>GPU Base</i>|| 115.89||2 || 91.29 || 194.46 || 194.43  || 203.83 || 132.19 || <b>219.72</b>
-|-
-| Cedar, <i>GPU Base</i>  || 114.77 ||4 || 232.85 || 280.69 || 274.41  || 341.29 || 330.04 || <b>388.53</b>
-|-
-| Cedar, <i>GPU Large</i>  || 137.16 ||4 || 175.20 || 379.80 ||336.72  || 417.46 || 225.37 || <b>490.52</b>
-|}
-
-===TensorFlow 2.x===
-
+<div class="mw-translate-fuzzy">
 À l'instar de TensorFlow 1.x, TensorFlow 2.x offre des stratégies différentes pour utiliser plusieurs GPU avec l'API de haut niveau <code>tf.distribute</code>. Dans les sections qui suivent, nous montrons des exemples de code pour chacune des stratégies avec Keras. Pour plus d'information, consultez la [https://www.tensorflow.org/api_docs/python/tf/distribute documentation officielle de TensorFlow].
+</div>
 
+<span id="Mirrored_strategy"></span>
 ====Stratégie miroir====
 
+<span id="Single_node"></span>
 =====Nœud unique=====
 
 
@@ -343,6 +291,7 @@ model.fit(dataset, epochs=2)
 
 }}
 
+<span id="Multiple_nodes"></span>
 =====Nœuds multiples=====
 
 La syntaxe pour utiliser des GPU distribués sur plusieurs nœuds ressemble beaucoup au cas du nœud simple; la différence principale est l'emploi de <code>MultiWorkerMirroredStrategy()</code>. Ici, nous utilisons <code>SlurmClusterResolver()</code> pour dire à TensorFlow d'obtenir par Slurm l'information sur la tâche plutôt que d'assigner manuellement un nœud principal et des nœuds secondaires (''workers''), par exemple. Nous devons aussi ajouter <code>CommunicationImplementation.NCCL</code> à la stratégie de distribution pour indiquer que nous voulons utiliser la bibliothèque NCCL de NVIDIA pour les communications entre les GPU. Ceci n'était pas nécessairement le cas pour un nœud simple puisque NCCL se trouve par défaut avec <code>MirroredStrategy()</code>.
@@ -467,109 +416,10 @@ model.fit(dataset, epochs=2)
 
 }}
 
-====Horovod====
-
-[https://horovod.readthedocs.io/en/latest/summary_include.html Horovod] est une bibliothèque d'apprentissage profond distribué pour TensorFlow, Keras, PyTorch et Apache MXNet. Nous reprenons le même tutoriel que ci-dessus, cette fois-ci avec Horovod.
-
-{{File
-  |name=tensorflow-horovod.sh
-  |lang="bash"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes 1             
-#SBATCH --gres=gpu:2          # Request 2 GPU "generic resources”. You will get 2 per node.
-
-#SBATCH --ntasks-per-node=2    # Request 1 process per GPU. You will get 1 CPU per process by default. Request more CPUs with the "cpus-per-task" parameter if your input pipeline can handle parallel data-loading/data-transforms
-
-#SBATCH --mem=8G      
-#SBATCH --time=0-00:30
-#SBATCH --output=%N-%j.out
-
-
-module load StdEnv/2020 
-module load python/3.8
-virtualenv --no-download $SLURM_TMPDIR/env
-source $SLURM_TMPDIR/env/bin/activate
-pip install --no-index tensorflow==2.5.0 horovod
-
-export NCCL_BLOCKING_WAIT=1  #Set this environment variable if you wish to use the NCCL backend for inter-GPU communication.
-
-srun python tensorflow-horovod.py
-}}
-
-{{File
-  |name=tensorflow-horovod.py
-  |lang="python"
-  |contents=
-
-import tensorflow as tf
-import numpy as np
-import horovod.tensorflow.keras as hvd
-
-import argparse
-
-
-parser = argparse.ArgumentParser(description='cifar10 classification models, tensorflow horovod test')
-parser.add_argument('--lr', default=0.001, help='')
-parser.add_argument('--batch_size', type=int, default=256, help='')
-
-args = parser.parse_args()
-
-hvd.init()
-
-gpus = tf.config.experimental.list_physical_devices('GPU')
-
-tf.config.experimental.set_visible_devices(gpus[hvd.local_rank()], 'GPU')
-
-model = tf.keras.Sequential()
-
-model.add(tf.keras.layers.Conv2D(32, (3, 3), padding='same',
-                 input_shape=(32,32,3)))
-model.add(tf.keras.layers.Activation('relu'))
-model.add(tf.keras.layers.Conv2D(32, (3, 3)))
-model.add(tf.keras.layers.Activation('relu'))
-model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
-model.add(tf.keras.layers.Dropout(0.25))
-
-model.add(tf.keras.layers.Conv2D(64, (3, 3), padding='same'))
-model.add(tf.keras.layers.Activation('relu'))
-model.add(tf.keras.layers.Conv2D(64, (3, 3)))
-model.add(tf.keras.layers.Activation('relu'))
-model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
-model.add(tf.keras.layers.Dropout(0.25))
-
-model.add(tf.keras.layers.Flatten())
-model.add(tf.keras.layers.Dense(512))
-model.add(tf.keras.layers.Activation('relu'))
-model.add(tf.keras.layers.Dropout(0.5))
-model.add(tf.keras.layers.Dense(10))
-
-optimizer = tf.keras.optimizers.SGD(learning_rate=args.lr)
-
-optimizer = hvd.DistributedOptimizer(optimizer)
-
-model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-         optimizer=optimizer,metrics=['accuracy'])
-
-callbacks = [
-    hvd.callbacks.BroadcastGlobalVariablesCallback(0),
-]
-
-### This next line will attempt to download the CIFAR10 dataset from the internet if you don't already have it stored in ~/.keras/datasets. 
-### Run this line on a login node prior to submitting your job, or manually download the data from 
-### https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz, rename to "cifar-10-batches-py.tar.gz" and place it under ~/.keras/datasets
-
-(x_train, y_train),_ = tf.keras.datasets.cifar10.load_data()
-
-dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(args.batch_size)
-
-model.fit(dataset, epochs=2, callbacks=callbacks, verbose=2) # verbose=2 to avoid printing a progress bar to *.out files.
-
-}}
-
 ==Créer des points de contrôle==
 Peu importe le temps que dure l'exécution de votre code, une bonne habitude à prendre est de créer des points de contrôle pendant l'entraînement. Un point de contrôle vous donne le portrait de votre modèle à un moment précis du processus d'entraînement (après un certain nombre d'itérations ou d'époques); le portrait est enregistré sur disque et vous pourrez le récupérer par la suite. Ceci est pratique pour diviser en petites tâches une tâche qui doit avoir un long temps d'exécution, ce qui pourrait faire qu'elles soient être allouées plus rapidement à une grappe. C'est aussi un bon moyen d'éviter de perdre votre travail en cas d'erreurs inattendues ou de panne du matériel.
 
+<span id="With_Keras"></span>
 ===Avec Keras===
 
 Pour créer un point de contrôle dans un entraînement avec <code>keras</code>, nous recommandons le paramètre <code>callbacks</code> de la méthode <code>model.fit()</code>. Dans l'exemple suivant, nous demandons à TensorFlow de créer un point de contrôle à la fin de chacune des époques d'entraînement.
@@ -580,47 +430,15 @@ Pour créer un point de contrôle dans un entraînement avec <code>keras</code>,
 
 Pour plus d'information, consultez la [https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/ModelCheckpoint documentation officielle de TensorFlow].
 
+<span id="With_a_custom_training_loop"></span>
 ===Avec une boucle d'entraînement personnalisée===
 
 Voyez la [https://www.tensorflow.org/guide/checkpoint#writing_checkpoints documentation officielle de TensorFlow].
 
-==Opérateurs personnalisés==
-Dans le cadre de votre recherche, vous pourriez avoir besoin d'utiliser [https://github.com/Yang7879/3D-BoNet du code pour tirer avantage des opérateurs personnalisés] qui ne sont pas inclus dans les distributions de TensorFlow, ou même vouloir [https://www.tensorflow.org/guide/create_op créer vos propres opérateurs personnalisés]. Dans les deux cas, vos opérateurs personnalisés doivent être compilés avant que vous soumettiez la tâche. Suivez les étapes ci-dessous.
-
-Créez d'abord un [[Python/fr|environnement virtuel Python]] et installez une version de TensorFlow compatible avec vos opérateurs personnalisés. Allez ensuite au répertoire qui contient le code source des opérateurs et utilisez les commandes qui suivent selon la version que vous avez installée.
-
-===TensorFlow <= 1.4.x===
-Si votre opérateur personnalisé <b>peut prendre en charge</b> un GPU :
-
-{{Commands
-| module load cuda/<version>
-| nvcc <operator>.cu -o <operator>.cu.o -c -O2 -DGOOGLE_CUDA{{=}}1 -x cu -Xcompiler -fPI
-| g++ -std{{=}}c++11 <operator>.cpp <operator>.cu.o -o <operator>.so -shared -fPIC -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include -I/<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include/external/nsync/public -I /usr/local/cuda-<version>/include -lcudart -L /usr/local/cuda-<version>/lib64/
-}}
-
-Si votre opérateur personnalisé <b>ne peut pas prendre en charge</b> un GPU :
-
-{{Commands
-| g++ -std{{=}}c++11 <operator>.cpp -o <operator>.so -shared -fPIC -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include -I/<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include/external/nsync/public
-}}
-
-===TensorFlow > 1.4.x===
-Si votre opérateur personnalisé <b>peut prendre en charge</b> un GPU :
-
-{{Commands
-| module load cuda/<version>
-|nvcc <operator>.cu -o <operator>.cu.o -c -O2 -DGOOGLE_CUDA{{=}}1 -x cu -Xcompiler -fPI
-|g++ -std{{=}}c++11 <operator>.cpp <operator>.cu.o -o <operator>.so -shared -fPIC -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include -I /usr/local/cuda-<version>/include -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include/external/nsync/public -lcudart -L /usr/local/cuda-<version>/lib64/ -L /<path to python virtual env>/lib/python<version>/site-packages/tensorflow -ltensorflow_framework
-}}
-
-Si votre opérateur personnalisé <b>ne peut pas prendre en charge</b> un GPU :
-
-{{Commands
-|g++ -std{{=}}c++11 <operator>.cpp -o <operator>.so -shared -fPIC -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include/external/nsync/public -L /<path to python virtual env>/lib/python<version>/site-packages/tensorflow -ltensorflow_framework
-}}
-
+<span id="Troubleshooting"></span>
 ==Dépannage==
 
+<span id="scikit_image"></span>
 ===scikit-image===
 
 Si vous utilisez la bibliothèque scikit-image, vous pourriez recevoir l'erreur
@@ -659,24 +477,15 @@ Pour solutionner ces erreurs, accédez au répertoire indiqué dans le message (
 
 Le fichier texte sera remplacé par le bon lien symbolique.
 
+<span id="Controlling_the_number_of_CPUs_and_threads"></span>
 ==Contrôle du nombre de CPU et de fils==
 
-===TensorFlow 1.x===
-
+<div class="mw-translate-fuzzy">
 Les paramètres de configuration  <code>device_count</code>, <code>intra_op_parallelism_threads</code> et <code>inter_op_parallelism_threads</code> ont un effet sur le nombre de fils utilisés par TensorFlow; ces paramètres peuvent être définis comme suit à l'instanciation d'une session :
-
- tf.Session(config=tf.ConfigProto(device_count={'CPU': num_cpus}, intra_op_parallelism_threads=num_intra_threads, inter_op_parallelism_threads=num_inter_threads))
-
-Si par exemple vous voulez exécuter plusieurs instances en parallèle dans un seul nœud, vous pourriez devoir utiliser de plus petites valeurs et même diminuer jusqu'à <code>1</code>.
-
-===TensorFlow 2.x===
-
-Puisque les sessions ne sont plus utilisées, la configuration des fils se fait comme suit :
+</div>
 
  tf.config.threading.set_inter_op_parallelism_threads(num_threads)
  tf.config.threading.set_intra_op_parallelism_threads(num_threads)
-
-Il ne semble pas possible de définir un nombre de CPU depuis la version 2.1.
 
 ==Problèmes connus==
 Un bogue s'est introduit dans l'implémentation Keras de Tensorflow après la version 2.8.3. Il affecte la performance des layers d'augmentation des données <i>tf.keras.layers.Random</i> (comme <i>tf.keras.layers.RandomRotation</i>, <i>tf.keras.layers.RandomTranslation</i>, etc.). Le processus d'entraînement est ralenti d'un facteur de plus de 100. <b>Ce bogue a été corrigé dans la version 2.12.

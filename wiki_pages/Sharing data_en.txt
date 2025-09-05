@@ -54,7 +54,7 @@ or via octal notation,
 In the context of the project space, the directory owner will be the PI who sponsors the roles of the students and collaborators.
 
 === Set Group ID bit ===
-When creating files and directories within a parent directory, it is often useful to match the group ownership of the new files or directories to the parent directory's owner or group automatically. This is key to the operation of the [[Project layout|Project]] filesystems at Graham and Cedar for example, since storage quotas in Project spaces are enforced by group. 
+When creating files and directories within a parent directory, it is often useful to match the group ownership of the new files or directories to the parent directory's owner or group automatically. 
 
 If the <code>setGID</code> bit is enabled for a directory, new files and directories in that directory will be created with the same group ownership as the directory. To illustrate the use of this mode, let us walk through an example.
 
@@ -110,8 +110,8 @@ Its usual behaviour is completely disabled, for security reasons.
 
 Default filesystem permissions are defined by something called the [https://en.wikipedia.org/wiki/Umask <code>umask</code>]. There is a default value that is defined on any Linux system. To display the current value in your session, you can run the command
 {{Command|umask -S}}
-For example, on Graham, you would get
-{{Command|prompt=[user@gra-login1]$|umask -S
+For example, on our clusters, you would get
+{{Command|umask -S
 |result=u=rwx,g=rx,o=}}
 This means that, by default, new files that you create can be read, written and executed by yourself, they can be read and executed by members of the group of the file, and they cannot be accessed by other people. <b>The <code>umask</code> only applies to new files. Changing the <code>umask</code> does not change the access permissions of existing files.</b> 
 
@@ -139,21 +139,6 @@ The umask is not the only thing that determines who can access a file.
 * The user trying to access a file based on its group permissions must be a member of the file's group. 
 * You can explicitly change the permissions on a file or directory after it is created, using <code>chmod</code>.
 * Access Control Lists (ACLs) also determine who can access a file. 
-
-=== Change of the default <code>umask</code> on Cedar, Béluga and Niagara ===
-In the summer 2019, we discovered that the default <code>umask</code> was not the same on all our servers. On October 16th, 2019, we changed the default <code>umask</code> on these three servers to match the one from Graham. The default <code>umask</code> changed as follows: 
-{| class="wikitable"
-|-
-! Cluster !! <code>umask</code> before the change !! <code>umask</code> after the change
-|-
-| Béluga || 002 || 027
-|-
-| Cedar || 002 || 027
-|-
-| Niagara || 022 || 027
-|-
-|}
-This means that more restrictive permissions are enforced on newly created files. If you need more permissive permissions for your workflow, you can change your default <code>umask</code> in your <code>.bashrc</code>. Our general advice is however to keep the default permissions. 
 
 Note that this change does <i>not</i> mean that your files have been inappropriately exposed in the past. Restrictive access permissions have been set on your home, project, and scratch directories since the beginning.  Unless the permissions were changed to give <i>execute</i> permission to other users on these folders, they still cannot be accessed by them.
 

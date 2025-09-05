@@ -2,23 +2,24 @@
 
 ''Page enfant de [[SSH/fr]]''
 
+<span id="What_is_SSH_tunnelling?"></span>
 =Description=
 
 Un tunnel SSH permet d’utiliser un ordinateur passerelle pour connecter deux ordinateurs qui ne peuvent pas être connectés directement l’un à l’autre.
 
-Dans certains cas, il est nécessaire de mettre en place un tunnel puisque les nœuds de calcul de [[Niagara/fr|Niagara]], [[Béluga]] et [[Graham/fr|Graham]] n’ont pas d’accès direct avec l’Internet ni ne peuvent être contactés directement via l’Internet.
+Dans certains cas, il est nécessaire de mettre en place un tunnel puisque les nœuds de calcul de certaines grappes n’ont pas d’accès direct avec l’Internet ni ne peuvent être contactés directement via l’Internet.
 
 Un tunnel sera requis dans les cas suivants :
 
 * pour utiliser une application du commerce qui doit entrer en contact avec un serveur de licence via l’Internet;
 * pour utiliser une application de [[Visualization/fr|visualisation]] sur un nœud de calcul avec lequel une application client sur l’ordinateur local d’un utilisateur doit entrer en contact;
-* pour utiliser [[Jupyter/fr|Jupyter Notebook]] sur un nœud de calcul avec lequel le navigateur Web sur l’ordinateur local d’un utilisateur doit entrer en contact;
-* pour accéder au serveur de bases de données de Cedar à partir d’un ordinateur autre que le nœud de connexion de Cedar, par exemple votre ordinateur personnel.
+* pour accéder à une base de données sur une grappe à partir d’un endroit autre que le nœud de connexion de cette grappe, par exemple votre ordinateur personnel.
 
 Dans le premier cas, le serveur de licence est situé à l’extérieur de la grappe et est rarement contrôlé par l’utilisateur alors que dans les autres cas, le serveur se trouve dans le nœud de calcul et la difficulté est de s’y connecter à partir de l’extérieur. Nous traitons ici des deux situations.
 
 Même si elles ne sont pas essentielles à l'utilisation de tunnels, vous pourriez vous familiariser avec les [[SSH Keys/fr|clés SSH]].
 
+<span id="Contacting_a_license_server_from_a_compute_node"></span>
 = Entrer en contact avec un serveur de licence à partir d’un nœud de calcul =
 
 {{Panel
@@ -37,11 +38,7 @@ Souvent, la mise en place d’un tunnel pour une tâche en série ne nécessite 
 
 Ces renseignements peuvent être obtenus de la personne qui gère le serveur de licence. Le serveur doit aussi permettre la connexion à partir des nœuds de connexion; dans le cas de Niagara, l’adresse IP vers l’extérieur est 142.1.174.227 ou 142.1.174.228.
 
-Le tunnel peut maintenant être mis en place. Sur Graham, une autre solution serait de demander une exception de pare-feu pour LICSERVER et son port LICPORT.
-
-Le serveur passerelle pour Niagara est nia-gw. Pour Graham, choisissez un nœud de connexion (gra-login1, 2, ...). Ici, notre nœud passerelle se nomme GATEWAY. Choisissez aussi le numéro de port du nœud de calcul que vous voulez utiliser (ici COMPUTEPORT).
-
-La commande SSH dans le script est
+Le tunnel peut maintenant être mis en place. Sur Nibi, une autre solution serait de demander une exception de pare-feu pour LICSERVER et son port LICPORT. Le serveur de passerelle (GATEWAY) sur Niagara est nia-gw, tandis que sur Nibi vous devez choisir l'un des nœuds de connexion (l1, l2, ... l5). Vous devez également choisir le numéro de port (COMPUTEPORT) à utiliser sur le nœud de calcul. La commande SSH à exécuter dans le script de tâche est alors&nbsp;:
 
 <source lang="bash">
 ssh GATEWAY -L COMPUTEPORT:LICSERVER:LICPORT -N -f
@@ -58,6 +55,7 @@ Une autre commande devrait être ajoutée pour que l’application sache que le 
 export MLM_LICENSE_FILE=COMPUTEPORT@localhost
 </source>
 
+<span id="Example_job_script"></span>
 == Exemple de script==
 
 Le script suivant met en place un tunnel SSH pour entrer en contact avec licenseserver.institution.ca au port 9999.
@@ -81,12 +79,14 @@ module load thesoftware/2.0
 mpirun thesoftware ..... 
 </source>
 
+<span id="Connecting_to_a_program_running_on_a_compute_node"></span>
 =Se connecter à une application qui est exécutée sur un nœud de calcul=
 
 Un tunnel crypté peut être mis en place dans un nœud de connexion d’une grappe  pour connecter l’ordinateur d’un utilisateur à un nœud de calcul de cette grappe. L’ordinateur de l’utilisateur peut ainsi afficher de façon transparente des [[Visualization/fr|visualisations]] et des graphiques de [[Jupyter/fr|Jupyter Notebook]] exécutés dans un nœud de calcul de la grappe. Lorsque la seule façon d’accéder à un serveur de bases de données est par un nœud de connexion, un tunnel SSH peut transférer un port réseau arbitraire d’un nœud de calcul vers le nœud de connexion de la grappe et l’associer au serveur de bases de données.
 
 Graham et Cedar effectuent une NAT (<i>network address translation</i>) pour que les utilisateurs puissent avoir accès à l’Internet à partir des nœuds de calcul. Le pare-feu de Graham bloque cependant l’accès par défaut. Il faut faire une demande au [[Technical support/fr|soutien technique]] pour faire ouvrir un port IP particulier; indiquez l'adresse ou les adresses IP qui utiliseront ce port.
 
+<span id="From_Linux_or_MacOS_X"></span>
 == De Linux ou MacOS X ==
 
 Le paquet Python [https://sshuttle.readthedocs.io sshuttle] est recommandé.
@@ -103,6 +103,7 @@ Copiez et collez l’URL de l'application dans votre navigateur. Si votre applic
  http://cdr544.int.cedar.computecanada.ca:8888/?token=7ed7059fad64446f837567e32af8d20efa72e72476eb72ca
 </pre>
 
+<span id="From_Windows"></span>
 == De Windows == 
 
 Un tunnel SSH peut être créé avec [[Connecting with MobaXTerm/fr|MobaXTerm]] comme suit :
@@ -125,6 +126,7 @@ Suivant l'exemple avec [[Jupyter/fr#Lancer_Jupyter_Notebook|Jupyter Notebook]], 
  http://localhost:8888/?token=7ed7059fad64446f837567e32af8d20efa72e72476eb72ca
 </pre>
 
+<span id="Example_for_connecting_to_a_database_server_on_Cedar_from_your_desktop"></span>
 == Se connecter à un serveur de base de données sur Cedar à partir de votre ordinateur  ==
 
 Les commandes suivantes créent un tunnel SSH de votre ordinateur aux serveurs PostgreSQL et MySQL.

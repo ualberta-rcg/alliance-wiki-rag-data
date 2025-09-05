@@ -22,45 +22,30 @@ Pour l'information générale sur l'ordonnancement des tâches, consultez [[Runn
 = GPU disponibles =
 Le tableau suivant liste les GPU qui sont présentement disponibles.
 
-<div class="mw-translate-fuzzy">
 {| class="wikitable"
 |-
 ! Grappe !! Caractéristiques !! Type <br>de GPU !! Modèle  !! Compute<br>Capability(*) !! Remarques
-|-
-| Béluga           || [[Béluga#Caractéristiques_des_nœuds|<b>Détails</b>]]
-|| <code>v100</code>  || V100-16gb || 70 || tous les GPU associés au même socket CPU; connectés via NVLink et SXM2
-|-
-| rowspan=3|Cedar  || rowspan=3|[[Cedar/fr#Caractéristiques_des_nœuds|<b>Détails</b>]]
-|| <code>p100</code>  || P100-12gb || 60 || deux GPU connectés par socket CPU; connectés via PCIe
-|-
-|  <code>p100l</code> || P100-16gb || 60 || tous les GPU associés au même socket CPU; connectés via PCIe
-|-
-|  <code>v100l</code> || V100-32gb || 70 || deux GPU connectés par socket CPU; connectés via NVLink et SXM2
-|-
-| rowspan=3|Graham || rowspan=3|[[Graham/fr#Caractéristiques_des_nœuds|<b>Détails</b>]]
-|| <code>v100</code>(**)  || V100-16gb || 70 || voir [[Graham/fr#Nœuds_GPU_Volta|nœuds Volta]]
-|-
-|  <code>v100</code>(***) || V100-32gb || 70 || voir [[Graham/fr#Nœuds_GPU_Volta|nœuds Volta]]
-|-
-|  <code>t4</code>        || T4-16gb   || 75 || deux GPU connectés par socket CPU
-|-
-| Mist             || [https://docs.scinet.utoronto.ca/index.php/Mist#Specifications <b>Détails</b>]
-|| (aucun)    || V100-32gb || 70
 |- 
+| Fir   || [[Fir/fr#Caractéristiques_des_nœuds|<b>Détails</b>]] || [[Multi-Instance_GPU/fr#Configurations_disponibles|Configurations disponibles|<b>options</b>]]
+|| H100-80gb    || 90   ||deux GPU connectés par socket CPU; tous les GPU sont connectés via NVLink
+|-
+
 | Narval           || [[Narval#Caractéristiques_des_nœuds|<b>Détails</b>]]
-|| [[Narval/en#GPU_instances|<b>Options</b>]] || A100-40gb || 80 || deux GPU connectés par socket CPU; connectés via NVLink
+|| [[Narval/en#GPU_instances|<b>options</b>]] || A100-40gb || 80 || deux GPU connectés par socket CPU; tous les GPU sont connectés via NVLink
 |- 
 | rowspan=2|Nibi   || rowspan=2|[[Nibi/fr#Caractéristiques_des_nœuds|<b>Détails</b>]] || rowspan=2|[[Multi-Instance GPU/fr#Configurations_disponibles|<b>Options</b>]]
-|| H100-80gb    || 90   || deux GPU connectés par socket CPU; connectés via NVLink
+|| H100-80gb    || 90   || deux GPU connectés par socket CPU; tous les GPU sont connectés via NVLink
 |-
 || MI300A-128gb || s.o. || mémoire unifiée entre CPU et GPU
 |- 
 | Rorqual          || [[Rorqual#Caractéristiques_des_nœuds|<b>Détails</b>]]
-|| [[Rorqual#Instances_GPU|<b>Options</b>]] || H100-80gb || 90 || tous les GPU associés au même socket CPU; connectés via NVLink
+|| [[Rorqual#Instances_GPU|<b>options</b>]] || H100-80gb || 90 || deux GPU connectés par socket CPU; tous les GPU sont connectés via NVLink
+|-
+| Trillium          || [[Trillium/fr#Caractéristiques_des_nœuds|<b>détails</b>]]
+|| [[Trillium/fr#Instances_GPU|Instances GPU|<b>options</b>]] || H100-80gb || 90 || deux GPU connectés par socket CPU; tous les GPU sont connectés via NVLink
 |-
 | Arbutus || colspan=4|Les ressources infonuagiques ne sont pas ordonnancées. Voir [[Cloud resources/fr|Ressources infonuagiques]] pour l'information sur le matériel.
 |}
-</div>
 
 (*) Le terme <i>Compute Capability</i> est utilisé par NVIDIA pour indiquer les fonctionnalités matérielles spécifiques à un GPU particulier et n'a aucun rapport avec la performance des dispositifs. Cet attribut n'est utile que si vous compilez vos propres programmes GPU. Pour plus d'information, voir [[CUDA/fr#Attribut_.22compute_capability.22|la page CUDA]].
 
@@ -71,11 +56,7 @@ La technologie MIG permettant de partitionner un GPU en plusieurs instances est 
 <span id="Selecting_the_type_of_GPU_to_use"></span>
 = Indiquer le type de GPU à utiliser =
 
-<div class="mw-translate-fuzzy">
-Certaines grappes possèdent plus d'un type de GPU; c'est le cas de [[Cedar/fr|Cedar]] et [[Graham/fr|Graham]].
-</br>
-Sur [[Béluga]], [[Cedar/fr|Cedar]] et [[Graham/fr|Graham]] les GPU sont uniquement disponibles sur certains nœuds.
-</div> 
+Certaines grappes possèdent plus d'un type de GPU et sur d'autres, les GPU sont uniquement disponibles sur certains nœuds. 
 
 Si le type de GPU n'est pas spécifié, Slurm pourrait acheminer aléatoirement votre tâche vers un nœud équipé avec n'importe quel type de GPU. Dans certains cas, ceci pourrait ne pas être souhaitable. Assurez-vous donc de spécifier le type de GPU.
 
@@ -117,14 +98,11 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 ./program
 }}
 
-<div class="mw-translate-fuzzy">
 Pour chaque GPU demandé, nous recommandons
-* sur Béluga, un maximum de 10 cœurs CPU;
-* sur Cedar,
-** un maximum de 6 cœurs CPU par GPU de type P100 (p100 et p100l)
-** un maximum de 8 cœurs CPU par GPU de type V100 (v100l)
-* sur Graham, un maximum de 16 cœurs CPU
-</div>
+* sur Fir, un maximum de 12 cœurs CPU
+* sur Narval, un maximum de 12 cœurs CPU
+* sur Nibi, un maximum de 14 cœurs CPU
+* sur Rorqual, un maximum de 16 cœurs CPU
 
 == Tâches MPI ==
 {{File
@@ -167,12 +145,10 @@ Vous pouvez ainsi soumettre plusieurs tâches. Le paramètre <code>-j4</code> fa
 <span id="Profiling_GPU_tasks"></span>
 == Profilage des tâches avec GPU ==
 
-<div class="mw-translate-fuzzy">
-Sur [[Béluga]] et [[Narval]], 
+Sur [[Narval]], 
 [https://developer.nvidia.com/dcgm DCGM (NVIDIA Data Center GPU Manager)]
 doit être désactivé, et ce lorsque vous soumettez la tâche. 
 Selon l'exemple, configurez la variable d'environnement  <code>DISABLE_DCGM</code>.
-</div>
 
 {{Command|DISABLE_DCGM{{=}}1 salloc --account{{=}}def-someuser --gpus-per-node{{=}}1 --mem{{=}}4000M --time{{=}}03:00}}
 

@@ -22,7 +22,7 @@ Activate your newly created Python virtual environment.
 
 Install TensorFlow in your newly created virtual environment using the following command.
 {{Command2|prompt=(tensorflow) [name@server ~]$
-|pip install --no-index tensorflow{{=}}{{=}}2.8}}
+|pip install --no-index tensorflow}}
 </tab>
 <tab name="TF 1.x">
 
@@ -86,7 +86,7 @@ The job submission script contains
   |contents=
 #!/bin/bash
 #SBATCH --gres=gpu:1        # request GPU "generic resource"
-#SBATCH --cpus-per-task=6   # maximum CPU cores per GPU request: 6 on Cedar, 16 on Graham.
+#SBATCH --cpus-per-task=6   # maximum CPU cores per GPU request. See https://docs.alliancecan.ca/wiki/Allocations_and_compute_scheduling#Ratios_in_bundles
 #SBATCH --mem=32000M        # memory per node
 #SBATCH --time=0-03:00      # time (DD-HH:MM)
 #SBATCH --output=%N-%j.out  # %N for node name, %j for jobID
@@ -125,12 +125,12 @@ print(sess.run(node1 + node2))
 </tab>
 </tabs>
 
-Once the job has completed (should take less than a minute), you should see an output file called something like <code>cdr116-122907.out</code> with contents similar to the following (the logged messages from TensorFlow are only examples, expect different messages and more messages):
+Once the job has completed (should take less than a minute), you should see an output file called something like <code>node_id-job_id.out</code> with contents similar to the following (the logged messages from TensorFlow are only examples, expect different messages and more messages):
 
 <tabs>
 <tab name="TF 2.x">
 {{File
-  |name=cdr116-122907.out
+  |name=node_id-job_id.out
   |lang="text"
   |contents=
 2017-07-10 12:35:19.491097: I tensorflow/core/common_runtime/gpu/gpu_device.cc:961] DMA: 0
@@ -142,7 +142,7 @@ tf.Tensor(7.0, shape=(), dtype=float32)
 </tab>
 <tab name="TF 1.x">
 {{File
-  |name=cdr116-122907.out
+  |name=node_id-job_id.out
   |lang="text"
   |contents=
 2017-07-10 12:35:19.491097: I tensorflow/core/common_runtime/gpu/gpu_device.cc:961] DMA: 0
@@ -155,7 +155,7 @@ Tensor("Const:0", shape=(), dtype=float32) Tensor("Const_1:0", shape=(), dtype=f
 </tabs>
 
 
-TensorFlow can run on all GPU node types. Cedar's <i>GPU large</i> node type, which is equipped with 4 x P100-PCIE-16GB with GPUDirect P2P enabled between each pair, is highly recommended for large-scale deep learning or machine learning research. See [[Using GPUs with SLURM]] for more information.
+TensorFlow can run on all GPU node types. See [[Using GPUs with SLURM]] for more information.
 
 ==Monitoring==
 
@@ -179,80 +179,13 @@ To create the connection, use the following command on your local computer:
 {{Command2|prompt=[name@my_computer ~]$
 |ssh -N -f -L localhost:6006:computenode:6006 userid@cluster.computecanada.ca}}
 
-Replace <code>computenode</code> with the node hostname you retrieved from the preceding step, <code>userid</code> by your Alliance username, <code>cluster</code> by the cluster hostname (i.e.: <code>beluga</code>, <code>cedar</code>, <code>graham</code>, etc.). If port 6006 was already in use, tensorboard will be using another one (e.g. 6007, 6008...).
+Replace <code>computenode</code> with the node hostname you retrieved from the preceding step, <code>userid</code> by your Alliance username, <code>cluster</code> by the cluster hostname (i.e.: <code>rorqual</code>, <code>fir</code>, <code>nibi</code>, etc.). If port 6006 was already in use, tensorboard will be using another one (e.g. 6007, 6008...).
 
 Once the connection is created, go to [http://localhost:6006 http://localhost:6006].
 
 ==TensorFlow with multi-GPUs==
 
-===TensorFlow 1.x===
-TensorFlow provides different methods of managing variables when training models on multiple GPUs. "Parameter Server" and "Replicated" are the most two common methods. 
-*In this section, [https://github.com/tensorflow/benchmarks TensorFlow Benchmarks] code will be used as an example to explain the different methods. Users can reference the TensorFlow Benchmarks code to implement their own.
-====Parameter server====
-Variables are stored on a parameter server that holds the master copy of the variable. In distributed training, the parameter servers are separate processes in the different devices. For each step, each tower gets a copy of the variables from the parameter server, and sends its gradients to the param server.
-
-Parameters can be stored in a CPU:
-<pre>
-python tf_cnn_benchmarks.py --variable_update=parameter_server --local_parameter_device=cpu
-</pre>
-or a GPU:
-<pre>
-python tf_cnn_benchmarks.py --variable_update=parameter_server --local_parameter_device=gpu
-</pre>
-
-====Replicated====
-With this method, each GPU has its own copy of the variables. To apply gradients, an all_reduce algorithm or or regular cross-device aggregation is used to replicate the combined gradients to all towers (depending on the all_reduce_spec parameter's setting).
-
-All reduce method can be default:
-<pre>
-python tf_cnn_benchmarks.py --variable_update=replicated
-</pre>
-Xring --- use one global ring reduction for all tensors:
-<pre>
-python tf_cnn_benchmarks.py --variable_update=replicated --all_reduce_spec=xring
-</pre>
-Pscpu --- use CPU at worker 0 to reduce all tensors:
-<pre>
-python tf_cnn_benchmarks.py --variable_update=replicated --all_reduce_spec=pscpu
-</pre>
-NCCL --- use NCCL to locally reduce all tensors:
-<pre>
-python tf_cnn_benchmarks.py --variable_update=replicated --all_reduce_spec=nccl
-</pre>
-Different variable managing methods perform differently with different models. Users are highly recommended to test their own models with all methods on different types of GPU node.
-
-====Benchmarks====
-This section will give ResNet-50 and VGG-16 benchmarking results on both Graham and Cedar with single and multiple GPUs using different methods for managing variables. TensorFlow v1.5 (built with CUDA 9 and cuDNN 7) is used. The benchmark can be found on github at [https://github.com/tensorflow/benchmarks TensorFlow Benchmarks]. 
-*ResNet-50
-Batch size is 32 per GPU. Data parallelism is used. (Results in "images per second")
-{| class="wikitable"
-|-
-! Node type !! 1 GPU !! Number of GPUs !! ps,cpu  !! ps, gpu !! replicated !! replicated, xring !! replicated, pscpu !! replicated, nccl
-|-
-| Graham  GPU node   || 171.23||2 || 93.31 || <b>324.04</b> || 318.33  || 316.01 || 109.82 || 315.99
-|-
-| Cedar GPU Base  || 172.99|| 4 || <b>662.65</b>  ||595.43  || 616.02 || 490.03|| 645.04 || 608.95
-|-
-| Cedar GPU Large  || 205.71 ||4 || 673.47 || 721.98 || <b>754.35</b>  || 574.91 || 664.72 || 692.25
-|}
-
-*VGG-16
-Batch size is 32 per GPU. Data parallelism is used.  (Results in <i>images per second</i>)
-
-{| class="wikitable"
-|-
-! Node type !! 1 GPU !! Number of GPUs !! ps,cpu  !! ps, gpu !! replicated !! replicated, xring !! replicated, pscpu !! replicated, nccl
-|-
-| Graham  GPU node   || 115.89||2 || 91.29 || 194.46 || 194.43  || 203.83 || 132.19 || <b>219.72</b>
-|-
-| Cedar GPU Base  || 114.77 ||4 || 232.85 || 280.69 || 274.41  || 341.29 || 330.04 || <b>388.53</b>
-|-
-| Cedar GPU Large  || 137.16 ||4 || 175.20 || 379.80 ||336.72  || 417.46 || 225.37 || <b>490.52</b>
-|}
-
-===TensorFlow 2.x===
-
-Much like TensorFlow 1.x, TensorFlow 2.x offers a number of different strategies to make use of multiple GPUs through the high-level API <code>tf.distribute</code>. In the following sections, we provide code examples of each strategy using Keras for simplicity. For more details, please refer to the official [https://www.tensorflow.org/api_docs/python/tf/distribute TensorFlow documentation].
+TensorFlow offers a number of different strategies to make use of multiple GPUs through the high-level API <code>tf.distribute</code>. In the following sections, we provide code examples of each strategy using Keras for simplicity. For more details, please refer to the official [https://www.tensorflow.org/api_docs/python/tf/distribute TensorFlow documentation].
 
 ====Mirrored strategy====
 
@@ -465,106 +398,6 @@ model.fit(dataset, epochs=2)
 
 }}
 
-====Horovod====
-
-[https://horovod.readthedocs.io/en/latest/summary_include.html Horovod] is a distributed deep learning training framework for TensorFlow, Keras, PyTorch, and Apache MXNet. The following is the same tutorial from above reimplemented using Horovod:
-
-{{File
-  |name=tensorflow-horovod.sh
-  |lang="bash"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes 1             
-#SBATCH --gres=gpu:2          # Request 2 GPU "generic resources”. You will get 2 per node.
-
-#SBATCH --ntasks-per-node=2   # Request 1 process per GPU. You will get 1 CPU per process by default. Request more CPUs with the "cpus-per-task" parameter if your input pipeline can handle parallel data-loading/data-transforms
-
-#SBATCH --mem=8G      
-#SBATCH --time=0-00:30
-#SBATCH --output=%N-%j.out
-
-
-module load StdEnv/2020 
-module load python/3.8
-virtualenv --no-download $SLURM_TMPDIR/env
-source $SLURM_TMPDIR/env/bin/activate
-pip install --no-index tensorflow==2.5.0 horovod
-
-export NCCL_BLOCKING_WAIT=1  #Set this environment variable if you wish to use the NCCL backend for inter-GPU communication.
-
-srun python tensorflow-horovod.py
-}}
-
-{{File
-  |name=tensorflow-horovod.py
-  |lang="python"
-  |contents=
-
-import tensorflow as tf
-import numpy as np
-import horovod.tensorflow.keras as hvd
-
-import argparse
-
-
-parser = argparse.ArgumentParser(description='cifar10 classification models, tensorflow horovod test')
-parser.add_argument('--lr', default=0.001, help='')
-parser.add_argument('--batch_size', type=int, default=256, help='')
-
-args = parser.parse_args()
-
-hvd.init()
-
-gpus = tf.config.experimental.list_physical_devices('GPU')
-
-tf.config.experimental.set_visible_devices(gpus[hvd.local_rank()], 'GPU')
-
-model = tf.keras.Sequential()
-
-model.add(tf.keras.layers.Conv2D(32, (3, 3), padding='same',
-                 input_shape=(32,32,3)))
-model.add(tf.keras.layers.Activation('relu'))
-model.add(tf.keras.layers.Conv2D(32, (3, 3)))
-model.add(tf.keras.layers.Activation('relu'))
-model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
-model.add(tf.keras.layers.Dropout(0.25))
-
-model.add(tf.keras.layers.Conv2D(64, (3, 3), padding='same'))
-model.add(tf.keras.layers.Activation('relu'))
-model.add(tf.keras.layers.Conv2D(64, (3, 3)))
-model.add(tf.keras.layers.Activation('relu'))
-model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
-model.add(tf.keras.layers.Dropout(0.25))
-
-model.add(tf.keras.layers.Flatten())
-model.add(tf.keras.layers.Dense(512))
-model.add(tf.keras.layers.Activation('relu'))
-model.add(tf.keras.layers.Dropout(0.5))
-model.add(tf.keras.layers.Dense(10))
-
-optimizer = tf.keras.optimizers.SGD(learning_rate=args.lr)
-
-optimizer = hvd.DistributedOptimizer(optimizer)
-
-model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-         optimizer=optimizer,metrics=['accuracy'])
-
-callbacks = [
-    hvd.callbacks.BroadcastGlobalVariablesCallback(0),
-]
-
-### This next line will attempt to download the CIFAR10 dataset from the internet if you don't already have it stored in ~/.keras/datasets. 
-### Run this line on a login node prior to submitting your job, or manually download the data from 
-### https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz, rename to "cifar-10-batches-py.tar.gz" and place it under ~/.keras/datasets
-
-(x_train, y_train),_ = tf.keras.datasets.cifar10.load_data()
-
-dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(args.batch_size)
-
-model.fit(dataset, epochs=2, callbacks=callbacks, verbose=2) # verbose=2 to avoid printing a progress bar to *.out files.
-
-}}
-
 ==Creating model checkpoints==
 Whether or not you expect your code to run for long time periods, it is a good habit to create Checkpoints during training. A checkpoint is a snapshot of your model at a given point during the training process (after a certain number of iterations or after a number of epochs) that is saved to disk and can be loaded at a later time. It is a handy way of breaking jobs that are expected to run for a very long time, into multiple shorter jobs that may get allocated on the cluster more quickly. It is also a good way of avoiding losing progress in case of unexpected errors in your code or node failures.
 
@@ -581,41 +414,6 @@ For more information, please refer to the [https://www.tensorflow.org/api_docs/p
 ===With a custom training loop===
 
 Please refer to the [https://www.tensorflow.org/guide/checkpoint#writing_checkpoints official TensorFlow documentation].
-
-==Custom TensorFlow operators==
-In your research, you may come across [https://github.com/Yang7879/3D-BoNet code that leverages custom operators] that are not part of the core tensorflow distribution, or you might want to [https://www.tensorflow.org/guide/create_op create your own]. In both cases, you will need to compile your custom operators <i>before</i> submitting your job. To ensure your code will run correctly, follow the steps below.
-
-First, create a [[Python|Python virtual environment]] and install a tensorflow version compatible with your custom operators. Then go to the directory containing the operators source code and follow the next steps according to the version you installed:
-
-===TensorFlow <= 1.4.x===
-If your custom operator <b>is</b> GPU-enabled:
-
-{{Commands
-| module load cuda/<version>
-| nvcc <operator>.cu -o <operator>.cu.o -c -O2 -DGOOGLE_CUDA{{=}}1 -x cu -Xcompiler -fPI
-| g++ -std{{=}}c++11 <operator>.cpp <operator>.cu.o -o <operator>.so -shared -fPIC -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include -I/<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include/external/nsync/public -I /usr/local/cuda-<version>/include -lcudart -L /usr/local/cuda-<version>/lib64/
-}}
-
-If your custom operator <b>is not</b> GPU-enabled:
-
-{{Commands
-| g++ -std{{=}}c++11 <operator>.cpp -o <operator>.so -shared -fPIC -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include -I/<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include/external/nsync/public
-}}
-
-===TensorFlow > 1.4.x===
-If your custom operator <b>is</b> GPU-enabled:
-
-{{Commands
-| module load cuda/<version>
-|nvcc <operator>.cu -o <operator>.cu.o -c -O2 -DGOOGLE_CUDA{{=}}1 -x cu -Xcompiler -fPI
-|g++ -std{{=}}c++11 <operator>.cpp <operator>.cu.o -o <operator>.so -shared -fPIC -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include -I /usr/local/cuda-<version>/include -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include/external/nsync/public -lcudart -L /usr/local/cuda-<version>/lib64/ -L /<path to python virtual env>/lib/python<version>/site-packages/tensorflow -ltensorflow_framework
-}}
-
-If your custom operator <b>is not</b> GPU-enabled:
-
-{{Commands
-|g++ -std{{=}}c++11 <operator>.cpp -o <operator>.so -shared -fPIC -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include/external/nsync/public -L /<path to python virtual env>/lib/python<version>/site-packages/tensorflow -ltensorflow_framework
-}}
 
 ==Troubleshooting==
 
@@ -659,22 +457,10 @@ This will replace the text file with the correct symbolic link.
 
 ==Controlling the number of CPUs and threads==
 
-===TensorFlow 1.x===
-
-The config parameters <code>device_count</code>, <code>intra_op_parallelism_threads</code> and <code>inter_op_parallelism_threads</code> influence the number of threads used by TensorFlow. You can set those parameters when instantiating a session:
-
- tf.Session(config=tf.ConfigProto(device_count={'CPU': num_cpus}, intra_op_parallelism_threads=num_intra_threads, inter_op_parallelism_threads=num_inter_threads))
-
-For example, if you want to run multiple instances of TF in parallel on a single node, you might want to reduce those values, potentially down to <code>1</code>.
-
-===TensorFlow 2.x===
-
-Sessions are not used anymore in TF 2.x, so here is the approach for configuring threads:
+The config parameters <code>intra_op_parallelism_threads</code> and <code>inter_op_parallelism_threads</code> influence the number of threads used by TensorFlow. You can set those parameters with:
 
  tf.config.threading.set_inter_op_parallelism_threads(num_threads)
  tf.config.threading.set_intra_op_parallelism_threads(num_threads)
-
-As of TF 2.1, there does not seem to be a way to set a CPU count.
 
 ==Known issues==
 A bug sneaked into the Keras implementation of Tensorflow after version 2.8.3. It affects the performance of the layers used for data augmentation with prefix <i>tf.keras.layers.Random</i> (like <i>tf.keras.layers.RandomRotation</i>, <i>tf.keras.layers.RandomTranslation</i>, etc). It significantly slows down the training process by more than 100 times. The bug is fixed in version 2.12.

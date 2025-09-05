@@ -143,12 +143,12 @@ CHANGELOG.md  conf                main.nf  nextflow.config  README.md           
 </source>
 
 <!--T:15-->
-When the pipeline is launched, Nextflow will look at the <code>nextflow.config</code> file in that folder and also at the <code>~/.nextflow/config</code> file (if it exists) in your home to control how to run the workflow. The nf-core pipelines all have a default configuration, a test configuration, and container configurations (singularity, podman, etc). You will need to provide a custom configuration for the cluster you are running on (Narval, Béluga, Cedar or Graham), a simple configuration is provided in next section. Nextflow pipelines could also run on [[Niagara]] if they were designed with that specific cluster in mind, but we generally discourage you to run nf-core or any other generic Nextflow pipeline on Niagara.
+When the pipeline is launched, Nextflow will look at the <code>nextflow.config</code> file in that folder and also at the <code>~/.nextflow/config</code> file (if it exists) in your home to control how to run the workflow. The nf-core pipelines all have a default configuration, a test configuration, and container configurations (singularity, podman, etc). You will need to provide a custom configuration for the cluster you are running on, a simple configuration is provided in next section. Nextflow pipelines could also run on [[Trillium]] if they were designed with that specific cluster in mind, but we generally discourage you to run nf-core or any other generic Nextflow pipeline on Trillium.
 
 ==== A configuration for our clusters ==== <!--T:16-->
 
 <!--T:17-->
-You can use the following config by changing the default value for nf-core processes and enter the correct information for the [[Béluga/en|Béluga]] and [[Narval/en|Narval]] clusters. This config is saved in a profile block that will be loaded at runtime. 
+You can use the following config by changing the default value for nf-core processes and enter the correct information for the cluster you are using. This config is saved in a profile block that will be loaded at runtime. 
 </translate>
 {{File
   |name=~/.nextflow/config
@@ -188,14 +188,24 @@ executor {
 }
 
 profiles {
-  beluga {
-    max_memory='186G'
-    max_cpu=40
+  fir {
+    max_memory='750G'
+    max_cpu=192
+    max_time='168h'
+  }
+  nibi {
+    max_memory='750G'
+    max_cpu=192
     max_time='168h'
   }
   narval {
     max_memory='249G'
     max_cpu=64
+    max_time='168h'
+  }
+  rorqual {
+    max_memory='750G'
+    max_cpu=192
     max_time='168h'
   }
 }
@@ -206,7 +216,7 @@ Replace <code><my-account></code> with your own account, which looks like <code>
 The <code>singularity.autoMounts = true</code> bits ensure that all the cluster File Systems (<code>/project</code>, <code>/scratch</code>, <code>/home</code> & <code>/localscratch</code>)  will be properly mounted inside the singularity container.
 
 <!--T:19-->
-This configuration ensures that there are no more than 100 jobs in the Slurm queue and that only 60 jobs are submitted per minute. It indicates that Béluga machines have 40 cores and 186G of RAM with a maximum walltime of one week (168 hours).
+This configuration ensures that there are no more than 100 jobs in the Slurm queue and that only 60 jobs are submitted per minute. It indicates that Rorqual machines have 192 cores and 750G of RAM with a maximum walltime of one week (168 hours).
 
 <!--T:20-->
 The config is linked to the system you are running on, but it is also related to the pipeline itself. For example, here cpu = 1 is the default value, but steps in the pipeline can have more than that. This can get quite complicated and labels in the <code>nf-core-smrnaseq_2.3.1/2_3_1/conf/base.config</code> file are used internally by the pipeline to identify a step with a non default configuration. We do not cover this more advanced topic here, but note that tweaking these labels could make a big difference in the queuing and execution time of your pipeline.
@@ -217,7 +227,7 @@ If the jobs fail with return codes 125 (<i>out of memory</i>) or 139 (<i>omm kil
 ====Running the pipeline==== <!--T:22-->
 
 <!--T:23-->
-Use the two profiles provided by nf-core (<i>test</i> for nextflow's test dataset and <i>singularity</i> for the container platform) and the profile we have just created for Béluga. Note that Nextflow is mainly written in Java which tends to use a lot of virtual memory. On the Narval cluster that won't be a problem, but with the Béluga login node, you will need to change the virtual memory to run most workflows. To set the virtual memory limit to 40G, use the <code>ulimit -v 40000000</code> command. We also used a [[Prolonging_terminal_sessions#Terminal_multiplexers|terminal multiplexer]], so the Nextflow pipeline will still run if you are disconnected and you will be able to reconnect to the controller process. Note that running Nextflow on login nodes is easy on Béluga and Narval, but harder on Graham and Cedar since the login node virtual memory limit cannot be changed on these clusters; we recommend launching Nextflow from a compute node, where the virtual memory is never limited.   
+Use the two profiles provided by nf-core (<i>test</i> for nextflow's test dataset and <i>singularity</i> for the container platform) and the profile we have just created for Narval. Note that Nextflow is mainly written in Java which tends to use a lot of virtual memory. On some clusters, this may be a problem when running from a login node.
 <source lang="bash">
 nextflow run nf-core-${NFCORE_PL}_${PL_VERSION}/2_3_1/  -profile test,singularity,narval  --outdir ${NFCORE_PL}_OUTPUT
 </source>

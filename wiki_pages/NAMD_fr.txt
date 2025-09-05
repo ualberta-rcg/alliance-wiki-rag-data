@@ -9,14 +9,14 @@ Les simulations sont préparées et analysées dans le logiciel de visualisation
 = Installation =
 Le logiciel est installé par notre équipe technique et est disponible via des modules. Si vous avez besoin d'une version plus récente, que vous devez faire vous-même l'installation ou que vous avez des questions, contactez le [[Technical support/fr|soutien technique]].
 
+<span id="Environment_modules"></span>
 = Modules d'environnement =
 
 La plus récente version 3.0.1 est installée sur toutes nos grappes. La version précédente 2.14 est aussi disponible.
 
-Les versions 2.13 et 2.12 sont aussi disponibles.
-
 Pour les tâches exécutées sur plusieurs nœuds, utilisez UCX.
 
+<span id="Submission_scripts"></span>
 = Scripts =
 
 L'information sur l'ordonnanceur Slurm se trouve à la page [[Running jobs/fr|Exécuter des tâches]].
@@ -47,50 +47,14 @@ module load StdEnv/2020 namd-multicore/2.14
 namd2 +p$SLURM_CPUS_PER_TASK  +idlepoll apoa1.namd
 }}
 
+<span id="Parallel_CPU_jobs"></span>
 == Tâches parallèles sur CPU ==
 
-=== Tâches MPI ===
-'''NOTE : N'utilisez pas MPI mais plutôt UCX.'''  
 
-=== Tâches verbs ===
-
-NOTE:  Avec NAMD 2.14, utilisez UCX sur les autres grappes. Les directives ci-dessous s'appliquent uniquement aux versions NAMD 2.13 et 2.12.
-
-
-Ces directives seront mises à jour une fois cette configuration testée sur les nouvelles grappes.
-Dans cet exemple, nous utilisons 64 processus sur 2 nœuds, à raison de 32 processus par nœud; les 32 cœurs sont donc pleinement utilisés. Nous supposons que des nœuds entiers sont utilisés et <code>ntasks-per-node</code> devrait être 32 sur Graham. Pour une performance optimale, utilisez des nœuds entiers.
-
-'''NOTES''':
-*Les versions Verbs ne fonctionnent pas sur Cedar en raison de la réseautique qui est différente; utilisez plutôt la version MPI.
-*Les versions verbs ne fonctionnent pas sur Béluga en raison de l'incompatibilité des pilotes du noyau InfiniBand; utilisez plutôt la version UCX.
-{{File
-  |name=verbs_namd_job.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=32
-#SBATCH --mem=0            # memory per node, 0 means all memory
-#SBATCH -o slurm.%N.%j.out    # STDOUT
-#SBATCH -t 0:05:00            # time (D-HH:MM)
-#SBATCH --account=def-specifyaccount
-
-NODEFILE=nodefile.dat
-slurm_hl2hl.py --format CHARM > $NODEFILE
-P=$SLURM_NTASKS
-
-module load namd-verbs/2.12
-CHARMRUN=`which charmrun`
-NAMD2=`which namd2`
-$CHARMRUN ++p $P ++nodelist $NODEFILE  $NAMD2  +idlepoll apoa1.namd
-}}
 
 ===Tâches UCX===
 L'exemple suivant utilise 80 processus à raison de 40 processus par nœud sur 2 nœuds et utilise ainsi pleinement les 80 cœurs. Le script  suppose que des nœuds entiers sont utilisés; ainsi, sur Béluga, <code>ntasks-per-node</code> devrait être 40. Les tâches NAMD qui utilisent des nœuds entiers offrent la meilleure performance.
 
-
-'''NOTE :''' Les versions UCX devraient fonctionner sur toutes les grappes.
 {{File
   |name=ucx_namd_job.sh
   |lang="sh"
@@ -116,25 +80,7 @@ module load StdEnv/2020 namd-ucx/2.14
 srun --mpi=pmi2 namd2 apoa1.namd
 }}
 
-=== Tâches OFI===
 
-'''NOTE''': Les versions OFI fonctionnent '''UNIQUEMENT''' sur Cedar en raison de sa réseautique qui est différente. Des problèmes sont survenus avec OFI et il est préférable d'utiliser UCX.
-{{File
-  |name=ucx_namd_job.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --account=def-specifyaccount
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=32
-#SBATCH -t 0:05:00            # time (D-HH:MM)
-#SBATCH --mem=0            # memory per node, 0 means all memory
-#SBATCH -o slurm.%N.%j.out    # STDOUT
-
-<!--T:55-->
-module load StdEnv/2020 namd-ofi/2.14
-srun --mpi=pmi2 namd2 stmv.namd 
-}}
 
 === Tâches utilisant 1 GPU ===
 Le prochain exemple utilise huit cœurs CPU et un GPU P100 sur un seul nœud.
@@ -196,61 +142,9 @@ NUM_PES=$(expr $SLURM_CPUS_PER_TASK - 1 )
 srun --cpus-per-task=$SLURM_CPUS_PER_TASK --mpi=pmi2 namd2 ++ppn $NUM_PES apoa1.namd
 }}
 
-=== Tâches OFI avec GPU ===
 
-'''NOTE''': Les versions OFI fonctionnent '''UNIQUEMENT''' sur Cedar en raison de sa réseautique qui est différente. Des problèmes sont survenus avec OFI et il est préférable d'utiliser UCX.   
-{{File
-  |name=ucx_namd_job.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --account=def-specifyaccount
-#SBATCH --ntasks 8            # number of tasks
-#SBATCH --nodes=2
-#SBATCH --cpus-per-task=6
-#SBATCH --gpus-per-node=p100:4
-#SBATCH -t 0:05:00            # time (D-HH:MM)
-#SBATCH --mem=0            # memory per node, 0 means all memory
 
-module load StdEnv/2020 cuda/11.0 namd-ofi-smp/2.14
-NUM_PES=$(expr $SLURM_CPUS_PER_TASK - 1 )
-srun --cpus-per-task=$SLURM_CPUS_PER_TASK --mpi=pmi2 namd2 ++ppn $NUM_PES stmv.namd
-}}
-
-=== Tâches verbs avec GPU ===
-
-NOTE:  Avec NAMD 2.14, utilisez les GPU UCX sur toutes les grappes. Les directives ci-dessous s'appliquent à NAMD 2.13 et 2.12.
-
-Cet exemple utilise 64 processus sur 2 nœuds, chaque nœud exécutant 32 processus, ce qui utilise pleinement les 32 cœurs. Chaque nœud utilise 2 GPU, donc la tâche utilise un total de 4 GPU. Le script  suppose que des nœuds entiers sont utilisés; sur Graham, <code>ntasks-per-node</code> serait 32. Les tâches NAMD qui utilisent des nœuds entiers offrent la meilleure performance.
-
-'''NOTE''' : Les versions verbs ne fonctionnent pas sur Cedar à cause de différences de réseautique.  
-{{File
-  |name=verbsgpu_namd_job.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#
-#SBATCH --ntasks 64            # number of tasks
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=32
-#SBATCH --mem 0            # memory per node, 0 means all memory
-#SBATCH --gpus-per-node=p100:2
-#SBATCH -o slurm.%N.%j.out    # STDOUT
-#SBATCH -t 0:05:00            # time (D-HH:MM)
-#SBATCH --account=def-specifyaccount
-
-slurm_hl2hl.py --format CHARM > nodefile.dat
-NODEFILE=nodefile.dat
-OMP_NUM_THREADS=32
-P=$SLURM_NTASKS
-
-module load cuda/8.0.44
-module load namd-verbs-smp/2.12
-CHARMRUN=`which charmrun`
-NAMD2=`which namd2`
-$CHARMRUN ++p $P ++ppn $OMP_NUM_THREADS ++nodelist $NODEFILE  $NAMD2  +idlepoll apoa1.namd
-}}
-
+<span id="Performance_and_benchmarking"></span>
 ==Performance et étalonnage <i>benchmarking</i>==
 
 Le guide <i>[https://mdbench.ace-net.ca/mdbench/ Molecular Dynamics Performance Guide]</i> a été créé par une équipe [https://www.ace-net.ca/ d'ACENET]. Le guide décrit les conditions optimales pour exécuter aussi des tâches sur nos grappes avec AMBER, GROMACS et OpenMM.

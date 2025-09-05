@@ -34,8 +34,6 @@ La meilleure option est d'installer avec [https://pythonwheels.com/ Python wheel
 
 {{Note|With H100 gpus, torch 2.3 and higher is required.}}
 
-<b>Remarque : </b>PyTorch 1.10 cause des problèmes connus sur nos grappes (à l'exception de Narval). Si l'entraînement distribué produit des erreurs ou si vous obtenez une erreur qui inclut <code>c10::Error</code>, nous vous recommandons d'installer PyTorch 1.9.1 avec <code>pip install --no-index torch==1.9.1</code>.
-
 ====En supplément====
 En plus de  <code>torch</code>, vous pouvez aussi installer <code>torchvision</code>, <code>torchtext</code> et <code>torchaudio</code>.
 {{Command|prompt=(venv) [name@server ~]|pip install --no-index torch torchvision torchtext torchaudio }}
@@ -51,8 +49,8 @@ Le script suivant est un exemple de soumission d'une tâche utilisant le wheel P
   |contents=
 #!/bin/bash
 #SBATCH --gres=gpu:1       # Request GPU "generic resources"
-#SBATCH --cpus-per-task=6  # Cores proportional to GPUs: 6 on Cedar, 16 on Graham.
-#SBATCH --mem=32000M       # Memory proportional to GPUs: 32000 Cedar, 64000 Graham.
+#SBATCH --cpus-per-task=6  # Cores proportional to GPUs.
+#SBATCH --mem=32000M       # Memory proportional to GPUs.
 #SBATCH --time=0-03:00
 #SBATCH --output=%N-%j.out
 
@@ -63,6 +61,8 @@ pip install torch --no-index
 
 python pytorch-test.py
 }}
+
+See https://docs.alliancecan.ca/wiki/Allocations_and_compute_scheduling#Ratios_in_bundles for more information on the appropriate number of CPUs and Memory per GPU for each cluster.
 
 Le script Python <code>pytorch-ddp-test.py</code> a la forme suivante :
 
@@ -921,20 +921,6 @@ Les valeurs sont le nombre d'images par seconde '''par GPU''', avec <code>Distri
 
 <span id="Troubleshooting"></span>
 = Dépannage =
-
-== Fuites de mémoire ==
-Sur le matériel AVX512 (nœuds V100, Skylake ou Béluga), les versions PyTorch  antérieures à v1.0.1 qui utilisent des bibliothèques moins récentes (cuDNN < v7.5 ou MAGMA < v2.5) peuvent avoir des fuites de mémoire importantes et créer des exceptions de mémoire insuffisante et terminer vos tâches. Pour contrer ceci, utilisez la plus récente version de <code>torch</code>.
-
-== c10::Error ==
-
-Dans certains cas, vous pouvez obtenir un erreur comme
-
-  terminate called after throwing an instance of 'c10::Error'
-    what():  Given groups=1, weight of size [256, 1, 3, 3], expected input[16, 10, 16, 16] to have 1 channels, but got 10 channels instead
-  Exception raised from check_shape_forward at /tmp/coulombc/pytorch_build_2021-11-09_14-57-01/avx2/python3.8/pytorch/aten/src/ATen/native/Convolution.cpp:496 (most recent call first):
-  ...
-
-Une exception C++ est émise plutôt qu'une exception Python. Ceci peut se produire quand vous programmez en C++ avec libtorch, mais ne devrait pas se produire quand vous programmez en Python. Il n'est pas possible de suivre la trace des appels (''traceback'')du programme Python, ce qui ne permet pas d'identifier facilement la cause de l'erreur dans le script Python. Nous avons constaté que le fait d'utiliser PyTorch 1.9.1 plutôt que 1.10.x permet le ''traceback'' du programme Python.
 
 <span id="CUDA_error:_no_kernel_image_is_available_for_execution_on_the_device"></span>
 == Erreur CUDA : no kernel image is available for execution on the device ==

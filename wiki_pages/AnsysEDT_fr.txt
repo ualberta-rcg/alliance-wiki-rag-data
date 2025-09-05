@@ -8,8 +8,10 @@
 
 AnsysEDT est hébergé sur nos grappes, mais nous n'avons pas une licence qui permet un accès généralisé. Toutefois, plusieurs établissements, facultés et départements possèdent des serveurs de licences qui peuvent être utilisés dépendant de l'aspect légal de leur utilisation. En ce qui a trait à l'aspect technique, nos nœuds de calcul doivent pouvoir communiquer avec votre serveur de licence.  Quand tout sera en place, vous pourrez charger le module ansysEDT qui localisera de lui-même la licence. En cas de difficulté, communiquez avec le [[technical support/fr|soutien technique]].
 
+<div class="mw-translate-fuzzy">
 == Configurer votre propre fichier de licence ==
 Notre module ansysEDT cherche l'information sur la licence à différents endroits, dont votre répertoire /home. Pour indiquer votre propre serveur de licence, créez un fichier nommé <code>$HOME/.licenses/ansys.lic</code> qui contient deux lignes. Ce fichier devrait ressembler au fichier <code>ansys.lic</code> puisque tous les produits Ansys que vous utiliserez seront sur le même serveur de licence Ansys. Pour les détails, voir [[Ansys/fr#Configurez_votre_propre_fichier_de_licence|Configurez votre propre fichier de licence]].
+</div>
 
 <span id="Cluster_batch_job_submission"></span>
 = Soumettre des tâches en lots =
@@ -35,8 +37,11 @@ Les tâches peuvent être soumises à la file d'attente d'une grappe avec la com
 #SBATCH --ntasks=8             # Specify cores (beluga 40, cedar 32 or 48, graham 32 or 44, narval 64)
 #SBATCH --nodes=1              # Request one node (Do Not Change)
 
-module load StdEnv/2020
-module load ansysedt/2021R2
+#module load StdEnv/2020
+#module load ansysedt/2021R2
+
+module load StdEnv/2023
+module load ansysedt/2023R2    # ou plus récente
 
 # Uncomment next line to run a test example:
 cp -f $EBROOTANSYSEDT/AnsysEM21.2/Linux64/Examples/HFSS/Antennas/TransientGeoRadar.aedt .
@@ -71,8 +76,11 @@ ansysedt -monitor -UseElectronicsPPE -ng -distributed -machinelist list=localhos
 #SBATCH --ntasks=8             # Specify cores (beluga 40, cedar 32 or 48, graham 32 or 44, narval 64)
 #SBATCH --nodes=1              # Request one node (Do Not Change)
 
-module load StdEnv/2020
-module load ansysedt/2021R2
+#module load StdEnv/2020
+#module load ansysedt/2021R2
+
+module load StdEnv/2023
+module load ansysedt/2023R2    # ou plus récente
 
 # Uncomment next line to run a test example:
 cp -f $EBROOTANSYSEDT/AnsysEM21.2/Linux64/Examples/HFSS/Antennas/TransientGeoRadar.aedt .
@@ -176,12 +184,14 @@ Les conditions d'utilisation de la licence ANSYS de SHARCNET (qui inclut AnsysED
 <span id="License_file"></span>
 ==== Fichier de licence ====
 
+<div class="mw-translate-fuzzy">
 Pour utiliser la licence Ansys de SHARCNET sur nos grappes, configurez votre fichier <code>ansys.lic</code> comme suit&nbsp;:
 <source lang="bash">
 [username@cluster:~] cat ~/.licenses/ansysedt.lic
 setenv("ANSYSLMD_LICENSE_FILE", "1055@license3.sharcnet.ca")
 setenv("ANSYSLI_SERVERS", "2325@license3.sharcnet.ca")
 </source>
+</div>
 
 <span id="Local_modules"></span>
 == Modules locaux ==
@@ -191,6 +201,7 @@ Les modules locaux sur gra-vdi ou sur Graham peuvent être intéressants, mais i
 <span id="Use_on_gra-vdi"></span>
 === Utilisation sur gra-vdi ===
 
+<div class="mw-translate-fuzzy">
 Si vous utilisez gra-vdi, vous pouvez choisir de charger les modules Ansys à partir de notre environnement global (après avoir chargé CcEnv) ou de charger les modules Ansys installés localement sur la grappe (après avoir chargé SnEnv). Pour charger un module local ansysedt sur gra-vdi et utiliser le programme en mode graphique&nbsp;:
 # Connectez-vous à gra-vdi.computecanada.ca avec [[VNC/fr#Nœuds_VDI|TigerVNC]].
 # Ouvrez une fenêtre de terminal et chargez le module.
@@ -199,6 +210,7 @@ Si vous utilisez gra-vdi, vous pouvez choisir de charger les modules Ansys à pa
 # Lancez Ansys Electromagnetics Desktop avec la commande <code>ansysedt</code>.
 # Appuyez sur <code>y</code> et <code>Enter</code> pour accepter les conditions. 
 # Appuyez sur <code>Enter</code> pour accepter l'option <code>n</code> et utiliser le serveur SHARCNET par défaut (en présence de <i>~/.licenses/ansysedt.lic</i>, ceci sera utilisé, autrement ANSYSLI_SERVERS et ANSYSLMD_LICENSE_FILE seront utilisés si définis dans votre environnement, par exemple pour un autre serveur distant). Si vous changez <code>n</code> pour <code>y</code> et appuyez sur enter, le serveur CMC sera utilisé.
+</div>
 
 <span id="Use_on_Graham"></span>
 === Utilisation sur Graham ===

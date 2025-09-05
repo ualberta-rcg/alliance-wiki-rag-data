@@ -11,16 +11,16 @@ Please use the tabs below to select the remote system.
 
 <tabs>
 
-<tab name="Cedar,Graham,Béluga,Narval">
-== Client-server visualization on Cedar, Graham, Béluga and Narval ==
+<tab name="Fir,Nibi,Rorqual,Narval">
+== Client-server visualization on Fir, Nibi, Rorqual and Narval ==
 
-On [[Cedar]], [[Graham]], [[Béluga/en|Béluga]] and [[Narval/en|Narval]], you can do client-server rendering on both CPUs (in software) and GPUs (hardware acceleration). Due to additional complications with GPU rendering, we strongly recommend starting with CPU-only visualization, allocating as many cores as necessary to your rendering. The easiest way to estimate the number of necessary cores is to look at the amount of memory that you think you will need for your rendering and divide it by ~3.5 GB/core. For example, a 40GB dataset (that you load into memory at once, e.g. a single timestep) would require at least 12 cores just to hold the data. Since software rendering is CPU-intensive, we do not recommend allocating more than 4GB/core. In addition, it is important to allocate some memory for filters and data processing (e.g. a structured to unstructured dataset conversion will increase your memory footprint by ~3X); depending on your workflow, you may want to start this rendering with 32 cores or 64 cores. If your ParaView server gets killed when processing these data, you will need to increase the number of cores.
+On [[Fir]], [[Nibi]], [[Rorqual/en|Rorqual]] and [[Narval/en|Narval]], you can do client-server rendering on both CPUs (in software) and GPUs (hardware acceleration). Due to additional complications with GPU rendering, we strongly recommend starting with CPU-only visualization, allocating as many cores as necessary to your rendering. The easiest way to estimate the number of necessary cores is to look at the amount of memory that you think you will need for your rendering and divide it by ~3.5 GB/core. For example, a 40GB dataset (that you load into memory at once, e.g. a single timestep) would require at least 12 cores just to hold the data. Since software rendering is CPU-intensive, we do not recommend allocating more than 4GB/core. In addition, it is important to allocate some memory for filters and data processing (e.g. a structured to unstructured dataset conversion will increase your memory footprint by ~3X); depending on your workflow, you may want to start this rendering with 32 cores or 64 cores. If your ParaView server gets killed when processing these data, you will need to increase the number of cores.
 
 === CPU-based visualization ===
 
 You can also do interactive client-server ParaView rendering on cluster CPUs. For some types of rendering, modern CPU-based libraries such as OSPRay and OpenSWR offer performance quite similar to GPU-based rendering. Also, since the ParaView server uses MPI for distributed-memory processing, for very large datasets one can do parallel rendering on a large number of CPU cores, either on a single node, or scattered across multiple nodes.
 
-1. First, install on your computer the same ParaView version as the one available on the cluster you will be using; log into Cedar or Graham and start a serial CPU interactive job.
+1. First, install on your computer the same ParaView version as the one available on the cluster you will be using; log into Fir or Nibi and start a serial CPU interactive job.
 
 {{Command|salloc --time{{=}}1:00:0 --ntasks{{=}}1 --mem-per-cpu{{=}}3600 --account{{=}}def-someprof}}
 
@@ -33,17 +33,17 @@ and then
 {{Command|pvserver --force-offscreen-rendering
 |result=
 Waiting for client...
-Connection URL: cs://cdr774.int.cedar.computecanada.ca:11111
-Accepting connection(s): cdr774.int.cedar.computecanada.ca:11111
+Connection URL: cs://fc30107:11111
+Accepting connection(s): fc30107:11111
 }}
 
 :Wait for the server to be ready to accept client connection.
 
-3. Make a note of the node (in this case cdr774) and the port (usually 11111) and in another terminal on your computer (on Mac/Linux; in Windows use a terminal emulator) link the port 11111 on your computer and the same port on the compute node (make sure to use the correct compute node).
+3. Make a note of the node (in this case fc30107) and the port (usually 11111) and in another terminal on your computer (on Mac/Linux; in Windows use a terminal emulator) link the port 11111 on your computer and the same port on the compute node (make sure to use the correct compute node).
 
-{{Command|prompt=[name@computer $]|ssh <username>@cedar.computecanada.ca -L 11111:cdr774:11111}}
+{{Command|prompt=[name@computer $]|ssh <username>@fir.alliancecan.ca -L 11111:fc30107:11111}}
 
-4. Start ParaView on your computer, go to ''File -> Connect'' (or click on the green ''Connect'' button in the toolbar) and click on ''Add Server.'' You will need to point ParaView to your local port 11111, so you can do something like name = cedar, server type = Client/Server, host = localhost, port = 11111; click ''Configure'', select ''Manual'' and click ''Save.''
+4. Start ParaView on your computer, go to ''File -> Connect'' (or click on the green ''Connect'' button in the toolbar) and click on ''Add Server.'' You will need to point ParaView to your local port 11111, so you can do something like name = fir, server type = Client/Server, host = localhost, port = 11111; click ''Configure'', select ''Manual'' and click ''Save.''
 :Once the remote is added to the configuration, simply select the server from the list and click on ''Connect.'' The first terminal window that read ''Accepting connection'' will now read ''Client connected.''
 
 5. Open a file in ParaView (it will point you to the remote filesystem) and visualize it as usual.
@@ -66,9 +66,9 @@ To check that you are doing parallel rendering, you can pass your visualization 
 
 === GPU-based ParaView visualization ===
 
-Cedar and Graham have a number of interactive GPU nodes that can be used for remote client-server visualization.
+Fir and Nibi have a number of interactive GPU nodes that can be used for remote client-server visualization.
 
-1. First, install on your computer the same version as the one available on the cluster you will be using; log into Cedar or Graham and start a serial GPU interactive job.
+1. First, install on your computer the same version as the one available on the cluster you will be using; log into Fir or Nibi and start a serial GPU interactive job.
 
 {{Command|salloc --time{{=}}1:00:0 --ntasks{{=}}1 --mem-per-cpu{{=}}3600 --gres{{=}}gpu:1 --account{{=}}def-someprof}}
 
@@ -82,17 +82,17 @@ Cedar and Graham have a number of interactive GPU nodes that can be used for rem
 {{Command|pvserver
 |result=
 Waiting for client...
-Connection URL: cs://cdr347.int.cedar.computecanada.ca:11111
-Accepting connection(s): cdr347.int.cedar.computecanada.ca:11111
+Connection URL: cs://fc30107:11111
+Accepting connection(s): fc30107:11111
 }}
 
 :Wait for the server to be ready to accept client connection.
 
-3. Make a note of the node (in this case ''cdr347'') and the port (usually 11111) and in another terminal on your computer (on Mac/Linux; in Windows use a terminal emulator), link the port 11111 on your computer and the same port on the compute node (make sure to use the correct compute node).
+3. Make a note of the node (in this case ''fc30107'') and the port (usually 11111) and in another terminal on your computer (on Mac/Linux; in Windows use a terminal emulator), link the port 11111 on your computer and the same port on the compute node (make sure to use the correct compute node).
 
-{{Command|prompt=[name@computer $]|ssh <username>@cedar.computecanada.ca -L 11111:cdr347:11111}}
+{{Command|prompt=[name@computer $]|ssh <username>@fir.alliancecan.ca -L 11111:fc30107:11111}}
 
-4. Start ParaView on your computer, go to ''File -> Connect'' (or click on the green ''Connect'' button on the toolbar) and click on ''Add Server.'' You will need to point ParaView to your local port 11111, so you can do something like name = cedar, server type = Client/Server, host = localhost, port = 11111; click on ''Configure'', select ''Manual'' and click on ''Save.''
+4. Start ParaView on your computer, go to ''File -> Connect'' (or click on the green ''Connect'' button on the toolbar) and click on ''Add Server.'' You will need to point ParaView to your local port 11111, so you can do something like name = fir, server type = Client/Server, host = localhost, port = 11111; click on ''Configure'', select ''Manual'' and click on ''Save.''
 :Once the remote is added to the configuration, simply select the server from the list and click on ''Connect.'' The first terminal window that read ''Accepting connection'' will now read ''Client connected.''
 
 5. Open a file in ParaView (it will point you to the remote filesystem) and visualize it as usual.
@@ -104,10 +104,10 @@ NVIDIA IndeX is a 3D volumetric interactive renderer on NVIDIA GPUs enabled as a
 Our license lets you run NVIDIA IndeX in parallel on multiple GPUs, however parallel speedup is far from perfect. Before doing any production rendering with IndeX on multiple GPUs, please test your parallel scaling and verify that using more than one GPU leads to better performance for your dataset, otherwise use a single GPU.
 
 </tab>
-<tab name="Niagara">
-== Client-server visualization on Niagara==
+<tab name="Trillium">
+== Client-server visualization on Trillium==
 
-Niagara does not have GPUs, therefore, you are limited to software rendering. With ParaView, you need to explicitly specify one of the mesa flags to tell it to not use OpenGL hardware acceleration, e.g.
+Trillium does not have GPUs, therefore, you are limited to software rendering. With ParaView, you need to explicitly specify one of the mesa flags to tell it to not use OpenGL hardware acceleration, e.g.
 
 {{Commands
 |module load paraview
@@ -116,7 +116,7 @@ Niagara does not have GPUs, therefore, you are limited to software rendering. Wi
 
 or use one of the flags below.
 
-To access [https://docs.scinet.utoronto.ca/index.php/Niagara_Quickstart#Testing interactive resources on Niagara], you will need to start a <code>debugjob</code>. Here are the steps:
+To access [https://docs.scinet.utoronto.ca/index.php/Trillium_Quickstart#Testing interactive resources on Trillium], you will need to start a <code>debugjob</code>. Here are the steps:
 
 <ol>
 <li> Launch an interactive job (debugjob).</li>
@@ -139,15 +139,15 @@ The <code>--mesa-swr-avx2</code> flag has been reported to offer faster software
  Accepting connection(s): niaXYZW.scinet.local:11111
 }}
 
-<li> Open a new terminal without closing your debugjob, and SSH into Niagara using the following command:</li>
+<li> Open a new terminal without closing your debugjob, and SSH into Trillium using the following command:</li>
 
-{{Command|prompt=[name@computer $]|ssh YOURusername@niagara.scinet.utoronto.ca -L11111:niaXYZW:11111 -N}}
+{{Command|prompt=[name@computer $]|ssh YOURusername@trillium.alliancecan.ca -L11111:niaXYZW:11111 -N}}
 
-this will establish a tunnel mapping the port 11111 in your computer (<code>localhost</code>) to the port 11111 on the Niagara's compute node, <code>niaXYZW</code>, where the ParaView server will be waiting for connections.
+this will establish a tunnel mapping the port 11111 in your computer (<code>localhost</code>) to the port 11111 on the Trillium's compute node, <code>niaXYZW</code>, where the ParaView server will be waiting for connections.
 
 <li> Start ParaView on your local computer, go to ''File -> Connect'' and click on ''Add Server.''
 You will need to point ParaView to your local port <code>11111</code>, so you can do something like</li>
- name = niagara
+ name = trillium
  server type = Client/Server
  host = localhost
  port = 11111
@@ -278,9 +278,14 @@ Finally, start the ParaView client on your computer and connect to localhost:111
 </tab>
 </tabs>
 
-= Remote VNC desktop on Graham VDI nodes = 
+= Remove VNC desktop through JupyterLab = 
+For some interactive visualisation, [[JupyterLab#ParaView|ParaView in JupyterLab]] can be used. Unlike client-server visualizations, you will be using VNC remote desktop. 
 
-For small interactive visualizations requiring up to 256GB memory and 16 cores, you can use the Graham VDI nodes. Unlike client-server visualizations you will be using VNC remote desktop. Here are the basic steps:
+To do so, launch a [[JupyterLab]] instance through one of the [[JupyterLab#Launching_JupyterLab|supported options]], then load a <code>paraview</code> module. A launcher icon for ParaView will appear and let you start your visualisation.
+
+= Remote VNC desktop on Nibi's Open OnDemand = 
+
+For small interactive visualizations requiring up to 256GB memory and 16 cores, you can use the Nibi's Open OnDemand. Unlike client-server visualizations you will be using VNC remote desktop. Here are the basic steps:
 
 1. Connect to gra-vdi as described [https://docs.computecanada.ca/wiki/VNC#VDI_Nodes TigerVNC] then open a terminal window and run:
  module load CcEnv

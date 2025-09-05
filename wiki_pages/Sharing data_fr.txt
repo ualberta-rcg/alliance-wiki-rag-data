@@ -14,6 +14,7 @@ Pour partager des données avec un autre utilisateur qui détient un compte sur 
 
 La personne avec laquelle vous voulez partager vos données doit pouvoir accéder à tous les répertoires à partir des espaces <code>/scratch</code> ou <code>/project</code>, jusqu'au répertoire qui contient le fichier. Pour avoir accès, par exemple, à un document placé dans un coffre-fort situé dans une pièce de votre appartement, il ne suffit pas de me fournir la combinaison pour ouvrir le coffre-fort; je dois aussi pouvoir entrer dans l'édifice, puis dans votre appartement, puis dans la pièce où se trouve le coffre-fort. Dans le contexte d'un système de fichiers, ceci signifie accorder à l'autre utilisateur une permission d'exécution à tous les répertoires entre le répertoire racine (par exemple <code>/scratch</code> ou <code>/project</code>) et le répertoire qui contient le fichier en question. 
 
+<span id="Filesystem_permissions"></span>
 ==Permissions des systèmes de fichiers==
 
 À l'instar de la plupart des systèmes de fichiers modernes, ceux de nos grappes possèdent des fonctionnalités permettant de lire, écrire et exécuter des fichiers et des répertoires. Quand un utilisateur essaie avec la commande <code>cd</code> de lire, modifier ou supprimer un fichier ou encore obtenir l'accès à un répertoire, le noyau Linux (le <i>kernel</i>) vérifie d'abord les permissions. Si l'action est impossible, un message annonce que la permission n’est pas accordée.
@@ -61,7 +62,7 @@ ou en octal,
 Pour l'espace projet, le propriétaire du répertoire est le chercheur principal qui parraine les étudiants et les collaborateurs.
 
 === Bit pour l'ID du groupe ===
-Lorsque des fichiers et des répertoires sont créés dans un répertoire parent, il est très utile dans certains cas de pouvoir associer automatiquement le propriétaire ou le groupe de ces nouveaux fichiers et répertoires au répertoire parent ou au groupe auquel ils sont reliés. Ceci est très important au fonctionnement des fichiers de système des [[Project layout/fr|espaces /project]] de Cedar et Graham par exemple, puisque les quotas de stockage sont comptabilisés par groupe. 
+Lorsque des fichiers et des répertoires sont créés dans un répertoire parent, il est très utile dans certains cas de pouvoir associer automatiquement le propriétaire ou le groupe de ces nouveaux fichiers et répertoires au répertoire parent ou au groupe auquel ils sont reliés. 
 
 Si le bit <code>setGID</code> est activé pour un répertoire, les nouveaux fichiers et sous-répertoires créés sous celui-ci héritent du propriétaire du groupe auquel le répertoire est associé. Voyons un exemple.
 
@@ -112,11 +113,12 @@ drwxrS---  3 someuser   def-someuser       4096 Oct 13 19:39 dirTest
 Le bit <code>setUID</code> <b>ne fonctionne pas</b> sur nos grappes.
 Il est désactivé pour des raisons de sécurité.
 
+<span id="Default_filesystem_permissions"></span>
 == Permissions par défaut des systèmes de fichiers ==
 
 Les permissions par défaut sont définies par l'attribut [https://https://fr.wikipedia.org/wiki/Umask <code>umask</code>]. Une valeur par défaut est définie pour chaque système Linux. Pour faire afficher cette valeur dans votre session, lancez 
 {{Command|umask -S}}
-Par exemple, le résultat sur Graham serait
+Par exemple, le résultat sur nos grappes serait
 {{Command|prompt=[user@gra-login1]$|umask -S
 |result=u=rwx,g=rx,o=}}
 Ceci signifie que par défaut, les nouveaux fichiers que vous créez peuvent être lus, modifiés et exécutés par vous-même; ils peuvent être lus et exécutés par les membres du groupe du fichier; les autres utilisateurs n'y ont pas accès. <b>L'attribut <code>umask</code> ne s'applique qu'aux nouveaux fichiers; le fait de changer <code>umask</code> ne change pas les permissions d'accès aux fichiers existants.</b> 
@@ -146,21 +148,6 @@ D'autres conditions déterminent l'accès aux fichiers.
 * Les permissions d'un fichier ou d'un répertoire peuvent être modifiées après leur création avec <code>chmod</code>.
 * L'accès aux fichiers est aussi déterminé par les listes de contrôle d'accès (ACL pour ''Access Control List''). 
 
-=== Modification de l'attribut par défaut <code>umask</code> sur Cedar, Béluga et Niagara ===
-À l'été de 2019, nous avons remarqué que l'attribut <code>umask</code> n'était pas le même sur tous nos serveurs. En date du 16 octobre 2019, <code>umask</code> a été modifié et est maintenant le même que sur Graham. 
-{| class="wikitable"
-|-
-! Grappe!! Valeur antérieure  !! Valeur depuis 2019-10-16
-|-
-| Béluga || 002 || 027
-|-
-| Cedar || 002 || 027
-|-
-| Niagara || 022 || 027
-|-
-|}
-Ceci signifie que les permissions sont devenues plus restrictives pour les fichiers nouvellement créés. Si ce n'est pas convenable, vous pouvez modifier votre <code>umask</code> dans votre <code>.bashrc</code>. En général, nous recommandons toutefois de conserver les permissions définies par défaut. 
-
 Vos fichiers n'étaient pas plus à risque avant cette modification. Depuis le début, les permissions d'accès sont restrictives pour vos répertoires /home, /project et /scratch; ils ne peuvent être accédés par les autres utilisateurs à moins que vous leur ayez accordé le droit d'exécuter.
 
 === Changer les permissions de fichiers existants ===
@@ -169,8 +156,10 @@ Pour que les permissions soient les mêmes que les nouvelles permissions par dé
 Pour le répertoire au complet, utilisez 
 {{Command|chmod -R g-w,o-rx <directory>}}
 
+<span id="Access_control_lists_(ACLs)"></span>
 == Listes de contrôle d'accès ==
 
+<span id="Sharing_access_with_an_individual"></span>
 === Partage de données avec un autre utilisateur ===
 
 Les systèmes d'exploitation de type Unix fonctionnent avec ces permissions depuis plusieurs années, mais les possibilités sont limitées. Comme il n'y a que trois catégories d'utilisateurs (propriétaire, groupe, autres), comment permettre la lecture à un utilisateur en particulier qui n'appartient pas à un groupe? Faut-il alors permettre à tous de lire le fichier? Heureusement, la réponse est non, puisque dans de tels cas, nos systèmes nationaux offrent des listes de règles d'accès (ACL pour <i>access control lists</i>) par utilisateur. Les deux commandes pour ce faire sont : 
@@ -183,6 +172,7 @@ Par exemple, pour accorder à l'utilisateur <code>smithj</code> la permission de
 $ setfacl -m u:smithj:rx my_script.py
 </source>
 
+<span id="Sharing_a_subdirectory"></span>
 ==== Partage d'un sous-répertoire ====
 
 Pour accorder un accès en lecture et écriture à un seul utilisateur dans un sous-répertoire, incluant les nouveaux fichiers qui y seront créés, utilisez les commandes suivantes :
@@ -206,12 +196,14 @@ Pour supprimer récursivement tous les attributs dans un répertoire, utilisez
 setfacl -bR /home/<user>/projects/def-<PI>/shared_data
 </source>
 
+<span id="Data_sharing_groups"></span>
 === Partage de données avec un groupe ===
 
 Dans les cas de partage de données plus complexes (avec plusieurs utilisateurs sur plusieurs grappes), il est possible de créer un <b>groupe de partage</b>. Il s'agit d'un groupe spécial composé des utilisateurs avec lesquels les données doivent être partagées. Le groupe obtient ses permissions d'accès via des listes de contrôle d'accès (ACL).
 
 Vous aurez besoin d'un groupe dans des cas particuliers de partage de données.
 
+<span id="Creating_a_data_sharing_group"></span>
 ==== Création d'un groupe de partage de données ====
 
 La procédure suivante décrit la création du groupe <code>wg-datasharing</code>.
@@ -227,6 +219,7 @@ La procédure suivante décrit la création du groupe <code>wg-datasharing</code
 <br/>4. Ajoutez un membre (par exemple, Victor Van Doom avec son identifiant CCI vdv-888).
 [[File:Cc service add member success screen.png|1036px|Les membres du groupe sont affichés.]]<br />
 
+<span id="Using_a_data_sharing_group"></span>
 ==== Utilisation d'un groupe de partage de données ====
 
 Comme pour le partage avec un seul utilisateur, les répertoires parents des données que vous voulez partager doivent avoir la permission d'exécuter, soit pour tous, soit pour le groupe avec lequel vous voulez les partager. Ceci signifie que dans le répertoire /project, le chercheur principal doit consentir comme suit (à moins que vous n'ayez la permission de faire ceci vous-même) :
@@ -246,8 +239,10 @@ $ setfacl -d -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data
 $ setfacl -R -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data
 </source>
 
+<span id="Troubleshooting"></span>
 == Dépannage ==
 
+<span id="Testing_read_access_recursively"></span>
 ===Vérification de votre droit de lecture===
 
 Pour connaître les fichiers et les sous-répertoires auxquels <b>vous <u>n'avez pas</u> droit de lecture</b>, utilisez la commande

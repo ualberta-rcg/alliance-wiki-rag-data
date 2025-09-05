@@ -8,16 +8,14 @@
 Simulation preparation and analysis is integrated into the [[VMD]] visualization package.
 
 
-= Installation = <!--T:22-->
+<!--T:22-->
+= Installation =
 NAMD is installed by our software team and is available as a module.  If a new version is required or if for some reason you need to do your own installation, please contact [[Technical support]].  You can also ask for details of how our NAMD modules were compiled.
 
 = Environment modules = <!--T:4-->
 
 <!--T:48-->
 The latest version of NAMD is 3.0.1 and it has been installed on all clusters.  The previous version 2.14 is also available.
-
-<!--T:49-->
-Older versions 2.13 and 2.12 are also available.
 
 <!--T:50-->
 To run jobs that span nodes, use UCX.
@@ -27,7 +25,8 @@ To run jobs that span nodes, use UCX.
 <!--T:14-->
 Please refer to the [[Running jobs]] page for help on using the SLURM workload manager.
 
-== Serial and threaded jobs == <!--T:15-->
+<!--T:15-->
+== Serial and threaded jobs ==
 Below is a simple job script for a serial simulation (using only one core).  You can increase the number for --cpus-per-task to use more cores, up to the maximum number of cores available on a cluster node.
 </translate>
 {{File
@@ -57,53 +56,14 @@ namd2 +p$SLURM_CPUS_PER_TASK  +idlepoll apoa1.namd
 
 == Parallel CPU jobs == <!--T:61-->
 
-=== MPI jobs === <!--T:18-->
-'''NOTE''': MPI should not be used.  Instead use UCX.  
-
-=== Verbs jobs === <!--T:16-->
-
-<!--T:51-->
-NOTE: For NAMD 2.14, use UCX. Instructions below apply only to NAMD versions 2.13 and 2.12.
-
-<!--T:52-->
-These provisional instructions will be refined further once this configuration can be fully tested on the new clusters.
-This example uses 64 processes in total on 2 nodes, each node running 32 processes, thus fully utilizing its 32 cores.  This script assumes full nodes are used, thus <code>ntasks-per-node</code> should be 32 (on Graham).  For best performance, NAMD jobs should use full nodes.
-
-<!--T:17-->
-'''NOTES''':
-*Verbs versions will not run on Cedar because of its different interconnect; use the MPI version instead.
-*Verbs versions will not run on Béluga either because of its incompatible infiniband kernel drivers; use the UCX version instead.
 </translate>
-{{File
-  |name=verbs_namd_job.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=32
-#SBATCH --mem=0            # memory per node, 0 means all memory
-#SBATCH -o slurm.%N.%j.out    # STDOUT
-#SBATCH -t 0:05:00            # time (D-HH:MM)
-#SBATCH --account=def-specifyaccount
 
-NODEFILE=nodefile.dat
-slurm_hl2hl.py --format CHARM > $NODEFILE
-P=$SLURM_NTASKS
-
-module load namd-verbs/2.12
-CHARMRUN=`which charmrun`
-NAMD2=`which namd2`
-$CHARMRUN ++p $P ++nodelist $NODEFILE  $NAMD2  +idlepoll apoa1.namd
-}}
 <translate>
 
-=== UCX jobs === <!--T:42-->
+<!--T:42-->
+=== UCX jobs ===
 This example uses 80 processes in total on 2 nodes, each node running 40 processes, thus fully utilizing its 80 cores.  This script assumes full nodes are used, thus <code>ntasks-per-node</code> should be 40 (on Béluga).  For best performance, NAMD jobs should use full nodes.
 
-
-<!--T:43-->
-'''NOTE''': UCX versions should work on all clusters.
 </translate>
 {{File
   |name=ucx_namd_job.sh
@@ -129,32 +89,12 @@ srun --mpi=pmi2 namd3 apoa1.namd
 module load StdEnv/2020 namd-ucx/2.14
 srun --mpi=pmi2 namd2 apoa1.namd
 }}
+
+
 <translate>
 
-=== OFI jobs === <!--T:53-->
-
-<!--T:54-->
-'''NOTE''': OFI versions will run '''ONLY''' on Cedar because of its different interconnect. There have been some issues with OFI so it is better to use UCX.
-</translate>
-{{File
-  |name=ucx_namd_job.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --account=def-specifyaccount
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=32
-#SBATCH -t 0:05:00            # time (D-HH:MM)
-#SBATCH --mem=0            # memory per node, 0 means all memory
-#SBATCH -o slurm.%N.%j.out    # STDOUT
-
-<!--T:55-->
-module load StdEnv/2020 namd-ofi/2.14
-srun --mpi=pmi2 namd2 stmv.namd 
-}}
-<translate>
-
-== Single GPU jobs == <!--T:19-->
+<!--T:19-->
+== Single GPU jobs ==
 This example uses 8 CPU cores and 1 P100 GPU on a single node.
 
 <!--T:72-->
@@ -193,7 +133,8 @@ namd2 +p$SLURM_CPUS_PER_TASK  +idlepoll apoa1.namd
 
 <translate>
 
-== Parallel GPU jobs == <!--T:44-->
+<!--T:44-->
+== Parallel GPU jobs ==
 === UCX GPU jobs ===
 This example is for Béluga and it assumes that full nodes are used, which gives best performance for NAMD jobs. It uses 8 processes in total on 2 nodes, each process(task) using 10 threads and 1 GPU.   This fully utilizes Béluga GPU nodes which have 40 cores and 4 GPUs per node.  Note that 1 core per task has to be reserved for a communications thread, so NAMD will report that only 72 cores are being used but this is normal.  
 
@@ -223,66 +164,8 @@ NUM_PES=$(expr $SLURM_CPUS_PER_TASK - 1 )
 srun --cpus-per-task=$SLURM_CPUS_PER_TASK --mpi=pmi2 namd2 ++ppn $NUM_PES apoa1.namd
 }}
 
-=== OFI GPU jobs === <!--T:56-->
-
-<!--T:57-->
-'''NOTE''': OFI versions will run '''ONLY''' on Cedar because of its different interconnect.  There have been some issues with OFI, so it is better to use UCX.
-{{File
-  |name=ucx_namd_job.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --account=def-specifyaccount
-#SBATCH --ntasks 8            # number of tasks
-#SBATCH --nodes=2
-#SBATCH --cpus-per-task=6
-#SBATCH --gpus-per-node=p100:4
-#SBATCH -t 0:05:00            # time (D-HH:MM)
-#SBATCH --mem=0            # memory per node, 0 means all memory
-
-<!--T:58-->
-module load StdEnv/2020 cuda/11.0 namd-ofi-smp/2.14
-NUM_PES=$(expr $SLURM_CPUS_PER_TASK - 1 )
-srun --cpus-per-task=$SLURM_CPUS_PER_TASK --mpi=pmi2 namd2 ++ppn $NUM_PES stmv.namd
-}}
-
-=== Verbs-GPU jobs === <!--T:20-->
-
-<!--T:59-->
-NOTE:  For NAMD 2.14, use UCX GPU on all clusters.  Instructions below apply only to NAMD versions 2.13 and 2.12.
-
-<!--T:60-->
-This example uses 64 processes in total on 2 nodes, each node running 32 processes, thus fully utilizing its 32 cores.  Each node uses 2 GPUs, so job uses 4 GPUs in total. This script assumes full nodes are used, thus <code>ntasks-per-node</code> should be 32 (on Graham).  For best performance, NAMD jobs should use full nodes.
-
-<!--T:21-->
-'''NOTE''': Verbs versions will not run on Cedar because of its different interconnect.  
 </translate>
-{{File
-  |name=verbsgpu_namd_job.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#
-#SBATCH --ntasks 64            # number of tasks
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=32
-#SBATCH --mem 0            # memory per node, 0 means all memory
-#SBATCH --gpus-per-node=p100:2
-#SBATCH -o slurm.%N.%j.out    # STDOUT
-#SBATCH -t 0:05:00            # time (D-HH:MM)
-#SBATCH --account=def-specifyaccount
 
-slurm_hl2hl.py --format CHARM > nodefile.dat
-NODEFILE=nodefile.dat
-OMP_NUM_THREADS=32
-P=$SLURM_NTASKS
-
-module load cuda/8.0.44
-module load namd-verbs-smp/2.12
-CHARMRUN=`which charmrun`
-NAMD2=`which namd2`
-$CHARMRUN ++p $P ++ppn $OMP_NUM_THREADS ++nodelist $NODEFILE  $NAMD2  +idlepoll apoa1.namd
-}}
 <translate>
 
 = Performance and benchmarking= <!--T:31-->
@@ -389,7 +272,8 @@ For best performance of NAMD 3 on GPUs, we highly recommend adding the following
 <!--T:70-->
 Please see the [https://www.ks.uiuc.edu/Research/namd/alpha/3.0alpha/ NAMD 3.0 Alpha web page] for more on this parameter and related changes in NAMD 3.
 
-= References = <!--T:23-->
+<!--T:23-->
+= References =
 * Downloads: http://www.ks.uiuc.edu/Development/Download/download.cgi?PackageName=NAMD -- Registration is required to download the software.
 *[https://www.ks.uiuc.edu/Research/namd/3.0.1/ug/ NAMD User's guide for version 3.0.1]
 *[https://www.ks.uiuc.edu/Research/namd/2.14/ug/ NAMD User's guide for version 2.14]
