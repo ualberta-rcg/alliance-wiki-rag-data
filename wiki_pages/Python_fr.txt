@@ -18,39 +18,13 @@ Une version est disponible quand vous vous connectez à nos grappes, mais vous a
 Pour connaître les versions disponibles, utilisez
 {{Command|module avail python}}
 
+<div class="mw-translate-fuzzy">
 Vous pouvez ensuite charger la version de votre choix avec la commande <code>module load</code>, par exemple, pour charger Python 3.10 avec
 {{Command|module load python/3.10}}
+</div>
 
 ===Version supportée===
 En règle générale dans l'écosystème Python, la transition vers des versions plus modernes s'accélère et plusieurs paquets ne supportent que les quelques dernières versions de Python 3.x. Dans notre cas, nous offrons uniquement des paquets préconstruits  ([[Available Python wheels/fr|wheels Python]]) pour les trois versions les plus récentes disponibles sur nos systèmes. Des problèmes de dépendance se présenteront quand vous tentez d'installer ces paquets avec les plus anciennes versions de Python. Voir [[Python/fr#Message_Package_'X'_requires_a_different_Python:_X.Y.Z_not_in_'>=X.Y'|la section Dépannage]]. 
-
-Le tableau suivant montre les dates auxquelles nous avons cessé de construire des wheels pour les versions de Python.
-{| class="wikitable"
-|-
-! Version
-! Date
-|-
-| 3.10
-| 
-|-
-| 3.9
-|
-|-
-| 3.8
-|
-|-
-| 3.7
-| 2022-02
-|-
-| 3.6
-| 2021-02
-|-
-| 3.5
-| 2020-02
-|-
-| 2.7
-| 2020-01
-|}
 
 <span id="SciPy_stack"></span>
 === Pile logicielle SciPy===
@@ -107,8 +81,10 @@ Une fois que vous avez chargé un environnement virtuel, vous pouvez lancer la c
 
 Les commandes disponibles sont expliquées dans le [https://pip.pypa.io/en/stable/user_guide/ manuel d'utilisation pip]. Nous mentionnons ici les commandes les plus importantes en présentant un exemple d'installation du paquet [http://numpy.scipy.org/ NumPy].
 
+<div class="mw-translate-fuzzy">
 Chargeons d'abord l'interpréteur Python avec 
 {{Command|module load python/3.10}}
+</div>
 
 Ensuite, activons l'environnement virtuel créé précédemment avec la commande <code>virtualenv</code>.
 {{Command|source ~/ENV/bin/activate}}
@@ -631,3 +607,26 @@ Ceci se produit quand une version incompatible de Numpy est installée ou utilis
 
 Le cas type est  [https://numpy.org/devdocs/dev/depending_on_numpy.html#numpy-2-0-specific-advice la version 2.0 de Numpy qui brise l'ABI.]
 Dans le cas d'un wheel construit avec une version 1.x mais installé avec une version 2.x, vous devez installer une version antérieure avec <code>pip install --no-index 'numpy<2.0'</code>.
+
+=== Defaulting to user installation because normal site-packages is not writeable ===
+When installing packages, one may encounter the message <tt>Defaulting to user installation because normal site-packages is not writeable</tt>.
+
+This is <tt>pip</tt> default behavior outside a virtual environment.
+This means that no virtual environment was found nor activated and that <tt>pip</tt> tried to install in a location where it does not have permissions to do so.
+
+This results in [[Python#Local_installation_(--user)|local installations]] which may be problematic.
+
+=== Local installation (--user) ===
+Local installation can occur unexpectedly (if an error occur with your virtual environment, or permissions issues) or by user defined installation (<tt>pip install --user</tt>).
+
+Local installation is essentially dumping dependencies into one shared space, which is a recipe for headaches.
+This creates weird import issues or runtime issues with your python packages, or version conflicts which could result in <i>dependency hell</i>.
+
+Using a [[Python#Creating_virtual_environments_inside_of_your_jobs|virtual environment]] is best for isolation, reproducibility and managing different versions across your different projects.
+
+==== Remove local installation ====
+To effectively remove local installations, one needs to:
+{{Command|rm -vr ~/.local/bin ~/.local/lib/python*}}
+Note that you may need to specify binaries directly if you are using the <tt>~/.local/bin</tt> for local binaries (other then Python packages)
+
+Once the local installations are removed, start over with [[Python#Creating_virtual_environments_inside_of_your_jobs| a clean fresh new virtual environment]].

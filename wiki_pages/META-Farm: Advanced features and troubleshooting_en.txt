@@ -36,7 +36,7 @@ You do not need to subtract 2 from <code>NJOBS_MAX</code>.
 System messages from the auto-resubmit feature are logged in <code>farm.log</code>, in the root farm directory.
 
 = WHOLE_NODE mode =
-Starting from the version 1.0.3, meta-farm supports packaging individual serial farming jobs into whole node jobs. This made it possible to use the package on clusters Niagara/Trillium. This mode is off by default. To enable it, edit the file config.h inside your farm directory. Specifically, you need to set <code>WHOLE_NODE=1</code>, and set the variable <code>NWHOLE</code> to the number of CPU cores per node (40 for Niagara; 192 for Trillium). 
+Starting from the version 1.0.3, meta-farm supports packaging individual serial farming jobs into whole node jobs. This made it possible to use the package on Trillium. This mode is off by default. To enable it, edit the file config.h inside your farm directory. Specifically, you need to set <code>WHOLE_NODE=1</code>, and set the variable <code>NWHOLE</code> to the number of CPU cores per node (192 for Trillium). 
 
 In the WHOLE_NODE mode, the positive integer argument for the <code>submit.run</code> command changes its meaning: instead of being the number of meta-jobs, now it is the number of whole nodes to be used in META mode. For example, consider this command:
 
@@ -44,18 +44,18 @@ In the WHOLE_NODE mode, the positive integer argument for the <code>submit.run</
 $ submit.run 2
 </code>
 
-If the WHOLE_NODE mode is enabled, the above command will allocate 2 whole nodes, which will be used to run up to 80 concurrent serial tasks (on Niagara; 40 tasks on each node) using META mode (dynamic workload balancing). These tasks are executed as separate threads within whole-node jobs.
+If the WHOLE_NODE mode is enabled, the above command will allocate 2 whole nodes, which will be used to run up to 384 concurrent serial tasks (192 tasks on each node) using META mode (dynamic workload balancing). These tasks are executed as separate threads within whole-node jobs.
 
 The "-1" argument for <code>submit.run</code> preserves its original meaning: run the farm using the SIMPLE mode. The number of actual (whole node) jobs is computed as <code>Number_of_cases / NWHOLE</code>.
 
 Important details:
 
-* The advanced features "Automatic job resubmission" and "Automatic post-processing job" will only work on Niagara/Trillium if you place the following line at the end of your ~/.bashrc file:
+* The advanced features "Automatic job resubmission" and "Automatic post-processing job" will only work on Trillium if you place the following line at the end of your ~/.bashrc file:
 <code>
-module load CCEnv StdEnv
+module load StdEnv
 </code>
 * The WHOLE_NODE mode can only be used for serial farming. (That is, it cannot be used for multi-threaded, MPI, or GPU farming).
-* The WHOLE_NODE mode can also be used on other clusters (not just on Niagara/Trillium). It may be advantageous in situations when the queue wait time for whole node jobs becomes shorter that the queue wait time for serial jobs.
+* The WHOLE_NODE mode can also be used on other clusters (not just on Trillium). It may be advantageous in situations when the queue wait time for whole node jobs becomes shorter that the queue wait time for serial jobs.
 
 =Additional information= 
 
@@ -128,14 +128,13 @@ Alternatively, you can prepend <code>srun</code> to each line of <code>table.dat
 
 ==GPU applications== 
 
-For applications which use GPUs, modify <code>job_script.sh</code> following the guidance at [[Using GPUs with Slurm]]. 
-For example, if your cases each use one GPU, add this line:
+For applications which use GPUs, modify <code>job_script.sh</code> following the guidance at [[Using GPUs with Slurm]]: 
 
 <source lang="bash">
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu[[:type]:number]
 </source>
 
-You may also wish to copy the utility <code>~syam/bin/gpu_test</code> to your <code>~/bin</code> directory (only on Graham, Cedar, and Beluga), 
+You may also wish to copy the utility <code>~syam/bin/gpu_test</code> to your <code>~/bin</code> directory (only on Nibi), 
 and put the following lines in <code>job_script.sh</code> right before the <code>task.run</code> line:
 
 <source lang="bash">

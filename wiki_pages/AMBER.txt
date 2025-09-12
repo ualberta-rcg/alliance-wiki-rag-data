@@ -22,11 +22,12 @@ To see a list of installed versions and which other modules they depend on, you 
 <!--T:72-->
 '''Key Update:''' Older AMBER modules are incompatible with NVIDIA H100 GPUs. For GPU-accelerated runs, use the newly installed modules below.
 
-<!--T:73-->
-=== Module Requirements: ===
-<pre>
-ambertools/25.0 or amber-pmemd/24.3
-</pre>
+=== Module Requirements: === <!--T:73-->
+
+<!--T:75-->
+<code>ambertools/25.0</code> or <code>amber-pmemd/24.3</code>
+
+<!--T:76-->
 These modules include H100-specific CUDA kernels (compiled with CUDA 12+ for the Hopper architecture).
 
 <!--T:74-->
@@ -105,7 +106,9 @@ CPU-only modules provide all MD programs available in AmberTools/20 plus pmemd (
 <!--T:37-->
 ==Job submission examples==
 === Single GPU job ===
-For GPU-accelerated simulations on Narval, use amber/20.12-20.15. Modules compiled with CUDA version < 11.4 do not work on A100 GPUs. Below is an example submission script for a single-GPU job with amber/20.12-20.15.
+For GPU-accelerated simulations on Narval, use amber/20.12-20.15. Modules compiled with CUDA version < 11.4 do not work on A100 GPUs. Below is an example submission script for a single-GPU job.
+</translate>
+
 {{File
   |name=pmemd_cuda_job.sh
   |lang="bash"
@@ -116,72 +119,17 @@ For GPU-accelerated simulations on Narval, use amber/20.12-20.15. Modules compil
 #SBATCH --mem-per-cpu=2000 
 #SBATCH --time=10:00:00
 
-<!--T:54-->
 module purge
-module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 amber/22
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 amber-pmemd/24.3
 
-<!--T:55-->
 pmemd.cuda -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r restart.rst7
 }}
 
+<translate>
 === CPU-only parallel MPI job === <!--T:47-->
+</translate>
 
-<!--T:56-->
 <tabs>
-<tab name="Graham">
-{{File
-  |name=pmemd_MPI_job_graham.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=4
-#SBATCH --ntasks-per-node=32
-#SBATCH --mem-per-cpu=2000
-#SBATCH --time=1:00:00
-
-<!--T:57-->
-module purge
-module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 amber/22
-
-<!--T:58-->
-srun pmemd.MPI -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r restart.rst7
-}}</tab>
-<tab name="Cedar">
-{{File
-  |name=pmemd_MPI_job_cedar.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=4
-#SBATCH --ntasks-per-node=48
-#SBATCH --mem-per-cpu=2000
-#SBATCH --time=1:00:00
-
-<!--T:59-->
-module purge
-module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 amber/22
-
-<!--T:60-->
-srun pmemd.MPI -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r restart.rst7
-}}</tab>
-<tab name="Béluga">
-{{File
-  |name=pmemd_MPI_job_beluga.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash
-#SBATCH --nodes=4
-#SBATCH --ntasks-per-node=40
-#SBATCH --mem-per-cpu=2000
-#SBATCH --time=1:00:00
-
-<!--T:61-->
-module purge
-module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 amber/22
-
-<!--T:62-->
-srun pmemd.MPI -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r restart.rst7
-}}</tab>
 <tab name="Narval">
 {{File
   |name=pmemd_MPI_job_narval.sh
@@ -193,57 +141,105 @@ srun pmemd.MPI -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r re
 #SBATCH --mem-per-cpu=2000
 #SBATCH --time=1:00:00
 
-<!--T:63-->
 module purge
-module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 amber/22
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 amber-pmemd/24.3
 
-<!--T:64-->
 srun pmemd.MPI -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r restart.rst7
 }}</tab>
-<tab name="Niagara">
+<tab name="Rorqual">
 {{File
-  |name=pmemd_MPI_job_narval.sh
+  |name=pmemd_MPI_job_rorqual.sh
   |lang="sh"
   |contents=
 #!/bin/bash
-#SBATCH --nodes=4
-#SBATCH --ntasks-per-node=40
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=192
 #SBATCH --mem-per-cpu=2000
 #SBATCH --time=1:00:00
 
-<!--T:65-->
 module purge
-module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 amber/22
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 amber-pmemd/24.3
 
-<!--T:66-->
+srun pmemd.MPI -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r restart.rst7
+}}</tab>
+<tab name="Fir">
+{{File
+  |name=pmemd_MPI_job_fir.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=192
+#SBATCH --mem-per-cpu=2000
+#SBATCH --time=1:00:00
+
+module purge
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 amber-pmemd/24.3
+
+srun pmemd.MPI -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r restart.rst7
+}}</tab>
+<tab name="Nibi">
+{{File
+  |name=pmemd_MPI_job_nibi.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=192
+#SBATCH --mem-per-cpu=2000
+#SBATCH --time=1:00:00
+
+module purge
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 amber-pmemd/24.3
+
+srun pmemd.MPI -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r restart.rst7
+}}</tab>
+<tab name="Trillium">
+{{File
+  |name=pmemd_MPI_job_trillium.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=192
+#SBATCH --mem-per-cpu=2000
+#SBATCH --time=1:00:00
+
+module purge
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 amber-pmemd/24.3
+
 srun pmemd.MPI -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r restart.rst7
 }}</tab>
 </tabs>
 
+<translate>
 <!--T:48-->
 === QM/MM distributed multi-GPU job ===
 The example below requests eight GPUs.
+</translate>
+
 {{File
   |name=quick_MPI_job.sh
   |lang="bash"
   |contents=
 #!/bin/bash
-#SBATCH --ntasks=8 --cpus-per-task=1
+#SBATCH --ntasks=8
 #SBATCH --gpus-per-task=1 
 #SBATCH --mem-per-cpu=4000 
 #SBATCH --time=02:00:00
 
-<!--T:52-->
 module purge
-module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 ambertools/23.5
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 ambertools/25.0
 
-<!--T:53-->
 srun sander.quick.cuda.MPI -O -i input.in -p topol.parm7 -c coord.rst7 -o output.mdout -r restart.rst7
 }}
 
+<translate>
 <!--T:6-->
 === Parallel MMPBSA job ===
 The example below uses 32 MPI processes. MMPBSA scales linearly because each trajectory frame is processed independently. 
+</translate>
+
 {{File
   |name=mmpbsa_job.sh
   |lang="bash"
@@ -253,13 +249,14 @@ The example below uses 32 MPI processes. MMPBSA scales linearly because each tra
 #SBATCH --mem-per-cpu=4000 
 #SBATCH --time=1:00:00
 
-<!--T:67-->
 module purge
-module load module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 amber/22
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 ambertools/25.0
 
-<!--T:68-->
 srun MMPBSA.py.MPI -O -i mmpbsa.in -o mmpbsa.dat -sp solvated_complex.parm7 -cp complex.parm7 -rp receptor.parm7 -lp ligand.parm7 -y trajectory.nc
 }}
+
+<translate>
+<!--T:77-->
 You can modify scripts to fit your simulation requirements for computing resources. See [[Running jobs]] for more details.
 
 ==Performance and benchmarking== <!--T:69-->

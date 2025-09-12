@@ -104,7 +104,7 @@ mpirun thesoftware .....
 
 SSH tunnelling can also be used in our context to allow a user's computer to connect to a compute node on a cluster through an encrypted tunnel that is routed via the login node of this cluster. This technique allows graphical output of applications like a [[Jupyter | Jupyter Notebook]] or [[Visualization|visualization software]] to be displayed transparently on the user's local workstation even while they are running on a cluster's compute node. When connecting to a database server where the connection is only possible through the head node, SSH tunnelling can be used to bind an external port to the database server.
 
-There is Network Address Translation (NAT) on both Graham and Cedar allowing users to access the Internet from the compute nodes. On Graham however, access is blocked by default at the firewall. Contact [[Technical support|technical support]] if you need to have a specific port opened, supplying the IP address or range of addresses which should be allowed to use that port.
+There is Network Address Translation (NAT) on both Nibi and Fir allowing users to access the Internet from the compute nodes. 
 
 == From Linux or MacOS X ==
 
@@ -119,7 +119,7 @@ On your computer, open a new terminal window and run the following <code>sshuttl
 Then, copy and paste the application's URL into your browser.  If your application is a 
 [[Jupyter#Starting_Jupyter_Notebook|Jupyter notebook]], for example, you are given a URL with a token:
 <pre>
- http://cdr544.int.cedar.computecanada.ca:8888/?token=7ed7059fad64446f837567e32af8d20efa72e72476eb72ca
+ http://fc3281.int.fir.alliancecan.ca:8888/?token=7ed7059fad64446f837567e32af8d20efa72e72476eb72ca
 </pre>
 
 == From Windows == 
@@ -128,15 +128,15 @@ An SSH tunnel can be created from Windows using [[Connecting with MobaXTerm|Moba
 
 Open two sessions in MobaXTerm. 
 
-*Session 1 should be a connection to a cluster. Start your job there following the instructions for your application, such as [[Jupyter#Starting_Jupyter_Notebook|Jupyter Notebook]]. You should be given a URL that includes a host name and a port, such as <code>cdr544.int.cedar.computecanada.ca:8888</code> for example.
+*Session 1 should be a connection to a cluster. Start your job there following the instructions for your application, such as [[Jupyter#Starting_Jupyter_Notebook|Jupyter Notebook]]. You should be given a URL that includes a host name and a port, such as <code>fc3281.int.fir.alliancecan.ca:8888</code> for example.
 
 *Session 2 should be a local terminal in which we will set up the SSH tunnel. Run the following command, replacing this example host name with the one from the URL you received in Session 1. 
 
 {{Command
 |prompt=[name@my_computer ]$
-| ssh -L 8888:cdr544.int.cedar.computecanada.ca:8888 someuser@cedar.computecanada.ca}}
+| ssh -L 8888:fc3281.int.fir.alliancecan.ca:8888 someuser@fir.alliancecan.ca}}
 
-This command forwards connections to <b>local port</b/> 8888 to port 8888 on cdr544.int.cedar.computecanada.ca, the <b>remote port</b>.
+This command forwards connections to <b>local port</b/> 8888 to port 8888 on fc3281.int.fir.alliancecan.ca, the <b>remote port</b>.
 The local port number, the first one, does not <i>need</i> to match the remote port number, the second one, but it is conventional and reduces confusion.
 
 Modify the URL you were given in Session 1 by replacing the host name with <code>localhost</code>. 
@@ -145,13 +145,13 @@ Again using an example from [[Jupyter#Starting_Jupyter_Notebook|Jupyter Notebook
  http://localhost:8888/?token=7ed7059fad64446f837567e32af8d20efa72e72476eb72ca
 </pre>
 
-== Example for connecting to a database server on Cedar from your desktop ==
+== Example for connecting to a database server on Fir from your desktop ==
 
 An SSH tunnel can be created from your desktop to database servers PostgreSQL or MySQL using the following commands respectively:
 
 <pre> 
-ssh -L PORT:cedar-pgsql-vm.int.cedar.computecanada.ca:5432 someuser@cedar.computecanada.ca
-ssh -L PORT:cedar-mysql-vm.int.cedar.computecanada.ca:3306 someuser@cedar.computecanada.ca
+ssh -L PORT:cedar-pgsql-vm.int.cedar.computecanada.ca:5432 someuser@fir.alliancecan.ca
+ssh -L PORT:cedar-mysql-vm.int.cedar.computecanada.ca:3306 someuser@fir.alliancecan.ca
 </pre>
 
 These commands connect port number PORT on your local host to PostgreSQL or MySQL database servers respectively. The port number you choose (PORT) should not be bigger than 32768 (2^15). In this example, <i>someuser</i> is your account username. The difference between this connection and an ordinary SSH connection is that you can now use another terminal to connect to the database server directly from your desktop. On your desktop, run one of these commands for PostgreSQL or MySQL as appropriate:
@@ -161,5 +161,5 @@ psql -h 127.0.0.1 -p PORT -U <your username> -d <your database>
 mysql -h 127.0.0.1 -P PORT -u <your username> --protocol=TCP -p 
 </pre>
 
-MySQL requires a password; it is stored in your <i>.my.cnf</i> located in your home directory on Cedar. 
+MySQL requires a password; it is stored in your <i>.my.cnf</i> located in your home directory on Fir. 
 The database connection will remain open as long as the SSH connection remains open.

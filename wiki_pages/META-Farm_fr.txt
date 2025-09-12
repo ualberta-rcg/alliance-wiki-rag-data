@@ -1,8 +1,9 @@
 <languages />
 
 = Nouveauté =
-* La version 1.0.3 publiée en mars 2025 fonctionne sur la grappe Niagara (et sur Trillium qui remplacera Niagara). Ceci est rendu possible avec l'ajout du nouveau mode WHOLE_NODE (inactif par défaut, mais configurable dans config.h) et de quelques autres ajustements. Le mode WHOLE_NODE rassemble les cas séquentiels de calcul dans des tâches qui demandent des nœuds complets. Pour plus d'information, voir  [[META-Farm: Advanced features and troubleshooting/fr|META-Farm : Fonctions avancées et dépannage]].
+* La version 1.0.3 publiée en mars 2025 fonctionne sur la grappe Trillium. Ceci est rendu possible avec l'ajout du nouveau mode WHOLE_NODE (inactif par défaut, mais configurable dans config.h) et de quelques autres ajustements. Le mode WHOLE_NODE rassemble les cas séquentiels de calcul dans des tâches qui demandent des nœuds complets. Pour plus d'information, voir  [[META-Farm: Advanced features and troubleshooting/fr|META-Farm : Fonctions avancées et dépannage]].
 
+<span id="Overview"></span>
 =Description=
 
 META (pour META-Farm) est une suite de scripts conçus par l’équipe SHARCNET pour automatiser l’exécution d’un  grand nombre de calculs connexes. En anglais, cette pratique est parfois nommée <i>farming</i>, <i>serial farming</i> ou <i>task farming</i>. META fonctionne sur tous les systèmes nationaux de l'Alliance et peut également être utilisée sur d'autres grappes qui possèdent la même configuration et qui font usage de [https://slurm.schedmd.com/documentation.html l’ordonnanceur Slurm].  
@@ -28,21 +29,24 @@ En mode META, le nombre de tâches (ou <i>métatâches</i>) effectivement soumis
 
 En mode META, toutes les métatâches n'ont pas besoin d'exécuter des cas. La première métatâche commencera à traiter les lignes de table.dat et si la deuxième tâche démarre, elle rejoint la première, et ainsi de suite. Si le temps d'exécution d'une métatâche individuelle est suffisamment long, tous les cas peuvent être traités avec une seule métatâche.
 
+<span id="META_vs._GLOST"></span>
 == META vs GLOST == 
 
 META possède des avantages importants par rapport à d'autres approches telles que [[GLOST/fr|GLOST]] où le traitement de chaque groupe de cas est effectué dans une seule grande tâche parallèle (MPI).
-* Comme l'ordonnanceur dispose de toute la souplesse pour démarrer les métatâches individuelles quand il le souhaite, le temps en file d'attente peut être beaucoup plus court avec META qu'avec GLOST. Par exemple, dans un contexte où 1 000 cœurs CPU doivent être utilisés pendant 3 jours
-** avec GLOST et MPI, le temps en file d'attente peut être de plusieurs semaines et il faudra donc des semaines avant d’obtenir votre tout premier résultat;
+* Comme l'ordonnanceur dispose de toute la souplesse pour démarrer les métatâches individuelles quand il le souhaite, le temps en file d'attente peut être beaucoup plus court avec META qu'avec GLOST. Par exemple, dans un contexte où 10&nbsp;000 cœurs CPU doivent être utilisés pendant 3 jours
+** avec GLOST, le temps en file d'attente pour une tâche MPI avec 10&nbsp;000 cœurs CPU peut être long et il faudra donc des semaines avant d’obtenir votre tout premier résultat;
 ** avec META, certaines métatâches démarrent et produisent les premiers résultats en quelques minutes.
 * À la fin du traitement d'un groupe de cas, 
 ** avec GLOST, certains rangs MPI se termineront plus tôt et resteront inactifs jusqu'à la fin du tout dernier rang MPI, le plus lent;
 ** avec META, il n'y a pas de telle perte à la fin du traitement; les métatâches individuelles sortent plus tôt si elles n'ont plus de charge de travail à traiter.
 * GLOST et d'autres outils similaires ne prennent pas en charge la resoumission automatisée des cas qui ont échoué ou qui n'ont jamais été exécutés. META possède cette fonctionnalité qui de plus est très facile à utiliser.
 
+<span id="The_META_webinar"></span>
 == Webinaire META ==
 
 Voyez le [https://youtu.be/GcYbaPClwGE webinaire enregistré le 6 octobre 2021].
 
+<span id="Quick_start"></span>
 =Démarrage rapide= 
 
 Si vous débutez avec META, suivez les étapes ci-dessous. Il est toutefois fortement recommandé de lire cette page au complet.
@@ -88,6 +92,7 @@ Pour faire exécuter un autre groupe de cas en même temps que le premier, lance
 
 Toutes ces commandes (à l'exception de <code>farm_init.run</code> elle-même) doivent être exécutées dans un répertoire de groupe de cas créé par <code>farm_init.run</code>.
 
+<span id="Small_number_of_cases_(SIMPLE_mode)"></span>
 =Mode SIMPLE pour un petit nombre de cas=
 
 Rappelons qu'une seule exécution de votre code est un <b>cas</b> et qu’une invocation de l'ordonnanceur est une <b>tâche</b>. Si:
@@ -181,6 +186,7 @@ STATUS=$?
 
 <b>Remarque 2 :</b> Il n’est pas nécessaire d’inclure les numéros de ligne au début de chaque ligne de <code>table.dat</code>. Si le script <code>submit.run</code> ne les trouve pas, il modifiera <code>table.dat</code> pour y ajouter les numéros de lignes. 
 
+<span id="STATUS_and_handling_errors"></span>
 ===STATUS et traitement des erreurs=== 
 
 À quoi sert <code>STATUS</code> dans <code>single_case.sh</code>? La valeur de cette variable devrait être de 0 si votre cas a été traité correctement, autrement sa valeur sera positive (plus grande que 0). Ceci est très important, car <code>resubmit.run</code> l’utilise pour identifier les cas qui ont échoué et qui doivent être traités de nouveau. Dans la version de <code>single_case.sh</code> que nous fournissons, <code>STATUS</code> est le code de sortie de votre programme. Ceci ne résout pas tous les problèmes parce que certains programmes produisent un code de sortie de 0 même si tout ne s’est pas bien déroulé. Vous pouvez changer la définition de <code>STATUS</code> en modifiant <code>single_case.sh</code>.  
@@ -227,7 +233,7 @@ fi
 task.run
 </source>
 
-L’utilitaire <code>gpu_test</code> fait un travail équivalent. Sur Graham, Cedar ou Béluga, copiez-le dans votre répertoire <code>~/bin</code>.
+L’utilitaire <code>gpu_test</code> fait un travail équivalent. Sur Nibi, copiez-le dans votre répertoire <code>~/bin</code>.
 
  cp ~syam/bin/gpu_test ~/bin
 
@@ -249,6 +255,7 @@ De plus, chaque fois que <code>submit.run</code> est exécuté, un sous-réperto
 <code>$PID</code>, l’identifiant unique du processus pour le script.
 Ce sous-répertoire peut être supprimé une fois que le traitement complet du groupe de cas est terminé. Si vous lancez <code>clean.run</code>, le sous-répertoire sera automatiquement supprimé, mais prenez garde parce que cette commande supprime aussi tous les résultats obtenus.
 
+<span id="Resubmitting_failed_cases"></span>
 ==Resoumettre les cas qui ont échoué== 
 
 <i><b>Remarque :</b> La présente section est valide pour les deux modes.</i><br><br>
@@ -273,7 +280,7 @@ De la même manière que pour <code>submit.run</code>, si l’option <code>-auto
 =Mode META pour un grand nombre de cas=
 Le mode SIMPLE (un cas par tâche) fonctionne bien lorsque le nombre de cas est assez petit (<500). Lorsque le nombre de cas est largement supérieur à 500, les problèmes suivants peuvent survenir&nbsp;:
 
-* Chaque grappe a une limite quant au nombre de tâches que vous pouvez avoir en même temps; pour Graham par exemple, la limite est de 1000.
+* Chaque grappe a une limite quant au nombre de tâches que vous pouvez avoir en même temps.
 * Avec un très grand nombre de cas, chaque traitement de cas est généralement court. Si un cas s'exécute pendant <20 min, les cycles CPU peuvent être gaspillés par de l’ordonnancement non nécessaire.
 
 Le mode META est la solution à ces problèmes. Au lieu de soumettre une tâche distincte pour chaque cas, un plus petit nombre de métatâches sont soumises, chacune traitant plusieurs cas. Pour activer le mode META, le premier argument de <code>submit.run</code> doit être le nombre souhaité de métatâches, qui doit être un nombre assez petit, soit beaucoup plus petit que le nombre de cas à traiter, par exemple
@@ -298,6 +305,7 @@ L'équilibrage dynamique de la charge de travail a pour résultat que toutes les
 
 En résumé, toutes les métatâches demandées ne s'exécuteront pas nécessairement; cela dépend de la disponibilité de la grappe. Mais comme décrit ci-dessus, vous obtiendrez éventuellement tous vos résultats en mode META, quel que soit le nombre de métatâches exécutées, même si vous devrez peut-être utiliser <code>resubmit.run</code> pour terminer un groupe de cas en particulier.
 
+<span id="Estimating_the_runtime_and_number_of_metajobs"></span>
 ==Estimation du temps d'exécution et du nombre de métatâches== 
 
 Comment peut-on déterminer le nombre optimal de métatâches et le temps d'exécution à utiliser dans <code>job_script.sh</code>? 
@@ -324,7 +332,7 @@ Par mesure de sécurité, multipliez cela par un facteur de 1,2 pour obtenir 31,
 N = 31,7 heures de base / 3 heures = 10,6<br>
 ce qui, arrondi au nombre entier suivant, est 11. Ensuite, vous pouvez lancer le groupe de cas en exécutant une fois <code>submit.run 11</code>.
 
-Si le nombre de métatâches dans l'analyse est supérieur à 1000, vous disposez d'un groupe de cas de taille particulièrement grande. Le nombre maximum de tâches pouvant être soumis sur Graham et Béluga étant de 1000, vous ne pourrez donc pas exécuter tout le groupe de cas avec une seule soumission. La solution de contournement consiste à utiliser la séquence de commandes suivante. N'oubliez pas que chaque commande ne peut être exécutée qu'après la fin de l'exécution du groupe précédent.
+Si le nombre de métatâches dans l'analyse est supérieur à 1000, vous disposez d'un groupe de cas de taille particulièrement grande. Le nombre maximum de tâches pouvant être soumis sur Nibi et Rorqual étant de 1000, vous ne pourrez donc pas exécuter tout le groupe de cas avec une seule soumission. La solution de contournement consiste à utiliser la séquence de commandes suivante. N'oubliez pas que chaque commande ne peut être exécutée qu'après la fin de l'exécution du groupe précédent.
 
 <source lang="bash">
    $  submit.run 1000
@@ -335,6 +343,7 @@ Si le nombre de métatâches dans l'analyse est supérieur à 1000, vous dispose
 
 Si cela semble plutôt fastidieux, envisagez plutôt d'utiliser la fonctionnalité avancée pour [[META-Farm:_Advanced_features_and_troubleshooting/fr#Resoumettre_automatiquement_les_cas_qui_ont_échoué|resoumettre automatiquement les cas qui ont échoué]].
 
+<span id="Words_of_caution"></span>
 =Quelques précautions=
 
 Commencez toujours par un petit test pour vous assurer que tout fonctionne avant de soumettre un grand groupe de cas. Vous pouvez tester des cas individuels en réservant un nœud interactif avec <code>salloc</code>, en passant au répertoire du groupe de cas et en exécutant des commandes telles que <code>./single_case.sh table.dat 1</code>, <code>./single_case.sh table.dat 2</code>, etc.
@@ -366,6 +375,7 @@ STATUS=$?
 ...
 </source>
 
+<span id="If_more_help_is_needed"></span>
 = Assistance supplémentaire = 
 
 Pour des détails sur certaines fonctionnalités et des suggestions de dépannage, voyez la version française de la page [[META-Farm: Advanced features and troubleshooting/fr|META-Farm&nbsp;: Fonctions avancées et dépannage]].

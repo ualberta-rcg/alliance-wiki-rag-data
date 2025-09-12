@@ -5,7 +5,7 @@ __FORCETOC__
 
 '''NOTE 1:''' An important setting in ParaView's preferences is ''Render View -> Remote/Parallel Rendering Options -> Remote Render Threshold.'' If you set it to default (20MB) or similar, small rendering will be done on your computer's GPU, the rotation with a mouse will be fast, but anything modestly intensive (under 20MB) will be shipped to your computer and (depending on your connection) visualization might be slow. If you set it to 0MB, all rendering will be remote including rotation, so you will really be using the cluster resources for everything, which is good for large data processing but not so good for interactivity. Experiment with the threshold to find a suitable value.
 
-'''NOTE 2:''' ParaView requires the same major version on the local client and the remote host; this prevents incompatibility that typically shows as a failed handshake when establishing the client-server connection. For example, to use ParaView server version 5.10.0 on the cluster, you need client version 5.10.x on your computer.
+'''NOTE 2:''' ParaView requires the same major version on the local client and the remote host; this prevents incompatibility that typically shows as a failed handshake when establishing the client-server connection. For example, to use ParaView server version 5.13.1 on the cluster, you need client version 5.13.x on your computer.
 
 Please use the tabs below to select the remote system.
 
@@ -26,7 +26,7 @@ You can also do interactive client-server ParaView rendering on cluster CPUs. Fo
 
 :The job should automatically start on one of the CPU interactive nodes.
 
-2. At the prompt that is now running inside your job, load the offscreen ParaView module and start the server.
+2. At the prompt that is now running inside your job, load the ParaView module and start the server.
 
 {{Command|module load paraview/5.13.1}}
 and then
@@ -58,7 +58,7 @@ If you want to do parallel rendering on multiple CPUs, start a parallel job; don
 Start the ParaView server with <code>srun</code>.
 
 {{Commands
-|module load paraview-offscreen/5.13.1
+|module load paraview/5.13.1
 |srun pvserver --force-offscreen-rendering
 }}
 
@@ -99,12 +99,18 @@ Accepting connection(s): fc30107:11111
 
 === Rendering with NVIDIA's IndeX plugin ===
 
-NVIDIA IndeX is a 3D volumetric interactive renderer on NVIDIA GPUs enabled as a ParaView server plugin. To use IndeX, connect via client-server to ParaView 5.10 (provided by paraview-offscreen-gpu/5.10.0) running inside an interactive GPU job as described above. Then in your client go to Tools | Manage Plugins and enable the <code>pvNVIDIAIndeX</code> plugin first locally and then remotely. Loading it locally might not be necessary on all platforms, but we saw a bug in several configurations where ParaView server would crash if the local plugin was not selected first. After enabling the plugin, load your dataset and in the Representation drop-down menu select NVIDIA Index.
+NVIDIA IndeX is a 3D volumetric interactive renderer on NVIDIA GPUs enabled as a ParaView server plugin. To use IndeX, connect via client-server to ParaView running inside an interactive GPU job as described above. Then in your client go to Tools | Manage Plugins and enable the <code>pvNVIDIAIndeX</code> plugin first locally and then remotely. Loading it locally might not be necessary on all platforms, but we saw a bug in several configurations where ParaView server would crash if the local plugin was not selected first. After enabling the plugin, load your dataset and in the Representation drop-down menu select NVIDIA Index.
 
 Our license lets you run NVIDIA IndeX in parallel on multiple GPUs, however parallel speedup is far from perfect. Before doing any production rendering with IndeX on multiple GPUs, please test your parallel scaling and verify that using more than one GPU leads to better performance for your dataset, otherwise use a single GPU.
 
 </tab>
 <tab name="Trillium">
+{{Panel
+  |title=Outdated
+  |panelstyle=outdated
+  |content='''This section contains obsolete information and some statements may not be valid.''' The technical documentation is currently being updated by our support team. The only thing that should be different on Trillium is that load the <tt>StdEnv/2023</tt> module is required before loading the <tt>paraview</tt> module.
+[[Category:Outdated]]
+}}
 == Client-server visualization on Trillium==
 
 Trillium does not have GPUs, therefore, you are limited to software rendering. With ParaView, you need to explicitly specify one of the mesa flags to tell it to not use OpenGL hardware acceleration, e.g.
@@ -174,6 +180,7 @@ For performing parallel rendering using multiple CPUs, <code>pvserver</code> sho
 
 </tab>
 <tab name="Cloud VM">
+{{Outdated}}
 == Client-server visualization on a cloud ==
 
 === Prerequisites ===
@@ -283,7 +290,8 @@ For some interactive visualisation, [[JupyterLab#ParaView|ParaView in JupyterLab
 
 To do so, launch a [[JupyterLab]] instance through one of the [[JupyterLab#Launching_JupyterLab|supported options]], then load a <code>paraview</code> module. A launcher icon for ParaView will appear and let you start your visualisation.
 
-= Remote VNC desktop on Nibi's Open OnDemand = 
+= Remote VNC desktop on Nibi's Open OnDemand =
+{{Outdated}}
 
 For small interactive visualizations requiring up to 256GB memory and 16 cores, you can use the Nibi's Open OnDemand. Unlike client-server visualizations you will be using VNC remote desktop. Here are the basic steps:
 

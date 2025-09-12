@@ -47,8 +47,10 @@ La quantité de mémoire peut être demandée avec <code>--mem-per-cpu</code> (m
 
 Une source commune de confusion est qu'une certaine quantité de la mémoire du nœud n'est pas disponible pour la tâche, étant réservée pour le système d'exploitation, etc.  Chaque type de nœud a donc une quantité maximum à la disposition des tâches; par exemple, les nœuds de 128Go sont configurés de façon à offrir 125Go pour l'exécution des tâches soumises. Si vous demandez plus que cette quantité, votre tâche devra être exécutée avec des nœuds de plus de mémoire qui pourraient être moins nombreux.
 
+<div class="mw-translate-fuzzy">
 Pour compliquer davantage, K, M, G, etc. sont interprétés par Slurm comme étant des [https://fr.wikipedia.org/wiki/Pr%C3%A9fixe_binaire préfixes binaires]; ainsi <code>--mem=125G</code> équivaut à <code>--mem=128000M</code>. La quantité de mémoire que vous pouvez demander est indiquée dans le tableau <i>Caractéristiques des nœuds</i> pour [[Béluga#Caractéristiques_des_nœuds|Béluga]], [[Cedar/fr#Caractéristiques_des_nœuds|Cedar]], [[Graham/fr#Caractéristiques_des_nœuds|Graham]],  [[Narval#Caractéristiques_des_nœuds|Narval]]
 et [[Rorqual#Caractéristiques_des_nœuds|Rorqual]].
+</div>
 
 <span id="Use_squeue_or_sq_to_list_jobs"></span>
 ==Lister les tâches avec <code>squeue</code> ou <code>sq</code>==
@@ -176,18 +178,20 @@ Les tâches intensives avec MPI, et spécifiquement celles qui peuvent utiliser 
 
 Pour plus d'information, consultez la page [[OpenMP/fr|OpenMP]].
 
+<div class="mw-translate-fuzzy">
 === Tâche GPU (avec processeur graphique) === 
 Pour utiliser un GPU, il faut considérer plusieurs options, surtout parce que
 * les nœuds de [[Cedar/fr|Cedar]] et [[Graham/fr|Graham]] qui sont équipés de GPU ne sont pas tous configurés uniformément,
 * il y a deux configurations différentes sur Cedar,
 * les politiques sont différentes pour les nœuds GPU de Cedar.
 Pour des informations et des exemples d'ordonnancement sur les ressources GPU, consultez [[Using GPUs with Slurm/fr|Ordonnancement Slurm des tâches avec GPU]].
+</div>
 
-== Tâches interactives ==
-Si la soumission de tâches en lot est la façon la plus efficace d'utiliser les grappes de Calcul Canada, il est cependant possible de soumettre des tâches interactivement,  ce qui peut s'avérer utile pour&nbsp;:
-* l'exploration de données en mode ligne de commande;
-* l'utilisation des outils de console interactifs de R et iPython;
-* les projets intensifs de développement, de débogage ou de compilation.
+== Interactive jobs ==
+Though batch submission is the most common and most efficient way to take advantage of our clusters, interactive jobs are also supported. These can be useful for things like:
+* Data exploration at the command line
+* Interactive console tools like R and iPython
+* Significant software development, debugging, or compiling
 
 Pour démarrer une session interactive sur un nœud de calcul, utilisez [https://slurm.schedmd.com/salloc.html salloc]. Dans l'exemple suivant, nous avons une tâche sur un cœur CPU et 3Go de mémoire, pour une durée d'une heure.
  $ salloc --time=1:0:0 --mem-per-cpu=3G --ntasks=1 --account=def-someuser
@@ -239,6 +243,7 @@ Il existe des façons de réduire ou même d'éliminer ce temps d'attente, mais 
 <span id="Completed_jobs"></span>
 === Tâches terminées ===
 
+<div class="mw-translate-fuzzy">
 La commande <code>seff</code> permet d'obtenir un sommaire de l'efficacité en CPU et mémoire pour une tâche terminée.
  $ seff 12345678
  Job ID: 12345678
@@ -251,6 +256,7 @@ La commande <code>seff</code> permet d'obtenir un sommaire de l'efficacité en C
  Job Wall-clock time: 02:49:26
  Memory Utilized: 213.85 MB
  Memory Efficiency: 0.17% of 125.00 GB
+</div>
 
 Pour avoir plus de renseignements sur une tâche complétée, utilisez [https://slurm.schedmd.com/sacct.html sacct]; ajoutez <code>--format</code> pour savoir le résultat de la tâche, ainsi
  $ sacct -j <jobid>
@@ -504,9 +510,11 @@ Les problèmes sont quelquefois difficiles à diagnostiquer quand les paramètre
 
 Il arrive qu'aucun résultat (ou seulement une partie) ne soit enregistré dans le fichier <code>.out</code> pour une tâche qui a été soumise, et qu'il semble qu'elle soit arrêtée. Ceci se produit surtout parce que la [[#Résultats_en_mémoire_tampon|mise en mémoire tampon]] effectuée par l'ordonnanceur Slurm est agressive, car il regroupe plusieurs lignes de résultat avant de les acheminer vers le fichier, et souvent celui-ci n'est produit que quand la tâche se termine. Pire encore, si une tâche est annulée ou manque de temps, une partie des résultats peut être perdue. Si vous voulez suivre le progrès de la tâche en cours au fur et à mesure de son exécution, vous pouvez le faire avec une [[#Tâches_interactives|tâche interactive]]. C'est aussi une bonne façon d'observer combien de temps la tâche a besoin.
 
+<div class="mw-translate-fuzzy">
 ==État des tâches et priorité==
 * Consultez [[Job scheduling policies/fr|Politique d'ordonnancement des tâches]] pour des renseignements sur la politique de priorisation des tâches sur Cedar et Graham et connaître les éléments pouvant influer sur l'ordonnancement de vos tâches.
 * Si des tâches <b>dans votre groupe de recherche</b> sont en concurrence entre elles, consultez [[Managing_Slurm_accounts/fr|Gestion des comptes Slurm]].
+</div>
 
 == Pour plus d'information ==
 * SchedMD : [https://slurm.schedmd.com/documentation.html documentation Slurm] et [https://slurm.schedmd.com/tutorials.html tutoriels] 

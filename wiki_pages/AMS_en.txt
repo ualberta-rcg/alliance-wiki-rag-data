@@ -26,7 +26,7 @@ For module commands, please see [[Utiliser des modules/en|Using modules]].
 
 The clusters use the Slurm scheduler; for details about submitting jobs, see [[Running jobs]].
 
-====Example scripts for an ADF job ====
+====Example scripts for an AMS job ====
 This H2O_adf.sh example script is to request 32 CPUs on one node.  Please use a reasonable number of CPUs instead of simply running a full-node job on Nibi, unless you have demonstrated that your job can scale efficiently to 192 CPUs.
 {{File
   |name=H2O_adf.sh
@@ -131,34 +131,13 @@ EndEngine
 eor
 }}
 
-The following slurm script is for cpus across multi-node (e.g., 32 cpus across 2 nodes) 
-{{File
-  |name=SnO_EFG_band.sh
-  |lang="bash"
-  |contents=
-#!/bin/bash
-#SBATCH --account=def-pi
-#SBATCH --nodes=2                # number of nodes 
-#SBATCH --ntasks-per-node=16     # cpus per node
-#SBATCH --mem-per-cpu=3G         # memory; 3G per cpu in this example
-#SBATCH --time=00-10:00          # time (DD-HH:MM)
-#SBATCH --output=SnO_EFG_band-%j.log
-
-module unload openmpi
-module load ams/2025.102
-bash SnO_EFG_band.run                 # run the input file
-}}
-
 ===Notes===
-# The input for AMS is different from ADF, the previous ADF input file will not run for the new AMS. Some examples can be found in /opt/software/ams/2020.102/examples/
+# The input for AMS is different from ADF, the previous ADF input file will not run for the new AMS. Some examples can be found in /opt/software/ams/2025.102/examples/
 # Except the output .log file, other files are all saved in a subdirectory AMS_JOBNAME.results. If AMS_JOBNAME is not defined in the input .run file, the default name is ams.results
-# The restart file name is ams.rkf instead of the TAPE13 in previous ADF versions.
-# You can watch a recorded webinar/tutorial: [https://www.youtube.com/watch?v=lvJv_aN-wQU An Update on ADF/AMS software on Graham]
+# The restart file name is ams.rkf instead of the TAPE13 in previous ADF versions
 For more usage information, please check the manuals in [https://www.scm.com/support/ SCM Support]
 
 ==Running AMS-GUI==
-Rendering over an SSH connection with X11 forwarding is very slow for GUI applications such as AMS-GUI. We recommend you use [[VNC]] to connect if you will be running AMS-GUI.
-
 ===Nibi===
 
 AMS can be run interactively in graphical mode on a Nibi compute node (8hr time limit) via OnDemand with these steps:

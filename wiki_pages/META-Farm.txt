@@ -1,8 +1,9 @@
 <languages />
 <translate>
 
-= What's new = <!--T:239-->
-* Version 1.0.3 (released in March 2025) adds support for Niagara (an its future replacement Trillium) clusters. This is achieved via the introduction of the new WHOLE_NODE mode (can be set in config.h; it is disabled by default), and a few other accommodations. The Whole Node mode operates by packaging serial farm jobs into whole node jobs. The WHOLE_NODE mode is discussed in detail here: [[META-Farm: Advanced features and troubleshooting]].
+<!--T:239-->
+= What's new =
+* Version 1.0.3 (released in March 2025) adds support for the Trillium cluster. This is achieved via the introduction of the new WHOLE_NODE mode (can be set in config.h; it is disabled by default), and a few other accommodations. The Whole Node mode operates by packaging serial farm jobs into whole node jobs. The WHOLE_NODE mode is discussed in detail here: [[META-Farm: Advanced features and troubleshooting]].
 
 =Overview= <!--T:133-->
 
@@ -41,8 +42,8 @@ Not all metajobs need to run in META mode. The first metajob to run will start p
 
 <!--T:142-->
 The META package has important advantages over other approaches like [[GLOST]] where farm processing is done by bundling up all the jobs into a large parallel (MPI) job:
-* As the scheduler has full flexibility to start individual metajobs when it wants, the queue wait time can be dramatically shorter with the META package than with GLOST. Consider a large farm where 1000 CPU cores need to be used for 3 days;
-** with GLOST, with a 1000-way MPI job, queue wait time can be weeks, so it'll be weeks before you see your very first result;
+* As the scheduler has full flexibility to start individual metajobs when it wants, the queue wait time can be dramatically shorter with the META package than with GLOST. Consider a large farm where 10,000 CPU cores need to be used for 3 days;
+** with GLOST, with a 10,000-way MPI job, queue wait time can be weeks, so it'll be weeks before you see your very first result;
 ** with META, some metajobs start to run and produce the first results within minutes.
 * At the end of the farm computations;
 ** with GLOST, some MPI ranks will finish earlier and will sit idle until the very last—the slowest—MPI rank ends;
@@ -87,7 +88,8 @@ for the many cases per job (META) mode, where <i>N</i> is the number of metajobs
 <!--T:148-->
 To run another farm concurrently with the first one, run <code>farm_init.run</code> again (providing a different farm name) and customize files <code>single_case.sh</code> and <code>job_script.sh</code> inside the new farm directory, then create a new table.dat file there. Also copy the executable and all the input files as needed. Now you can execute the <code>submit.run</code> command inside the second farm directory to submit the second farm.
 
-=List of commands= <!--T:149-->
+<!--T:149-->
+=List of commands=
 * <b>farm_init.run</b>: Initialize a farm. See [[#Quick start|Quick start]] above.
 * <b>submit.run</b>: Submit the farm to the scheduler. See [[#submit.run|submit.run]] below.
 * <b>resubmit.run</b>: Resubmit all computations which failed or never ran as a new farm. See [[#Resubmitting_failed_cases|Resubmitting failed cases]].
@@ -114,7 +116,8 @@ for which please see [[#Large number of cases (META mode)|Large number of cases 
 <!--T:153-->
 The three essential scripts are the command <code>submit.run</code>, and two user-customizable scripts <code>single_case.sh</code> and <code>job_script.sh</code>.
 
-==submit.run== <!--T:154-->
+<!--T:154-->
+==submit.run==
 <i><b>Note:</b> This section applies to both SIMPLE and META modes.</i><br><br>
 The command <code>submit.run</code> has one obligatory argument, the number of jobs to submit, <i>N</i>:
 
@@ -135,7 +138,8 @@ If a file named <code>final.sh</code> is present in the farm directory, <code>su
 <!--T:159-->
 If you supply any other arguments, they will be passed on to the Slurm command <code>sbatch</code> used to launch all metajobs for this farm.
 
-==single_case.sh== <!--T:160-->
+<!--T:160-->
+==single_case.sh==
 <i><b>Note:</b> This section applies to both SIMPLE and META modes.</i><br><br>
 
 <!--T:161-->
@@ -293,7 +297,7 @@ task.run
 
 <!--T:178-->
 There is a utility <code>gpu_test</code> which does a similar job to <code>nvidia_smi</code> in the above example.
-On Graham, Cedar, or Beluga you can copy it to your <code>~/bin</code> directory:
+On Nibi you can copy it to your <code>~/bin</code> directory:
 
  <!--T:179-->
 cp ~syam/bin/gpu_test ~/bin
@@ -301,7 +305,8 @@ cp ~syam/bin/gpu_test ~/bin
 <!--T:180-->
 The META package has a built-in mechanism which tries to detect problems of this kind and kill a metajob which churns through the cases too quickly. The two relevant parameters, <code>N_failed_max</code> and <code>dt_failed</code> are set in the file <code>config.h</code>. The protection mechanism is triggered when the first <code>$N_failed_max</code> cases are very short - less than <code>$dt_failed</code> seconds in duration.  The default values are 5 and 5, so by default a metajob will stop if the first 5 cases all finish in less than 5 seconds. If you get false triggering of this protective mechanism because some of your normal cases have runtime shorter than <code>$dt_failed</code>, reduce the value of <code>dt_failed</code> in <code>config.h</code>.
 
-==Output files== <!--T:181-->
+<!--T:181-->
+==Output files==
 <i><b>Note:</b> This section applies to both SIMPLE and META modes.</i><br><br>
 
 <!--T:182-->
@@ -350,12 +355,13 @@ If some cases still fail or do not run, you can resubmit the farm as many times 
 <!--T:191-->
 Similarly to <code>submit.run</code>, if the optional switch <code>-auto</code> is present, the farm will resubmit itself automatically at the end, more than once if necessary. This advanced feature is described at [[META:_Advanced_features_and_troubleshooting#Resubmitting_failed_cases_automatically|Resubmitting failed cases automatically]].
 
-=Large number of cases (META mode)= <!--T:192-->
+<!--T:192-->
+=Large number of cases (META mode)=
 The SIMPLE (one case per job) mode works fine when the number of cases is fairly small (<500). 
 When the number of cases is much greater than 500, the following problems may arise:
 
 <!--T:193-->
-* Each cluster has a limit on how many jobs a user can have at one time. (e.g. for Graham, it is 1000.) 
+* Each cluster has a limit on how many jobs a user can have at one time.
 * With a very large number of cases, each case computation is typically short. If one case runs for <20 min, CPU cycles may be wasted due to scheduling overheads.
 
 <!--T:194-->
@@ -441,7 +447,7 @@ which rounded up to the next integer is 11. Then you can launch the farm by exec
 
 <!--T:212-->
 If the number of jobs in the above analysis is larger than 1000, you have a particularly large farm.  
-The maximum number of jobs which can be submitted on Graham and Beluga is 1000, so you won't be able to run the whole collection with a single command.  
+The maximum number of jobs which can be submitted on Nibi and Rorqual is 1000, so you won't be able to run the whole collection with a single command.  
 The workaround would be to go through the following sequence of commands. 
 Remember each command can only be executed after the previous farm has finished running:
 
@@ -502,7 +508,8 @@ See [[META-Farm: Advanced features and troubleshooting]] for more detailed discu
 <!--T:221-->
 If you need more help, contact [[technical support]], mentioning the name of the package (META), and the name of the staff member who wrote the software (Sergey Mashchenko).
 
-== Glossary == <!--T:222-->
+<!--T:222-->
+== Glossary ==
 * '''case''': One independent computation. The file <code>table.dat</code> should list one case per line.
 * '''farm / farming''' (verb): Running many jobs on a cluster which carry out independent (but related) computations, of the same kind.
 * '''farm''' (noun): The directory and files involved in running one instance of the package.

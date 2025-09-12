@@ -8,9 +8,7 @@ Gaussian est une application de chimie computationnelle produite par [http://gau
 <span id="Limitations"></span>
 ==Limites==
 
-<div class="mw-translate-fuzzy">
-Gaussian est présentement disponible uniquement sur [[Graham/fr|Graham]], [[Nibi/fr|Nibi]], [[Cedar/fr|Cedar]] et [[Fir/fr|Fir]].
-</div> 
+Gaussian est présentement disponible uniquement sur [[Nibi/fr|Nibi]] et [[Fir/fr|Fir]]. 
 
 Nos systèmes nationaux ne prennent pas en charge [https://gaussian.com/running/?tabid=4 l'exécution en parallèle grappe/réseau (''parallélisme Linda'')], mais uniquement 
 [https://gaussian.com/running/?tabid=4 l'exécution en parallèle avec multiprocesseur à mémoire partagée]. <br> 
@@ -28,10 +26,8 @@ Si vous êtes un utilisateur parrainé par un chercheur principal, celui-ci doit
 
 Nous pourrons alors vous donner accès à Gaussian.
 
-<div class="mw-translate-fuzzy">
-==Utiliser Gaussian sur Graham et Cedar==
-Le module <code>gaussian</code> est installé sur [[Graham/fr|Graham]], [[Nibi/fr|Nibi]], [[Cedar/fr|Cedar]] et [[Fir/fr|Fir]]. Pour connaître les versions disponibles. utiliser la commande <code>module spider</code> comme suit&nbsp;:
-</div>
+==Utiliser Gaussian sur Fir et Nibi==
+Le module <code>gaussian</code> est installé sur [[Nibi/fr|Nibi]] et [[Fir/fr|Fir]]. Pour connaître les versions disponibles. utiliser la commande <code>module spider</code> comme suit&nbsp;:
 
  [name@server $] module spider gaussian
 
@@ -41,17 +37,11 @@ Pour les commandes qui s'appliquent aux modules, voir [[Utiliser des modules]].
 ===Soumettre des tâches===
 Les grappes nationales utilisent l'ordonnanceur Slurm; pour des renseignements sur la soumission d'une tâche, consultez [[Running jobs/fr|Exécuter des tâches]].
 
-<div class="mw-translate-fuzzy">
-Puisque seule la version avec multiprocesseur à mémoire partagée de Gaussian est prise en charge, vos tâches ne peuvent utiliser qu'un seul nœud et jusqu'à 48 cœurs par nœud sur Cedar et 32 cœurs par nœud sur Graham. Si vos tâches nécessitent plus de mémoire que ce que vous pouvez obtenir sur un seul nœud, sachez que chacune des grappes offre quelques nœuds avec plus de mémoire. Pour connaître le nombre de nœuds sur une grappe et leur capacité, consultez  [[Cedar/fr#Caractéristiques_des_nœuds|Cedar]] et [[Graham/fr#Caractéristiques_des_nœuds|Graham]].
-</div> 
+Puisque seule la version avec multiprocesseur à mémoire partagée de Gaussian est prise en charge, vos tâches ne peuvent utiliser qu'un seul nœud et jusqu'au maximum de cœurs par nœud. Cependant, en raison de la scalabilité de Gaussian, nous vous recommandons <em>de ne pas utiliser plus de 32 CPU par tâche si vous ne pouvez pas prouver qu'ils seront bien utilisés.</em>  Nibi et Fir ont 192 CPU par nœud; nous vous demandons de ne pas utiliser des nœuds entiers puisque ce ne serait pas efficace. Si vos tâches nécessitent plus de mémoire que ce que vous pouvez obtenir sur un seul nœud, sachez que chacune des grappes offre quelques nœuds avec plus de mémoire. Pour connaître le nombre de nœuds sur une grappe et leur capacité, consultez  [[Fir/fr#Caractéristiques_des_nœuds|Fir]] et [[Nibi/fr#Caractéristiques_des_nœuds|Nibi]]. 
 
-<div class="mw-translate-fuzzy">
 En plus du fichier d'entrée ''name.com'', vous devez préparer un script décrivant les ressources de calcul pour la tâche; ce script doit être dans le même répertoire que le fichier d'entrée.
-</div>
 
-<div class="mw-translate-fuzzy">
-Il y a deux options pour les tâches Gaussian sur Graham et Cedar, selon la localisation des fichiers d'exécution par défaut et la taille de la tâche&nbsp;:
-</div>
+Il y a deux options pour les tâches Gaussian, selon la localisation des fichiers d'exécution par défaut et la taille de la tâche&nbsp;:
 
 <span id="G16_(G09,_G03)"></span>
 ====Option 1 : G16 (G09, G03)====
@@ -73,14 +63,12 @@ Remarquez que pour assurer la cohérence, les fichiers portent le même nom avec
 module load gaussian/g16.c01
 G16 name.com            # G16 command, input: name.com, output: name.log
 }}
-<div class="mw-translate-fuzzy">
-Pour utiliser Gaussian 09 ou Gaussian 03, remplacez gaussian/g16.b01 par gaussian/g09.e01 ou gaussian/g03.d01 et remplacez G16 par G09 ou G03. Modifiez --mem, --time, --cpus-per-task selon vos besoins en ressources de calcul.
-</div>
+Pour utiliser Gaussian 09 ou Gaussian 03, remplacez gaussian/g16.c01 par gaussian/g09.e01 ou gaussian/g03.d01 et remplacez G16 par G09 ou G03. Modifiez --mem, --time, --cpus-per-task selon vos besoins en ressources de calcul.
 
 <span id="g16_(g09,_g03)"></span>
 ====Option 2 : g16 (g09, g03)====
 
-Avec cette option, les fichiers d'exécution par défaut (unnamed .rwf, .inp, .d2e, .int, .skr) sont enregistrés temporairement dans $SLURM_TMPDIR (/localscratch/username.jobid.0/) dans le nœud de calcul où la tâche devait être exécutée. L'ordonnanceur supprime les fichiers quand la tâche est terminée avec ou sans succès. Vous pouvez utiliser cette option si vous n'aurez pas besoin du fichier .rwf pour redémarrer la tâche plus tard.
+Avec cette option, les fichiers d'exécution par défaut (unnamed .rwf, .inp, .d2e, .int, .skr) sont enregistrés temporairement dans $SLURM_TMPDIR (/localscratch/username.jobid.0/) dans le nœud de calcul où la tâche devait être exécutée. L'ordonnanceur supprime les fichiers quand la tâche est terminée avec ou sans succès. Vous pouvez utiliser cette option si vous n'avez pas besoin du fichier .rwf pour redémarrer la tâche plus tard.
 
 /localscratch est d'environ 800Go, partagés par toutes les tâches exécutées sur le même nœud. Si la taille de vos fichiers est semblable ou plus grande, utilisez plutôt l'option G16 (G09, G03).
 
@@ -101,10 +89,8 @@ g16 < name.com >& name.log              # g16 command, input: name.com, output: 
 ====Soumettez la tâche====
  sbatch mysub.sh
 
-<div class="mw-translate-fuzzy">
 ===Tâches interactives===
-Il est possible d'exécuter une tâche Gaussian interactive sur Graham et Cedar à des fins de test. Il n'est cependant pas indiqué d'exécuter une tâche Gaussian interactive sur un nœud de connexion. Ouvrez plutôt une session interactive sur un nœud de calcul avec <code>salloc</code> pour une durée d'une heure, avec 8 CPUs et 10Go de mémoire.
-</div>
+Il est possible d'exécuter une tâche Gaussian interactive à des fins de test. Il n'est cependant pas indiqué d'exécuter une tâche Gaussian interactive sur un nœud de connexion. Ouvrez plutôt une session interactive sur un nœud de calcul avec <code>salloc</code> pour une durée d'une heure, avec 8 CPUs et 10Go de mémoire.
 {{Command|salloc --time{{=}}1:0:0 --cpus-per-task{{=}}8 --mem{{=}}10g}}
 
 Puis, utilisez
@@ -121,7 +107,7 @@ ou
 === Redémarrer une tâche ===
 Une tâche Gaussian peut être redémarrée à partir du fichier <tt>rwf</tt> précédent.
 
-Comme d'habitude, l'optimisation géométrique peut être redémarrée à partir du ficher <tt>chk</tt>.
+Comme d'habitude, l'optimisation géométrique peut être redémarrée à partir du fichier <tt>chk</tt>.
 Avec le fichier <tt>rwf</tt>, vous pouvez redémarrer les calculs qui se font en une étape, par exemple les calculs de fréquence analytique incluant des propriétés comme ROA et VCD avec ONIOM; les calculs CCSD et EOM-CCSD; NMR; Polar=OptRot; et les énergies CID, CISD, CCD, QCISD et BD.
 
 Pour redémarrer une tâche à partir du fichier <tt>rwf</tt>, vous devez connaître l'endroit où se situe ce fichier <tt>rwf</tt> de la tâche précédente. 
@@ -149,12 +135,10 @@ Un exemple de fichier d'entrée et de scripts <tt>*.sh</tt> se trouve dans
 <tt>/opt/software/gaussian/version/examples/</tt>
 où la version est g03.d10, g09.e01, g16.a03 ou g16.b01.
 
-<div class="mw-translate-fuzzy">
 == Remarques ==
 # NBO7 est inclus uniquement dans la version g16.c01 avec l'emploi des mots-clés nbo6 et nbo7.
 # NBO6 est inclus dans les versions g09.e01 et g16.b01.
-# Voir le tutoriel [https://www.youtube.com/watch?v=xpBhPnRbeQo Gaussian16 and NBO7 on Graham and Cedar].
-</div>
+# Voir le tutoriel de 2022, [https://www.youtube.com/watch?v=xpBhPnRbeQo Gaussian16 and NBO7 on Graham and Cedar].
 
 == Erreurs ==
 Vous trouverez la solution à plusieurs erreurs dans [[Gaussian error messages/fr|Gaussian – Messages d’erreur]].

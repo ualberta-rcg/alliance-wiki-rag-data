@@ -1,7 +1,7 @@
 <languages />
 
 = What's new =
-* Version 1.0.3 (released in March 2025) adds support for Niagara (an its future replacement Trillium) clusters. This is achieved via the introduction of the new WHOLE_NODE mode (can be set in config.h; it is disabled by default), and a few other accommodations. The Whole Node mode operates by packaging serial farm jobs into whole node jobs. The WHOLE_NODE mode is discussed in detail here: [[META-Farm: Advanced features and troubleshooting]].
+* Version 1.0.3 (released in March 2025) adds support for the Trillium cluster. This is achieved via the introduction of the new WHOLE_NODE mode (can be set in config.h; it is disabled by default), and a few other accommodations. The Whole Node mode operates by packaging serial farm jobs into whole node jobs. The WHOLE_NODE mode is discussed in detail here: [[META-Farm: Advanced features and troubleshooting]].
 
 =Overview=
 
@@ -32,8 +32,8 @@ Not all metajobs need to run in META mode. The first metajob to run will start p
 == META vs. GLOST == 
 
 The META package has important advantages over other approaches like [[GLOST]] where farm processing is done by bundling up all the jobs into a large parallel (MPI) job:
-* As the scheduler has full flexibility to start individual metajobs when it wants, the queue wait time can be dramatically shorter with the META package than with GLOST. Consider a large farm where 1000 CPU cores need to be used for 3 days;
-** with GLOST, with a 1000-way MPI job, queue wait time can be weeks, so it'll be weeks before you see your very first result;
+* As the scheduler has full flexibility to start individual metajobs when it wants, the queue wait time can be dramatically shorter with the META package than with GLOST. Consider a large farm where 10,000 CPU cores need to be used for 3 days;
+** with GLOST, with a 10,000-way MPI job, queue wait time can be weeks, so it'll be weeks before you see your very first result;
 ** with META, some metajobs start to run and produce the first results within minutes.
 * At the end of the farm computations;
 ** with GLOST, some MPI ranks will finish earlier and will sit idle until the very last—the slowest—MPI rank ends;
@@ -241,7 +241,7 @@ task.run
 </source>
 
 There is a utility <code>gpu_test</code> which does a similar job to <code>nvidia_smi</code> in the above example.
-On Graham, Cedar, or Beluga you can copy it to your <code>~/bin</code> directory:
+On Nibi you can copy it to your <code>~/bin</code> directory:
 
  cp ~syam/bin/gpu_test ~/bin
 
@@ -289,7 +289,7 @@ Similarly to <code>submit.run</code>, if the optional switch <code>-auto</code> 
 The SIMPLE (one case per job) mode works fine when the number of cases is fairly small (<500). 
 When the number of cases is much greater than 500, the following problems may arise:
 
-* Each cluster has a limit on how many jobs a user can have at one time. (e.g. for Graham, it is 1000.) 
+* Each cluster has a limit on how many jobs a user can have at one time.
 * With a very large number of cases, each case computation is typically short. If one case runs for <20 min, CPU cycles may be wasted due to scheduling overheads.
 
 META mode is the solution to these problems. 
@@ -353,7 +353,7 @@ N = 31.7 core-hours / 3 hours = 10.6<br>
 which rounded up to the next integer is 11. Then you can launch the farm by executing a single <code>submit.run 11</code>.
 
 If the number of jobs in the above analysis is larger than 1000, you have a particularly large farm.  
-The maximum number of jobs which can be submitted on Graham and Beluga is 1000, so you won't be able to run the whole collection with a single command.  
+The maximum number of jobs which can be submitted on Nibi and Rorqual is 1000, so you won't be able to run the whole collection with a single command.  
 The workaround would be to go through the following sequence of commands. 
 Remember each command can only be executed after the previous farm has finished running:
 

@@ -17,39 +17,12 @@ When you log into our clusters, a default Python version will be available, but 
 To discover the versions of Python available:
 {{Command|module avail python}}
 
-You can then load the version of your choice using <code>module load</code>. For example, to load Python 3.10 you can use the command
-{{Command|module load python/3.10}}
+You can then load the version of your choice using <code>module load</code>. For example
+{{Command|module load python/X.Y}}
+where <tt>X.Y</tt> represent the version, for example <tt>3.13</tt>.
 
 ===Python version supported===
 In general in the Python ecosystem, the transition to more modern versions of python is accelerating, with many packages only supporting the latest few versions of Python 3.x. In our case, we provide prebuilt Python packages in our [[Available Python wheels|wheelhouse]] only for the 3 most recent Python versions available on the systems. This will result in dependencies issues when trying to install those packages with older versions of Python. See [[Python#Package_.27X.27_requires_a_different_Python:_X.Y.Z_not_in_.27.3E.3DX.Y.27|Troubleshooting]]. 
-
-Below is a table indicating when we stopped building wheels for each version of Python.
-{| class="wikitable"
-|-
-! Python version
-! Date
-|-
-| 3.10
-| 
-|-
-| 3.9
-|
-|-
-| 3.8
-|
-|-
-| 3.7
-| 2022-02
-|-
-| 3.6
-| 2021-02
-|-
-| 3.5
-| 2020-02
-|-
-| 2.7
-| 2020-01
-|}
 
 === SciPy stack ===
 
@@ -103,7 +76,8 @@ Once you have a virtual environment loaded, you will be able to run the [http://
 All of <code>pip</code>'s commands are explained in detail in the [https://pip.pypa.io/en/stable/user_guide/ user guide]. We will cover only the most important commands and use the [http://numpy.scipy.org/ Numpy] package as an example.
 
 We first load the Python interpreter:
-{{Command|module load python/3.10}}
+{{Command|module load python/X.Y}}
+where <tt>X.Y</tt> represent the version, for example <tt>3.13</tt>.
 
 We then activate the virtual environment, previously created using the <code>virtualenv</code> command:
 {{Command|source ENV/bin/activate}}
@@ -619,3 +593,26 @@ This is caused by an incompatible version of Numpy installed or used and you mus
 
 This is especially true with the [https://numpy.org/devdocs/dev/depending_on_numpy.html#numpy-2-0-specific-advice release of Numpy 2.0 which breaks the ABI.]
 In the case of a wheel that was built with version 1.x but installed version 2.x, one must installed a lower version with: <code>pip install --no-index 'numpy<2.0'</code>
+
+=== Defaulting to user installation because normal site-packages is not writeable ===
+When installing packages, one may encounter the message <tt>Defaulting to user installation because normal site-packages is not writeable</tt>.
+
+This is <tt>pip</tt> default behavior outside a virtual environment.
+This means that no virtual environment was found nor activated and that <tt>pip</tt> tried to install in a location where it does not have permissions to do so.
+
+This results in [[Python#Local_installation_(--user)|local installations]] which may be problematic.
+
+=== Local installation (--user) ===
+Local installation can occur unexpectedly (if an error occur with your virtual environment, or permissions issues) or by user defined installation (<tt>pip install --user</tt>).
+
+Local installation is essentially dumping dependencies into one shared space, which is a recipe for headaches.
+This creates weird import issues or runtime issues with your python packages, or version conflicts which could result in <i>dependency hell</i>.
+
+Using a [[Python#Creating_virtual_environments_inside_of_your_jobs|virtual environment]] is best for isolation, reproducibility and managing different versions across your different projects.
+
+==== Remove local installation ====
+To effectively remove local installations, one needs to:
+{{Command|rm -vr ~/.local/bin ~/.local/lib/python*}}
+Note that you may need to specify binaries directly if you are using the <tt>~/.local/bin</tt> for local binaries (other then Python packages)
+
+Once the local installations are removed, start over with [[Python#Creating_virtual_environments_inside_of_your_jobs| a clean fresh new virtual environment]].

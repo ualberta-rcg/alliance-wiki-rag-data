@@ -7,22 +7,18 @@
 We have the authorization to host STAR-CCM+ binaries on our servers, but we don't provide licenses. You will need to have your own license in order to use this software. A remote POD license can be purchased directly from [https://www.plm.automation.siemens.com/global/en/buy/ Siemens]. Alternatively, a local license hosted at your institution can be used, providing it can be accessed through the firewall from the cluster where jobs are to be run.
 
 == Configuring your account ==
-In order to configure your account to use a license server with our Star-CCM+ module, create a license file <code>$HOME/.licenses/starccm.lic</code> with the following layout:
+To configure your account to use a license server with the Star-CCM+ module, create a license file <code>$HOME/.licenses/starccm.lic</code> with the following layout:
 {{File|name=starccm.lic|contents=SERVER <server> ANY <port>
 USE_SERVER}}
-where <code><server></code> and <code><port></code> should be changed to specify the hostname (or ip address) and the static vendor port of the license server respectively.
+where <code><server></code> and <code><port></code> should be changed to specify the hostname (or ip address) and the static vendor port of the license server respectively.  Note that manually setting <code>CDLMD_LICENSE_FILE</code> equal to <port>@<server> in your slurm script is not required;  Instead, when a Star-CCM+ module is loaded this variable is automatically set to your <i>$HOME/.licenses/starccm.lic</i> file.
 
 === POD license file ===
 
-Researchers with a POD license purchased from [https://www.plm.automation.siemens.com/global/en/buy/ Siemens] can specify it by creating a  <code>~/.licenses/starccm.lic</code> text file as follows:
+Researchers with a POD license purchased from [https://www.plm.automation.siemens.com/global/en/buy/ Siemens] must manually set the <code>LM_PROJECT</code> environment variable equal to <I>YOUR CD-ADAPCO PROJECT ID</i> in your slurm script.  Also the <code>~/.licenses/starccm.lic</code> file should be configured as follows on each cluster:
 {{File|name=starccm.lic|contents=SERVER flex.cd-adapco.com ANY 1999
 USE_SERVER}}
-on any cluster (except Niagara) as well as setting LM_PROJECT to CD-ADAPCO PROJECT ID in your slurm script.  Please note that manually setting CDLMD_LICENSE_FILE="<port>@<server>" in your slurm script will no longer be required.
 
-= Cluster batch job submission =
-Select one of the available modules:
-* <code>starccm</code> for the double-precision flavour (i.e., <code>module load starccm/19.04.007-R8</code>), 
-* <code>starccm-mixed</code> for the mixed-precision flavour (i.e., <code>module load starccm-mixed/19.04.007</code>).
+= Cluster batch job submission = 
 
 When submitting jobs on a cluster for the first time, you must set up the environment to use your license. If you are using Siemans remote <i>pay-on-usage</i> license server then create a <code>~/.licenses/starccm.lic</code> file as shown in the <b>Configuring your account- POD license file</b> section above and license checkouts should immediately work.  If however you are using an institutional license server, then after creating your <code>~/.licenses/starccm.lic</code> file you must also submit a problem ticket to [[technical support]] so we can help co-ordinate the necessary one time network firewall changes required to access it (assuming the server has never been setup to be accessed from the Alliance cluster you will be using).   If you still have problems getting the licensing to work then try removing or renaming file <code>~/.flexlmrc</code> since previous search paths and/or license server settings maybe stored in it.  Note that temporary output files from starccm jobs runs may accumulate in hidden directories named <code>~/.star-version_number</code> consuming valuable quota space.  These can be removed by periodically running <code>rm -ri ~/.starccm*</code> and replying yes when prompted.
 
@@ -43,11 +39,10 @@ When submitting jobs on a cluster for the first time, you must set up the enviro
 #SBATCH --mem=0               # Request all memory per node
 #SBATCH --ntasks-per-node=1   # Do not change this value
 
-#module load StdEnv/2020      # Versions < 18.06.006
 module load StdEnv/2023
 
-#module load starccm/18.06.006-R8
-module load starccm-mixed/18.06.006
+#module load starccm/20.04.007-R8
+module load starccm-mixed/20.04.007
 
 SIM_FILE='mysample.sim'       # Specify your input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
@@ -83,11 +78,10 @@ fi
 #SBATCH --mem=0               # Request all memory per node
 #SBATCH --ntasks-per-node=1   # Do not change this value
 
-#module load StdEnv/2020      # Versions < 18.06.006
 module load StdEnv/2023
 
-#module load starccm/18.06.006-R8
-module load starccm-mixed/18.06.006
+#module load starccm/20.04.007-R8
+module load starccm-mixed/20.04.007
 
 SIM_FILE='mysample.sim'       # Specify your input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
@@ -123,11 +117,10 @@ fi
 #SBATCH --mem=0               # Request all memory per node
 #SBATCH --ntasks-per-node=1   # Do not change this value
 
-#module load StdEnv/2020      # Versions < 18.06.006
 module load StdEnv/2023
 
-#module load starccm/18.06.006-R8
-module load starccm-mixed/18.06.006
+#module load starccm/20.04.007-R8
+module load starccm-mixed/20.04.007
 
 SIM_FILE='mysample.sim'       # Specify your input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
@@ -163,11 +156,10 @@ fi
 #SBATCH --mem=0               # Request all memory per node
 #SBATCH --ntasks-per-node=1   # Do not change this value
 
-#module load StdEnv/2020      # Versions < 18.06.006
 module load StdEnv/2023
 
-#module load starccm/18.06.006-R8
-module load starccm-mixed/18.06.006
+#module load starccm/20.04.007-R8
+module load starccm-mixed/20.04.007
 
 SIM_FILE='mysample.sim'       # Specify your input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
@@ -208,8 +200,8 @@ module load CCEnv
 #module load StdEnv/2020      # Versions < 18.06.006
 module load StdEnv/2023
 
-#module load starccm/18.06.006-R8
-module load starccm-mixed/18.06.006
+#module load starccm/20.04.007-R8
+module load starccm-mixed/20.04.007
 
 SIM_FILE='mysample.sim'       # Specify input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename

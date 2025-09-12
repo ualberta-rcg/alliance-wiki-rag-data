@@ -50,9 +50,8 @@ These are the GPUs currently available:
 It is not a measure of performance and is relevant only if you are compiling your own GPU programs.  See the page on [[CUDA#.22Compute_Capability.22|CUDA programming]] for more.
 
 
-== Multi-Instance GPU (MIG) on Narval ==
-MIG, a technology that allows to partition a GPU into multiple instances, is currently activated on Narval cluster as a pilot project. For more information on 
-how to use the MIGs on Narval please see [[Multi-Instance_GPU]].
+== Multi-Instance GPUs (MIGs) ==
+MIG, a technology that allows to partition a GPU into multiple instances. Please see [[Multi-Instance_GPU]].
 
 = Selecting the type of GPU to use =
 
@@ -143,16 +142,16 @@ With this method, you can run multiple tasks in one submission. The <code>-j4</c
 
 == Profiling GPU tasks ==
 
-On [[[Narval/en|Narval]], the
-[https://developer.nvidia.com/dcgm NVIDIA Data Center GPU Manager (DCGM)]
-needs to be disabled, and this must be done while doing your job submission.
-Based on the simplest example in this page, set the <code>DISABLE_DCGM</code> environment variable:
+On Fir and Nibi, GPU profiling is not available since performance counters are not accessible.
+
+On [[Narval/en|Narval]] and [[Rorqual/en|Rorqual]], profiling is possible but requires disabling the
+[https://developer.nvidia.com/dcgm NVIDIA Data Center GPU Manager (DCGM)]. This must be done during job submission by setting the <code>DISABLE_DCGM</code> environment variable:
 
 {{Command|DISABLE_DCGM{{=}}1 salloc --account{{=}}def-someuser --gpus-per-node{{=}}1 --mem{{=}}4000M --time{{=}}03:00}}
 
-then, when you get your interactive node, wait until DCGM is disabled on the node: 
+Then, in your interactive job, wait until DCGM is disabled on the node: 
 {{Command|while [ ! -z "$(dcgmi -v {{!}} grep 'Hostengine build info:')" ]; do  sleep 5; done}}
 
-then launch your profiler. For more details on profilers, see [[Debugging and profiling]].
+Finally, launch your profiler. For more details on profilers, see [[Debugging and profiling]].
 
 [[Category:SLURM]]

@@ -15,10 +15,8 @@ Tous les produits du module SCM sont disponibles&nbsp;:
 *QE-GUI
 *NBO6
 
-<div class="mw-translate-fuzzy">
-==Utiliser AMS sur Graham==
-Le module <code>ams</code> est seulement installé sur [[Graham/fr|Graham]] en raison de restrictions liées à l'octroi des licences. SHARCNET est propriétaire de cette licence qui est réservée aux centres de calcul universitaires; cette licence ne peut être utilisée pour des services de consultation ou pour tout autre usage de nature commerciale. Pour connaître les versions disponibles, lancez la commande
-</div>
+==Utiliser AMS sur Nibi==
+Le module <code>ams</code> est installé sur [[Nibi/fr|Nibi]]. SHARCNET est propriétaire de cette licence qui est réservée aux centres de calcul universitaires; cette licence ne peut être utilisée pour des services de consultation ou pour tout autre usage de nature commerciale. Pour connaître les versions disponibles, lancez la commande
 
  [name@server $] module spider ams
 
@@ -27,14 +25,10 @@ Pour les commandes en rapport avec les modules, voyez [[Utiliser des modules|Uti
 <span id="Job_submission"></span>
 ===Soumettre une tâche===
 
-<div class="mw-translate-fuzzy">
-Les tâches soumises sur Graham sont ordonnancées par Slurm; pour les détails, consultez [[Running jobs/fr|Exécuter des tâches]].
-</div>
+Les tâches soumises sur nos grappes sont ordonnancées par Slurm; pour les détails, consultez [[Running jobs/fr|Exécuter des tâches]].
 
-<div class="mw-translate-fuzzy">
-====Exemples de scripts pour une tâche adf ====
-Le script H2O_adf.sh utilise un nœud entier.
-</div>
+====Exemples de scripts pour une tâche AMS ====
+Le script suivant demande 32 CPU sur un nœud. Veuillez utiliser un nombre raisonnable de CPU au lieu de simplement exécuter une tâche sur un nœud complet de Nibi, à moins que vous n'ayez démontré que votre tâche peut utiliser efficacement 192 CPU.
 {{File
   |name=H2O_adf.sh
   |lang="bash"
@@ -139,47 +133,24 @@ EndEngine
 eor
 }}
 
-<div class="mw-translate-fuzzy">
-Le script suivant est semblable à H2O_adf.sh, sauf qu'il n'utilise pas un nœud entier.
-</div> 
-{{File
-  |name=SnO_EFG_band.sh
-  |lang="bash"
-  |contents=
-#!/bin/bash
-#SBATCH --account=def-pi
-#SBATCH --nodes=2                # number of nodes 
-#SBATCH --ntasks-per-node=16     # cpus per node
-#SBATCH --mem-per-cpu=3G         # memory; 3G per cpu in this example
-#SBATCH --time=00-10:00          # time (DD-HH:MM)
-#SBATCH --output=SnO_EFG_band-%j.log
-
-module unload openmpi
-module load ams/2025.102
-bash SnO_EFG_band.run                 # run the input file
-}}
-
 ===Remarques===
-# Le fichier en entrée pour AMS est différent de celui pour ADF; le fichier en entrée précédent pour ADF ne fonctionnera pas avec le nouveau AMS. Vous trouverez des exemples dans  /opt/software/ams/2020.102/examples/.
+# Le fichier en entrée pour AMS est différent de celui pour ADF; le fichier en entrée précédent pour ADF ne fonctionnera pas avec le nouveau AMS. Vous trouverez des exemples dans  /opt/software/ams/2025.102/examples/.
 # À l'exception du fichier en sortie .log, les fichiers sont tous sauvegardés dans le sous-répertoire AMS_JOBNAME.results. Si AMS_JOBNAME n'est pas défini dans le fichier en entrée .run, le nom par défaut sera ams.results.
 # Le nom du fichier de point de sauvegarde est ams.rkf plutôt que TAPE13 dans les versions ADF précédentes.
-# Voyez le tutoriel [https://www.youtube.com/watch?v=lvJv_aN-wQU An Update on ADF/AMS software on Graham]
 Pour plus d'information, consultez [https://www.scm.com/support/ SCM Support].
 
-==Utiliser AMS-GUI==
-Avec des applications comme AMS-GUI, la redirection X11 via une connexion SSH exige beaucoup de temps pour produire les rendus. Nous recommandons de vous connecter avec [[VNC/fr|VNC]].
-
+==AMS-GUI==
 ===Nibi===
 
-AMS can be run interactively in graphical mode on a Nibi compute node (8hr time limit) via OnDemand with these steps:
+Sur un nœud de calcul de Nibi (durée limite de 8 heures), AMS peut être utilisée interactivement en mode graphique via OnDemand en suivant ces étapes&nbsp;:
 
-# Login to [https://ondemand.sharcnet.ca ondemand.sharcnet.ca]
-# Select ''Nibi Desktop'' from ''Compute'' on the top
-# Select your options (don't select ''Enable VirtualGL'') and press ''Launch''
-# Select ''Launch Nibi Desktop'' once your job starts
-# Right click on the desktop and pick ''Open it Terminal''
-# Pick ''MATE Terminal'' from the ''System Tools'' menu under the ''Applications'' menu
+# Connectez-vous à [https://ondemand.sharcnet.ca ondemand.sharcnet.ca].
+# Sélectionnez ''Nibi Desktop'' dans ''Compute' (dans le haut).
+# Sélectionnez vos options (ne sélectionnez pas ''Enable VirtualGL'') et cliquez sur ''Launcher''.
+# Sélectionnez ''Launcher Nibi Desktop'' une fois que la tâche est lancée.
+# Faites un clic droit sur le bureau et sélectionnez ''Open it Terminal''.
+# Sélectionnez ''MATE Terminal'' dans le menu ''System Tools'' sous ''Applications''.
 # <code>module load ams</code>
 # <code>amsinput</code>
 
-If you need to select ''Enable VirtualGL'' for some other program that you are using, you will have to disable it for just AMS by starting it with <code>LD_PRELOAD= amsinput</code>.
+Si vous devez sélectionner ''Enable VirtualGL'' pour un autre programme que vous utilisez, vous devez d'abord le désactiver pour AMS en le lançant avec <code>LD_PRELOAD= amsinput</code>.
