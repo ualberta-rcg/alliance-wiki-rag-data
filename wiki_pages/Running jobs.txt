@@ -37,7 +37,7 @@ sleep 30
 }}
 
 <!--T:58-->
-On general-purpose (GP) clusters, this job reserves 1 core and 256MB of memory for 15 minutes. On [[Niagara]], this job reserves the whole node with all its memory.
+On general-purpose (GP) clusters, this job reserves 1 core and 256MB of memory for 15 minutes. On [[Trillium]], this job reserves the whole node with all its memory.
 Directives (or <i>options</i>) in the job script are prefixed with <code>#SBATCH</code> and must precede all executable commands. All available directives are described on the [https://slurm.schedmd.com/sbatch.html sbatch page]. Our policies require that you supply at least a time limit (<code>--time</code>) for each job. You may also need to supply an account name (<code>--account</code>). See [[#Accounts and projects|Accounts and projects]] below.
 
 <!--T:59-->
@@ -51,7 +51,7 @@ Please be cautious if you use a script to submit multiple Slurm jobs in a short 
 === Memory === <!--T:161-->
 
 <!--T:106-->
-Memory may be requested with <code>--mem-per-cpu</code> (memory per core) or <code>--mem</code> (memory per node).  On general-purpose (GP) clusters, a default memory amount of 256 MB per core will be allocated unless you make some other request.  On [[Niagara]], only whole nodes are allocated along with all available memory, so a memory specification is not required there.
+Memory may be requested with <code>--mem-per-cpu</code> (memory per core) or <code>--mem</code> (memory per node).  On general-purpose (GP) clusters, a default memory amount of 256 MB per core will be allocated unless you make some other request.  On [[Trillium]], only whole nodes are allocated along with all available memory, so a memory specification is not required there.
 
 <!--T:162-->
 A common source of confusion comes from the fact that some memory on a node is not available to the job (reserved for the OS, etc.).  The effect of this is that each node type has a maximum amount available to jobs; for instance, nominally "128G" nodes are typically configured to permit 125G of memory to user jobs.  If you request more memory than a node-type provides, your job will be constrained to run on higher-memory nodes, which may be fewer in number.
@@ -185,6 +185,9 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 ./ompHello
 }}
 
+<!--T:23-->
+For more on writing and running parallel programs with OpenMP, see [[OpenMP]].
+
 === MPI job === <!--T:18-->
 
 <!--T:51-->
@@ -197,17 +200,15 @@ This example script launches four MPI processes, each with 1024 MB of memory. Th
   |contents=
 #!/bin/bash
 #SBATCH --account=def-someuser
-#SBATCH --ntasks=4               # number of MPI processes
+#SBATCH --ntasks-per-node=4      # number of MPI processes
+#SBATCH --nodes=1
 #SBATCH --mem-per-cpu=1024M      # memory; default unit is megabytes
 #SBATCH --time=0-00:05           # time (DD-HH:MM)
 srun ./mpi_program               # mpirun or mpiexec also work
 }}
 
 <!--T:20-->
-Large MPI jobs, specifically those which can efficiently use whole nodes, should use <code>--nodes</code> and <code>--ntasks-per-node</code> instead of <code>--ntasks</code>. Hybrid MPI/threaded jobs are also possible. For more on these and other options relating to distributed parallel jobs, see [[Advanced MPI scheduling]].
-
-<!--T:23-->
-For more on writing and running parallel programs with OpenMP, see [[OpenMP]].
+Large MPI jobs may span more than one node. Hybrid MPI/threaded jobs are also possible. For more on these and other options relating to distributed parallel jobs, see [[Advanced MPI scheduling]].
 
 <!--T:24-->
 === GPU job ===

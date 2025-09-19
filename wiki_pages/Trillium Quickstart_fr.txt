@@ -16,7 +16,7 @@ La grappe Trillium est conçue pour prendre en charge des tâches massivement pa
 
 2. Sous-grappe de GPU
 
-* 244GPU fournis par 61&nbsp;nœuds de calcul GPU. 
+* 252 GPU fournis par 63&nbsp;nœuds de calcul GPU. 
 * Chaque nœud de calcul GPU est équipé de 4&nbsp;GPU NVIDIA H100 (SXM) avec 80GB de VRAM dédiée.
 * Chaque nœud de calcul GPU a 96&nbsp;cœurs provenant d'un processeur AMD EPYC 9654 à 96&nbsp;cœurs (Zen 4, ou Genoa) cadencé à 2,4GHz (fréquence de base).
 * Les nœuds ont une connexion InfiniBand NDR non bloquante (1:1) de 800Gb/s, soit 200Gb/s par GPU.
@@ -38,6 +38,11 @@ Prenez bien connaissance de la présente page. La page [[Frequently Asked Questi
 
 <span id="Logging_in"></span>
 ==Se connecter==
+
+Il y a deux moyens de se connecter à Trillium&nbsp;:
+
+* Via un navigateur avec Open OnDemand. Cette méthode est recommandée si vous ne connaissez pas bien Linux ou la ligne de commande. Voir [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart cette docmentation de SciNet].
+* Via un terminal avec ssh, comme décrit ci-dessous.
 
 Comme pour tous les systèmes de SciNet et de l'Alliance, l'accès s'effectue via [[SSH/fr|SSH]]. De plus, pour Trillium en particulier, l'authentification est uniquement autorisée via des clés SSH téléversées dans [https://ccdb.alliancecan.ca CCDB]. Pour savoir comment générer votre paire de clés SSH, téléverser et utiliser vos clés SSH, voir [[SSH Keys/fr| Clés SSH]].
 
@@ -76,8 +81,6 @@ Si vous ne parvenez pas à vous connecter,
 * assurez-vous que votre compte [https://ccdb.alliancecan.ca CCDB] est actif,
 * assurez-vous que votre clé publique a été téléversée (au format openssh) dans CCDB
 * vérifiez que vous avez demandé l'accès sur la page [https://ccdb.alliancecan.ca/me/access_systems Accès aux systèmes].
-
-L'accès à Trillium via Open OnDemand est prévu pour bientôt. En attendant, vous pouvez toujours accéder à notre déploiement Open OnDemand existant en suivant les directives de notre guide [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart Open OnDemand Quickstart].
 
 <span id="Storage"></span>
 ==Stockage==
@@ -123,25 +126,28 @@ Le tableau ci-dessous indique l'espace disponible et les politiques pour chaque 
 | oui
 |-
 | $PROJECT
-| par allocation de groupe
+| déterminé par l'allocation via le concours
+1 To pour groupe par défaut<sup>(2)</sup>
 | aucun
 | oui
 | oui
 | lecture seule
 |-
 | $ARCHIVE
-| par allocation de groupe
+| déterminé par l'allocation via le concours<sup>(2)</sup>
 | aucun
 | double copie
 | non
 | non
 |}
-<small><sup>*</sup>Les politiques pour SCRATCH ne sont pas définitives.</small>
+<small><sup>(1)</sup>Les politiques pour SCRATCH ne sont pas définitives.</small>
+
+<small><sup>(2)</sup>Le concours pour l'allocation de ressources ne permet pas d'augmenter les quotas pour project ($PROJECT) et nearline ($ARCHIVE) sur Trillium.</small>
 
 <span id="Software"></span>
 == Logiciels ==
 
-Trillium utilise des [[Using modules|modules d'environnement]] pour gérer les compilateurs, les bibliothèques et autres progiciels. Les modules modifient dynamiquement votre environnement (par exemple, code>PATH</code>, <code>LD_LIBRARY_PATH</code>) afin que vous puissiez accéder sans problème à différentes versions des logiciels.
+Trillium utilise des [[Utiliser des modules|modules d'environnement]] pour gérer les compilateurs, les bibliothèques et autres progiciels. Les modules modifient dynamiquement votre environnement (par exemple, code>PATH</code>, <code>LD_LIBRARY_PATH</code>) afin que vous puissiez accéder sans problème à différentes versions des logiciels.
 
 Commandes fréquemment utilisées&nbsp;:
 
@@ -172,7 +178,7 @@ Une bonne gestion de votre environnement logiciel est essentielle pour éviter l
 
 * Soyez explicite quant aux versions des modules. Des noms courts comme <code>gcc</code> chargeront le module par défaut (par exemple <code>gcc/12.3</code>) qui pourrait éventuellement changer. Spécifiez les versions complètes (par exemple <code>gcc/13.3</code>) pour une reproductibilité à long terme.
 
-* Résolvez les dépendances avec <code>module spider</code>. Certains modules dépendent d'autres modules. Utilisez <code>module spider <module-name></code> pour savoir lesquels sont requis et comment les charger dans le bon ordre. Pour en savoir plus, voir [[Using_modules/fr#Sous_-_commande_spider |Sous-commande spider]].
+* Résolvez les dépendances avec <code>module spider</code>. Certains modules dépendent d'autres modules. Utilisez <code>module spider <module-name></code> pour savoir lesquels sont requis et comment les charger dans le bon ordre. Pour en savoir plus, voir [[Utiliser des modules#Sous_-_commande_spider |Sous-commande spider]].
 
 <span id="Using_commercial_software"></span>
 ==  Applications commerciales ==
@@ -353,7 +359,7 @@ La taille et la durée de vos tâches, leur nombre d'exécutions et leur nombre 
 |-
 |tâches de calcul ||compute|| 150 || 500 || 1&nbsp;nœud (192&nbsp;cœurs) || par défaut, &nbsp;10&nbsp;nœud&nbsp;(1920&nbsp;cœurs) <br> avec&nbsp;une&nbsp;allocation,&nbsp;128&nbsp;nœuds &nbsp;(24576&nbsp;cœurs)<sup>*</sup>|| 15 minutes || 24 heures
 |-
-|Tests ou débogage || debug || 1 || 1 || 1 nœud (192&nbsp;cœurs) || 2&nbsp;nœuds&nbsp;(384&nbsp;cœurs)|| s.o. || 1 heure
+|tests ou débogage || debug || 1 || 1 || 1 nœud (192&nbsp;cœurs) || 2&nbsp;nœuds&nbsp;(384&nbsp;cœurs)|| s.o. || 1 heure
 |}
 <small><sup>*</sup> Maximum recommandé; si vous avez des tâches plus exigeantes, contactez-nous.</small>
 
@@ -527,7 +533,7 @@ Sur Trillium, vous ne pouvez demander qu'un seul GPU ou un multiple de quatre GP
 |-
 |calcul avec GPU ||calcul|| 150 || 500 || 1/4 nœud (24&nbsp;cœurs / 1GPU) || par défaut, 5&nbsp;nœuds&nbsp;(480&nbsp;cœurs /20 GPU) <br> avec une allocation:&nbsp;25&nbsp;nœuds&nbsp;(2400&nbsp;cœurs /100 GPU)|| 15 minutes || 24 heures
 |-
-|test avec GPU || débogage|| 1 || 1 || 1/4 nœud (24 cœurs / 1 GPU) || 2 nodes (192 cœurs / 8 GPU)|| s.o. || 2 heures (1 GPU) - 30 minutes (8 GPU)
+|test avec GPU || débogage|| 1 || 1 || 1/4 nœud (24 cœurs / 1 GPU) || 2 nœuds (192 cœurs / 8 GPU)|| s.o. || 2 heures (1 GPU) - 30 minutes (8 GPU)
 |}
 
 Même si vous respectez ces limites, vos tâches devront passer par la file d'attente. Le temps d'attente dépend de nombreux facteurs, tels que la taille de ressources pour votre groupe, la quantité de l'allocation utilisée récemment, le nombre de nœuds et le temps d'exécution demandés, ainsi que le nombre total des tâches en attente.
@@ -609,7 +615,7 @@ srun python train_distributed.py
 
 * N'utilisez pas <code>--mem</code>; la mémoire est fixe par GPU (192GB) ou par nœud (768GB).
 * Indiquez toujours le nombre de nœuds et <code>--gpus-per-node=4</code> pour les tâches sur un nœud entier ou sur plusieurs nœuds.
-* Chargez uniquement les modules nécessaires (voir [[Using_modules/fr|Utiliser les modules]]).
+* Chargez uniquement les modules nécessaires (voir [[Utiliser des modules]]).
 * Pour une meilleure reproductibilité, soyez explicite quant aux versions des logiciels (par exemple, <code>cuda/12.6</code> plutôt que simplement <code>cuda</code>).
 * Testez sur un seul GPU avant de passer à plusieurs GPU ou nœuds.
 * Surveillez l'utilisation avec <code>nvidia-smi</code> pour vous assurer que les GPU sont pleinement utilisés.

@@ -145,24 +145,17 @@ Vous pouvez ainsi soumettre plusieurs tâches. Le paramètre <code>-j4</code> fa
 <span id="Profiling_GPU_tasks"></span>
 == Profilage des tâches avec GPU ==
 
-On Fir and Nibi, GPU profiling is not available since performance counters are not accessible.
+Sur Fir et Nibi, le profilage n'est pas disponible parce que les compteurs de performance ne sont pas accessibles.
 
-<div class="mw-translate-fuzzy">
-Sur [[Narval]], 
+Sur [[Narval]] et [[Rorqual]] le profilage est possible, mais 
 [https://developer.nvidia.com/dcgm DCGM (NVIDIA Data Center GPU Manager)]
-doit être désactivé, et ce lorsque vous soumettez la tâche. 
-Selon l'exemple, configurez la variable d'environnement  <code>DISABLE_DCGM</code>.
-</div>
+doit être désactivé. Ceci doit se faire lorsque vous soumettez la tâche en configurant la variable d'environnement <code>DISABLE_DCGM</code>.
 
 {{Command|DISABLE_DCGM{{=}}1 salloc --account{{=}}def-someuser --gpus-per-node{{=}}1 --mem{{=}}4000M --time{{=}}03:00}}
 
-<div class="mw-translate-fuzzy">
-Quand le nœud interactif est disponible, attendez que DCGM soit désactivé sur le nœud. 
+Ensuite, dans votre tâche interactive, attendez que DCGM soit désactivé sur le nœud. 
 {{Command|while [ ! -z "$(dcgmi -v {{!}} grep 'Hostengine build info:')" ]; do  sleep 5; done}}
-</div>
 
-<div class="mw-translate-fuzzy">
-Lancez le profileur (voir [[Debugging and profiling/fr|débogage et profilage]] pour les détails).
-</div>
+Enfin, lancez le profileur (voir [[Debugging and profiling/fr|débogage et profilage]] pour les détails).
 
 [[Category:SLURM]]

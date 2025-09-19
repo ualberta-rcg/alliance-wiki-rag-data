@@ -27,7 +27,7 @@ It is even possible that you could end a month or even a year having run more wo
 
 =Reference GPU Units (RGUs)=
 
-The performance of GPUs has dramatically increased in the recent years and continues to do so. Until RAC 2023 we treated all GPUs as equivalent to each other for allocation purposes. This caused problems both in the allocation process and while running jobs, so in the 2024 RAC year we introduced the <i>reference GPU unit</i>, or <b>RGU</b>, to rank all GPU models in production and alleviate these problems. In the 2025 RAC year we will also have to deal with new complexity involving [[Multi-Instance GPU|multi-instance GPU technology]].
+The performance of GPUs has dramatically increased in the recent years and continues to do so. Until RAC 2023 we treated all GPUs as equivalent to each other for allocation purposes. This caused problems both in the allocation process and while running jobs, so in the 2024 RAC year we introduced the <i>reference GPU unit</i>, or <b>RGU</b>, to rank all GPU models in production and alleviate these problems. Since the 2025 RAC year we also have to deal with new complexity involving [[Multi-Instance GPU|multi-instance GPU technology]].
 
 Because roughly half of our users primarily use single-precision floating-point operations ([https://en.wikipedia.org/wiki/Single-precision_floating-point_format FP32]), the other half use half-precision floating-point operations ([https://en.wikipedia.org/wiki/Half-precision_floating-point_format FP16]), and a significant portion of all users are constrained by the amount of memory on the GPU, we chose the following evaluation criteria and corresponding weights to rank the different GPU models:
 
@@ -65,11 +65,11 @@ We currently use the NVidia <b>A100-40gb</b> GPU as the reference model and assi
 ! scope="col"| 0.8
 ! scope="col"| (RGU)
 ! scope="col"| Now
-! scope="col"| 2025
-! scope="col"| RAC 2025
+! scope="col"| 2026
+! scope="col"| RAC 2026
 |-
 ! scope="row" | H100-80gb 
-| 3.44 || 3.17 || 2.0 || 12.2 || No ||  Yes || Yes 
+| 3.44 || 3.17 || 2.0 || 12.2 || Yes ||  Yes || Yes 
 |-
 ! scope="row"| A100-80gb
 | 1.00 || 1.00 || 2.0 ||  4.8 || No ||    ? || No
@@ -78,27 +78,27 @@ We currently use the NVidia <b>A100-40gb</b> GPU as the reference model and assi
 | <b>1.00</b> || <b>1.00</b> || <b>1.0</b> || <b>4.0</b> || Yes || Yes || Yes
 |-
 ! scope="row"| V100-32gb
-| 0.81 || 0.40 || 0.8 || 2.6 || Yes ||  ? || No
+| 0.81 || 0.40 || 0.8 || 2.6 || No || No || No
 |-
 ! scope="row"| V100-16gb
-| 0.81 || 0.40 || 0.4 || 2.2 || Yes ||  ? || No
+| 0.81 || 0.40 || 0.4 || 2.2 || No ||  ? || No
 |-
 ! scope="row"| T4-16gb
-| 0.42 || 0.21 || 0.4 || 1.3 || Yes ||  ? || No
+| 0.42 || 0.21 || 0.4 || 1.3 || No || No || No
 |-
 ! scope="row"| P100-16gb
-| 0.48 || 0.03 || 0.4 || 1.1 || Yes || No || No
+| 0.48 || 0.03 || 0.4 || 1.1 || No || No || No
 |-
 ! scope="row"| P100-12gb
-| 0.48 || 0.03 || 0.3 || 1.0 || Yes || No || No
+| 0.48 || 0.03 || 0.3 || 1.0 || No || No || No
 |}
 
 With the 2025 [[infrastructure renewal]], it will become possible to schedule a fraction of a GPU using [[Multi-Instance GPU|multi-instance GPU]] technology.  Different jobs, potentially belonging to different users, can run on the same GPU at the same time.  Following [https://docs.nvidia.com/datacenter/tesla/mig-user-guide/#terminology NVidia's terminology], a fraction of a GPU allocated to a single job is called a <i>GPU instance</i>, also sometimes called a <i>MIG instance</i>.  
 
-The following table lists the GPU models and instances that can be selected in the CCDB form for RAC 2025. RGU values for GPU instances have been estimated from whole-GPU performance numbers and the fraction of the GPU which comprises the instance.
+The following table lists the GPU models and instances that can be selected in the CCDB form for RAC 2026. RGU values for GPU instances have been estimated from whole-GPU performance numbers and the fraction of the GPU which comprises the instance.
 
 {| class="wikitable" style="margin: auto; text-align: center;
-|+ GPU models and instances available for RAC 2025
+|+ GPU models and instances available for RAC 2026
 |-
 ! Model or instance !! Fraction of GPU !! RGU
 |-
@@ -114,9 +114,6 @@ The following table lists the GPU models and instances that can be selected in t
 ! scope="row"| A100-3g.20gb
 | max(3g/7g, 20GB/40GB) ⇒ 50% || 2.0
 |-
-! scope="row"| A100-4g.20gb 
-| max(4g/7g, 20GB/40GB) ⇒ 57% || 2.3
-|-
 ! scope="row"| H100-80gb 
 | Whole GPU ⇒ 100% || 12.2
 |-
@@ -128,12 +125,9 @@ The following table lists the GPU models and instances that can be selected in t
 |-
 ! scope="row"| H100-3g.40gb 
 | max(3g/7g, 40GB/80GB) ⇒ 50% || 6.1
-|-
-! scope="row"| H100-4g.40gb 
-| max(4g/7g, 40GB/80GB) ⇒ 57% || 7.0 (deprecated)
 |}
 
-Note: a GPU instance of profile <b>1g</b> is worth 1/7 of an A100 or H100 GPU. The case of <b>3g</b> takes into consideration the extra amount of memory per <b>g</b>.  H100-4g.40gb is deprecated mainly to simplify scheduling.
+Note: a GPU instance of profile <b>1g</b> is worth 1/7 of an A100 or H100 GPU. The case of <b>3g</b> takes into consideration the extra amount of memory per <b>g</b>. The A100-4g.20gb and H100-4g.40gb profiles are deprecated mainly to simplify scheduling.
 
 ==Choosing GPU models for your project==
 

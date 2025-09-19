@@ -25,7 +25,7 @@ When submitting jobs on a cluster for the first time, you must set up the enviro
 == Slurm scripts ==
 
 <tabs>
-<tab name="Beluga" >
+<tab name="Fir/Rorqual/Nibi" >
 {{File
 |name=starccm_job.sh
 |lang="bash"
@@ -35,7 +35,7 @@ When submitting jobs on a cluster for the first time, you must set up the enviro
 #SBATCH --account=def-group   # Specify some account
 #SBATCH --time=00-01:00       # Time limit: dd-hh:mm
 #SBATCH --nodes=1             # Specify 1 or more nodes
-#SBATCH --cpus-per-task=40    # Request all cores per node
+#SBATCH --cpus-per-task=192   # Request all cores per node (32 or 48)
 #SBATCH --mem=0               # Request all memory per node
 #SBATCH --ntasks-per-node=1   # Do not change this value
 
@@ -52,83 +52,10 @@ LM_PROJECT='my22digitpodkey'  # Specify your Siemens Power on Demand (PoD) Key
 
 # ------- no changes required below this line --------
 
-slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
-NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
-
-if [ -n "$LM_PROJECT" ]; then
-   # Siemens PoD license server
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE
-else
-   # Institutional license server
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE
-fi
-}}
-</tab>
-<tab name="Cedar" >
-{{File
-|name=starccm_job.sh
-|lang="bash"
-|contents=
-#!/bin/bash
-
-#SBATCH --account=def-group   # Specify some account
-#SBATCH --time=00-01:00       # Time limit: dd-hh:mm
-#SBATCH --nodes=1             # Specify 1 or more nodes
-#SBATCH --cpus-per-task=48    # Request all cores per node (32 or 48)
-#SBATCH --mem=0               # Request all memory per node
-#SBATCH --ntasks-per-node=1   # Do not change this value
-
-module load StdEnv/2023
-
-#module load starccm/20.04.007-R8
-module load starccm-mixed/20.04.007
-
-SIM_FILE='mysample.sim'       # Specify your input sim filename
-#JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
-
-# Comment the next line when using an institutional license server
-LM_PROJECT='my22digitpodkey'  # Specify your Siemens Power on Demand (PoD) Key
-
-# ------- no changes required below this line --------
-
-slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
-NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
-
-if [ -n "$LM_PROJECT" ]; then
-   # Siemens PoD license server
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi intel -fabric psm2
-else
-   # Institutional license server
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi intel -fabric psm2
-fi
-}}
-</tab>
-<tab name="Graham" >
-{{File
-|name=starccm_job.sh
-|lang="bash"
-|contents=
-#!/bin/bash
-
-#SBATCH --account=def-group   # Specify some account
-#SBATCH --time=00-01:00       # Time limit: dd-hh:mm
-#SBATCH --nodes=1             # Specify 1 or more nodes
-#SBATCH --cpus-per-task=32    # Request all cores per node (32 or 44)
-#SBATCH --mem=0               # Request all memory per node
-#SBATCH --ntasks-per-node=1   # Do not change this value
-
-module load StdEnv/2023
-
-#module load starccm/20.04.007-R8
-module load starccm-mixed/20.04.007
-
-SIM_FILE='mysample.sim'       # Specify your input sim filename
-#JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
-
-# Comment the next line when using an institutional license server
-LM_PROJECT='my22digitpodkey'  # Specify your Siemens Power on Demand (PoD) Key
-
-# ------- no changes required below this line --------
+echo "Checking $CDLMD_LICENSE_FILE ..."
+server=$(head -n1 $CDLMD_LICENSE_FILE | awk '{print $2}')
+port=$(cat $CDLMD_LICENSE_FILE | grep -Eo '[0-9]+$')
+nmap $server -Pn -p $port | grep -v '^$'; echo
 
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
 NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
@@ -181,7 +108,7 @@ else
 fi
 }}
 </tab>
-<tab name="Niagara" >
+<tab name="Trillium" >
 {{File
 |name=starccm_job.sh
 |lang="bash"
@@ -191,13 +118,12 @@ fi
 #SBATCH --account=def-group   # Specify some account
 #SBATCH --time=00-01:00       # Time limit: dd-hh:mm
 #SBATCH --nodes=1             # Specify 1 or more nodes
-#SBATCH --cpus-per-task=40    # Request all cores per node
+#SBATCH --cpus-per-task=192   # Request all cores per node
 #SBATCH --mem=0               # Request all memory per node
 #SBATCH --ntasks-per-node=1   # Do not change this value
  
 module load CCEnv
 
-#module load StdEnv/2020      # Versions < 18.06.006
 module load StdEnv/2023
 
 #module load starccm/20.04.007-R8

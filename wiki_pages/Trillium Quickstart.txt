@@ -20,7 +20,7 @@ Trillium is a large parallel cluster built by Lenovo Canada and hosted by SciNet
 
 <!--T:127-->
 2. GPU Subcluster
-* 244 GPUs provided by 61 GPU compute nodes.
+* 252 GPUs provided by 63 GPU compute nodes.
 * Each GPU compute node has 4 NVIDIA H100 (SXM) GPUs with 80 GB of dedicated VRAM
 * Each GPU compute node also has 96 cores from one 96-core AMD EPYC 9654 CPUs ("Zen 4" a.k.a. "Genoa") at 2.4 GHz (base frequency)
 * The nodes are connected by a non-blocking (1:1) 800 Gb/s InfiniBand NDR interconnect, i.e. 200 Gb/s per GPU
@@ -42,6 +42,13 @@ You need an active [https://ccdb.alliancecan.ca CCDB] account from the [https://
 Please read this present document carefully.  The [[Frequently Asked Questions]] is also a useful resource.  If at any time you require assistance, or if something is unclear, please do not hesitate to [mailto:trillium@tech.alliancecan.ca contact us].
 
 == Logging in == <!--T:132-->
+
+<!--T:278-->
+There are two ways to access Trillium:
+
+<!--T:279-->
+# Via your browser with Open OnDemand. This is recommended for users who are not familiar with Linux or the command line. Please see our [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart quickstart guide] for more instructions on how to use Open OnDemand.
+# Terminal access with ssh. Please read the following instructions.
 
 <!--T:133-->
 As with all SciNet and Alliance compute systems, access is done via [[SSH]] (secure shell). Furthermore, for Trillium specifically, authentication is only allowed via SSH keys that are uploaded to the [https://ccdb.alliancecan.ca CCDB]. [[SSH Keys | Please refer to this page]] on how to generate your SSH key pair, upload, and use SSH Keys.
@@ -83,9 +90,6 @@ Here, <code>/PATH/TO/SSH_PRIVATE_KEY</code> is the path to your private SSH key 
 
 <!--T:140-->
 If you cannot log in, be sure to first check the [https://status.alliancecan.ca System Status], ensure your [https://ccdb.alliancecan.ca CCDB] account is active and that your public key was uploaded (in openssh format) to CCDB, and check that you had requested access on the [https://ccdb.alliancecan.ca/me/access_systems Access Systems] page.
-
-<!--T:141-->
-There are plans to add browser access to Trillium via Open OnDemand in the near future. In the meantime you can still access our existing Open OnDemand deployment by following the instructions in our [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart quickstart guide].
 
 == Storage == <!--T:142-->
 
@@ -130,27 +134,31 @@ The table below summarized the available space and policiies for each location:
 | read-only
 |-
 | $SCRATCH
-| 25 TB per user<sup>*</sup>
+| 25 TB per user<sup>(1)</sup>
 | TBD<sup>*</sup>
 | no
 | yes
 | yes
 |-
 | $PROJECT
-| by group allocation
+| determined by RAC allocation
+1 TB per default group<sup>(2)</sup>
 | none 
 | yes
 | yes
 | read-only
 |-
 | $ARCHIVE
-| by group allocation
+| determined by RAC allocation<sup>(2)</sup>
 | none
 | dual-copy
 | no
 | no
 |}
-<small><sup>*</sup>The SCRATCH policies are still subject to revision.</small>
+<small><sup>(1)</sup>The SCRATCH policies are still subject to revision.</small>
+
+<!--T:277-->
+<small><sup>(2)</sup>There is no RAC mechanism to increase project ($PROJECT) and nearline ($ARCHIVE) quotas on Trillium.</small>
 
 == Software == <!--T:150-->
 
@@ -196,7 +204,7 @@ Properly managing your software environment is key to avoiding conflicts and ens
 * Be explicit about module versions. Short names like <code>gcc</code> will load the system default (e.g., <code>gcc/12.3</code>), which may change in the future. Specify full versions (e.g., <code>gcc/13.3</code>) for long-term reproducibility.
 
 <!--T:163-->
-* Resolve dependencies with <code>module spider</code>. Some modules depend on others. Use <code>module spider <module-name></code> to discover which modules are required and how to load them in the correct order. For more, see [[Using_modules#Sub-command_spider |Sub-command spider]].
+* Resolve dependencies with <code>module spider</code>. Some modules depend on others. Use <code>module spider <module-name></code> to discover which modules are required and how to load them in the correct order. For more, see [[Utiliser des modules/en#Sub-command_spider |Sub-command spider]].
 
 == Using commercial software == <!--T:164-->
 
@@ -688,7 +696,7 @@ srun python train_distributed.py
 <!--T:261-->
 * Do not use <code>--mem</code> — memory is fixed per GPU (192 GB) or per node (768 GB).
 * Always specify node count, and <code>--gpus-per-node=4</code> for whole-node or multi-node jobs.
-* Load only the modules you need — see [[Using_modules]].
+* Load only the modules you need — see [[Using modules]].
 * Be explicit with software versions for reproducibility (e.g., <code>cuda/12.6</code> rather than just <code>cuda</code>).
 * Test on a single GPU before scaling to multiple GPUs or nodes.
 * Monitor usage with <code>nvidia-smi</code> to ensure GPUs are fully utilized.

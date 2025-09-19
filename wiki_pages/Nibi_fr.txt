@@ -9,7 +9,7 @@
 |-
 | Interface web : [https://ondemand.sharcnet.ca ondemand.sharcnet.ca]
 |-
-| Collection Globus : computecanada#graham-globus
+| Collection Globus : [https://app.globus.org/file-manager?origin_id=07baf15f-d7fd-4b6a-bf8a-5b5ef2e229d3 alliancecan#nibi] 
 |-
 | Nœud de copie (rsync, scp, sftp, etc.) : utiliser les nœuds de connexion
 |-
@@ -51,7 +51,7 @@ Notez également que Nibi utilise un nouveau mécanisme expérimental pour gére
 
 =Particularités=
 ==Accès à l'internet==
-Tous les nœuds ont accès à Internet; aucune autorisation de pare-feu spéciale ou proxy n'est nécessaire.
+Tous les nœuds ont accès à l'internet; aucune autorisation de pare-feu spéciale ou proxy n'est nécessaire.
 
 ==Espace /project==
 Les répertoires des utilisateurs ne sont plus créés par défaut dans /project. Vous pouvez toujours créer vos propres répertoires dans l'espace /project du groupe à l'aide de <code>mkdir</code>. Ceci permet aux groupes de décider de l'organisation de leur espace /project pour le partage de données entre les membres. 
@@ -62,43 +62,47 @@ Un quota souple de 1&nbsp;TB sur /scratch s'applique à chaque utilisateur. Ce q
 ==Accès via Open OnDemand (OOD)==
 Il est possible d'accéder à la grappe Nibi simplement via un navigateur web. Nibi utilise Open OnDemand (OOD), une plateforme web qui simplifie l'accès en fournissant une interface web aux nœuds de connexion et un environnement de bureau à distance. Pour vous connecter à Nibi, rendez-vous sur https://ondemand.sharcnet.ca/ et connectez-vous avec l'authentification multifacteur. Une interface conviviale s'affichera, proposant des options pour ouvrir un terminal Bash ou lancer une session de bureau à distance.
 
-==Utilisation de JupyterLab via OOD (<i>Open OnDemand</i>)==
-[[File:nibi-desktop-running.png|thumb]]
-Vous pouvez exécuter JupyterLab de manière interactive dans une session sur votre bureau avec OOD. Après vous être connecté au [https://ondemand.sharcnet.ca portail Nibi Open OnDemand], cliquez sur ''Compute'' dans le menu supérieur, puis sélectionnez ''Nibi Desktop''. Une page s'ouvrira avec un formulaire vous permettant de demander une nouvelle session sur votre bureau.
+==Utilisation de JupyterLab via OOD==
+[[File:nibi-jupyterlab.png|thumb]]
+Vous pouvez exécuter JupyterLab de manière interactive via le [https://ondemand.sharcnet.ca portail Nibi Open OnDemand].
 
-Après avoir rempli le formulaire avec les détails de votre demande, cliquez sur ''Launch'' pour soumettre votre demande. Après quelques instants, vous verrez l'état demandé passer de ''Queued'' à ''Starting and Running''. Cliquez ensuite sur ''Launch Nibi Desktop'' pour vous connecter au bureau. Un bureau Linux apparaîtra.
+'''Option 1''' : travailler dans un environnement préconfiguré, le même que pour [[JupyterHub/fr|JupyterHub]]
 
-Sur le bureau Nibi, faites un clic droit dans une zone vide. Dans le menu contextuel qui apparaît, sélectionnez ''Open in Terminal'' pour ouvrir une fenêtre de terminal où vous pourrez créer et/ou activer votre [[Python/fr#Créer_et_utiliser_un_environnement_virtuel|environnement virtuel Python]] dans lequel JupyterLab est installé. 
+Quand la connexion au [https://ondemand.sharcnet.ca portail Nibi Open OnDemand] est établie, cliquez sur ''Compute Node'' dans le menu du haut et sélectionnez ''Nibi JupyterLab''. Une page sera affichée dans laquelle un formulaire vous permet de demander une nouvelle session Nibi JupyterLab.
+
+Après avoir rempli le formulaire avec les détails, cliquez sur ''Launch'' pour soumettre votre demande. Quand l'état des modifications pour Nibi JupyterLab passe à ''Running'', cliquez sur ''Connect to Jupyter'' pour ouvrir JupyterLab dans le navigateur web. 
+
+Pour les détails sur la préconfiguration, voir [[JupyterLab/fr#Interface_JupyterLab|Interface JupyterLab]]. 
+
+
+'''Option 2''' : travailler dans un 
+[[Python/fr#Créer_et_utiliser_un_environnement_virtuel_Python|environnement virtuel Python]] que vous avez créé 
+
+Quand la connexion au [https://ondemand.sharcnet.ca portail Nibi Open OnDemand] est établie, cliquez sur ''Compute Node'' dans le menu du haut et sélectionnez ''Nibi Desktop''. Une page sera affichée dans laquelle un formulaire vous permet de demander une nouvelle session Nibi Desktop.
+[[File:nibi-desktop.png|thumb]]
+
+Après avoir rempli le formulaire avec les détails, cliquez sur ''Launch'' pour soumettre votre demande. Quand l'état des modifications pour Nibi desktop passe à ''Running'', cliquez sur ''Launch Nibi Desktop'' pour vous connecter au bureau. Un bureau Linux sera affiché.
 
 Si vous n'avez pas déjà installé JupyterLab dans un environnement virtuel, vous pouvez l'installer en ligne de commande.
 Par exemple, utilisez <code>pip</code> pour installer JupyterLab dans un environnement virtuel Python avec la commande :
 {{Commands2
 |prompt=(your_python_ENV) [username@<node>.nibi]$
 |pip install --no-index jupyterlab
-}} 
+}}
 
-Vous pouvez lancer JupyterLab à partir de votre environnement virtuel Python avec
 {{Commands2
 |prompt=(your_python_ENV) [username@<node>.nibi]$
-|jupyter-lab --no-browser
-}}
+|pip install --no-index jupyterlab
+}} 
 
-Une fois JuptyerLab lancé, l'URL de l'instance JupyterLab sur l'hôte local s'affiche. Vous pouvez maintenant ouvrir un navigateur web sur le bureau Nibi pour vous connecter à l'URL de JupyterLab. Copiez-collez l'URL dans le navigateur pour accéder à JupyterLab. L'URL devrait être au format suivant&nbsp;:
-<pre>
-http://localhost:8888/lab?token=953a895492dfa929b5649385f907d50833306e4aa46b8262
-</pre>
-
-Notez que vous devez ouvrir un navigateur pour utiliser JupyterLab. D'ici à ce qu'un module de navigateur web soit disponible sur le système, vous pouvez télécharger Firefox pour Linux 64&nbsp;bits et téléverser ce paquet sur votre compte Nibi. Par exemple, si le fichier s'appelle ''firefox-xxx.tar.xz'', il peut être décompressé et exécuté dans une autre fenêtre de terminal sur le bureau avec les commandes suivantes&nbsp;:
+Vous pouvez ensuite lancer JupyterLab à partir de votre environnement virtuel Python avec
 
 {{Commands2
-|prompt=[username@<node>.nibi Desktop]$
-|tar -xf /path/to/firefox-xxx.tar.xz
-|prompt=[username@<node>.nibi Desktop]$
-|cd firefox
-|prompt=[username@<node>.nibi Desktop]$
-|./firefox --private-window <JupyterLab URL>
-
+|prompt=(your_python_ENV) [username@<node>.nibi]$
+|jupyter-lab --notebook-dir $HOME
 }}
+ 
+JupyterLab s'ouvre dans le navigateur sur le bureau et le contenu de votre espace $HOME est listé dans le panneau de gauche.
 
 ==Prise en charge de VDI via OOD==
-Nibi n'offre pas VDI (Virtual Desktop Infrastructure), mais fournit désormais un environnement de bureau à distance via le portail [https://ondemand.sharcnet.ca/] d'Open OnDemand (OOD), offrant des performances matérielles et une prise en charge logicielle améliorées.
+Nibi n'offre pas VDI (Virtual Desktop Infrastructure), mais fournit désormais un environnement de bureau à distance via le [https://ondemand.sharcnet.ca/ portail Open OnDemand (OOD)], offrant des performances matérielles et une prise en charge logicielle améliorées.

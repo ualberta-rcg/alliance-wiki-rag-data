@@ -1,3 +1,5 @@
+{{Outdated}}
+
 <languages />
 
 La plupart du temps, vous devriez soumettre les tâches MPI parallèles à mémoire distribuée selon l'exemple présenté à section <i>Tâche MPI</i> de la page [[Running_jobs/fr#Tâche_MPI|Exécuter des tâches]]. Il suffit d'utiliser <code>- ntasks</code> ou <code>-n</code> pour spécifier le nombre de processus et de laisser l'ordonnanceur faire la meilleure allocation, compte tenu de l'efficacité de la grappe.
@@ -6,6 +8,7 @@ Si par contre vous voulez plus de contrôle sur l'allocation, prenez connaissanc
 
 Dans la foire aux questions Slurm, la réponse à [https://slurm.schedmd.com/faq.html#cpu_count What exactly is considered a CPU?] peut aussi s'avérer utile.
 
+<span id="Examples_of_common_MPI_scenarios"></span>
 === Exemples de scénarios ===
 
 ==== Peu de cœurs, nœuds indéterminés ====
@@ -22,6 +25,7 @@ srun application.exe
 }}
 Nous avons ici 15 processus MPI. L'allocation des cœurs pourrait se faire sur 1 nœud, sur 15 nœuds, ou sur tout nombre de nœuds entre 1 et 15.
 
+<span id="Whole_nodes"></span>
 ====Nœuds entiers ====
 
 Pour une tâche parallèle intensive qui peut utiliser efficacement 32 cœurs ou plus, vous devriez probablement demander des nœuds entiers; il est donc utile de savoir quels types de nœuds sont disponibles sur la grappe que vous utilisez.
@@ -130,6 +134,7 @@ Vous pourriez aussi utiliser <code>--mem-per-cpu=3G</code>, mais la tâche serai
 ==== Tâche intensive en parallèle, sans multiples de nœuds entiers ==== 
 Ce ne sont pas toutes les tâches qui sont effectuées de façon optimale sur des cœurs en multiples de 32, 40 ou 48. Le fait d'indiquer ou non un nombre précis de cœurs peut influer sur le <i>temps d'exécution</i> (ou la bonne utilisation de la ressource) ou le <i>temps d'attente</i> (ou la bonne utilisation du temps qui vous est imparti). Pour de l'aide sur comment évaluer ces facteurs, communiquez avec le [[Technical support/fr|soutien technique]].
 
+<span id="Hybrid_jobs:_MPI_and_OpenMP,_or_MPI_and_threads"></span>
 === Tâches hybrides : MPI avec OpenMP ou MPI avec fils ===
 
 Il est important de bien comprendre que le nombre de <i>tâches</i> Slurm demandées représente le nombre de <i>processus</i> qui seront démarrés avec <code>srun</code>. Dans le cas d'une tâche hybride qui utilise à la fois des processus MPI et des fils OpenMP ou Posix, vous voudrez indiquer le nombre de processus MPI avec <code>--ntasks</code> ou <code>-ntasks-per-node</code> et ;le nombre de fils avec <code>--cpus-per-task</code>.
@@ -147,6 +152,7 @@ Ici, 64 cœurs sont alloués, mais seulement 16 processus (tâches) MPI sont et 
   srun --cpus-per-task=$SLURM_CPUS_PER_TASK application.exe
 La taille de cette tâche est identique à celle de la précédente, c'est-à-dire 16 tâches (soit 16 processus MPI) avec chacune 4 fils. La différence ici est que nous obtiendrons exactement 2 nœuds entiers. N'oubliez pas que <code>--mem</code> précise la quantité de mémoire <i>par nœud</i> et que nous l'utilisons de préférence à <code>--mem-per-cpu</code> pour la raison donnée plus haut.
 
+<span id="Why_srun_instead_of_mpiexec_or_mpirun?"></span>
 === Pourquoi ''srun'' plutôt que ''mpiexec'' ou ''mpirun''? ===
 
 <code>mpirun</code> permet la communication entre processus exécutés sur des ordinateurs différents;  les ordonnanceurs récents possèdent cette même fonctionnalité. Avec Torque/Moab, il n'est pas nécessaire de fournir à <code>mpirun</code> la liste des nœuds ou le nombre de processus puisque l'ordonnanceur s'en charge. Avec Slurm, c'est l'ordonnanceur qui décide de l'affinité des tâches, ce qui évite d'avoir à préciser des paramètres comme 

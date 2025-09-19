@@ -18,10 +18,9 @@ Une version est disponible quand vous vous connectez à nos grappes, mais vous a
 Pour connaître les versions disponibles, utilisez
 {{Command|module avail python}}
 
-<div class="mw-translate-fuzzy">
-Vous pouvez ensuite charger la version de votre choix avec la commande <code>module load</code>, par exemple, pour charger Python 3.10 avec
-{{Command|module load python/3.10}}
-</div>
+Vous pouvez ensuite charger la version de votre choix avec la commande <code>module load</code>, par exemple,
+{{Command|module load python/X.Y}}
+où <tt>X.Y</tt> représente la version, (dans l'exemple, <tt>3.13</tt>).
 
 ===Version supportée===
 En règle générale dans l'écosystème Python, la transition vers des versions plus modernes s'accélère et plusieurs paquets ne supportent que les quelques dernières versions de Python 3.x. Dans notre cas, nous offrons uniquement des paquets préconstruits  ([[Available Python wheels/fr|wheels Python]]) pour les trois versions les plus récentes disponibles sur nos systèmes. Des problèmes de dépendance se présenteront quand vous tentez d'installer ces paquets avec les plus anciennes versions de Python. Voir [[Python/fr#Message_Package_'X'_requires_a_different_Python:_X.Y.Z_not_in_'>=X.Y'|la section Dépannage]]. 
@@ -81,10 +80,9 @@ Une fois que vous avez chargé un environnement virtuel, vous pouvez lancer la c
 
 Les commandes disponibles sont expliquées dans le [https://pip.pypa.io/en/stable/user_guide/ manuel d'utilisation pip]. Nous mentionnons ici les commandes les plus importantes en présentant un exemple d'installation du paquet [http://numpy.scipy.org/ NumPy].
 
-<div class="mw-translate-fuzzy">
 Chargeons d'abord l'interpréteur Python avec 
-{{Command|module load python/3.10}}
-</div>
+{{Command|module load python/X.Y}}
+où <tt>X.Y</tt> représente la version, (dans l'exemple, <tt>3.13</tt>).
 
 Ensuite, activons l'environnement virtuel créé précédemment avec la commande <code>virtualenv</code>.
 {{Command|source ~/ENV/bin/activate}}
@@ -335,7 +333,7 @@ numpy   1.22.2     cp39      generic
 }}
 La colonne <i>python</i> montre la version de Python pour laquelle le wheel est disponible, où <code>cp39</code> est utilisé pour <code>cpython 3.9</code>.
 
-==== Requirements file ====
+==== Fichier de requis ====
 Pour savoir si les wheels disponibles incluent ceux qui sont indiqués dans le fichier <code>requirements.txt</code>, lancez
 {{Command
 |avail_wheels -r requirements.txt 
@@ -493,11 +491,60 @@ Voir la page sur [[Anaconda/fr|Anaconda]].
 == Jupyter ==
 Voir la page sur [[JupyterNotebook/fr|Jupyter Notebook]].
 
+== Debugging ==
+
+Debugging your python code might not be obvious. Simple methods such as adding <tt>print</tt> statement or assertion (<tt>assert</tt>) can help you fix some errors.
+
+But often, it is required to dig a bit deeper in the code and its context, using a debugger such as <tt>pdb</tt> is then easier.
+
+You can debug your Python code, in [[Running_jobs#Interactive_jobs|a small interactive job]]:
+
+#. Add <code>import pdb; pdb.set_trace()</code> to the beginning of your file, or add <code>breakpoint()</code> at the desired location. 
+#. Run your code: <code>python ...</code>
+#. You'll end up in the debugger and can now look around and evaluate expressions.
+
+Useful commands:
+{| class="wikitable"
+! Command
+! Description
+|-
+| w (here)
+| Print a stack trace, with the most recent frame at the bottom. An arrow (>) indicates the current frame, which determines the context of most commands.
+|-
+| b (reak)
+| With a lineno argument, set a break at line lineno in the current file.
+|-
+| s (tep)
+| Execute the current line, stop at the first possible occasion (either in a function that is called or on the next line in the current function).
+|-
+| n (ext)
+| Continue execution until the next line in the current function is reached or it returns.
+|-
+| r (eturn)
+| Continue execution until the current function returns.
+|-
+| c (ont(inue))
+| Continue execution, only stop when a breakpoint is encountered.
+|-
+| p exp
+| Evaluate expression in the current context and print its value.
+|-
+| l (ist)
+| List source code for the current file.
+|-
+| q (uit)
+| Quit from the debugger. The program being executed is aborted.
+|}
+
+Typically, one would use <tt>w</tt>, <tt>s</tt>, <tt>l</tt>, <tt>p</tt>, <tt>n</tt> to debug a file.
+
+For more information, see [https://docs.python.org/3/library/pdb.html the Python Debugger].
+
 <span id="Troubleshooting"></span>
 == Dépannage ==
 
 <span id="Python_script_is_hanging"></span>
-=== Script gelé ===
+=== Script Python suspendu ===
 
 Avec le module [https://docs.python.org/3.8/library/faulthandler.html faulthandler], vous pouvez modifier votre script pour qu'une trace de l'origine du problème soit fournie après une certaine durée; voir l'information sur la commande <tt>faulthandler.dump_traceback_later(timeout, repeat=False, file=sys.stderr, exit=False)</tt>.
 
@@ -510,12 +557,12 @@ Vous pouvez aussi inspecter un processus Python pendant l'exécution d'une tâch
 # Lancez <code>py-spy top --pid PID</code> pour visionner en direct les endroits où le code utilise beaucoup de temps.
 # Lancez <code>py-spy dump --pid PID</code> pour obtenir une trace de l'état de votre code.
 
-=== Message Package 'X' requires a different Python: X.Y.Z not in '>=X.Y' ===
+===''Package 'X' requires a different Python: X.Y.Z not in '>=X.Y' ''===
 En installant un paquet, vous pourriez avoir une erreur comme <code>ERROR: Package 'X' requires a different Python: 3.6.10 not in '>=3.7'</code>.
 
 Dans ce cas, le module Python 3.6.10 qui est chargé n'est pas supporté par le paquet. Vous pouvez utiliser une version de Python plus récente, comme le dernier module disponible, ou encore installer une version moins récente du paquet X.
 
-=== Message Package has requirement X, but you'll have Y which is incompatible  ===
+=== ''Package has requirement X, but you'll have Y which is incompatible '' ===
 En installant un paquet, vous pourriez avoir une erreur comme 
 <code>ERROR: Package has requirement X, but you'll have Y which is incompatible.</code>.
 
@@ -525,7 +572,7 @@ Pour utiliser le nouveau résolveur de dépendances, installez la plus récente 
 |pip install --no-index --upgrade pip}}
 Lancez ensuite de nouveau la commande d'installation.
 
-=== Message No matching distribution found for X ===
+=== ''No matching distribution found for X'' ===
 À l'installation d'un paquet, vous pouvez obtenir un message semblable à
 {{Command
 |prompt=(ENV) [name@server ~]
@@ -540,7 +587,7 @@ Sachez aussi que les wheels <code>manylinux_x_y</code> sont ignorés.
 
 Vous pouvez aussi vérifier si le paquet est disponible avec la commande [[Python/fr#Wheels_disponibles|avail_wheels]] ou en consultant la page  [[Available Python wheels/fr|Wheels disponibles]].
 
-=== Installation de plusieurs paquets  ===
+=== Installer plusieurs paquets ===
 Lorsque possible, il est préférable d'installer plusieurs paquets avec une seule commande.
 {{Commands
 |prompt=(ENV) [name@server ~]
@@ -549,7 +596,7 @@ Lorsque possible, il est préférable d'installer plusieurs paquets avec une seu
 }}
 Ainsi, <code>pip</code> peut résoudre plus facilement les problèmes de dépendance.
 
-=== Mon environnement virtuel fonctionnait hier, mais pas aujourd'hui ===
+=== ''My virtual environment was working yesterday but not anymore''  ===
 Les fréquentes mises à jour des paquets font en sorte qu'un environnement virtuel ne peut souvent pas être reproduit.
 
 Il est possible aussi qu'un environnement virtuel créé dans $SCRATCH soit partiellement détruit lors de la purge automatique de ce système de fichiers, ce qui empêcherait l'environnement virtuel de bien fonctionner.
@@ -562,7 +609,7 @@ Pour contrer ceci, gelez les paquets et leurs versions avec
 }}
 et créez ensuite un [[Python/fr#Créer_un_environnement_virtuel_dans_vos_tâches|fichier de requis]] qui sera utilisé pour installer ces paquets dans votre tâche.
 
-=== Le wheel X n'est pas pris en charge sur cette plateforme ===
+=== ''X is not a supported wheel on this platform'' ===
 À l'installation d'un paquet, vous pourriez obtenir une erreur comme  <code>ERROR: package-3.8.1-cp311-cp311-manylinux_2_28_x86_64.whl is not a supported wheel on this platform.</code>
 
 Certains paquets peuvent être incompatibles ou non pris en charge par nos systèmes.
@@ -572,7 +619,7 @@ Deux cas fréquents sont :
 
 Certains paquets <code>manylinux</code> peuvent se trouver parmi nos [[Available Python wheels/fr|wheels Python]].
 
-=== Message AttributeError: module ‘numpy’ has no attribute ‘X’ ===
+=== ''AttributeError: module ‘numpy’ has no attribute ‘X’'' ===
 À l'installation d'un whell, la plus récente version de Numpy est installée si aucune version spécifique n'est demandée.
 Plusieurs attributs  ont été déclarés obsolètes dans Numpy v1.20 et  [https://numpy.org/devdocs/release/1.24.0-notes.html#expired-deprecations ne sont plus offerts dans v1.24].
 
@@ -580,7 +627,7 @@ Dépendant de l'attribut, une erreur comme <code>AttributeError: module ‘numpy
 
 Ceci est résolu avec l'installation d'une version précédente de Numpy avec <code>pip install --no-index 'numpy<1.24'</code>.
 
-=== Message ModuleNotFoundError: No module named 'X' ===
+=== ''ModuleNotFoundError: No module named 'X''' ===
 Il est possible qu'un module Python que vous voulez importer ne soit pas trouvé. Il y a plusieurs explications pour ceci, mais les plus fréquentes sont que
 * le paquet n'est pas installé ou encore il n'est pas visible pour l'interpréteur Python;
 * le nom du module ne correspond pas au nom réel;
@@ -599,7 +646,7 @@ Si vous avez ce problème,
 Dans le doute, recommencez avec un nouvel environnement.
 
 <span id="ImportError:_numpy.core.multiarray_failed_to_import"></span>
-=== Message ImportError: numpy.core.multiarray failed to import ===
+=== ''ImportError: numpy.core.multiarray failed to import'' ===
 
 Ce message peut survenir quand vous tentez d'importer un module Python qui dépend de Numpy.
 
@@ -608,25 +655,24 @@ Ceci se produit quand une version incompatible de Numpy est installée ou utilis
 Le cas type est  [https://numpy.org/devdocs/dev/depending_on_numpy.html#numpy-2-0-specific-advice la version 2.0 de Numpy qui brise l'ABI.]
 Dans le cas d'un wheel construit avec une version 1.x mais installé avec une version 2.x, vous devez installer une version antérieure avec <code>pip install --no-index 'numpy<2.0'</code>.
 
-=== Defaulting to user installation because normal site-packages is not writeable ===
+=== ''Defaulting to user installation because normal site-packages is not writeable'' ===
 When installing packages, one may encounter the message <tt>Defaulting to user installation because normal site-packages is not writeable</tt>.
 
-This is <tt>pip</tt> default behavior outside a virtual environment.
-This means that no virtual environment was found nor activated and that <tt>pip</tt> tried to install in a location where it does not have permissions to do so.
+Il s'agit du comportement par défaut de <tt>pip</tt> en dehors d'un environnement virtuel.
+Cela signifie qu'aucun environnement virtuel n'a été trouvé ni activé et que <tt>pip</tt> a essayé d'installer à un endroit où il ne dispose pas des permissions nécessaires.
 
-This results in [[Python#Local_installation_(--user)|local installations]] which may be problematic.
+Ceci causera des [[Python/fr#Installations_locales_(--user)|installations locales]] pouvant causer des problèmes.
 
-=== Local installation (--user) ===
-Local installation can occur unexpectedly (if an error occur with your virtual environment, or permissions issues) or by user defined installation (<tt>pip install --user</tt>).
+=== Installation locale ===
+Une installation locale peut se produire de manière inattendue (si une erreur se produit avec votre environnement virtuel ou des problèmes de permission) ou par une installation définie avec (<tt>pip install --user</tt>).
 
-Local installation is essentially dumping dependencies into one shared space, which is a recipe for headaches.
-This creates weird import issues or runtime issues with your python packages, or version conflicts which could result in <i>dependency hell</i>.
+Une installation locale est essentiellement le transfert des dépendances dans un espace partagé, ce qui n'est pas du tout souhaitable. Cela crée des problèmes d'importation ou d'exécution étranges avec vos paquets Python, ou encore des conflits de versions pouvant engendrer un véritable ''enfer de dépendances''.
 
-Using a [[Python#Creating_virtual_environments_inside_of_your_jobs|virtual environment]] is best for isolation, reproducibility and managing different versions across your different projects.
+Il est préférable d'utiliser un  [[Python/fr#Créer_et_utiliser_un_environnement_virtuel_Python|environnement virtuel]] pour isoler, reproduire et gérer les diffférentes versions dans vos projets.
 
-==== Remove local installation ====
-To effectively remove local installations, one needs to:
+==== Supprimer une installation locale ====
+Pour bien supprimer une installation locale, lancez
 {{Command|rm -vr ~/.local/bin ~/.local/lib/python*}}
-Note that you may need to specify binaries directly if you are using the <tt>~/.local/bin</tt> for local binaries (other then Python packages)
+Vous devrez peut-être spécifier les binaires directement si vous utilisez <tt>~/.local/bin</tt> pour des binaires locaux (dans des paquets autres que Python.)
 
-Once the local installations are removed, start over with [[Python#Creating_virtual_environments_inside_of_your_jobs| a clean fresh new virtual environment]].
+Quand les installations locales sont supprimées, recommencez avec [[Python/fr#Créer_et_utiliser_un_environnement_virtuel_Python|un nouvel environnement virtuel jamais utilisé]].
