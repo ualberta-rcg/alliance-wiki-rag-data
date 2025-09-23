@@ -1,4 +1,4 @@
-name: RAGFlow Keyword & QA Pipeline
+name: RAGFlow Update All Keywords and Create All Prompt Completion JSON files Pipeline
 
 on:
   workflow_dispatch:  # run manually
@@ -16,6 +16,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true   # keep the GitHub token
+          fetch-depth: 0              # fetch all history
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -37,7 +40,20 @@ jobs:
           echo "Pip packages:"
           pip list | grep -E "google-generativeai|ragflow-sdk"
 
-      - name: List repo contents recursively
+      - name: Run keyword & QA pipeline
         run: |
-          echo "📂 Full repo tree:"
-          ls -lR
+          mkdir -p wiki_pages/keywords wiki_pages/prompt_completion
+          python generate_all_keywords_completions.py
+
+      - name: Commit and push results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add wiki_pages
+          if git diff --cached --quiet; then
+            echo "✅ No changes to commit."
+          else
+            git commit -m "chore: update wiki_pages outputs"
+            git push
+          fi          
