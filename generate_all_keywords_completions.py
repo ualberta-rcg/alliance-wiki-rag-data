@@ -209,6 +209,10 @@ while True:
                 with open(os.path.join(keywords_dir, f"{base_name}-{i}-keywords.txt"), "w") as f:
                     f.write("\n".join(kws))
                 print(f"Saved {base_name}-{i}-keywords.txt")
+
+                # 🔹 Update chunk in RAGFlow with new keywords
+                chunk.update(important_keywords=kws)
+                print(f"Updated chunk {i} with {len(kws)} keywords")
             except Exception as e:
                 print(f"❌ Keyword generation failed: {e}")
 
