@@ -1,0 +1,41 @@
+name: RAGFlow Keyword & QA Pipeline
+
+on:
+  workflow_dispatch:  # run manually
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    env:
+      RAGFLOW_BASE_URL: ${{ vars.RAGFLOW_BASE_URL }}
+      RAGFLOW_DATASET_NAME: ${{ vars.RAGFLOW_DATASET_NAME }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      RAGFLOW_API_KEY: ${{ secrets.RAGFLOW_API_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          python -m pip install --upgrade pip
+          pip install google-generativeai ragflow-sdk
+
+      - name: Verify environment
+        run: |
+          echo "RAGFLOW_BASE_URL=$RAGFLOW_BASE_URL"
+          echo "RAGFLOW_DATASET_NAME=$RAGFLOW_DATASET_NAME"
+          echo "Python version:"
+          python --version
+          echo "Pip packages:"
+          pip list | grep -E "google-generativeai|ragflow-sdk"
+
+      # later we’ll add:
+      # - run: python keyword-test-4.py
