@@ -163,8 +163,8 @@ Chunk (focus):
 
 # --- MAIN ---
 
-keywords_dir = "keywords"
-prompts_dir = "prompt_completion"
+keywords_dir = "wiki_pages/keywords"
+prompts_dir = "wiki_pages/prompt_completion"
 os.makedirs(keywords_dir, exist_ok=True)
 os.makedirs(prompts_dir, exist_ok=True)
 
@@ -211,7 +211,7 @@ while True:
                 print(f"Saved {base_name}-{i}-keywords.txt")
 
                 # 🔹 Update chunk in RAGFlow with new keywords
-                chunk.update(important_keywords=kws)
+                chunk.update({"important_keywords": kws})
                 print(f"Updated chunk {i} with {len(kws)} keywords")
             except Exception as e:
                 print(f"❌ Keyword generation failed: {e}")
