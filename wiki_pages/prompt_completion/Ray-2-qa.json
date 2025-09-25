@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What loss function is used in the `train` function of the `ray-tune-example.py` script?",
+    "answer": "The `nn.CrossEntropyLoss()` function is used as the loss function and is loaded onto the GPU."
+  },
+  {
+    "question": "Which optimizer is employed in the `train` function, and what parameters does it take?",
+    "answer": "The `optim.SGD` (Stochastic Gradient Descent) optimizer is used, taking the model's parameters (`net.parameters()`) and a learning rate (`lr`) from the configuration (`config[\"lr\"]`)."
+  },
+  {
+    "question": "How does the `train` function report its evaluation results during the hyperparameter sweep?",
+    "answer": "The `train` function reports the calculated accuracy using `session.report({\"accuracy\": correct / total})`."
+  },
+  {
+    "question": "What command-line argument is available to specify the number of samples for the hyperparameter sweep, and what is its default value?",
+    "answer": "The `--num_samples` command-line argument is used, and its default value is 10."
+  },
+  {
+    "question": "Which command-line argument determines the number of GPUs allocated per trial?",
+    "answer": "The `--gpus_per_trial` command-line argument (a float, defaulting to 1) sets the number of GPUs per trial."
+  },
+  {
+    "question": "Which command-line argument is used to set the number of CPUs allocated per trial?",
+    "answer": "The `--cpus_per_trial` command-line argument (an integer, defaulting to 1) sets the number of CPUs per trial."
+  },
+  {
+    "question": "How does the `main` function in `ray-tune-example.py` connect to the Ray cluster?",
+    "answer": "It connects to the Ray cluster using `ray.init` with the address constructed from the `HEAD_NODE` and `RAY_PORT` environment variables."
+  },
+  {
+    "question": "How is the hyperparameter search space defined for the learning rate (`lr`) and `batch_size` in the example?",
+    "answer": "The learning rate (`lr`) is sampled from a log-uniform distribution between 1e-4 and 1e-1, and `batch_size` is chosen from a list of values: [2, 4, 8, 16]."
+  },
+  {
+    "question": "What type of scheduler is used for the hyperparameter tuning in this example, and what are its key parameters?",
+    "answer": "An `ASHAScheduler` is used, configured with `max_t=1`, `grace_period=1`, and `reduction_factor=2`."
+  },
+  {
+    "question": "How are resources (CPU and GPU) allocated per trial in the `tune.Tuner` setup?",
+    "answer": "Resources are specified within `tune.Tuner` using `resources={\"cpu\": args.cpus_per_trial, \"gpu\": args.gpus_per_trial}`, where `args.cpus_per_trial` and `args.gpus_per_trial` come from command-line arguments."
+  },
+  {
+    "question": "What metric is optimized during the hyperparameter search, and in what direction?",
+    "answer": "The 'accuracy' metric is optimized in 'max' mode, meaning the tuner aims to maximize accuracy."
+  },
+  {
+    "question": "How is the hyperparameter tuning process initiated in the `main` function?",
+    "answer": "The tuning process is initiated by calling `tuner.fit()`."
+  },
+  {
+    "question": "How can the configuration of the best trial found during the hyperparameter sweep be accessed?",
+    "answer": "The configuration of the best trial can be accessed through `best.config` after retrieving the best result with `results.get_best_result(\"accuracy\", \"max\")`."
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What additional packages might be needed on a CentOS VM to compile ParaView or VisIt?",
+    "answer": "You may need to install `mesa-libGLU`, `mesa-libGLU-devel`, `bzip2`, `bzip2-libs`, `libXt-devel`, `zlib-devel`, `flex`, and `byacc`. Additionally, a symbolic link `glx.h` might be required."
+  },
+  {
+    "question": "How can you simplify logins to a VM using an existing private-public SSH key pair?",
+    "answer": "You can copy your public SSH key to the VM's `~/.ssh/authorized_keys` file by executing `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'` on your computer."
+  },
+  {
+    "question": "Why is it necessary to compile ParaView with OSMesa support on a cloud VM?",
+    "answer": "Compiling with OSMesa support is necessary because most Arbutus VMs do not have GPU access, and it enables offscreen (software) rendering for ParaView using CPU-based resources."
+  },
+  {
+    "question": "Which software rasterization driver is recommended for OSMesa-enabled ParaView servers on a VM?",
+    "answer": "The SWR (Software Rasterization) driver is recommended, as it is newer and faster than the `llvmpipe` driver."
+  },
+  {
+    "question": "What are the basic steps to compile CMake on a VM for ParaView compilation?",
+    "answer": "First, download the CMake tarball, then unpack and change into its directory. After that, run `./bootstrap`, `make`, and finally `sudo make install`."
+  },
+  {
+    "question": "What are the key CMake flags used when compiling the ParaView server for offscreen rendering on a VM?",
+    "answer": "Key CMake flags include `-DCMAKE_BUILD_TYPE=Release`, `-DCMAKE_INSTALL_PREFIX=/home/centos/paraview`, `-DPARAVIEW_USE_MPI=OFF`, `-DPARAVIEW_ENABLE_PYTHON=ON`, `-DPARAVIEW_BUILD_QT_GUI=OFF`, `-DVTK_OPENGL_HAS_OSMESA=ON`, `-DVTK_USE_OFFSCREEN=ON`, and `-DVTK_USE_X=OFF`."
+  },
+  {
+    "question": "How do you start the ParaView server on the VM once it has been compiled with SWR rendering?",
+    "answer": "You can start the ParaView server by running `./paraview/bin/pvserver --mesa-swr-avx2`."
+  },
+  {
+    "question": "How do you establish an SSH tunnel from your local computer to the VM for a ParaView client-server connection?",
+    "answer": "On your computer, organize an SSH tunnel from local port 11111 to the VM's port 11111 using the command `ssh centos@vm.ip.address -L 11111:localhost:11111`."
+  },
+  {
+    "question": "What message indicates successful SWR rendering when connected to the ParaView server on a VM?",
+    "answer": "If SWR rendering is successful, you should see the message \"SWR detected AVX2\" in the console during rendering."
+  },
+  {
+    "question": "Which systems can utilize Graham VDI nodes for remote VNC desktop interactive visualizations?",
+    "answer": "Graham VDI nodes can be used for small interactive visualizations requiring up to 256GB memory and 16 cores."
+  }
+]

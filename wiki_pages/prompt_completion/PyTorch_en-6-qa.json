@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What is the primary purpose of the `pytorch-ddp-test.sh` script?",
+    "answer": "The `pytorch-ddp-test.sh` script is designed to submit a PyTorch distributed data parallel job, setting up the necessary environment and launching the Python training script."
+  },
+  {
+    "question": "How are PyTorch and torchvision installed within the `pytorch-ddp-test.sh` script?",
+    "answer": "They are installed using `pip install torch torchvision --no-index` within a Python virtual environment created in `$SLURM_TMPDIR/env`."
+  },
+  {
+    "question": "Which environment variable is set in `pytorch-ddp-test.sh` to enable asynchronous handling for NCCL?",
+    "answer": "The `TORCH_NCCL_ASYNC_HANDLING` environment variable is set to `1` using `export TORCH_NCCL_ASYNC_HANDLING=1`."
+  },
+  {
+    "question": "How is the master node's IP address determined and stored in the `pytorch-ddp-test.sh` script?",
+    "answer": "The master node's IP address is stored in the `MASTER_ADDR` environment variable using `export MASTER_ADDR=$(hostname)`."
+  },
+  {
+    "question": "How is the `world_size` parameter, representing the total number of processes, calculated in the `pytorch-ddp-test.sh` script?",
+    "answer": "The `world_size` is calculated using the expression `$((SLURM_NTASKS_PER_NODE * SLURM_JOB_NUM_NODES))`."
+  },
+  {
+    "question": "What is the significance of `SLURM_LOCALID` and `SLURM_NODEID` in the `pytorch-ddp-test.py` script for DistributedDataParallel?",
+    "answer": "`SLURM_LOCALID` identifies the current process's ID within a node, while `SLURM_NODEID` identifies the node itself. These are combined to compute a unique global `rank` for each process and determine the `current_device` (GPU) for `local_rank`."
+  },
+  {
+    "question": "How does the `pytorch-ddp-test.py` script initialize the distributed process group for communication?",
+    "answer": "It initializes the process group using `dist.init_process_group(backend=args.dist_backend, init_method=args.init_method, world_size=args.world_size, rank=rank)`."
+  },
+  {
+    "question": "Describe the neural network architecture defined by the `Net` class in `pytorch-ddp-test.py`.",
+    "answer": "The `Net` class defines a Convolutional Neural Network (CNN) composed of two `Conv2d` layers with `MaxPool2d` and ReLU activations, followed by three fully connected `Linear` layers."
+  },
+  {
+    "question": "How is a PyTorch model configured for distributed training using `DistributedDataParallel` in `pytorch-ddp-test.py`?",
+    "answer": "After the model (`net`) is moved to the GPU with `net.cuda()`, it is wrapped with `torch.nn.parallel.DistributedDataParallel(net, device_ids=[current_device])`."
+  },
+  {
+    "question": "Which PyTorch class is recommended by PyTorch maintainers for Data Parallelism with multiple GPUs?",
+    "answer": "The `DistributedDataParallel` class is recommended by PyTorch maintainers for using multiple GPUs for Data Parallelism."
+  },
+  {
+    "question": "What is a known issue with PyTorch 1.10 regarding `DistributedDataParallel` and specific backends?",
+    "answer": "There is a known issue where multi-GPU code using `DistributedDataParallel` with PyTorch 1.10 may fail unpredictably if the backend is set to `'nccl'` or `'gloo'`."
+  },
+  {
+    "question": "What is the recommended action if encountering issues with PyTorch 1.10 and `DistributedDataParallel`?",
+    "answer": "It is recommended to use the latest PyTorch build instead of version 1.10 on all GPU clusters."
+  },
+  {
+    "question": "What is the core concept of Data Parallelism when training with multiple GPUs?",
+    "answer": "Data Parallelism involves training multiple replicas of a model in parallel, where each replica processes a different segment of the training data during each iteration. Gradients are then aggregated, and the parameters of all replicas are updated either synchronously or asynchronously."
+  },
+  {
+    "question": "What crucial adjustment must be made when using Data Parallelism to ensure the trained model is equivalent to one trained without it?",
+    "answer": "The user must scale either the learning rate or the desired batch size in proportion to the number of model replicas being used."
+  },
+  {
+    "question": "What is a key constraint for models when using Data Parallelism with multiple GPUs?",
+    "answer": "The model must be sufficiently small to fit entirely within the memory of a single GPU."
+  }
+]

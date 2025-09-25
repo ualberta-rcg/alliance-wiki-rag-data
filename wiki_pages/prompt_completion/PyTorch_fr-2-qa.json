@@ -1,0 +1,46 @@
+[
+  {
+    "question": "What is the primary purpose of the `pytorch-multi-cpu.sh` and `cifar10-cpu.py` example scripts?",
+    "answer": "These scripts demonstrate intra-op parallelism using multiple CPUs, showing how increasing CPU cores can affect performance without modifying the Python code."
+  },
+  {
+    "question": "How can I configure a SLURM job to test intra-op parallelism with multiple CPUs for PyTorch?",
+    "answer": "You can use the `pytorch-multi-cpu.sh` script, specifically by changing the `#SBATCH --cpus-per-task` parameter to values like 2, 4, 6, etc., to observe the effect on performance."
+  },
+  {
+    "question": "What is the role of the `SLURM_CPUS_PER_TASK` environment variable in the `cifar10-cpu.py` script?",
+    "answer": "The `cifar10-cpu.py` script uses `os.environ['SLURM_CPUS_PER_TASK']` to set the number of threads for PyTorch's intra-op parallelism via `torch.set_num_threads()`."
+  },
+  {
+    "question": "Is it always recommended to train a model with a GPU on shared clusters?",
+    "answer": "No, it is not always recommended on shared clusters. Training very small models might be faster with one or more CPUs, and requesting a GPU should be avoided if your code cannot make reasonable use of its computational capacity."
+  },
+  {
+    "question": "What are the two main sources of performance advantage for GPUs in deep learning tasks?",
+    "answer": "The performance advantage of GPUs comes from their ability to parallelize key operations across thousands of computation cores and their significantly higher memory bandwidth compared to CPUs."
+  },
+  {
+    "question": "How does PyTorch leverage GPUs for parallel operations in deep learning?",
+    "answer": "PyTorch provides parallel implementations for common deep learning operations, such as matrix multiplication and convolution, by utilizing specialized GPU libraries like CUDNN or MIOpen, depending on the hardware platform."
+  },
+  {
+    "question": "What characteristics should a deep learning task possess to justify using a GPU?",
+    "answer": "A deep learning task should involve elements that can be scaled for massive parallelism, either due to a large number of operations, a large quantity of data, or ideally both. Examples include large models with many units and layers, or models with substantial input data."
+  },
+  {
+    "question": "Which two parameters are crucial for optimizing performance when using a single GPU with PyTorch, and what is their impact?",
+    "answer": "The `batch_size` and `num_workers` parameters are crucial. `batch_size` improves performance by increasing input size per iteration, better utilizing GPU capacity. `num_workers` enhances performance by facilitating data movement between host (CPU) and GPU memory, reducing GPU idle time."
+  },
+  {
+    "question": "What are the two key conclusions for maximizing single GPU utilization mentioned in the document?",
+    "answer": "1. Increase the `batch_size` to the maximum possible for the GPU's memory to optimize performance. 2. Use a `DataLoader` with as many workers as `cpus-per-task` to facilitate data input to the GPU efficiently."
+  },
+  {
+    "question": "How do you request a single GPU for a PyTorch training job using a SLURM script like `pytorch-single-gpu.sh`?",
+    "answer": "You request a single GPU by including `#SBATCH --gres=gpu:1` in your SLURM submission script."
+  },
+  {
+    "question": "What modifications are typically made in a Python script (like `cifar10-gpu.py`) to adapt it for GPU usage compared to a CPU-only version?",
+    "answer": "To utilize the GPU, the Python script needs to explicitly move the neural network model (`net`), the loss function (`criterion`), input data (`inputs`), and target data (`targets`) to the GPU by calling the `.cuda()` method on these objects."
+  }
+]

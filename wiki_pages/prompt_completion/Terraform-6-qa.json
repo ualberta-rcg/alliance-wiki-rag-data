@@ -1,0 +1,42 @@
+[
+  {
+    "question": "How can you verify SSH access to a new VM after associating a floating IP using Terraform?",
+    "answer": "You can attempt to SSH into the VM using its floating IP and a command like `$ ssh centos@X.Y.Z.W hostname`."
+  },
+  {
+    "question": "What should you do if you encounter issues connecting to a VM via SSH after a floating IP has been associated?",
+    "answer": "It may be necessary to add your workstation's IP address to the project's default security group."
+  },
+  {
+    "question": "What is an important consideration when adding a root volume to an existing VM through Terraform?",
+    "answer": "Adding a root volume to a VM is a destructive operation that will replace its boot disk, which can lead to rebuilding existing VMs."
+  },
+  {
+    "question": "How do you define a root volume for a VM within a Terraform `openstack_compute_instance_v2` resource?",
+    "answer": "A root volume is defined as a `block_device` subblock, which includes attributes like `uuid` (image UUID), `source_type`, `destination_type`, `volume_size`, `boot_index`, and `delete_on_termination`."
+  },
+  {
+    "question": "What does setting `destination_type = \"volume\"` mean in a Terraform `block_device` configuration?",
+    "answer": "It indicates that the root volume should be stored with an OpenStack-provided volume rather than using disk on the hypervisor."
+  },
+  {
+    "question": "When configuring a root volume with `block_device`, what value is recommended for `delete_on_termination` for real-world use?",
+    "answer": "For real use, it is recommended to set `delete_on_termination` to `false` as a defense against accidental deletion of resources, although `true` is convenient for testing."
+  },
+  {
+    "question": "What common mistake should be avoided when defining a root volume using `block_device` in Terraform for OpenStack VMs?",
+    "answer": "Do not leave the `image_id` attribute defined in the outer `openstack_compute_instance_v2` definition, as Terraform will continuously attempt to rebuild the instance due to a perceived change in boot method."
+  },
+  {
+    "question": "What does the symbol `-/+ destroy and then create replacement` signify in a Terraform execution plan?",
+    "answer": "This symbol indicates that a resource will be destroyed and then a replacement resource will be created."
+  },
+  {
+    "question": "If a Terraform plan shows \"2 to add, 0 to change, 2 to destroy\" when adding a root volume, what does that imply?",
+    "answer": "It implies that two existing resources (likely the VM instance and its floating IP association) will be destroyed, and two new ones will be created in their place to accommodate the changes, such as adding a root volume."
+  },
+  {
+    "question": "What post-creation steps are necessary if a VM is rebuilt in Terraform with a new SSH key?",
+    "answer": "You will need to remove the old SSH key from your `known_hosts` file (or equivalent) on your workstation, and then log into the VM to apply all available OS updates (e.g., `sudo yum update -y`)."
+  }
+]

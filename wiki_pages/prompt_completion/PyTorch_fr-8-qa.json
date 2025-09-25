@@ -1,0 +1,78 @@
+[
+  {
+    "question": "What is the purpose of the `pytorch-modelpar-pipelined-rpc.sh` script?",
+    "answer": "This script is an example for model parallelism using pipelined RPC with PyTorch, specifically for a single node with multiple GPUs."
+  },
+  {
+    "question": "How many GPUs are requested by the `pytorch-modelpar-pipelined-rpc.sh` script?",
+    "answer": "The script requests 2 GPUs using `#SBATCH --gres=gpu:2`."
+  },
+  {
+    "question": "What memory and time limits are set in the `pytorch-modelpar-pipelined-rpc.sh` SLURM script?",
+    "answer": "The script requests 8GB of memory (`#SBATCH --mem=8G`) and a time limit of 10 minutes (`#SBATCH --time=0:10:00`)."
+  },
+  {
+    "question": "Which Python module is loaded before setting up the virtual environment in the `pytorch-modelpar-pipelined-rpc.sh` script?",
+    "answer": "The script loads the `python` module, specifying 'Using Default Python version - Make sure to choose a version that suits your application'."
+  },
+  {
+    "question": "What PyTorch-related packages are installed in the virtual environment within the `pytorch-modelpar-pipelined-rpc.sh` script?",
+    "answer": "The script installs `torch` and `torchvision` using `pip install torch torchvision --no-index`."
+  },
+  {
+    "question": "What environment variables are exported in the `pytorch-modelpar-pipelined-rpc.sh` script for PyTorch's RPC module?",
+    "answer": "`MASTER_ADDR` is set to the hostname, and `MASTER_PORT` is set to 34567."
+  },
+  {
+    "question": "How are the two parts of the neural network model, `ConvPart` and `MLPPart`, distributed across GPUs in the `pytorch-modelpar-pipelined-rpc.py` script?",
+    "answer": "The `ConvPart` is loaded onto the first GPU (`cuda:0`), and the `MLPPart` is loaded onto the second GPU (`cuda:1`)."
+  },
+  {
+    "question": "What is `ConvPart` designed for in the `pytorch-modelpar-pipelined-rpc.py` model?",
+    "answer": "`ConvPart` handles the convolutional and pooling operations of the model."
+  },
+  {
+    "question": "What does `MLPPart` represent in the `pytorch-modelpar-pipelined-rpc.py` model?",
+    "answer": "`MLPPart` represents the dense feedforward part (Multi-Layer Perceptron) of the model."
+  },
+  {
+    "question": "How is pipeline parallelism implemented in the `pytorch-modelpar-pipelined-rpc.py` script?",
+    "answer": "The `ConvPart` and `MLPPart` are wrapped into an `nn.Sequential` module, which is then passed to `torch.distributed.pipeline.sync.Pipe` with `chunks=32`."
+  },
+  {
+    "question": "Why is `torch.distributed.rpc.init_rpc` called in the `pytorch-modelpar-pipelined-rpc.py` script?",
+    "answer": "Initializing RPC is required by the `Pipe` class, which is used for pipeline parallelism in the script."
+  },
+  {
+    "question": "Which GPU is the `CrossEntropyLoss` criterion loaded onto in the `pytorch-modelpar-pipelined-rpc.py` script?",
+    "answer": "The `CrossEntropyLoss` criterion is loaded onto the second GPU (`cuda:1`)."
+  },
+  {
+    "question": "What optimizer is used for training in the `pytorch-modelpar-pipelined-rpc.py` script?",
+    "answer": "An `optim.SGD` (Stochastic Gradient Descent) optimizer is used."
+  },
+  {
+    "question": "What dataset is utilized for training in the `pytorch-modelpar-pipelined-rpc.py` example?",
+    "answer": "The CIFAR10 dataset is used for training."
+  },
+  {
+    "question": "What does `outputs = net(inputs).local_value()` do in the training loop when using `Pipe`?",
+    "answer": "When models are wrapped with `Pipe()`, they return an `RRef` object. Since this example is for a single node, `local_value()` is used to retrieve the value locally."
+  },
+  {
+    "question": "When is it recommended to combine model and data parallelism with multiple GPUs?",
+    "answer": "It is recommended when a model is too large to fit into a single GPU and its training requires a very large dataset."
+  },
+  {
+    "question": "How does the combined model and data parallelism approach work?",
+    "answer": "The model is divided into portions, each assigned to a GPU. Pipeline parallelism is applied to the results, and then copies of this process are made to train the model copies in parallel with distinct subsets of the training data."
+  },
+  {
+    "question": "What is a key characteristic of gradient calculation and parameter updates in combined model and data parallelism?",
+    "answer": "Gradients are calculated independently in each model copy and then aggregated to modify all copies synchronously or asynchronously, depending on the method."
+  },
+  {
+    "question": "What is a current limitation when using Torch RPC for model division across multiple nodes?",
+    "answer": "As of now, Torch RPC only supports dividing a model within a single node."
+  }
+]

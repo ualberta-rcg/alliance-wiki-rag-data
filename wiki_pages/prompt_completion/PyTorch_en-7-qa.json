@@ -1,0 +1,46 @@
+[
+  {
+    "question": "What is PyTorch Lightning?",
+    "answer": "PyTorch Lightning is a Python package that provides interfaces to PyTorch to make many common, but otherwise code-heavy tasks, more straightforward, including training on multiple GPUs."
+  },
+  {
+    "question": "How do you set up a PyTorch Lightning job on a SLURM cluster for multiple GPUs?",
+    "answer": "An example SLURM script requests generic GPU resources (`--gres=gpu:2`), sets tasks per node (`--tasks-per-node=2`), loads a Python module, creates a virtual environment, installs `torchvision` and `pytorch-lightning`, exports `TORCH_NCCL_ASYNC_HANDLING=1`, and then runs the Python script using `srun`."
+  },
+  {
+    "question": "What is a key requirement for PyTorch Lightning when running in a SLURM batch job with multiple GPUs?",
+    "answer": "PyTorch Lightning expects the user to have requested one task per GPU. If this is not the case or the script is not run with `srun`, the job will fail."
+  },
+  {
+    "question": "How is a neural network model typically defined in PyTorch Lightning?",
+    "answer": "A neural network model in PyTorch Lightning is defined by creating a class that inherits from `pl.LightningModule` and implementing methods like `__init__` for layer definition and `forward` for the data flow."
+  },
+  {
+    "question": "Which arguments are defined for the `pytorch-ddp-test-pl.py` script?",
+    "answer": "The script defines command-line arguments for learning rate (`--lr`), maximum epochs (`--max_epochs`), batch size (`--batch_size`), and number of workers (`--num_workers`)."
+  },
+  {
+    "question": "What happens during a `training_step` in a PyTorch Lightning model?",
+    "answer": "In the provided `pytorch-ddp-test-pl.py` example, the `training_step` method receives a `batch` and `batch_idx`, and it immediately unpacks the `batch` into `x` (inputs) and `y` (targets)."
+  },
+  {
+    "question": "How is the loss function initialized in the `pytorch-ddp-test.py` script?",
+    "answer": "The loss function is initialized as `nn.CrossEntropyLoss().cuda()`."
+  },
+  {
+    "question": "Which optimizer is used in the `pytorch-ddp-test.py` script and with what parameters?",
+    "answer": "The optimizer used is `optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=1e-4)`."
+  },
+  {
+    "question": "How are inputs and targets prepared for GPU computation within the `train` function of `pytorch-ddp-test.py`?",
+    "answer": "Inputs and targets are moved to the GPU using `inputs = inputs.cuda()` and `targets = targets.cuda()` respectively."
+  },
+  {
+    "question": "What are the three main steps performed by the optimizer in each training batch iteration in `pytorch-ddp-test.py`?",
+    "answer": "In each training batch iteration, the optimizer performs `optimizer.zero_grad()` to clear previous gradients, `loss.backward()` to compute new gradients, and `optimizer.step()` to update model parameters."
+  },
+  {
+    "question": "What is the purpose of `train_sampler.set_epoch(epoch)` in the `pytorch-ddp-test.py` training loop?",
+    "answer": "It is used to set the epoch for the `train_sampler`, which is important for distributed data loading to ensure different data subsets are used across epochs when shuffling is enabled."
+  }
+]

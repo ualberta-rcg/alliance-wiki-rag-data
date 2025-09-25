@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What are the recommended SBATCH settings for a STAR-CCM+ job on the Narval cluster?",
+    "answer": "The recommended `SBATCH` settings for Narval include `--account=def-group`, `--time=00-01:00`, `--nodes=1`, `--cpus-per-task=64`, `--mem=0`, and `--ntasks-per-node=1`."
+  },
+  {
+    "question": "Which modules should be loaded for running STAR-CCM+ on Narval?",
+    "answer": "For Narval, you should load `StdEnv/2023` and either `starccm-mixed/18.06.006` or `starccm/18.06.006-R8`."
+  },
+  {
+    "question": "How do you launch STAR-CCM+ with a Siemens PoD license on Narval?",
+    "answer": "After setting `LM_PROJECT='my22digitpodkey'`, the command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi openmpi`."
+  },
+  {
+    "question": "How do you launch STAR-CCM+ with an institutional license on Narval?",
+    "answer": "The command to launch STAR-CCM+ with an institutional license on Narval is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi openmpi`."
+  },
+  {
+    "question": "What MPI implementation is specified for STAR-CCM+ jobs on Narval?",
+    "answer": "The `openmpi` implementation is specified for STAR-CCM+ jobs on Narval using the `-mpi openmpi` flag."
+  },
+  {
+    "question": "What are the recommended SBATCH settings for a STAR-CCM+ job on the Niagara cluster?",
+    "answer": "The recommended `SBATCH` settings for Niagara include `--account=def-group`, `--time=00-01:00`, `--nodes=1`, `--cpus-per-task=40`, `--mem=0`, and `--ntasks-per-node=1`."
+  },
+  {
+    "question": "Which modules are required for running STAR-CCM+ on Niagara?",
+    "answer": "For Niagara, you should load `CCEnv`, `StdEnv/2023`, and either `starccm-mixed/18.06.006` or `starccm/18.06.006-R8`."
+  },
+  {
+    "question": "How are license server settings configured for STAR-CCM+ jobs on Niagara, replacing the ~/.licenses/starccm.lic file?",
+    "answer": "On Niagara, license server settings are explicitly configured in the job script by setting `FLEXPORT` (e.g., `1999`), `VENDPORT` (e.g., `2099`), and `LICSERVER` (e.g., `flex.cd-adapco.com`) variables. These settings are used instead of the `~/.licenses/starccm.lic` file."
+  },
+  {
+    "question": "How is the CDLMD_LICENSE_FILE environment variable set for STAR-CCM+ on Niagara?",
+    "answer": "The `CDLMD_LICENSE_FILE` environment variable is set by `export CDLMD_LICENSE_FILE=\"$FLEXPORT@127.0.0.1\"` in the Niagara Slurm script."
+  },
+  {
+    "question": "What is the purpose of the ssh nia-gw command in a Niagara Slurm script for STAR-CCM+?",
+    "answer": "The `ssh nia-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f` command is used to set up SSH port forwarding from the Niagara gateway to the license server, allowing the job to access the license server."
+  },
+  {
+    "question": "How is STAR-CCM+ launched with a Siemens PoD license on Niagara?",
+    "answer": "After setting `LM_PROJECT='my22digitpodkey'`, the command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`. This command is typically embedded within a retry loop for license failures."
+  },
+  {
+    "question": "What is the command to launch STAR-CCM+ with an institutional license on Niagara?",
+    "answer": "The command to launch STAR-CCM+ with an institutional license on Niagara is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`. This is usually part of a retry mechanism for license issues."
+  },
+  {
+    "question": "Describe the license failure workaround implemented in the Niagara Slurm script.",
+    "answer": "The Niagara Slurm script includes a `while` loop that attempts to start STAR-CCM+ up to 5 times. It waits for 5 seconds between attempts (after the first one) until the exit status of the `starccm+` command is 0, indicating a successful launch."
+  }
+]

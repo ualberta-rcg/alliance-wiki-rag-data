@@ -1,0 +1,122 @@
+[
+  {
+    "question": "What should you do before creating a new SSH key pair?",
+    "answer": "Check to see if you already have one. If you do, but can't remember where it's used, it's better to create a fresh one."
+  },
+  {
+    "question": "Where are SSH key pairs typically stored?",
+    "answer": "Key pairs are typically located in the `.ssh/` directory within your /home directory."
+  },
+  {
+    "question": "How are SSH key files typically named by default?",
+    "answer": "By default, a key is named with an 'id_' prefix, followed by the key type (e.g., 'rsa', 'dsa', 'ed25519'), and the public key also has a '.pub' suffix (e.g., `id_rsa` and `id_rsa.pub`)."
+  },
+  {
+    "question": "What is a good practice when naming a new SSH key pair?",
+    "answer": "A good practice is to give it a name that is meaningful to you and identifies the system on which the key is used."
+  },
+  {
+    "question": "Which command is used to generate a new SSH key?",
+    "answer": "You can generate a new key with the `ssh-keygen` command."
+  },
+  {
+    "question": "How do you generate an ED25519 type SSH key?",
+    "answer": "Run the command: `ssh-keygen -t ed25519`."
+  },
+  {
+    "question": "How do you generate a 4-kbit RSA SSH key?",
+    "answer": "Run the command: `ssh-keygen -b 4096 -t rsa`."
+  },
+  {
+    "question": "What prompts will you typically receive when generating an SSH key pair?",
+    "answer": "You will be prompted to enter a file in which to save the key, and to enter a passphrase (twice)."
+  },
+  {
+    "question": "What should you do if you already have SSH key pairs saved with default names when generating new ones?",
+    "answer": "You should enter a different file name for the new keys to avoid overwriting existing key pairs."
+  },
+  {
+    "question": "How do you generate an SSH key pair backed by a hardware security key?",
+    "answer": "You can generate it with the `ssh-keygen -t ecdsa-sk` command."
+  },
+  {
+    "question": "What additional step is required when creating an SSH key pair backed by a hardware security key?",
+    "answer": "You will be prompted to both enter a passphrase and activate a hardware security key as part of the key creation process."
+  },
+  {
+    "question": "What is the recommended method for installing your SSH public key for cluster access?",
+    "answer": "Users are encouraged to leverage the CCDB feature to install their SSH public key, making it available to all clusters."
+  },
+  {
+    "question": "What is the simplest and safest way to install a public key to a remote system?",
+    "answer": "The simplest, safest way to install a key to a remote system is by using the `ssh-copy-id` command."
+  },
+  {
+    "question": "Provide an example of using `ssh-copy-id` to install a public key.",
+    "answer": "An example command is `ssh-copy-id -i ~/.ssh/mynewkey.pub graham.computecanada.ca`, assuming 'mynewkey' is the keypair name and your local and remote usernames are the same."
+  },
+  {
+    "question": "What does the `ssh-copy-id` command do behind the scenes?",
+    "answer": "It connects to the remote machine and places the public key into `.ssh/authorized_keys` in your /home directory there."
+  },
+  {
+    "question": "What are the main benefits of using `ssh-copy-id`?",
+    "answer": "The main benefit is that it will create files and directories if necessary, and will ensure that the permissions on them are correct."
+  },
+  {
+    "question": "What are the manual steps to install a public key on a remote server?",
+    "answer": "First, copy the public key file to the remote server, then run: `mkdir ~/.ssh`, `cat id_rsa.pub >> ~/.ssh/authorized_keys`, `chmod --recursive go-rwx ~/.ssh`, and `chmod go-w ~`."
+  },
+  {
+    "question": "What are the required file permissions for SSH to function correctly on the private key file?",
+    "answer": "The private key file must not be accessible to others; use `chmod go-rwx id_rsa`."
+  },
+  {
+    "question": "What are the required file permissions for the remote /home directory for SSH to function correctly?",
+    "answer": "Your remote /home directory must not be writable by others; use `chmod go-w ~`."
+  },
+  {
+    "question": "What are the required file permissions for the remote ~/.ssh directory and ~/.ssh/authorized_keys file for SSH to function correctly?",
+    "answer": "They must not be accessible to others; use `chmod --recursive go-rwx ~/.ssh`."
+  },
+  {
+    "question": "How do you test a new SSH key by connecting to a remote machine?",
+    "answer": "Use the command: `ssh -i /path/to/your/privatekey USERNAME@ADDRESS`, where `/path/to/your/privatekey` specifies your private key file, `USERNAME` is the remote user, and `ADDRESS` is the remote machine's address."
+  },
+  {
+    "question": "What is the purpose of the `ssh-agent` program?",
+    "answer": "The `ssh-agent` program stores your private key in memory on your local computer, providing it for authentication and allowing you to log in to remote clusters multiple times after unlocking the key only once."
+  },
+  {
+    "question": "How do you start the `ssh-agent` program?",
+    "answer": "You can start the `ssh-agent` program using the command `eval `ssh-agent``."
+  },
+  {
+    "question": "How do you add a key pair to be managed by `ssh-agent`?",
+    "answer": "After starting `ssh-agent`, you can add your key pair using the command `ssh-add`."
+  },
+  {
+    "question": "How can you check which private keys are currently accessible to the `ssh-agent`?",
+    "answer": "Use the `ssh-add -l` option to show which private keys are currently accessible to the `ssh-agent`."
+  },
+  {
+    "question": "When is 'agent forwarding' needed with `ssh-agent`?",
+    "answer": "Agent forwarding is needed if you need to use your private key on the cluster itself, for example, when interacting with a remote GitHub repository."
+  },
+  {
+    "question": "How do you enable agent forwarding for a specific host like 'beluga.computecanada.ca'?",
+    "answer": "Add the following lines to your `$HOME/.ssh/config` file on your personal computer: `Host beluga.computecanada.ca` and `ForwardAgent yes`."
+  },
+  {
+    "question": "What should you never do when configuring agent forwarding in your SSH configuration file?",
+    "answer": "You should never use the line `Host *` for agent forwarding in your SSH configuration file."
+  },
+  {
+    "question": "What is an alternative way to manage SSH key pairs on Linux and macOS distributions?",
+    "answer": "Many contemporary Linux distributions and macOS offer graphical 'keychain managers' that can be configured to manage SSH key pairs."
+  },
+  {
+    "question": "How do graphical 'keychain managers' simplify SSH key usage?",
+    "answer": "Keychain managers can be configured to store the private key in memory upon local login, and have the operating system automatically provide it to the SSH client during login on a remote cluster, eliminating the need to type a passphrase."
+  }
+]

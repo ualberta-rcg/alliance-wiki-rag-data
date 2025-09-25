@@ -1,0 +1,70 @@
+[
+  {
+    "question": "What is the primary function of the `singularity exec` command?",
+    "answer": "The `singularity exec` command runs a specified command within a container and then stops running, leaving the container."
+  },
+  {
+    "question": "How do you run a single command inside a Singularity container while bind mounting host directories?",
+    "answer": "You can use the `singularity exec` command with the `-B` option for each directory to bind mount, followed by the image name and the command. For example: `$ singularity exec -B /home -B /project -B /scratch -B /localscratch myimage.simg ls /`"
+  },
+  {
+    "question": "How can you pass user-defined environment variables from a file to a command executed with `singularity exec`?",
+    "answer": "You can use the `--env-file` flag followed by the path to a file defining the variables. For example: `$ singularity exec --env-file envfile myimage.simg gcc -v`"
+  },
+  {
+    "question": "When should `singularity exec` not be used, and what is the recommended alternative?",
+    "answer": "`singularity exec` should not be used for running daemons and backgrounded processes. Instead, `instance.start` and `instance.stop` commands should be used to create and destroy container instances (sessions)."
+  },
+  {
+    "question": "How do you start a Singularity container instance (session)?",
+    "answer": "To start a Singularity session, use the `singularity instance.start` command, specifying the image name and your chosen session name. For example: `$ singularity instance.start myimage.simg quadrat5run`"
+  },
+  {
+    "question": "How do you stop a running Singularity container instance?",
+    "answer": "A running Singularity session can be stopped using the `singularity instance.stop` command, followed by the image name and session name. For example: `$ singularity instance.stop myimage.simg quadrat5run`"
+  },
+  {
+    "question": "How can you obtain a list of all currently running Singularity container instances?",
+    "answer": "You can obtain a list of all running Singularity sessions by executing the command: `$ singularity instance.list`"
+  },
+  {
+    "question": "After starting a Singularity container instance, how do you run programs or commands within it?",
+    "answer": "Once a session is started, programs can be run using Singularity's `shell`, `exec`, or `run` commands by prefixing the session name with `instance://` after the image name. For example: `$ singularity exec myimage.simg instance://mysessionname ps -eaf`"
+  },
+  {
+    "question": "What is the default file visibility for a program running inside a Singularity container, and how can it be changed?",
+    "answer": "By default, a program within a Singularity container can only see files within the container image and the current directory. To access other filesystems, you need to use the `-B` (bind mount) option."
+  },
+  {
+    "question": "How do you bind mount host filesystems like /home, /project, and /scratch into a Singularity container?",
+    "answer": "You use the `-B` option for each filesystem with `singularity shell`, `exec`, or `run` commands. For example: `$ singularity shell -B /home -B /project -B /scratch -B /localscratch myimage.simg`"
+  },
+  {
+    "question": "Can a bind-mounted directory be given a different name inside the Singularity container?",
+    "answer": "Yes, you can change the mount name visible within the Singularity container by specifying it after a colon. For example, `/localscratch:/temp` will make `/localscratch` on the host appear as `/temp` inside the container."
+  },
+  {
+    "question": "What are the key requirements for running MPI programs across multiple nodes using Singularity containers?",
+    "answer": "Key requirements include compiling the MPI program with OpenMPI (version 3 or 4) inside the container, ensuring the container's MPI installation uses the same process-management interface library (PMI-2 or PMIx) as the cluster, using `srun` with the correct `--mpi` flag, installing `slurm-client` in the container, loading `singularity` and `openmpi` modules in the CC shell environment before `sbatch`, and installing appropriate high-performance interconnect packages (libpsm2 for OmniPath, UCX for Infiniband) in the image."
+  },
+  {
+    "question": "What OpenMPI versions are recommended for MPI programs compiled inside a Singularity container for multi-node jobs?",
+    "answer": "Ideally, OpenMPI version 3 or 4 should be used inside the container. Version 2 may or may not work, and Version 1 will not work."
+  },
+  {
+    "question": "How should `srun` be used in a SLURM job script to run an MPI program from a Singularity container across nodes?",
+    "answer": "The `srun` command should be used with the appropriate MPI plugin, such as `--mpi=pmi2` or `--mpi=pmix`, depending on what the container's MPI supports. For example: `srun --mpi=pmi2 singularity exec /path/to/your/singularity/image.sif /path/to/your-program`."
+  },
+  {
+    "question": "What modules need to be loaded in the CC shell environment before submitting an `sbatch` job for multi-node MPI with Singularity?",
+    "answer": "Before submitting the job, the `singularity` and `openmpi` modules should be loaded in the CC shell environment. The OpenMPI version loaded does not need to match the container's OpenMPI version, but version 4 or 3 is ideal."
+  },
+  {
+    "question": "What high-performance interconnect packages are required in a Singularity image for clusters using OmniPath or Infiniband for MPI jobs?",
+    "answer": "For clusters using OmniPath, `libpsm2` is needed, and for clusters using Infiniband, `UCX` is required to be installed in the image."
+  },
+  {
+    "question": "How do you enable CUDA functionality for a program running in a Singularity container on a cluster?",
+    "answer": "To enable CUDA, the Singularity container must have CUDA installed, and the `--nv` flag needs to be added to the `singularity run` command. For example: `$ srun singularity run --nv container-name.sif [job to do]`."
+  }
+]

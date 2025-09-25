@@ -1,0 +1,58 @@
+[
+  {
+    "question": "When sharing a directory in the project filesystem, what kind of path should collaborators be provided with?",
+    "answer": "Collaborators must be provided with a path that starts with `/project`, not `/home/<user>/projects`."
+  },
+  {
+    "question": "Why should collaborators avoid using paths starting with `/home/<user>/projects` when accessing shared project directories?",
+    "answer": "Paths starting with `/home/<user>/projects` contain symbolic links to physical directories in `/project`. These symlinks will not be reachable by collaborators unless they also have access to the user's home directory."
+  },
+  {
+    "question": "What command can be used to find the physical path a symlink points to?",
+    "answer": "The `realpath` command can be used to get the physical path a symlink points to."
+  },
+  {
+    "question": "How do you check the physical path of a project directory if you want to share it across multiple clusters?",
+    "answer": "If you wish to share a project directory on more than one cluster, you should check its physical path with `realpath` on each cluster, as the path may not be the same."
+  },
+  {
+    "question": "What command is used to recursively remove all extended ACL attributes from a directory?",
+    "answer": "To recursively remove all extended ACL attributes from a directory, use `setfacl -bR /home/<user>/projects/def-<PI>/shared_data`."
+  },
+  {
+    "question": "In what data sharing scenarios is it useful to create a data sharing group?",
+    "answer": "A data sharing group is useful for more complicated data sharing scenarios, particularly those involving multiple people on multiple clusters."
+  },
+  {
+    "question": "When is a data sharing group not necessary?",
+    "answer": "You do not need a data sharing group except in specialized sharing circumstances."
+  },
+  {
+    "question": "What is the first step in creating a data sharing group?",
+    "answer": "The first step is to send an email to technical support requesting the creation of the data sharing group, indicating the desired name and confirming you should be the owner."
+  },
+  {
+    "question": "After technical support confirms the creation of a data sharing group, what is the next step to manage it?",
+    "answer": "After receiving confirmation, go to `https://ccdb.computecanada.ca/services/` and access the group."
+  },
+  {
+    "question": "How do you add members to a data sharing group once it has been created?",
+    "answer": "After accessing the group management screen on the services portal, you can add members to the group."
+  },
+  {
+    "question": "What permissions are required for parent directories when sharing data using a data sharing group?",
+    "answer": "The parent directories of the data you are trying to share must have execute permissions either for everyone or for the data sharing group itself."
+  },
+  {
+    "question": "How can a PI grant execute permissions on a project directory for a data sharing group?",
+    "answer": "A PI can grant execute permissions using `$ setfacl -m g:wg_datasharing:X /project/def-<PI>/` or `$ chmod o+X /project/def-<PI>/`."
+  },
+  {
+    "question": "What commands are used to add a data sharing group to the ACL for a shared directory, including both new and existing data?",
+    "answer": "To add the group to the ACL for new data, use `setfacl -d -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data`. For existing data, use `setfacl -R -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data`."
+  },
+  {
+    "question": "How can you recursively test for items within a directory that are not readable to you?",
+    "answer": "You can use the command `find <directory_name> ! -readable -ls` to list all items not readable to you within a specific directory."
+  }
+]

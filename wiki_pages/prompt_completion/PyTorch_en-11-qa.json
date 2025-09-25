@@ -1,0 +1,58 @@
+[
+  {
+    "question": "What is the primary goal of combining model and data parallelism?",
+    "answer": "The primary goal is to achieve high performance when training massive models with very large training sets, especially when a model is too large to fit inside a single GPU."
+  },
+  {
+    "question": "How do model replicas differ in combined model and data parallelism compared to purely data parallelism?",
+    "answer": "In combined model and data parallelism, each model replica lives in more than one GPU, unlike purely data parallelism where each replica fits on a single GPU."
+  },
+  {
+    "question": "What is a known limitation of Torch RPC when attempting to combine model and data parallelism?",
+    "answer": "Torch RPC currently only supports splitting models inside a single node."
+  },
+  {
+    "question": "Which alternative is suggested for very large models that do not fit within the combined memory of all GPUs on a single compute node?",
+    "answer": "DeepSpeed is suggested for models that exceed the combined memory of all GPUs on a single compute node."
+  },
+  {
+    "question": "How many GPUs per node are requested in the example SLURM script for combined model and data parallelism?",
+    "answer": "The example SLURM script requests 4 GPUs per node (`#SBATCH --gres=gpu:4`)."
+  },
+  {
+    "question": "What is the purpose of setting `MASTER_ADDR` and `MASTER_PORT` environment variables in the `pytorch-model-data-par.py` script?",
+    "answer": "These environment variables are set to allow each model replica to run its own RPC server for pipeline parallelism."
+  },
+  {
+    "question": "How do different model replicas communicate in the combined model and data parallelism example using Torch RPC and DDP?",
+    "answer": "Different replicas communicate through DistributedDataParallel (DDP), not RPC."
+  },
+  {
+    "question": "How are the two parts of the model distributed across GPUs in each process in the `pytorch-model-data-par.py` script?",
+    "answer": "The `ConvPart` is loaded on the first GPU (`cuda(local_rank)`) and the `MLPPart` on the second GPU (`cuda(local_rank + 1)`) of each process."
+  },
+  {
+    "question": "What Python version is recommended for the `pytorch-model-data-par.sh` demo script?",
+    "answer": "Python/3.10.2 is recommended and works with this demo."
+  },
+  {
+    "question": "What modules must be loaded before running the `pytorch-model-data-par.sh` script?",
+    "answer": "The modules `StdEnv/2020`, `gcc/11.3.0`, `python`, and `cuda/11.8.0` must be loaded."
+  },
+  {
+    "question": "How is pipeline parallelism implemented within the `pytorch-model-data-par.py` script?",
+    "answer": "Pipeline parallelism is implemented by wrapping the `nn.Sequential` model with `torch.distributed.pipeline.sync.Pipe`, specifying `chunks=32` and `checkpoint=\"never\"`."
+  },
+  {
+    "question": "What is the `batch_size` value passed to the Python script in the `pytorch-model-data-par.sh` example?",
+    "answer": "The `batch_size` passed to the Python script is 512."
+  },
+  {
+    "question": "What is the requested memory for the SLURM job described in `pytorch-model-data-par.sh`?",
+    "answer": "The requested memory for the SLURM job is 16GB (`#SBATCH --mem=16G`)."
+  },
+  {
+    "question": "How many tasks per node are requested for the combined model and data parallelism example, and what do they represent?",
+    "answer": "2 tasks per node are requested, with each task representing one model per node."
+  }
+]

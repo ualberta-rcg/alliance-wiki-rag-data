@@ -1,0 +1,70 @@
+[
+  {
+    "question": "What is the importance of checking the last line of the `terraform plan` output?",
+    "answer": "It is important to check the last line, such as \"Plan: 1 to add, 0 to change, 0 to destroy,\" to confirm if Terraform intends to add, change, or destroy resources as expected, preventing unintended operations."
+  },
+  {
+    "question": "Does Terraform manage or affect OpenStack resources that were created manually or outside of its configuration?",
+    "answer": "No, Terraform has no knowledge of resources already defined in the project that are not part of its configuration and will not affect them."
+  },
+  {
+    "question": "Can pre-existing OpenStack resources be brought under Terraform management?",
+    "answer": "Yes, it is possible to import previously defined OpenStack resources into Terraform, but the document notes it is not a trivial amount of work."
+  },
+  {
+    "question": "What command is used to apply the changes outlined in a Terraform plan?",
+    "answer": "The `terraform apply` command is used to actually effect the changes described in the plan."
+  },
+  {
+    "question": "What is required to confirm the actions during a `terraform apply` execution?",
+    "answer": "You must explicitly type 'yes' when prompted to approve the actions Terraform will perform."
+  },
+  {
+    "question": "What error might occur if you try to create an OpenStack VM with Terraform without specifying a network?",
+    "answer": "An 'Error creating OpenStack server: Expected HTTP response code [...] but got 409 instead {\"conflictingRequest\": {\"message\": \"Multiple possible networks found, use a Network ID to be more specific.\", \"code\": 409}}' error might occur."
+  },
+  {
+    "question": "Why does Terraform produce a 'Multiple possible networks found' error during VM creation?",
+    "answer": "This error occurs because OpenStack projects typically have at least two networks (one private and one public), and Terraform needs to know which one to use for the VM."
+  },
+  {
+    "question": "How can you specify a network for an OpenStack VM in Terraform to resolve the 'Multiple possible networks found' error?",
+    "answer": "You can resolve this by adding a `network` resource sub-block to your VM definition, specifying the private network's name, for example: `network { name = \"my-tenant-net\" }`."
+  },
+  {
+    "question": "Where can you find the name of your OpenStack project's private network?",
+    "answer": "The private network name can be found in the OpenStack CLI using `network list` or on Horizon under 'Network -> Networks'."
+  },
+  {
+    "question": "What file is created in the Terraform workspace upon successful application of a configuration?",
+    "answer": "A file named `terraform.tfstate` is created in your workspace."
+  },
+  {
+    "question": "What is the function of the `terraform.tfstate` file?",
+    "answer": "The `terraform.tfstate` file contains details about the managed resources that Terraform uses to determine how to achieve a new state based on configuration updates."
+  },
+  {
+    "question": "What are the consequences of deleting the `terraform.tfstate` file?",
+    "answer": "If you delete the `terraform.tfstate` file, Terraform cannot properly manage resources, and you would need to restore or recreate it, or manage those resources without Terraform."
+  },
+  {
+    "question": "Why might a VM created by Terraform not be directly accessible from outside the tenant?",
+    "answer": "A VM might not be directly accessible from outside the tenant if it has not been assigned a floating IP."
+  },
+  {
+    "question": "How can a VM without a direct public IP be accessed if it's within a tenant?",
+    "answer": "If another host in the same tenant has a floating IP, it can be used as a jump host (or bastion host) to access the new VM, as they are on the same private network."
+  },
+  {
+    "question": "How are floating IPs allocated and associated with VMs in OpenStack?",
+    "answer": "Floating IPs are allocated to the project from a pool and then associated with the VM\u2019s private network interface, rather than being created directly on the VM."
+  },
+  {
+    "question": "What Terraform resource is used to allocate a floating IP?",
+    "answer": "The `openstack_networking_floatingip_v2` resource is used to declare and allocate a floating IP."
+  },
+  {
+    "question": "What essential information is needed to declare an `openstack_networking_floatingip_v2` resource?",
+    "answer": "You need to know the `pool` from which to allocate the floating IP; for example, `pool = \"ext_net\"`."
+  }
+]

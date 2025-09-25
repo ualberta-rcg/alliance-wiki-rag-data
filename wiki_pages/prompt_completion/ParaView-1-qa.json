@@ -1,0 +1,98 @@
+[
+  {
+    "question": "What is the function of the 'Remote Render Threshold' setting in ParaView preferences?",
+    "answer": "The 'Remote Render Threshold' determines whether small rendering tasks are processed locally on your computer's GPU or remotely on cluster resources, influencing visualization speed and interactivity."
+  },
+  {
+    "question": "What happens if the 'Remote Render Threshold' is set to its default value (20MB) or similar?",
+    "answer": "Small rendering tasks will be done on your computer's GPU, making mouse rotation fast, but anything modestly intensive (under 20MB) will be shipped to your computer, potentially slowing down visualization depending on your connection."
+  },
+  {
+    "question": "What is the consequence of setting the 'Remote Render Threshold' to 0MB?",
+    "answer": "All rendering, including rotation, will be performed remotely using the cluster resources, which is good for large data processing but may reduce interactivity."
+  },
+  {
+    "question": "What is a crucial requirement for establishing a client-server connection in ParaView?",
+    "answer": "ParaView requires the same major version on the local client and the remote host to prevent incompatibility issues that typically manifest as a failed handshake."
+  },
+  {
+    "question": "If the ParaView server on the cluster is version 5.10.0, what client version is necessary on my computer?",
+    "answer": "You need client version 5.10.x on your computer for compatibility."
+  },
+  {
+    "question": "What types of client-server rendering are available on Cedar, Graham, B\u00e9luga, and Narval?",
+    "answer": "Client-server rendering is available on both CPUs (in software) and GPUs (hardware acceleration) on these clusters."
+  },
+  {
+    "question": "What is the recommended approach for starting visualization on Cedar, Graham, B\u00e9luga, and Narval, especially given GPU rendering complexities?",
+    "answer": "It is strongly recommended to start with CPU-only visualization due to additional complications with GPU rendering."
+  },
+  {
+    "question": "How can one estimate the number of cores needed for CPU-only visualization?",
+    "answer": "Estimate the number of cores by taking the amount of memory needed for rendering and dividing it by approximately 3.5 GB/core."
+  },
+  {
+    "question": "What is the suggested maximum memory allocation per core for software rendering?",
+    "answer": "It is not recommended to allocate more than 4GB/core for software rendering, as it is CPU-intensive."
+  },
+  {
+    "question": "Why is it important to allocate additional memory for filters and data processing during ParaView rendering?",
+    "answer": "It is important because filters and data processing, such as a structured to unstructured dataset conversion, can significantly increase your memory footprint (e.g., by ~3X)."
+  },
+  {
+    "question": "What should be done if the ParaView server is terminated while processing data?",
+    "answer": "If your ParaView server gets killed when processing data, you will need to increase the number of allocated cores."
+  },
+  {
+    "question": "What modern CPU-based libraries offer performance comparable to GPU-based rendering for certain types of ParaView rendering?",
+    "answer": "Modern CPU-based libraries such as OSPRay and OpenSWR offer performance quite similar to GPU-based rendering for some types of rendering."
+  },
+  {
+    "question": "How does the ParaView server facilitate parallel rendering for very large datasets using CPUs?",
+    "answer": "The ParaView server uses MPI for distributed-memory processing, allowing parallel rendering on a large number of CPU cores, either on a single node or scattered across multiple nodes."
+  },
+  {
+    "question": "What is the initial step for interactive client-server CPU-based ParaView rendering on Cedar or Graham?",
+    "answer": "First, install the same ParaView version on your computer as available on the cluster, then log into Cedar or Graham and start a serial CPU interactive job."
+  },
+  {
+    "question": "Which command is used to start a serial CPU interactive job on Cedar or Graham?",
+    "answer": "Use the command `salloc --time=1:00:0 --ntasks=1 --mem-per-cpu=3600 --account=def-someprof`."
+  },
+  {
+    "question": "How do you load the offscreen ParaView module and initiate the server within a CPU interactive job?",
+    "answer": "Load the module using `module load paraview/5.13.1` and then start the server with `pvserver --force-offscreen-rendering`."
+  },
+  {
+    "question": "What information should you record after starting the ParaView server?",
+    "answer": "Make a note of the compute node (e.g., cdr774) and the port (usually 11111) from the 'Connection URL' displayed in the server output."
+  },
+  {
+    "question": "How do you establish an SSH tunnel to link your local port 11111 to the ParaView server's port on the compute node?",
+    "answer": "In another terminal, use `ssh <username>@cedar.computecanada.ca -L 11111:cdr774:11111`, replacing `<username>` with your actual username and `cdr774` with the correct compute node."
+  },
+  {
+    "question": "What steps are required to configure and connect the ParaView client on your local computer to the remote server?",
+    "answer": "In ParaView, go to 'File -> Connect' or click the green 'Connect' button, then 'Add Server'. Set name=cedar, server type=Client/Server, host=localhost, port=11111. Click 'Configure', select 'Manual', and 'Save'. Finally, select the server from the list and click 'Connect'."
+  },
+  {
+    "question": "What message confirms a successful client connection in the ParaView server's terminal window?",
+    "answer": "The first terminal window that initially read 'Accepting connection' will then read 'Client connected'."
+  },
+  {
+    "question": "After successfully connecting to the remote ParaView server, what can you do?",
+    "answer": "You can open a file in ParaView, which will point you to the remote filesystem, and visualize it as usual."
+  },
+  {
+    "question": "How do you start a parallel job for rendering with multiple CPUs?",
+    "answer": "You can start a parallel job using `salloc --time=0:30:0 --ntasks=8 --mem-per-cpu=3600 --account=def-someprof`."
+  },
+  {
+    "question": "What commands are used to load the ParaView module and start the server with `srun` for parallel rendering?",
+    "answer": "First, `module load paraview-offscreen/5.13.1`, then `srun pvserver --force-offscreen-rendering`."
+  },
+  {
+    "question": "How can you verify that parallel rendering is actively being performed?",
+    "answer": "To check parallel rendering, you can pass your visualization through the Process Id Scalars filter and then color it by 'process id'."
+  }
+]

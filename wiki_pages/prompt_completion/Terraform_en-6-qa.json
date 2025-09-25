@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What does a Terraform plan indicate when adding a root volume to an existing VM?",
+    "answer": "When adding a root volume to an existing VM, the Terraform plan will indicate '2 to add, 0 to change, 2 to destroy,' meaning the VM and its associated floating IP will be replaced."
+  },
+  {
+    "question": "What must a user do regarding SSH keys if a VM they previously connected to is recreated by Terraform?",
+    "answer": "If a VM is recreated by Terraform, it will have a new SSH key, so users who connected previously will need to remove the old SSH key from their `known_hosts` file."
+  },
+  {
+    "question": "What is a crucial step after a Terraformed VM is successfully created?",
+    "answer": "After a Terraformed VM is created and accessible, the first thing to do is log on and apply all available operating system updates, typically using a command like `sudo yum update -y`."
+  },
+  {
+    "question": "How do you declare the OpenStack provider in a Terraform configuration?",
+    "answer": "The OpenStack provider is declared using the `provider \"openstack\" {}` block in Terraform."
+  },
+  {
+    "question": "What are the essential components for defining an OpenStack VM with a network and bootable volume in Terraform?",
+    "answer": "An OpenStack VM can be defined using the `openstack_compute_instance_v2` resource, including `name`, `flavor_id`, `key_pair`, `security_groups`, a `network` block with `name`, and a `block_device` block specifying `uuid` (image ID), `source_type` as \"image\", `destination_type` as \"volume\", `volume_size`, `boot_index`, and `delete_on_termination`."
+  },
+  {
+    "question": "How is a floating IP resource defined in Terraform for an OpenStack environment?",
+    "answer": "A floating IP resource is defined using `resource \"openstack_networking_floatingip_v2\" \"myvm_fip\" { pool = \"provider-199-2\" }`, where `pool` specifies the external network from which the IP is allocated."
+  },
+  {
+    "question": "How do you associate an allocated floating IP with an OpenStack VM in Terraform?",
+    "answer": "A floating IP is associated with an OpenStack VM using the `openstack_compute_floatingip_associate_v2` resource, referencing the `address` attribute of the `openstack_networking_floatingip_v2` resource and the `id` attribute of the `openstack_compute_instance_v2` resource."
+  },
+  {
+    "question": "What is the syntax compatibility status of the OpenStack provider documentation for Terraform?",
+    "answer": "As of the document's writing, the OpenStack provider's documentation adheres to v0.11 syntax, but it is expected to function correctly with Terraform v0.12."
+  },
+  {
+    "question": "Where can one find an introductory guide to Terraform?",
+    "answer": "An introduction to Terraform is available at `https://www.terraform.io/intro/index.html`."
+  },
+  {
+    "question": "What are some recommended resources for examples of creating OpenStack VMs with Terraform?",
+    "answer": "Recommended resources include the `OpenStack compute instance resource` documentation, the `Magic Castle` project, and `diodonfrost/terraform-openstack-examples` on GitHub."
+  },
+  {
+    "question": "What steps are involved in finding an image's UUID using the OpenStack Horizon web interface?",
+    "answer": "To find an image's UUID in Horizon, navigate to the `Compute` section, select `Images`, then click on the specific image to view its details, including the ID."
+  },
+  {
+    "question": "How can you identify the name of a flavour in the OpenStack Horizon web interface?",
+    "answer": "To find a flavour's name in Horizon, you can initiate the process of launching an instance and then navigate to the `Flavor` pane in the instance launch dialog, which lists available flavours by name."
+  },
+  {
+    "question": "What are the suggested methods for obtaining a flavour's ID when only its name is displayed in OpenStack Horizon?",
+    "answer": "To obtain a flavour's ID when only its name is shown in Horizon, you can either use the name for an initial Terraform run and extract the ID from the output or state file, or the recommended approach is to use the OpenStack CLI."
+  }
+]

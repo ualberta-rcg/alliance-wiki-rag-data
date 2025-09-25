@@ -1,0 +1,86 @@
+[
+  {
+    "question": "How is the `net` model wrapped for distributed data parallelism in the combined model and data parallelism example?",
+    "answer": "The `net` model is wrapped with `torch.nn.parallel.DistributedDataParallel(net)`."
+  },
+  {
+    "question": "Which GPU is the `nn.CrossEntropyLoss` criterion loaded onto in the combined model and data parallelism setup?",
+    "answer": "The `nn.CrossEntropyLoss` criterion is loaded onto the second GPU of each process, specified as `cuda(local_rank + 1)`."
+  },
+  {
+    "question": "What type of optimizer is used in the combined model and data parallelism example?",
+    "answer": "An `optim.SGD` optimizer is used with the model parameters and a learning rate (`lr`)."
+  },
+  {
+    "question": "How are input data and targets moved to specific GPUs within the training loop of the combined model and data parallelism example?",
+    "answer": "Inputs are moved to `inputs.cuda(model_rank)` and targets to `targets.cuda(model_rank + 1)`."
+  },
+  {
+    "question": "What is DeepSpeed?",
+    "answer": "DeepSpeed is a deep learning training optimization library designed for training massive billion-parameter models at scale."
+  },
+  {
+    "question": "What concept are DeepSpeed's memory-efficient distributed training methods based on?",
+    "answer": "DeepSpeed's memory-efficient distributed training methods are based on the Zero Redundancy Optimizer (ZeRO) concept."
+  },
+  {
+    "question": "What elements of a training task does ZeRO enable distributed storage and computing for?",
+    "answer": "ZeRO enables distributed storage and computing for optimizer states, model weights, model gradients, and model activations."
+  },
+  {
+    "question": "Across which devices can ZeRO distribute storage and computing?",
+    "answer": "ZeRO can distribute storage and computing across multiple devices, including GPU, CPU, local hard disk, and combinations of these."
+  },
+  {
+    "question": "How does DeepSpeed allow models with massive amounts of parameters to be trained efficiently?",
+    "answer": "DeepSpeed uses 'pooling' of resources, particularly for storage, enabling efficient training of massive models across multiple nodes without explicitly handling Model, Pipeline, or Data Parallelism."
+  },
+  {
+    "question": "What interface does DeepSpeed use for its ZeRO variants in the provided examples?",
+    "answer": "DeepSpeed uses its PyTorch Lightning interface for ease of use in the provided examples."
+  },
+  {
+    "question": "What does ZeRO Stage 3 mean when training a model using a pool of GPUs?",
+    "answer": "ZeRO Stage 3 means that optimizer states, model parameters, and model gradients will all be split (sharded) between all available GPUs."
+  },
+  {
+    "question": "How does ZeRO Stage 3's memory efficiency compare to pure Data Parallelism?",
+    "answer": "ZeRO Stage 3 is more memory-efficient than pure Data Parallelism, where a full replica of the model is loaded on each GPU."
+  },
+  {
+    "question": "What DeepSpeed optimizer is recommended for ZeRO Stage 3 on GPU?",
+    "answer": "DeepSpeed's `FusedAdam` optimizer is recommended for ZeRO Stage 3 on GPU."
+  },
+  {
+    "question": "How does `FusedAdam`'s performance compare to native PyTorch optimizers when used with ZeRO Stage 3?",
+    "answer": "Performance with `FusedAdam` is comparable to using a native PyTorch optimizer when used with ZeRO Stage 3."
+  },
+  {
+    "question": "What module must be loaded when using a DeepSpeed optimizer that is JIT compiled at run-time?",
+    "answer": "The `cuda/<version>` module must be loaded, where `<version>` matches the version used to build the PyTorch installation."
+  },
+  {
+    "question": "What is the purpose of the `TORCH_NCCL_ASYNC_HANDLING=1` environment variable in the `deepspeed-stage3.sh` script?",
+    "answer": "The `TORCH_NCCL_ASYNC_HANDLING=1` environment variable is exported."
+  },
+  {
+    "question": "What is the `ConvPart` class in the `deepspeed-stage3.py` script?",
+    "answer": "The `ConvPart` class represents the convolutional and pooling layers of the model, including two `Conv2d` layers, `MaxPool2d` layers, and a `ReLU` activation."
+  },
+  {
+    "question": "What is the `MLPPart` class in the `deepspeed-stage3.py` script?",
+    "answer": "The `MLPPart` class represents the dense feedforward layers of the model, including three `Linear` layers and a `ReLU` activation."
+  },
+  {
+    "question": "How is the `Net` model structured in the `deepspeed-stage3.py` script for use with DeepSpeed?",
+    "answer": "The `Net` model has a `conv_part` and `mlp_part` which are combined into an `nn.Sequential` block during the `configure_sharded_model` call."
+  },
+  {
+    "question": "What strategy is used for the `pl.Trainer` in the `deepspeed-stage3.py` script?",
+    "answer": "The `pl.Trainer` uses the `deepspeed_stage_3` strategy."
+  },
+  {
+    "question": "Which optimizer is configured for the `Net` in the `deepspeed-stage3.py` script?",
+    "answer": "The `FusedAdam` optimizer from `deepspeed.ops.adam` is configured for the `Net`."
+  }
+]

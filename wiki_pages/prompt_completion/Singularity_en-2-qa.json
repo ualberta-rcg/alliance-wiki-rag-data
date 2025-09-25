@@ -1,0 +1,94 @@
+[
+  {
+    "question": "Why is it important to create a Singularity image on a Linux system with root permissions if you plan to upgrade or install software later?",
+    "answer": "Commands like `dpkg`, `apt-get`, and `apt` for Debian and Ubuntu images all require root to upgrade or install packages. Thus, if the ability to install and upgrade software in the future is important, you should create the image on a Linux system where you have root permissions."
+  },
+  {
+    "question": "What must be done with a Singularity image created on a personal computer before it can be used on a cluster?",
+    "answer": "Any image you create on your own computer needs to be uploaded to the cluster before you can use that image."
+  },
+  {
+    "question": "What error might occur when building Singularity images on certain Linux distributions despite having enough memory?",
+    "answer": "You may get a build error with messages like 'WARNING: 'nodev' mount option set on /tmp, it could be a source of failure during build process' and 'FATAL: no memory left on device'."
+  },
+  {
+    "question": "What causes the 'no memory left on device' error during Singularity image builds on some Linux distributions?",
+    "answer": "Many modern Linux distributions use an in-memory `tmpfs` filesystem, which may limit the size of the container you can build."
+  },
+  {
+    "question": "How can you resolve the 'no memory left on device' error during Singularity image builds?",
+    "answer": "You can solve the problem by setting the `SINGULARITY_TMPDIR` environment variable so that it points to a local disk, for example: `$ SINGULARITY_TMPDIR=\"disk/location\" singularity build IMAGE_NAME.sif docker://DOCKER-IMAGE-NAME`."
+  },
+  {
+    "question": "Can users obtain `sudo` access when creating Singularity images directly on a cluster?",
+    "answer": "If you decide to create an image on a cluster, be aware of the fact that you will never have `sudo` access."
+  },
+  {
+    "question": "What are the recommended locations for creating Singularity images within the Alliance clusters?",
+    "answer": "Images can be created on any Alliance cluster or on a visualization computer, e.g., `gra-vdi.computecanada.ca`."
+  },
+  {
+    "question": "How should a user create a Singularity image on `beluga.computecanada.ca`?",
+    "answer": "On `beluga.computecanada.ca`, connect using SSH and use a login node to create the image."
+  },
+  {
+    "question": "What is the procedure for creating a Singularity image on `cedar.computecanada.ca`?",
+    "answer": "On `cedar.computecanada.ca`, connect using SSH and create the image in an interactive job; do not use a login node."
+  },
+  {
+    "question": "What are the instructions for creating a Singularity image on `graham.computecanada.ca`?",
+    "answer": "On `graham.computecanada.ca`, connect using SSH and use a login node to create the image."
+  },
+  {
+    "question": "How should a user create a Singularity image on `gra-vdi.computecanada.ca`?",
+    "answer": "On `gra-vdi.computecanada.ca`, connect using VNC and use a terminal window to create the image."
+  },
+  {
+    "question": "Which cluster is considered the best choice for creating Singularity images among the listed options?",
+    "answer": "Among these options, `gra-vdi.computecanada.ca` is the best choice for creating images."
+  },
+  {
+    "question": "What is an important consideration when creating a Singularity image on `niagara.computecanada.ca`?",
+    "answer": "On `niagara.computecanada.ca`, connect using SSH and use a login node. IMPORTANT: Do not bind to `/localscratch` on Niagara as it does not exist!"
+  },
+  {
+    "question": "What are some limitations when creating Singularity images on `beluga`, `graham`, and `niagara`?",
+    "answer": "On `beluga`, `graham`, and `niagara`, the maximum amount of RAM that can be used on login nodes is fixed, and there is no Internet access on compute nodes."
+  },
+  {
+    "question": "What are the challenges when creating Singularity images on `cedar`?",
+    "answer": "On `cedar`, login nodes cannot be used for image creation, and compute node jobs require specifying the amount of RAM needed, which is very difficult to know in advance. If an error occurs, you must exit the interactive job and try again requesting more memory."
+  },
+  {
+    "question": "What is Docker Hub used for in the context of Singularity?",
+    "answer": "Docker Hub provides an interface to search for images."
+  },
+  {
+    "question": "What errors might indicate a problem with Docker authentication when using Singularity to download images?",
+    "answer": "You might get errors similar to 'requested access to the resource is denied' or 'unauthorized: authentication required'."
+  },
+  {
+    "question": "What are two common reasons for authentication errors when trying to download images from Docker Hub using Singularity?",
+    "answer": "Authentication errors might occur because your Docker URL is incorrect or you need to authenticate with Docker in order to download the image, for example, by adding `--docker-login` after the Singularity `build` or `pull` command."
+  },
+  {
+    "question": "How can you verify a Docker URL when encountering download errors with Singularity?",
+    "answer": "You can verify the Docker URL by using Docker Hub and searching for the specific image you want."
+  },
+  {
+    "question": "How do you download a container from Docker Hub, such as `ubuntu`, into a Singularity image file named `myubuntuimage.sif`?",
+    "answer": "You would download the container by running: `$ singularity build myubuntuimage.sif docker://ubuntu`."
+  },
+  {
+    "question": "Why is building large Singularity images directly on login nodes not recommended?",
+    "answer": "We don't recommend building large Singularity images on login nodes because this process will affect other users and likely fail due to the high CPU and RAM usage."
+  },
+  {
+    "question": "Where does the command `singularity build myubuntuimage.sif docker://ubuntu` work and not work among the clusters mentioned, and why?",
+    "answer": "This command will work on a Cedar compute node but not on B\u00e9luga or Graham, where compute nodes cannot access the internet."
+  },
+  {
+    "question": "What two-step process is recommended for building large Singularity images when direct building on login nodes is not feasible?",
+    "answer": "The recommended two-step process involves first downloading a Docker image without converting it to Singularity (which is not computationally intensive and can be done on any data transfer or login node), and then converting the downloaded Docker image to a Singularity image on a compute node with a suitable allocation of memory and CPU (which is computationally intensive)."
+  }
+]

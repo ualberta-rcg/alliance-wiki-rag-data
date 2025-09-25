@@ -1,0 +1,54 @@
+[
+  {
+    "question": "When would you typically need to boot a system in single-user mode or with a recovery kernel?",
+    "answer": "You would typically need to boot the operating system in single-user mode or launch a recovery kernel if it's impossible to access the instance via SSH or a local user."
+  },
+  {
+    "question": "What is the main prerequisite for using single-user mode or a recovery kernel for system access?",
+    "answer": "The only condition is that the boot manager must be accessible and modifiable."
+  },
+  {
+    "question": "Why is booting into single-user mode not helpful for recovery on most Debian10 images?",
+    "answer": "For most images, including Debian10, the root account is locked, which prevents effective recovery via single-user mode."
+  },
+  {
+    "question": "What is the purpose of the `init` process in a Linux system?",
+    "answer": "The `init` process is a single-user space binary that has PID1 and takes control from the kernel in user space, handling tasks like daemon execution. In recent distributions, it can be `systemd`, `systemV`, or `upstart`."
+  },
+  {
+    "question": "How can the default `init` process be bypassed to run a shell for system recovery?",
+    "answer": "The `init` process can be modified with the boot manager to instruct the kernel to execute a shell instead, allowing for manual file system mounting and recovery operations."
+  },
+  {
+    "question": "What key should be pressed in the GRUB menu to edit boot parameters on a Debian10 instance?",
+    "answer": "When the GRUB menu is displayed for a Debian10 instance, press `e` (for edit) to modify boot parameters."
+  },
+  {
+    "question": "What modification needs to be made in the GRUB menu for Debian10 to make the kernel recognize a new `init` process?",
+    "answer": "You need to delete any serial transmission consoles and add `init=/bin/bash` to the GRUB line to make the kernel recognize the new `init` process."
+  },
+  {
+    "question": "Provide an example of a modified `linux` line in the GRUB menu for Debian10 recovery.",
+    "answer": "An example of a modified `linux` line is: `linux /boot/vmlinuz-4.19.0-6-cloud-amd64 root=UUID=d187d85e-8a80-4664-8b5a-dce4d7ceca9e ro biosdevname=0 net.ifnames=0 console=tty0 init=/bin/bash`."
+  },
+  {
+    "question": "What is the initial state of the file system after booting Debian10 with `init=/bin/bash`?",
+    "answer": "After booting Debian10 with `init=/bin/bash`, the system is in memory, and the file system is mounted in read-only (r/o) mode."
+  },
+  {
+    "question": "What are the essential subsequent steps for performing a useful recovery after booting into a bash shell on Debian10?",
+    "answer": "For a useful recovery on Debian10, the next steps are to remount the initrd file system in read-write mode, mount the operating system's image disk, enter with chroot, define a root password, and then restart the instance."
+  },
+  {
+    "question": "How do you remount the initrd file system in read-write mode during recovery on Debian10?",
+    "answer": "To remount the initrd file system in read-write mode, use the command: `mount -o remount,rw /`."
+  },
+  {
+    "question": "Which command is used to mount the primary partition (`/dev/vda1`) of the OS image onto `/mnt` during Debian10 recovery?",
+    "answer": "The command `mount /dev/vda1 /mnt` is used to mount the primary partition (`/dev/vda1`) onto `/mnt`."
+  },
+  {
+    "question": "What bind mounts are required under `/mnt` to enable the use of tools via chroot for Debian10 recovery?",
+    "answer": "To use tools via chroot, `/dev`, `/proc`, and `/sys` must be bind-mounted onto `/mnt` using the commands: `mount -o bind /proc /mnt/proc`, `mount -o bind /sys /mnt/sys`, and `mount -o bind /dev /mnt/dev`."
+  }
+]

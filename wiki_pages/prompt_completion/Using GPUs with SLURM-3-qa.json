@@ -1,0 +1,58 @@
+[
+  {
+    "question": "How do you request a single GPU node on Graham with two P100 GPUs?",
+    "answer": "You can use the following sbatch directives: `--nodes=1`, `--gpus-per-node=p100:2`, `--ntasks-per-node=32`, `--mem=127000M`, and `--time=3:00`."
+  },
+  {
+    "question": "What are the recommended resource requests for a P100 GPU node on Cedar?",
+    "answer": "For a P100 GPU node on Cedar, you should request `--nodes=1`, `--gpus-per-node=p100:4`, `--ntasks-per-node=24`, `--exclusive`, `--mem=125G`, and `--time=3:00`."
+  },
+  {
+    "question": "What distinguishes the special P100-16GB GPU nodes on Cedar from other P100 GPUs?",
+    "answer": "These special nodes have four Tesla P100 16GB cards, compared to 12GB on other P100s. Their GPUs use the same PCI switch for lower inter-GPU communication latency, but have lower bandwidth between the CPU and GPU than regular nodes. They also feature 256GB RAM."
+  },
+  {
+    "question": "How much RAM do the P100-16GB GPU nodes on Cedar (p100l type) have?",
+    "answer": "The P100-16GB GPU nodes on Cedar have 256GB of RAM."
+  },
+  {
+    "question": "What is the maximum job duration for P100L GPU jobs on Cedar?",
+    "answer": "P100L GPU jobs on Cedar can run for up to 28 days."
+  },
+  {
+    "question": "How do you request a P100-16GB GPU node on Cedar?",
+    "answer": "You must request these nodes as whole nodes. It is specified using `--gpus-per-node=p100l:4` or `--gres=gpu:p100l:4`. For example, a job script would include `--nodes=1`, `--gpus-per-node=p100l:4`, `--ntasks=1`, `--cpus-per-task=24`, and `--mem=0` to request the full memory."
+  },
+  {
+    "question": "How many CPU cores are available on the P100L Cedar GPU nodes?",
+    "answer": "There are 24 CPU cores on P100L Cedar GPU nodes."
+  },
+  {
+    "question": "What is the purpose of `--mem=0` in an sbatch script for a P100L GPU node on Cedar?",
+    "answer": "`--mem=0` is used to request the full memory of the node when submitting a job to a P100L GPU node on Cedar."
+  },
+  {
+    "question": "When is GNU Parallel recommended for GPU jobs?",
+    "answer": "GNU Parallel is recommended if you need to run four single-GPU programs or two 2-GPU programs for longer than 24 hours within one SLURM job."
+  },
+  {
+    "question": "How does GNU Parallel assign GPU IDs in the provided example?",
+    "answer": "In the example, the GPU ID is calculated by subtracting 1 from the slot ID (`{%}`). The command `CUDA_VISIBLE_DEVICES=$(({%} - 1))` is used for this."
+  },
+  {
+    "question": "What does the `-j4` parameter signify in a GNU Parallel command?",
+    "answer": "The `-j4` parameter means that GNU Parallel can run a maximum of four concurrent tasks."
+  },
+  {
+    "question": "Why is `CUDA_VISIBLE_DEVICES` used when packing single-GPU jobs with GNU Parallel?",
+    "answer": "`CUDA_VISIBLE_DEVICES` is used to ensure that two tasks do not try to use the same GPU at the same time."
+  },
+  {
+    "question": "On which clusters is it necessary to disable NVIDIA Data Center GPU Manager (DCGM) for GPU profiling?",
+    "answer": "It is necessary to disable NVIDIA Data Center GPU Manager (DCGM) on B\u00e9luga and Narval for GPU profiling tasks."
+  },
+  {
+    "question": "How do you disable NVIDIA DCGM during job submission for GPU profiling?",
+    "answer": "NVIDIA DCGM needs to be disabled by setting the `DISABLE_DCGM` environment variable to 1 using the `--export=ALL,DISABLE_DCGM=1` parameter in your sbatch command."
+  }
+]

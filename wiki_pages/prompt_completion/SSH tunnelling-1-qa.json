@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What is SSH tunnelling?",
+    "answer": "SSH tunnelling is a method to use a gateway computer to connect two computers that cannot connect directly."
+  },
+  {
+    "question": "Why is SSH tunnelling necessary for compute nodes on Alliance clusters like Niagara, B\u00e9luga, and Graham?",
+    "answer": "SSH tunnelling is necessary because compute nodes on these clusters do not have direct access to the Internet, nor can they be contacted directly from the Internet."
+  },
+  {
+    "question": "What are the main use cases that require SSH tunnels in the Alliance context?",
+    "answer": "SSH tunnels are required for: running commercial software needing a license server over the Internet; running visualization software needing client contact on a user's local computer; running a Jupyter Notebook needing Web browser contact; and connecting to the Cedar database server from a desktop."
+  },
+  {
+    "question": "What is a 'port' in the context of computer communication?",
+    "answer": "A port is a number used to distinguish streams of communication from one another, analogous to a radio frequency or a channel. Many port numbers are reserved for specific types of traffic."
+  },
+  {
+    "question": "Why is SSH tunnelling, also called port forwarding, used when commercial software on a compute node needs to contact an Internet-based license server?",
+    "answer": "It's used because compute nodes typically lack direct Internet access. A gateway server with Internet access must be used to forward communications from the compute node to the license server via a predetermined port."
+  },
+  {
+    "question": "What essential information is required to set up an SSH tunnel in a batch job for contacting a license server?",
+    "answer": "You will need the IP address or name of the license server (LICSERVER) and the port number of the license service (LICPORT)."
+  },
+  {
+    "question": "Who should provide the IP address and port number for the license server?",
+    "answer": "You should obtain this information from whoever maintains the license server."
+  },
+  {
+    "question": "What are the outgoing IP addresses for Niagara login nodes when connecting to a license server?",
+    "answer": "For Niagara, the outgoing IP address will either be 142.1.174.227 or 142.1.174.228."
+  },
+  {
+    "question": "Is there an alternative solution for Graham users to connect to a license server without setting up an SSH tunnel?",
+    "answer": "Yes, for Graham, an alternative is to request a firewall exception for the specific license server (LICSERVER) and its port (LICPORT)."
+  },
+  {
+    "question": "What are the designated gateway servers for setting up an SSH tunnel on Niagara and Graham?",
+    "answer": "On Niagara, the gateway server is 'nia-gw'. On Graham, you need to pick one of the login nodes (e.g., 'gra-login1, 2, ...')."
+  },
+  {
+    "question": "What is the purpose of the `-N` and `-f` parameters in the SSH tunnel command `ssh GATEWAY -L COMPUTEPORT:LICSERVER:LICPORT -N -f`?",
+    "answer": "The `-N` parameter tells SSH not to open a shell on the GATEWAY, and combining `-f` with `-N` tells SSH to run in the background, allowing the job script to continue executing past this SSH command."
+  },
+  {
+    "question": "How should software be configured in a job script to utilize a license server through an SSH tunnel?",
+    "answer": "The software should be informed that the license server is on port COMPUTEPORT on the server 'localhost'. This is often achieved by setting an environment variable in the job script, such as `export MLM_LICENSE_FILE=COMPUTEPORT@localhost`."
+  },
+  {
+    "question": "What does the term 'localhost' signify when configuring software to use an SSH tunnel for a license server?",
+    "answer": "The term 'localhost' is the standard name a computer uses to refer to itself. It should be taken literally and not replaced with the computer's actual name."
+  },
+  {
+    "question": "What is the primary benefit of using SSH tunnelling to connect to a program running on a compute node?",
+    "answer": "It allows a user's computer to connect to a compute node through an encrypted tunnel via the login node, enabling graphical output of applications like Jupyter Notebooks or visualization software to be displayed transparently on the user's local workstation."
+  },
+  {
+    "question": "What tool is recommended for creating an SSH tunnel from Linux or MacOS X systems when connecting to a program on a compute node?",
+    "answer": "On Linux or MacOS X systems, the `sshuttle` Python package is recommended."
+  },
+  {
+    "question": "What command is used to create an SSH tunnel with `sshuttle` on Linux or MacOS X?",
+    "answer": "The command to create the tunnel using `sshuttle` is `sshuttle --dns -Nr userid@machine_name`."
+  },
+  {
+    "question": "Which software is used to create an SSH tunnel from Windows for connecting to a program on a compute node?",
+    "answer": "An SSH tunnel can be created from Windows using MobaXTerm."
+  },
+  {
+    "question": "When using MobaXTerm on Windows to connect to a program on a compute node, how is the SSH tunnel typically set up?",
+    "answer": "You open two MobaXTerm sessions: one for the cluster job to get the application URL, and a second local terminal session. In the local terminal, you run an `ssh -L` command to forward a local port to the remote host and port. Finally, you modify the application's URL to use `localhost` instead of the remote hostname."
+  },
+  {
+    "question": "In the MobaXTerm example command `ssh -L 8888:cdr544.int.cedar.computecanada.ca:8888 someuser@cedar.computecanada.ca`, what do the two '8888' port numbers represent?",
+    "answer": "The first '8888' is the local port number on your computer, to which connections will be forwarded. The second '8888' is the remote port number on `cdr544.int.cedar.computecanada.ca` (the compute node) where the application is listening."
+  },
+  {
+    "question": "In the example job script for contacting a license server, how is the `LOCALPORT` determined?",
+    "answer": "The `LOCALPORT` is determined by randomly selecting a number between 1024 and 65535 using the `shuf -i 1024-65535 -n 1` command."
+  }
+]

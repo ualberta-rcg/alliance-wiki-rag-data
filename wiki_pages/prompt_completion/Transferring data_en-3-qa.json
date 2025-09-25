@@ -1,0 +1,82 @@
+[
+  {
+    "question": "How do you transfer a directory or file locally into a project directory using rsync?",
+    "answer": "You can use the command `rsync -avh --no-g --no-p LOCALNAME ~/projects/def-professor/someuser/somedir/`. This will create `somedir` if it doesn't already exist before copying `LOCALNAME` into it."
+  },
+  {
+    "question": "What is a key difference between `rsync` and `cp` when transferring a directory locally?",
+    "answer": "Unlike rsync, if you use the `cp` command to transfer a directory locally, such as `cp -rv --preserve=\"mode,timestamps\" LOCALNAME ~/projects/def-professor/someuser/somedir/`, and `somedir` does not exist, the `LOCALNAME` directory will be renamed to `somedir`."
+  },
+  {
+    "question": "When is it recommended to use checksums to verify if files match?",
+    "answer": "Checksums should be used to check if files match when Globus is unavailable between two systems being synchronized and Rsync is taking too long."
+  },
+  {
+    "question": "Which checksum utility is used in the provided example to check file matches?",
+    "answer": "The `sha1sum` utility is used in the example to determine if files match."
+  },
+  {
+    "question": "What command generates checksums for files in a directory and saves them to a log file?",
+    "answer": "The command `find /home/username/ -type f -print0 | xargs -0 sha1sum | tee checksum-result.log` will create a `checksum-result.log` file containing all checksums for files in `/home/username/`."
+  },
+  {
+    "question": "How can I ensure that a checksum generation command continues if my SSH connection times out?",
+    "answer": "If you have a lot of files or very large files, you may want to run the checksum command in the background, in a GNU Screen, or Tmux session to ensure it continues if your SSH connection times out."
+  },
+  {
+    "question": "After generating checksums on two systems, how can you find files that don't match?",
+    "answer": "You can use the `diff` utility with the command `diff checksum-result-silo.log checksum-dtn.log` to find files that don't match."
+  },
+  {
+    "question": "How can you resolve false differences when comparing checksum logs with `diff`?",
+    "answer": "If the `find` command crawls through directories in a different order, causing false differences, you may need to run `sort -k2` on both checksum log files (e.g., `sort -k2 checksum-result-silo.log -o checksum-result-silo.log`) before running `diff`."
+  },
+  {
+    "question": "What does SFTP stand for, and what protocol does it use?",
+    "answer": "SFTP stands for Secure File Transfer Protocol and it uses the SSH protocol to transfer files between machines, which encrypts data being transferred."
+  },
+  {
+    "question": "How do you connect to a remote machine using SFTP with a username and password?",
+    "answer": "You can connect using the command `sftp USERNAME@ADDRESS`."
+  },
+  {
+    "question": "How can you connect to a remote machine using SFTP with an SSH key for authentication?",
+    "answer": "You can connect using the `-i` option, for example: `sftp -i /home/name/.ssh/id_rsa USERNAME@ADDRESS`."
+  },
+  {
+    "question": "How do you get a list of available commands at the SFTP prompt?",
+    "answer": "To get a list of commands available at the `sftp>` prompt, enter the `help` command."
+  },
+  {
+    "question": "What are some graphical SFTP programs available for different operating systems?",
+    "answer": "Graphical programs available for SFTP include WinSCP and MobaXterm for Windows, Filezilla for Windows, Mac, and Linux, and Cyberduck for Mac and Windows."
+  },
+  {
+    "question": "What does SCP stand for, and what protocol does it utilize?",
+    "answer": "SCP stands for Secure Copy Protocol and it uses the SSH protocol to encrypt data being transferred."
+  },
+  {
+    "question": "Does SCP support file synchronization?",
+    "answer": "No, SCP does not support synchronization like Globus or rsync."
+  },
+  {
+    "question": "How do you copy a local file to a remote directory on a cluster using SCP?",
+    "answer": "You can copy a local file, for example `foo.txt`, to the `$HOME/work` directory on the B\u00e9luga cluster using `scp foo.txt username@beluga.alliancecan.ca:work/`."
+  },
+  {
+    "question": "How do you copy a file from a remote cluster's project space to your local computer using SCP?",
+    "answer": "You can copy a remote file, for example `output.dat` from Cedar, to your current local directory using `scp username@cedar.alliancecan.ca:projects/def-jdoe/username/results/output.dat .`."
+  },
+  {
+    "question": "Where should the `scp` command always be executed?",
+    "answer": "The `scp` command should always be executed on your local computer, regardless of whether you are transferring data to or from the remote cluster."
+  },
+  {
+    "question": "Is it recommended to use `scp -r` to transfer data into `/project` file systems?",
+    "answer": "No, it is recommended against using `scp -r` to transfer data into `/project` because it can turn off the setgid bit in created directories, potentially leading to 'Disk quota exceeded' errors."
+  },
+  {
+    "question": "How do you specify a custom SSH key when using SCP?",
+    "answer": "If you chose a custom SSH key name, you need to use the `-i` option of `scp` and specify the path to your private key before the file paths, for example: `scp -i /path/to/key foo.txt username@beluga.alliancecan.ca:work/`."
+  }
+]

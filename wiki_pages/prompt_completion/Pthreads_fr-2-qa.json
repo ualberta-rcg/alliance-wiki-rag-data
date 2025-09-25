@@ -1,0 +1,70 @@
+[
+  {
+    "question": "What is the function of `pthread_mutex_lock`?",
+    "answer": "The `pthread_mutex_lock` function performs blocking, meaning the thread will wait indefinitely until the mutex becomes available, typically to serialize access to shared resources like the standard output channel."
+  },
+  {
+    "question": "What problem can arise when a real program has multiple mutex variables?",
+    "answer": "In a real program with several mutex variables controlling access to different global data structures, it's problematic because one must ensure the code does not cause other blocks, as a mutex must eventually become available."
+  },
+  {
+    "question": "What is the non-blocking alternative to `pthread_mutex_lock`?",
+    "answer": "The non-blocking alternative is `pthread_mutex_trylock`."
+  },
+  {
+    "question": "What does `pthread_mutex_trylock` indicate if the mutex is busy?",
+    "answer": "If the mutex is not available, `pthread_mutex_trylock` immediately produces a non-zero value, indicating that the mutex is occupied."
+  },
+  {
+    "question": "What consideration is important for code within a serialized block?",
+    "answer": "There should be no superfluous code inside the serialized block; since this code is executed in series, it must be as concise as possible to avoid hindering the program's parallelism."
+  },
+  {
+    "question": "What is `pthread_rwlock_t` and how does it function for reading and writing?",
+    "answer": "`pthread_rwlock_t` is a read/write lock tool that allows simultaneous reading of a variable by multiple threads, but it behaves like a standard mutex (exclusive access) for writing, meaning no other thread has access (read or write) during a write operation."
+  },
+  {
+    "question": "How should a `pthread_rwlock_t` lock be managed?",
+    "answer": "Like a mutex, the `pthread_rwlock_t` lock must be initialized before use and destroyed when it is no longer needed."
+  },
+  {
+    "question": "Which functions are used to acquire read and write locks with `pthread_rwlock_t`?",
+    "answer": "A thread obtains a read lock with `pthread_rwlock_rdlock` and a write lock with `pthread_rwlock_wrlock`."
+  },
+  {
+    "question": "How is a `pthread_rwlock_t` lock released?",
+    "answer": "In both read and write cases, the lock is released with `pthread_rwlock_unlock`."
+  },
+  {
+    "question": "What is the purpose of a condition variable (`pthread_cond_t`) in pthreads?",
+    "answer": "A condition variable, expressed as `pthread_cond_t`, allows multiple threads to act on the same condition, for example, waiting for slave threads to be solicited for a task."
+  },
+  {
+    "question": "What is required to use a `pthread_cond_t` variable?",
+    "answer": "To use a `pthread_cond_t` variable, a mutex must control access to the variables that influence the condition."
+  },
+  {
+    "question": "How does a thread wait for a condition using `pthread_cond_wait`?",
+    "answer": "A thread waiting for a condition locks the mutex and calls `pthread_cond_wait` with the condition variable and the mutex as arguments. The mutex is then atomically destroyed with the creation of the condition variable whose result is awaited by the thread."
+  },
+  {
+    "question": "What happens after a mutex is atomically destroyed by `pthread_cond_wait`?",
+    "answer": "After the mutex is atomically destroyed, other threads can then lock the mutex, either to wait for the condition or to modify one or more variables, which will modify the condition."
+  },
+  {
+    "question": "In the `thread_condition.c` example, what is the initial constraint for the `workload` variable?",
+    "answer": "In the `thread_condition.c` example, the initial value of the `workload` integer must be less than or equal to 25."
+  },
+  {
+    "question": "What is the role of `pthread_cond_signal` in a conditional wait scenario?",
+    "answer": "`pthread_cond_signal` is called to signal to the waiting thread that the condition is satisfied, allowing it to resume execution."
+  },
+  {
+    "question": "What is the difference between `pthread_cond_signal` and `pthread_cond_broadcast`?",
+    "answer": "In a real program where multiple threads are waiting for a condition, `pthread_cond_broadcast` signals all waiting threads that the condition is satisfied, while `pthread_cond_signal` would only alert a single random waiting thread, leaving others in a waiting state."
+  },
+  {
+    "question": "What resources are recommended for more information on pthreads?",
+    "answer": "For more information on pthreads, including optional arguments and advanced topics, the book 'Programming with POSIX Threads' by David Butenhof or the tutorial from the Lawrence Livermore National Laboratory are recommended."
+  }
+]

@@ -1,0 +1,90 @@
+[
+  {
+    "question": "How can multiple users connect to the same VNC desktop session?",
+    "answer": "Multiple connections to a VNC desktop session can be made if the vncserver was started with the additional `-AlwaysShared` option."
+  },
+  {
+    "question": "What command can be used to list all VNC servers running under your username?",
+    "answer": "All vncserver(s) running under your username can be displayed with `vncserver -list`."
+  },
+  {
+    "question": "What happens if a VNC server is not started with the `-AlwaysShared` option regarding multiple connections?",
+    "answer": "If a vncserver was not started with `vncserver -AlwaysShared`, only one vncviewer connection will be possible, and additional connection attempts will immediately fail."
+  },
+  {
+    "question": "What is a common reason for repeated failures to establish a new VNC server/viewer connection?",
+    "answer": "Repeated failing attempts to establish a new vncserver/vncviewer connection may be due to an old SSH tunnel still running on your desktop tying up ports."
+  },
+  {
+    "question": "How do you identify and terminate old SSH tunnels on your desktop that might be causing VNC connection issues?",
+    "answer": "To identify and kill any such tunnels, open a terminal window on your desktop and run `ps ux | grep ssh` followed by `kill PID`."
+  },
+  {
+    "question": "Which password should you use if your VNC screensaver times out and requests one?",
+    "answer": "If your VNC screensaver times out and requests a password, enter your cluster account password to unlock it (not your vncserver password)."
+  },
+  {
+    "question": "What command can be used to unlock a MATE desktop screensaver if it's stuck?",
+    "answer": "If you are running the MATE desktop and the screensaver will not unlock, try running `killall -9 .mate-screensaver`."
+  },
+  {
+    "question": "What kind of graphics capabilities do VDI nodes support?",
+    "answer": "The VDI nodes support direct vncviewer connections and GPU-accelerated OpenGL graphics for appropriately-configured software applications."
+  },
+  {
+    "question": "What is the typical state of software modules when you first log into a VDI node?",
+    "answer": "When you log into a VDI node, you will typically see 'No modules loaded', unlike regular login nodes where default modules are automatically loaded."
+  },
+  {
+    "question": "What must be done before running any graphical software on gra-vdi?",
+    "answer": "Before running any graphical software on gra-vdi, you must first manually load one of the available software modules."
+  },
+  {
+    "question": "What is the purpose of loading the StdEnv module on gra-vdi?",
+    "answer": "Loading the StdEnv module on gra-vdi will provide access to the same software modules that are loaded by default on the clusters."
+  },
+  {
+    "question": "When is it necessary to load the SnEnv module on gra-vdi?",
+    "answer": "In some rare cases, users will need to load a locally installed module(s) on gra-vdi, requiring the `SnEnv` module to be loaded first."
+  },
+  {
+    "question": "What is the `nix` module, and what advantage does it offer?",
+    "answer": "The `nix` module provides open-source software that is optimized to use accelerated OpenGL whenever possible."
+  },
+  {
+    "question": "On which systems is the `nix` module available?",
+    "answer": "The `nix` module is only available on graham and gra-vdi."
+  },
+  {
+    "question": "How do you search for programs using the NIX environment?",
+    "answer": "You can search for programs using the `nix search <regexp>` command after loading the `nix` module."
+  },
+  {
+    "question": "What command is used to install a nix package into your environment?",
+    "answer": "You install packages using the `nix-env --install --attr <attribute>` command after loading the `nix` module."
+  },
+  {
+    "question": "How does the NIX environment handle software persistence across logins?",
+    "answer": "Your nix environment persists from one login to the next, meaning whatever software you install today will be available next time you load the nix module."
+  },
+  {
+    "question": "What is necessary for accelerated OpenGL to work with compiled binaries?",
+    "answer": "For accelerated OpenGL to work, it is necessary to adjust compiled binaries to pre-load 'vglfaker.so' from VirtualGL."
+  },
+  {
+    "question": "How is the pre-loading of 'vglfaker.so' handled for OpenGL applications installed with nix on gra-vdi?",
+    "answer": "This customization is automatically done for you on gra-vdi when you install any OpenGL based software package with nix."
+  },
+  {
+    "question": "What utility is recommended for manually adjusting compiled binaries to pre-load 'vglfaker.so' if not using nix?",
+    "answer": "If you download and install software from outside of nix, the `patchelf` utility is suggested to manually adjust the final binary for OpenGL."
+  },
+  {
+    "question": "How can the `patchelf` utility be installed into a nix environment?",
+    "answer": "The `patchelf` utility can be installed into nix with `nix-env --install --attr nixpkgs.patchelf`."
+  },
+  {
+    "question": "Why is using the `LD_PRELOAD` environment variable generally not recommended for pre-loading `vglfaker.so`?",
+    "answer": "It is generally a bad idea because it applies indiscriminately to all binaries, and those that require a different `vglfaker.so` than that set in `LD_PRELOAD` will then fail."
+  }
+]

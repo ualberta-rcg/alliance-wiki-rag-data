@@ -1,0 +1,46 @@
+[
+  {
+    "question": "What does the `terraform plan` output indicate when adding a block device to an existing VM, specifically regarding destruction and creation?",
+    "answer": "When adding a block device, the `terraform plan` output will indicate that resources will be destroyed and then created as replacements (`-/+ destroy and then create replacement`). The summary will show 'Plan: 2 to add, 0 to change, 2 to destroy.', meaning the existing VM and its floating IP association will be destroyed and rebuilt."
+  },
+  {
+    "question": "What action is necessary for SSH connectivity if a VM is recreated by Terraform, for instance after adding a block device?",
+    "answer": "If you have previously connected to the VM, you will need to remove its SSH key from your `known_hosts` file (or equivalent) because the VM will be created with a new SSH key."
+  },
+  {
+    "question": "What is the recommended initial action after successfully creating and accessing a new OpenStack VM via Terraform?",
+    "answer": "The first recommended action is to connect to the VM and apply all available operating system updates, typically by running `sudo yum update -y`."
+  },
+  {
+    "question": "Can you provide a complete Terraform configuration example for an OpenStack VM that includes a volume and a floating IP?",
+    "answer": "The complete example configuration includes an OpenStack provider definition, an `openstack_compute_instance_v2` resource named 'myvm' with attributes like name, flavor_id, key_pair, and security_groups, along with a nested `network` block (`name = 'my-tenant-net'`) and a `block_device` block for the boot volume. It also defines an `openstack_networking_floatingip_v2` resource with a `pool` and an `openstack_compute_floatingip_associate_v2` resource to link the floating IP to the instance using references."
+  },
+  {
+    "question": "What is the function of the `delete_on_termination` attribute within a `block_device` configuration in Terraform for an OpenStack VM?",
+    "answer": "The `delete_on_termination` attribute, when set to `true`, ensures that the volume is automatically deleted when the VM is terminated. For testing, this is useful for cleanup, but for actual use, it's recommended to set it to `false` as a safeguard against accidental resource deletion."
+  },
+  {
+    "question": "What happens if both `image_id` is specified at the instance level and a `block_device` is configured to boot from an image-backed volume in Terraform?",
+    "answer": "If both `image_id` is defined for the `openstack_compute_instance_v2` and a `block_device` with `destination_type = 'volume'` is used, Terraform will detect a change in boot method (from volume to direct image boot) on each run and attempt to rebuild the instance. It is recommended to remove the external `image_id` when booting from a volume via `block_device`."
+  },
+  {
+    "question": "Where can users find more detailed information and use cases for the OpenStack provider and compute instances in Terraform?",
+    "answer": "Users can find more detailed information on the official Terraform documentation pages, including 'What is Terraform?', 'OpenStack Provider' (https://www.terraform.io/docs/providers/openstack/index.html), and 'OpenStack compute instance v2' (https://www.terraform.io/docs/providers/openstack/r/compute_instance_v2.html) which provides several use cases for creating instances."
+  },
+  {
+    "question": "Are there any external project examples provided for Terraform OpenStack configurations?",
+    "answer": "Yes, the document mentions the 'Magic Castle project' (https://github.com/ComputeCanada/magic_castle) and 'diodonfrost/terraform-openstack-examples' (https://github.com/diodonfrost/terraform-openstack-examples) on GitHub as examples."
+  },
+  {
+    "question": "How can one locate the UUID of an OpenStack image using the Horizon web interface?",
+    "answer": "To find an image's UUID in Horizon, first log in to the cloud's web interface. Then, navigate to the 'Images' menu item under 'Compute' and click on the specific image you wish to use; its ID will then be displayed."
+  },
+  {
+    "question": "What is the process for finding the UUID of an OpenStack flavor in the Horizon web interface, and what are its limitations?",
+    "answer": "To find a flavor's UUID in Horizon, you need to simulate launching an instance and select 'Flavor' to view a list of available flavors by name. However, Horizon does not directly display the flavor's UUID. Users can either use the flavor name for an initial Terraform run and retrieve the ID from the output/state file, or, as recommended, use the OpenStack command-line interface."
+  },
+  {
+    "question": "What is the recommended approach if the OpenStack Horizon interface only provides the name of a flavor but not its UUID, and the UUID is needed for Terraform?",
+    "answer": "The recommended approach is to use the OpenStack command-line interface (CLI) to obtain the flavor's UUID directly, as Horizon only displays the flavor name."
+  }
+]

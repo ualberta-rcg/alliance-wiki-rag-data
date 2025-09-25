@@ -1,0 +1,66 @@
+[
+  {
+    "question": "What are the two main ways to work with an Apptainer image for RAPIDS on clusters?",
+    "answer": "You can either request an interactive session on a GPU node or submit a batch job to the Slurm scheduler if your RAPIDS code is ready."
+  },
+  {
+    "question": "When is it appropriate to use an interactive session on a GPU node with an Apptainer image?",
+    "answer": "If the Apptainer image was built based on a `Notebooks` type of Docker image, it includes a Jupyter Notebook server and is suitable for exploring RAPIDS interactively on a compute node with a GPU."
+  },
+  {
+    "question": "How do you request an interactive session with a single T4 GPU on Graham?",
+    "answer": "You can run the command: `salloc --ntasks=1 --cpus-per-task=2 --mem=10G --gres=gpu:t4:1 --time=1:0:0 --account=def-someuser`."
+  },
+  {
+    "question": "What commands are used to start the RAPIDS shell on a GPU node once resources are granted?",
+    "answer": "First, load the apptainer module: `module load apptainer`. Then, start the shell: `apptainer shell --nv -B /home -B /project -B /scratch rapids.sif`."
+  },
+  {
+    "question": "What is the purpose of the `--nv` option when starting an Apptainer shell?",
+    "answer": "The `--nv` option binds the GPU driver on the host to the container, allowing the GPU device to be accessed from inside the Apptainer container."
+  },
+  {
+    "question": "What does the `-B` option do in the `apptainer shell` command?",
+    "answer": "The `-B` option binds any filesystem you want to access from inside the container."
+  },
+  {
+    "question": "How can you verify that the GPU device is accessible inside the Apptainer container?",
+    "answer": "After the shell prompt changes to `Apptainer>`, run the command `nvidia-smi`."
+  },
+  {
+    "question": "How do you launch a Jupyter Notebook server within the RAPIDS Apptainer environment?",
+    "answer": "Inside the `Apptainer>` shell, use the command: `jupyter-lab --ip $(hostname -f) --no-browser`."
+  },
+  {
+    "question": "What is important to know about packages in RAPIDS v23.08 containers?",
+    "answer": "Starting with RAPIDS v23.08, all packages are included in the base conda environment, which is activated by default in the container shell."
+  },
+  {
+    "question": "Why is an SSH tunnel required to connect to a Jupyter Notebook server on a compute node on Graham?",
+    "answer": "There is no direct Internet connection on a compute node on Graham, so an SSH tunnel with port forwarding is needed between your local computer and the GPU node."
+  },
+  {
+    "question": "What is a good practice when working with containers and submitting RAPIDS jobs to the Slurm scheduler?",
+    "answer": "It is a good practice to use the local disk on a compute node, typically by copying files to `$SLURM_TMPDIR`."
+  },
+  {
+    "question": "What are the steps involved in preparing a Slurm submission script for a RAPIDS job?",
+    "answer": "The script should include SBATCH directives for resources, load the Apptainer module, copy the container image, RAPIDS code, and datasets to `$SLURM_TMPDIR`, execute the code using `apptainer exec`, and then save any results back to your project directory."
+  },
+  {
+    "question": "How do you execute a Python script (`my_rapids_code.py`) using the RAPIDS Apptainer image within a Slurm job?",
+    "answer": "After navigating to `$SLURM_TMPDIR` and copying the necessary files, use the command: `apptainer exec --nv rapids.sif python ./my_rapids_code.py`."
+  },
+  {
+    "question": "Where can I find the official documentation for RAPIDS?",
+    "answer": "You can find it at https://docs.rapids.ai/."
+  },
+  {
+    "question": "Where can I find example notebooks for RAPIDS?",
+    "answer": "A collection of example notebooks is available on GitHub at https://github.com/rapidsai/notebooks."
+  },
+  {
+    "question": "Where can I read about RAPIDS use cases and blogs?",
+    "answer": "A collection of use cases and blogs for RAPIDS applications is available on Medium at https://medium.com/rapids-ai."
+  }
+]

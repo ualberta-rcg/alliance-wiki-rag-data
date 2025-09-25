@@ -1,0 +1,134 @@
+[
+  {
+    "question": "What is an important security warning regarding `chmod -R 777` on shared facilities?",
+    "answer": "It is a HUGE security risk and completely unacceptable to issue a bulk `chmod -R 777` on any folder, especially on shared facilities like clusters, and it's never necessary."
+  },
+  {
+    "question": "What are the various mechanisms provided for data sharing with colleagues on the systems?",
+    "answer": "The systems provide mechanisms such as using a common project space for members of the same research group, Globus (specifically shared endpoints) for those without a cluster account, and filesystem permissions for sharing with colleagues who have accounts but are not in a common research group."
+  },
+  {
+    "question": "How do you share data with a colleague who is a member of the same research group?",
+    "answer": "The best approach is to make use of the project space that each research group has in common."
+  },
+  {
+    "question": "What should you do if your research requires the creation of a new group on a national cluster?",
+    "answer": "You can request the creation of a group by contacting technical support, as users cannot create their own groups."
+  },
+  {
+    "question": "How can data be shared with someone who doesn't have an account on the cluster?",
+    "answer": "You can use Globus, and in particular a shared endpoint, to share the data."
+  },
+  {
+    "question": "What is the simplest way to share data with a colleague who has a cluster account but is not in a common research group?",
+    "answer": "The simplest approach is to use the permissions available in the filesystem to share the data."
+  },
+  {
+    "question": "What is a crucial requirement for sharing a file with someone in terms of directory access?",
+    "answer": "The individual must have execute permission for the entire chain of directories leading from `/scratch` or `/project` to the directory in which the file is located."
+  },
+  {
+    "question": "What happens if a user tries to access a file or directory without the necessary permissions?",
+    "answer": "The Linux kernel will verify permissions, and if not granted, the user will see the error message 'Permission denied'."
+  },
+  {
+    "question": "What are the three categories of users for each filesystem object?",
+    "answer": "The three categories are: the object's owner, members of the object's group, and everyone else."
+  },
+  {
+    "question": "What types of permissions are associated with files and directories?",
+    "answer": "Files and directories can have permissions to read, write, and execute."
+  },
+  {
+    "question": "How many total permissions are associated with each filesystem object?",
+    "answer": "There are nine permissions associated with each object (three categories of users times three types of permission)."
+  },
+  {
+    "question": "How can you view the current permissions for a filesystem object?",
+    "answer": "You can use the command `ls -l name_of_object`."
+  },
+  {
+    "question": "What does the permission string `-rw-r--r--` signify for a file?",
+    "answer": "It means the owner can read and write the file but not execute it, while group members and everyone else can only read the file."
+  },
+  {
+    "question": "Which command is used to change the permissions of a file or directory?",
+    "answer": "The `chmod` command is used to change permissions."
+  },
+  {
+    "question": "What abbreviations are used for user categories with the `chmod` command?",
+    "answer": "The abbreviations are `u` for owner (user), `g` for group, `o` for others (everyone else), and `a` for everyone (all)."
+  },
+  {
+    "question": "How would you grant read permission to all members of a file's group using `chmod`?",
+    "answer": "You would use a command like `chmod g+r file.txt`."
+  },
+  {
+    "question": "How would you withdraw execute permission for a script from everyone but the owner and group?",
+    "answer": "You would use a command like `chmod o-x script.py`."
+  },
+  {
+    "question": "How can you grant everyone on the cluster the right to read a specific file?",
+    "answer": "You can use the command `chmod a+r file.txt`."
+  },
+  {
+    "question": "What is octal notation in the context of Unix filesystem permissions?",
+    "answer": "Octal notation uses three bits to represent permissions for each user category, interpreted as a number from 0 to 7 using the formula (read_bit)*4 + (write_bit)*2 + (execute_bit)*1."
+  },
+  {
+    "question": "What octal representation corresponds to owner permissions of read and write, and group/others permissions of only read?",
+    "answer": "The octal representation would be 6 for the owner (4+2+0) and 4 for the group and everyone else (4+0+0), resulting in `644` overall."
+  },
+  {
+    "question": "What permissions are needed on a directory to be able to exercise rights on a file within it?",
+    "answer": "You need both read and execute permission (\"5\" or \"7\" in octal notation) on the directory in question."
+  },
+  {
+    "question": "How can you use `chmod` with octal notation to grant read, write, and execute permissions to everyone in your group for a file?",
+    "answer": "You can use the command `chmod 770 name_of_file`."
+  },
+  {
+    "question": "Can you modify the permissions of any file or directory?",
+    "answer": "No, you can naturally only modify the permissions of a file or directory you own."
+  },
+  {
+    "question": "Which command allows you to alter the group ownership of a file or directory?",
+    "answer": "You can alter the group by means of the command `chgrp`."
+  },
+  {
+    "question": "What is the purpose of the sticky bit in Unix filesystems?",
+    "answer": "The sticky bit restricts filesystem permissions for a directory so that a file within it can only be renamed or deleted by the file's owner or the directory's owner, preventing other users with write/execute permission from deleting others' files."
+  },
+  {
+    "question": "How can you set the sticky bit on a directory?",
+    "answer": "You can set the sticky bit using `chmod +t <directory name>` or `chmod 1000 <directory name>` if using octal notation, or `chmod 1774 <directory name>` to also set `rwxrwxr--` permissions."
+  },
+  {
+    "question": "How is the sticky bit represented in the `ls -l` output?",
+    "answer": "The sticky bit is represented by the letter 't' or 'T' in the last place of the permissions field, for example `drwxrws--T`."
+  },
+  {
+    "question": "How can you unset the sticky bit on a directory?",
+    "answer": "You can unset the sticky bit using `chmod -t <directory name>` or `chmod 0774 <directory name>` via octal notation."
+  },
+  {
+    "question": "What is the purpose of the Set Group ID (setGID) bit for directories?",
+    "answer": "When the `setGID` bit is enabled for a directory, new files and directories created within it will automatically match the group ownership of the parent directory."
+  },
+  {
+    "question": "How do you enable the `setGID` permission on a directory?",
+    "answer": "You can enable the `setGID` permission using `chmod g+s <directory name>`."
+  },
+  {
+    "question": "How is the `setGID` bit indicated in `ls -l` output?",
+    "answer": "When the `setGID` bit is enabled, the `x` permission for the group changes to an `s` (e.g., `drwxrws---`)."
+  },
+  {
+    "question": "What happens to new directories created inside a `setGID` enabled directory?",
+    "answer": "If a directory is created inside a directory with the `setGID` enabled, it will inherit the same group as the parent folder and also have its `setGID` enabled."
+  },
+  {
+    "question": "What is the difference between `S` (uppercase) and `s` (lowercase) for the `setGID` bit in `ls -l` output?",
+    "answer": "Lowercase 's' indicates that the `setGID` is in place and the group also has execute permissions. Uppercase 'S' indicates that `setGID` is in place but execute permissions have been removed from the directory for the group."
+  }
+]

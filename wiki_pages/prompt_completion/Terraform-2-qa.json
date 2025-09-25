@@ -1,0 +1,158 @@
+[
+  {
+    "question": "What is the primary function of defining a provider in Terraform?",
+    "answer": "Defining a provider tells Terraform which cloud infrastructure to use, such as OpenStack, and how to connect to it. Upon initialization, the OpenStack provider plugin is installed, and credentials are used for subsequent operations."
+  },
+  {
+    "question": "In what ways can OpenStack connection and credential information be supplied to Terraform?",
+    "answer": "Connection and credential information can be provided in the Terraform specification, via environment variables, or partially in the specification with the remainder in the environment."
+  },
+  {
+    "question": "Can you provide an example of a complete OpenStack provider specification in Terraform?",
+    "answer": "An example includes `tenant_name`, `tenant_id`, `auth_url`, `user_name`, `password`, and `user_domain_name` within the `provider \"openstack\" {}` block."
+  },
+  {
+    "question": "How does Terraform support partial credentials for OpenStack?",
+    "answer": "Terraform supports partial credentials, allowing some values, like a password, to be omitted from the configuration file and instead specified in the environment (e.g., with `$OS_PASSWORD`)."
+  },
+  {
+    "question": "How do you configure the OpenStack provider in Terraform if you prefer using a `clouds.yaml` file?",
+    "answer": "If you prefer using `clouds.yaml`, you can specify the cloud name within the provider stanza like this: `provider \"openstack\" { cloud = \"my_cloud\" }`."
+  },
+  {
+    "question": "Is it permissible to leave the OpenStack provider definition entirely empty in Terraform?",
+    "answer": "Yes, it is acceptable to leave the provider definition completely empty (`provider \"openstack\" {}`). In this case, either `$OS_CLOUD` or variables from an appropriate RC file must be present in the executing environment for Terraform to proceed."
+  },
+  {
+    "question": "What is the recommended practice for storing OpenStack credentials in Terraform configurations?",
+    "answer": "It is recommended to avoid storing credentials like passwords directly in the Terraform configuration file due to security concerns and potential risks if the file is copied or moved."
+  },
+  {
+    "question": "What command is used to initialize Terraform and install provider plugins?",
+    "answer": "The `terraform init` command is used to initialize Terraform. It checks for available provider plugins and downloads them (e.g., `terraform-providers/openstack`) into the working directory."
+  },
+  {
+    "question": "Does `terraform init` verify the provided OpenStack credentials?",
+    "answer": "No, `terraform init` initializes Terraform and downloads the provider plugin but does not test out the credentials by attempting to connect to the defined provider."
+  },
+  {
+    "question": "Why is it important to use image and flavor IDs rather than names when defining OpenStack VMs in Terraform?",
+    "answer": "It is crucial to always specify flavors and images using their IDs because the ID never changes and precisely defines the resource's state. If a name changes (e.g., due to retirement and replacement), Terraform might incorrectly detect an updated ID and attempt to rebuild or resize the associated resource, which is a destructive operation."
+  },
+  {
+    "question": "How do you define a minimal OpenStack VM in Terraform?",
+    "answer": "A minimal OpenStack VM can be defined using the `resource \"openstack_compute_instance_v2\"` block, specifying `name`, `image_id`, `flavor_id`, `key_pair`, and `security_groups`."
+  },
+  {
+    "question": "What information should a user customize when defining an OpenStack VM with Terraform?",
+    "answer": "Users should customize values for `image_id`, `flavor_id`, and `key_pair` with their own specific values, or the Terraform operation will likely fail."
+  },
+  {
+    "question": "How can you find `image_id` and `flavor_id` using the OpenStack CLI?",
+    "answer": "You can find `image_id` and `flavor_id` by running `image list` or `flavor list` in a terminal session connected to the OpenStack cloud via the CLI."
+  },
+  {
+    "question": "What is the purpose of the `terraform plan` command?",
+    "answer": "The `terraform plan` command compiles the Terraform definition, determines how to reconcile the desired state with the actual cloud state, and produces a plan of actions that would be performed if changes were applied."
+  },
+  {
+    "question": "What does `known after apply` signify in the output of `terraform plan`?",
+    "answer": "`known after apply` indicates that these values will be determined from the state of newly created resources queried from OpenStack after the changes are applied."
+  },
+  {
+    "question": "What should be carefully checked in the `terraform plan` output before applying changes?",
+    "answer": "It is required to check the entire output of `terraform plan`, especially the summary line indicating `Plan: X to add, Y to change, Z to destroy`, to ensure there are no surprises before applying changes."
+  },
+  {
+    "question": "What might cause an \"incomplete credentials\" error when running `terraform plan`?",
+    "answer": "An \"incomplete credentials\" error can occur if `OS_CLOUD` was not defined, the RC file was not sourced, or the `clouds.yaml` file is missing."
+  },
+  {
+    "question": "Does Terraform automatically manage existing OpenStack resources that are not defined in its configuration?",
+    "answer": "No, Terraform has no knowledge of resources already defined in the project and does not attempt to determine existing state. Any existing resources are invisible to Terraform."
+  },
+  {
+    "question": "What command is used to execute the changes outlined in a Terraform plan?",
+    "answer": "The `terraform apply` command is used to actually effect the changes described in the plan."
+  },
+  {
+    "question": "What common error can occur during `terraform apply` if a network is not explicitly specified for an OpenStack VM?",
+    "answer": "A common error is `Multiple possible networks found, use a Network ID to be more specific.`, typically indicating that Terraform needs to know which of the project's at least two networks (private and public) to use."
+  },
+  {
+    "question": "How can you find the name of a private network in OpenStack?",
+    "answer": "The name of a private network can be found using `network list` in the OpenStack CLI or under `Network -> Networks` in Horizon (the OpenStack web interface)."
+  },
+  {
+    "question": "How do you add a network configuration to an OpenStack VM definition in Terraform?",
+    "answer": "You add a `network` resource sub-block within the `openstack_compute_instance_v2` definition, specifying the network's `name` (e.g., `name = \"my-tenant-net\"`)."
+  },
+  {
+    "question": "How can you confirm that a VM has been successfully created by Terraform?",
+    "answer": "You can confirm VM creation by checking Horizon or by using the OpenStack CLI command `server list` in your terminal window, looking for the VM's ID and name."
+  },
+  {
+    "question": "What is the `terraform.tfstate` file, and what is its significance?",
+    "answer": "The `terraform.tfstate` file is created by Terraform during the application of configurations and contains details about the managed resources. Terraform uses it to determine how to transition to a new state based on configuration updates."
+  },
+  {
+    "question": "What are the consequences of deleting the `terraform.tfstate` file?",
+    "answer": "If you delete `terraform.tfstate`, Terraform cannot properly manage resources. You would need to restore it, recreate it, or manage those resources without Terraform."
+  },
+  {
+    "question": "Why might a newly created OpenStack VM not be directly accessible from outside its tenant?",
+    "answer": "A newly created VM may not be directly accessible from outside the tenant because it has not yet been assigned a floating IP address."
+  },
+  {
+    "question": "What is a 'jump host' or 'bastion host' in an OpenStack tenant?",
+    "answer": "A jump host (or bastion host) is another VM within the same tenant that has a floating IP, allowing it to be used as an intermediary to access other VMs on the same private network that do not have direct external access."
+  },
+  {
+    "question": "How are Floating IPs allocated and associated in OpenStack?",
+    "answer": "Floating IPs are allocated to the project from a pool (e.g., `ext_net`) and then associated with the VM\u2019s private network interface; they are not created directly on the VM."
+  },
+  {
+    "question": "How do you declare a floating IP resource in a Terraform configuration for OpenStack?",
+    "answer": "You declare a floating IP resource using `resource \"openstack_networking_floatingip_v2\"`, specifying the `pool` from which to allocate it (e.g., `pool = \"ext_net\"`)."
+  },
+  {
+    "question": "How is an allocated floating IP associated with a VM in Terraform?",
+    "answer": "An allocated floating IP is associated with a VM using `resource \"openstack_compute_floatingip_associate_v2\"`, referencing the `floating_ip` address and the `instance_id` of the VM."
+  },
+  {
+    "question": "What is the typical syntax for referencing attributes of other resources in Terraform?",
+    "answer": "References typically follow the syntax: `<resource type>.<resource name>.<attribute>` (e.g., `openstack_networking_floatingip_v2.myvm_fip.address`)."
+  },
+  {
+    "question": "What is a crucial consideration when adding a root volume to an existing VM in Terraform?",
+    "answer": "Adding a root volume to an existing VM is a destructive operation because it replaces the VM's boot disk, potentially requiring the VM to be rebuilt."
+  },
+  {
+    "question": "How is a root volume defined as part of an OpenStack compute instance in Terraform?",
+    "answer": "A root volume is defined as a `block_device` sub-block within the `openstack_compute_instance_v2` resource, specifying attributes like `uuid` (of the image), `source_type`, `destination_type`, `volume_size`, `boot_index`, and `delete_on_termination`."
+  },
+  {
+    "question": "What is the purpose of `destination_type = \"volume\"` when defining a block device in Terraform for OpenStack?",
+    "answer": "Setting `destination_type = \"volume\"` indicates that the boot disk is to be stored with an OpenStack-provided volume rather than using disk space on the hypervisor."
+  },
+  {
+    "question": "What is the significance of `delete_on_termination` when configuring a block device?",
+    "answer": "`delete_on_termination` determines if the volume is deleted when the VM is terminated. For testing, setting it to `true` is convenient, but for real use, `false` is recommended as a defense against accidental resource deletion."
+  },
+  {
+    "question": "What is the consequence of leaving `image_id` defined in the outer compute instance block when also defining a `block_device` for a root volume?",
+    "answer": "Leaving `image_id` defined will cause Terraform to see a change from 'boot from volume' to 'boot directly from image' on every run, leading it to always attempt to rebuild the instance."
+  },
+  {
+    "question": "How does `terraform plan` indicate that an existing resource will be destroyed and replaced?",
+    "answer": "`terraform plan` indicates a destroy-and-create replacement with the symbol `- / +` (e.g., `# openstack_compute_instance_v2.myvm must be replaced`) and a summary line showing a non-zero 'destroy' count (e.g., `Plan: 2 to add, 0 to change, 2 to destroy`)."
+  },
+  {
+    "question": "What action should be taken after a VM is created with a new SSH key using Terraform and a root volume?",
+    "answer": "If you connected previously, you'll need to remove the old SSH key from your `known_hosts` file (or equivalent) because the VM will be created with a new SSH key."
+  },
+  {
+    "question": "Can you provide a complete Terraform configuration example for defining an OpenStack VM with a floating IP and a bootable volume?",
+    "answer": "The full example configuration includes a basic `provider \"openstack\" {}` block, an `openstack_compute_instance_v2` resource with a `network` and `block_device` sub-blocks, an `openstack_networking_floatingip_v2` resource, and an `openstack_compute_floatingip_associate_v2` resource to link the IP to the instance."
+  }
+]

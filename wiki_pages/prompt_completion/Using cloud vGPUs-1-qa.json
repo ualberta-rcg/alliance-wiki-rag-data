@@ -1,0 +1,110 @@
+[
+  {
+    "question": "What is the primary purpose of this documentation page?",
+    "answer": "This page describes how to allocate virtual GPU (vGPU) resources to a virtual machine (VM), install the necessary drivers, and check whether the vGPU can be used."
+  },
+  {
+    "question": "Where is access to vGPU repositories and vGPUs currently available?",
+    "answer": "Access to repositories as well as to the vGPUs is currently only available within the Arbutus cloud."
+  },
+  {
+    "question": "Is the CUDA toolkit pre-installed according to this document?",
+    "answer": "No, the CUDA toolkit is not pre-installed."
+  },
+  {
+    "question": "How can one install the CUDA toolkit if it's not pre-installed?",
+    "answer": "The CUDA toolkit can be installed directly from NVIDIA or loaded from the CVMFS software stack."
+  },
+  {
+    "question": "What precaution should be taken when installing the CUDA toolkit directly from NVIDIA?",
+    "answer": "If installing the CUDA toolkit directly from NVIDIA, ensure that the vGPU driver is not overwritten with the one from the CUDA package."
+  },
+  {
+    "question": "What are the supported flavors for deploying a VM to use a vGPU?",
+    "answer": "The supported flavors are g1-8gb-c4-22gb and g1-16gb-c8-40gb."
+  },
+  {
+    "question": "How does the vGPU become available to the operating system in a VM?",
+    "answer": "The vGPU will be available to the operating system via the PCI bus."
+  },
+  {
+    "question": "What are the initial steps for preparing an AlmaLinux 9 VM for vGPU use?",
+    "answer": "First, update the OS to the latest software, including the kernel, then reboot the VM to ensure the latest kernel is running."
+  },
+  {
+    "question": "Why is the EPEL repository required for AlmaLinux 9?",
+    "answer": "The EPEL repository is required to have access to the DKMS package."
+  },
+  {
+    "question": "What issue does the default `nouveau` driver cause on AlmaLinux 9?",
+    "answer": "AlmaLinux 9 has a faulty `nouveau` driver by default which crashes the kernel as soon as the `nvidia` driver is mounted."
+  },
+  {
+    "question": "How do you prevent the `nouveau` driver from loading on AlmaLinux 9?",
+    "answer": "You need to add 'blacklist nouveau' and 'options nouveau modeset=0' to `/etc/modprobe.d/blacklist-nouveau.conf` and then run `dracut -fv --omit-drivers nouveau`, followed by a system update, EPEL installation, and reboot."
+  },
+  {
+    "question": "What command updates the OS, installs EPEL, and reboots an AlmaLinux 9 VM?",
+    "answer": "The command is `dnf -y update && dnf -y install epel-release && reboot`."
+  },
+  {
+    "question": "How do you install the Arbutus vGPU Cloud repository on AlmaLinux 9?",
+    "answer": "Run `dnf install http://repo.arbutus.cloud.computecanada.ca/pulp/repos/alma9/Packages/a/arbutus-cloud-vgpu-repo-1.0-1.el9.noarch.rpm`."
+  },
+  {
+    "question": "What command installs the necessary vGPU packages on AlmaLinux 9?",
+    "answer": "The command is `dnf -y install nvidia-vgpu-gridd.x86_64 nvidia-vgpu-tools.x86_64 nvidia-vgpu-kmod.x86_64`."
+  },
+  {
+    "question": "How can you verify the proper functionality of the vGPU installation on AlmaLinux 9?",
+    "answer": "After a successful installation, `nvidia-smi` can be used to verify the proper functionality."
+  },
+  {
+    "question": "What are the initial steps for preparing an AlmaLinux 8 VM for vGPU use?",
+    "answer": "Once the VM is available, update the OS to the latest software, including the kernel, and then reboot the VM to ensure the latest kernel is running."
+  },
+  {
+    "question": "How do you update the OS and install the EPEL repository on AlmaLinux 8?",
+    "answer": "Run the command `dnf -y update && dnf -y install epel-release && reboot`."
+  },
+  {
+    "question": "How do you install the Arbutus vGPU Cloud repository on AlmaLinux 8?",
+    "answer": "Run `dnf install http://repo.arbutus.cloud.computecanada.ca/pulp/repos/alma8/Packages/a/arbutus-cloud-vgpu-repo-1.0-1.el8.noarch.rpm`."
+  },
+  {
+    "question": "What command installs the vGPU driver packages on AlmaLinux 8?",
+    "answer": "The command is `dnf -y install nvidia-vgpu-gridd.x86_64 nvidia-vgpu-tools.x86_64 nvidia-vgpu-kmod.x86_64`."
+  },
+  {
+    "question": "How do you verify vGPU functionality on AlmaLinux 8 after installation?",
+    "answer": "`nvidia-smi` can be used to verify proper functionality after a successful installation."
+  },
+  {
+    "question": "What is the first step for preparing a Debian 11 VM for vGPU use?",
+    "answer": "Ensure that the latest packages are installed and the system has been booted with the latest stable kernel."
+  },
+  {
+    "question": "Why is it important to have the latest stable kernel for DKMS on Debian 11?",
+    "answer": "DKMS will request the latest stable kernel available from the Debian repositories."
+  },
+  {
+    "question": "How do you update and upgrade packages, then reboot a Debian 11 VM?",
+    "answer": "Execute `apt-get update && apt-get -y dist-upgrade && reboot`."
+  },
+  {
+    "question": "How do you install the Arbutus vGPU Cloud repository on Debian 11?",
+    "answer": "First, download the repository package using `wget http://repo.arbutus.cloud.computecanada.ca/pulp/deb/deb11/pool/main/arbutus-cloud-repo_0.1_all.deb`, then install it with `apt-get install -y ./arbutus-cloud-repo_0.1_all.deb`."
+  },
+  {
+    "question": "What does the `arbutus-cloud-repo` package contain for Debian 11?",
+    "answer": "The `arbutus-cloud-repo` package also contains the GPG key that all packages are signed with."
+  },
+  {
+    "question": "How do you update the apt cache and install vGPU packages on Debian 11?",
+    "answer": "Run `apt-get update && apt-get -y install nvidia-vgpu-kmod nvidia-vgpu-tools nvidia-vgpu-gridd`."
+  },
+  {
+    "question": "How can you check if the vGPU is functioning correctly on Debian 11?",
+    "answer": "After installation, execute the `nvidia-smi` command."
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "question": "How do you create checkpoints using PyTorch Lightning?",
+    "answer": "You should use the `callbacks` parameter of the `Trainer()` class. For example, `callbacks = [pl.callbacks.ModelCheckpoint(dirpath=\"./ckpt\",every_n_epochs=1)]` will configure checkpointing."
+  },
+  {
+    "question": "How can you resume training from a checkpoint with PyTorch Lightning?",
+    "answer": "If a checkpoint exists in the specified `dirpath` (e.g., `./ckpt`), initializing `trainer = pl.Trainer(callbacks=callbacks)` and then calling `trainer.fit(model)` will automatically load it and continue training."
+  },
+  {
+    "question": "Where can I find more information about checkpointing with PyTorch Lightning?",
+    "answer": "You can consult the PyTorch Lightning documentation at `https://pytorch-lightning.readthedocs.io/en/stable/api/pytorch_lightning.callbacks.model_checkpoint.html`."
+  },
+  {
+    "question": "Where can I find examples for creating checkpoints with custom PyTorch training loops?",
+    "answer": "For examples on creating checkpoints with custom training loops, consult the PyTorch documentation at `https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_a_general_checkpoint.html`."
+  },
+  {
+    "question": "How should checkpoints be handled in distributed training when using DistributedDataParallel or Horovod?",
+    "answer": "Checkpoints should be created by only a single process (e.g., `rank 0`) of your program, as all processes will have the same state after each iteration."
+  },
+  {
+    "question": "Why is it important to ensure a checkpoint is fully saved before another process tries to load it in distributed training?",
+    "answer": "If a process attempts to load a checkpoint that has not yet been fully saved by another, it can lead to errors or incorrect results."
+  },
+  {
+    "question": "How can you prevent issues when loading checkpoints in distributed training due to concurrent access or GPU mapping?",
+    "answer": "Add a `torch.distributed.barrier()` to ensure the checkpoint is written to disk, and pass `map_location` to `torch.load` (e.g., `map_location = f\"cuda:{local_rank}\"`) to load tensors onto the correct GPU for each process."
+  },
+  {
+    "question": "What is the default behavior of `torch.load` when loading tensors, and how can it be problematic in distributed training?",
+    "answer": "By default, `torch.load` attempts to load tensors onto the GPU where they were originally saved (e.g., `cuda:0`), which can cause issues if other processes need them on different GPUs."
+  },
+  {
+    "question": "What causes memory leaks on AVX512 hardware (V100, Skylake, B\u00e9luga) with PyTorch?",
+    "answer": "PyTorch versions older than v1.0.1, especially when used with older libraries like cuDNN < v7.5 or MAGMA < v2.5, can cause significant memory leaks leading to out-of-memory exceptions and job termination."
+  },
+  {
+    "question": "How can memory leak issues on AVX512 hardware be resolved?",
+    "answer": "To counter memory leak issues on AVX512 hardware, it is recommended to use the most recent version of `torch`."
+  },
+  {
+    "question": "What does a `c10::Error` signify in PyTorch, especially in a Python program?",
+    "answer": "A `c10::Error` indicates a C++ exception rather than a Python one, often occurring with `libtorch` or specific PyTorch versions (like 1.10.x). It makes it difficult to trace the error in the Python script."
+  },
+  {
+    "question": "How can one obtain a Python traceback when encountering a `c10::Error` with PyTorch?",
+    "answer": "Using PyTorch 1.9.1 instead of 1.10.x often allows for the Python program's traceback to be generated when a `c10::Error` occurs."
+  },
+  {
+    "question": "What does the error \"CUDA error: no kernel image is available for execution on the device\" mean?",
+    "answer": "This error means that the current Torch installation does not support the computing architecture or the GPU being used."
+  },
+  {
+    "question": "How can the \"CUDA error: no kernel image is available for execution on the device\" be resolved?",
+    "answer": "You can resolve this error by installing a newer version of `torch` or by requesting a GPU that is compatible with your current PyTorch version."
+  }
+]

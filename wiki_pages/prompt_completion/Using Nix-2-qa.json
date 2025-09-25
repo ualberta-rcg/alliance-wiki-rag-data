@@ -1,0 +1,58 @@
+[
+  {
+    "question": "How do I uninstall a package from my Nix user environment?",
+    "answer": "You can uninstall a package by using the `nix-env --uninstall` command, followed by the package name (e.g., `nix-env --uninstall git-minimal`)."
+  },
+  {
+    "question": "How can I see a list of my Nix user environment generations?",
+    "answer": "You can view all your Nix user environment generations by running the command `nix-env --list-generations`."
+  },
+  {
+    "question": "How do I switch to a specific past generation of my Nix environment?",
+    "answer": "To switch to a particular generation, use `nix-env --switch-generation` followed by the generation number, for example, `nix-env --switch-generation 1`."
+  },
+  {
+    "question": "What command allows me to undo the last change to my Nix environment?",
+    "answer": "The `nix-env --rollback` command allows you to move up one generation, effectively undoing the last change."
+  },
+  {
+    "question": "How can I delete old Nix environment generations?",
+    "answer": "You can delete environments older than a specified time using `nix-env --delete-generations <time>`, where `<time>` could be `30d` for 30 days."
+  },
+  {
+    "question": "What is the purpose of creating unique Nix compositions?",
+    "answer": "Unique Nix compositions are useful for bundling binaries from multiple existing compositions (e.g., `make`, `gcc`, `ld`) or for integrating specific libraries with software like Python by wrapping executables to set environment variables like `PYTHON_PATH`."
+  },
+  {
+    "question": "How do I create a new composition in Nix?",
+    "answer": "To create a composition, you write a Nix expression in a `.nix` file that combines existing compositions. Then, you use commands like `nix build` with the `-f <nix file>` option to tell Nix to use your custom definition."
+  },
+  {
+    "question": "Can you give an example of creating a per-project `bin` directory using a custom Nix composition file?",
+    "answer": "If you have a `python.nix` file defining a Python environment, you can create a per-project `bin` directory using `nix build -f python.nix -o python`, which will make the binaries available via `./python/bin/python`."
+  },
+  {
+    "question": "What are the common elements of a Nix expression for creating compositions?",
+    "answer": "Generally, a Nix expression for compositions includes `with import <nixpkgs> {}` to bring the `nixpkgs` set into scope and calls existing composition functions with a list of space-separated components."
+  },
+  {
+    "question": "What is the `buildEnv` function in Nixpkgs used for?",
+    "answer": "The `buildEnv` function in Nixpkgs is used to create a basic composition of existing compositions by combining their `bin`, `lib`, and other directories into a single environment."
+  },
+  {
+    "question": "How are packages specified within a `buildEnv` Nix expression?",
+    "answer": "Within a `buildEnv` expression, packages are listed without the `nixpkgs` prefix (e.g., `git` instead of `nixpkgs.git`), assuming `with import <nixpkgs> {};` has been used."
+  },
+  {
+    "question": "What are the primary Python-related attributes provided by Nixpkgs?",
+    "answer": "Nixpkgs provides `python<major><minor>` (a composition for a specific Python version), `python<major><minor>.pkgs` (the set of Python compositions for that version), and `python<major><minor>.withPackages` (for wrapping Python with a `PYTHON_PATH` configured for specified packages)."
+  },
+  {
+    "question": "How can I run a program from a Python composition directly using Nix?",
+    "answer": "You can directly run programs from a Python composition using `nix run`, for example: `nix run python36.pkgs.spambayes` to execute `sb_filter.py`."
+  },
+  {
+    "question": "How do I define a custom Python environment with specific libraries in a `.nix` file?",
+    "answer": "To define a custom Python environment with specific libraries, you would use `python.withPackages` in your `.nix` file like this: `with import <nixpkgs> { }; python.withPackages (packages: with packages; [ ... list of python packages ... ])`."
+  }
+]

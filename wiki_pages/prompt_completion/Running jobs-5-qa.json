@@ -1,0 +1,30 @@
+[
+  {
+    "question": "What is the primary requirement for long-running computations that exceed system time limits?",
+    "answer": "The application must support checkpointing, meaning it should be able to save its state to a file and restart from that saved state."
+  },
+  {
+    "question": "What are the two recommended methods for automatically restarting jobs on the clusters?",
+    "answer": "The two recommended methods are using SLURM job arrays and resubmitting from the end of the job script."
+  },
+  {
+    "question": "How do job arrays facilitate restarting long-running computations?",
+    "answer": "Using the `--array=1-100%10` syntax, a collection of identical jobs can be submitted with the condition that only one job runs at a time, and the script ensures the last checkpoint is used for the next job."
+  },
+  {
+    "question": "Can you give an example of how a job array can be used to split a long simulation?",
+    "answer": "A molecular dynamics simulation requiring 1,000,000 steps that exceeds time limits can be split into 10 smaller jobs of 100,000 steps, run one after another using a job array."
+  },
+  {
+    "question": "What is the purpose of the `if test -e state.cpt; then mdrun --restart state.cpt; else mdrun fi` block in a job array restart script?",
+    "answer": "This block checks for the existence of a checkpoint file (`state.cpt`). If it exists, the simulation restarts from the checkpoint; otherwise, a new simulation is started."
+  },
+  {
+    "question": "How does resubmission from the job script work for long-running calculations?",
+    "answer": "A job is submitted to run a chunk of the calculation and save a checkpoint. Before the allocated run-time elapses, the script checks if the calculation is finished; if not, it submits a copy of itself to continue working."
+  },
+  {
+    "question": "What is an important consideration when defining the `work_should_continue` function in a job resubmission script?",
+    "answer": "The test to determine whether to submit a follow-up job should be a *positive test*, checking if work *should* continue, rather than a negative test for a stopping condition, to prevent indefinite job chains in case of unforeseen errors."
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "question": "Why might the order of output from worker threads vary when running a multithreaded program multiple times?",
+    "answer": "The worker threads run asynchronously and compete for access to shared resources, such as standard output during a `printf` call. The random order in which they gain access causes the output sequence to vary between executions."
+  },
+  {
+    "question": "What is the primary reason for synchronizing data access among worker threads in a multithreaded program?",
+    "answer": "To avoid 'race conditions,' where the program's output depends on the unpredictable order of asynchronous threads accessing shared data. Synchronization ensures consistent results, ideally identical to a serial execution."
+  },
+  {
+    "question": "Define a 'race condition' in the context of parallel programming.",
+    "answer": "A race condition is a situation where the program's output is dependent on the random, non-deterministic order in which asynchronous threads access and modify shared data."
+  },
+  {
+    "question": "What is a mutex and how does it facilitate data synchronization in pthreads?",
+    "answer": "A mutex (mutual exclusion) is a variable that can be 'locked' or 'owned' by only one thread at a time. It ensures that any code block protected by the mutex is executed by a single thread serially, thereby controlling access to shared data and preventing race conditions."
+  },
+  {
+    "question": "How do you declare and initialize a mutex in a pthreads program?",
+    "answer": "You declare a global variable of type `pthread_mutex_t` and initialize it by calling `pthread_mutex_init()` before use."
+  },
+  {
+    "question": "Which pthreads function is used to release resources associated with a mutex at the end of a program?",
+    "answer": "The `pthread_mutex_destroy()` function is used to release resources associated with a mutex."
+  },
+  {
+    "question": "In the `thread_mutex.c` example, what is the purpose of `pthread_mutex_lock(&mutex)` and `pthread_mutex_unlock(&mutex)` within the `task` function?",
+    "answer": "These calls serialize access to the standard output (`printf`) channel. `pthread_mutex_lock(&mutex)` ensures only one thread can proceed to print, and `pthread_mutex_unlock(&mutex)` releases the mutex for another thread after printing."
+  },
+  {
+    "question": "What happens if `pthread_create` fails in the provided `thread_mutex.c` example?",
+    "answer": "If `pthread_create` fails, an error message is printed, `pthread_mutex_destroy(&mutex)` is called to clean up mutex resources, and the program exits with a return code of 1."
+  },
+  {
+    "question": "What does it mean for `pthread_mutex_lock()` to be a 'blocking' call?",
+    "answer": "A 'blocking' call means that the thread calling `pthread_mutex_lock()` will pause and wait indefinitely until the mutex becomes available."
+  },
+  {
+    "question": "What potential issue should be carefully managed when using blocking mutex locks, especially with multiple mutexes?",
+    "answer": "Developers must take care to prevent deadlocks, ensuring that the mutex is guaranteed to become available eventually, which can be challenging in programs with many different mutexes controlling various global data structures."
+  },
+  {
+    "question": "Is there a non-blocking alternative to `pthread_mutex_lock()`, and what does it do?",
+    "answer": "Yes, `pthread_mutex_trylock()` is a non-blocking alternative. If it fails to obtain the mutex lock, it returns immediately with a non-zero value indicating the mutex is busy, rather than waiting."
+  },
+  {
+    "question": "What is a key recommendation regarding the code contained within a mutex-protected serialized block?",
+    "answer": "The code within the serialized block should be as short as safely possible, as it will be executed serially and longer blocks can reduce the program's overall parallel performance."
+  },
+  {
+    "question": "How does a `pthread_rwlock_t` (read/write lock) differ from a standard mutex in terms of access control?",
+    "answer": "A `pthread_rwlock_t` allows multiple threads to simultaneously read a variable. However, for write access, it behaves like a standard mutex, permitting only one thread to write at a time and blocking all other read or write access."
+  },
+  {
+    "question": "Which functions are used to obtain read and write locks, respectively, with a `pthread_rwlock_t`?",
+    "answer": "Threads obtain a read lock by calling `pthread_rwlock_rdlock()` and a write lock by calling `pthread_rwlock_wrlock()`."
+  },
+  {
+    "question": "How are read and write locks obtained via `pthread_rwlock_t` released?",
+    "answer": "Both read and write locks obtained with `pthread_rwlock_t` are released using the `pthread_rwlock_unlock()` function."
+  }
+]

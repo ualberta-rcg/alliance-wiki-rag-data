@@ -1,0 +1,94 @@
+[
+  {
+    "question": "What is the primary benefit of using Singularity container instances (sessions)?",
+    "answer": "By using sessions, Singularity ensures that all programs running within the instance are terminated when your job ends, unexpectedly dies, or is killed."
+  },
+  {
+    "question": "How do you initiate a Singularity session instance?",
+    "answer": "To start a Singularity session instance, you use the `singularity instance.start` command, specifying the image name and a chosen session name, for example: `singularity instance.start myimage.simg quadrat5run`."
+  },
+  {
+    "question": "What is the command to stop a running Singularity session instance?",
+    "answer": "A running Singularity session (and all associated programs) can be stopped by running the `singularity instance.stop` command, for example: `singularity instance.stop myimage.simg quadrat5run`."
+  },
+  {
+    "question": "How can you view a list of all active Singularity sessions?",
+    "answer": "You can obtain a list of all sessions you currently have running by executing the command `singularity instance.list`."
+  },
+  {
+    "question": "What information is provided when you list Singularity instances?",
+    "answer": "Listing Singularity instances will show the daemon name, its PID, and the path to the container's image for each running session."
+  },
+  {
+    "question": "How do you run programs within a previously started Singularity session?",
+    "answer": "With a session started, programs can be run using Singularity's `shell`, `exec`, or `run` commands by specifying the name of the session immediately after the image name, prefixed with `instance://` (e.g., `instance://mysessionname`)."
+  },
+  {
+    "question": "By default, what filesystems can a program running inside a Singularity container access?",
+    "answer": "By default, a program running within a Singularity container can only see the files within the container image and the current directory."
+  },
+  {
+    "question": "What is the purpose of the `-B` option in Singularity commands like `shell`, `exec`, or `run`?",
+    "answer": "The `-B` option is used to bind mount various filesystems from the host into the Singularity container, allowing the container to access files outside its image."
+  },
+  {
+    "question": "How would you bind mount `/home`, `/project`, `/scratch`, and `/localscratch` into a Singularity container called `myimage.simg` using the `shell` command?",
+    "answer": "You would use the command: `singularity shell -B /home -B /project -B /scratch -B /localscratch myimage.simg`."
+  },
+  {
+    "question": "How can you specify an alternative mount name for a bind-mounted directory inside a Singularity container?",
+    "answer": "You can change the mount name visible within the Singularity container by using the format `host_path:container_path` with the `-B` option, for example, `-B /localscratch:/temp` would mount `/localscratch` as `/temp` inside the container."
+  },
+  {
+    "question": "Why is it often recommended to mount the top directory of a filesystem rather than individual subdirectories in Singularity?",
+    "answer": "In most cases, it is not recommended to directly mount each individual directory needed, as this can cause access issues; instead, mounting the top directory of the filesystem is advised."
+  },
+  {
+    "question": "Are there any special steps required to run MPI programs on a single node from within a Singularity container?",
+    "answer": "No, nothing special needs to be done for jobs running MPI programs on a single node from within a Singularity container."
+  },
+  {
+    "question": "What are the key requirements for running MPI programs across multiple nodes using Singularity containers?",
+    "answer": "Running MPI programs across nodes requires: the MPI program to be compiled with OpenMPI (v3 or 4) inside the container, the container's MPI installation to use the same process-management interface library (PMI-2 or PMIx) as the cluster, using `srun` with the appropriate `--mpi` flag (e.g., `--mpi=pmi2`) in the SLURM job script, no `module load` commands in the job script, installing the `slurm-client` package in the container, and `module load singularity` and `openmpi` (v3 or 4) in the CC shell environment before submitting the job."
+  },
+  {
+    "question": "Which OpenMPI versions are compatible for running MPI jobs across nodes within Singularity containers on a cluster?",
+    "answer": "Ideally, OpenMPI version 3 or 4 should be used both inside the container and loaded in the CC shell environment. Version 2 may or may not work, while version 1 will not work."
+  },
+  {
+    "question": "What high-performance interconnect packages should be installed in a Singularity image for clusters utilizing OmniPath or Infiniband?",
+    "answer": "Clusters using OmniPath need `libpsm2` installed, and clusters using Infiniband need `UCX` installed in the Singularity image."
+  },
+  {
+    "question": "How can you determine which libraries MPI was configured with on the cluster?",
+    "answer": "For OpenMPI, use the command `ompi_info --config`, and for MPICH, use `mpiexec -info`. The information from these commands provides details on which libraries to use when installing MPI within the Singularity container."
+  },
+  {
+    "question": "What is a prerequisite for running programs that use the CUDA library within a Singularity container?",
+    "answer": "If you are running programs which use the CUDA library, you must make sure that your Singularity container has CUDA installed."
+  },
+  {
+    "question": "Which flag is essential for enabling CUDA functionality when executing a Singularity container?",
+    "answer": "The `--nv` flag needs to be added to make CUDA work."
+  },
+  {
+    "question": "Provide an example of a Slurm command to run a CUDA-enabled program in a Singularity container.",
+    "answer": "An example command is: `$ srun singularity run --nv container-name.sif [job to do]`."
+  },
+  {
+    "question": "How can Singularity's default temporary and cache directories be changed?",
+    "answer": "You can override Singularity's default temporary and cache directories by setting the `SINGULARITY_CACHEDIR` and `SINGULARITY_TMPDIR` environment variables before running `singularity`."
+  },
+  {
+    "question": "What is the purpose of the `SINGULARITY_CACHEDIR` environment variable?",
+    "answer": "`SINGULARITY_CACHEDIR` is the directory where Singularity will download and cache files."
+  },
+  {
+    "question": "What is the purpose of the `SINGULARITY_TMPDIR` environment variable?",
+    "answer": "`SINGULARITY_TMPDIR` is the directory where Singularity will write temporary files, including when building (squashfs) images."
+  },
+  {
+    "question": "How can a user configure Singularity to use their scratch space for both its cache and temporary files?",
+    "answer": "To use scratch space for cache and temporary files, one might run: `$ mkdir -p /scratch/$USER/singularity/{cache,tmp}`, then `$ export SINGULARITY_CACHEDIR=\"/scratch/$USER/singularity/cache\"`, and `$ export SINGULARITY_TMPDIR=\"/scratch/$USER/singularity/tmp\"` before running singularity commands."
+  }
+]

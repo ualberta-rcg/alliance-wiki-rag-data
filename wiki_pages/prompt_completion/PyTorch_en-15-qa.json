@@ -1,0 +1,38 @@
+[
+  {
+    "question": "How can you configure PyTorch Lightning to offload model parameters and optimizer states to NVMe using DeepSpeed's ZeRO stage 3?",
+    "answer": "To offload to NVMe, initialize the `pl.Trainer` with `strategy=DeepSpeedStrategy(stage=3, offload_optimizer=True, offload_parameters=True, remote_device=\"nvme\", offload_params_device=\"nvme\", offload_optimizer_device=\"nvme\", nvme_path=\"local_scratch\")`. You'll also need to get the local scratch path using `os.environ['SLURM_TMPDIR']` and pass it to `nvme_path`."
+  },
+  {
+    "question": "What is the purpose of creating model checkpoints during training?",
+    "answer": "Model checkpoints are snapshots of your model at a specific point in training. They are useful for breaking long jobs into shorter ones, allowing for quicker cluster allocation, and for avoiding loss of progress due to unexpected errors or node failures."
+  },
+  {
+    "question": "How do you create checkpoints with PyTorch Lightning?",
+    "answer": "You can create checkpoints in PyTorch Lightning by using the `callbacks` parameter of the `Trainer()` class. For example, `callbacks = [pl.callbacks.ModelCheckpoint(dirpath=\"./ckpt\",every_n_epochs=1)]` will create a checkpoint in the `./ckpt` directory at the end of every training epoch."
+  },
+  {
+    "question": "How does PyTorch Lightning handle loading checkpoints?",
+    "answer": "If a checkpoint exists in the specified `dirpath` (e.g., `./ckpt`), PyTorch Lightning will automatically load it and continue training from that point when the `trainer.fit(model)` method is called."
+  },
+  {
+    "question": "Where can I find documentation for creating and loading checkpoints in custom PyTorch training loops?",
+    "answer": "You can refer to the official PyTorch documentation on 'Saving and Loading a General Checkpoint' for examples on how to manage checkpoints within a custom training loop."
+  },
+  {
+    "question": "How should checkpointing be handled in distributed training when using DistributedDataParallel or Horovod?",
+    "answer": "When using DistributedDataParallel or Horovod, checkpointing should only be performed by one process (typically rank 0) of your program, as all ranks will have the same model state at the end of each iteration."
+  },
+  {
+    "question": "What is an example of saving a checkpoint by rank 0 in distributed training?",
+    "answer": "An example of saving a checkpoint by rank 0 is: `if global_rank == 0: torch.save(ddp_model.state_dict(), \"./checkpoint_path\")`."
+  },
+  {
+    "question": "What issues can arise when loading checkpoints in distributed training, and how can they be avoided?",
+    "answer": "If a process tries to load a checkpoint before another process has finished saving it, errors or incorrect results may occur. To prevent this, you should add a `torch.distributed.barrier()` before loading to ensure the saving process completes. Additionally, pass `map_location` to `torch.load` to ensure tensors are loaded onto the correct GPU for each rank, for example: `map_location = f\"cuda:{local_rank}\"`."
+  },
+  {
+    "question": "Why is it important to use `map_location` when loading checkpoints in distributed PyTorch training?",
+    "answer": "It is important because `torch.load` by default attempts to load tensors to the GPU they were originally saved from (e.g., `cuda:0`). Passing `map_location` ensures that tensors are loaded to the correct GPU for each specific rank, preventing potential issues."
+  }
+]

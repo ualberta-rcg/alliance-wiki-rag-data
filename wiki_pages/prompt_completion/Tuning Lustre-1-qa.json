@@ -1,0 +1,86 @@
+[
+  {
+    "question": "What is Lustre?",
+    "answer": "Lustre is a high performance distributed filesystem which allows users to reach high bandwidth for input/output operations."
+  },
+  {
+    "question": "Who is the performance advice for Lustre intended for?",
+    "answer": "The advice offered is for advanced users and should be used with caution, requiring tests to verify validity and performance improvements."
+  },
+  {
+    "question": "What parameters can be changed for a file or directory in Lustre?",
+    "answer": "For each file or directory, it is possible to change the stripe size and stripe count parameters."
+  },
+  {
+    "question": "What is 'stripe size' in the context of Lustre?",
+    "answer": "Stripe size is the size of the smallest block of data that is allocated on the filesystem."
+  },
+  {
+    "question": "What is 'stripe count' in the context of Lustre?",
+    "answer": "Stripe count is the number of disks on which the data are spread."
+  },
+  {
+    "question": "How do you check the stripe parameters for a file or directory?",
+    "answer": "It is possible to get the value of those parameters for a given file or directory using the command `lfs getstripe /path/to/file`."
+  },
+  {
+    "question": "How do you change the stripe parameters for a directory?",
+    "answer": "It is possible to change those parameters for a given directory using the command `lfs setstripe -c count /path/to/dir`."
+  },
+  {
+    "question": "What happens if you set the stripe count to 8 for a directory?",
+    "answer": "If `count`=8, then the files will be spread on 8 targets (RAIDs), and each MB will be written in a round-robin fashion on up to 8 different servers."
+  },
+  {
+    "question": "Does changing the stripe count on a directory affect existing files within it?",
+    "answer": "No, changing the stripe count will not modify an existing file."
+  },
+  {
+    "question": "How can you change the stripe parameters of an existing file?",
+    "answer": "To change those parameters for an existing file, the file must be copied (not moved) to a directory with different parameters or the file needs to be migrated."
+  },
+  {
+    "question": "How can you create an empty file with specific stripe parameters without altering the directory's settings?",
+    "answer": "To create an empty file with given stripe parameters without changing the directory's parameters, you may run `lfs setstripe` on the name of the file to be created."
+  },
+  {
+    "question": "What command can be used to restripe an old file in Lustre?",
+    "answer": "An old file can be restriped using the `lfs migrate` command, for example, `lfs migrate -c 2 striping_example/example_file`."
+  },
+  {
+    "question": "What are the trade-offs of increasing the stripe count?",
+    "answer": "Increasing the stripe count may improve performances, but also makes this file more susceptible to hardware failures."
+  },
+  {
+    "question": "What is the recommended stripe count for small files (less than 1MB) in a parallel program?",
+    "answer": "For small files (< 1MB), it is best to put this file on one disk (stripe count=1), to read it with the master rank, and to send its content to other ranks using a MPI_Broadcast or MPI_Scatter."
+  },
+  {
+    "question": "What is the recommended stripe count for large files in a parallel program?",
+    "answer": "When treating large files, it is usually best to use a stripe count as large as the number of MPI ranks."
+  },
+  {
+    "question": "What is the ideal stripe size for large files if each rank reads a specific amount of data?",
+    "answer": "For large files, the ideal stripe size will likely be the same size as the buffer size for the data that is being read or written by each rank (e.g., 1 MB if each rank reads 1 MB)."
+  },
+  {
+    "question": "What should you do if you don't know what stripe size to use for large files?",
+    "answer": "If you don't know what stripe size to use, your best bet is to keep the default value, which has been optimized for large files."
+  },
+  {
+    "question": "What is a critical requirement for stripe size values?",
+    "answer": "The stripe size must always be an integer multiple of 1MB."
+  },
+  {
+    "question": "How can you generally optimize filesystem performance by reducing I/O operations?",
+    "answer": "In general, you want to reduce the number of open/close operations on the filesystem, concatenate all data within a single file rather than writing a lot of small files, and open the file once at the beginning and close it once at the end of the program."
+  },
+  {
+    "question": "Is it better to write many small files or one large concatenated file in Lustre?",
+    "answer": "It is best to concatenate all data within a single file rather than writing a lot of small files."
+  },
+  {
+    "question": "What is the recommended practice for opening and closing files during a program for optimal Lustre performance?",
+    "answer": "It is best to open the file once at the beginning, and close it once at the end of the program, rather than opening and closing it each time you want to add new data."
+  }
+]

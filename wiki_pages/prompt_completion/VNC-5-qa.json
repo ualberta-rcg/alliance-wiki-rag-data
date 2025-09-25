@@ -1,0 +1,46 @@
+[
+  {
+    "question": "How do users typically load software modules on gra-vdi?",
+    "answer": "Most users find it sufficient to load the StdEnv module, which provides access to the same software modules loaded by default on clusters, using the command `module load CcEnv StdEnv/2023`."
+  },
+  {
+    "question": "What is the purpose of loading the SnEnv module on gra-vdi?",
+    "answer": "The SnEnv module needs to be loaded in rare cases when users require access to locally installed module(s) on gra-vdi. The command to load it is `module load SnEnv`."
+  },
+  {
+    "question": "Is the `nix` module currently available on gra-vdi or graham?",
+    "answer": "No, the `nix` module is no longer available on gra-vdi (or graham), and there is no guarantee it will return."
+  },
+  {
+    "question": "What was the intended purpose of the `nix` module when it was available?",
+    "answer": "The `nix` module was intended to provide open-source software optimized to use accelerated OpenGL whenever possible, as an alternative to StdEnv or SnEnv."
+  },
+  {
+    "question": "What commands were available for managing software packages after loading the `nix` module?",
+    "answer": "After loading the `nix` module, the `nix` and `nix-env` commands would be available in the user's path to manage software packages within their personal Nix environment."
+  },
+  {
+    "question": "How would one install a Nix package into their environment using the `nix` module?",
+    "answer": "After opening a terminal and running `module load nix`, users could search for programs with `nix search <regexp>` and install them using `nix-env --install --attr <attribute>`."
+  },
+  {
+    "question": "Do Nix-installed software packages persist across login sessions?",
+    "answer": "Yes, a Nix environment persists from one login to the next, meaning software installed with Nix remains available after loading the `nix` module in subsequent sessions."
+  },
+  {
+    "question": "How is accelerated OpenGL handled for software installed via Nix on gra-vdi?",
+    "answer": "For OpenGL applications installed with Nix on gra-vdi, the necessary adjustments to pre-load 'vglfaker.so' from VirtualGL for accelerated OpenGL are done automatically."
+  },
+  {
+    "question": "What utility is recommended for manually adjusting compiled binaries to pre-load 'vglfaker.so' when software is installed outside of Nix?",
+    "answer": "The `patchelf` utility is suggested for manually adjusting binaries. It can be installed into Nix using `nix-env --install --attr nixpkgs.patchelf`."
+  },
+  {
+    "question": "Provide an example command for using `patchelf` to add a VirtualGL system library to a custom OpenGL application.",
+    "answer": "After loading the `nix` module, an example command is `patchelf --add-needed /usr/lib64/VirtualGL/libvglfaker.so ~/.local/bin/myglapp`."
+  },
+  {
+    "question": "What is the drawback of preloading 'vglfaker.so' using the `LD_PRELOAD` environment variable?",
+    "answer": "Preloading 'vglfaker.so' via `LD_PRELOAD` is generally a bad idea because it applies indiscriminately to all binaries, potentially causing failures for those requiring a different 'vglfaker.so' than the one set."
+  }
+]

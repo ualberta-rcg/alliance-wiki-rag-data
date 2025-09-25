@@ -1,0 +1,114 @@
+[
+  {
+    "question": "What is the primary purpose of the /scratch file system on the clusters?",
+    "answer": "The /scratch file system is used for fast and temporary storage of data during execution."
+  },
+  {
+    "question": "Where should long-term data and reference data be stored?",
+    "answer": "Long-term data and reference data should be stored in the `/project` space or one of the archive zones."
+  },
+  {
+    "question": "How are files managed on /scratch to ensure sufficient space?",
+    "answer": "Files older than 60 days are periodically deleted based on their age."
+  },
+  {
+    "question": "Does moving a file to a different directory within /scratch prevent it from being deleted?",
+    "answer": "No, moving a file within /scratch will not prevent it from being purged."
+  },
+  {
+    "question": "How does the /scratch file system on Graham differ from other clusters?",
+    "answer": "The /scratch file system on Graham does not expire based on age but uses a quota to enforce temporary usage."
+  },
+  {
+    "question": "When are files that are susceptible to deletion first identified?",
+    "answer": "At the end of each month, files that might be deleted on the 15th of the following month are identified."
+  },
+  {
+    "question": "What kind of warning do users receive at the beginning of the month if their files are slated for deletion?",
+    "answer": "Users receive an on-screen warning message and an email notification with a list of all files susceptible to deletion, giving them two weeks to copy them."
+  },
+  {
+    "question": "What happens on the 12th of the month regarding file deletion?",
+    "answer": "A final notice is sent on the 12th of the month with an updated list of files to be deleted on the 15th, providing users with 72 hours to move their files."
+  },
+  {
+    "question": "When are files actually deleted from the /scratch space?",
+    "answer": "At the end of the day on the 15th of the month, all files in /scratch for which `ctime` and `atime` are older than 60 days are deleted."
+  },
+  {
+    "question": "Is the warning about file deletion a mandatory service?",
+    "answer": "No, the warning is issued only as a courtesy, as these files should not be in the /scratch space in the first place."
+  },
+  {
+    "question": "How can a user prevent a file from being considered for purging?",
+    "answer": "Copying a file or using the `rsync` command to move it modifies `atime`, which will prevent the file from being considered for purging."
+  },
+  {
+    "question": "What should users do after moving data from /scratch that they wish to keep?",
+    "answer": "Users should delete the original files and directories themselves rather than waiting for the purge procedure to remove them."
+  },
+  {
+    "question": "How can users check which files are slated for purging on Cedar, B\u00e9luga, or Narval?",
+    "answer": "On Cedar, B\u00e9luga, and Narval, users should navigate to `/scratch/to_delete/` and locate the file under their name."
+  },
+  {
+    "question": "How can users check which files are slated for purging on Niagara?",
+    "answer": "On Niagara, users can go to `/scratch/t/to_delete/` or establish a symbolic link to `/scratch/t/todelete/current`."
+  },
+  {
+    "question": "What information does the file listing purged files contain?",
+    "answer": "This file contains a list of file names with their full paths and possibly other information such as size, atime, and ctime."
+  },
+  {
+    "question": "How often is the file listing purged files updated?",
+    "answer": "This file is updated only on the 1st and 12th day of each month."
+  },
+  {
+    "question": "If a user accesses or modifies files between the 1st and 11th of the month, will the purge list be immediately updated?",
+    "answer": "No, if files are accessed, read, moved, or deleted between the 1st and 11th of the month, no modification will be made to the list before the 12th."
+  },
+  {
+    "question": "How is the age of a file determined for purging?",
+    "answer": "The age of a file is determined by `atime` (last access time) and `ctime` (last modification time)."
+  },
+  {
+    "question": "What command is used to find a file's `ctime`?",
+    "answer": "To find `ctime`, use the command `ls -lc <filename>`."
+  },
+  {
+    "question": "What command is used to find a file's `atime`?",
+    "answer": "To find `atime`, use the command `ls -lu <filename>`."
+  },
+  {
+    "question": "Why is the `mtime` parameter not used to determine a file's age for purging?",
+    "answer": "The `mtime` parameter is not used because its value can be modified by the user or another program to display false information."
+  },
+  {
+    "question": "Why are both `atime` and `ctime` used to determine file age, rather than just `atime`?",
+    "answer": "While `atime` is updated by the system in sync with `ctime`, user programs could potentially modify `atime` to set its value in the past, so using `ctime` adds a second level of control."
+  },
+  {
+    "question": "What is considered a bad practice related to managing file age on /scratch?",
+    "answer": "Falsifying the age of files by periodically executing the recursive `touch` command is considered a bad practice."
+  },
+  {
+    "question": "What happens if a user is caught falsifying file ages on /scratch?",
+    "answer": "The technical team can detect such practices, and users engaging in them will be asked to remove the tampered files from the /scratch space."
+  },
+  {
+    "question": "What are the common commands for copying data from /scratch to a project directory?",
+    "answer": "In most cases, `cp` or `rsync` are sufficient for copying data from /scratch to a project directory."
+  },
+  {
+    "question": "What problem can arise when copying a directory with symbolic links from /scratch using `cp` or `rsync`?",
+    "answer": "If a directory contains symbolic links, `cp` or `rsync` will copy them as-is, and they will continue to point back to the original /scratch location."
+  },
+  {
+    "question": "How can a directory with symbolic links be safely copied from /scratch to a project directory?",
+    "answer": "To safely copy a directory with symbolic links, you can use `tar` to create an archive of your files on /scratch and then extract it into your project directory."
+  },
+  {
+    "question": "Provide an example command to safely copy a directory named 'vos_donnees' with symlinks from /scratch to /project.",
+    "answer": "An example command is `cd /scratch/.../vos_donnees; mkdir /project/.../vos_donnees; tar cf - ./* | (cd /project/.../vos_donnees && tar xf -)`."
+  }
+]

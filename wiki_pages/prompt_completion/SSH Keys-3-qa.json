@@ -1,0 +1,190 @@
+[
+  {
+    "question": "How do RFC4716 or PKCS8 public key formats compare to PEM format?",
+    "answer": "Public keys in RFC4716 or PKCS8 formats are similar to PEM, with minor variations in their header and footer lines."
+  },
+  {
+    "question": "Is the `authorized_keys` file method for installing SSH keys a long-term solution?",
+    "answer": "No, support for the `authorized_keys` file method might eventually be withdrawn."
+  },
+  {
+    "question": "What is an advantage of using the CCDB method for SSH key installation?",
+    "answer": "The CCDB method makes your public key available on all HPC systems, which is convenient and often desired."
+  },
+  {
+    "question": "How can you install an SSH key for a specific system only?",
+    "answer": "You can install a key only on a specific system by adding your public key to the `~/.ssh/authorized_keys` file in your `/home` directory on that system."
+  },
+  {
+    "question": "What file should you copy your public key to on a specific system like Cedar to enable login?",
+    "answer": "To enable login to a specific system like Cedar, you should copy your public key into the file `~/.ssh/authorized_keys` on Cedar."
+  },
+  {
+    "question": "What does installing a public key in `~/.ssh/authorized_keys` on a system like Cedar enable?",
+    "answer": "Installing a public key in `~/.ssh/authorized_keys` on a system like Cedar allows you to log in to any of its login nodes using Public Key (PK) cryptography."
+  },
+  {
+    "question": "What is the most convenient command to install a public key using the `authorized_keys` method on OpenSSH systems?",
+    "answer": "The `ssh-copy-id` command is the most convenient way, for example: `ssh-copy-id -i computecanada-key username@cedar.computecanada.ca`."
+  },
+  {
+    "question": "What makes the `authorized_keys` mechanism fragile despite being standard?",
+    "answer": "The `authorized_keys` mechanism is fragile because SSH is very particular about the permissions on the `authorized_keys` file, your `/home` directory, and the `.ssh` subdirectory."
+  },
+  {
+    "question": "Why is entering a passphrase for an encrypted private key sometimes inconvenient?",
+    "answer": "It's inconvenient to have to enter your passphrase every time you use the key, despite its importance for securing your private key."
+  },
+  {
+    "question": "What is recommended instead of leaving a private key unencrypted for convenience?",
+    "answer": "It is strongly suggested to use an SSH key agent."
+  },
+  {
+    "question": "How does an SSH key agent simplify the use of encrypted private keys?",
+    "answer": "You type the passphrase when starting up the agent, after which the agent supplies the private key for new connections."
+  },
+  {
+    "question": "What security benefit does an SSH key agent provide?",
+    "answer": "Using an SSH key agent avoids storing the unencrypted private key on permanent storage, where it is more vulnerable to being stolen or copied."
+  },
+  {
+    "question": "Where should SSH key generation operations be performed?",
+    "answer": "SSH key generation should be performed on your own computer, not on a shared computer like a cluster."
+  },
+  {
+    "question": "Are default settings usually sufficient when generating an SSH key?",
+    "answer": "Yes, when you generate a key, the default settings are usually sufficient."
+  },
+  {
+    "question": "How can you add a comment to an SSH key when generating it?",
+    "answer": "You can add a comment using the `-C` option with `ssh-keygen`, for example: `ssh-keygen -C 'Alliance systems'`."
+  },
+  {
+    "question": "How do you specify a custom name for your SSH key files during generation?",
+    "answer": "You can use the `-f` option with `ssh-keygen`, for example: `ssh-keygen -f alliance-key`, which will create `alliance-key` (private) and `alliance-key.pub` (public)."
+  },
+  {
+    "question": "What option might be required when logging in if you've named your SSH key file?",
+    "answer": "If you named your SSH key file, you may have to use the `-i` option to specify the key name when logging in, like `ssh -i alliance-key user@host`."
+  },
+  {
+    "question": "How can you specify a different key type when generating an SSH key?",
+    "answer": "You can specify a different key type using the `-t` option with `ssh-keygen`, for example: `ssh-keygen -t ed25519`."
+  },
+  {
+    "question": "How can you strengthen an RSA SSH key by setting a longer key length?",
+    "answer": "You can strengthen an RSA key by setting a longer key length using options like `-t rsa-sha2-512 -b 4096` with `ssh-keygen`."
+  },
+  {
+    "question": "What is the purpose of SSH key constraints?",
+    "answer": "SSH key constraints allow you to limit what a public key is allowed to do, as by default, a public key installed without constraints can do anything."
+  },
+  {
+    "question": "Can an SSH key be constrained to perform only a specific command?",
+    "answer": "Yes, an SSH key can be constrained to perform only a specific command, such as `restrict,command=\"squeue --me\"`."
+  },
+  {
+    "question": "How can an SSH key be restricted for use with SFTP only?",
+    "answer": "An SSH key can be restricted to SFTP using the constraint `restrict,command=\"/usr/libexec/openssh/sftp-server\"`."
+  },
+  {
+    "question": "Can SSH key constraints limit access based on the connecting host?",
+    "answer": "Yes, key constraints can limit which hosts can connect using the key, for example: `restrict,from=\"d24-141-114-17.home.cgocable.net\"`."
+  },
+  {
+    "question": "What is a security benefit of limiting SSH key access by host?",
+    "answer": "Limiting by hosts is a powerful way to minimize the danger posed by a key being compromised."
+  },
+  {
+    "question": "What does the `restrict` keyword typically disable in a key constraint, and how can it be re-enabled for interactive sessions?",
+    "answer": "The `restrict` keyword typically turns off `pty allocation`. To allow `pty allocation` for a source-constrained interactive session, you can add `pty` to the constraint, such as `restrict,from=\"...\",pty`."
+  },
+  {
+    "question": "Where can you find documentation for the various SSH key constraints?",
+    "answer": "The various SSH key constraints are documented in the `sshd man` page (`man sshd` on a Linux system)."
+  },
+  {
+    "question": "Should SSH keys be shared among multiple users?",
+    "answer": "No, keys should be unique to a given user account and should not be used by multiple people."
+  },
+  {
+    "question": "Where should a private key be stored if using a shared computer?",
+    "answer": "On a shared computer, store your private key where only you are allowed access, or use an external storage device like a USB key if secure storage is not available."
+  },
+  {
+    "question": "Is it important to encrypt your private key, and what is the recommended passphrase length?",
+    "answer": "Yes, always encrypt your private key with a passphrase. We recommend 15 characters or more for the passphrase."
+  },
+  {
+    "question": "Should you ever share your private SSH key?",
+    "answer": "No, you should not share your private key."
+  },
+  {
+    "question": "Should a private SSH key be copied to a remote system?",
+    "answer": "No, a private key should not be copied to a remote system and should not leave your workstation."
+  },
+  {
+    "question": "What is recommended if you use SSH from multiple laptops?",
+    "answer": "If you have several laptops, you can create dedicated SSH key pairs for each of them."
+  },
+  {
+    "question": "Is it helpful to name SSH key pairs if you have multiple?",
+    "answer": "Yes, if you have several pairs, you may wish to name them, for example, `Laptop_RSA4096`."
+  },
+  {
+    "question": "How do you specify a named SSH key when logging in?",
+    "answer": "To use a named key when logging in, you must use the `-i` option to specify the key name, like this: `ssh -i Laptop_RSA4096 username@host`."
+  },
+  {
+    "question": "What tool is recommended for convenient use of encrypted SSH keys?",
+    "answer": "Use `ssh-agent` to make encrypted keys convenient."
+  },
+  {
+    "question": "What additional tool should be used if you are using SSH agent forwarding?",
+    "answer": "If you use agent forwarding, you should also use `ssh-askpass`."
+  },
+  {
+    "question": "Why should constraints be applied to public SSH keys?",
+    "answer": "Constraints should be applied to your public key to limit its scope."
+  },
+  {
+    "question": "What are common reasons for an SSH key to be revoked?",
+    "answer": "An SSH key may be revoked due to identified SSH key sharing or if its private component is believed to have become compromised."
+  },
+  {
+    "question": "How can an SSH key's private component become compromised?",
+    "answer": "A private key can become compromised through improper key management, theft, or a security breach."
+  },
+  {
+    "question": "What security risk does a compromised SSH key pose?",
+    "answer": "A compromised SSH key poses a significant security risk, as a malicious actor may use it to gain unauthorized access to systems and sensitive data."
+  },
+  {
+    "question": "What does the Digital Research Alliance of Canada use to mitigate risks from compromised SSH keys?",
+    "answer": "The Digital Research Alliance of Canada maintains a Key Revocation List (KRL) to mitigate the risk associated with compromised SSH keys."
+  },
+  {
+    "question": "What is a Key Revocation List (KRL)?",
+    "answer": "A Key Revocation List (KRL) is a registry of SSH keys that are no longer trusted or are otherwise considered invalid."
+  },
+  {
+    "question": "Can an SSH key on the Key Revocation List be used to access Alliance services?",
+    "answer": "No, no SSH key on the Key Revocation List can be used to access Alliance services."
+  },
+  {
+    "question": "What should you do if you discover your SSH key has been revoked?",
+    "answer": "If you discover that your SSH key has been revoked, it is imperative that you take immediate action."
+  },
+  {
+    "question": "What is the first step to take after an SSH key is revoked?",
+    "answer": "The first step is to replace the revoked key with a new one to ensure that you can connect securely to Alliance services."
+  },
+  {
+    "question": "Why should a revoked key be removed from all services?",
+    "answer": "A revoked key should be removed from all services (Alliance or other) to prevent unauthorized access or data breaches."
+  },
+  {
+    "question": "Who should be contacted if an SSH key is believed to be erroneously listed on the KRL or for questions about key revocation?",
+    "answer": "If you believe that your SSH key has been listed on the Key Revocation List in error, or if you have concerns or questions, contact Technical support for assistance."
+  }
+]

@@ -1,0 +1,170 @@
+[
+  {
+    "question": "What is the purpose of this guide?",
+    "answer": "Cette page constitue un guide de d\u00e9marrage servant \u00e0 porter une t\u00e2che d'apprentissage automatique (Machine Learning) sur une de nos grappes."
+  },
+  {
+    "question": "What is the first step when porting a machine learning task to the cluster regarding graphical output?",
+    "answer": "Modifiez votre programme afin qu'il n'utilise pas d'affichage graphique."
+  },
+  {
+    "question": "How should graphical results be handled on the cluster?",
+    "answer": "Tout r\u00e9sultat graphique devra \u00eatre \u00e9crit sur le disque dans un fichier, et visualis\u00e9 sur votre ordinateur personnel, une fois la t\u00e2che termin\u00e9e."
+  },
+  {
+    "question": "How should Matplotlib graphs be handled on the cluster?",
+    "answer": "Par exemple, si vous affichez des graphiques avec matplotlib, vous devez enregistrer les graphiques sous forme de fichiers, au lieu de les afficher \u00e0 l'\u00e9cran."
+  },
+  {
+    "question": "Are shared storage systems on the clusters optimized for many small files?",
+    "answer": "Les stockages partag\u00e9s sur nos grappes ne sont pas optimis\u00e9s pour g\u00e9rer un grand nombre de petits fichiers (ils sont plut\u00f4t optimis\u00e9s pour les tr\u00e8s gros fichiers)."
+  },
+  {
+    "question": "How should datasets be prepared for training on the cluster?",
+    "answer": "Assurez-vous que l'ensemble de donn\u00e9es dont vous aurez besoin pour votre entra\u00eenement se trouve dans un fichier archive (tel que \"tar\"), que vous transf\u00e9rerez sur votre n\u0153ud de calcul au d\u00e9but de votre t\u00e2che."
+  },
+  {
+    "question": "What happens if I don't archive my dataset for training?",
+    "answer": "Si vous ne le faites pas, vous risquez de causer des lectures de fichiers \u00e0 haute fr\u00e9quence du noeud de stockage vers votre n\u0153ud de calcul, nuisant ainsi \u00e0 la performance globale du syst\u00e8me."
+  },
+  {
+    "question": "How can I archive a dataset named 'mydataset' using tar?",
+    "answer": "En supposant que les fichiers dont vous avez besoin sont dans le dossier <tt>mydataset</tt>: $ tar cf mydataset.tar mydataset/*"
+  },
+  {
+    "question": "How can I compress data while archiving it with tar?",
+    "answer": "Si vous croyez que ce serait appropri\u00e9, vous pouvez utiliser <tt>tar czf</tt>."
+  },
+  {
+    "question": "Where should a virtual environment be created for machine learning tasks?",
+    "answer": "Cr\u00e9ez un environnement virtuel dans votre espace home."
+  },
+  {
+    "question": "Where can I find documentation for installing and using machine learning frameworks like PyTorch and TensorFlow?",
+    "answer": "Pour les d\u00e9tails d'installation et d'utilisation des diff\u00e9rents frameworks d'apprentissage machine, r\u00e9f\u00e9r\u00e9z-vous \u00e0 notre documentation: PyTorch et TensorFlow."
+  },
+  {
+    "question": "Why is it recommended to use an interactive task before submitting a script?",
+    "answer": "Nous vous recommandons d'essayer votre t\u00e2che dans une t\u00e2che interactive avant de la soumettre avec un script (section suivante). Vous pourrez ainsi diagnostiquer plus rapidement les probl\u00e8mes."
+  },
+  {
+    "question": "What is an example command to submit an interactive task?",
+    "answer": "$ salloc --account=def-someuser --gres=gpu:1 --cpus-per-task=3 --mem=32000M --time=1:00:00"
+  },
+  {
+    "question": "What steps should be taken once an interactive task is running?",
+    "answer": "Une fois dans la t\u00e2che: Activez votre environnement virtuel Python, Tentez d'ex\u00e9cuter votre programme, Installez les paquets manquants s'il y a lieu. Les noeuds de calcul n'ayant d'acc\u00e8s \u00e0 Internet, vous devrez faire l'installation \u00e0 partir d'un noeud de connexion. R\u00e9f\u00e9rez-vous \u00e0 notre documentation sur les environnements virtuels Python pour plus de d\u00e9tails, Notez les \u00e9tapes qui ont \u00e9t\u00e9 n\u00e9cessaires pour faire fonctionner le votre programme."
+  },
+  {
+    "question": "Where should a task primarily read and write data to optimize performance?",
+    "answer": "Maintenant est un bon moment pour v\u00e9rifier que votre t\u00e2che lit et \u00e9crit le plus possible dans le stockage local au n\u0153ud de calcul (<tt>$SLURM_TMPDIR</tt>), et le moins possible sur les syst\u00e8mes de fichiers partag\u00e9s (home, scratch, project)."
+  },
+  {
+    "question": "How should tasks be submitted for full automation?",
+    "answer": "Vous devez soumettre vos t\u00e2ches \u00e0 l'aide de scripts <tt>sbatch</tt>, afin qu'elles puissent \u00eatre enti\u00e8rement automatis\u00e9es."
+  },
+  {
+    "question": "What is the primary purpose of interactive tasks?",
+    "answer": "Les t\u00e2ches interactives servent uniquement \u00e0 pr\u00e9parer et \u00e0 d\u00e9boguer des t\u00e2ches qui seront ensuite ex\u00e9cut\u00e9es enti\u00e8rement et/ou \u00e0 grande \u00e9chelle en utilisant <tt>sbatch</tt>."
+  },
+  {
+    "question": "What is the first important element to include in an `sbatch` script?",
+    "answer": "Compte sur lequel les ressources seront \"factur\u00e9es\""
+  },
+  {
+    "question": "What are the suggested resources to request in an `sbatch` script for a machine learning task?",
+    "answer": "Ressources demand\u00e9es: Nombre de CPU, suggestion: 6; Nombre de GPU, suggestion: 1; Quantit\u00e9 de m\u00e9moire, suggestion: <tt>32000M</tt>; Dur\u00e9e (Maximum B\u00e9luga: 7 jours, Graham et Cedar: 28 jours)."
+  },
+  {
+    "question": "What is the default GPU usage for TensorFlow and PyTorch?",
+    "answer": "Par d\u00e9faut, TensorFlow et PyTorch utilisent un seul GPU."
+  },
+  {
+    "question": "What are the maximum job durations for B\u00e9luga, Graham, and Cedar clusters?",
+    "answer": "Dur\u00e9e (Maximum B\u00e9luga: 7 jours, Graham et Cedar: 28 jours)"
+  },
+  {
+    "question": "What bash commands should be included in an `sbatch` script?",
+    "answer": "Commandes ''bash'': Pr\u00e9paration de l'environnement (modules, virtualenv), Transfert des donn\u00e9es vers le noeud de calcul, Lancement de l'ex\u00e9cutable."
+  },
+  {
+    "question": "How do you request one GPU in an sbatch script?",
+    "answer": "#SBATCH --gres=gpu:1"
+  },
+  {
+    "question": "How many CPUs are requested per task in the example sbatch script?",
+    "answer": "#SBATCH --cpus-per-task=3"
+  },
+  {
+    "question": "What amount of memory is requested in the example sbatch script?",
+    "answer": "#SBATCH --mem=32000M"
+  },
+  {
+    "question": "What is the requested time duration in the example sbatch script?",
+    "answer": "#SBATCH --time=0-03:00"
+  },
+  {
+    "question": "Which modules are loaded in the example sbatch script?",
+    "answer": "module load python/3.6 cuda cudnn"
+  },
+  {
+    "question": "How is the virtual environment activated in the example sbatch script?",
+    "answer": "source ~/my_env/bin/activate"
+  },
+  {
+    "question": "How is a data directory created in the local storage of the compute node in the example script?",
+    "answer": "mkdir $SLURM_TMPDIR/data"
+  },
+  {
+    "question": "How is an archived dataset transferred and extracted to the local storage in the example script?",
+    "answer": "tar xf ~/projects/def-xxxx/data.tar -C $SLURM_TMPDIR/data"
+  },
+  {
+    "question": "How is the training script launched in the example sbatch script?",
+    "answer": "python $SOURCEDIR/train.py $SLURM_TMPDIR/data"
+  },
+  {
+    "question": "How can I improve job priority for long tasks?",
+    "answer": "Nous vous recommandons de morceler vos t\u00e2ches en blocs de 24 heures. Demander des t\u00e2ches plus courtes am\u00e9liore votre priorit\u00e9."
+  },
+  {
+    "question": "How can the 7-day limit on B\u00e9luga be exceeded for a task?",
+    "answer": "En cr\u00e9ant une cha\u00eene de t\u00e2ches, il est possible de d\u00e9passer la limite de 7 jours sur B\u00e9luga."
+  },
+  {
+    "question": "What is required for a long task to be interrupted and resumed?",
+    "answer": "Modifiez votre script de soumission (ou votre programme) afin que votre t\u00e2che puisse \u00eatre interrompue et continu\u00e9e. Votre programme doit pouvoir acc\u00e9der au ''checkpoint'' le plus r\u00e9cent."
+  },
+  {
+    "question": "What should be checked before segmenting a long task into 24-hour blocks?",
+    "answer": "V\u00e9rifiez combien d'epochs (ou d'it\u00e9rations) peuvent \u00eatre effectu\u00e9es \u00e0 l'int\u00e9rieur de 24 heures."
+  },
+  {
+    "question": "How do you calculate the number of 24-hour blocks needed for a task?",
+    "answer": "Calculez combien de blocs de 24 heures vous aurez besoin: <tt>n_blocs = n_epochs_total / n_epochs_par_24h</tt>"
+  },
+  {
+    "question": "Which sbatch argument is used to request a chain of tasks?",
+    "answer": "Utilisez l'argument <tt>--array 1-<n_blocs>%1</tt> pour demander une chaine de <tt>n_blocs</tt> t\u00e2ches."
+  },
+  {
+    "question": "What does `#SBATCH --array=1-10%1` mean in an sbatch script?",
+    "answer": "#SBATCH --array=1-10%1 # 10 is the number of jobs in the chain"
+  },
+  {
+    "question": "What is the suggested checkpoint extension for H5 checkpoints?",
+    "answer": "CHECKPOINT_EXT='*.h5'"
+  },
+  {
+    "question": "Where are checkpoints suggested to be stored in the example script for chained tasks?",
+    "answer": "CHECKPOINTS=~/scratch/checkpoints/ml-test"
+  },
+  {
+    "question": "How is the most recent checkpoint retrieved in the example script for chained tasks?",
+    "answer": "LAST_CHECKPOINT=$(find $CHECKPOINTS -maxdepth 1 -name \"$CHECKPOINT_EXT\" -print0 {{!}} xargs -r -0 ls -1 -t {{!}} head -1)"
+  },
+  {
+    "question": "How does the example script handle starting a training task with or without a previous checkpoint?",
+    "answer": "if [ -z \"$LAST_CHECKPOINT\" ]; then # $LAST_CHECKPOINT is null; start from scratch python $SOURCEDIR/train.py --write-checkpoints-to $CHECKPOINTS ...else python $SOURCEDIR/train.py --load-checkpoint $LAST_CHECKPOINT --write-checkpoints-to $CHECKPOINTS ...fi"
+  }
+]

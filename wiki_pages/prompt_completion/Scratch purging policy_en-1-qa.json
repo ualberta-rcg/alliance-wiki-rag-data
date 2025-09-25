@@ -1,0 +1,102 @@
+[
+  {
+    "question": "What is the primary purpose of the scratch filesystem on the clusters?",
+    "answer": "The scratch filesystem is intended as temporary, fast storage for data being used during job execution."
+  },
+  {
+    "question": "Where should data for long-term storage and reference be kept instead of scratch?",
+    "answer": "Data needed for long-term storage and reference should be kept in either `/project` or other archival storage areas."
+  },
+  {
+    "question": "What is the policy for deleting files from the scratch filesystem?",
+    "answer": "Files older than 60 days are periodically deleted according to the policy outlined in the document."
+  },
+  {
+    "question": "Does moving a file from one directory to another within scratch prevent it from being purged?",
+    "answer": "No, simply moving a file from one directory in scratch to another directory in scratch will not in general prevent it from being purged, as purging is based on its age, not its location."
+  },
+  {
+    "question": "How does the scratch filesystem policy differ on the Graham cluster?",
+    "answer": "On Graham, the scratch filesystem does not explicitly expire, but uses quota to enforce transient use."
+  },
+  {
+    "question": "When are files on the scratch filesystem checked as candidates for expiry?",
+    "answer": "The scratch filesystem is checked at the end of the month for files which will be candidates for expiry on the 15th of the following month."
+  },
+  {
+    "question": "How are users notified about files slated for purging on the 1st of the month?",
+    "answer": "On the first day of the month, a login message is posted and a notification e-mail is sent to all users who have at least one file which is a candidate for purging, containing the location of a file listing all candidates."
+  },
+  {
+    "question": "How much time do users have to copy their data after the initial purge notification?",
+    "answer": "Users will have two weeks from the 1st of the month to make arrangements to copy data to their project space or another location if they wish to save it."
+  },
+  {
+    "question": "When is the final notification email sent regarding files slated for expiration?",
+    "answer": "A final notification e-mail will be sent on the 12th of the month with an updated assessment of candidate files for expiration on the 15th."
+  },
+  {
+    "question": "What is the final deadline for files to be deleted from the scratch filesystem?",
+    "answer": "At the end of the day on the 15th, any remaining files on the scratch filesystem for which both the `ctime` and the `atime` are older than 60 days will be deleted."
+  },
+  {
+    "question": "Is it the user's responsibility to manage files older than 60 days in scratch?",
+    "answer": "Yes, it is the user's ultimate responsibility to keep files older than 60 days from being located in the scratch space, as e-mail reminders and login notices are a courtesy."
+  },
+  {
+    "question": "What effect does copying or `rsync`-ing files have on their `atime` on scratch?",
+    "answer": "Simply copying or using the `rsync` command to displace files will update the `atime` for the original data on scratch, making them ineligible for deletion at that moment."
+  },
+  {
+    "question": "What is recommended after moving data from scratch to another location?",
+    "answer": "Once you have put the data in another location, please delete the original files and directories in scratch instead of depending on the automatic purging."
+  },
+  {
+    "question": "Where can users on Cedar, Beluga, and Narval clusters check for files slated for purging?",
+    "answer": "On Cedar, Beluga, and Narval clusters, users should go to the `/scratch/to_delete/` path and look for a file with their name."
+  },
+  {
+    "question": "Where can users on Niagara check for files slated for purging?",
+    "answer": "On Niagara, users should go to `/scratch/t/to_delete/` (a symlink to `/scratch/t/todelete/current`)."
+  },
+  {
+    "question": "What kind of information does the file listing candidates for purging contain?",
+    "answer": "The file will contain a list of filenames with full path, possibly other information about `atime`, `ctime`, and size."
+  },
+  {
+    "question": "How often is the file listing purge candidates updated?",
+    "answer": "The file listing purge candidates is updated only on the 1st and the 12th of each month."
+  },
+  {
+    "question": "What does it signify if there is no file with your name in the `/scratch/to_delete/` path?",
+    "answer": "If a file with your name is not present, it means you do not have any candidates slated for purging that month."
+  },
+  {
+    "question": "How is a file's age defined for the purpose of scratch filesystem purging?",
+    "answer": "A file's age is defined as the most recent of its access time (`atime`) and its change time (`ctime`)."
+  },
+  {
+    "question": "Which command can be used to find a file's `ctime`?",
+    "answer": "You can find the `ctime` of a file using `ls -lc <filename>`."
+  },
+  {
+    "question": "Which command can be used to obtain a file's `atime`?",
+    "answer": "The `atime` of a file can be obtained with the command `ls -lu <filename>`."
+  },
+  {
+    "question": "Why is the modify time (`mtime`) not used to determine a file's age?",
+    "answer": "The `mtime` is not used because it can be modified by the user or by other programs to display incorrect information."
+  },
+  {
+    "question": "Why is `ctime` used as a fallback for determining file age, alongside `atime`?",
+    "answer": "The use of `ctime` as a fallback guards against `atime` being altered by userspace programs to times in the past, which could result in early expiration of a file."
+  },
+  {
+    "question": "Is periodically running a recursive `touch` command to prevent file expiration considered acceptable?",
+    "answer": "No, periodically running a recursive `touch` command to prevent files from being flagged for expiration is considered potential abuse."
+  },
+  {
+    "question": "What happens if users are detected attempting to circumvent the purging policy?",
+    "answer": "Users who employ such techniques will be contacted and asked to modify their behavior, in particular to move the \"retouched\" data from scratch to a more appropriate location."
+  }
+]

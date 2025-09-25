@@ -1,0 +1,70 @@
+[
+  {
+    "question": "What are the typical SBATCH directives for a STAR-CCM+ job on the B\u00e9luga cluster?",
+    "answer": "For a STAR-CCM+ job on B\u00e9luga, the SBATCH directives generally include `--account=def-group`, `--time=00-01:00`, `--nodes=1`, `--cpus-per-task=40`, `--mem=0`, and `--ntasks-per-node=1`."
+  },
+  {
+    "question": "Which environment modules are loaded for STAR-CCM+ on B\u00e9luga according to the example script?",
+    "answer": "The `StdEnv/2023` module is loaded, followed by a STAR-CCM+ module like `starccm-mixed/18.06.006` or `starccm-mixed/18.04.008`."
+  },
+  {
+    "question": "How is a Siemens Power on Demand (PoD) Key specified in a STAR-CCM+ Slurm script for B\u00e9luga?",
+    "answer": "The Siemens PoD Key is specified by setting the `LM_PROJECT` variable, for example, `LM_PROJECT='my22digitpodkey'`."
+  },
+  {
+    "question": "What is the command to launch STAR-CCM+ with a Siemens PoD license on B\u00e9luga?",
+    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
+  },
+  {
+    "question": "What is the command to launch STAR-CCM+ with an institutional license on B\u00e9luga?",
+    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
+  },
+  {
+    "question": "What is the recommended `cpus-per-task` setting for STAR-CCM+ jobs on the Cedar cluster?",
+    "answer": "For STAR-CCM+ jobs on Cedar, the recommended `cpus-per-task` is 48, requesting all cores per node (options are 32 or 48)."
+  },
+  {
+    "question": "How do you specify the input simulation file (`.sim`) and an optional Java macro file (`.java`) in a Cedar job script?",
+    "answer": "The input simulation file is specified with `SIM_FILE='mysample.sim'`, and the Java macro file can be specified by uncommenting `JAVA_FILE='mymacros.java'`."
+  },
+  {
+    "question": "Which MPI implementation and fabric are used for STAR-CCM+ on the Cedar and Graham clusters?",
+    "answer": "STAR-CCM+ on Cedar and Graham uses `-mpi intel -fabric psm2`."
+  },
+  {
+    "question": "What is the recommended `cpus-per-task` setting for STAR-CCM+ jobs on the Graham cluster?",
+    "answer": "For STAR-CCM+ jobs on Graham, the recommended `cpus-per-task` is 32, requesting all cores per node (options are 32 or 44)."
+  },
+  {
+    "question": "What is the recommended `cpus-per-task` setting for STAR-CCM+ jobs on the Narval cluster?",
+    "answer": "For STAR-CCM+ jobs on Narval, the recommended `cpus-per-task` is 64, requesting all cores per node."
+  },
+  {
+    "question": "Which MPI implementation is used for STAR-CCM+ on the Narval cluster?",
+    "answer": "STAR-CCM+ on Narval uses `-mpi openmpi`."
+  },
+  {
+    "question": "What specific environment module should be loaded on Niagara before `StdEnv/2023` for STAR-CCM+?",
+    "answer": "The `CCEnv` module should be loaded on Niagara before `StdEnv/2023`."
+  },
+  {
+    "question": "How are license server details configured for PoD licenses on Niagara, including the use of an SSH tunnel?",
+    "answer": "On Niagara, `FLEXPORT`, `VENDPORT`, and `LICSERVER` variables are explicitly set (e.g., `FLEXPORT=1999`, `VENDPORT=2099`, `LICSERVER=flex.cd-adapco.com`), and an SSH tunnel is established via `ssh nia-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f`."
+  },
+  {
+    "question": "What is the workaround for license failures when running STAR-CCM+ on Niagara?",
+    "answer": "A `while` loop attempts to start STAR-CCM+ up to 5 times, with a `sleep 5` between attempts, until the exit status is 0."
+  },
+  {
+    "question": "What is the purpose of the `slurm_hl2hl.py` script in the STAR-CCM+ job scripts?",
+    "answer": "The `slurm_hl2hl.py` script is used to generate a machinefile for STAR-CCM+, typically by running `slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile`."
+  },
+  {
+    "question": "How is the total number of cores (`NCORE`) calculated in the STAR-CCM+ Slurm job scripts?",
+    "answer": "The total number of cores (`NCORE`) is calculated as the product of `SLURM_NNODES`, `SLURM_CPUS_PER_TASK`, and `SLURM_NTASKS_PER_NODE`."
+  },
+  {
+    "question": "What are the common JVM arguments used when launching STAR-CCM+ across the different clusters?",
+    "answer": "The common JVM arguments are `-jvmargs -Xmx4G` for memory allocation and `-jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR` for the temporary directory."
+  }
+]

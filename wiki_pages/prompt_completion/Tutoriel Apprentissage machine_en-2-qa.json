@@ -1,0 +1,54 @@
+[
+  {
+    "question": "How is data prepared for training within the example `sbatch` script?",
+    "answer": "In the example `sbatch` script, a directory `$SLURM_TMPDIR/data` is created, and then a tar archive `~/projects/def-xxxx/data.tar` is extracted into it using `tar xf ~/projects/def-xxxx/data.tar -C $SLURM_TMPDIR/data`."
+  },
+  {
+    "question": "How is the training process started in the provided `sbatch` example script?",
+    "answer": "The training process is started by executing `python $SOURCEDIR/train.py $SLURM_TMPDIR/data`."
+  },
+  {
+    "question": "What is the recommended unit for checkpointing long-running jobs?",
+    "answer": "It is recommended to checkpoint jobs in 24-hour units."
+  },
+  {
+    "question": "Why are short job durations beneficial for checkpointed jobs?",
+    "answer": "Submitting jobs with short durations ensures they are more likely to start sooner."
+  },
+  {
+    "question": "How can the seven-day job limit on B\u00e9luga be bypassed for long-running jobs?",
+    "answer": "The seven-day limit on B\u00e9luga can be overcome by creating a daisy chain of jobs."
+  },
+  {
+    "question": "What modifications are necessary for a program or script to support checkpointing?",
+    "answer": "The job submission script or program must be modified so that it can be interrupted and continued, and be able to access the most recent checkpoint file."
+  },
+  {
+    "question": "How do you calculate the number of 24-hour units required for a checkpointed job?",
+    "answer": "The number of 24-hour units (`n_units`) is calculated by dividing the total number of epochs by the number of epochs that can be carried out in a 24-hour unit (`n_units = n_epochs_total / n_epochs_per_24h`)."
+  },
+  {
+    "question": "What `sbatch` argument is used to request a chain of jobs for checkpointing?",
+    "answer": "The argument `--array 1-<n_blocs>%1` is used to ask for a chain of `n_blocs` jobs."
+  },
+  {
+    "question": "What are common checkpoint file extensions mentioned in the example script?",
+    "answer": "Common checkpoint file extensions mentioned are `*.h5` (for HDF5) and `*.pt` (for PyTorch checkpoints)."
+  },
+  {
+    "question": "How does the example `ml-test-chain.sh` script handle starting training if no previous checkpoint is found?",
+    "answer": "If no previous checkpoint is found (`$LAST_CHECKPOINT` is null), the script starts training from scratch using `python $SOURCEDIR/train.py --write-checkpoints-to $CHECKPOINTS ...`."
+  },
+  {
+    "question": "How does the example `ml-test-chain.sh` script handle continuing training if a checkpoint is found?",
+    "answer": "If a checkpoint is found, the script loads the most recent one using `--load-checkpoint $LAST_CHECKPOINT` and continues training, writing new checkpoints to `$CHECKPOINTS`."
+  },
+  {
+    "question": "Where does the example script recommend storing checkpoints?",
+    "answer": "The example script specifies that checkpoints should be stored in `~/scratch/checkpoints/ml-test`."
+  },
+  {
+    "question": "What does `#SBATCH --array=1-10%1` in the example script mean?",
+    "answer": "It means that the job submission requests a chain consisting of 10 jobs."
+  }
+]

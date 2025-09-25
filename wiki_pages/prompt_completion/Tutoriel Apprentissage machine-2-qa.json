@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What are the important elements to include in an `sbatch` script?",
+    "answer": "An `sbatch` script must include the account to which resources will be charged, requested resources (CPUs, GPUs, memory, duration), and Bash commands for environment preparation, data transfer, and executable launch."
+  },
+  {
+    "question": "What is the suggested number of CPUs for an `sbatch` script?",
+    "answer": "The suggestion is 6 CPUs."
+  },
+  {
+    "question": "How many GPUs should typically be requested in an `sbatch` script?",
+    "answer": "It is suggested to use one (1) GPU, unless you are certain your program uses several. By default, TensorFlow and PyTorch use only one GPU."
+  },
+  {
+    "question": "What is the suggested amount of memory for an `sbatch` script?",
+    "answer": "The suggested memory amount is 32000M."
+  },
+  {
+    "question": "What are the maximum job durations on B\u00e9luga, Graham, and Cedar clusters?",
+    "answer": "The maximum duration for B\u00e9luga is 7 days, and for Graham and Cedar, it's 28 days."
+  },
+  {
+    "question": "What types of Bash commands are necessary in an `sbatch` script?",
+    "answer": "Necessary Bash commands include environment preparation (modules, virtualenv), data transfer to the compute node, and launching the executable."
+  },
+  {
+    "question": "What modules are loaded in the example `ml-test.sh` sbatch script?",
+    "answer": "The example `ml-test.sh` script loads the `python/3.6`, `cuda`, and `cudnn` modules."
+  },
+  {
+    "question": "How is the virtual environment prepared in the example `ml-test.sh` script?",
+    "answer": "The virtual environment is prepared by sourcing `~/my_env/bin/activate`. It's also mentioned that it could be created on local storage ($SLURM_TMPDIR) for better performance."
+  },
+  {
+    "question": "How are data prepared and transferred to the compute node in the example `ml-test.sh` script?",
+    "answer": "Data are prepared by creating a directory `$SLURM_TMPDIR/data` and extracting an archive `~/projects/def-xxxx/data.tar` into it using `tar xf`."
+  },
+  {
+    "question": "What is recommended for handling long machine learning tasks?",
+    "answer": "It is recommended to split long tasks into 24-hour blocks."
+  },
+  {
+    "question": "What is a benefit of requesting shorter tasks?",
+    "answer": "Requesting shorter tasks improves your job priority."
+  },
+  {
+    "question": "How can one exceed the 7-day job limit on B\u00e9luga?",
+    "answer": "By creating a chain of tasks, it is possible to exceed the 7-day limit on B\u00e9luga."
+  },
+  {
+    "question": "What steps are involved in segmenting a long task?",
+    "answer": "Segmenting a long task involves modifying the script or program to allow interruption and continuation (accessing the latest checkpoint), verifying how many epochs can run within 24 hours, calculating the total number of 24-hour blocks needed, and using the `--array 1-<n_blocs>%1` argument to request a chain of tasks."
+  },
+  {
+    "question": "Which `sbatch` argument is used to request a chain of tasks?",
+    "answer": "The `--array 1-<n_blocs>%1` argument is used to request a chain of `n_blocs` tasks."
+  },
+  {
+    "question": "How does the example script `ml-test-chain.sh` handle checkpoints to resume training?",
+    "answer": "The `ml-test-chain.sh` script finds the most recent checkpoint (`.h5` or `.pt` file) in `~/scratch/checkpoints/ml-test`. If no checkpoint is found, it starts training from scratch; otherwise, it loads the last checkpoint to continue training."
+  }
+]

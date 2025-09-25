@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What kind of error might you encounter when programming with PyTorch 1.10.x that manifests as a C++ exception?",
+    "answer": "You might get a `c10::Error` that outputs a C++ exception, making it difficult to trace the error in your Python script."
+  },
+  {
+    "question": "Why is a `c10::Error` problematic when programming in Python with PyTorch?",
+    "answer": "A `c10::Error` emits a C++ exception instead of a Python exception, which prevents following the Python program's traceback and easily identifying the error's cause in the Python script."
+  },
+  {
+    "question": "How can you resolve the issue of missing Python tracebacks when encountering a `c10::Error` in PyTorch?",
+    "answer": "Using PyTorch 1.9.1 instead of 1.10.x can allow the Python program's traceback to be followed."
+  },
+  {
+    "question": "What does the CUDA error 'no kernel image is available for execution on the device' indicate?",
+    "answer": "This error means that the current Torch installation does not support the computational architecture or the GPU being used."
+  },
+  {
+    "question": "How can one resolve the CUDA error 'no kernel image is available for execution on the device'?",
+    "answer": "You can resolve this error by installing a newer version of `torch` or by requesting a GPU that is compatible with your current Torch version."
+  },
+  {
+    "question": "What is LibTorch?",
+    "answer": "LibTorch is a distribution that enables the implementation of C++ extensions to PyTorch and pure C++ machine learning applications."
+  },
+  {
+    "question": "What components are included in the LibTorch distribution?",
+    "answer": "The LibTorch distribution includes the necessary headers, libraries, and CMake configuration files for working with PyTorch."
+  },
+  {
+    "question": "Where can I find official documentation for LibTorch?",
+    "answer": "You can find documentation at https://pytorch.org/cppdocs/installing.html."
+  },
+  {
+    "question": "What are the initial steps to set up the environment for using LibTorch?",
+    "answer": "First, load the required modules for LibTorch, then install PyTorch within a Python virtual environment."
+  },
+  {
+    "question": "Which modules are necessary for setting up a LibTorch environment using StdEnv/2023?",
+    "answer": "For StdEnv/2023, you need to load `StdEnv/2023`, `gcc`, `cuda/12.2`, `cmake`, `protobuf`, `cudnn`, `python/3.11`, `abseil`, `cusparselt`, and `opencv/4.8.1`."
+  },
+  {
+    "question": "How do you install `torch` and `numpy` into a virtual environment for LibTorch under StdEnv/2023?",
+    "answer": "After activating your virtual environment, run `pip install --no-index torch numpy`."
+  },
+  {
+    "question": "How can you determine the correct versions for `abseil`, `cusparselt`, and `opencv` modules when compiling a LibTorch application with StdEnv/2023?",
+    "answer": "You can determine the correct versions by running the command `ldd $VIRTUAL_ENV/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so | sed -n 's&^.*/\\(\\(opencv\\|abseil\\|cusparselt\\)/[^/]*\\).*&\\1&p' | sort -u`."
+  },
+  {
+    "question": "Which modules are necessary for setting up a LibTorch environment using StdEnv/2020?",
+    "answer": "For StdEnv/2020, you need to load `gcc`, `cuda/11.4`, `cmake`, `protobuf`, `cudnn`, and `python/3.10`."
+  },
+  {
+    "question": "How do you install `torch` and `numpy` into a virtual environment for LibTorch under StdEnv/2020?",
+    "answer": "After activating your virtual environment, run `pip install --no-index torch numpy`."
+  },
+  {
+    "question": "What is the content of `example.cpp` for a minimal LibTorch application?",
+    "answer": "The `example.cpp` file should contain:\n```cpp\n#include <torch/torch.h>\n#include <iostream>\n\nint main() \n{\n    torch::Device device(torch::kCPU);\n    if (torch::cuda::is_available()) \n    {\n        std::cout << \"CUDA is available! Using GPU.\" << std::endl;\n        device = torch::Device(torch::kCUDA);\n    }\n\n    torch::Tensor tensor = torch::rand({2, 3}).to(device);\n    std::cout << tensor << std::endl;\n}\n```"
+  },
+  {
+    "question": "What is the content of `CMakeLists.txt` for a minimal LibTorch application?",
+    "answer": "The `CMakeLists.txt` file should contain:\n```cmake\ncmake_minimum_required(VERSION 3.0 FATAL_ERROR)\nproject(example)\n\nfind_package(Torch REQUIRED)\n\nadd_executable(example example.cpp)\ntarget_link_libraries(example \"${TORCH_LIBRARIES}\")\nset_property(TARGET example PROPERTY CXX_STANDARD 14)\n```"
+  },
+  {
+    "question": "How do you configure and build a simple LibTorch example using StdEnv/2023?",
+    "answer": "After activating your Python virtual environment, use the commands:\n```bash\ncmake -B build -S . -DCMAKE_PREFIX_PATH=$VIRTUAL_ENV/lib/python3.11/site-packages \\\n                     -DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath=$VIRTUAL_ENV/lib/python3.11/site-packages/torch/lib,-L$EBROOTCUDA/extras/CUPTI/lib64 \\\n                     -DCMAKE_SKIP_RPATH=ON -DTORCH_CUDA_ARCH_LIST=\"6.0;7.0;7.5;8.0;9.0\"\ncmake --build build\n```"
+  },
+  {
+    "question": "How do you configure and build a simple LibTorch example using StdEnv/2020?",
+    "answer": "After activating your Python virtual environment, use the commands:\n```bash\ncmake -B build -S . -DCMAKE_PREFIX_PATH=$VIRTUAL_ENV/lib/python3.10/site-packages \\\n                     -DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath=$VIRTUAL_ENV/lib/python3.10/site-packages/torch/lib \\\n                     -DCMAKE_SKIP_RPATH=ON\ncmake --build build\n```"
+  },
+  {
+    "question": "How do you run a compiled LibTorch example?",
+    "answer": "You can run the compiled program with the command `build/example`."
+  },
+  {
+    "question": "What should you do to test a LibTorch application with CUDA support?",
+    "answer": "To test a CUDA application, you should request an interactive job with a GPU."
+  }
+]

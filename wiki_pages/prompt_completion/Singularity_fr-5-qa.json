@@ -1,0 +1,66 @@
+[
+  {
+    "question": "What is the purpose of the `-B` option when using `singularity shell`, `exec`, or `run` commands?",
+    "answer": "The `-B` option is used to perform a 'bind mount', making specified file systems from the host accessible within the Singularity container."
+  },
+  {
+    "question": "How do you make `/home`, `/project`, `/scratch`, and `/localscratch` accessible inside a Singularity container using `singularity shell`?",
+    "answer": "You would use the command: `singularity shell -B /home -B /project -B /scratch -B /localscratch myimage.simg`"
+  },
+  {
+    "question": "Can you change the name of a bind-mounted directory inside a Singularity container?",
+    "answer": "Yes, you can modify the name of a bind-mounted directory inside the container. For example, `/localscratch:/temp` would make `/localscratch` visible as `/temp` inside the container."
+  },
+  {
+    "question": "What is the general recommendation for bind mounting directories in Singularity?",
+    "answer": "It is generally not recommended to mount each subdirectory directly to avoid access problems; instead, mount the root directory of the file system."
+  },
+  {
+    "question": "Are there special considerations for single-node MPI tasks in a Singularity container?",
+    "answer": "No, nothing particular needs to be done for single-node MPI tasks."
+  },
+  {
+    "question": "What are the requirements for using MPI applications across multiple nodes in a Singularity container?",
+    "answer": "For multi-node MPI applications, you must ensure your MPI application is compiled with OpenMPI version 3 or 4 in the container, that MPI in the container can use the same process management interface library (e.g., PMI-2 or PMIx) as the cluster's MPI, use `srun` with the correct PMI option, install `slurm-client` in the container, load `singularity` and `openmpi` modules on the host, and install high-performance networking packages like `libpsm2` or `UCX`."
+  },
+  {
+    "question": "Which versions of OpenMPI are ideally recommended for multi-node MPI applications in Singularity containers?",
+    "answer": "Ideally, OpenMPI version 3 or 4 should be used. Version 2 might or might not work, and version 1 will not function."
+  },
+  {
+    "question": "How should `srun` be used to execute an MPI application within a Singularity container for multi-node tasks?",
+    "answer": "The `srun` command should be used with the appropriate `--mpi` flag (e.g., `--mpi=pmi2` or `--mpi=pmix`), followed by `singularity exec /path/to/your/singularity/image.sif /path/to/your-program`."
+  },
+  {
+    "question": "What high-performance networking packages should be installed in a Singularity image for MPI applications?",
+    "answer": "You should install `libpsm2` if the supercomputer uses OmniPath or `UCX` if it uses Infiniband."
+  },
+  {
+    "question": "How can you determine the libraries used for MPI configuration on a cluster?",
+    "answer": "For OpenMPI, use `ompi_info --config`, and for MPICH, use `mpiexec -info`."
+  },
+  {
+    "question": "What is required to run CUDA programs within a Singularity container?",
+    "answer": "You must ensure that CUDA is installed in your Singularity container, and you need to add the `--nv` flag when running the container."
+  },
+  {
+    "question": "What flag is used to enable CUDA functionality when running a Singularity container?",
+    "answer": "The `--nv` flag is used, for example: `srun singularity run --nv container-name.sif [job to do]`."
+  },
+  {
+    "question": "How can you change Singularity's default temporary and cache directories?",
+    "answer": "You can change these directories by defining the `SINGULARITY_CACHEDIR` and `SINGULARITY_TMPDIR` environment variables before launching Singularity."
+  },
+  {
+    "question": "Which environment variable is used for Singularity's temporary files, including those created during SquashFS image construction?",
+    "answer": "The `SINGULARITY_CACHEDIR` environment variable is used for writing temporary files, including those created during SquashFS image construction."
+  },
+  {
+    "question": "Which environment variable is used for Singularity's download and cache files?",
+    "answer": "The `SINGULARITY_TMPDIR` environment variable is used for downloading and caching files."
+  },
+  {
+    "question": "Provide an example of commands to configure Singularity to use `/scratch/$USER/singularity/{cache,tmp}` for temporary and cache files.",
+    "answer": "First, create the directories: `mkdir -p /scratch/$USER/singularity/{cache,tmp}`. Then, export the environment variables: `export SINGULARITY_CACHEDIR=\"/scratch/$USER/singularity/cache\"` and `export SINGULARITY_TMPDIR=\"/scratch/$USER/singularity/tmp\"`."
+  }
+]

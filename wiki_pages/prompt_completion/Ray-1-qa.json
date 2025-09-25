@@ -1,0 +1,90 @@
+[
+  {
+    "question": "What is Ray?",
+    "answer": "Ray is a unified framework designed for scaling AI and Python applications. It includes a core distributed runtime and a toolkit of libraries to simplify parallel and distributed workloads, particularly for Machine Learning jobs."
+  },
+  {
+    "question": "How can you check the latest available wheel for Ray?",
+    "answer": "You can see the latest built version of Ray by running the command `avail_wheels \"ray\"`."
+  },
+  {
+    "question": "What is the preferred method for installing Ray?",
+    "answer": "The preferred method for installing Ray is to use a Python wheel."
+  },
+  {
+    "question": "What are the steps to install Ray using its Python wheel?",
+    "answer": "To install Ray using its Python wheel, first load a Python module (e.g., `module load python`), then create and start a virtual environment, and finally install Ray within the virtual environment using `pip install --no-index ray`."
+  },
+  {
+    "question": "What is an example of a single-node Ray cluster configuration?",
+    "answer": "A single-node Ray cluster example is configured with 1 task, 1 GPU per task, 6 CPUs per task, 32GB of memory, and a time limit of 5 minutes."
+  },
+  {
+    "question": "How is the head node started in a single-node Ray cluster job submission script?",
+    "answer": "The head node is started with the command `ray start --head --node-ip-address=$HEAD_NODE --port=$RAY_PORT --num-cpus=$SLURM_CPUS_PER_TASK --num-gpus=1 --block &`."
+  },
+  {
+    "question": "How do you connect to a Ray cluster in a Python script?",
+    "answer": "You connect to a Ray cluster in a Python script using `ray.init(address=f\"{os.environ['HEAD_NODE']}:{os.environ['RAY_PORT']}\",_node_ip_address=os.environ['HEAD_NODE'])`."
+  },
+  {
+    "question": "How can you check the resources visible to Ray in a connected cluster?",
+    "answer": "You can check the resources Ray sees by calling `print(ray.available_resources())` in your Python script."
+  },
+  {
+    "question": "What are the SBATCH settings for a two-node Ray cluster example?",
+    "answer": "For a two-node Ray cluster, the SBATCH settings include `--nodes 2`, `--ntasks-per-node=1`, `--gpus-per-task=1`, `--cpus-per-task=6`, `--mem=32000M`, and `--time=0-00:10`."
+  },
+  {
+    "question": "How is the environment prepared and Ray installed on all nodes in a multi-node Ray job submission?",
+    "answer": "The environment is prepared and Ray is installed on all nodes by executing `srun -N $SLURM_NNODES -n $SLURM_NNODES config_env.sh`, where `config_env.sh` handles loading Python, creating a virtual environment, and installing Ray."
+  },
+  {
+    "question": "What does the `config_env.sh` script do for a multi-node Ray cluster?",
+    "answer": "The `config_env.sh` script loads the Python module, creates a virtual environment, activates it, upgrades pip, and then installs Ray."
+  },
+  {
+    "question": "How are Ray worker nodes launched in a multi-node cluster?",
+    "answer": "Ray worker nodes are launched by executing `srun launch_ray.sh &`, where the `launch_ray.sh` script starts Ray workers on nodes other than the head node."
+  },
+  {
+    "question": "How does `launch_ray.sh` distinguish between the head node and worker nodes?",
+    "answer": "The `launch_ray.sh` script uses `if [[ \"$SLURM_PROCID\" -eq \"0\" ]]; then` to check if it's the head node (SLURM_PROCID 0). If it's not the head node, it starts a Ray worker."
+  },
+  {
+    "question": "How are Ray worker nodes shut down after a Python script exits in a multi-node job?",
+    "answer": "Ray worker nodes are shut down by calling `kill $ray_cluster_pid` after the Python script `test_ray.py` finishes execution."
+  },
+  {
+    "question": "What is Ray Tune used for?",
+    "answer": "Ray Tune is a Ray module used for experiment execution and hyperparameter tuning at any scale."
+  },
+  {
+    "question": "Which ML frameworks does Ray Tune support?",
+    "answer": "Ray Tune supports a wide range of frameworks including Pytorch, Tensorflow, and Scikit-Learn."
+  },
+  {
+    "question": "What factors determine the resources required for a hyperparameter search job with Ray Tune?",
+    "answer": "The amount of resources required depends mainly on the number of samples you wish to draw from the search space and the size of your model in memory."
+  },
+  {
+    "question": "If a model takes up 1GB of memory, how many trials can run in parallel on a single GPU using Ray Tune?",
+    "answer": "If a model takes up 1GB in memory, and assuming a single GPU can fit multiple copies, you can run as many trials in parallel as copies of your model can fit inside the memory of that single GPU. The example implies 10 trials can run in parallel on one GPU if each uses 0.1 GPU."
+  },
+  {
+    "question": "What modifications are needed for the single-node job submission script to run the Ray Tune example with 20 trials, 1 CPU per trial, and 0.1 GPU per trial?",
+    "answer": "The `#SBATCH --cpus-per-task` line should be changed to `#SBATCH --cpus-per-task=10`, and the Python call should be `python ray-tune-example.py --num_samples=20 --cpus-per-trial=1 --gpus-per-trial=0.1`."
+  },
+  {
+    "question": "What additional packages need to be installed in the virtual environment for the Ray Tune example?",
+    "answer": "For the Ray Tune example, the packages `ray[tune]` and `torchvision` need to be installed in the virtual environment."
+  },
+  {
+    "question": "How does the `ray-tune-example.py` script define the hyperparameter search space?",
+    "answer": "The `ray-tune-example.py` script defines the search space using `config = {\"lr\": tune.loguniform(1e-4, 1e-1), \"batch_size\": tune.choice([2, 4, 8, 16])}`."
+  },
+  {
+    "question": "What scheduler is used in the Ray Tune example?",
+    "answer": "The Ray Tune example uses an `ASHAScheduler`."
+  }
+]

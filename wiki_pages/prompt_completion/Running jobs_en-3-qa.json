@@ -1,0 +1,162 @@
+[
+  {
+    "question": "What is the purpose of the `SBATCH_ACCOUNT` environment variable?",
+    "answer": "Slurm will use the value of `SBATCH_ACCOUNT` in place of the `--account` directive in the job script when submitting jobs using `sbatch`."
+  },
+  {
+    "question": "If both the `SBATCH_ACCOUNT` environment variable and the `--account` directive are specified, which one takes precedence?",
+    "answer": "The `SBATCH_ACCOUNT` environment variable takes priority over the `--account` directive specified inside the job script."
+  },
+  {
+    "question": "How can you override the `SBATCH_ACCOUNT` environment variable?",
+    "answer": "To override the `SBATCH_ACCOUNT` environment variable, you must supply an account name as a command-line argument to `sbatch`."
+  },
+  {
+    "question": "What is the role of the `SLURM_ACCOUNT` environment variable?",
+    "answer": "The `SLURM_ACCOUNT` environment variable serves the same purpose as `SBATCH_ACCOUNT` but is used for the `srun` command instead of `sbatch`."
+  },
+  {
+    "question": "What is the role of the `SALLOC_ACCOUNT` environment variable?",
+    "answer": "The `SALLOC_ACCOUNT` environment variable plays the same role as `SBATCH_ACCOUNT` but is used for the `salloc` command."
+  },
+  {
+    "question": "What defines a serial job?",
+    "answer": "A serial job is a job that requests only a single CPU core."
+  },
+  {
+    "question": "What is an array job?",
+    "answer": "An array job, also known as a task array, is a method to submit a whole set of jobs with a single command."
+  },
+  {
+    "question": "How are individual jobs within an array job identified?",
+    "answer": "Individual jobs in an array are distinguished by the environment variable `$SLURM_ARRAY_TASK_ID`, which is assigned a unique value for each job instance."
+  },
+  {
+    "question": "What Slurm directive is used to specify the number of CPU cores for a threaded or OpenMP job?",
+    "answer": "The `#SBATCH --cpus-per-task=N` directive is used to specify the number of CPU cores for a threaded or OpenMP job, where N is the desired number of cores (e.g., `--cpus-per-task=8`)."
+  },
+  {
+    "question": "Which environment variable is typically set for OpenMP applications to control the number of threads?",
+    "answer": "The `OMP_NUM_THREADS` environment variable is typically set to `$SLURM_CPUS_PER_TASK` for OpenMP applications."
+  },
+  {
+    "question": "How do you request a specific number of MPI processes and memory per CPU for an MPI job in a Slurm script?",
+    "answer": "You request the number of MPI processes with `#SBATCH --ntasks=N` and memory per CPU with `#SBATCH --mem-per-cpu=MM` (e.g., `#SBATCH --ntasks=4` and `#SBATCH --mem-per-cpu=1024M`)."
+  },
+  {
+    "question": "What command is commonly used to launch an MPI program within a Slurm job script?",
+    "answer": "The `srun` command is commonly used, although `mpirun` or `mpiexec` also work."
+  },
+  {
+    "question": "What directives are recommended for large MPI jobs that can efficiently use entire nodes?",
+    "answer": "For large MPI jobs that can efficiently use whole nodes, `--nodes` and `--ntasks-per-node` are recommended instead of `--ntasks`."
+  },
+  {
+    "question": "Where can users find detailed information and examples for scheduling GPU jobs?",
+    "answer": "Users should consult the 'Using GPUs with Slurm' page for a comprehensive discussion and examples of how to schedule various job types on available GPU resources."
+  },
+  {
+    "question": "What are some common use cases for interactive jobs on clusters?",
+    "answer": "Interactive jobs are useful for data exploration at the command line, interactive console tools like R and iPython, and significant software development, debugging, or compiling."
+  },
+  {
+    "question": "What command is used to start an interactive session on a compute node?",
+    "answer": "The `salloc` command is used to start an interactive session on a compute node."
+  },
+  {
+    "question": "How can you run graphical programs interactively on a compute node?",
+    "answer": "You can run graphical programs interactively by adding the `--x11` flag to your `salloc` command, provided you connected to the cluster with X11 forwarding enabled."
+  },
+  {
+    "question": "How does the requested duration of an interactive job affect its start time?",
+    "answer": "Interactive jobs requesting three hours or less are likely to start very soon on dedicated test nodes, while longer jobs (more than three hours) run on regular nodes and may experience longer wait times."
+  },
+  {
+    "question": "Which Slurm command, by default, shows information about all jobs in the system?",
+    "answer": "By default, the `squeue` command shows information about all jobs in the system."
+  },
+  {
+    "question": "How can a user view only their own jobs using `squeue`?",
+    "answer": "A user can view only their own jobs by running `squeue -u $USER`."
+  },
+  {
+    "question": "What is the purpose of the `sq` utility?",
+    "answer": "The `sq` utility is a local customization that allows users to list only their own Slurm jobs with less typing than `squeue -u $USER`."
+  },
+  {
+    "question": "How can a user filter `squeue` output to display only running jobs?",
+    "answer": "A user can filter `squeue` output to show only running jobs by using the command `squeue -u <username> -t RUNNING`."
+  },
+  {
+    "question": "How can a user filter `squeue` output to display only pending jobs?",
+    "answer": "A user can filter `squeue` output to show only pending jobs by using the command `squeue -u <username> -t PENDING`."
+  },
+  {
+    "question": "What command provides detailed information for a specific Slurm job?",
+    "answer": "The `scontrol show job <jobid>` command provides detailed information for a specific job."
+  },
+  {
+    "question": "Why is it discouraged to run `squeue` from a script or program at a high frequency?",
+    "answer": "Running `squeue` at a high frequency adds load to Slurm, which can interfere with its performance or correct operation."
+  },
+  {
+    "question": "How can a user configure their Slurm job to receive email notifications?",
+    "answer": "A user can configure email notifications by adding `#SBATCH --mail-user=your.email@example.com` and `#SBATCH --mail-type=ALL` (or specific notification types) to their job script."
+  },
+  {
+    "question": "What is output buffering in the context of non-interactive Slurm jobs?",
+    "answer": "Output buffering refers to a delay between when data is written by a non-interactive job and when it appears in the output file, as Slurm aggregates output lines before flushing them."
+  },
+  {
+    "question": "Why is output buffering important for filesystem performance?",
+    "answer": "Buffering is vital to preserving the overall performance of the filesystem."
+  },
+  {
+    "question": "What is the recommended method for monitoring job output in real time?",
+    "answer": "The recommended method for monitoring job output in real time is to run an interactive job."
+  },
+  {
+    "question": "Which command provides a summary of CPU and memory efficiency for a completed job?",
+    "answer": "The `seff <jobid>` command provides a short summary of the CPU and memory efficiency for a completed job."
+  },
+  {
+    "question": "What command is used to get more detailed information about a completed job?",
+    "answer": "The `sacct -j <jobid>` command is used to find more detailed information about a completed job."
+  },
+  {
+    "question": "How can the output format of the `sacct` command be customized?",
+    "answer": "The output format of `sacct` can be customized using the `--format` option, for example, `sacct -j <jobid> --format=JobID,JobName,MaxRSS,Elapsed`."
+  },
+  {
+    "question": "In `sacct` output, what do the `.bat+` and `.ext+` records typically represent?",
+    "answer": "The `.bat+` record typically represents the batch step (the submission script itself where the main work occurs), and the `.ext+` record represents the extern step (prologue and epilogue that normally consume insignificant resources)."
+  },
+  {
+    "question": "If a node fails and a job is restarted, how can a user view all records related to that job using `sacct`?",
+    "answer": "To see all records related to a job that may have been restarted due to a node failure, the user should add the `--duplicates` option to `sacct` (e.g., `sacct -j <jobid> --duplicates`)."
+  },
+  {
+    "question": "How can a user determine the maximum memory utilized by a completed job?",
+    "answer": "The `MaxRSS` accounting field in the `sacct` output can be used to determine the largest resident set size, indicating the maximum memory a job needed."
+  },
+  {
+    "question": "What command provides statistics for a running job, similar to `sacct` for completed jobs?",
+    "answer": "The `sstat` command works on a running job much the same way that `sacct` works on a completed job."
+  },
+  {
+    "question": "How can a user attach to a running job to execute a new process, such as monitoring GPU usage with `nvidia-smi`?",
+    "answer": "A user can attach and execute `nvidia-smi` to monitor GPU usage by running `srun --jobid <jobid> --pty watch -n 30 nvidia-smi`."
+  },
+  {
+    "question": "How can multiple monitoring commands, like `htop` and `nvidia-smi`, be launched in separate panes on a node running a job?",
+    "answer": "Multiple monitoring commands can be launched using `tmux` with `srun --jobid <jobid> --pty tmux new-session -d 'htop -u $USER' \\; split-window -h 'watch nvidia-smi' \\; attach`."
+  },
+  {
+    "question": "What is a key caution when launching new processes with `srun` on a node where a job is already running?",
+    "answer": "Processes launched with `srun` share resources with the existing job, so care should be taken not to launch processes that would consume a significant portion of the allocated resources, as this could lead to the job being killed or slowed down."
+  },
+  {
+    "question": "Can `srun --jobid` commands be used to monitor an interactive job?",
+    "answer": "No, `srun --jobid` commands only work to monitor a job submitted with `sbatch`. To monitor an interactive job, you should create multiple panes with `tmux` and start each process in its own pane."
+  }
+]

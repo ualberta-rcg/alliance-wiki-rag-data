@@ -1,0 +1,58 @@
+[
+  {
+    "question": "How do you request an interactive session on a GPU node for RAPIDS, specifying resources like GPU type, CPU, memory, and time?",
+    "answer": "You can request an interactive session on a compute node with a single GPU, such as a T4 GPU on Graham, by running `salloc --ntasks=1 --cpus-per-task=2 --mem=10G --gres=gpu:t4:1 --time=1:0:0 --account=def-someuser`."
+  },
+  {
+    "question": "What are the commands to load the Apptainer module and start a RAPIDS shell on a GPU node after an interactive session is granted?",
+    "answer": "After the requested resource is granted, you would run `module load apptainer` followed by `apptainer shell --nv -B /home -B /project -B /scratch rapids.sif`."
+  },
+  {
+    "question": "What is the purpose of the `--nv` option when starting an Apptainer shell for RAPIDS?",
+    "answer": "The `--nv` option binds the GPU driver on the host to the container, allowing the GPU device to be accessed from inside the Apptainer container."
+  },
+  {
+    "question": "What is the function of the `-B` option in the Apptainer shell command?",
+    "answer": "The `-B` option is used to bind any filesystem that you would like to access from inside the container."
+  },
+  {
+    "question": "How can you check the GPU stats within an Apptainer container to ensure the GPU device is accessible?",
+    "answer": "After the shell prompt changes to `Apptainer>`, you can check the GPU stats by running `nvidia-smi`."
+  },
+  {
+    "question": "What command is used to launch a Jupyter Notebook server in the RAPIDS environment from within an Apptainer shell?",
+    "answer": "You can launch the Jupyter Notebook server using the command `jupyter-lab --ip $(hostname -f) --no-browser`. The URL of the Notebook server will be displayed after it starts successfully."
+  },
+  {
+    "question": "What is notable about package inclusion in the RAPIDS v23.08 release?",
+    "answer": "Starting with the RAPIDS v23.08 release, all packages are included in the base conda environment, which is activated by default in the container shell."
+  },
+  {
+    "question": "Why is an SSH tunnel necessary when connecting to a Jupyter Notebook server on a compute node on Graham?",
+    "answer": "An SSH tunnel with port forwarding is necessary because there is no direct Internet connection on a compute node on Graham."
+  },
+  {
+    "question": "What is a recommended practice for data storage when working with RAPIDS via a container on clusters?",
+    "answer": "It is a good practice to use the local disk on a compute node, accessible via the `$SLURM_TMPDIR` variable, when working via a container."
+  },
+  {
+    "question": "What SLURM directives are typically included in a job submission script for a RAPIDS job requiring a GPU?",
+    "answer": "Typical SLURM directives include `--gres=gpu:t4:1`, `--cpus-per-task=2`, `--mem=10G`, `--time=dd:hh:mm`, and `--account=def-someuser`."
+  },
+  {
+    "question": "How would you prepare and run a RAPIDS Python script (`my_rapids_code.py`) using an Apptainer image (`rapids.sif`) within a Slurm submission script, ensuring local disk usage?",
+    "answer": "Within the submission script, load the Apptainer module, change directory to `$SLURM_TMPDIR`, copy `rapids.sif`, `your_rapids_code.py`, and `your_datasets` to `./`, then execute the code with `apptainer exec --nv rapids.sif python ./my_rapids_code.py`. Finally, save results back to `/project`."
+  },
+  {
+    "question": "Where can users find documentation, connection information, and issue reporting for RAPIDS?",
+    "answer": "Users can find this information at the RAPIDS Docs link: `https://docs.rapids.ai/`."
+  },
+  {
+    "question": "What is available at the RAPIDS Notebooks GitHub repository?",
+    "answer": "The RAPIDS Notebooks GitHub repository provides a collection of example notebooks for getting started quickly."
+  },
+  {
+    "question": "What kind of content is published on RAPIDS on Medium?",
+    "answer": "RAPIDS on Medium features a collection of use cases and blogs for RAPIDS applications."
+  }
+]

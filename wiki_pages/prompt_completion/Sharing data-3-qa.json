@@ -1,0 +1,50 @@
+[
+  {
+    "question": "What does the `X` attribute in `rwX` signify when setting ACL permissions?",
+    "answer": "The `X` attribute in `rwX` sets the execute permission only if the item is already executable (e.g., a directory or an executable file). For directories, execute permission is necessary to allow browsing."
+  },
+  {
+    "question": "What is the difference between `setfacl -d` and `setfacl -R` commands when sharing a subdirectory using ACLs?",
+    "answer": "The `setfacl -d` command sets default access rules for the directory, meaning any new file or directory created within it will inherit the specified ACL rule, and is required for new data. The `setfacl -R` command sets ACL rules recursively for the directory and all its existing content, and is applicable only to existing data."
+  },
+  {
+    "question": "What are the essential requirements for the `setfacl` method to successfully share a subdirectory?",
+    "answer": "For the `setfacl` method to work, the directory you intend to share must be owned by you. Additionally, all parent directories in the path must grant execute permission to the user you are sharing with. When sharing a project directory, you must use a path starting with `/project`, not `/home/<user>/projects`."
+  },
+  {
+    "question": "Why should a `/project` path be used instead of a `/home/<user>/projects` path when sharing a directory in the project filesystem?",
+    "answer": "Collaborators should be given a path starting with `/project` because `/home/<user>/projects` contains symbolic links to the physical directories in `/project`. These symlinks will not be accessible by collaborators unless they also have access to your home directory."
+  },
+  {
+    "question": "How can you determine the physical path that a symbolic link (symlink) points to?",
+    "answer": "You can determine the physical path a symlink points to using the `realpath` command. For example, `realpath /home/smithj/projects/def-smithj/shared_data` could return `/project/9041430/shared_data`."
+  },
+  {
+    "question": "What command is used to recursively remove all extended ACL attributes from a directory?",
+    "answer": "To remove all extended ACL attributes from a directory recursively, use the command: `setfacl -bR /home/<user>/projects/def-<PI>/shared_data`."
+  },
+  {
+    "question": "What is a data sharing group and when is it typically useful?",
+    "answer": "A data sharing group is a special group designed for more complex data sharing scenarios, particularly those involving multiple people on multiple clusters. It allows all individuals with whom certain data is to be shared to be added to one group, which is then given access permissions via ACLs."
+  },
+  {
+    "question": "When is it necessary to create a data sharing group?",
+    "answer": "A data sharing group is typically only necessary in specialized sharing circumstances, such as when dealing with multiple people across multiple clusters, rather than for simple individual sharing."
+  },
+  {
+    "question": "What are the steps to create a data sharing group named `wg-datasharing`?",
+    "answer": "1. Send an email to technical support requesting the creation of the data sharing group, indicating the desired name (`wg-datasharing`) and that you should be the owner. 2. After confirmation from technical support, go to [https://ccdb.computecanada.ca/services/ ccdb.computecanada.ca/services/] and access the group. 3. Click on the group's name to enter its management screen. 4. Add members to the group."
+  },
+  {
+    "question": "How do you add a member to an existing data sharing group?",
+    "answer": "After the data sharing group has been created and you have access to manage it, you can add members by navigating to the group management screen on [https://ccdb.computecanada.ca/services/ ccdb.computecanada.ca/services/]."
+  },
+  {
+    "question": "What permissions are required on parent directories when utilizing a data sharing group for sharing data?",
+    "answer": "When using a data sharing group, the parent directories of the data you are sharing must have execute permissions either for everyone (e.g., `chmod o+X /project/def-<PI>/`) or specifically for the data sharing group (e.g., `setfacl -m g:wg_datasharing:X /project/def-<PI>/`). This usually requires consent from the PI for project directories."
+  },
+  {
+    "question": "How do you apply ACL permissions to a directory and its contents for a data sharing group?",
+    "answer": "You apply two commands: `setfacl -d -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data` to set default access rules for newly created data, and `setfacl -R -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data` to apply ACL rules to the directory and its existing contents."
+  }
+]

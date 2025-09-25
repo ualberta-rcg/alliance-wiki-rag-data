@@ -1,0 +1,38 @@
+[
+  {
+    "question": "What is PyTorch's recommended method for Data Parallelism?",
+    "answer": "PyTorch maintainers recommend using the `DistributedDataParallel` class for Data Parallelism, which is designed to work with multiple GPUs but can also be used with a single GPU."
+  },
+  {
+    "question": "Can `DistributedDataParallel` be used with a single GPU?",
+    "answer": "Yes, `DistributedDataParallel` can be used with a single GPU, even though it is designed for multiple GPUs."
+  },
+  {
+    "question": "When might one consider using Data Parallelism with a single GPU for a small model?",
+    "answer": "If a model is small enough not to fully utilize a GPU's compute capacity but you have a very large dataset and wish to train with a small batch size, Data Parallelism on a GPU becomes a viable option."
+  },
+  {
+    "question": "How many model replicas can be fit on a V100 GPU (16GB memory) using Data Parallelism for a small model (e.g., 1GB memory usage, 6% compute capacity)?",
+    "answer": "Up to 14 or 15 replicas of such a small model can be fit on a V100 GPU with 16GB memory using Data Parallelism."
+  },
+  {
+    "question": "What technologies are used to efficiently place multiple model replicas on a single GPU?",
+    "answer": "Nvidia's Multi-Process Service (MPS) along with MPI are used to efficiently place multiple model replicas on one GPU."
+  },
+  {
+    "question": "How is Nvidia MPS activated in a job submission script for single-GPU Data Parallelism?",
+    "answer": "Nvidia MPS is activated by exporting `CUDA_MPS_PIPE_DIRECTORY`, `CUDA_MPS_LOG_DIRECTORY`, and running `nvidia-cuda-mps-control -d`."
+  },
+  {
+    "question": "Which backend should be used for `dist.init_process_group` when performing Data Parallelism with MPS on a single GPU?",
+    "answer": "The `backend` for `dist.init_process_group` should be set to 'mpi' or 'gloo' because NCCL does not work on a single GPU due to a hard-coded multi-GPU topology check."
+  },
+  {
+    "question": "How is the PyTorch model wrapped for DistributedDataParallel in the provided Python example for single-GPU MPS?",
+    "answer": "The model is wrapped using `net = torch.nn.parallel.DistributedDataParallel(net, device_ids=[current_device])`."
+  },
+  {
+    "question": "What is the purpose of `torch.cuda.set_device(current_device)` in the `cifar10-gpu-mps.py` script?",
+    "answer": "It sets the current CUDA device for the process, which is necessary when working with GPUs."
+  }
+]

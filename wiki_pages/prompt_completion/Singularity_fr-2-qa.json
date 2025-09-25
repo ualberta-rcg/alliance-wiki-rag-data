@@ -1,0 +1,50 @@
+[
+  {
+    "question": "What issues might arise when trying to download Docker images from Docker Hub?",
+    "answer": "You might encounter errors like `requested access to the resource is denied` or `unauthorized: authentication required`."
+  },
+  {
+    "question": "How can you resolve \"access denied\" or \"unauthorized\" errors when downloading Docker images from Docker Hub?",
+    "answer": "These errors can be resolved by verifying the Docker URL on Docker Hub and/or by authenticating with Docker using the `--docker-login` option after `build` or `pull` commands."
+  },
+  {
+    "question": "How do you download a container with an URL like `docker://ubuntu` using Singularity?",
+    "answer": "You can download it with the command `$ singularity build myubuntuimage.sif docker://ubuntu`."
+  },
+  {
+    "question": "Why is it not recommended to build large Singularity images on B\u00e9luga or Graham connection nodes?",
+    "answer": "It is not recommended because building large images on these nodes would affect other users and would likely fail due to intensive CPU and RAM usage."
+  },
+  {
+    "question": "What is the recommended two-step process for downloading and converting large Docker images to Singularity images on clusters like Cedar, B\u00e9luga, or Graham?",
+    "answer": "First, download the Docker image without converting it to Singularity on a copy or connection node. Second, convert the downloaded Docker image into a Singularity image on a compute node with appropriate memory and CPU allocation."
+  },
+  {
+    "question": "Which tool can be used to download a Docker image without converting it to Singularity?",
+    "answer": "You can use the `download-frozen-image` tool from the moby project, found at `https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh`."
+  },
+  {
+    "question": "What are the commands to download the Docker image for the GQCP package on a copy or connection node and prepare it for Singularity conversion?",
+    "answer": "You should navigate to `~/scratch`, then execute `$ wget https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh`, followed by `$ sh download-frozen-image-v2.sh gqcp gqcg/gqcp:latest`, and finally `$ cd gqcp && tar cf ../gqcp.tar * && cd ..`."
+  },
+  {
+    "question": "How do you allocate resources for converting a downloaded Docker image to a Singularity image on a compute node?",
+    "answer": "You can launch an interactive job using `$ salloc --mem-per-cpu=2000 --cpus-per-task=4 --time=2:0:0`."
+  },
+  {
+    "question": "What is the command to build a Singularity image (`gqcp.sif`) from a downloaded Docker archive (`gqcp.tar`) on an allocated compute node?",
+    "answer": "After loading the singularity module, use the command `$ singularity build gqcp.sif docker-archive://gqcp.tar`."
+  },
+  {
+    "question": "How do you create a Singularity image from a Dockerfile?",
+    "answer": "First, create a Docker image with a Dockerfile on a Linux machine with `sudo` permissions using `sudo docker build -t CC:latest .`. Then, use this Docker image as a source for Singularity to create the .sif image, for example, `sudo singularity build cc_image_latest.sif docker-daemon://CC:latest`."
+  },
+  {
+    "question": "What does the `.` parameter signify in the `sudo docker build -t CC:latest .` command?",
+    "answer": "The `.` parameter asks Docker to search for the Dockerfile in the current directory."
+  },
+  {
+    "question": "Is it required to specify the path for the Docker image when building a Singularity image from `docker-daemon://`?",
+    "answer": "No, it is not necessary to specify the path because the Docker daemon automatically searches for the image in the Docker registry, but you must ensure to use the correct image name and tag value."
+  }
+]

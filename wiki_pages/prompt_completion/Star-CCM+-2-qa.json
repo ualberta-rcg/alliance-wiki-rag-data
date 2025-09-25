@@ -1,0 +1,74 @@
+[
+  {
+    "question": "How do you specify the input simulation filename in a STAR-CCM+ Slurm script?",
+    "answer": "You specify it using the `SIM_FILE` variable, for example: `SIM_FILE='mysample.sim'`."
+  },
+  {
+    "question": "How can you include an input Java filename in a STAR-CCM+ Slurm job?",
+    "answer": "Uncomment the line `#JAVA_FILE='mymacros.java'` and specify your Java filename, for example: `JAVA_FILE='mymacros.java'`."
+  },
+  {
+    "question": "Which environment module should be loaded for STAR-CCM+ versions running on StdEnv/2023?",
+    "answer": "You should load `StdEnv/2023` followed by either `starccm-mixed/18.06.006` or `starccm/18.06.006-R8`."
+  },
+  {
+    "question": "How is the Siemens Power on Demand (PoD) Key specified in a Slurm script?",
+    "answer": "The PoD Key is specified using the `LM_PROJECT` variable, for example: `LM_PROJECT='my22digitpodkey'`."
+  },
+  {
+    "question": "What is the command to generate the machinefile for STAR-CCM+ jobs?",
+    "answer": "The command `slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile` generates the machinefile."
+  },
+  {
+    "question": "How are the total number of cores calculated within the Slurm script?",
+    "answer": "The total number of cores (`NCORE`) is calculated as `NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))`."
+  },
+  {
+    "question": "What command is used to launch STAR-CCM+ when using a Siemens PoD license server?",
+    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
+  },
+  {
+    "question": "What command is used to launch STAR-CCM+ when using an institutional license server?",
+    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
+  },
+  {
+    "question": "What is the recommended `--cpus-per-task` for Beluga cluster jobs?",
+    "answer": "The recommended `--cpus-per-task` for Beluga is `40`."
+  },
+  {
+    "question": "What MPI settings are used for STAR-CCM+ jobs on Cedar and Graham clusters?",
+    "answer": "STAR-CCM+ jobs on Cedar and Graham use `-mpi intel -fabric psm2`."
+  },
+  {
+    "question": "What is the recommended `--cpus-per-task` for Cedar cluster jobs?",
+    "answer": "The recommended `--cpus-per-task` for Cedar is `48` (can be 32 or 48)."
+  },
+  {
+    "question": "What MPI settings are used for STAR-CCM+ jobs on the Narval cluster?",
+    "answer": "STAR-CCM+ jobs on Narval use `-mpi openmpi`."
+  },
+  {
+    "question": "What is the recommended `--cpus-per-task` for Narval cluster jobs?",
+    "answer": "The recommended `--cpus-per-task` for Narval is `64`."
+  },
+  {
+    "question": "What environment module is loaded specifically for Niagara cluster STAR-CCM+ jobs, in addition to StdEnv?",
+    "answer": "For Niagara cluster jobs, `CCEnv` is loaded in addition to `StdEnv/2023`."
+  },
+  {
+    "question": "How are license server settings configured directly in the Slurm script for Niagara?",
+    "answer": "License server settings are configured using `FLEXPORT`, `VENDPORT`, and `LICSERVER` variables, for example: `FLEXPORT=1999`, `VENDPORT=2099`, `LICSERVER=flex.cd-adapco.com`."
+  },
+  {
+    "question": "What command is used to set the `CDLMD_LICENSE_FILE` environment variable on Niagara?",
+    "answer": "The command `export CDLMD_LICENSE_FILE=\"$FLEXPORT@127.0.0.1\"` is used."
+  },
+  {
+    "question": "What SSH command is run on Niagara for licensing purposes?",
+    "answer": "The SSH command `ssh nia-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f` is run."
+  },
+  {
+    "question": "Is there a workaround implemented in the Niagara Slurm script for license failures?",
+    "answer": "Yes, there is a `while` loop that attempts to start STAR-CCM+ up to 5 times (`while [ $i -le 5 ] && [ $RET -ne 0 ]; do ... done`) in case of initial license failures."
+  }
+]

@@ -1,0 +1,110 @@
+[
+  {
+    "question": "How can you dynamically determine the number of CPUs to use in a Python multiprocessing script on a cluster?",
+    "answer": "You can use `ncpus = int(os.environ.get('SLURM_CPUS_PER_TASK',default=1))` to get the number of allocated cores from the `SLURM_CPUS_PER_TASK` environment variable."
+  },
+  {
+    "question": "What is the limitation of the `multiprocessing` module for parallel programming?",
+    "answer": "The `multiprocessing` module is restricted to using a single compute node, so speedup is usually limited to the total number of CPU cores in that node."
+  },
+  {
+    "question": "What alternatives exist for parallel Python programming across multiple compute nodes?",
+    "answer": "For multiple nodes, consider using `mpi4py` or `PySpark`."
+  },
+  {
+    "question": "What is the first step to improve the performance of a Python program before parallelizing it?",
+    "answer": "You should first ensure your Python program is written efficiently."
+  },
+  {
+    "question": "How can you configure a Python script to dump a traceback after a timeout if it hangs?",
+    "answer": "You can use the `faulthandler` module and specifically `faulthandler.dump_traceback_later()`."
+  },
+  {
+    "question": "What tool allows inspecting a running Python process without prior modification?",
+    "answer": "You can use `py-spy` to inspect a running Python process."
+  },
+  {
+    "question": "How do you find the process ID (PID) of a Python script within a running job using `py-spy`?",
+    "answer": "After attaching to the job with `srun --pty --jobid JOBID bash`, you can use `htop -u $USER` to find the process ID."
+  },
+  {
+    "question": "How can you get live feedback on where your Python code is spending time using `py-spy`?",
+    "answer": "After activating the virtual environment where `py-spy` is installed, run `py-spy top --pid PID`."
+  },
+  {
+    "question": "How can you obtain a traceback of the current state of a running Python script using `py-spy`?",
+    "answer": "After activating the virtual environment where `py-spy` is installed, run `py-spy dump --pid PID`."
+  },
+  {
+    "question": "What does the error `ERROR: Package 'X' requires a different Python: X.Y.Z not in '>=X.Y'` signify?",
+    "answer": "This error means the current Python module loaded (e.g., 3.6.10) is not supported by the package you are trying to install."
+  },
+  {
+    "question": "How can the error `Package 'X' requires a different Python` be resolved?",
+    "answer": "You can resolve this by updating to a more recent Python version (such as the latest available module) or by installing an older version of package 'X'."
+  },
+  {
+    "question": "What does the error `ERROR: Package has requirement X, but you'll have Y which is incompatible.` imply?",
+    "answer": "This error indicates a dependency conflict where a package requires a specific version of a dependency, but an incompatible version is present or planned for installation."
+  },
+  {
+    "question": "How do you fix the error `Package has requirement X, but you'll have Y which is incompatible.`?",
+    "answer": "To fix this, upgrade `pip` to the latest version (or higher than 21.3) to use the new dependency resolver, then rerun your install command with `pip install --no-index --upgrade pip`."
+  },
+  {
+    "question": "What does `ERROR: No matching distribution found for X` mean when installing a Python package?",
+    "answer": "This error means `pip` could not find a package that satisfies the specified requirements (name, version, or tags)."
+  },
+  {
+    "question": "What steps should be taken to troubleshoot a `No matching distribution found for X` error?",
+    "answer": "Verify that the name and version are correct, note that `manylinux_x_y` wheels are discarded, and check for package availability using the `avail_wheels` command or on the 'Available Python wheels' page."
+  },
+  {
+    "question": "What is the recommended approach when installing multiple Python packages with `pip`?",
+    "answer": "It is best to install them with one command (e.g., `pip install package1 package2 package3 package4`) as this helps `pip` resolve dependencies."
+  },
+  {
+    "question": "Why might a virtual environment stop working unexpectedly?",
+    "answer": "A virtual environment might stop working because packages are often updated leading to non-reproducible environments, or because it was created in `$SCRATCH` and was partially deleted by automatic filesystem purges."
+  },
+  {
+    "question": "How can you make a virtual environment reproducible to avoid issues caused by package updates?",
+    "answer": "You can make it reproducible by freezing specific packages and their versions (e.g., `pip install --no-index 'package1==X.Y'`) and then creating a `requirements file` for installation in jobs."
+  },
+  {
+    "question": "What does the error `X is not a supported wheel on this platform` indicate during package installation?",
+    "answer": "This error indicates that the package is incompatible or not supported on the system, often due to trying to install a `manylinux` package or a package built for a different Python version."
+  },
+  {
+    "question": "How can you solve an `AttributeError: module \u2018numpy\u2019 has no attribute \u2018X\u2019` when using Numpy?",
+    "answer": "This error often occurs with newer Numpy versions (like v1.24+) where old attributes have expired deprecations. It can be solved by installing a previous version of Numpy, such as `pip install --no-index 'numpy<1.24'`."
+  },
+  {
+    "question": "What are common reasons for a `ModuleNotFoundError: No module named 'X'` in Python?",
+    "answer": "Common causes include the package not being installed or visible, the module name differing from the package name, or a broken virtual environment."
+  },
+  {
+    "question": "What environment variables should you avoid modifying to prevent `ModuleNotFoundError`?",
+    "answer": "You should avoid modifying the `PYTHONPATH` and `PATH` environment variables."
+  },
+  {
+    "question": "When should you activate your virtual environment relative to loading modules to prevent `ModuleNotFoundError`?",
+    "answer": "You should activate your virtual environment only after loading all the required modules."
+  },
+  {
+    "question": "What initial checks should be performed when troubleshooting `ModuleNotFoundError`?",
+    "answer": "First, make sure the package is installed by running `pip list`. Second, double-check the module name for correct casing and underscores. Third, ensure the module is imported at the correct level."
+  },
+  {
+    "question": "What is a general step to take if `ModuleNotFoundError` persists?",
+    "answer": "If in doubt, start over with a new virtual environment."
+  },
+  {
+    "question": "What causes `ImportError: numpy.core.multiarray failed to import`?",
+    "answer": "This error is caused by an incompatible version of Numpy being installed or used, especially with the ABI-breaking release of Numpy 2.0."
+  },
+  {
+    "question": "How can you resolve `ImportError: numpy.core.multiarray failed to import`?",
+    "answer": "You must install a compatible version of Numpy, for example, `pip install --no-index 'numpy<2.0'` if a wheel built with Numpy 1.x is incompatible with an installed Numpy 2.x."
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "question": "What is Lustre?",
+    "answer": "Lustre is a high-performance distributed filesystem designed to allow users to achieve high bandwidth for input/output operations."
+  },
+  {
+    "question": "What are the key parameters that can be adjusted for files or directories in Lustre?",
+    "answer": "The stripe size and stripe count parameters can be adjusted for each file or directory."
+  },
+  {
+    "question": "Define 'stripe size' in the context of Lustre.",
+    "answer": "Stripe size is the size of the smallest block of data that is allocated on the filesystem."
+  },
+  {
+    "question": "Define 'stripe count' in the context of Lustre.",
+    "answer": "Stripe count is the number of disks on which the data are spread."
+  },
+  {
+    "question": "How can you check the current stripe count and stripe size for a file or directory?",
+    "answer": "You can use the command `lfs getstripe /path/to/file` to retrieve these parameters."
+  },
+  {
+    "question": "How do you change the stripe count for a directory in Lustre?",
+    "answer": "You can change the stripe count for a directory using the command `lfs setstripe -c count /path/to/dir`."
+  },
+  {
+    "question": "Provide an example of setting the stripe count to 8 for a directory named 'newdir' in a user's home directory.",
+    "answer": "You would use the command `lfs setstripe -c 8 /home/user/newdir`."
+  },
+  {
+    "question": "What is the effect of changing the stripe count on existing files within a directory?",
+    "answer": "Changing the stripe count for a directory will not modify existing files; only new files created in that directory will adopt the new parameters."
+  },
+  {
+    "question": "How can you apply new stripe parameters to an existing file in Lustre?",
+    "answer": "To change parameters for an existing file, it must either be copied (not moved) to a directory with different parameters or be migrated using `lfs migrate`."
+  },
+  {
+    "question": "How do you create an empty file with specific stripe parameters without altering the directory's default parameters?",
+    "answer": "You can run `lfs setstripe` directly on the name of the file to be created, and it will be created as an empty file with the specified parameters."
+  },
+  {
+    "question": "What command can be used to re-stripe an existing file?",
+    "answer": "The `lfs migrate` command can be used, for example, `lfs migrate -c 2 striping_example/example_file` to set a stripe count of 2."
+  },
+  {
+    "question": "What is a potential drawback of increasing the stripe count?",
+    "answer": "While increasing the stripe count may improve performance, it also makes the file more susceptible to hardware failures."
+  },
+  {
+    "question": "What is the recommended stripe count for small files (less than 1MB) in a parallel program?",
+    "answer": "It is best to set the stripe count to 1 (put the file on one disk) for small files."
+  },
+  {
+    "question": "How should data from small files be distributed to other ranks in a parallel program after being read by a master rank?",
+    "answer": "The content should be sent to other ranks using `MPI_Broadcast` or `MPI_Scatter`."
+  },
+  {
+    "question": "What is the recommended stripe count for large files in a parallel program?",
+    "answer": "It is usually best to use a stripe count as large as the number of MPI ranks."
+  },
+  {
+    "question": "How should stripe size be determined for large files?",
+    "answer": "The stripe size should ideally be the same size as the buffer size for the data being read or written by each rank. If unsure, keeping the default value, which is optimized for large files, is recommended."
+  },
+  {
+    "question": "What is a mandatory rule regarding the stripe size?",
+    "answer": "The stripe size must always be an integer multiple of 1MB."
+  },
+  {
+    "question": "What general advice is given to reduce open/close operations on the Lustre filesystem?",
+    "answer": "It is best to concatenate all data within a single file instead of writing many small files, and to open the file once at the beginning and close it once at the end of the program."
+  }
+]

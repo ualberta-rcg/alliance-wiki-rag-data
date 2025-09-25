@@ -1,0 +1,58 @@
+[
+  {
+    "question": "How can I use rsync for local file transfers within a single system to a project directory?",
+    "answer": "You can use the command `rsync -avh --no-g --no-p LOCALNAME ~/projects/def-professor/someuser/somedir/`. The `somedir` will be created if it does not already exist before copying `LOCALNAME` into it."
+  },
+  {
+    "question": "How does the `cp` command behave differently from `rsync` when transferring a directory locally?",
+    "answer": "The `cp` command, like `cp -rv --preserve=\"mode,timestamps\" LOCALNAME ~/projects/def-professor/someuser/somedir/`, can transfer files locally. However, unlike `rsync`, if `LOCALNAME` is a directory and `somedir` does not exist, `LOCALNAME` will be renamed to `somedir`."
+  },
+  {
+    "question": "Under what circumstances should I use checksums to verify if files match between two systems?",
+    "answer": "You should use a checksum utility if Globus is unavailable for synchronization between two systems and Rsync is taking too long to determine if files match."
+  },
+  {
+    "question": "Which checksum utility is mentioned as an example for checking file matches?",
+    "answer": "The `sha1sum` utility is used as an example for checking if files match."
+  },
+  {
+    "question": "How do I generate SHA1 checksums for all files in a directory and save them to a log file?",
+    "answer": "You can use the command `find /home/username/ -type f -print0 | xargs -0 sha1sum | tee checksum-result.log` to generate checksums and save them to `checksum-result.log`."
+  },
+  {
+    "question": "What information is stored in the `checksum-result.log` file?",
+    "answer": "The `checksum-result.log` file will contain all of the checksums for the files found in the specified directory (e.g., `/home/username/`)."
+  },
+  {
+    "question": "What is recommended when running the checksum command for a large number of files or very large files?",
+    "answer": "For many or very large files, it is recommended to run the checksum command in the background, in a `screen` or `tmux` session, to ensure it continues even if your SSH connection times out."
+  },
+  {
+    "question": "After generating checksum log files on two systems, how can I find files that don't match?",
+    "answer": "After running the checksum command on both systems, you can use the `diff` utility, such as `diff checksum-result-silo.log checksum-dtn.log`, to find files that don't match."
+  },
+  {
+    "question": "What should I do if `diff` shows many false differences when comparing checksum log files?",
+    "answer": "If `diff` shows many false differences because the `find` command may have crawled directories in a different order, you should `sort` both files by their second column before running `diff`, for example: `sort -k2 checksum-result-silo.log -o checksum-result-silo.log` and `sort -k2 checksum-dtn.log -o checksum-dtn.log`."
+  },
+  {
+    "question": "What is SFTP and what protocol does it use for data transfer?",
+    "answer": "SFTP stands for Secure File Transfer Protocol and it uses the SSH protocol to transfer files between machines, which encrypts the data being transferred."
+  },
+  {
+    "question": "How do I initiate an SFTP connection to a remote machine using a username and address?",
+    "answer": "You can initiate an SFTP connection using the command `sftp USERNAME@ADDRESS`."
+  },
+  {
+    "question": "How can I connect to a remote machine via SFTP using an SSH key for authentication?",
+    "answer": "You can connect using the `-i` option to specify your private key, for example: `sftp -i /home/name/.ssh/id_rsa USERNAME@ADDRESS`."
+  },
+  {
+    "question": "Once connected to the SFTP prompt, how can I view the available commands?",
+    "answer": "At the `sftp>` prompt, you can type `help` to get a list of available commands."
+  },
+  {
+    "question": "What are some graphical SFTP programs available for different operating systems?",
+    "answer": "Graphical SFTP programs include WinSCP and MobaXterm for Windows, FileZilla for Windows, Mac, and Linux, and Cyberduck for Mac and Windows."
+  }
+]

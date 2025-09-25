@@ -1,0 +1,66 @@
+[
+  {
+    "question": "How can I determine the maximum memory a completed job used?",
+    "answer": "You can determine the maximum memory a job needed by using the `MaxRSS` accounting field with the `sacct` command."
+  },
+  {
+    "question": "How do I find out which task and node recorded the largest resident set size for a completed job?",
+    "answer": "To know which task and node recorded the largest resident set size, you should print the `MaxRSSTask` and `MaxRSSNode` fields along with `MaxRSS`."
+  },
+  {
+    "question": "Which command is used to monitor a running job in a similar way that `sacct` works for completed jobs?",
+    "answer": "The `sstat` command works on a running job much the same way that `sacct` works on a completed job."
+  },
+  {
+    "question": "What are the primary reasons for connecting to a node where a job is running?",
+    "answer": "Connecting to a node running a job can be useful for troubleshooting or to monitor the progress of a job."
+  },
+  {
+    "question": "How can I monitor GPU usage on a node assigned to my running job?",
+    "answer": "You can monitor GPU usage by running `srun --jobid <jobid> --pty watch -n 30 nvidia-smi`, which will execute `nvidia-smi` every 30 seconds on the assigned node."
+  },
+  {
+    "question": "How do I launch multiple monitoring commands in separate panes on a node assigned to a running job?",
+    "answer": "You can launch multiple monitoring commands, like `htop` and `nvidia-smi`, in separate panes using `srun --jobid <jobid> --pty tmux new-session -d 'htop -u $USER' \\; split-window -h 'watch nvidia-smi' \\; attach`."
+  },
+  {
+    "question": "What precautions should be taken when launching new processes with `srun` on a node where a job is already running?",
+    "answer": "You should be careful not to launch processes that would use a significant portion of the resources allocated for the job, as excessive memory or CPU usage could cause the job to be killed or slowed down."
+  },
+  {
+    "question": "Can `srun` commands be used to monitor interactive jobs?",
+    "answer": "No, the `srun` commands described for monitoring only work for jobs submitted with `sbatch`. To monitor an interactive job, you would create multiple panes with `tmux` and start each process in its own pane."
+  },
+  {
+    "question": "What is the command to cancel a specific job?",
+    "answer": "To cancel a specific job, use `scancel <jobid>`."
+  },
+  {
+    "question": "How do I cancel all my jobs?",
+    "answer": "You can cancel all your jobs by using the command `scancel -u $USER`."
+  },
+  {
+    "question": "What command is used to cancel only my pending jobs?",
+    "answer": "To cancel only your pending jobs, use `scancel -t PENDING -u $USER`."
+  },
+  {
+    "question": "What is a prerequisite for applications that need to run longer than the system's time limits?",
+    "answer": "The application must support checkpointing, meaning it can save its state to a file and restart from that saved state."
+  },
+  {
+    "question": "What are the two recommended methods for automatically restarting long-running computations?",
+    "answer": "The two recommended methods for automatic restarting are using SLURM job arrays and resubmitting from the end of the job script."
+  },
+  {
+    "question": "How can a job array be configured to ensure only one job runs at a time?",
+    "answer": "A job array can be configured to run only one job at a time by using the `--array=1-100%10` syntax (where 10 is the number of concurrent jobs allowed, and for one at a time, it would be `--array=1-X%1`)."
+  },
+  {
+    "question": "How is a job array script designed to restart a simulation from the last checkpoint?",
+    "answer": "A job array script should check for the existence of a checkpoint file (e.g., `state.cpt`); if found, it restarts the simulation from that file (`mdrun --restart state.cpt`), otherwise, it starts a new simulation (`mdrun`)."
+  },
+  {
+    "question": "How can a molecular dynamics simulation requiring 1,000,000 steps, which exceeds time limits, be managed using job arrays?",
+    "answer": "The simulation can be split into 10 smaller jobs of 100,000 steps each, with each job in the array running one after another and using checkpoints to continue the overall simulation."
+  }
+]

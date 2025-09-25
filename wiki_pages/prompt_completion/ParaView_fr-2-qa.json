@@ -1,0 +1,50 @@
+[
+  {
+    "question": "How do you establish an SSH tunnel for a ParaView client-server connection on Cedar using a CPU-based setup?",
+    "answer": "From a Mac/Linux workstation, open a terminal and execute `ssh <username>@cedar.computecanada.ca -L 11111:cdr774:11111`, replacing `<username>` with your actual username and `cdr774` with the specific compute node. On Windows, use a terminal emulator."
+  },
+  {
+    "question": "What are the steps to connect the ParaView client to the remote server after setting up the SSH tunnel for CPU-based rendering?",
+    "answer": "Launch ParaView on your workstation, navigate to ''File -> Connect'', click on ''Add Server''. Configure the server parameters as `name = cedar`, `server type = Client/Server`, `host = localhost`, and `port = 11111`. Then, click ''Configure'', select ''Manual'', and ''Save''. Finally, select the newly added server from the list and click ''Connect''."
+  },
+  {
+    "question": "How do you open a ParaView file after establishing a client-server connection for visualization?",
+    "answer": "Once connected, open a ParaView file; the client will automatically direct you to the remote file system for data visualization."
+  },
+  {
+    "question": "What is the function of the 'Remote Render Threshold' setting in ParaView's preferences?",
+    "answer": "This setting in ''Render View -> Remote/Parallel Rendering Options'' determines where rendering tasks occur. A default value like 20Mo directs small tasks to your local GPU for fast interactive rotation, while intensive tasks (under 20Mo) go to your computer. A value of 0Mo sends all renderings to the remote cluster's resources."
+  },
+  {
+    "question": "What is the impact of setting the 'Remote Render Threshold' to 0Mo?",
+    "answer": "Setting the threshold to 0Mo means all rendering tasks will be performed remotely by the cluster's resources, which is beneficial for intensive processing but may reduce interactivity."
+  },
+  {
+    "question": "How can you launch a parallel task for ParaView client-server rendering with multiple CPUs?",
+    "answer": "You can launch a parallel task using the command `salloc --time=0:30:0 --ntasks=8 --mem-per-cpu=3600 --account=def-someprof`, remembering to specify the execution time limit."
+  },
+  {
+    "question": "Which commands are used to start the ParaView server for parallel off-screen rendering with multiple CPUs?",
+    "answer": "First, load the ParaView off-screen module with `module load paraview-offscreen/5.13.1`, then start the server using `srun pvserver --force-offscreen-rendering`."
+  },
+  {
+    "question": "How can you verify that rendering is happening in parallel with multiple CPUs?",
+    "answer": "To verify parallel rendering, use the ''Process Id Scalars'' filter and apply color based on the 'process id'."
+  },
+  {
+    "question": "On which clusters are interactive GPU nodes available for client-server visualization?",
+    "answer": "Cedar and Graham offer several interactive GPU nodes for client-server visualization."
+  },
+  {
+    "question": "What command is used to launch an interactive task with a GPU on Cedar or Graham?",
+    "answer": "To launch an interactive task with a GPU, use `salloc --time=1:00:0 --ntasks=1 --mem-per-cpu=3600 --gres=gpu:1 --account=def-someprof`."
+  },
+  {
+    "question": "What steps are required to prepare for starting the ParaView server for GPU-based rendering?",
+    "answer": "First, load the GPU+EGL module (`module load paraview/5.13.1`), then unset the `DISPLAY` variable (`unset DISPLAY`) to prevent ParaView from using the X11 rendering context, and finally start the server with `pvserver`."
+  },
+  {
+    "question": "How do you set up an SSH tunnel for a ParaView client-server connection on Cedar or Graham using a GPU-based setup?",
+    "answer": "In a separate terminal on your Mac/Linux workstation (or using an emulator on Windows), execute `ssh <username>@cedar.computecanada.ca -L 11111:cdr347:11111`, replacing `<username>` with your actual username and `cdr347` with the specific compute node."
+  }
+]

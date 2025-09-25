@@ -1,0 +1,82 @@
+[
+  {
+    "question": "Comment une application peut-elle savoir que le serveur de licence se trouve sur le port COMPUTEPORT du serveur localhost ?",
+    "answer": "La proc\u00e9dure exacte varie selon l'application et le type de serveur de licence, mais il s'agit souvent de d\u00e9finir une variable d'environnement dans le script, par exemple `export MLM_LICENSE_FILE=COMPUTEPORT@localhost`."
+  },
+  {
+    "question": "\u00c0 quoi fait r\u00e9f\u00e9rence le terme 'localhost' ?",
+    "answer": "Le terme 'localhost' est le nom avec lequel un ordinateur r\u00e9f\u00e8re \u00e0 lui-m\u00eame; il ne doit pas \u00eatre remplac\u00e9 par le nom de votre ordinateur."
+  },
+  {
+    "question": "Donnez un exemple de script pour la mise en place d'un tunnel SSH pour un serveur de licence.",
+    "answer": "Un exemple de script est:\n```bash\n#!/bin/bash\n#SBATCH --nodes 1\n#SBATCH --ntasks 40\n#SBATCH --time 3:00:00\n\nREMOTEHOST=licenseserver.institution.ca\nREMOTEPORT=9999\nLOCALHOST=localhost\nfor ((i=0; i<10; ++i)); do\n  LOCALPORT=$(shuf -i 1024-65535 -n 1)\n  ssh nia-gw -L $LOCALPORT:$REMOTEHOST:$REMOTEPORT -N -f && break\ndone || { echo \"Giving up forwarding license port after $i attempts...\"; exit 1; }\nexport MLM_LICENSE_FILE=$LOCALPORT@$LOCALHOST\n\nmodule load thesoftware/2.0\nmpirun thesoftware ..... \n```"
+  },
+  {
+    "question": "Quel est le but d'un tunnel crypt\u00e9 mis en place dans un n\u0153ud de connexion d'une grappe ?",
+    "answer": "Un tunnel crypt\u00e9 peut connecter l'ordinateur d'un utilisateur \u00e0 un n\u0153ud de calcul de cette grappe, permettant d'afficher de fa\u00e7on transparente des visualisations et des graphiques de Jupyter Notebook ex\u00e9cut\u00e9s dans le n\u0153ud de calcul."
+  },
+  {
+    "question": "Comment un tunnel SSH peut-il \u00eatre utilis\u00e9 pour acc\u00e9der \u00e0 un serveur de bases de donn\u00e9es ?",
+    "answer": "Lorsque la seule fa\u00e7on d\u2019acc\u00e9der \u00e0 un serveur de bases de donn\u00e9es est par un n\u0153ud de connexion, un tunnel SSH peut transf\u00e9rer un port r\u00e9seau arbitraire d\u2019un n\u0153ud de calcul vers le n\u0153ud de connexion de la grappe et l\u2019associer au serveur de bases de donn\u00e9es."
+  },
+  {
+    "question": "Comment Graham et Cedar g\u00e8rent-ils l'acc\u00e8s \u00e0 Internet pour les n\u0153uds de calcul ?",
+    "answer": "Graham et Cedar effectuent une NAT (network address translation) pour que les utilisateurs puissent avoir acc\u00e8s \u00e0 l\u2019Internet \u00e0 partir des n\u0153uds de calcul."
+  },
+  {
+    "question": "Quelle est la configuration par d\u00e9faut du pare-feu de Graham concernant l'acc\u00e8s ?",
+    "answer": "Le pare-feu de Graham bloque l\u2019acc\u00e8s par d\u00e9faut."
+  },
+  {
+    "question": "Que faut-il faire pour ouvrir un port IP particulier sur Graham ?",
+    "answer": "Il faut faire une demande au soutien technique pour faire ouvrir un port IP particulier et indiquer l'adresse ou les adresses IP qui utiliseront ce port."
+  },
+  {
+    "question": "Quel paquet Python est recommand\u00e9 pour les tunnels SSH sur Linux ou MacOS X ?",
+    "answer": "Le paquet Python `sshuttle` est recommand\u00e9."
+  },
+  {
+    "question": "Comment lancer `sshuttle` sur Linux ou MacOS X ?",
+    "answer": "Sur votre ordinateur, ouvrez une nouvelle fen\u00eatre de terminal et lancez la commande `sshuttle --dns -Nr userid@machine_name`."
+  },
+  {
+    "question": "Que doit-on faire apr\u00e8s avoir lanc\u00e9 `sshuttle` sur Linux ou MacOS X ?",
+    "answer": "Copiez et collez l\u2019URL de l'application dans votre navigateur."
+  },
+  {
+    "question": "Donnez un exemple d'URL pour une application Jupyter Notebook.",
+    "answer": "Un exemple d'URL est `http://cdr544.int.cedar.computecanada.ca:8888/?token=7ed7059fad64446f837567e32af8d20efa72e72476eb72ca`."
+  },
+  {
+    "question": "Quel outil est utilis\u00e9 pour cr\u00e9er un tunnel SSH sous Windows ?",
+    "answer": "Un tunnel SSH peut \u00eatre cr\u00e9\u00e9 avec MobaXTerm."
+  },
+  {
+    "question": "Combien de sessions MobaXterm sont n\u00e9cessaires pour cr\u00e9er un tunnel SSH sous Windows ?",
+    "answer": "Deux sessions MobaXterm sont n\u00e9cessaires."
+  },
+  {
+    "question": "Quel est le r\u00f4le de la premi\u00e8re session MobaXterm lors de la cr\u00e9ation d'un tunnel SSH ?",
+    "answer": "La session 1 devrait servir \u00e0 la connexion \u00e0 la grappe et au lancement de votre t\u00e2che (par exemple avec Jupyter Notebook) pour obtenir une URL contenant le nom et un port du n\u0153ud h\u00f4te, comme `cdr544.int.cedar.computecanada.ca:8888`."
+  },
+  {
+    "question": "Quel est le r\u00f4le de la deuxi\u00e8me session MobaXterm lors de la cr\u00e9ation d'un tunnel SSH ?",
+    "answer": "La session 2 est un terminal local dans lequel le tunnel SSH sera mis en place en lan\u00e7ant une commande sp\u00e9cifique."
+  },
+  {
+    "question": "Quelle commande SSH est utilis\u00e9e dans MobaXterm Session 2 pour mettre en place un tunnel vers une application s'ex\u00e9cutant sur un n\u0153ud de calcul ?",
+    "answer": "La commande est `ssh -L 8888:cdr544.int.cedar.computecanada.ca:8888 someuser@cedar.computecanada.ca`, en rempla\u00e7ant le nom du n\u0153ud par l'URL obtenue dans la session 1."
+  },
+  {
+    "question": "Que fait la commande `ssh -L 8888:cdr544.int.cedar.computecanada.ca:8888 someuser@cedar.computecanada.ca` ?",
+    "answer": "Cette commande effectue une redirection des connexions au port local 8888 vers le port 8888 sur `cdr544.int.cedar.computecanada.ca`, nom donn\u00e9 au port distant."
+  },
+  {
+    "question": "Est-il obligatoire que les num\u00e9ros de port local et distant soient identiques lors de la cr\u00e9ation d'un tunnel SSH ?",
+    "answer": "Non, il n'est pas n\u00e9cessaire que les num\u00e9ros soient identiques, mais il s'agit d'une convention qui permet d'identifier facilement le port local et le port distant."
+  },
+  {
+    "question": "Comment modifier l'URL d'une application (par exemple Jupyter Notebook) pour y acc\u00e9der apr\u00e8s avoir configur\u00e9 un tunnel SSH avec MobaXterm ?",
+    "answer": "Modifiez l'URL obtenue dans la session 1 en rempla\u00e7ant le nom du n\u0153ud par `localhost`. Par exemple, `http://localhost:8888/?token=7ed7059fad64446f837567e32af8d20efa72e72476eb72ca`."
+  }
+]

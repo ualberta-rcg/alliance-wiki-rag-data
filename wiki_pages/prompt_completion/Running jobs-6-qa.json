@@ -1,0 +1,98 @@
+[
+  {
+    "question": "What is meant by 'farming,' 'serial farming,' or 'task farming' in the context of job submission?",
+    "answer": "These terms refer to the practice of running a large number of related serial, parallel, or GPU calculations, often automated to improve computational efficiency by bundling short computations into longer tasks."
+  },
+  {
+    "question": "What tools are available on the clusters for automating job submission, also known as farming or task farming?",
+    "answer": "The clusters provide tools such as META-Farm, GNU Parallel, and GLOST for automating job submission."
+  },
+  {
+    "question": "What is the recommended approach for specifying partitions when submitting jobs?",
+    "answer": "It is recommended to allow the scheduler to assign a partition to your job based on the resources it requests, rather than specifying one explicitly."
+  },
+  {
+    "question": "How should I configure software like Masurca that automatically submits jobs and expects a partition to be specified?",
+    "answer": "You may configure such software to use `--partition=default`, which the script treats the same as not specifying a partition."
+  },
+  {
+    "question": "What are the job duration and job limit policies on the Beluga cluster?",
+    "answer": "On Beluga, jobs are not permitted longer than 168 hours (7 days), and there is a limit of 1000 jobs (queued and running) per user. Production jobs should have a duration of at least one hour."
+  },
+  {
+    "question": "What are the job duration and job limit policies on the Graham cluster?",
+    "answer": "On Graham, jobs are not permitted longer than 168 hours (7 days), and there is a limit of 1000 jobs (queued and running) per user. Production jobs should have a duration of at least one hour."
+  },
+  {
+    "question": "What are the job duration and job limit policies on the Narval cluster?",
+    "answer": "On Narval, jobs are not permitted longer than 168 hours (7 days), and there is a limit of 1000 jobs (queued and running) per user. Production jobs should have a duration of at least one hour."
+  },
+  {
+    "question": "What are the restrictions for submitting jobs on the Cedar cluster?",
+    "answer": "Jobs may not be submitted from directories on the /home filesystem on Cedar. The maximum duration for a job is 28 days. Files should be transferred to a /project or /scratch directory for job submission."
+  },
+  {
+    "question": "How can I check if I am attempting to submit a job from a restricted directory on Cedar?",
+    "answer": "You can use the command `readlink -f $(pwd) | cut -d/ -f2`. If it returns `home`, you are not permitted to submit jobs from that directory."
+  },
+  {
+    "question": "What are the specific characteristics of job scheduling on the Niagara cluster?",
+    "answer": "On Niagara, scheduling is by node (multiples of 40-cores), the maximum walltime for jobs is 24 hours, jobs must write to scratch or project directories (home is read-only), and compute nodes do not have internet access."
+  },
+  {
+    "question": "What is a common cause of issues when preparing job scripts, and what is the best practice to avoid them?",
+    "answer": "Preparing a job script with a word processor instead of a text editor is a common cause of trouble. The best practice is to prepare the script on the cluster using an editor like nano, vim, or emacs."
+  },
+  {
+    "question": "How should Windows users prepare job scripts offline to avoid hidden characters or incorrect line endings?",
+    "answer": "Windows users should use a text editor such as Notepad or Notepad++, and after uploading the script, use `dos2unix` to convert Windows end-of-line characters to Linux end-of-line characters."
+  },
+  {
+    "question": "What happens to a dependent job if its parent job fails?",
+    "answer": "If a parent job fails (ends with a non-zero exit code), the dependent job, submitted with `--dependency=afterok:<jobid>`, can never be scheduled and will be automatically cancelled."
+  },
+  {
+    "question": "What error message might indicate that a module cannot be loaded due to an unsatisfied prerequisite?",
+    "answer": "An error message like 'Lmod has detected the following error: These module(s) exist but cannot be loaded as requested: \"<module-name>/<version>\" Try: \"module spider <module-name>/<version>\" to see how to load the module(s)' indicates an unsatisfied prerequisite."
+  },
+  {
+    "question": "How can I resolve a 'module cannot be loaded' error caused by an unsatisfied prerequisite?",
+    "answer": "You should use `module spider <module-name>/<version>` to identify the necessary prerequisite modules and then load them in your job script before attempting to load the desired module."
+  },
+  {
+    "question": "What is the default behavior regarding environment variables when a job is submitted, and why is this a potential issue?",
+    "answer": "By default, a job inherits the environment variables of the shell where it was submitted. This can lead to hard-to-diagnose problems if changes made in the shell (e.g., by `module` commands) affect the job's ability to load modules due to missing prerequisites."
+  },
+  {
+    "question": "What is recommended to ensure a consistent state for environment variables in a job script?",
+    "answer": "It is recommended to include the line `module purge` in your job script before loading all required modules to ensure a consistent state and prevent shell environment changes from affecting your jobs."
+  },
+  {
+    "question": "How can environment variable inheritance from the submitting shell be suppressed?",
+    "answer": "To suppress inheritance of environment variables, use the `--export=none` directive when submitting jobs."
+  },
+  {
+    "question": "Why might a submitted job appear to hang, have no output, or incomplete output?",
+    "answer": "A common reason for this is the aggressive output buffering performed by the Slurm scheduler, which aggregates many output lines before flushing them. The output file may only be written after the job completes, and part of the output may be lost if the job is cancelled or runs out of time."
+  },
+  {
+    "question": "Is it recommended to reduce or eliminate output buffering for non-interactive jobs?",
+    "answer": "No, it is not recommended to reduce or eliminate buffering because it is vital to preserving the overall performance of the filesystem."
+  },
+  {
+    "question": "What is the recommended method for monitoring the progress of a submitted job in real time?",
+    "answer": "To monitor the output from a job in real time, it is recommended to run an interactive job."
+  },
+  {
+    "question": "Where can users find information about job priority and how time limits affect job scheduling at Cedar and Graham?",
+    "answer": "Users can find this information in the 'Job scheduling policies' documentation."
+  },
+  {
+    "question": "Where can users find information if jobs within their research group are competing with one another?",
+    "answer": "Users should refer to the 'Managing Slurm accounts' documentation for information on competing jobs within a research group."
+  },
+  {
+    "question": "Where can users find comprehensive documentation and tutorials for Slurm?",
+    "answer": "Comprehensive documentation and tutorials for Slurm are maintained by SchedMD, and links are provided for the sbatch command options and a 'Rosetta stone' mapping commands from other schedulers."
+  }
+]

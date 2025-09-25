@@ -1,0 +1,138 @@
+[
+  {
+    "question": "What is NVIDIA's Compute Capability?",
+    "answer": "Compute Capability is a technical term created by NVIDIA to describe the hardware functions available on different GPU models. It is not a measure of performance."
+  },
+  {
+    "question": "When is Compute Capability relevant for GPU programming?",
+    "answer": "Compute Capability is relevant only if you are compiling your own GPU programs."
+  },
+  {
+    "question": "Where can I find more information about Compute Capability?",
+    "answer": "For more information, see the page on CUDA programming."
+  },
+  {
+    "question": "How do I access the 16GB V100 GPU flavor on Graham?",
+    "answer": "Use the arguments `--constraint=skylake,v100` in your sbatch/salloc command to access the 16GB V100 GPU on Graham."
+  },
+  {
+    "question": "How do I access the 32GB V100 GPU flavor on Graham?",
+    "answer": "Use the arguments `--constraint=cascade,v100` in your sbatch/salloc command to access the 32GB V100 GPU on Graham."
+  },
+  {
+    "question": "What kind of CPUs and GPUs does the Mist cluster use?",
+    "answer": "Mist is a cluster comprised of IBM Power9 CPUs (not Intel x86!) and NVIDIA V100 GPUs."
+  },
+  {
+    "question": "Who can access the Mist cluster?",
+    "answer": "Users with access to Niagara can also access Mist."
+  },
+  {
+    "question": "Where can I find specific instructions for job requirements on Mist?",
+    "answer": "Specific instructions for job requirements on Mist can be found on the SciNet website."
+  },
+  {
+    "question": "What is MIG (Multi-Instance GPU)?",
+    "answer": "MIG is a technology that allows a GPU to be partitioned into multiple instances."
+  },
+  {
+    "question": "Is MIG currently active on the Narval cluster?",
+    "answer": "Yes, MIG is currently activated on the Narval cluster as a pilot project."
+  },
+  {
+    "question": "Where can I find more information on how to use MIGs on Narval?",
+    "answer": "For more information on how to use MIGs on Narval, please see the Multi-Instance GPU page."
+  },
+  {
+    "question": "Why should I specify a GPU type when submitting a Slurm job?",
+    "answer": "You should specify a GPU type to ensure your job runs on a node with a GPU type appropriate for your workflow, as Slurm may otherwise send your job to any available GPU type, which might be undesirable for certain tasks like molecular dynamics requiring high double-precision performance."
+  },
+  {
+    "question": "What happens if I don't specify a GPU type in my Slurm job submission?",
+    "answer": "If you do not supply a type specifier, Slurm may send your job to a node equipped with any type of GPU available on the cluster."
+  },
+  {
+    "question": "Which clusters have more than one GPU type available?",
+    "answer": "Cedar and Graham clusters have more than one GPU type available."
+  },
+  {
+    "question": "Which clusters only have GPUs on certain nodes?",
+    "answer": "B\u00e9luga, Cedar, and Graham clusters only have GPUs on certain nodes."
+  },
+  {
+    "question": "Can you provide an example of a Slurm script for a single-core GPU job?",
+    "answer": "A single-core GPU job script requesting one GPU, 4000MB memory, and a 3-hour time limit would include:\n```bash\n#!/bin/bash\n#SBATCH --account=def-someuser\n#SBATCH --gpus-per-node=1\n#SBATCH --mem=4000M\n#SBATCH --time=0-03:00\n./program\n```"
+  },
+  {
+    "question": "Can you provide an example of a Slurm script for a multi-threaded GPU job?",
+    "answer": "A multi-threaded GPU job script requesting one GPU, 6 CPU cores, 4000MB memory, and a 3-hour time limit would include:\n```bash\n#!/bin/bash\n#SBATCH --account=def-someuser\n#SBATCH --gpus-per-node=1\n#SBATCH --cpus-per-task=6\n#SBATCH --mem=4000M\n#SBATCH --time=0-03:00\nexport OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK\n./program\n```"
+  },
+  {
+    "question": "What is the recommended maximum number of CPU cores per GPU on B\u00e9luga?",
+    "answer": "On B\u00e9luga, no more than 10 CPU cores are recommended for each GPU requested."
+  },
+  {
+    "question": "What is the recommended maximum number of CPU cores per P100 GPU on Cedar?",
+    "answer": "On Cedar, no more than 6 CPU cores per P100 GPU (p100 and p100l) are recommended."
+  },
+  {
+    "question": "What is the recommended maximum number of CPU cores per V100 GPU on Cedar?",
+    "answer": "On Cedar, no more than 8 CPU cores per V100 GPU (v100l) are recommended."
+  },
+  {
+    "question": "What is the recommended maximum number of CPU cores per GPU on Graham?",
+    "answer": "On Graham, no more than 16 CPU cores are recommended for each GPU requested."
+  },
+  {
+    "question": "Can you provide an example of a Slurm script for an MPI GPU job?",
+    "answer": "An MPI GPU job script requesting a total of 8 GPUs, 1 MPI process per GPU, 6 CPU cores per MPI process, 5GB host memory per CPU core, and a 3-hour time limit would include:\n```bash\n#!/bin/bash\n#SBATCH --account=def-someuser\n#SBATCH --gpus=8\n#SBATCH --ntasks-per-gpu=1\n#SBATCH --cpus-per-task=6\n#SBATCH --mem-per-cpu=5G\n#SBATCH --time=0-03:00\nexport OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK\nsrun --cpus-per-task=$SLURM_CPUS_PER_TASK ./program\n```"
+  },
+  {
+    "question": "Why might requesting a whole node for GPU applications be beneficial?",
+    "answer": "If your application can efficiently use an entire node and its associated GPUs, you will probably experience shorter wait times if you ask Slurm for a whole node."
+  },
+  {
+    "question": "How do I request a GPU node on Graham with two P100 GPUs?",
+    "answer": "To request a GPU node on Graham with two P100 GPUs, use a script with:\n```bash\n#!/bin/bash\n#SBATCH --nodes=1\n#SBATCH --gpus-per-node=p100:2\n#SBATCH --ntasks-per-node=32\n#SBATCH --mem=127000M\n#SBATCH --time=3:00\n#SBATCH --account=def-someuser\nnvidia-smi\n```"
+  },
+  {
+    "question": "How do I request a P100 GPU node on Cedar with four P100 GPUs?",
+    "answer": "To request a P100 GPU node on Cedar with four P100 GPUs, use a script with:\n```bash\n#!/bin/bash\n#SBATCH --nodes=1\n#SBATCH --gpus-per-node=p100:4\n#SBATCH --ntasks-per-node=24\n#SBATCH --exclusive\n#SBATCH --mem=125G\n#SBATCH --time=3:00\n#SBATCH --account=def-someuser\nnvidia-smi\n```"
+  },
+  {
+    "question": "What are the characteristics of the P100L GPU nodes on Cedar?",
+    "answer": "The P100L GPU nodes on Cedar have four Tesla P100 16GB cards, all GPUs use the same PCI switch for lower inter-GPU communication latency, but lower bandwidth between CPU and GPU than regular GPU nodes. They also have 256GB RAM."
+  },
+  {
+    "question": "How do I request a P100-16GB GPU node (P100L) on Cedar?",
+    "answer": "You must request these nodes as whole nodes by specifying `--gres=gpu:p100l:4` or `--gpus-per-node=p100l:4` in your script. An example includes:\n```bash\n#!/bin/bash\n#SBATCH --nodes=1\n#SBATCH --gpus-per-node=p100l:4\n#SBATCH --ntasks=1\n#SBATCH --cpus-per-task=24\n#SBATCH --mem=0\n#SBATCH --time=3:00\n#SBATCH --account=def-someuser\nhostname\nnvidia-smi\n```"
+  },
+  {
+    "question": "What is the maximum job duration for P100L GPU jobs on Cedar?",
+    "answer": "P100L GPU jobs up to 28 days can be run on Cedar."
+  },
+  {
+    "question": "What tool is recommended for packing multiple single-GPU jobs or 2-GPU programs into one Slurm job for longer durations?",
+    "answer": "GNU Parallel is recommended for packing multiple single-GPU jobs or two 2-GPU programs into one Slurm job for longer than 24 hours."
+  },
+  {
+    "question": "How is `CUDA_VISIBLE_DEVICES` used with `GNU Parallel` to manage GPU assignments?",
+    "answer": "`CUDA_VISIBLE_DEVICES` is used with `GNU Parallel` to ensure that two tasks do not try to use the same GPU at the same time, often by calculating the GPU ID based on the slot ID (`CUDA_VISIBLE_DEVICES=$(({%} - 1))`)."
+  },
+  {
+    "question": "What does the `-j4` parameter mean in a GNU Parallel command?",
+    "answer": "The `-j4` parameter in GNU Parallel means that it can run a maximum of four concurrent tasks, launching another as soon as one ends."
+  },
+  {
+    "question": "What needs to be disabled on B\u00e9luga and Narval for profiling GPU tasks?",
+    "answer": "The NVIDIA Data Center GPU Manager (DCGM) needs to be disabled on B\u00e9luga and Narval for profiling GPU tasks."
+  },
+  {
+    "question": "How is the NVIDIA Data Center GPU Manager (DCGM) disabled for a Slurm job?",
+    "answer": "DCGM must be disabled while doing your job submission by using the `--export` parameter to set the `DISABLE_DCGM` environment variable, for example `--export=ALL,DISABLE_DCGM=1`."
+  },
+  {
+    "question": "Can you provide an example of a Slurm script for profiling GPU tasks?",
+    "answer": "A Slurm script for profiling GPU tasks, disabling DCGM, would include:\n```bash\n#!/bin/bash\n#SBATCH --account=def-someuser\n#SBATCH --export=ALL,DISABLE_DCGM=1\n#SBATCH --gpus-per-node=1\n#SBATCH --mem=4000M\n#SBATCH --time=0-03:00\n\n# Wait until DCGM is disabled on the node\nwhile [ ! -z \"$(dcgmi -v {{!}} grep 'Hostengine build info:')\" ]; do\n  sleep 5;\ndone\n\n./profiler arg1 arg2 ...\n```"
+  }
+]

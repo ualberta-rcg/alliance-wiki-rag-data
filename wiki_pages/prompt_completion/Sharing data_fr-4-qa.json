@@ -1,0 +1,38 @@
+[
+  {
+    "question": "Comment modifier les permissions d'un r\u00e9pertoire existant et son contenu de mani\u00e8re r\u00e9cursive pour restreindre les droits d'\u00e9criture au groupe et les droits de lecture et d'ex\u00e9cution aux autres ?",
+    "answer": "Pour restreindre les permissions d'\u00e9criture pour le groupe et les permissions de lecture et d'ex\u00e9cution pour les autres sur un r\u00e9pertoire et son contenu de mani\u00e8re r\u00e9cursive, utilisez la commande `chmod -R g-w,o-rx <directory>`."
+  },
+  {
+    "question": "Qu'est-ce qu'une liste de contr\u00f4le d'acc\u00e8s (ACL) et \u00e0 quoi sert-elle ?",
+    "answer": "Les listes de contr\u00f4le d'acc\u00e8s (ACL pour 'access control lists') permettent de d\u00e9finir des r\u00e8gles d'acc\u00e8s plus granulaires que les permissions Unix traditionnelles, notamment pour accorder des droits \u00e0 un utilisateur sp\u00e9cifique qui n'appartient pas au groupe du fichier, sans avoir \u00e0 rendre le fichier public."
+  },
+  {
+    "question": "Quelles sont les deux commandes principales pour g\u00e9rer les listes de contr\u00f4le d'acc\u00e8s (ACL) ?",
+    "answer": "Les deux commandes principales pour g\u00e9rer les ACL sont `getfacl` pour conna\u00eetre les permissions d\u00e9finies dans la liste, et `setfacl` pour modifier ces permissions."
+  },
+  {
+    "question": "Comment accorder la permission de lire et d'ex\u00e9cuter un fichier sp\u00e9cifique \u00e0 un utilisateur nomm\u00e9 'smithj' en utilisant les ACL ?",
+    "answer": "Pour accorder la permission de lire et d'ex\u00e9cuter le fichier `my_script.py` \u00e0 l'utilisateur `smithj`, utilisez la commande `$ setfacl -m u:smithj:rx my_script.py`."
+  },
+  {
+    "question": "Comment accorder un acc\u00e8s en lecture et \u00e9criture \u00e0 un utilisateur sp\u00e9cifique pour un sous-r\u00e9pertoire et tous les fichiers et sous-r\u00e9pertoires futurs qu'il contiendra ?",
+    "answer": "Pour accorder un acc\u00e8s en lecture et \u00e9criture \u00e0 l'utilisateur `smithj` pour un sous-r\u00e9pertoire `/home/<user>/projects/def-<PI>/shared_data`, incluant les nouveaux fichiers, utilisez les commandes :\n`$ setfacl -d -m u:smithj:rwX /home/<user>/projects/def-<PI>/shared_data` (pour les nouvelles donn\u00e9es) et\n`$ setfacl -R -m u:smithj:rwX /home/<user>/projects/def-<PI>/shared_data` (pour les donn\u00e9es existantes)."
+  },
+  {
+    "question": "Que signifie l'attribut 'X' (majuscule) dans une commande `setfacl` ?",
+    "answer": "L'attribut `X` (majuscule) donne la permission d'ex\u00e9cution uniquement si le r\u00e9pertoire ou le fichier poss\u00e8de d\u00e9j\u00e0 cette permission d'ex\u00e9cution. Pour qu'un r\u00e9pertoire puisse \u00eatre visualis\u00e9, il doit avoir la permission d'ex\u00e9cution."
+  },
+  {
+    "question": "Quelle est la diff\u00e9rence entre l'utilisation de `setfacl -d` et `setfacl -R` lors du partage d'un sous-r\u00e9pertoire ?",
+    "answer": "La commande `setfacl -d` d\u00e9finit les r\u00e8gles d'acc\u00e8s par d\u00e9faut pour le r\u00e9pertoire, s'appliquant aux **nouvelles** donn\u00e9es (fichiers et r\u00e9pertoires cr\u00e9\u00e9s ult\u00e9rieurement). La commande `setfacl -R` s'applique de mani\u00e8re r\u00e9cursive au r\u00e9pertoire sp\u00e9cifi\u00e9 et \u00e0 tout son contenu **existant**."
+  },
+  {
+    "question": "Quelles sont les conditions pr\u00e9alables pour partager un r\u00e9pertoire \u00e0 l'aide des ACL ?",
+    "answer": "Pour que le partage d'un r\u00e9pertoire avec les ACL fonctionne, vous devez \u00eatre propri\u00e9taire du r\u00e9pertoire, les r\u00e9pertoires parents doivent accorder la permission d'ex\u00e9cution \u00e0 l'utilisateur avec qui vous partagez (par exemple, `setfacl -m u:smithj:X ...` ou `chmod o+x ...`), et pour un r\u00e9pertoire `/project`, vous devez fournir un chemin qui commence par `/project` et non `/home/<user>/projects`."
+  },
+  {
+    "question": "Pourquoi est-il recommand\u00e9 d'utiliser le chemin `/project` au lieu de `/home/<user>/projects` lors du partage d'un r\u00e9pertoire /project ?",
+    "answer": "Il est recommand\u00e9 d'utiliser le chemin `/project` car `/home/<user>/projects` contient des liens symboliques vers les r\u00e9pertoires physiques de /project. D'autres utilisateurs n'auraient pas acc\u00e8s \u00e0 votre r\u00e9pertoire /home et ne pourraient pas atteindre le r\u00e9pertoire cible via ces liens symboliques. La commande `realpath` peut \u00eatre utilis\u00e9e pour obtenir le chemin physique."
+  }
+]

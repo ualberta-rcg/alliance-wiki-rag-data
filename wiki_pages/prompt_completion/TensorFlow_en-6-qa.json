@@ -1,0 +1,58 @@
+[
+  {
+    "question": "What is the first step to compile custom TensorFlow operators?",
+    "answer": "First, create a Python virtual environment and install a TensorFlow version compatible with your custom operators. Then, go to the directory containing the operators' source code."
+  },
+  {
+    "question": "How do you compile a GPU-enabled custom operator for TensorFlow versions 1.4.x or older?",
+    "answer": "To compile a GPU-enabled custom operator for TensorFlow <= 1.4.x, you need to load the CUDA module, compile the .cu file with `nvcc`, and then compile the .cpp and .cu.o files with `g++`, linking against CUDA libraries. The commands are: `module load cuda/<version>`, `nvcc <operator>.cu -o <operator>.cu.o -c -O2 -DGOOGLE_CUDA=1 -x cu -Xcompiler -fPI`, and `g++ -std=c++11 <operator>.cpp <operator>.cu.o -o <operator>.so -shared -fPIC -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include -I/<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include/external/nsync/public -I /usr/local/cuda-<version>/include -lcudart -L /usr/local/cuda-<version>/lib64/`."
+  },
+  {
+    "question": "What are the compilation steps for a non-GPU enabled custom TensorFlow operator with TensorFlow versions 1.4.x or older?",
+    "answer": "For a non-GPU enabled custom operator with TensorFlow <= 1.4.x, compile using `g++ -std=c++11 <operator>.cpp -o <operator>.so -shared -fPIC -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include -I/<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include/external/nsync/public`."
+  },
+  {
+    "question": "How do you compile a GPU-enabled custom operator for TensorFlow versions greater than 1.4.x?",
+    "answer": "For a GPU-enabled custom operator with TensorFlow > 1.4.x, load the CUDA module, compile the .cu file with `nvcc`, and then compile the .cpp and .cu.o files with `g++`, linking against CUDA and `tensorflow_framework`. The commands are: `module load cuda/<version>`, `nvcc <operator>.cu -o <operator>.cu.o -c -O2 -DGOOGLE_CUDA=1 -x cu -Xcompiler -fPI`, and `g++ -std=c++11 <operator>.cpp <operator>.cu.o -o <operator>.so -shared -fPIC -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include -I /usr/local/cuda-<version>/include -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include/external/nsync/public -lcudart -L /usr/local/cuda-<version>/lib64/ -L /<path to python virtual env>/lib/python<version>/site-packages/tensorflow -ltensorflow_framework`."
+  },
+  {
+    "question": "What is the command to compile a non-GPU enabled custom operator for TensorFlow versions greater than 1.4.x?",
+    "answer": "To compile a non-GPU enabled custom operator with TensorFlow > 1.4.x, use `g++ -std=c++11 <operator>.cpp -o <operator>.so -shared -fPIC -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include -I /<path to python virtual env>/lib/python<version>/site-packages/tensorflow/include/external/nsync/public -L /<path to python virtual env>/lib/python<version>/site-packages/tensorflow -ltensorflow_framework`."
+  },
+  {
+    "question": "What error might you encounter when using the scikit-image library with TensorFlow?",
+    "answer": "You might get the error: `OMP: Error #15: Initializing libiomp5.so, but found libiomp5.so already initialized.`"
+  },
+  {
+    "question": "Why does the 'OMP: Error #15' occur when using scikit-image with TensorFlow?",
+    "answer": "This error occurs because the TensorFlow library tries to load a bundled version of OMP, which conflicts with the system version of `libiomp5.so`."
+  },
+  {
+    "question": "How can you workaround the 'OMP: Error #15' when using scikit-image with TensorFlow?",
+    "answer": "The workaround involves changing to the virtual environment directory, exporting the `LIBIOMP_PATH`, and then creating a symbolic link: `cd tf_skimage_venv`, `export LIBIOMP_PATH=$(strace python -c 'from skimage.transform import AffineTransform' 2>&1 | grep -v ENOENT | grep -ohP -e '(?<=\")[^\"]+libiomp5.so(?=\")' | xargs realpath)`, `find -path '*_solib_local*' -name libiomp5.so -exec ln -sf $LIBIOMP_PATH {} \\;`."
+  },
+  {
+    "question": "What is the purpose of the workaround for the 'OMP: Error #15' with scikit-image?",
+    "answer": "This workaround patches the TensorFlow library installation to use the systemwide `libiomp5.so`."
+  },
+  {
+    "question": "What error message indicates that 'libcupti.so' is not available for TensorFlow tracing features?",
+    "answer": "The error message `I tensorflow/stream_executor/dso_loader.cc:142] Couldn't open CUDA library libcupti.so.9.0. LD_LIBRARY_PATH: /usr/local/cuda-9.0/lib64` indicates that `libcupti.so` is missing."
+  },
+  {
+    "question": "How do you resolve the 'Couldn't open CUDA library libcupti.so' error in TensorFlow?",
+    "answer": "To resolve this, load the appropriate CUDA module and export the `LD_LIBRARY_PATH` to include the CUPTI library path. The commands are: `module load cuda/9.0.xxx` and `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CUDA_HOME/extras/CUPTI/lib64/`."
+  },
+  {
+    "question": "How can you find the appropriate CUDA version to load when troubleshooting 'libcupti.so' errors?",
+    "answer": "The appropriate CUDA version can be found using the command `module av cuda`."
+  },
+  {
+    "question": "What causes the error 'libiomp5.so: invalid ELF header'?",
+    "answer": "This error occurs when the `libiomp5.so` shared object file is erroneously installed as a text file instead of a proper binary or symbolic link."
+  },
+  {
+    "question": "How do you fix the 'libiomp5.so invalid ELF header' error?",
+    "answer": "Navigate to the directory specified in the error message (e.g., `[...]/_U@mkl_Ulinux_S_S_Cmkl_Ulibs_Ulinux___Uexternal_Smkl_Ulinux_Slib`) and execute the command `ln -sf $(cat libiomp5.so) libiomp5.so`. This replaces the text file with the correct symbolic link."
+  }
+]

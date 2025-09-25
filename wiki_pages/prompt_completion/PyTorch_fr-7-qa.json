@@ -1,0 +1,74 @@
+[
+  {
+    "question": "What is PyTorch Lightning?",
+    "answer": "PyTorch Lightning is a Python package that provides interfaces to PyTorch, simplifying several common, code-intensive tasks, including training models with multiple GPUs."
+  },
+  {
+    "question": "How does PyTorch Lightning simplify multi-GPU training compared to DistributedDataParallel?",
+    "answer": "PyTorch Lightning simplifies multi-GPU training by handling much of the boilerplate code, such as explicit DistributedDataParallel class usage, and automatically querying environment variables for SLURM jobs, expecting one task per GPU if run with `srun`."
+  },
+  {
+    "question": "What are the key parameters used when initializing a `pl.Trainer` for multi-GPU training?",
+    "answer": "When initializing a `pl.Trainer` for multi-GPU training, key parameters include `accelerator=\"gpu\"`, `devices` (e.g., 2 for two GPUs), `num_nodes` (e.g., 1), `strategy='ddp'`, `max_epochs`, and `enable_progress_bar=False` to avoid frequent log updates."
+  },
+  {
+    "question": "How do you define the training step in a PyTorch Lightning model?",
+    "answer": "The training step in a PyTorch Lightning model is defined by implementing the `training_step` method, which takes `batch` and `batch_idx` as arguments, processes the batch, calculates the loss, and returns it."
+  },
+  {
+    "question": "How do you configure optimizers in a PyTorch Lightning model?",
+    "answer": "Optimizers in a PyTorch Lightning model are configured by implementing the `configure_optimizers` method, which returns the optimizer (e.g., `torch.optim.Adam(self.parameters(), lr=args.lr)`)."
+  },
+  {
+    "question": "What is Horovod?",
+    "answer": "Horovod is a distributed training platform for deep learning, compatible with TensorFlow, Keras, PyTorch, and Apache MXNet."
+  },
+  {
+    "question": "How does Horovod's API compare to PyTorch's `DistributedDataParallel`?",
+    "answer": "Horovod's API offers the same level of control over training code as `DistributedDataParallel`, but simplifies script writing by eliminating the need for direct process group configuration and by taking charge of scheduler environment variables."
+  },
+  {
+    "question": "What benefits does Horovod offer beyond simplifying API usage?",
+    "answer": "Horovod also offers distributed optimizers, which can improve performance in certain cases."
+  },
+  {
+    "question": "How do you initialize Horovod in a Python script?",
+    "answer": "Horovod is initialized by calling `hvd.init()` at the beginning of the script."
+  },
+  {
+    "question": "How does Horovod handle device assignment for GPUs?",
+    "answer": "Horovod uses `hvd.local_rank()` to determine the local rank of the process on a node, and then `torch.cuda.set_device(local_rank)` is called to assign the appropriate GPU."
+  },
+  {
+    "question": "How is a standard PyTorch optimizer adapted for use with Horovod?",
+    "answer": "A standard PyTorch optimizer is adapted for use with Horovod by wrapping it with `hvd.DistributedOptimizer(optimizer, named_parameters=net.named_parameters())`."
+  },
+  {
+    "question": "How are model parameters synchronized across processes when using Horovod?",
+    "answer": "Model parameters are synchronized across processes using `hvd.broadcast_parameters(net.state_dict(), root_rank=0)`."
+  },
+  {
+    "question": "How is the data sampler configured for distributed training with Horovod?",
+    "answer": "A `torch.utils.data.distributed.DistributedSampler` is used, configured with `num_replicas=hvd.size()` (total number of processes) and `rank=global_rank` (global rank of the current process)."
+  },
+  {
+    "question": "What is the purpose of pipeline parallelism when a model is too large for a single GPU?",
+    "answer": "When a model is too large for a single GPU, pipeline parallelism aims to reduce the inactivity time of subsequent GPUs waiting for results from previous ones by dividing the model into portions, loading each on distinct GPUs, and processing input batches in chunks through these stages."
+  },
+  {
+    "question": "How is a model typically divided for pipeline parallelism in PyTorch?",
+    "answer": "In PyTorch, a model can be divided into distinct `nn.Module` portions, such as convolutional/pooling layers and fully connected layers, and then wrapped together using `nn.Sequential`."
+  },
+  {
+    "question": "Which PyTorch class is used to implement pipeline parallelism?",
+    "answer": "`torch.distributed.pipeline.sync.Pipe` is used to implement pipeline parallelism, which takes an `nn.Sequential` model and a `chunks` parameter."
+  },
+  {
+    "question": "What is required to initialize PyTorch's RPC module, which is necessary for the `Pipe` class?",
+    "answer": "To initialize PyTorch's RPC module, which is required by the `Pipe` class, environment variables like `MASTER_ADDR` and `MASTER_PORT` must be exported, and `torch.distributed.rpc.init_rpc` must be called."
+  },
+  {
+    "question": "On which GPU should the loss function be loaded when using model parallelism with two GPUs?",
+    "answer": "When using model parallelism with two GPUs, the loss function should be loaded on the last GPU in the pipeline (e.g., `cuda:1`)."
+  }
+]

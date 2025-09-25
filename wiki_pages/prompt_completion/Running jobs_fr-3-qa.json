@@ -1,0 +1,114 @@
+[
+  {
+    "question": "Quelle est la condition fondamentale pour associer chaque t\u00e2che \u00e0 un compte ?",
+    "answer": "Chaque t\u00e2che doit \u00eatre associ\u00e9e \u00e0 un nom de compte correspondant \u00e0 un RAP (Resource Allocation Project)."
+  },
+  {
+    "question": "Que fait l'ordonnanceur si un utilisateur est membre d'un seul compte ?",
+    "answer": "L'ordonnanceur associe automatiquement les t\u00e2ches de l'utilisateur \u00e0 ce compte unique."
+  },
+  {
+    "question": "Quels messages d'erreur indiquent qu'un utilisateur a acc\u00e8s \u00e0 plusieurs comptes lors de la soumission d'une t\u00e2che ?",
+    "answer": "Les messages sont 'You are associated with multiple _cpu allocations...' ou 'You are associated with multiple _gpu allocations... Please specify one of the following accounts to submit this job:'"
+  },
+  {
+    "question": "Comment sp\u00e9cifier un compte lorsque l'on a acc\u00e8s \u00e0 plusieurs ?",
+    "answer": "Il faut utiliser la directive `--account` pour sp\u00e9cifier un des comptes list\u00e9s dans le message d'erreur, par exemple `#SBATCH --account=def-user-ab`."
+  },
+  {
+    "question": "Comment trouver le nom du compte correspondant \u00e0 un projet ?",
+    "answer": "Connectez-vous \u00e0 CCDB, cliquez sur 'Mon compte -> Mes ressources et allocations' et le deuxi\u00e8me champ ('Nom du groupe') contient la cha\u00eene de caract\u00e8res \u00e0 utiliser avec la directive `--account`."
+  },
+  {
+    "question": "Un projet d'allocation de ressources peut-il \u00eatre transf\u00e9r\u00e9 entre grappes ?",
+    "answer": "Un projet qui a re\u00e7u une allocation de ressources peut \u00eatre associ\u00e9 \u00e0 une grappe particuli\u00e8re et il se peut qu'il ne puisse \u00eatre transf\u00e9r\u00e9 de cette grappe \u00e0 une autre."
+  },
+  {
+    "question": "Comment d\u00e9finir un compte par d\u00e9faut pour toutes les t\u00e2ches ?",
+    "answer": "Il est utile de d\u00e9finir les variables d'environnement suivantes dans votre fichier `~/.bashrc` : `export SLURM_ACCOUNT=def-someuser`, `export SBATCH_ACCOUNT=$SLURM_ACCOUNT`, `export SALLOC_ACCOUNT=$SLURM_ACCOUNT`."
+  },
+  {
+    "question": "Quelle est la priorit\u00e9 des diff\u00e9rentes m\u00e9thodes de sp\u00e9cification d'un nom de compte ?",
+    "answer": "La variable d'environnement a priorit\u00e9 sur la directive `--account` sp\u00e9cifi\u00e9e dans le script. Pour remplacer la variable d'environnement, il faut fournir un nom de compte comme argument en ligne de commande avec `sbatch`."
+  },
+  {
+    "question": "\u00c0 quoi servent les variables d'environnement SLURM_ACCOUNT et SALLOC_ACCOUNT ?",
+    "answer": "`SLURM_ACCOUNT` joue le m\u00eame r\u00f4le que `SBATCH_ACCOUNT`, mais pour la commande `srun` plut\u00f4t que `sbatch`. Il en est de m\u00eame pour `SALLOC_ACCOUNT`."
+  },
+  {
+    "question": "Qu'est-ce qu'une t\u00e2che s\u00e9quentielle ?",
+    "answer": "Une t\u00e2che s\u00e9quentielle est une t\u00e2che qui ne n\u00e9cessite qu'un seul c\u0153ur."
+  },
+  {
+    "question": "Qu'est-ce qu'un lot de t\u00e2ches (task array) ?",
+    "answer": "Un lot de t\u00e2ches sert \u00e0 soumettre un ensemble de t\u00e2ches \u00e0 l'aide d'une seule commande."
+  },
+  {
+    "question": "Comment les t\u00e2ches individuelles d'un lot de t\u00e2ches sont-elles distingu\u00e9es ?",
+    "answer": "Chacune des t\u00e2ches du lot se distingue par la variable d'environnement `$SLURM_ARRAY_TASK_ID` qui comporte une valeur distincte pour chaque instance de la t\u00e2che."
+  },
+  {
+    "question": "Comment un script Slurm configure-t-il une t\u00e2che OpenMP avec un seul processus et huit c\u0153urs CPU ?",
+    "answer": "Le script doit inclure `#SBATCH --cpus-per-task=8` et `export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "Quelle est la condition pr\u00e9alable pour qu'une application utilise OpenMP ?",
+    "answer": "Une application doit avoir \u00e9t\u00e9 compil\u00e9e avec les indicateurs (flags) appropri\u00e9s, soit `gcc -fopenmp ...` ou `icc -openmp ...`."
+  },
+  {
+    "question": "Comment configurer un script Slurm pour une t\u00e2che MPI avec 4 processus, 1024Mo de m\u00e9moire par c\u0153ur et une limite de temps de 5 minutes ?",
+    "answer": "Le script doit inclure `#SBATCH --ntasks=4`, `#SBATCH --mem-per-cpu=1024M`, `#SBATCH --time=0-00:05` et ex\u00e9cuter l'application avec `srun ./mpi_program`."
+  },
+  {
+    "question": "Pour les t\u00e2ches MPI intensives utilisant des n\u0153uds entiers, quelles directives sont recommand\u00e9es ?",
+    "answer": "Il est recommand\u00e9 d'utiliser `--nodes` et `--ntasks-per-node` plut\u00f4t que `--ntasks`."
+  },
+  {
+    "question": "Est-il possible d'avoir des t\u00e2ches hybrides MPI et \u00e0 fils multiples ?",
+    "answer": "Oui, il est possible d'avoir des t\u00e2ches hybrides qui sont \u00e0 la fois ex\u00e9cut\u00e9es en MPI et en fils multiples."
+  },
+  {
+    "question": "Quels sont les points \u00e0 consid\u00e9rer lors de l'utilisation d'un GPU pour une t\u00e2che ?",
+    "answer": "Il faut prendre en compte la configuration non uniforme des n\u0153uds GPU sur Cedar et Graham, les deux configurations diff\u00e9rentes sur Cedar, et les politiques sp\u00e9cifiques pour les n\u0153uds GPU de Cedar."
+  },
+  {
+    "question": "Quand les t\u00e2ches interactives sont-elles utiles ?",
+    "answer": "Elles sont utiles pour l'exploration de donn\u00e9es en mode ligne de commande, l'utilisation des outils de console interactifs de R et iPython, et les projets intensifs de d\u00e9veloppement, de d\u00e9bogage ou de compilation."
+  },
+  {
+    "question": "Comment d\u00e9marrer une session interactive sur un n\u0153ud de calcul ?",
+    "answer": "Il faut utiliser la commande `salloc`, par exemple `$ salloc --time=1:0:0 --mem-per-cpu=3G --ntasks=1 --account=def-someuser`."
+  },
+  {
+    "question": "Comment ex\u00e9cuter des applications graphiques en mode interactif sur un n\u0153ud de calcul ?",
+    "answer": "Il faut ajouter l'indicateur `--x11` \u00e0 la commande `salloc` et activer la redirection X11 au pr\u00e9alable (consulter la page SSH)."
+  },
+  {
+    "question": "Quel est l'avantage des t\u00e2ches interactives d'une dur\u00e9e de moins de trois heures ?",
+    "answer": "Elles sont susceptibles d'\u00eatre lanc\u00e9es peu de temps apr\u00e8s leur soumission car des n\u0153uds de test leur sont d\u00e9di\u00e9s."
+  },
+  {
+    "question": "Comment v\u00e9rifier le statut de toutes les t\u00e2ches g\u00e9r\u00e9es par l'ordonnanceur ?",
+    "answer": "Utilisez la commande `squeue`."
+  },
+  {
+    "question": "Comment v\u00e9rifier uniquement le statut de ses propres t\u00e2ches ?",
+    "answer": "Utilisez `squeue -u $USER` ou la forme courte `sq`."
+  },
+  {
+    "question": "Comment lister les t\u00e2ches en cours d'ex\u00e9cution ?",
+    "answer": "Utilisez `$ squeue -u <username> -t RUNNING`."
+  },
+  {
+    "question": "Comment lister les t\u00e2ches en attente ?",
+    "answer": "Utilisez `$ squeue -u <username> -t PENDING`."
+  },
+  {
+    "question": "Comment obtenir les d\u00e9tails d'une t\u00e2che sp\u00e9cifique ?",
+    "answer": "Utilisez `scontrol show job <jobid>`."
+  },
+  {
+    "question": "Quelle pratique est \u00e0 \u00e9viter lors de la surveillance des t\u00e2ches Slurm ?",
+    "answer": "N'ex\u00e9cutez pas \u00e0 plusieurs reprises et \u00e0 de courts intervalles les commandes `squeue` ou `sq` \u00e0 partir d'un script ou d'une application, car cela surcharge Slurm et risque de nuire \u00e0 sa performance."
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "question": "How do you create an SSH tunnel from your workstation to a Cedar GPU node for ParaView client-server connection?",
+    "answer": "Open a terminal on your Mac/Linux workstation and use the command: `ssh <username>@cedar.computecanada.ca -L 11111:cdr347:11111`, replacing `cdr347` with the specific compute node."
+  },
+  {
+    "question": "What steps are required to connect the ParaView client on your workstation to a remote server on Cedar/Graham using a GPU node?",
+    "answer": "Start ParaView, go to 'File -> Connect' or click the green 'Connect' button, then 'Add Server'. Configure the server with 'name = cedar', 'server type = Client/Server', 'host = localhost', and 'port = 11111'. Click 'Configure', select 'Manual', and 'Save'. Finally, select the server from the list and click 'Connect'."
+  },
+  {
+    "question": "How can you verify that your ParaView client has successfully connected to the remote server?",
+    "answer": "In the first terminal window where the server was started, the message 'Accepting connection ...' will change to 'Client connected'."
+  },
+  {
+    "question": "What is NVIDIA IndeX?",
+    "answer": "NVIDIA IndeX is an interactive 3D volumetric rendering engine that can be installed as a plugin with ParaView."
+  },
+  {
+    "question": "What are the prerequisites for using NVIDIA IndeX with ParaView?",
+    "answer": "To use NVIDIA IndeX, you need to connect in client-server mode to ParaView 5.10 (provided by `paraview-offscreen-gpu/5.10.0`) running in an interactive GPU task."
+  },
+  {
+    "question": "How do you activate the NVIDIA IndeX plugin in ParaView?",
+    "answer": "In your ParaView client, go to 'Tools -> Manage Plugins' and activate `pvNVIDIAIndeX` first locally, then remotely."
+  },
+  {
+    "question": "Why is it recommended to activate the NVIDIA IndeX plugin locally first?",
+    "answer": "While not always necessary, in many configurations, a bug can cause ParaView to close abnormally if the local plugin is not activated first."
+  },
+  {
+    "question": "After activating the NVIDIA IndeX plugin, how do you use it for rendering?",
+    "answer": "Once the plugin is activated, load your dataset and then select NVIDIA IndeX from the 'Representation' dropdown menu."
+  },
+  {
+    "question": "What is the recommended approach for using NVIDIA IndeX with multiple GPUs?",
+    "answer": "Although NVIDIA IndeX can be used in parallel on multiple GPUs, the acceleration may be suboptimal. It's recommended to test parallel scalability and verify performance gains before production use; if performance isn't better with multiple GPUs, use a single GPU."
+  },
+  {
+    "question": "Why must ParaView renders on Niagara be limited to software-based rendering?",
+    "answer": "Niagara does not have GPUs, so ParaView must use software-based rendering."
+  },
+  {
+    "question": "What explicit indicator must be used for ParaView on Niagara to avoid hardware OpenGL acceleration?",
+    "answer": "You must explicitly use one of the Mesa indicators, such as `paraview --mesa-swr` or `pvserver --mesa-swr-avx2`."
+  },
+  {
+    "question": "How do you load the ParaView module and start a ParaView server on a Niagara compute node?",
+    "answer": "First, load the ParaView module with `module load paraview`, then start the server using `pvserver --mesa-swr-ax2`."
+  },
+  {
+    "question": "When is the `--mesa-swr-avx2` indicator beneficial for ParaView rendering on Niagara?",
+    "answer": "With the OpenSWR library, rendering can sometimes be faster when using the `--mesa-swr-avx2` indicator."
+  },
+  {
+    "question": "How do you establish an SSH tunnel for ParaView client-server connection to a Niagara node?",
+    "answer": "Open a new terminal on your laptop and execute `ssh YOURusername@niagara.scinet.utoronto.ca -L11111:niaXYZW:11111 -N`, replacing `YOURusername` and `niaXYZW` with your specific details."
+  },
+  {
+    "question": "What is the purpose of the SSH tunnel created for ParaView on Niagara?",
+    "answer": "The SSH tunnel associates port 11111 on your local computer (localhost) with port 11111 on the Niagara compute node (`niaXYZW`), where the ParaView server is waiting for connections."
+  },
+  {
+    "question": "What server configuration parameters should be used in the ParaView client to connect to a Niagara server via an SSH tunnel?",
+    "answer": "Set 'name = niagara', 'server type = Client/Server', 'host = localhost', and 'port = 11111'."
+  }
+]

@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What is the purpose of combining model and data parallelism with multiple GPUs in PyTorch?",
+    "answer": "Combining model and data parallelism is used to achieve good performance when a model is too large to fit on a single GPU and its training requires a very large dataset."
+  },
+  {
+    "question": "How does the combination of model and data parallelism work in PyTorch with multiple GPUs?",
+    "answer": "The model is divided into portions, with each portion assigned to a distinct GPU. Pipeline parallelism is applied to the results, and then multiple copies of the process are created. Each copy of the model (distributed across multiple GPUs) is trained in parallel using distinct subsets of the training data. Gradients are calculated independently in each copy, aggregated, and parameters are updated synchronously or asynchronously."
+  },
+  {
+    "question": "What is a key difference between combined model and data parallelism and pure data parallelism in PyTorch?",
+    "answer": "The main difference is that in combined parallelism, each copy of the model spans across more than one GPU, whereas in pure data parallelism, a complete copy of the model is loaded onto each individual GPU."
+  },
+  {
+    "question": "What is a current limitation of Torch RPC when used for model division on compute clusters?",
+    "answer": "As of the document's writing, Torch RPC only supports the division of a model within a single compute node."
+  },
+  {
+    "question": "What alternative is suggested if a model exceeds the memory capacity of all GPUs within a single compute node?",
+    "answer": "If a model exceeds the memory capacity of all GPUs in a compute node, the DeepSpeed section of the documentation should be consulted."
+  },
+  {
+    "question": "How is the `pytorch-model-data-par.sh` script configured in terms of GPU and node requests for combined model and data parallelism?",
+    "answer": "The script requests 2 nodes, 4 GPUs per node (`--gres=gpu:4`), and 2 tasks per node (`--tasks-per-node=2`), which corresponds to one task per model copy."
+  },
+  {
+    "question": "Which environment modules are loaded in the `pytorch-model-data-par.sh` script for combined model and data parallelism?",
+    "answer": "The script loads `StdEnv/2020`, `gcc/11.3.0`, `python` (with `python/3.10.2` specifically noted as compatible), and `cuda/11.8.0`."
+  },
+  {
+    "question": "How are PyTorch and torchvision installed within the `pytorch-model-data-par.sh` script?",
+    "answer": "They are installed into a virtual environment created in `$SLURM_TMPDIR/env` using `pip install torch torchvision --no-index` after activating the virtual environment."
+  },
+  {
+    "question": "How are `MASTER_ADDR` and `MASTER_PORT` set for RPC communication in the `pytorch-model-data-par.py` Python script?",
+    "answer": "`MASTER_ADDR` is set to '127.0.0.1', and `MASTER_PORT` is dynamically set to `34567` plus the `local_rank` to ensure each model replica's RPC server uses a unique port."
+  },
+  {
+    "question": "How is Torch RPC initialized in the `pytorch-model-data-par.py` script for combined parallelism?",
+    "answer": "Torch RPC is initialized using `torch.distributed.rpc.init_rpc('worker', rank=0, world_size=1)`. The documentation clarifies that different replicas communicate through DDP, not RPC."
+  },
+  {
+    "question": "Describe how the model is divided and distributed across GPUs in the `pytorch-model-data-par.py` script for combined parallelism.",
+    "answer": "The model is split into `ConvPart` and `MLPPart`. `part1` is loaded onto `cuda(local_rank)` and `part2` onto `cuda(local_rank + 1)`. These parts are then combined into an `nn.Sequential` and wrapped with `Pipe(net, chunks=32, checkpoint='never')` for pipeline parallelism. Finally, the piped model is wrapped with `torch.nn.parallel.DistributedDataParallel(net)` for data parallelism."
+  },
+  {
+    "question": "Which backend is used for DistributedDataParallel communications in the `pytorch-model-data-par.py` script for combined model and data parallelism?",
+    "answer": "The `dist-backend` argument is set to `'mpi'` for initializing the DistributedDataParallel communications group."
+  },
+  {
+    "question": "How are input tensors and target labels moved to the appropriate GPUs during the training loop in `pytorch-model-data-par.py`?",
+    "answer": "Inputs are moved to `inputs.cuda(model_rank)` and targets to `targets.cuda(model_rank + 1)` within the training loop, aligning with the model's distribution across GPUs."
+  }
+]

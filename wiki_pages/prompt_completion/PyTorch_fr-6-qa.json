@@ -1,0 +1,54 @@
+[
+  {
+    "question": "How is the training data prepared in the `pytorch-ddp-test.py` script for a DistributedDataParallel setup?",
+    "answer": "The data is transformed using `transforms.Compose` for `ToTensor()` and normalization, then loaded using `CIFAR10` dataset and a `DataLoader` with `torch.utils.data.distributed.DistributedSampler`."
+  },
+  {
+    "question": "What loss function and optimizer are used in the `pytorch-ddp-test.py` example?",
+    "answer": "The example uses `nn.CrossEntropyLoss().cuda()` as the loss function and `optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=1e-4)` as the optimizer."
+  },
+  {
+    "question": "What is the role of `train_sampler.set_epoch(epoch)` in the distributed training loop?",
+    "answer": "It is used to ensure proper shuffling and data distribution across different epochs when using `DistributedSampler`."
+  },
+  {
+    "question": "How are inputs and targets moved to the GPU within the training loop of `pytorch-ddp-test.py`?",
+    "answer": "Inputs and targets are moved to the GPU by calling `.cuda()` on them: `inputs = inputs.cuda()` and `targets = targets.cuda()`."
+  },
+  {
+    "question": "What is PyTorch Lightning?",
+    "answer": "PyTorch Lightning is a package that provides interfaces to PyTorch, simplifying common tasks that require a lot of code, including training models with multiple GPUs."
+  },
+  {
+    "question": "How does PyTorch Lightning simplify multi-GPU training compared to explicit `DistributedDataParallel`?",
+    "answer": "PyTorch Lightning provides interfaces that handle many common tasks, allowing users to train models with multiple GPUs without explicitly using the `DistributedDataParallel` class."
+  },
+  {
+    "question": "What are the SLURM resource requests for the `pytorch-ddp-test-pl.sh` script using PyTorch Lightning?",
+    "answer": "The script requests 1 node, 2 GPUs (`--gres=gpu:2`), 2 tasks per node (`--tasks-per-node=2`), 8GB of memory (`--mem=8G`), and a time limit of 3 hours (`--time=0-03:00`)."
+  },
+  {
+    "question": "What is the recommended way to set up the Python environment for a PyTorch Lightning job on a SLURM cluster?",
+    "answer": "It involves loading a Python module, creating and activating a virtual environment, and then installing `torchvision` and `pytorch-lightning` using `pip install --no-index`."
+  },
+  {
+    "question": "Which environment variable is exported in `pytorch-ddp-test-pl.sh` and for what purpose?",
+    "answer": "`TORCH_NCCL_ASYNC_HANDLING=1` is exported to enable asynchronous handling for NCCL communications in PyTorch."
+  },
+  {
+    "question": "What PyTorch Lightning class is used to define the neural network model in `pytorch-ddp-test-pl.py`?",
+    "answer": "The neural network model is defined by inheriting from `pl.LightningModule`, as shown in the `class Net(pl.LightningModule):` definition."
+  },
+  {
+    "question": "How is the `Trainer` object configured in `pytorch-ddp-test-pl.py` for distributed training on a single node with multiple GPUs?",
+    "answer": "The `Trainer` is initialized with `pl.Trainer(accelerator=\"gpu\", devices=2, num_nodes=1, strategy='ddp', max_epochs = args.max_epochs, enable_progress_bar=False)`."
+  },
+  {
+    "question": "What optimizer is configured for the PyTorch Lightning model in `pytorch-ddp-test-pl.py`?",
+    "answer": "The optimizer is `torch.optim.Adam(self.parameters(), lr=args.lr)`, returned by the `configure_optimizers` method."
+  },
+  {
+    "question": "What is an important note regarding running PyTorch Lightning scripts within a SLURM batch job?",
+    "answer": "PyTorch Lightning expects the user to have requested one task per GPU and that the script is run with `srun`; otherwise, the job may fail."
+  }
+]

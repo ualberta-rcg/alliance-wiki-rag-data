@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What is model parallelism used for in PyTorch?",
+    "answer": "Model parallelism is used when a deep learning model is too large to fit entirely within the memory of a single GPU, requiring it to be split into multiple parts and loaded onto separate GPUs."
+  },
+  {
+    "question": "How can you implement model parallelism in PyTorch to reduce GPU idle time?",
+    "answer": "To minimize the idle time of subsequent GPUs, one can implement pipeline parallelism by creating separate `nn.Module` objects for each part of the model, wrapping them with `nn.Sequential`, and then using `torch.distributed.pipeline.sync.Pipe` to break input batches into chunks and feed them in parallel."
+  },
+  {
+    "question": "What PyTorch components are used to split a Convolutional Neural Network into parts for model parallelism?",
+    "answer": "A Convolutional Neural Network can be split into parts like `ConvPart` (convolutional/pooling layers) and `MLPPart` (densely connected feedforward layers), each defined as a separate `nn.Module`."
+  },
+  {
+    "question": "How are different parts of a model loaded onto separate GPUs in a model parallelism setup?",
+    "answer": "Each part of the model is explicitly moved to a specific GPU, for example, `part1 = ConvPart().to('cuda:0')` and `part2 = MLPPart().to('cuda:1')`."
+  },
+  {
+    "question": "Which PyTorch utility is used to enable pipeline parallelism?",
+    "answer": "`torch.distributed.pipeline.sync.Pipe` is used to enable pipeline parallelism, requiring all modules to be wrapped with `nn.Sequential()`."
+  },
+  {
+    "question": "What is the purpose of `torch.distributed.rpc.init_rpc` when using `Pipe` for pipeline parallelism?",
+    "answer": "`torch.distributed.rpc.init_rpc` is required to initialize PyTorch's RPC (Remote Procedure Call) module, which is necessary for the `Pipe` class to function correctly."
+  },
+  {
+    "question": "How do you configure a SLURM job script to request GPUs for a model parallelism task?",
+    "answer": "In a SLURM job script, you request GPUs using `#SBATCH --gres=gpu:<number_of_gpus>`, for example, `#SBATCH --gres=gpu:2` to request two GPUs."
+  },
+  {
+    "question": "What environment variables are needed to initialize PyTorch's RPC module in a job script?",
+    "answer": "The `MASTER_ADDR` and `MASTER_PORT` environment variables are needed, typically set as `export MASTER_ADDR=$(hostname)` and `export MASTER_PORT=34567`."
+  },
+  {
+    "question": "On which GPU should the loss function be loaded when using model parallelism across two GPUs?",
+    "answer": "The loss function should be loaded on the GPU that handles the final part of the model, which is typically the last GPU in the pipeline, e.g., `criterion = nn.CrossEntropyLoss().to('cuda:1')` if `cuda:1` is the last GPU."
+  },
+  {
+    "question": "How are input tensors and target tensors distributed to GPUs in a pipelined model parallelism setup?",
+    "answer": "Input tensors are sent to the first GPU of the pipeline (e.g., `inputs = inputs.to('cuda:0')`), and target tensors are sent to the GPU where the loss function will be calculated (e.g., `targets = targets.to('cuda:1')`)."
+  }
+]

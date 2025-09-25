@@ -1,0 +1,58 @@
+[
+  {
+    "question": "In a TensorFlow 2.x multi-worker Mirrored Strategy setup, how many processes per GPU are requested by default, and how can more CPUs be requested?",
+    "answer": "One process per GPU is requested by default. More CPUs can be requested per task using the `--cpus-per-task` parameter if the input pipeline handles parallel data loading or transforms."
+  },
+  {
+    "question": "What are the SBATCH resource requests for memory, time, and output file format in the TensorFlow 2.x multi-worker Mirrored Strategy example?",
+    "answer": "The script requests 8GB of memory (`--mem=8G`), a time limit of 30 minutes (`--time=0-00:30`), and an output file format of `%N-%j.out`."
+  },
+  {
+    "question": "What is the purpose of the `srun -N $SLURM_NNODES -n $SLURM_NNODES config_env.sh` command in the multi-worker TensorFlow setup?",
+    "answer": "This command executes the `config_env.sh` script on all requested nodes to configure the environment."
+  },
+  {
+    "question": "Which modules are loaded for the multi-worker TensorFlow 2.x setup?",
+    "answer": "The `gcc/9.3.0` and `cuda/11.8` modules are loaded."
+  },
+  {
+    "question": "What environment variable is set to enable the NCCL backend for inter-GPU communication in TensorFlow 2.x?",
+    "answer": "The environment variable `NCCL_BLOCKING_WAIT=1` should be exported."
+  },
+  {
+    "question": "What does the `config_env.sh` script do to set up the Python environment for TensorFlow multi-worker training?",
+    "answer": "The `config_env.sh` script loads the `python` module, creates a Python virtual environment in `$SLURM_TMPDIR/ENV`, activates it, upgrades `pip`, and then installs `tensorflow`."
+  },
+  {
+    "question": "What is the function of the `launch_training.sh` script?",
+    "answer": "The `launch_training.sh` script activates the Python virtual environment created earlier and then executes the `tensorflow-multiworker.py` script."
+  },
+  {
+    "question": "How does `tensorflow-multiworker.py` configure the distributed training strategy for multiple nodes and GPUs?",
+    "answer": "It uses `tf.distribute.MultiWorkerMirroredStrategy` with `tf.distribute.cluster_resolver.SlurmClusterResolver()` to get cluster info and `tf.distribute.experimental.CommunicationOptions(implementation=tf.distribute.experimental.CommunicationImplementation.NCCL)` for communication."
+  },
+  {
+    "question": "What is Horovod?",
+    "answer": "Horovod is a distributed deep learning training framework that supports TensorFlow, Keras, PyTorch, and Apache MXNet."
+  },
+  {
+    "question": "What are the SBATCH resource requests for nodes, GPUs, tasks per node, memory, time, and output in the `tensorflow-horovod.sh` script?",
+    "answer": "The script requests 1 node (`--nodes 1`), 2 GPUs (`--gres=gpu:2`), 2 tasks per node (`--ntasks-per-node=2`), 8GB of memory (`--mem=8G`), a time limit of 30 minutes (`--time=0-00:30`), and an output file format of `%N-%j.out`."
+  },
+  {
+    "question": "Which modules are loaded for the Horovod TensorFlow job, and what specific TensorFlow version is installed?",
+    "answer": "The `StdEnv/2020` and `python/3.8` modules are loaded. TensorFlow version `2.5.0` and Horovod are installed using `pip`."
+  },
+  {
+    "question": "How are GPUs configured for a Horovod job within the Python script (`tensorflow-horovod.py`)?",
+    "answer": "Horovod is initialized with `hvd.init()`, and then `tf.config.experimental.set_visible_devices(gpus[hvd.local_rank()], 'GPU')` is used to assign visible GPUs based on the local rank."
+  },
+  {
+    "question": "How is the optimizer wrapped for distributed training when using Horovod?",
+    "answer": "The optimizer is wrapped using `hvd.DistributedOptimizer(optimizer)`."
+  },
+  {
+    "question": "What Horovod callback is included in the `model.fit()` call in `tensorflow-horovod.py`, and why is `verbose=2` used?",
+    "answer": "The `hvd.callbacks.BroadcastGlobalVariablesCallback(0)` is used as a callback. `verbose=2` is set in `model.fit()` to prevent a progress bar from being printed to the output files."
+  }
+]

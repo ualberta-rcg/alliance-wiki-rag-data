@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What is ZeRO Stage 3 in the context of DeepSpeed?",
+    "answer": "ZeRO Stage 3 is a memory-efficient distributed training method where optimizer states, model parameters, and model gradients are split (sharded) between all available GPUs."
+  },
+  {
+    "question": "How do you enable ZeRO Stage 3 using PyTorch Lightning?",
+    "answer": "You can enable it by setting `strategy=\"deepspeed_stage_3\"` when initializing the `pl.Trainer`."
+  },
+  {
+    "question": "Which optimizer is used with ZeRO Stage 3 when not offloading to CPU/NVMe?",
+    "answer": "The `FusedAdam` optimizer is used, which is a DeepSpeed optimizer JIT compiled at run-time."
+  },
+  {
+    "question": "What are the benefits of using ZeRO Stage 3 with offload to CPU?",
+    "answer": "It allows the compute node's memory to store tensors when not required by GPUs and computes optimizer steps on the CPU, effectively expanding GPU memory by about 32GB to support larger models or batch sizes."
+  },
+  {
+    "question": "Which optimizer should be used for ZeRO Stage 3 with offload to CPU?",
+    "answer": "The `DeepSpeedCPUAdam` optimizer should be used."
+  },
+  {
+    "question": "How is ZeRO Stage 3 with offload to CPU configured in PyTorch Lightning?",
+    "answer": "It is configured by setting `strategy=DeepSpeedStrategy(stage=3, offload_optimizer=True, offload_parameters=True)` when initializing the `pl.Trainer`."
+  },
+  {
+    "question": "What is the purpose of ZeRO Stage 3 with offload to NVMe?",
+    "answer": "It enables offloading model parameters and optimizer states to the local disk (like NVMe) to extend GPU memory, with optimizer steps still computed on the CPU."
+  },
+  {
+    "question": "How is ZeRO Stage 3 with offload to NVMe configured in PyTorch Lightning?",
+    "answer": "It is configured by setting `strategy=DeepSpeedStrategy(stage=3, offload_optimizer=True, offload_parameters=True, remote_device=\"nvme\", offload_params_device=\"nvme\", offload_optimizer_device=\"nvme\", nvme_path=\"local_scratch\")` when initializing the `pl.Trainer`."
+  },
+  {
+    "question": "What module needs to be loaded when using DeepSpeed optimizers or ZeRO offloading to CPU or NVMe?",
+    "answer": "The `cuda/<version>` module must be loaded, and its version must match the version used to build the PyTorch installation."
+  },
+  {
+    "question": "Why is `enable_progress_bar=False` or `progress_bar_refresh_rate=0` set in PyTorch Lightning Trainer initialization?",
+    "answer": "This setting is used to avoid issues caused by a progress bar frequently updating logs."
+  }
+]

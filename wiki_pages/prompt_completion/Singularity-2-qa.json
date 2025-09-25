@@ -1,0 +1,94 @@
+[
+  {
+    "question": "How do you authenticate with Docker when downloading an image using Singularity?",
+    "answer": "You need to add `--docker-login` after the Singularity `build` or `pull` command."
+  },
+  {
+    "question": "How can you download a container from Docker Hub, for example `docker://ubuntu`, into a Singularity image file named `myubuntuimage.sif`?",
+    "answer": "You can download it by running: `$ singularity build myubuntuimage.sif docker://ubuntu`"
+  },
+  {
+    "question": "Can Singularity images be built directly from Docker Hub on B\u00e9luga or Graham compute nodes?",
+    "answer": "No, this command will not work on B\u00e9luga or Graham compute nodes because they do not have internet access."
+  },
+  {
+    "question": "Is it advisable to build large Singularity images on login nodes?",
+    "answer": "No, it is not recommended to build large Singularity images on login nodes because this process can affect other users and is likely to fail due to high CPU and RAM usage."
+  },
+  {
+    "question": "What two-step process is recommended for building large Singularity images from Docker when direct building on compute nodes is not feasible due to lack of internet access?",
+    "answer": "The recommended two-step process is: 1) Download the Docker image without converting it to Singularity on a data transfer or login node. 2) Convert the downloaded Docker image to a Singularity image on a compute node with a suitable allocation of memory and CPU."
+  },
+  {
+    "question": "Which tool from the Moby Project can be used to download a Docker image without converting it to Singularity?",
+    "answer": "The `download-frozen-image` tool from the Moby Project can be used for this purpose."
+  },
+  {
+    "question": "Provide an example of how to download a Docker image for GQCP (`gqcg/gqcp:latest`) on a data transfer or login node.",
+    "answer": "Navigate to `~/scratch` and run the following commands:\n`$ wget https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh`\n`$ sh download-frozen-image-v2.sh gqcp gqcg/gqcp:latest`\n`$ cd gqcp && tar cf ../gqcp.tar * && cd ..`"
+  },
+  {
+    "question": "How do you start an interactive job with specific resource requests on a cluster to build a Singularity image from a Docker archive?",
+    "answer": "Navigate to `~/scratch` and run: `$ salloc --mem-per-cpu=2000 --cpus-per-task=4 --time=2:0:0`"
+  },
+  {
+    "question": "How do you build a Singularity image named `gqcp.sif` from a Docker archive `gqcp.tar` on an allocated compute node?",
+    "answer": "First, load the Singularity module: `$ module load singularity`, then build the image: `$ singularity build gqcp.sif docker-archive://gqcp.tar`."
+  },
+  {
+    "question": "Can Singularity images be created using a Dockerfile?",
+    "answer": "Yes, Singularity images can be created using a Dockerfile, but it is a two-step process."
+  },
+  {
+    "question": "What is the first step in creating a Singularity image from a Dockerfile?",
+    "answer": "The first step is to create a Docker image from the Dockerfile on your VM or Linux machine where you have sudo access. Go to the directory containing the Dockerfile and run `sudo docker build -t CC:latest .`."
+  },
+  {
+    "question": "What is the second step in creating a Singularity image from an existing Docker image (e.g., `CC:latest`) that was built from a Dockerfile?",
+    "answer": "The second step is to use the Docker image as the source for Singularity by running: `sudo singularity build cc_image_latest.sif docker-daemon://CC:latest`."
+  },
+  {
+    "question": "What is the purpose of the `--sandbox` flag when building a Singularity image?",
+    "answer": "The `--sandbox` flag allows you to create a container within a writable directory, which enables easy modifications of existing containers."
+  },
+  {
+    "question": "How do you build a sandbox Singularity image from a Docker image?",
+    "answer": "Use the command: `$ singularity build --sandbox IMAGE_NAME/ docker://DOCKER-IMAGE-NAME`."
+  },
+  {
+    "question": "How can you make changes within a Singularity sandbox container?",
+    "answer": "Changes can be made within the container by using the `--writable` flag when launching a shell, e.g., `$ singularity shell --writable IMAGE_NAME/`."
+  },
+  {
+    "question": "How do you convert a Singularity sandbox directory into a `.sif` file?",
+    "answer": "A sandbox directory can be converted into a `.sif` file using the build command: `$ singularity build production.sif IMAGE_NAME/`."
+  },
+  {
+    "question": "Why is the `sudo` command generally not usable for building Singularity images on a cluster?",
+    "answer": "On a cluster, regular users do not have root account access, and many uses of the `build` command require root privileges."
+  },
+  {
+    "question": "Is `sudo` access typically required when building a pre-built image from Singularity or Docker Hub?",
+    "answer": "No, typically `sudo` access is not needed when building a pre-built image from Singularity or Docker Hub."
+  },
+  {
+    "question": "What actions should be taken if root access is required to build a Singularity image on a cluster?",
+    "answer": "If root access is required, you should either ask technical support for help or install Linux and Singularity on your own computer to gain root account access."
+  },
+  {
+    "question": "What happens if `sudo` is not used when building a Singularity image from a source that generally requires it?",
+    "answer": "Singularity will output a warning that the image may not work (though it will still be created), and all filesystem permissions will be collapsed to those of the Linux user and group running the `singularity build` command."
+  },
+  {
+    "question": "When is it important to ensure filesystem permissions are retained in a Singularity image?",
+    "answer": "It is important to retain filesystem permissions if you need to regularly update or reconfigure the image's contents, and the tools used for those updates require specific permissions to be retained."
+  },
+  {
+    "question": "Why might losing filesystem permissions be an issue for updating software inside a Singularity image?",
+    "answer": "Commands like `apt-get` or `yum` for updating/installing new software may not run successfully unless filesystem permissions are retained."
+  },
+  {
+    "question": "What should you do if Singularity image creation fails due to user restrictions on a node, especially a login node?",
+    "answer": "If image creation fails due to user restrictions, particularly on login nodes, you should request assistance from Technical support."
+  }
+]

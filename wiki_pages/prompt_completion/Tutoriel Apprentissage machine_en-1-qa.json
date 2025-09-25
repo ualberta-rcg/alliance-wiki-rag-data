@@ -1,0 +1,134 @@
+[
+  {
+    "question": "What is the main purpose of this beginner's manual?",
+    "answer": "This page is a beginner's manual concerning how to port a machine learning job to one of our clusters."
+  },
+  {
+    "question": "What is the first step when porting a machine learning job to a cluster?",
+    "answer": "The first step is to edit your program such that it doesn't use a graphical display."
+  },
+  {
+    "question": "How should graphical results be handled when running a machine learning job on a cluster?",
+    "answer": "All graphical results will have to be written on disk, and visualized on your personal computer, when the job is finished."
+  },
+  {
+    "question": "What should you do with Matplotlib plots instead of showing them on screen when running a job on a cluster?",
+    "answer": "You need to write the plots to image files instead of showing them on screen."
+  },
+  {
+    "question": "Why are shared storage systems on our clusters not suitable for many small files?",
+    "answer": "Shared storage on our clusters is not designed to handle lots of small files; they are optimized for very large files."
+  },
+  {
+    "question": "What format should a data set be in before transferring it to a job's compute node?",
+    "answer": "The data set should be in an archive format like `tar`."
+  },
+  {
+    "question": "What risks are associated with not using archive formats for datasets on shared filesystems?",
+    "answer": "Not respecting these rules risks causing enormous numbers of I/O operations on the shared filesystem, leading to performance issues on the cluster for all of its users."
+  },
+  {
+    "question": "How can you create a non-compressed tar archive of a directory named `mydataset`?",
+    "answer": "You can use the command `$ tar cf mydataset.tar mydataset/*`."
+  },
+  {
+    "question": "How can you create a compressed tar archive?",
+    "answer": "You can use the command `tar czf`."
+  },
+  {
+    "question": "Where should a virtual environment be created for a machine learning job?",
+    "answer": "A virtual environment should be created in your home space."
+  },
+  {
+    "question": "Where can users find documentation for installing and using machine learning frameworks like PyTorch and TensorFlow?",
+    "answer": "For details on installation and usage of machine learning frameworks, users should refer to the documentation pages for PyTorch and TensorFlow."
+  },
+  {
+    "question": "What is recommended before submitting a job using a script?",
+    "answer": "It is recommended to try running your job in an interactive job before submitting it using a script."
+  },
+  {
+    "question": "What is an advantage of using an interactive job?",
+    "answer": "You can diagnose problems more quickly using an interactive job."
+  },
+  {
+    "question": "Provide an example command for submitting an interactive job requesting a GPU, 3 CPUs, 32GB memory, and 1 hour runtime.",
+    "answer": "An example command is `$ salloc --account=def-someuser --gres=gpu:1 --cpus-per-task=3 --mem=32000M --time=1:00:00`."
+  },
+  {
+    "question": "What are the initial steps to take once an interactive job has started?",
+    "answer": "Once the job has started, you should activate your virtual environment, try to run your program, and install any missing modules if necessary."
+  },
+  {
+    "question": "How should missing modules be installed if compute nodes lack internet access?",
+    "answer": "Since compute nodes don't have internet access, you will have to install missing modules from a login node."
+  },
+  {
+    "question": "Where should a job prioritize reading and writing data for optimal performance?",
+    "answer": "It is important to verify that your job reads and writes as much as possible on the compute node's local storage (`$SLURM_TMPDIR`) and as little as possible on the shared filesystems (home, scratch and project)."
+  },
+  {
+    "question": "How must jobs be submitted for full automation as a batch process?",
+    "answer": "You must submit your jobs using a script in conjunction with the `sbatch` command, so that they can be entirely automated as a batch process."
+  },
+  {
+    "question": "What is the primary role of interactive jobs compared to scripted jobs using `sbatch`?",
+    "answer": "Interactive jobs are just for preparing and debugging your jobs, while `sbatch` is used to execute them fully and/or at scale."
+  },
+  {
+    "question": "What are some important elements to include in an `sbatch` script?",
+    "answer": "Important elements of an `sbatch` script include the account to be billed, required resources (CPUs, GPUs, memory, duration), and Bash commands for environment setup, data transfer, and starting the executable."
+  },
+  {
+    "question": "What is the suggested number of GPUs for an `sbatch` job, and why?",
+    "answer": "The suggestion is 1 GPU. You should use one single GPU unless you are certain that your program can use several, as TensorFlow and PyTorch use just one GPU by default."
+  },
+  {
+    "question": "What is the suggested memory amount for an `sbatch` job?",
+    "answer": "The suggested amount of memory for an `sbatch` job is `32000M`."
+  },
+  {
+    "question": "What is the maximum job duration on the B\u00e9luga cluster?",
+    "answer": "The maximum job duration on B\u00e9luga is 7 days."
+  },
+  {
+    "question": "What types of Bash commands are typically found in an `sbatch` script?",
+    "answer": "Bash commands typically include preparing the environment (modules, virtualenv), transferring data to the compute node, and starting the executable."
+  },
+  {
+    "question": "How do you request a single GPU resource in an `sbatch` script?",
+    "answer": "You request a GPU using `#SBATCH --gres=gpu:1`."
+  },
+  {
+    "question": "How do you specify 3 CPUs per task in an `sbatch` script?",
+    "answer": "You specify 3 CPUs per task using `#SBATCH --cpus-per-task=3`."
+  },
+  {
+    "question": "How do you set a job duration of 3 hours in an `sbatch` script?",
+    "answer": "You set the job duration using `#SBATCH --time=0-03:00`."
+  },
+  {
+    "question": "How are Python, CUDA, and cuDNN modules typically loaded in the example `sbatch` script?",
+    "answer": "They are loaded using the `module load python/3.6 cuda cudnn` command."
+  },
+  {
+    "question": "How is a virtual environment activated in the example `sbatch` script?",
+    "answer": "A virtual environment is activated using `source ~/my_env/bin/activate`."
+  },
+  {
+    "question": "How is a data directory created within the local storage (`$SLURM_TMPDIR`) in the example script?",
+    "answer": "A data directory is created using `mkdir $SLURM_TMPDIR/data`."
+  },
+  {
+    "question": "How is an archived dataset extracted to the compute node's local storage in the example `sbatch` script?",
+    "answer": "An archived dataset is extracted using `tar xf ~/projects/def-xxxx/data.tar -C $SLURM_TMPDIR/data`."
+  },
+  {
+    "question": "How is a Python training script executed with local data in the example `sbatch` script?",
+    "answer": "A Python training script is executed using `python $SOURCEDIR/train.py $SLURM_TMPDIR/data`."
+  },
+  {
+    "question": "For better performance, where else could a virtual environment be created?",
+    "answer": "For better performance, a virtual environment could also be created on the local storage (`$SLURM_TMPDIR`)."
+  }
+]

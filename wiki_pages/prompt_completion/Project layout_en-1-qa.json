@@ -1,0 +1,114 @@
+[
+  {
+    "question": "On which clusters is the project filesystem organized by groups?",
+    "answer": "The project filesystem is organized by groups on B\u00e9luga, Cedar, Graham, and Narval."
+  },
+  {
+    "question": "How do users typically access their project space?",
+    "answer": "Users access project space through symbolic links in their home directory, in the form of `$HOME/projects/group_name`."
+  },
+  {
+    "question": "Who owns the group space on the project filesystem?",
+    "answer": "The group space is owned by the principal investigator (PI) for that group."
+  },
+  {
+    "question": "What are the default permissions for group members on the project directory?",
+    "answer": "Group members have read and write permission on the project directory, but by default, newly created files are only readable by group members."
+  },
+  {
+    "question": "How can a group ensure newly created files in a specific directory are writeable by all group members?",
+    "answer": "To make files writeable by group members, create a special directory, for example, `mkdir $HOME/projects/def-profname/group_writable`, and then set ACLs with `setfacl -d -m g::rwx $HOME/projects/def-profname/group_writable`."
+  },
+  {
+    "question": "What is the default storage quota for a project space?",
+    "answer": "The default quota for project space is 1 TB and 500,000 files per group."
+  },
+  {
+    "question": "How can a project space quota be increased?",
+    "answer": "The project space quota can be increased up to 10 TB upon request to Technical support."
+  },
+  {
+    "question": "Can groups obtain higher quotas than the standard 10 TB maximum?",
+    "answer": "Yes, certain groups may have been awarded significantly higher quotas through the annual Resource Allocation Competition."
+  },
+  {
+    "question": "Is a storage allocation transferable between different clusters?",
+    "answer": "No, storage allocation is specific to a particular cluster and cannot normally be transferred to another cluster."
+  },
+  {
+    "question": "What command is used to check current disk usage and available space?",
+    "answer": "The `diskusage_report` command is used to check current usage and available disk space."
+  },
+  {
+    "question": "What is the purpose of setting the `setgid` bit on a directory in project space?",
+    "answer": "Setting the `setgid` bit ensures that files copied or moved to that project space acquire the appropriate group membership and are counted against the expected quota."
+  },
+  {
+    "question": "What effect does the `setgid` bit have on new files and subdirectories?",
+    "answer": "Every new file and subdirectory created below a directory with the `setgid` bit will inherit the same group as the ambient directory, and new subdirectories will also possess this same `setgid` bit."
+  },
+  {
+    "question": "Does setting the `setgid` bit change the group membership of existing files or files moved into the directory?",
+    "answer": "No, existing files and subdirectories will not have their group membership changed (requiring `chgrp`), and any files moved to the directory will retain their existing group membership."
+  },
+  {
+    "question": "How do you set the `setgid` bit on a directory?",
+    "answer": "You can set the `setgid` bit on a directory using the command `chmod g+s <directory name>`."
+  },
+  {
+    "question": "How can you apply the `setgid` bit to existing subdirectories within a directory?",
+    "answer": "You can apply the `setgid` bit to existing subdirectories using the command `find <directory name> -type d -print0 | xargs -0 chmod g+s`."
+  },
+  {
+    "question": "How can you temporarily change your default group during an interactive session?",
+    "answer": "You can temporarily change your default group during an interactive session using the command `newgrp <group name>`, for example, `newgrp rrg-profname-ab`."
+  },
+  {
+    "question": "How long does the `newgrp` command change your default group for?",
+    "answer": "The `newgrp` command only changes your default group for the particular interactive session; you need to reuse the command at your next login if you wish to change the default group again."
+  },
+  {
+    "question": "What is a common reason for receiving 'disk quota exceeded' error messages?",
+    "answer": "Disk quota exceeded error messages may be due to files being associated with the wrong group, such as your personal group, which typically has a quota of only 2 MB."
+  },
+  {
+    "question": "How can you fix files associated with the wrong group causing quota errors?",
+    "answer": "To find and fix files associated with the wrong group, use the command `find <directory name> -group $USER -print0 | xargs -0 chgrp -h <group>`, where `<group>` is the correct group name like `def-profname`."
+  },
+  {
+    "question": "Where is the best place for a PI and their sponsored user to share data?",
+    "answer": "The best place for a PI and their sponsored user to share data is in their shared project directory, for example, `~/projects/def-sue`, which points to `/project/<some random number>`."
+  },
+  {
+    "question": "What happens in a user's project directory if a PI receives a RAC award with storage?",
+    "answer": "If a PI receives a RAC award with storage, a new entry like `~/projects/rrg-sue-ab` will appear in the project directories of both the PI and their sponsored users, for storing data related to that award."
+  },
+  {
+    "question": "What is the simplest way to share data with someone who doesn't have a sponsored role?",
+    "answer": "The simplest way to share data with someone who doesn't have a sponsored role is to change the file permissions, usually by using ACLs, to allow them to read a particular directory or file."
+  },
+  {
+    "question": "Where is it considered best practice to restrict file sharing?",
+    "answer": "Best practice is to restrict file sharing to `/project` and `/scratch` spaces."
+  },
+  {
+    "question": "What permissions does someone need to descend a filesystem structure to access a shared directory?",
+    "answer": "They need to have read and execute permission on each of the directories between the root of the shared path (e.g., `~/projects/def-sue`) and the directory containing the file(s) to be shared."
+  },
+  {
+    "question": "Can data be shared with researchers who do not have an Alliance account?",
+    "answer": "Yes, data can be shared with researchers who do not have an Alliance account using a Globus shared endpoint."
+  },
+  {
+    "question": "What is the primary purpose of `scratch` space?",
+    "answer": "`scratch` space is for private temporary files."
+  },
+  {
+    "question": "What is `home` space typically used for?",
+    "answer": "`home` space is normally used for small amounts of relatively private data, such as job scripts."
+  },
+  {
+    "question": "What are the characteristics and purpose of the `project` space?",
+    "answer": "The `project` space is for shared data for a research group; it is persistent, backed up, and fairly large (up to 10 TB, or more with a RAC)."
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "question": "How do you configure ParaView on your local machine to connect to a server on Niagara?",
+    "answer": "In ParaView, go to 'File -> Connect', then click 'Add Server'. Configure the settings with 'name = niagara', 'server type = Client/Server', 'host = localhost', and 'port = 11111'. Then click 'Configure', select 'Manual', and click 'Save'."
+  },
+  {
+    "question": "What indicates a successful client connection to the ParaView server on Niagara?",
+    "answer": "Once the client connects, the message in the server's terminal window will change from 'Accepting connection...' to 'Client connected'."
+  },
+  {
+    "question": "How can you perform parallel rendering with multiple CPUs on Niagara?",
+    "answer": "For parallel rendering with multiple CPUs, the `pvserver` needs to be executed with `mpiexec`. This involves submitting a job or requesting a task with `salloc --ntasks=N*40 --nodes=N --time=1:00:00`, loading the ParaView module, and then running `srun pvserver --mesa`."
+  },
+  {
+    "question": "What are the prerequisites for client-server visualization on a CentOS cloud instance?",
+    "answer": "After creating an instance, you must install several packages including `xauth`, `wget`, `gcc`, `gcc-c++`, `ncurses-devel`, `python-devel`, `libxcb-devel`, `patch`, `imake`, `libxml2-python`, `mesa-libGL`, `mesa-libGL-devel`, `mesa-libGLU`, `mesa-libGLU-devel`, `bzip2`, `bzip2-libs`, `libXt-devel`, `zlib-devel`, `flex`, and `byacc`. You also need to create a symbolic link: `sudo ln -s /usr/include/GL/glx.h /usr/local/include/GL/glx.h`."
+  },
+  {
+    "question": "How can you simplify SSH access to a cloud instance if you have your own SSH key pair?",
+    "answer": "You can copy your public key to the instance by running the command `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'` from your local computer."
+  },
+  {
+    "question": "Why is compiling ParaView with OSMesa necessary for cloud instances?",
+    "answer": "Cloud instances typically lack GPU access. Compiling ParaView with OSMesa enables offscreen rendering using software-based OpenGL rasterization."
+  },
+  {
+    "question": "What rendering drivers are recommended when compiling ParaView with OSMesa on a cloud instance?",
+    "answer": "The default OSMesa configuration activates OpenSWR. For offscreen rendering with a processor, newer and faster `llvmpipe` and `SWR` drivers are available, with SWR being recommended."
+  },
+  {
+    "question": "What are the steps to compile CMake on a cloud instance?",
+    "answer": "First, download CMake using `wget https://cmake.org/files/v3.7/cmake-3.7.0.tar.gz`. Then, unpack the archive, navigate into the directory, run `./bootstrap`, `make`, and `sudo make install`."
+  },
+  {
+    "question": "How do you compile LLVM on a cloud instance for ParaView?",
+    "answer": "Navigate to your home directory, download LLVM using `wget http://releases.llvm.org/3.9.1/llvm-3.9.1.src.tar.xz`, unpack it, create a `build` directory, and enter it. Then run `cmake` with specific build flags (`-DCMAKE_BUILD_TYPE=Release`, `-DLLVM_BUILD_LLVM_DYLIB=ON`, etc.), followed by `make` and `sudo make install`."
+  },
+  {
+    "question": "What are the steps to compile Mesa with OSMesa on a cloud instance?",
+    "answer": "Navigate to your home directory, download Mesa using `wget ftp://ftp.freedesktop.org/pub/mesa/mesa-17.0.0.tar.gz`, unpack it, and enter the directory. Run `./configure` with flags like `--enable-opengl`, `--disable-gles1`, `--enable-gallium-llvm`, `--with-gallium-drivers=swrast,swr`, and `--enable-gallium-osmesa`. Finally, run `make` and `sudo make install`."
+  },
+  {
+    "question": "How do you compile the ParaView server on a cloud instance with OSMesa support?",
+    "answer": "Navigate to your home directory, download ParaView using `wget http://www.paraview.org/files/v5.2/ParaView-v5.2.0.tar.gz`, unpack it, create a `build` directory, and enter it. Run `cmake` with flags such as `-DCMAKE_BUILD_TYPE=Release`, `-DCMAKE_INSTALL_PREFIX=/home/centos/paraview`, `-DPARAVIEW_USE_MPI=OFF`, `-DPARAVIEW_ENABLE_PYTHON=ON`, `-DPARAVIEW_BUILD_QT_GUI=OFF`, `-DVTK_OPENGL_HAS_OSMESA=ON`, `-DVTK_USE_OFFSCREEN=ON`, and `-DVTK_USE_X=OFF`. Then, run `make` and `make install`."
+  },
+  {
+    "question": "How do you start the ParaView server for SWR rendering on a cloud instance?",
+    "answer": "You can start the server by executing `./paraview/bin/pvserver --mesa-swr-avx2` from the instance's terminal."
+  },
+  {
+    "question": "How do you set up an SSH tunnel from your local computer to a cloud instance for ParaView client-server connection?",
+    "answer": "Open a terminal on your local computer and run the command `ssh centos@vm.ip.address -L 11111:localhost:11111`."
+  },
+  {
+    "question": "What are the final steps to connect the ParaView client on your local computer to the server running on a cloud instance after establishing an SSH tunnel?",
+    "answer": "Start the ParaView client on your computer and connect to `localhost:11111`. This will allow you to open and visualize files from the remote instance."
+  },
+  {
+    "question": "How can you confirm that SWR rendering is active when using ParaView on a cloud instance?",
+    "answer": "During rendering, the console will display the message 'SWR detected AVX2', confirming that SWR is active."
+  }
+]

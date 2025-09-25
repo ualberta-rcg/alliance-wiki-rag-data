@@ -1,0 +1,118 @@
+[
+  {
+    "question": "Is `sudo` always necessary to build Singularity images from Singularity or Docker Hub?",
+    "answer": "No, many users do not need to use the `sudo` command to build their images from Singularity or Docker Hub."
+  },
+  {
+    "question": "What happens if `sudo` is not used when building a Singularity image?",
+    "answer": "If `sudo` is not used, Singularity will issue a warning that the image may not work (though it will still be created), and all filesystem permissions within the image will be collapsed to those of the Linux user and group running `singularity build`."
+  },
+  {
+    "question": "Under what conditions is it important to retain all filesystem permissions in a Singularity image?",
+    "answer": "It is important to retain all filesystem permissions if you need to regularly update or reconfigure the image's contents, and if the tools used for these operations require those permissions to be retained."
+  },
+  {
+    "question": "Why might Linux software management commands fail if filesystem permissions are not retained in a Singularity image?",
+    "answer": "Commands like `apt-get update`, `apt-get install`, `yum install`, or `dnf install` may not run successfully unless filesystem permissions are retained in the image."
+  },
+  {
+    "question": "What should I do if Singularity image creation fails on a node due to user restrictions?",
+    "answer": "If Singularity image creation fails due to user restrictions, especially on login nodes, you should request assistance by contacting Technical support."
+  },
+  {
+    "question": "Where can I find information about using Slurm for interactive or batch jobs?",
+    "answer": "For information on interactive and batch job execution with Slurm, refer to the 'Running jobs' page."
+  },
+  {
+    "question": "Can `sudo` be used to run programs within a Singularity image on a cluster?",
+    "answer": "No, `sudo` cannot be used to run programs in your Singularity image on a cluster."
+  },
+  {
+    "question": "What are the three main ways to run programs within a Singularity image?",
+    "answer": "Programs can be run in a Singularity image by: 1) running commands interactively in a session, 2) running a single command which executes and stops, or 3) running a container instance for daemons and backgrounded processes."
+  },
+  {
+    "question": "How can one use Singularity interactively?",
+    "answer": "Singularity can be used interactively by using its `shell` command, for example, `$ singularity shell --help`."
+  },
+  {
+    "question": "What does the command `$ singularity shell -B /home -B /project -B /scratch -B /localscratch myimage.simg` achieve?",
+    "answer": "This command will bind mount `/home`, `/project`, `/scratch`, and `/localscratch` within the `myimage.simg` container, allowing access to these directories, and then run an interactive shell (e.g., `/bin/bash`)."
+  },
+  {
+    "question": "How do you exit an interactive Singularity shell session?",
+    "answer": "To exit an interactive Singularity shell session, you type \"exit\"."
+  },
+  {
+    "question": "How can I run a 'clean environment' shell in Singularity, free from host environment variables?",
+    "answer": "You can run a 'clean environment' shell by adding the `-e` option to the `singularity shell` command, for example, `$ singularity shell -e -B /home -B /project -B /scratch -B /localscratch myimage.simg`, though you may need to define essential shell environment variables like `$USER`."
+  },
+  {
+    "question": "What are the requirements for writing changes to a Singularity image interactively on your own machine?",
+    "answer": "To write changes to a Singularity image interactively on your own machine, you must be using a sandbox image (a directory), the `-w` option, and `sudo`."
+  },
+  {
+    "question": "How do you create a Singularity sandbox image on your own machine?",
+    "answer": "You can create a Singularity sandbox image using the command `$ sudo singularity build -s myimage-dir myimage.simg`."
+  },
+  {
+    "question": "How do you start an interactive session with write access on a Singularity sandbox image?",
+    "answer": "You can engage with a Singularity sandbox image interactively with write access using the command `$ sudo singularity shell -w myimage-dir`."
+  },
+  {
+    "question": "After modifying a Singularity sandbox directory, how can it be converted into a new `.simg` file?",
+    "answer": "After modifying a sandbox directory, you can build a new `.simg` file using the command `$ sudo singularity build myimage-new.simg myimage-dir/`."
+  },
+  {
+    "question": "Which Singularity commands are used for submitting jobs that invoke commands in containers?",
+    "answer": "When submitting jobs that invoke commands in Singularity containers, you will use either Singularity's `exec` or `run` commands."
+  },
+  {
+    "question": "What is the key difference in configuration between Singularity's `exec` and `run` commands?",
+    "answer": "The `exec` command does not require any configuration, while the `run` command requires configuring an application within a Singularity recipe file."
+  },
+  {
+    "question": "What is the primary function of the `singularity exec` command?",
+    "answer": "The `singularity exec` command runs a specified command within the container and then exits, executing the version of the command installed inside the container."
+  },
+  {
+    "question": "How can I check the version of `gcc` installed inside a Singularity container versus the one on the host cluster?",
+    "answer": "To check `gcc` inside the container, use `$ singularity exec -B /home -B /project -B /scratch -B /localscratch myimage.simg gcc -v`. To check `gcc` on the host, simply run `$ gcc -v` at the normal shell prompt."
+  },
+  {
+    "question": "What Singularity command should be used to run a single command within a container in a job, and what additional step is important?",
+    "answer": "The `exec` command should be used to run a single command within a Singularity container in a job, and it is important to bind mount the necessary directories for the job to run successfully."
+  },
+  {
+    "question": "How can user-defined environment variables be passed to a Singularity container, especially when running a clean environment?",
+    "answer": "User-defined environment variables can be passed via the `--env-file` flag, which points to a file defining all desired variables, proving useful when using the `-e` flag for a 'clean environment' with `singularity exec`."
+  },
+  {
+    "question": "How do you execute a Singularity command using an environment variable file named `envfile`?",
+    "answer": "You pass the path to the environment file using the `--env-file` flag, for example: `$ singularity exec --env-file envfile myimage.simg gcc -v`."
+  },
+  {
+    "question": "Which Singularity commands should be used when running daemons and backgrounded processes within a container?",
+    "answer": "Instead of `singularity exec`, you should use Singularity's `instance.start` and `instance.stop` commands to create and destroy container instances for daemons and backgrounded processes."
+  },
+  {
+    "question": "What benefit do Singularity container instances provide for managing processes?",
+    "answer": "By using container instances (sessions), Singularity ensures that all programs running within the instance are terminated when the job ends, unexpectedly dies, or is killed."
+  },
+  {
+    "question": "How do you start a Singularity session instance?",
+    "answer": "To start a Singularity session instance, use the `instance.start` command, specifying the image name and a chosen session name, for example: `$ singularity instance.start myimage.simg quadrat5run`."
+  },
+  {
+    "question": "How do you stop a running Singularity session instance?",
+    "answer": "A running Singularity session instance can be stopped by executing the `instance.stop` command, specifying the image name and the session name, e.g., `$ singularity instance.stop myimage.simg quadrat5run`."
+  },
+  {
+    "question": "How can you view a list of all currently running Singularity session instances?",
+    "answer": "You can obtain a list of all currently running Singularity session instances by executing the command `$ singularity instance.list`."
+  },
+  {
+    "question": "Once a Singularity session is started, how can programs be run within it using `shell`, `exec`, or `run` commands?",
+    "answer": "With a session started, programs can be run using `shell`, `exec`, or `run` commands by specifying `instance://` followed by the session name immediately after the image name, for example, `$ singularity exec myimage.simg instance://mysessionname ps -eaf`."
+  }
+]

@@ -1,0 +1,90 @@
+[
+  {
+    "question": "Pourquoi devrais-je cr\u00e9er une nouvelle paire de cl\u00e9s SSH m\u00eame si j'en ai d\u00e9j\u00e0 une?",
+    "answer": "Il est pr\u00e9f\u00e9rable d'en cr\u00e9er une nouvelle si vous ne vous souvenez pas o\u00f9 l'ancienne a \u00e9t\u00e9 utilis\u00e9e, car vous ne devriez pas utiliser une cl\u00e9 sans conna\u00eetre son degr\u00e9 de s\u00e9curit\u00e9."
+  },
+  {
+    "question": "O\u00f9 sont g\u00e9n\u00e9ralement stock\u00e9es les paires de cl\u00e9s SSH?",
+    "answer": "Les paires de cl\u00e9s se trouvent habituellement dans le r\u00e9pertoire `.ssh/` de votre espace /home."
+  },
+  {
+    "question": "Quelle est la convention de nommage par d\u00e9faut pour les cl\u00e9s SSH?",
+    "answer": "Par d\u00e9faut, le nom de la cl\u00e9 est compos\u00e9 du pr\u00e9fixe `id_` suivi de son type (par exemple, `rsa, dsa, ed25519`), et la cl\u00e9 publique poss\u00e8de le suffixe `.pub`. Un exemple commun est `id_rsa` et `id_rsa.pub`."
+  },
+  {
+    "question": "Comment g\u00e9n\u00e9rer une paire de cl\u00e9s SSH de type ED25519?",
+    "answer": "Vous pouvez la g\u00e9n\u00e9rer avec la commande `ssh-keygen -t ed25519`."
+  },
+  {
+    "question": "Comment g\u00e9n\u00e9rer une paire de cl\u00e9s SSH RSA de 4 Kbit?",
+    "answer": "Vous pouvez la g\u00e9n\u00e9rer avec la commande `ssh-keygen -b 4096 -t rsa`."
+  },
+  {
+    "question": "Que se passe-t-il apr\u00e8s avoir ex\u00e9cut\u00e9 la commande `ssh-keygen`?",
+    "answer": "La commande vous demandera d'entrer un fichier pour sauvegarder la cl\u00e9 (par d\u00e9faut `/home/username/.ssh/id_rsa`), puis de saisir et de confirmer une phrase de passe. Elle sauvegardera ensuite la cl\u00e9 priv\u00e9e et la cl\u00e9 publique."
+  },
+  {
+    "question": "Que faut-il faire si des cl\u00e9s existent d\u00e9j\u00e0 avec les noms par d\u00e9faut lors de la g\u00e9n\u00e9ration d'une nouvelle paire?",
+    "answer": "Vous devriez donner un nom diff\u00e9rent au fichier pour \u00e9viter d'\u00e9craser les cl\u00e9s existantes."
+  },
+  {
+    "question": "Comment g\u00e9n\u00e9rer une paire de cl\u00e9s SSH soutenue par une cl\u00e9 de s\u00e9curit\u00e9 mat\u00e9rielle (par exemple, YubiKey)?",
+    "answer": "Vous pouvez la g\u00e9n\u00e9rer avec la commande `ssh-keygen -t ecdsa-sk`."
+  },
+  {
+    "question": "Quelle \u00e9tape suppl\u00e9mentaire est requise lors de la g\u00e9n\u00e9ration d'une cl\u00e9 SSH soutenue par du mat\u00e9riel?",
+    "answer": "Une invite vous demandera d'entrer une phrase de passe et d'activer la cl\u00e9 mat\u00e9rielle (vous pourriez avoir besoin de toucher votre authentificateur)."
+  },
+  {
+    "question": "Quelle est la m\u00e9thode recommand\u00e9e pour enregistrer votre cl\u00e9 publique SSH pour l'utiliser avec les grappes?",
+    "answer": "Nous vous encourageons \u00e0 enregistrer votre cl\u00e9 publique SSH dans la CCDB."
+  },
+  {
+    "question": "Quelle est la commande la plus simple et la plus s\u00e9curis\u00e9e pour installer une cl\u00e9 publique sur un syst\u00e8me distant?",
+    "answer": "Le moyen le plus simple et le plus s\u00e9curitaire est d'utiliser la commande `ssh-copy-id`, par exemple `ssh-copy-id -i ~/.ssh/mynewkey.pub graham.computecanada.ca`."
+  },
+  {
+    "question": "Que fait la commande `ssh-copy-id`?",
+    "answer": "Elle se connecte au syst\u00e8me distant et place la cl\u00e9 publique dans `.ssh/authorized_keys` dans votre r\u00e9pertoire /home. Elle cr\u00e9e les fichiers et les r\u00e9pertoires n\u00e9cessaires et ajuste les permissions automatiquement."
+  },
+  {
+    "question": "Comment installer manuellement une cl\u00e9 publique SSH sur un serveur distant?",
+    "answer": "Copiez le fichier de la cl\u00e9 publique sur le serveur distant, puis ex\u00e9cutez: `mkdir ~/.ssh`, `cat id_rsa.pub >> ~/.ssh/authorized_keys`, `chmod --recursive go-rwx ~/.ssh`, et `chmod go-w ~`."
+  },
+  {
+    "question": "Quelles sont les permissions de fichiers essentielles pour que SSH fonctionne correctement?",
+    "answer": "Le fichier de cl\u00e9 priv\u00e9e ne doit pas \u00eatre accessible aux autres (`chmod go-rwx id_rsa`), votre r\u00e9pertoire /home distant ne doit pas \u00eatre accessible en \u00e9criture par d'autres (`chmod go-w ~`), et de m\u00eame pour vos `~/.ssh` et `~/.ssh/authorized_keys` (`chmod --recursive go-rwx ~/.ssh`)."
+  },
+  {
+    "question": "Comment tester une nouvelle cl\u00e9 SSH en se connectant \u00e0 un serveur distant?",
+    "answer": "Testez la nouvelle cl\u00e9 en vous connectant au serveur \u00e0 partir de votre poste local avec la commande `ssh -i /path/to/your/privatekey USERNAME@ADDRESS`."
+  },
+  {
+    "question": "Quel est le but du programme `ssh-agent`?",
+    "answer": "Le programme `ssh-agent` met en m\u00e9moire votre cl\u00e9 priv\u00e9e sur votre ordinateur local et la fournit aux programmes qui en ont besoin, vous permettant de ne d\u00e9verrouiller la cl\u00e9 priv\u00e9e qu'une seule fois pour vous connecter \u00e0 des grappes distantes sans phrase de passe r\u00e9p\u00e9t\u00e9e."
+  },
+  {
+    "question": "Comment d\u00e9marrer le programme `ssh-agent`?",
+    "answer": "Vous pouvez d\u00e9marrer `ssh-agent` avec la commande `eval `ssh-agent``."
+  },
+  {
+    "question": "Comment ajouter une paire de cl\u00e9s \u00e0 `ssh-agent` une fois qu'il est d\u00e9marr\u00e9?",
+    "answer": "Vous pouvez ajouter votre paire de cl\u00e9s \u00e0 l'agent avec la commande `ssh-add`. Si n\u00e9cessaire, vous pouvez explicitement ajouter le chemin complet de la cl\u00e9 priv\u00e9e en tant qu'argument."
+  },
+  {
+    "question": "Comment afficher les cl\u00e9s priv\u00e9es qui ont \u00e9t\u00e9 ajout\u00e9es \u00e0 `ssh-agent`?",
+    "answer": "Utilisez l'option `ssh-add -l`."
+  },
+  {
+    "question": "Quand est-il n\u00e9cessaire d'activer le transfert d'agent SSH?",
+    "answer": "Le transfert d'agent est n\u00e9cessaire si vous devez utiliser votre cl\u00e9 priv\u00e9e sur la grappe elle-m\u00eame, par exemple, lors de l'interaction avec un r\u00e9f\u00e9rentiel GitHub distant."
+  },
+  {
+    "question": "Comment activer le transfert d'agent SSH pour une grappe sp\u00e9cifique?",
+    "answer": "Ajoutez les lignes suivantes \u00e0 votre fichier `$HOME/.ssh/config` sur votre ordinateur local: `Host beluga.computecanada.ca\n    ForwardAgent yes` (en rempla\u00e7ant `beluga.computecanada.ca` par l'adresse de la grappe)."
+  },
+  {
+    "question": "Quelle ligne ne doit jamais \u00eatre incluse dans le fichier de configuration SSH pour le transfert d'agent?",
+    "answer": "Le fichier de configuration SSH ne doit jamais contenir la ligne `Host *` pour le transfert de l'agent."
+  }
+]

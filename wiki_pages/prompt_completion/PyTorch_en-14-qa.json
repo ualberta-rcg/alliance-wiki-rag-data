@@ -1,0 +1,46 @@
+[
+  {
+    "question": "What is ZeRO with offload to NVMe?",
+    "answer": "ZeRO with offload to NVMe is a technique that uses ZeRO stage 3 to offload model parameters and optimizer states to the local disk."
+  },
+  {
+    "question": "What does offloading to local disk allow for in ZeRO stage 3?",
+    "answer": "It allows the compute node's local disk storage to be used for storing tensors when they are not required by GPU computations."
+  },
+  {
+    "question": "Where are optimizer steps computed when using ZeRO stage 3 with offload to NVMe?",
+    "answer": "Optimizer steps are computed on the CPU when using ZeRO stage 3 with offload to NVMe."
+  },
+  {
+    "question": "What is the practical implication of ZeRO with offload to NVMe for GPU memory?",
+    "answer": "Practically, it extends GPU memory by the amount of available local disk storage, although performance will significantly degrade."
+  },
+  {
+    "question": "What type of storage is recommended for ZeRO with offload to NVMe for best performance?",
+    "answer": "NVMe-enabled drives are recommended for ZeRO with offload to NVMe because they offer higher throughput and faster response times, minimizing performance degradation."
+  },
+  {
+    "question": "Can ZeRO with offload to NVMe be used with any type of storage?",
+    "answer": "Yes, it can be used with any type of storage, though NVMe-enabled drives are preferred for better performance."
+  },
+  {
+    "question": "Which modules must be loaded when using DeepSpeed's optimizers with offload to CPU or NVMe?",
+    "answer": "The `python` and `cuda` modules must be loaded, where the CUDA version must match the version used to build the PyTorch installation."
+  },
+  {
+    "question": "What is the command to install required Python packages for ZeRO offloading to NVMe?",
+    "answer": "After activating a virtual environment, `pip install torchvision pytorch-lightning deepspeed --no-index` should be run."
+  },
+  {
+    "question": "Which DeepSpeed optimizer is used when offloading to CPU with ZeRO stage 3?",
+    "answer": "The `DeepSpeedCPUAdam` optimizer is used when offloading to CPU with ZeRO stage 3."
+  },
+  {
+    "question": "How is the PyTorch Lightning `Trainer` configured for ZeRO stage 3 with offload to NVMe?",
+    "answer": "The `Trainer` is configured with `accelerator=\"gpu\"`, `devices=2`, `num_nodes=1`, and a `DeepSpeedStrategy` with `stage=3`, `offload_optimizer=True`, `offload_parameters=True`, `remote_device=\"nvme\"`, `offload_params_device=\"nvme\"`, `offload_optimizer_device=\"nvme\"`, and `nvme_path=\"local_scratch\"`."
+  },
+  {
+    "question": "How is the `nvme_path` for offloading determined in the Python script?",
+    "answer": "The `nvme_path` is set to the value of the `SLURM_TMPDIR` environment variable, which points to the local scratch directory."
+  }
+]

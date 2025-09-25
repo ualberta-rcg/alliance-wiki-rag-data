@@ -1,0 +1,126 @@
+[
+  {
+    "question": "What software should be used instead of Singularity on clusters?",
+    "answer": "Apptainer should be used instead of Singularity on clusters, as much of the Singularity information is outdated."
+  },
+  {
+    "question": "What is Singularity?",
+    "answer": "Singularity is open-source software created by Berkeley Lab that provides operating-system-level virtualization, commonly called containers."
+  },
+  {
+    "question": "What are the primary purposes of Singularity?",
+    "answer": "Singularity's primary purposes are to provide a secure way to use Linux containers on multi-user clusters, give users full control of their environment, and package scientific software for deployment across clusters with the same architecture."
+  },
+  {
+    "question": "How does a container differ from a virtual machine?",
+    "answer": "A container likely has less overhead and can only run programs compatible with the same operating system kernel and hardware architecture, unlike virtual machines which can run different operating systems and sometimes support foreign CPU architectures."
+  },
+  {
+    "question": "What Linux technologies do containers use?",
+    "answer": "Containers use Linux control groups (cgroups), kernel namespaces, and an overlay filesystem."
+  },
+  {
+    "question": "What is the function of control groups (cgroups) in containers?",
+    "answer": "Control groups (cgroups) limit, control, and isolate resource usage, such as RAM, disk I/O, and CPU access."
+  },
+  {
+    "question": "What do kernel namespaces virtualize and isolate for processes?",
+    "answer": "Kernel namespaces virtualize and isolate operating system resources for a group of processes, including process and user IDs, filesystems, and network access."
+  },
+  {
+    "question": "What is the purpose of overlay filesystems in containers?",
+    "answer": "Overlay filesystems can be used to enable the appearance of writing to otherwise read-only filesystems."
+  },
+  {
+    "question": "How does Singularity compare to Docker?",
+    "answer": "Singularity is similar to Docker but was specifically designed for secure container usage without special permissions, especially on multi-user compute clusters."
+  },
+  {
+    "question": "Is Singularity available on the clusters mentioned in the document?",
+    "answer": "Yes, Singularity is available on the clusters."
+  },
+  {
+    "question": "What are the requirements for using Singularity on a personal computer?",
+    "answer": "To use Singularity on your own computer, you need to download and install it according to its documentation and ideally use a relatively recent version of a Linux distribution with a kernel version 3.10.0 or newer."
+  },
+  {
+    "question": "How do you load a specific Singularity module on a cluster?",
+    "answer": "You load a specific Singularity module by running a command like `$ module load singularity/2.5`."
+  },
+  {
+    "question": "How can you check all available versions of Singularity modules?",
+    "answer": "To see all available versions of Singularity modules, you can run the command `$ module spider singularity`."
+  },
+  {
+    "question": "What is a Singularity image?",
+    "answer": "A Singularity image is either a file or a directory containing an installation of Linux."
+  },
+  {
+    "question": "Which command is used to create a Singularity image?",
+    "answer": "The `singularity build` command is used to create a Singularity image."
+  },
+  {
+    "question": "What does `WHAT-TO-WRITE` refer to in the `singularity build` command?",
+    "answer": "In `singularity build WHAT-TO-WRITE SPECIAL-URI-OR-PATH`, `WHAT-TO-WRITE` can be a filename for a `.sif` image file or a directory for a sandbox build."
+  },
+  {
+    "question": "What are the possible sources (`SPECIAL-URI-OR-PATH`) for building a Singularity image?",
+    "answer": "A Singularity image can be built from a URI (library://, docker://, shub://), a path to an existing container or directory (sandbox), or a path to a Singularity image file (which is a recipe on how to build the image)."
+  },
+  {
+    "question": "What are the recommended conditions for creating Singularity images?",
+    "answer": "It is strongly advised to create Singularity images on a Linux computer or virtual machine with Singularity installed, Internet access, and ideally root (sudo) permissions."
+  },
+  {
+    "question": "What happens to permissions inside a Singularity image if it's created without root access?",
+    "answer": "If an image is created without root permissions, all user and group permissions inside the image will be set to those of the account that created it, making it difficult to re-establish proper permissions later."
+  },
+  {
+    "question": "Why is root access important when creating Singularity images for future upgrades?",
+    "answer": "Root access is important because package management commands like `dpkg`, `apt-get`, and `apt` in Debian/Ubuntu images require root to upgrade or install packages, and without proper permissions, future software installations or upgrades may fail."
+  },
+  {
+    "question": "What should be done with a Singularity image created on a personal computer before using it on a cluster?",
+    "answer": "Any Singularity image created on your own computer needs to be uploaded to the cluster before it can be used there."
+  },
+  {
+    "question": "What error might occur when building Singularity images on certain Linux distributions despite sufficient memory?",
+    "answer": "You might get a warning about a 'nodev' mount option on /tmp and a 'FATAL: no memory left on device' error."
+  },
+  {
+    "question": "What is a common cause for the 'no memory left on device' error during Singularity image builds on modern Linux distributions?",
+    "answer": "The 'no memory left on device' error often occurs because many modern Linux distributions use an in-memory `tmpfs` filesystem for `/tmp`, which can limit the size of the container that can be built."
+  },
+  {
+    "question": "How can you resolve the 'no memory left on device' build error in Singularity?",
+    "answer": "To resolve this error, you can set the `SINGULARITY_TMPDIR` environment variable to point to a local disk location before running the build command, for example: `$ SINGULARITY_TMPDIR=\"disk/location\" singularity build IMAGE_NAME.sif docker://DOCKER-IMAGE-NAME`."
+  },
+  {
+    "question": "What is a significant limitation when creating Singularity images directly on a cluster?",
+    "answer": "When creating Singularity images directly on a cluster, users will never have `sudo` access, which means the caveats regarding permissions apply."
+  },
+  {
+    "question": "Which Alliance cluster is recommended as the best choice for creating Singularity images?",
+    "answer": "`gra-vdi.computecanada.ca` is recommended as the best choice for creating Singularity images."
+  },
+  {
+    "question": "Why are `beluga`, `graham`, and `niagara` less ideal for creating Singularity images?",
+    "answer": "`beluga`, `graham`, and `niagara` are less ideal because they have fixed maximum RAM usage on login nodes and no Internet access on compute nodes."
+  },
+  {
+    "question": "What are the issues with creating Singularity images on the `cedar` cluster?",
+    "answer": "On `cedar`, login nodes cannot be used, and compute node jobs require specifying RAM in advance, which is difficult to estimate, potentially leading to errors."
+  },
+  {
+    "question": "What are common errors encountered when trying to download images from Docker Hub using Singularity?",
+    "answer": "Common errors include `requested access to the resource is denied` and `unauthorized: authentication required`."
+  },
+  {
+    "question": "What are the possible reasons for Docker Hub download errors with Singularity?",
+    "answer": "These errors might occur if the Docker URL is incorrect or if authentication with Docker is required, which can be done by adding `--docker-login` to the `build` or `pull` command."
+  },
+  {
+    "question": "How can you download a Docker container image (e.g., ubuntu) using Singularity?",
+    "answer": "You can download a Docker container image by running a command such as `$ singularity build myubuntuimage.sif docker://ubuntu`."
+  }
+]

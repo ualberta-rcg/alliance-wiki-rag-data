@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What is the purpose of the `pytorch-ddp-test.sh` script?",
+    "answer": "The `pytorch-ddp-test.sh` script is an example SLURM batch script for submitting a PyTorch distributed data parallel job, designed to run across multiple GPUs, potentially on different nodes."
+  },
+  {
+    "question": "How many GPUs are requested per node in the `pytorch-ddp-test.sh` example?",
+    "answer": "The `pytorch-ddp-test.sh` script requests 2 GPUs per node, specified by `#SBATCH --gres=gpu:2`."
+  },
+  {
+    "question": "How many tasks (processes) per node are requested in the example SLURM script?",
+    "answer": "The script requests 2 tasks per node (`#SBATCH --tasks-per-node=2`), which corresponds to one process per GPU."
+  },
+  {
+    "question": "What is the recommended way to install PyTorch and torchvision within the SLURM environment for this script?",
+    "answer": "The recommended way is to load a Python module, create and activate a virtual environment in `$SLURM_TMPDIR/env`, and then use `pip install torch torchvision --no-index` to install the packages."
+  },
+  {
+    "question": "How does the SLURM script set the master node's IP address?",
+    "answer": "The script sets the master node's IP address by storing the current hostname in the `MASTER_ADDR` environment variable using `export MASTER_ADDR=$(hostname)`."
+  },
+  {
+    "question": "How is the `world_size` parameter determined for the `pytorch-ddp-test.py` script?",
+    "answer": "The `world_size` is calculated by multiplying `SLURM_NTASKS_PER_NODE` (tasks per node) by `SLURM_JOB_NUM_NODES` (number of nodes), which is passed as `--world_size $((SLURM_NTASKS_PER_NODE * SLURM_JOB_NUM_NODES))`."
+  },
+  {
+    "question": "In `pytorch-ddp-test.py`, how are `local_rank` and global `rank` determined for each process?",
+    "answer": "The `local_rank` is obtained from the `SLURM_LOCALID` environment variable, and the global `rank` is calculated as `int(os.environ.get(\"SLURM_NODEID\")) * ngpus_per_node + local_rank`."
+  },
+  {
+    "question": "Which PyTorch function is used to initialize the distributed process group in `pytorch-ddp-test.py`?",
+    "answer": "The `dist.init_process_group(backend=args.dist_backend, init_method=args.init_method, world_size=args.world_size, rank=rank)` function is used to initialize the distributed process group."
+  },
+  {
+    "question": "How is the neural network model prepared for distributed data parallel training in `pytorch-ddp-test.py`?",
+    "answer": "After instantiating the `Net` model and moving it to CUDA, it is wrapped with `torch.nn.parallel.DistributedDataParallel(net, device_ids=[current_device])`."
+  },
+  {
+    "question": "What data loading component is crucial for distributed training with `DistributedDataParallel` in PyTorch?",
+    "answer": "A `torch.utils.data.distributed.DistributedSampler(dataset_train)` is crucial, which ensures that each process receives a distinct subset of the training data."
+  }
+]

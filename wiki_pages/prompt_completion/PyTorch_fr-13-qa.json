@@ -1,0 +1,50 @@
+[
+  {
+    "question": "What is DeepSpeed ZeRO with CPU offloading?",
+    "answer": "DeepSpeed ZeRO with CPU offloading utilizes ZeRO stage 3, where the CPU is used to store optimizer states and model parameters. This makes the node's memory available for these tensors when not needed by the GPU, and optimizer steps are computed on the CPU."
+  },
+  {
+    "question": "How does DeepSpeed ZeRO with CPU offloading improve training?",
+    "answer": "It effectively adds memory to the GPU by offloading optimizer states and model parameters to the CPU, allowing for larger batch sizes or models to be trained as GPU memory is less utilized."
+  },
+  {
+    "question": "What is required to use DeepSpeed ZeRO with CPU offloading?",
+    "answer": "You must load a `cuda/<version>` module that corresponds to the version used to compile your PyTorch package, as DeepSpeed optimizers are compiled at runtime."
+  },
+  {
+    "question": "What is DeepSpeed ZeRO with NVMe offloading?",
+    "answer": "DeepSpeed ZeRO with NVMe offloading uses ZeRO stage 3 to store optimizer states and model parameters on the local storage (NVMe disks) of the compute node, similar to CPU offloading."
+  },
+  {
+    "question": "What is the primary drawback of using DeepSpeed ZeRO with NVMe offloading?",
+    "answer": "This approach typically results in a significant performance loss compared to keeping data in memory."
+  },
+  {
+    "question": "Why is NVMe storage preferred for DeepSpeed ZeRO offloading to disk?",
+    "answer": "NVMe disks are faster and have shorter response times, which helps to compensate for the performance drop associated with offloading to disk."
+  },
+  {
+    "question": "What is the purpose of creating checkpoints during model training?",
+    "answer": "Checkpoints are snapshots of your model at a specific point in the training process, allowing you to save progress, divide long-running tasks into smaller ones, and recover from unexpected errors or node unavailability."
+  },
+  {
+    "question": "How do you implement checkpointing with PyTorch Lightning?",
+    "answer": "You should use the `callbacks` parameter of the `Trainer()` class, for example, `callbacks = [pl.callbacks.ModelCheckpoint(dirpath=\"./ckpt\",every_n_epochs=1)]`. This creates a checkpoint at the end of each training epoch."
+  },
+  {
+    "question": "How does PyTorch Lightning handle loading checkpoints?",
+    "answer": "The Trainer will automatically load a checkpoint from the specified `dirpath` (e.g., `./ckpt`) if one exists, allowing training to resume from that point."
+  },
+  {
+    "question": "When performing distributed training with `DistributedDataParallel` or `Horovod`, how should checkpoints be managed?",
+    "answer": "Only a single process (typically `rank 0`) should create checkpoints, as all processes will have the same model state after each iteration."
+  },
+  {
+    "question": "How can you prevent race conditions when loading checkpoints in a distributed training environment?",
+    "answer": "You can add a `torch.distributed.barrier()` call before loading to ensure that the checkpoint creation process has finished writing to disk before other processes attempt to load it."
+  },
+  {
+    "question": "How do you ensure tensors are loaded onto the correct GPU when loading checkpoints in distributed training?",
+    "answer": "Pass the `map_location` argument to `torch.load` (e.g., `map_location = f\"cuda:{local_rank}\"`) to direct tensors to the GPU identified by each process, as `torch.load` defaults to loading on the GPU where they were originally saved."
+  }
+]

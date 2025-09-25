@@ -1,0 +1,86 @@
+[
+  {
+    "question": "When would you use single user mode or a recovery kernel for a VM?",
+    "answer": "If the VM can't be accessed anymore via SSH or via a local user, the OS can be booted into single user mode or a recovery kernel can be launched."
+  },
+  {
+    "question": "What is the primary requirement for performing OS recovery on a VM?",
+    "answer": "The only requirement is that the boot manager is accessible and can be modified."
+  },
+  {
+    "question": "Why might booting into single user mode not be sufficient for Debian 10 cloud image recovery?",
+    "answer": "Most cloud images have the root account locked, so just booting single user won't help us."
+  },
+  {
+    "question": "What is the `init` process in a Linux system and what is its Process ID (PID)?",
+    "answer": "The `init` process is a single userspace binary that the kernel runs after all hardware is initialized, and it always has PID1."
+  },
+  {
+    "question": "How can you modify the kernel's initial process during boot using the boot manager for Debian 10 recovery?",
+    "answer": "Via the boot manager, we are able to modify that and tell the kernel to execute a shell instead and manually mount the image filesystem."
+  },
+  {
+    "question": "What key should be pressed in the GRUB menu to edit boot parameters for Debian 10 recovery?",
+    "answer": "Boot or reboot the system until you see the GRUB menu, then hit `e` for edit."
+  },
+  {
+    "question": "What parameter needs to be added to the `linux` line in GRUB for Debian 10 recovery to make the kernel execute a bash shell?",
+    "answer": "Remove the serial consoles and add `init=/bin/bash` to let the kernel know the new `init` process."
+  },
+  {
+    "question": "What is the initial mount state of the filesystem after executing `/bin/bash` as the `init` process during Debian 10 recovery?",
+    "answer": "Now, we basically landed in memory and are mounted r/o."
+  },
+  {
+    "question": "What is the first step for a useful recovery in Debian 10 after booting into the bash shell?",
+    "answer": "To do a useful recovery, the next steps will be to remount the initrd filesystem r/w, mount the OS image disk, chroot into it, set a root password and restart the VM."
+  },
+  {
+    "question": "What command is used to remount the initrd filesystem as read/write during Debian 10 recovery?",
+    "answer": "Within our initrd remount the file system r/w: `mount -o remount,rw /`"
+  },
+  {
+    "question": "How do you mount the OS image's first primary partition (`/dev/vda1`) to `/mnt` during Debian 10 recovery?",
+    "answer": "Mount /dev/vda1 (the first primary partition) to /mnt: `mount /dev/vda1 /mnt`"
+  },
+  {
+    "question": "Which directories need to be bind mounted into `/mnt` to enable tools like `passwd` and network access during Debian 10 recovery?",
+    "answer": "To use tools like `passwd` via chroot in there, we need to mount `/dev` to gain tty access and `/proc` and `/sys`, since we can then also access the network."
+  },
+  {
+    "question": "How do you reset the root password after chrooting into `/mnt` in Debian 10 recovery mode?",
+    "answer": "Now we can just use `passwd` to reset the root password."
+  },
+  {
+    "question": "What key combination is used to leave the chroot environment in Debian 10 recovery?",
+    "answer": "Once done we leave the chroot via `Ctrl+D`."
+  },
+  {
+    "question": "How should the VM be restarted after completing password reset in Debian 10 recovery, considering bash limitations?",
+    "answer": "Take note that bash has no `reboot` or any power control mechanism, so we have to unmount everything cleanly and stop the VM."
+  },
+  {
+    "question": "What security measure should be taken after successfully logging in as root post-recovery in Debian 10?",
+    "answer": "Once completed, remove the root password again, or disable direct root logins via SSH."
+  },
+  {
+    "question": "How do you get into edit mode for the GRUB menu during CentOS 7 recovery?",
+    "answer": "Once the GRUB menu is visible, hit `e` on your keyboard to get into edit mode."
+  },
+  {
+    "question": "What parameter is used in CentOS 7 to interrupt the boot process at an early stage for recovery?",
+    "answer": "Centos has a parameter to interrupt the boot process in an early stage, which is `rd.break`."
+  },
+  {
+    "question": "What key combination is used to boot the kernel with modified parameters in CentOS 7 GRUB edit mode?",
+    "answer": "To boot the kernel with the changes, hit `Crtl+x`."
+  },
+  {
+    "question": "Where is the read-only mounted filesystem from the image located after booting with `rd.break` in CentOS 7 recovery?",
+    "answer": "Under `/sysroot`, you will find the ro mounted filesystem from the image."
+  },
+  {
+    "question": "How do you remount the `/sysroot` filesystem as read/write in CentOS 7 recovery mode?",
+    "answer": "To make it rw, it needs to be remounted: `mount -o remount,rw /sysroot`."
+  }
+]

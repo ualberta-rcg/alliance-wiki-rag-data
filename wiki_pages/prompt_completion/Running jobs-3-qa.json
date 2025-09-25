@@ -1,0 +1,118 @@
+[
+  {
+    "question": "How can I set a default account name for all my jobs if I use one consistently?",
+    "answer": "You can set the environment variables `SLURM_ACCOUNT`, `SBATCH_ACCOUNT`, and `SALLOC_ACCOUNT` in your `~/.bashrc` file, for example: `export SLURM_ACCOUNT=def-someuser`."
+  },
+  {
+    "question": "What is the priority order for specifying an account name for a job?",
+    "answer": "An account name supplied as a command-line argument to `sbatch` takes priority over an environment variable, which in turn takes priority over an account name supplied within the job script."
+  },
+  {
+    "question": "What is a serial job?",
+    "answer": "A serial job is a job that requests only a single CPU core."
+  },
+  {
+    "question": "What is an array job and how are individual jobs distinguished?",
+    "answer": "An array job, also known as a task array, is a method to submit a collection of jobs with a single command. The individual jobs are distinguished by the environment variable `$SLURM_ARRAY_TASK_ID`, which is set to a different value for each job instance."
+  },
+  {
+    "question": "How do you specify the number of tasks for an array job?",
+    "answer": "You can specify the number of tasks using the `--array` directive in your job script, for example, `#SBATCH --array=1-10` to create 10 tasks."
+  },
+  {
+    "question": "What directive is used to request a specific number of CPU cores for a threaded or OpenMP job?",
+    "answer": "The `#SBATCH --cpus-per-task=` directive is used to request a specific number of CPU cores, for example, `#SBATCH --cpus-per-task=8`."
+  },
+  {
+    "question": "What environment variable is often exported for OpenMP jobs?",
+    "answer": "For OpenMP jobs, `OMP_NUM_THREADS` is often exported, typically set to the value of `$SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "How do you specify the number of MPI processes and memory per CPU for an MPI job?",
+    "answer": "You use `#SBATCH --ntasks=4` for the number of MPI processes and `#SBATCH --mem-per-cpu=1024M` for memory per CPU."
+  },
+  {
+    "question": "What command is typically used to launch MPI programs within a Slurm script?",
+    "answer": "The `srun` command is typically used, for example, `srun ./mpi_program`. `mpirun` or `mpiexec` also work."
+  },
+  {
+    "question": "What directives should be used for large MPI jobs that efficiently use whole nodes?",
+    "answer": "Large MPI jobs that can efficiently use whole nodes should use `--nodes` and `--ntasks-per-node` instead of `--ntasks`."
+  },
+  {
+    "question": "What are interactive jobs useful for?",
+    "answer": "Interactive jobs are useful for data exploration at the command line, interactive console tools like R and iPython, and significant software development, debugging, or compiling."
+  },
+  {
+    "question": "How do you start an interactive session on a compute node?",
+    "answer": "You can start an interactive session using the `salloc` command, for example: `salloc --time=1:0:0 --mem-per-cpu=3G --ntasks=1 --account=def-someuser`."
+  },
+  {
+    "question": "How can you run graphical programs interactively on a compute node?",
+    "answer": "You can run graphical programs interactively by adding the `--x11` flag to your `salloc` command, provided you connected to the cluster with X11 forwarding enabled."
+  },
+  {
+    "question": "How does the duration requested for an interactive job affect its start time?",
+    "answer": "Interactive jobs requesting three hours or less will likely start very soon on dedicated test nodes, while those requesting more than three hours run on regular nodes and may wait for many hours or days."
+  },
+  {
+    "question": "How can you list all the jobs managed by the scheduler?",
+    "answer": "By default, `squeue` will show all jobs. You can list only your own jobs using `squeue -u $USER` or the utility `sq`."
+  },
+  {
+    "question": "How do you show only running or only pending jobs for a specific user?",
+    "answer": "To show only running jobs, use `squeue -u <username> -t RUNNING`. To show only pending jobs, use `squeue -u <username> -t PENDING`."
+  },
+  {
+    "question": "How can you get detailed information for a specific job?",
+    "answer": "You can get detailed information for a specific job using `scontrol show job <jobid>`."
+  },
+  {
+    "question": "Why should you avoid running `squeue` or `sq` at high frequency from a script?",
+    "answer": "Running `squeue` or `sq` at high frequency adds load to Slurm and may interfere with its performance or correct operation."
+  },
+  {
+    "question": "How can you receive email notifications about job conditions?",
+    "answer": "You can request email notifications by supplying options to `sbatch` such as `#SBATCH --mail-user=your.email@example.com` and `#SBATCH --mail-type=ALL`."
+  },
+  {
+    "question": "What is output buffering in non-interactive Slurm jobs?",
+    "answer": "Output buffering means there's a delay between when data is written by the job and when it appears in the log file, ranging from seconds to minutes or until the job completes."
+  },
+  {
+    "question": "What is the recommended way to monitor job output in real time?",
+    "answer": "To monitor job output in real time, it is recommended to run an interactive job."
+  },
+  {
+    "question": "How can you get a short summary of the CPU and memory efficiency of a completed job?",
+    "answer": "You can get a short summary using the `seff` command, followed by the job ID, e.g., `seff 12345678`."
+  },
+  {
+    "question": "Which command provides more detailed information about a completed job?",
+    "answer": "The `sacct` command provides more detailed information about a completed job."
+  },
+  {
+    "question": "What do the `.bat+`, `.ext+`, and `.0` records typically represent in `sacct` output?",
+    "answer": "The `.bat+` record represents your submission script (batch step), where the main work is often done. The `.ext+` record is for prologue and epilogue (extern step) and usually consumes little resources. A `.0` step might be created if `srun` is used in the submission script."
+  },
+  {
+    "question": "How can you determine the maximum memory a job needed?",
+    "answer": "Use the `MaxRSS` accounting field from `sacct` to determine the largest resident set size (memory) for any of the tasks."
+  },
+  {
+    "question": "Which command works on a running job similar to how `sacct` works on a completed job?",
+    "answer": "The `sstat` command works on a running job in a similar way that `sacct` works on a completed job."
+  },
+  {
+    "question": "How can you attach to a running job to execute new processes, such as for monitoring?",
+    "answer": "You can use `srun --jobid <jobid> --pty` followed by the command you want to run, for example, `srun --jobid 123456 --pty watch -n 30 nvidia-smi`."
+  },
+  {
+    "question": "What tool can be used with `srun` to launch multiple monitoring commands in separate panes for a running job?",
+    "answer": "`tmux` can be used to launch multiple monitoring commands in separate panes, for example, `srun --jobid 123456 --pty tmux new-session -d 'htop -u $USER' \\; split-window -h 'watch nvidia-smi' \\; attach`."
+  },
+  {
+    "question": "What is a caution when launching processes with `srun` to monitor a running job?",
+    "answer": "Processes launched with `srun` share resources with the specified job, so care must be taken not to launch processes that would use a significant portion of allocated resources, which could slow down or kill the job."
+  }
+]

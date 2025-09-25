@@ -1,0 +1,66 @@
+[
+  {
+    "question": "Under what circumstances would you boot a VM into single user mode or a recovery kernel?",
+    "answer": "You would boot a VM into single user mode or a recovery kernel if it can no longer be accessed via SSH or a local user."
+  },
+  {
+    "question": "What is the primary requirement for initiating a VM recovery by booting into single user mode or a recovery kernel?",
+    "answer": "The boot manager must be accessible and modifiable."
+  },
+  {
+    "question": "Why is booting into single user mode often insufficient for recovery on Debian10 cloud images?",
+    "answer": "Most cloud images have the root account locked, which prevents effective recovery actions in single user mode."
+  },
+  {
+    "question": "What is the role of the 'init' process in a Linux-based system during boot?",
+    "answer": "The 'init' process is a single userspace binary that the kernel runs after hardware initialization, always having PID1, and it takes control for all userspace-related tasks like running daemons."
+  },
+  {
+    "question": "How can you modify the 'init' process during a Debian10 boot to execute a shell for recovery?",
+    "answer": "You can modify the GRUB2 boot manager by hitting 'e' for edit and adding 'init=/bin/bash' to the 'linux' line."
+  },
+  {
+    "question": "What specific command line parameter should be added to the GRUB menu's 'linux' line for Debian10 recovery to launch a bash shell?",
+    "answer": "You should add 'init=/bin/bash' to the 'linux' line, for example: `linux /boot/vmlinuz-4.19.0-6-cloud-amd64 root=UUID=d187d85e-8a80-4664-8b5a-dce4d7ceca9e ro biosdevname=0 net.ifnames=0 console=tty0 init=/bin/bash`."
+  },
+  {
+    "question": "What occurs after the kernel boots with 'init=/bin/bash' during Debian10 recovery?",
+    "answer": "The kernel initializes 'initrd' and executes '/bin/bash' as the 'init' process, resulting in the user landing in memory with the filesystem initially mounted read-only."
+  },
+  {
+    "question": "What are the subsequent steps required for a useful recovery once a bash shell is launched as the 'init' process in Debian10?",
+    "answer": "The next steps involve remounting the initrd filesystem read/write, mounting the OS image disk, chrooting into it, setting a root password, and then restarting the VM."
+  },
+  {
+    "question": "How do you remount the initrd filesystem as read/write during Debian10 recovery?",
+    "answer": "Execute the command `mount -o remount,rw /`."
+  },
+  {
+    "question": "What command is used to mount the first primary partition (/dev/vda1) of the OS image to /mnt during Debian10 recovery?",
+    "answer": "You mount it using the command `mount /dev/vda1 /mnt`."
+  },
+  {
+    "question": "Why are /dev, /proc, and /sys bind-mounted to /mnt when performing a chroot operation during Debian10 recovery?",
+    "answer": "They are bind-mounted to gain tty access (/dev) and allow tools like `passwd` to function correctly and potentially access the network from within the chrooted environment (/proc and /sys)."
+  },
+  {
+    "question": "What commands are used to bind mount /proc, /sys, and /dev to /mnt, respectively, during Debian10 recovery?",
+    "answer": "The commands are `mount -o bind /proc /mnt/proc`, `mount -o bind /sys /mnt/sys`, and `mount -o bind /dev /mnt/dev`."
+  },
+  {
+    "question": "After binding /dev, /proc, and /sys, how do you proceed to reset the root password during Debian10 recovery?",
+    "answer": "You chroot into `/mnt`, ignore any ioctl error for the terminal process group, and then use the `passwd` command to reset the root password."
+  },
+  {
+    "question": "How do you exit the chroot environment after resetting the root password in Debian10 recovery?",
+    "answer": "You leave the chroot environment by pressing `Ctrl+D`."
+  },
+  {
+    "question": "How can you restart the VM after completing the Debian10 recovery steps and unmounting all filesystems?",
+    "answer": "You can restart the system by using the `Ctrl+Alt+Del` submit button on the OpenStack console page, or by simply stopping and starting the VM."
+  },
+  {
+    "question": "What post-recovery actions are recommended after successfully logging in as root following a Debian10 recovery?",
+    "answer": "After logging in as root, you should either remove the root password again or disable direct root logins via SSH."
+  }
+]

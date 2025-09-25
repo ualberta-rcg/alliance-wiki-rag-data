@@ -1,0 +1,58 @@
+[
+  {
+    "question": "What is recommended when running NVIDIA IndeX in parallel on multiple GPUs?",
+    "answer": "It is recommended to test parallel scaling before doing any production rendering with IndeX on multiple GPUs to verify that using more than one GPU leads to better performance for your dataset; otherwise, use a single GPU."
+  },
+  {
+    "question": "Does Niagara support GPU-based visualization for ParaView?",
+    "answer": "No, Niagara does not have GPUs, so visualization on this system is limited to software rendering."
+  },
+  {
+    "question": "How do you configure ParaView for software rendering on Niagara?",
+    "answer": "You need to explicitly specify one of the mesa flags, such as `--mesa-swr`, to tell ParaView not to use OpenGL hardware acceleration after loading the ParaView module."
+  },
+  {
+    "question": "What command is used to launch an interactive job on Niagara to access resources for ParaView visualization?",
+    "answer": "You need to start a `debugjob` by running the `debugjob` command."
+  },
+  {
+    "question": "After launching a debugjob on Niagara, how do you load the ParaView module and start the server?",
+    "answer": "Load the ParaView module using `module load paraview` and then start the server with `pvserver --mesa-swr-ax2`."
+  },
+  {
+    "question": "Which ParaView server flag is reported to offer faster software rendering on Niagara?",
+    "answer": "The `--mesa-swr-avx2` flag is reported to offer faster software rendering using the OpenSWR library."
+  },
+  {
+    "question": "What information should be noted once the ParaView server is ready on a Niagara compute node?",
+    "answer": "You should note the connection URL, specifically the compute node name (e.g., `niaXYZW`) and the port (usually `11111`)."
+  },
+  {
+    "question": "How do you establish an SSH tunnel from your local computer to a Niagara compute node for ParaView client-server connection?",
+    "answer": "Open a new terminal and use the command `ssh YOURusername@niagara.scinet.utoronto.ca -L11111:niaXYZW:11111 -N`, replacing `YOURusername` and `niaXYZW` with your specific details."
+  },
+  {
+    "question": "What is the purpose of the `ssh` command with the `-L` option for ParaView connection on Niagara?",
+    "answer": "It establishes a tunnel mapping port 11111 on your local computer (`localhost`) to port 11111 on the Niagara compute node (e.g., `niaXYZW`) where the ParaView server is waiting for connections."
+  },
+  {
+    "question": "How do you configure the ParaView client on your local computer to connect to the server on Niagara?",
+    "answer": "In your local ParaView client, go to 'File -> Connect', click 'Add Server', and set 'name = niagara', 'server type = Client/Server', 'host = localhost', 'port = 11111'. Then click 'Configure', select 'Manual', and click 'Save'."
+  },
+  {
+    "question": "How can you perform parallel rendering using multiple CPUs on Niagara?",
+    "answer": "You should run `pvserver` using `srun` within an allocated job. For example, request a job with `salloc --ntasks=N*40 --nodes=N --time=1:00:00`, then load the ParaView module and run `srun pvserver --mesa`."
+  },
+  {
+    "question": "What are the prerequisites for client-server visualization on a cloud VM?",
+    "answer": "You need to launch a new virtual machine (VM) using the Cloud Quick Start Guide and then install additional packages to be able to compile ParaView or VisIt."
+  },
+  {
+    "question": "Which packages are typically installed on a CentOS VM for compiling ParaView or VisIt?",
+    "answer": "Common packages include `xauth`, `wget`, `gcc`, `gcc-c++`, `ncurses-devel`, `python-devel`, `libxcb-devel`, `patch`, `imake`, `libxml2-python`, `mesa-libGL`, `mesa-libGL-devel`, `mesa-libGLU`, `mesa-libGLU-devel`, `bzip2`, `bzip2-libs`, `libXt-devel`, `zlib-devel`, `flex`, and `byacc`. A symbolic link for `glx.h` is also typically created."
+  },
+  {
+    "question": "How can a user simplify SSH logins to a cloud VM if they have their own private-public SSH key pair?",
+    "answer": "The user can copy their public key to the VM's `authorized_keys` file by running `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'` on their computer."
+  }
+]

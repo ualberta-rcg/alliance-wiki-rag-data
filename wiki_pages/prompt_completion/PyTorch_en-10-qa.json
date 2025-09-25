@@ -1,0 +1,58 @@
+[
+  {
+    "question": "What are the two main parts a model is split into for model parallelism in the `pytorch-modelpar-pipelined-rpc.py` example?",
+    "answer": "The model is split into a convolutional/pooling part (`ConvPart`) and a dense feedforward part (`MLPPart`)."
+  },
+  {
+    "question": "How is the `ConvPart` class structured in the `pytorch-modelpar-pipelined-rpc.py` script?",
+    "answer": "The `ConvPart` consists of two `nn.Conv2d` layers, two `nn.MaxPool2d` layers, and uses `nn.ReLU` activation functions. It also includes a flattening operation (`x.view(-1, 16 * 5 * 5)`)."
+  },
+  {
+    "question": "How is the `MLPPart` class structured in the `pytorch-modelpar-pipelined-rpc.py` script?",
+    "answer": "The `MLPPart` consists of three `nn.Linear` layers and uses `nn.ReLU` activation functions."
+  },
+  {
+    "question": "How are the model parts distributed across GPUs in the `pytorch-modelpar-pipelined-rpc.py` example for model parallelism?",
+    "answer": "The `ConvPart` is loaded onto `cuda:0` (the first GPU), and the `MLPPart` is loaded onto `cuda:1` (the second GPU)."
+  },
+  {
+    "question": "What is the role of `torch.distributed.rpc.init_rpc` in the model parallelism example?",
+    "answer": "`torch.distributed.rpc.init_rpc('worker', rank=0, world_size=1)` is used to initialize PyTorch's RPC module, which is required by the `Pipe` class for Pipeline Parallelism."
+  },
+  {
+    "question": "How is pipeline parallelism implemented using the split model parts?",
+    "answer": "The `ConvPart` and `MLPPart` are first combined into an `nn.Sequential` model, and then this sequential model is wrapped with `torch.distributed.pipeline.sync.Pipe` with a specified number of `chunks` (e.g., `chunks=32`)."
+  },
+  {
+    "question": "Where is the `nn.CrossEntropyLoss` function placed in the `pytorch-modelpar-pipelined-rpc.py` example?",
+    "answer": "The `nn.CrossEntropyLoss` function is loaded onto the last GPU (`cuda:1`), matching the GPU where the final part of the model (`MLPPart`) resides."
+  },
+  {
+    "question": "How are input data and target labels moved to the correct GPUs during the training loop in the single GPU model parallelism script?",
+    "answer": "Input data (`inputs`) are moved to `cuda:0` and target labels (`targets`) are moved to `cuda:1`."
+  },
+  {
+    "question": "How do you retrieve outputs from a model wrapped with `Pipe()`?",
+    "answer": "Models wrapped with `Pipe()` return a `RRef` object, so you call `.local_value()` on it to get the actual outputs, for example, `outputs = net(inputs).local_value()`."
+  },
+  {
+    "question": "Under what conditions is combining model and data parallelism a viable option for high performance?",
+    "answer": "It is viable when a model is too large to fit inside a single GPU and needs to be trained using a very large dataset."
+  },
+  {
+    "question": "What is the general strategy for combining model and data parallelism?",
+    "answer": "The strategy involves splitting a large model into smaller parts (each on its own GPU), performing pipeline parallelism on the inputs, and then creating replicas of this entire process to be trained in parallel over separate subsets of the training data."
+  },
+  {
+    "question": "How does gradient aggregation work in combined model and data parallelism?",
+    "answer": "Gradients are computed independently within each model replica, and then an aggregation of these gradients is used to update all replicas synchronously or asynchronously."
+  },
+  {
+    "question": "What is an important caveat when using Torch RPC for combining model and data parallelism?",
+    "answer": "A significant limitation is that Torch RPC currently only supports splitting models inside a single node."
+  },
+  {
+    "question": "What tool is recommended for very large models that cannot fit within the combined memory of all GPUs on a single compute node?",
+    "answer": "DeepSpeed is recommended for such scenarios."
+  }
+]

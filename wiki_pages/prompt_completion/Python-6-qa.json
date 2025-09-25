@@ -1,0 +1,98 @@
+[
+  {
+    "question": "How can you inspect a running Python process without modifying the script beforehand?",
+    "answer": "You can inspect a running Python process using `py-spy`."
+  },
+  {
+    "question": "What are the steps to use `py-spy` to inspect a running Python job?",
+    "answer": "To use `py-spy`, you need to: 1. Install `py-spy` in a virtualenv in your home. 2. Attach to the running job using `srun --pty --jobid JOBID bash`. 3. Find the process ID (PID) of your Python script using `htop -u $USER`. 4. Activate the virtualenv where `py-spy` is installed. 5. Run `py-spy top --pid PID` for live feedback or `py-spy dump --pid PID` for a traceback."
+  },
+  {
+    "question": "How do you find the process ID (PID) of your Python script in a running job?",
+    "answer": "Use the command `htop -u $USER` to find the process ID (PID) of your Python script in a running job."
+  },
+  {
+    "question": "What does the error 'ERROR: Package 'X' requires a different Python: X.Y.Z not in '>=X.Y'' mean?",
+    "answer": "This error means that the current Python module loaded (e.g., 3.6.10) is not supported by the package you are trying to install."
+  },
+  {
+    "question": "How can you resolve the error 'Package 'X' requires a different Python'?",
+    "answer": "You can resolve this error by updating to a more recent Python version (such as the latest available module) or by installing an older version of package 'X'."
+  },
+  {
+    "question": "What should you do if you encounter the error 'ERROR: Package has requirement X, but you'll have Y which is incompatible'?",
+    "answer": "If you encounter this error, you should upgrade `pip` to the latest version (or higher than 21.3) to use the new dependency resolver, and then rerun your install command."
+  },
+  {
+    "question": "How do you upgrade `pip` to use the new dependency resolver?",
+    "answer": "Run `pip install --no-index --upgrade pip` to upgrade `pip`."
+  },
+  {
+    "question": "What does the error 'ERROR: No matching distribution found for X' indicate when installing packages?",
+    "answer": "This error indicates that `pip` could not find a package that satisfies the specified requirements (name, version, or tags)."
+  },
+  {
+    "question": "What steps should be taken if `pip install X` results in 'No matching distribution found for X'?",
+    "answer": "You should verify that the package name and version are correct. Additionally, `manylinux_x_y` wheels are discarded. You can also verify package availability from the wheelhouse using the `avail_wheels` command or the 'Available Python wheels' page."
+  },
+  {
+    "question": "What kind of Python wheels are discarded by `pip`?",
+    "answer": "Wheels named `manylinux_x_y` are discarded by `pip`."
+  },
+  {
+    "question": "What is the recommended approach for installing multiple Python packages simultaneously to help resolve dependencies?",
+    "answer": "When installing multiple packages, it is best to install them in one command (e.g., `pip install package1 package2 package3 package4`) as this helps `pip` resolve dependencies."
+  },
+  {
+    "question": "Why might a virtual environment stop working unexpectedly?",
+    "answer": "A virtual environment might stop working because packages are often updated, leading to a non-reproducible environment, or if it was created in $SCRATCH and part of it was deleted by automatic filesystem purging."
+  },
+  {
+    "question": "What is a common reason for a virtual environment to become non-functional due to location?",
+    "answer": "A virtual environment might become non-functional if it was created in $SCRATCH and part of it was deleted due to the automatic purge of the filesystem."
+  },
+  {
+    "question": "How can you make a virtual environment reproducible to prevent issues from package updates?",
+    "answer": "To make a virtual environment reproducible, you should freeze specific packages and their versions (e.g., `pip install --no-index 'package1==X.Y'`) and then create a requirements file to install them in your job."
+  },
+  {
+    "question": "What does the error 'ERROR: package-3.8.1-cp311-cp311-manylinux_2_28_x86_64.whl is not a supported wheel on this platform' mean?",
+    "answer": "This error indicates that the package is incompatible or not supported on the system, often due to trying to install a `manylinux` package or a package built for a different Python version."
+  },
+  {
+    "question": "What are the two common reasons for a Python wheel not being supported on a platform?",
+    "answer": "Two common reasons are trying to install a `manylinux` package or a Python package built for a different Python version than the one currently active."
+  },
+  {
+    "question": "What caused an 'AttributeError: module \u2018numpy\u2019 has no attribute \u2018bool\u2019'?",
+    "answer": "This `AttributeError` can be caused by using a version of Numpy where attributes, like `bool`, have been deprecated in v1.20 and expired in v1.24."
+  },
+  {
+    "question": "How can you fix 'AttributeError: module \u2018numpy\u2019 has no attribute \u2018X\u2019' if it's related to deprecated attributes in Numpy?",
+    "answer": "This can be solved by installing a previous version of Numpy, for example, `pip install --no-index 'numpy<1.24'`."
+  },
+  {
+    "question": "What are common causes for a 'ModuleNotFoundError: No module named 'X''?",
+    "answer": "Common causes include the package not being installed or visible to the interpreter, the module name differing from the package name, or a broken virtual environment."
+  },
+  {
+    "question": "What actions should be avoided to prevent 'ModuleNotFoundError' issues?",
+    "answer": "To avoid 'ModuleNotFoundError', do not modify the `PYTHONPATH` or `PATH` environment variables, and do not load a module while a virtual environment is activated (activate the virtual environment only after loading all required modules)."
+  },
+  {
+    "question": "What steps should be taken when encountering a 'ModuleNotFoundError'?",
+    "answer": "First, ensure you followed the advice on avoiding `PYTHONPATH`/`PATH` modifications and module loading order. Then, make sure the package is installed (`pip list`), double-check the module name (case/underscores), and ensure the module is imported at the correct level. If in doubt, start over with a new virtual environment."
+  },
+  {
+    "question": "What does 'ImportError: numpy.core.multiarray failed to import' signify?",
+    "answer": "This error indicates an incompatible version of Numpy is installed or being used, and a compatible version must be installed."
+  },
+  {
+    "question": "How can you resolve 'ImportError: numpy.core.multiarray failed to import' caused by an incompatible Numpy version?",
+    "answer": "You must install a compatible version of Numpy. If the issue is due to a wheel built with Numpy 1.x but installed with 2.x, install a lower version using `pip install --no-index 'numpy<2.0'`."
+  },
+  {
+    "question": "What significant change in Numpy can cause `ImportError: numpy.core.multiarray failed to import`?",
+    "answer": "The release of Numpy 2.0, which breaks the ABI (Application Binary Interface), is a significant change that can cause this `ImportError`."
+  }
+]

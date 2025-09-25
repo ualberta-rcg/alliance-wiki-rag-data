@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What are the primary advantages of using tape as a storage medium for /nearline?",
+    "answer": "Tape as a storage medium offers a lower cost per unit of data stored, the ability to easily expand the volume of data by buying more tapes, and effectively zero energy consumption per unit of data stored."
+  },
+  {
+    "question": "How does using /nearline for inactive data benefit the /project filesystem?",
+    "answer": "Keeping inactive data off of /project reduces the load on it and improves its performance, while also allowing for much greater volumes of storage on /nearline."
+  },
+  {
+    "question": "What is the initial state of a file after it is first copied to /nearline?",
+    "answer": "When a file is first copied to (or created on) /nearline, it exists only on disk, not tape."
+  },
+  {
+    "question": "How long does it typically take for a file on /nearline to be copied to tape?",
+    "answer": "After a period on the order of a day, and if the file meets certain criteria, the system will copy the file to tape, at which stage it will be on both disk and tape."
+  },
+  {
+    "question": "What happens to the disk copy of a file on /nearline after it has been archived to tape?",
+    "answer": "After a further period, the disk copy may be deleted, and the file will then exist only on tape."
+  },
+  {
+    "question": "What does it mean for a file to be 'virtualized' on /nearline?",
+    "answer": "A file is 'virtualized' when it has been moved entirely to tape, meaning it still appears in the directory listing but is no longer stored on disk."
+  },
+  {
+    "question": "What is the consequence of trying to read a virtualized file from /nearline?",
+    "answer": "When a virtualized file is read, it is copied from tape back to disk, and the process trying to read the file will block during this time, which can take from less than a minute to over an hour depending on file size and system demand."
+  },
+  {
+    "question": "Why should users expect longer transfer times when moving data from /nearline?",
+    "answer": "Tape access is relatively slow, so each file restoration can hang the transfer for a few seconds to a few minutes when data is automatically restored to disk upon reading, leading to longer transfer times."
+  },
+  {
+    "question": "What command can be used on some clusters to get an overview of the state of all files saved on /nearline?",
+    "answer": "On some clusters, the command `diskusage_report --nearline --per_user --all_users` can be used to get an overview of the state of files on /nearline."
+  },
+  {
+    "question": "What do the different 'Location' states indicate in a disk usage report for /nearline?",
+    "answer": "The 'Location' states indicate: 'On disk and tape' (data available on disk), 'Modified, will be archived again' (newest version on disk), 'Archiving in progress' (data being copied/moved to tape), and 'On tape' (data only on tape)."
+  },
+  {
+    "question": "How can you determine whether a given file has been moved to tape or is still on disk?",
+    "answer": "You can use the `lfs hsm_state <FILE>` command to determine whether a given file has been moved to tape or is still on disk."
+  },
+  {
+    "question": "What `lfs hsm_state` output indicates that a file is only on disk?",
+    "answer": "The output `<FILE>: (0x00000000)` from `lfs hsm_state <FILE>` indicates that the file is only on disk."
+  },
+  {
+    "question": "How do you know if a file is currently being copied to tape using `lfs hsm_state`?",
+    "answer": "The `lfs hsm_state` output `<FILE>: [...]: exists, [...]` signifies that the file is in progress of being copied to tape."
+  },
+  {
+    "question": "What `lfs hsm_state` output shows that a file is on tape but no longer on disk?",
+    "answer": "The output `<FILE>: [...]: released exists archived, [...]` from `lfs hsm_state <FILE>` indicates that the file is on tape but no longer on disk, and will incur a lag when opened."
+  },
+  {
+    "question": "How can a user force a file to be recalled from tape without actually reading it?",
+    "answer": "A user can explicitly force a file to be recalled from tape without actually reading it by using the command `lfs hsm_restore <FILE>`."
+  },
+  {
+    "question": "Where is /nearline accessible on the B\u00e9luga cluster?",
+    "answer": "On the B\u00e9luga cluster, /nearline is only accessible as a directory on login nodes and on Data Transfer Nodes (DTNs)."
+  },
+  {
+    "question": "What is the typical timeline for files placed in `~/nearline/PROJECT` on B\u00e9luga to be virtualized on tape?",
+    "answer": "Files placed in `~/nearline/PROJECT` on B\u00e9luga will be copied onto tape after about 24 hours. If the file remains unchanged for another 24 hours, the disk copy will be removed, making the file virtualized on tape."
+  },
+  {
+    "question": "What happens to the tape copy if a file is accidentally or deliberately deleted from `~/nearline` on B\u00e9luga?",
+    "answer": "If a file is accidentally (or deliberately) deleted from `~/nearline` on B\u00e9luga, the tape copy will be retained for up to 60 days."
+  },
+  {
+    "question": "How do you restore a deleted file from /nearline on B\u00e9luga?",
+    "answer": "To restore a deleted file from `~/nearline` on B\u00e9luga, you need to contact technical support with the full path for the file(s) and the desired version by date."
+  },
+  {
+    "question": "What is a recommended practice on B\u00e9luga to help with potential file restoration from /nearline?",
+    "answer": "It is important to retain a copy of the complete directory structure of your /nearline space; for example, you can run the command `ls -R > ~/nearline_contents.txt` from the `~/nearline/PROJECT` directory."
+  }
+]

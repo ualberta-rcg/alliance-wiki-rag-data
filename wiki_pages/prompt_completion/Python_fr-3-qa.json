@@ -1,0 +1,38 @@
+[
+  {
+    "question": "Why can the launching of software and loading of libraries be slow on parallel file systems?",
+    "answer": "Parallel file systems are very efficient for reading or writing large data portions but not for intensive use of small files, which can cause slowdowns when launching software and loading libraries, especially with Python and virtual environments."
+  },
+  {
+    "question": "How can one mitigate the slowdown experienced when launching Python and virtual environments for single-node tasks?",
+    "answer": "To counter this type of slowdown, particularly for single-node Python tasks, you can create your virtual environment inside your task using the compute node's local disk."
+  },
+  {
+    "question": "Is it efficient to recreate a virtual environment for each task?",
+    "answer": "While it may seem unreasonable to recreate your environment for each task, it is often faster and more efficient than using the parallel file system."
+  },
+  {
+    "question": "Where should a virtualenv be created when a task utilizes multiple nodes?",
+    "answer": "A virtualenv must be created locally on each node used by the task since virtualenv access is per-node."
+  },
+  {
+    "question": "What is an example SLURM script for creating a virtual environment within a task?",
+    "answer": "An example script named `submit_venv.sh` includes: `module load python/3.10`, `virtualenv --no-download $SLURM_TMPDIR/env`, `source $SLURM_TMPDIR/env/bin/activate`, `pip install --no-index --upgrade pip`, `pip install --no-index -r requirements.txt`, followed by the Python script execution."
+  },
+  {
+    "question": "How do you generate a `requirements.txt` file for a Python virtual environment, for example, for TensorFlow?",
+    "answer": "To create a `requirements.txt` file, for instance for TensorFlow, one can load Python 3.10, create a temporary virtual environment, activate it, upgrade pip, install TensorFlow, then run `pip freeze --local > requirements.txt`, deactivate the environment, and remove the temporary directory."
+  },
+  {
+    "question": "What is the purpose of the `requirements.txt` file in the context of creating virtual environments within tasks?",
+    "answer": "The `requirements.txt` file ensures that your virtual environment can be reproduced for other tasks."
+  },
+  {
+    "question": "What is a prerequisite for all packages needed when creating a virtual environment within a task using the described directives?",
+    "answer": "The directives require that all necessary packages are available as Python wheels provided by the system."
+  },
+  {
+    "question": "What options are available if a needed package is not provided as a Python wheel?",
+    "answer": "If a needed package is not available as a Python wheel, you can pre-download it, or you can request technical support to have the wheels provided."
+  }
+]

@@ -1,0 +1,70 @@
+[
+  {
+    "question": "How can I find detailed information about a completed Slurm job?",
+    "answer": "You can get detailed information about a completed job using the `sacct` command, typically with the job ID: `$ sacct -j <jobid>`."
+  },
+  {
+    "question": "How do I specify which fields `sacct` should display for a completed job?",
+    "answer": "You can control what `sacct` prints by using the `--format` option, for example: `$ sacct -j <jobid> --format=JobID,JobName,MaxRSS,Elapsed`."
+  },
+  {
+    "question": "What do the `.bat+` and `.ext+` records in `sacct` output represent?",
+    "answer": "The `.bat+` record (batch step) represents your submission script, which is where the main part of the work and resource consumption typically occur. The `.ext+` record (extern step) refers to prologue and epilogue and usually does not consume significant resources."
+  },
+  {
+    "question": "When would a `.0` step appear in `sacct` output?",
+    "answer": "If you use `srun` in your submission script, that would create a `.0` step which would consume most of the resources."
+  },
+  {
+    "question": "How do I see all records for a job if it was restarted due to a node failure?",
+    "answer": "If a node fails and a job is restarted, `sacct` normally shows only the record for the last run. To see all records related to a given job, add the `--duplicates` option."
+  },
+  {
+    "question": "How can I determine the maximum memory a completed job utilized?",
+    "answer": "You can determine how much memory a job needed by using the `MaxRSS` accounting field with `sacct`. This value will be the largest resident set size for any of the tasks."
+  },
+  {
+    "question": "What command provides similar information to `sacct` but for a running job?",
+    "answer": "The `sstat` command works on a running job much the same way that `sacct` works on a completed job."
+  },
+  {
+    "question": "Why might I want to connect to a node where my job is running?",
+    "answer": "You might want to connect to the node running a job to execute new processes there for troubleshooting or to monitor the job's progress."
+  },
+  {
+    "question": "How can I monitor GPU usage on a compute node assigned to my `sbatch` job?",
+    "answer": "You can monitor GPU usage by running `nvidia-smi` using `srun` on the node assigned to your job, for example: `$ srun --jobid 123456 --pty watch -n 30 nvidia-smi`."
+  },
+  {
+    "question": "How can I launch multiple monitoring commands like `htop` and `nvidia-smi` on a running `sbatch` job's node?",
+    "answer": "You can launch multiple monitoring commands using `tmux` with `srun`, for example: `$ srun --jobid 123456 --pty tmux new-session -d 'htop -u $USER' \\; split-window -h 'watch nvidia-smi' \\; attach`."
+  },
+  {
+    "question": "What considerations should I keep in mind when launching processes with `srun` on a node where my job is running?",
+    "answer": "You should be careful not to launch processes that would use a significant portion of the resources allocated for the job, as using too much memory might kill the job, or too many CPU cycles will slow it down."
+  },
+  {
+    "question": "Can `srun --jobid` be used to monitor an interactive job?",
+    "answer": "No, the `srun --jobid` commands only work to monitor a job submitted with `sbatch`. To monitor an interactive job, you should create multiple panes with `tmux` and start each process in its own pane."
+  },
+  {
+    "question": "How do I cancel a specific Slurm job?",
+    "answer": "Use `scancel` with the job ID to cancel a job, for example: `$ scancel <jobid>`."
+  },
+  {
+    "question": "How can I cancel all my Slurm jobs?",
+    "answer": "You can cancel all your jobs using the command: `$ scancel -u $USER`."
+  },
+  {
+    "question": "How do I cancel only my pending Slurm jobs?",
+    "answer": "To cancel only your pending jobs, use the command: `$ scancel -t PENDING -u $USER`."
+  },
+  {
+    "question": "What must an application support if it needs to run for a duration longer than system time limits?",
+    "answer": "If a computation is going to require a long time to complete, the application you are running must support checkpointing, allowing it to save its state to a file and restart from that saved state."
+  },
+  {
+    "question": "What are the two recommended methods for automatically restarting long-running computations?",
+    "answer": "The two recommended methods for automatic restarting are using SLURM job arrays and resubmitting from the end of the job script."
+  }
+]

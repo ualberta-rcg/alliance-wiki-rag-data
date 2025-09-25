@@ -1,0 +1,102 @@
+[
+  {
+    "question": "What is `SLURM_TMPDIR`?",
+    "answer": "`SLURM_TMPDIR` is an environment variable that stores the full path name of a temporary directory created by Slurm on each node assigned to a job."
+  },
+  {
+    "question": "When is the temporary directory for `SLURM_TMPDIR` created?",
+    "answer": "Slurm creates a temporary directory on each node assigned to a job when the job starts, and its path is then set in the `SLURM_TMPDIR` environment variable."
+  },
+  {
+    "question": "What is the primary advantage of using `SLURM_TMPDIR` for I/O operations?",
+    "answer": "The primary advantage is that I/O to `SLURM_TMPDIR` is almost always faster than I/O to network storage (/project, /scratch, or /home) because it resides on local disk."
+  },
+  {
+    "question": "For what type of I/O transactions is local disk, like `SLURM_TMPDIR`, better than network storage?",
+    "answer": "Local disk is specifically better for frequent small I/O transactions compared to network storage."
+  },
+  {
+    "question": "How can using `SLURM_TMPDIR` affect job runtime?",
+    "answer": "Any job doing a lot of input and output may expect to run more quickly if it uses `$SLURM_TMPDIR` instead of network storage."
+  },
+  {
+    "question": "What makes `SLURM_TMPDIR` more complex to use compared to network storage?",
+    "answer": "The temporary nature of `SLURM_TMPDIR` makes it more complex; input must be copied to it before use, and output must be copied back to network storage before the job ends to preserve it."
+  },
+  {
+    "question": "How can users copy input data to `SLURM_TMPDIR` in the simplest case?",
+    "answer": "In the simplest case, users can copy data to `SLURM_TMPDIR` using `cp` or `rsync`, for example: `cp /project/def-someone/you/input.files.* $SLURM_TMPDIR/`."
+  },
+  {
+    "question": "When might a simple `cp` or `rsync` command not be sufficient for copying input to `SLURM_TMPDIR`?",
+    "answer": "A simple `cp` or `rsync` might not work if the input data is too large or if it must be read by processes on different nodes."
+  },
+  {
+    "question": "Why is `SLURM_TMPDIR` recommended for creating Python virtual environments within jobs?",
+    "answer": "Using an application in a Python virtual environment generates a large number of small I/O transactions, so creating virtual environments inside jobs using `SLURM_TMPDIR` is recommended for better performance."
+  },
+  {
+    "question": "What must be done with output data from `SLURM_TMPDIR` before a job ends?",
+    "answer": "Output data must be copied from `SLURM_TMPDIR` back to some permanent network storage before the job ends to preserve it."
+  },
+  {
+    "question": "What are three ways to address the issue of output not being preserved if a job times out before copying from `SLURM_TMPDIR`?",
+    "answer": "The three ways are: requesting enough runtime, writing checkpoints to network storage, or writing a signal trapping function."
+  },
+  {
+    "question": "What is the purpose of a signal trapping function with `SLURM_TMPDIR`?",
+    "answer": "A signal trapping function allows Slurm to send a signal to a job shortly before its runtime expires, triggering the job to copy output from `SLURM_TMPDIR` back to network storage."
+  },
+  {
+    "question": "When is signal trapping particularly useful for managing output from `SLURM_TMPDIR`?",
+    "answer": "Signal trapping is useful if the runtime estimate is uncertain or if you are chaining together several Slurm jobs to complete a long calculation."
+  },
+  {
+    "question": "What are the limitations of using signal trapping to preserve `SLURM_TMPDIR` contents?",
+    "answer": "Signal trapping will not preserve the contents of `SLURM_TMPDIR` in the case of a node failure or certain malfunctions of the network file system."
+  },
+  {
+    "question": "How do you copy one or more files to the `SLURM_TMPDIR` directory on every node in a multinode job?",
+    "answer": "To copy files on every node, use the command: `srun --ntasks=$SLURM_NNODES --ntasks-per-node=1 cp file [files...] $SLURM_TMPDIR`."
+  },
+  {
+    "question": "How do you extract a ZIP archive to `SLURM_TMPDIR` on every node in a multinode job?",
+    "answer": "To extract a ZIP archive on every node, use the command: `srun --ntasks=$SLURM_NNODES --ntasks-per-node=1 unzip archive.zip -d $SLURM_TMPDIR`."
+  },
+  {
+    "question": "How do you extract a Tarball archive to `SLURM_TMPDIR` on every node in a multinode job?",
+    "answer": "To extract a Tarball archive on every node, use the command: `srun --ntasks=$SLURM_NNODES --ntasks-per-node=1 tar -xvf archive.tar.gz -C $SLURM_TMPDIR`."
+  },
+  {
+    "question": "How is `SLURM_TMPDIR` implemented at Niagara, and what limits its available space?",
+    "answer": "At Niagara, `SLURM_TMPDIR` is implemented as a RAMdisk, so the amount of space available is limited by the memory on the node, less the RAM used by the application."
+  },
+  {
+    "question": "How does the available space in `SLURM_TMPDIR` vary on general-purpose clusters?",
+    "answer": "On general-purpose clusters, the amount of space available in `SLURM_TMPDIR` depends on the specific cluster and the node to which your job is assigned."
+  },
+  {
+    "question": "What is the available space in `SLURM_TMPDIR` on B\u00e9luga's smallest nodes?",
+    "answer": "On B\u00e9luga's smallest nodes, 370G of space is available in `SLURM_TMPDIR`."
+  },
+  {
+    "question": "What is the available space in `SLURM_TMPDIR` on Cedar's smallest nodes?",
+    "answer": "On Cedar's smallest nodes, 840G of space is available in `SLURM_TMPDIR`."
+  },
+  {
+    "question": "What is the available space in `SLURM_TMPDIR` on Graham's smallest nodes?",
+    "answer": "On Graham's smallest nodes, 750G of space is available in `SLURM_TMPDIR`."
+  },
+  {
+    "question": "What is the available space in `SLURM_TMPDIR` on Narval's smallest nodes?",
+    "answer": "On Narval's smallest nodes, 800G of space is available in `SLURM_TMPDIR`."
+  },
+  {
+    "question": "If a job reserves whole nodes, how much `SLURM_TMPDIR` space can be assumed?",
+    "answer": "If a job reserves whole nodes, users can reasonably assume that the amount of space listed for the smallest node in the cluster table is available in `SLURM_TMPDIR` on each node."
+  },
+  {
+    "question": "How can `SLURM_TMPDIR` space be affected if a job requests less than a whole node?",
+    "answer": "If a job requests less than a whole node, other jobs may also write to the same filesystem (though a different directory!), potentially reducing the space available to your job."
+  }
+]

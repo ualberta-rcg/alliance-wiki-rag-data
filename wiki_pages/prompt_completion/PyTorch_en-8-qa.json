@@ -1,0 +1,42 @@
+[
+  {
+    "question": "How do you configure a PyTorch Lightning Trainer for multi-GPU training on a single node?",
+    "answer": "To configure a PyTorch Lightning Trainer for multi-GPU training on a single node, you would initialize it with `accelerator=\"gpu\"`, specify the number of `devices` (e.g., `2`), set `num_nodes` to `1`, and choose `strategy='ddp'` (DistributedDataParallel)."
+  },
+  {
+    "question": "Why is `enable_progress_bar=False` used in PyTorch Lightning Trainer configuration for cluster jobs?",
+    "answer": "`enable_progress_bar=False` is used to prevent the progress bar from being written to the logs, as frequent updates can cause issues in a cluster environment."
+  },
+  {
+    "question": "What is Horovod?",
+    "answer": "Horovod is a distributed deep learning training framework that supports TensorFlow, Keras, PyTorch, and Apache MXNet."
+  },
+  {
+    "question": "What are the advantages of using Horovod for distributed training?",
+    "answer": "Horovod simplifies writing distributed training scripts by abstracting away the direct configuration of process groups and cluster scheduler environment variables, while still allowing users to maintain control over their training code. It also includes distributed optimizers to enhance performance."
+  },
+  {
+    "question": "How is Horovod initialized in a PyTorch script?",
+    "answer": "Horovod is initialized by calling `hvd.init()` at the beginning of the script."
+  },
+  {
+    "question": "How should CUDA devices be assigned to individual processes when using Horovod?",
+    "answer": "The CUDA device for each process should be set using `torch.cuda.set_device(hvd.local_rank())`."
+  },
+  {
+    "question": "How is data prepared for distributed training with Horovod using a DataLoader?",
+    "answer": "Data is prepared using `torch.utils.data.distributed.DistributedSampler` with `num_replicas=hvd.size()` and `rank=hvd.rank()`. This sampler is then passed to the `DataLoader` to ensure each model replica receives a distinct subset of the training data."
+  },
+  {
+    "question": "How do you make an optimizer distributed with Horovod?",
+    "answer": "A standard PyTorch optimizer is wrapped with `hvd.DistributedOptimizer(optimizer, named_parameters=net.named_parameters())` to make it distributed."
+  },
+  {
+    "question": "What is the purpose of `hvd.broadcast_parameters` in a Horovod training script?",
+    "answer": "`hvd.broadcast_parameters(net.state_dict(), root_rank=0)` is used to ensure all model replicas start with the same initial parameters by broadcasting the state dictionary from the root rank (rank 0) to all other processes."
+  },
+  {
+    "question": "What are the minimum SLURM resource requests for running a Horovod job with 2 GPUs on a single node according to the example?",
+    "answer": "The example SLURM script requests `--nodes 1` (1 node), `--gres=gpu:2` (2 GPUs), `--tasks-per-node=2` (2 processes, 1 per GPU), `--mem=8G` (8GB memory), and `--time=0-03:00` (3 hours runtime)."
+  }
+]

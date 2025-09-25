@@ -1,0 +1,118 @@
+[
+  {
+    "question": "How does the group ownership of newly created files behave in a directory without the `setGID` permission enabled?",
+    "answer": "Without `setGID` enabled, a newly created file in a directory will belong to the user's default group, not necessarily the group of the parent directory."
+  },
+  {
+    "question": "How do you enable the `setGID` permission on a parent directory?",
+    "answer": "You can enable the `setGID` permission on a parent directory using the command `chmod g+s <directory_name>`."
+  },
+  {
+    "question": "What visual indication shows that the `setGID` permission has been enabled on a directory when using `ls -l`?",
+    "answer": "In the `ls -l` output, the `x` permission on the group permissions for the directory will change to an `s`."
+  },
+  {
+    "question": "What is the effect of enabling `setGID` on a directory concerning newly created files?",
+    "answer": "When `setGID` is enabled on a directory, newly created files within that directory will automatically have the same group ownership as the parent directory."
+  },
+  {
+    "question": "What happens when a new directory is created inside a directory that has `setGID` enabled?",
+    "answer": "If a new directory is created inside a directory with `setGID` enabled, it will inherit the same group as the parent folder and also have its own `setGID` enabled."
+  },
+  {
+    "question": "What is the difference between an uppercase 'S' and a lowercase 's' in the `ls -l` output for a `setGID`-enabled directory?",
+    "answer": "A lowercase 's' indicates that `setGID` is enabled and the group also has execute permission. An uppercase 'S' indicates that `setGID` is enabled, but the execute permission has been removed from the directory for the group."
+  },
+  {
+    "question": "What potential issue can arise if a `setGID`-enabled directory shows an uppercase 'S' for group permissions?",
+    "answer": "An uppercase 'S' means execute permissions have been removed, which can lead to unexpected problems, such as others in the group not being able to access files within that directory."
+  },
+  {
+    "question": "Is the `setUID` bit functional on the clusters described in the document?",
+    "answer": "No, the `setUID` bit is completely disabled on these clusters for security reasons."
+  },
+  {
+    "question": "What mechanism defines default filesystem permissions?",
+    "answer": "Default filesystem permissions are defined by something called the `umask`."
+  },
+  {
+    "question": "How can you check the current `umask` value in your session?",
+    "answer": "You can display the current `umask` value in your session by running the command `umask -S`."
+  },
+  {
+    "question": "What does a `umask` output of `u=rwx,g=rx,o=` imply for newly created files?",
+    "answer": "This `umask` output means that, by default, new files will be readable, writable, and executable by the owner, readable and executable by members of the file's group, and inaccessible to other people."
+  },
+  {
+    "question": "Does changing the `umask` affect the permissions of files that already exist?",
+    "answer": "No, the `umask` only applies to new files; changing it does not alter the access permissions of existing files."
+  },
+  {
+    "question": "How can a user set a custom `umask` value?",
+    "answer": "A user can set their own `umask` by calling the command `umask <value>`, either for the current session or by adding it to their `.bashrc` file."
+  },
+  {
+    "question": "Which `umask` value would ensure files are only readable, writable, and executable by the owner?",
+    "answer": "A `umask` value of `077` ensures files are readable, writable, and executable by the owner only."
+  },
+  {
+    "question": "What `umask` value grants read, write, and execute permissions to both the owner and the group?",
+    "answer": "A `umask` value of `007` grants read, write, and execute permissions to the owner and the group."
+  },
+  {
+    "question": "What `umask` value makes files readable and executable by everyone, but writable only by the owner?",
+    "answer": "A `umask` value of `022` makes files readable and executable by everyone, but writable only by the owner."
+  },
+  {
+    "question": "Besides `umask`, what other factors determine who can access a file?",
+    "answer": "Other factors include having execute permission on all directories in the file's path, being a member of the file's group if relying on group permissions, explicit changes via `chmod` after creation, and Access Control Lists (ACLs)."
+  },
+  {
+    "question": "How did the default `umask` on Cedar, B\u00e9luga, and Niagara clusters change on October 16th, 2019?",
+    "answer": "On October 16th, 2019, the default `umask` on Cedar, B\u00e9luga, and Niagara was changed to `027` to match Graham's `umask`, enforcing more restrictive permissions on newly created files."
+  },
+  {
+    "question": "What was the `umask` value on B\u00e9luga and Cedar clusters before the change in summer 2019?",
+    "answer": "The `umask` value on B\u00e9luga and Cedar clusters before the change was `002`."
+  },
+  {
+    "question": "What is the recommended approach for users if their workflow requires more permissive permissions than the default `umask`?",
+    "answer": "Users can change their default `umask` in their `.bashrc` file if more permissive permissions are needed, though the general advice is to keep the default permissions."
+  },
+  {
+    "question": "How can you modify the permissions of existing files to match a new default `umask` where group write and other read/execute permissions are removed?",
+    "answer": "For a single file, use `chmod g-w,o-rx <file>`. For a whole directory recursively, use `chmod -R g-w,o-rx <directory>`."
+  },
+  {
+    "question": "What are Access Control Lists (ACLs) and why are they useful?",
+    "answer": "ACLs are extensions to standard Unix file permissions that allow for more fine-grained control, enabling permissions to be set on a user-by-user basis rather than just for the owner, group, and everyone else."
+  },
+  {
+    "question": "Which two commands are used to manage extended ACL permissions?",
+    "answer": "The two commands used to manage extended ACL permissions are `getfacl` to view them and `setfacl` to modify them."
+  },
+  {
+    "question": "How do you use `setfacl` to grant read and execute permissions to a specific user named `smithj` for a file called `my_script.py`?",
+    "answer": "You use the command `$ setfacl -m u:smithj:rx my_script.py`."
+  },
+  {
+    "question": "When sharing a subdirectory with a single user using `setfacl`, what is the purpose of the `X` attribute?",
+    "answer": "The `X` attribute sets the execute permission only when the item is already executable (like a directory) or if it is a file that already has execute permission. This is important for directories to allow browsing."
+  },
+  {
+    "question": "What two `setfacl` commands are needed to grant read, write, and execute permissions to a user `smithj` for both existing and future files within a subdirectory `/home/<user>/projects/def-<PI>/shared_data`?",
+    "answer": "To set default access rules for new data, use `$ setfacl -d -m u:smithj:rwX /home/<user>/projects/def-<PI>/shared_data`. To set rules for existing data, use `$ setfacl -R -m u:smithj:rwX /home/<user>/projects/def-<PI>/shared_data`."
+  },
+  {
+    "question": "What are the essential requirements for `setfacl` sharing of a subdirectory to function correctly?",
+    "answer": "For `setfacl` sharing to work, the directory must be owned by you, parent directories must allow execute permission to the user you are sharing with (e.g., via `setfacl -m u:smithj:X` or `chmod o+x`), and for project filesystems, collaborators must be provided with a path starting with `/project`, not `/home/<user>/projects`."
+  },
+  {
+    "question": "When sharing a project directory, why is it important to provide collaborators with a path starting with `/project` instead of `/home/<user>/projects`?",
+    "answer": "Collaborators should be given a path starting with `/project` because the `/home/<user>/projects` path contains symbolic links that will not be accessible to collaborators unless they also have access to your home directory."
+  },
+  {
+    "question": "How can you find the physical path that a symbolic link points to when preparing to share a project directory?",
+    "answer": "You can find the physical path a symlink points to by using the `realpath` command, for example, `realpath /home/smithj/projects/def-smithj/shared_data`."
+  }
+]
