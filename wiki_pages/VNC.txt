@@ -66,29 +66,12 @@ To save the settings click OK and then click Connect.  If Connect is not clicked
 = Connect = <!--T:26-->
 
 <!--T:28-->
-Now you need a VNC server to connect to.  This can be either a persistent vncserver running on dedicated VDI nodes which are part of [[Graham]], or a temporary vncserver you start on a cluster compute node.  VNC is not a heavyweight server, so you can certainly run lightweight sessions on cluster login nodes.
-
-== VDI nodes == <!--T:30-->
-
-<!--T:32-->
-[[File:TigerVNC-GrahamDesktop.png|400px|thumb|right|'''gra-vdi.alliancecan.ca''']]
-
-<!--T:34-->
-Graham has two dedicated VDI (aka Virtual Desktop Infrastructure) nodes collectively known as gra-vdi.  These nodes provide a remote desktop environment equipped with accelerated OpenGL.  They are intended for the most demanding and complex interactive graphical tasks.  The VDI nodes share Graham's <code>/home, /project,</code> and <code>/scratch</code> filesystems.  As a result, any data files or directories created on graham by running jobs in the queue will immediately be accessible on gra-vdi for visualization and post-processing purposes without the need to transfer them over.
-
-<!--T:36-->
-To connect to gra-vdi, start VNC viewer (tigervnc) on your laptop and enter <code>VNC server: '''gra-vdi.alliancecan.ca''' or '''gra-vdi3.sharcnet.ca'''</code>. This will bring up a login screen where you can enter your Alliance credentials.  A desktop session will then be started on either gra-vdi3 or gra-vdi4 using a round robin algorithm.
-
-<!--T:179-->
-Note that $SCRATCH on gra-vdi is defined as /local/tmp/$USER whereas on the clusters it is defined as /scratch/$USER.  Similar to the clusters any data left on $SCRATCH on gra-vdi will eventually be deleted since the disc space is limited.  Therefore do not store any files on $SCRATCH or they may disappear in 60days.
-
-<!--T:38-->
-Please keep in mind that gra-vdi is a shared resource and intended for visualization tasks.  If you need to perform long-running 'heavy' computations within an application which uses a GUI (graphical user interface), then log out of gra-vdi and connect to a compute node on any cluster as described in the <b>Compute Nodes</b> section below (or use the new interactive open on demand infrastructure).  Doing so will ensure the memory and CPU resources on gra-vdi are available for others to conduct graphical work without potentially significant continuous performance impacts.
+Now you need a VNC server to connect to, such as a temporary vncserver started on a cluster login or compute node as shown below.
 
 == Login nodes == <!--T:41-->
 
 <!--T:42-->
-You may run a lightweight application (one that does not require much memory, cputime or a gpu since login node limits will apply here) in a remote VNC desktop on a cluster login node.  To do this you must login to a cluster login node:
+You may run lightweight applications (that do not require a gpu) within a remote VNC desktop on a cluster login node (memory and cputime limits apply).  To do this, you must first connect to a cluster login node.  Using nibi cluster for example :
 
 <!--T:163-->
  [<b>laptop</b>:~] ssh nibi.alliancecan.ca
@@ -138,7 +121,7 @@ Now you may exit the login node and your vncserver will continue running until t
  [<b>laptop</b>:~] vncviewer localhost:<span style="Color:red">5905</span>
 
 <!--T:52-->
-Mac or Windows users may optionally click the <i>TigerVNC Viewer</i> application icon on their desktop and enter '''localhost:<span style="Color:red">5905</span>''' in the "Connection Details" dialogue box that appears.  Keep in mind that strict memory and cputime limits apply on cluster login nodes. On Graham, these are 8GB and 1 cpu-hour per process according to <code>ulimit -t -v</code>; other clusters may vary.  If you require more resources, then run your VNC server on a cluster compute node or VDI as described below/above respectively.
+Mac or Windows users may optionally click the <i>TigerVNC Viewer</i> application icon on their desktop and enter '''localhost:<span style="Color:red">5905</span>''' in the "Connection Details" dialogue box that appears.  Keep in mind that strict memory and cputime limits apply on cluster login nodes.  If you require more resources, then start your VNC server on a cluster compute node instead as described in the next section.
 
 == Compute nodes == <!--T:54-->
 

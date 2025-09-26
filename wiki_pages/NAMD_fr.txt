@@ -21,39 +21,38 @@ Pour les tâches exécutées sur plusieurs nœuds, utilisez UCX.
 
 L'information sur l'ordonnanceur Slurm se trouve à la page [[Running jobs/fr|Exécuter des tâches]].
 
+<div class="mw-translate-fuzzy">
 == Tâches séquentielles et tâches multifils == 
 Le script suivant est pour une simulation séquentielle sur un seul cœur. Pour utiliser plus de cœurs, augmentez la valeur de <tt>--cpus-per-task</tt>, sans dépasser le nombre de cœurs disponible sur le nœud.
+</div>
+
 {{File
   |name=serial_namd_job.sh
   |lang="sh"
   |contents=
 #!/bin/bash
 #
-#SBATCH --cpus-per-task=1
-#SBATCH --mem 2048            # memory in Mb, increase as needed    
+#SBATCH --cpus-per-task=8
+#SBATCH --mem 10g            # memory in Mb, increase as needed    
 #SBATCH -o slurm.%N.%j.out    # STDOUT file
 #SBATCH -t 0:05:00            # time (D-HH:MM), increase as needed
 #SBATCH --account=def-specifyaccount
 
-# these are simple examples, please experiment with additional flags to improve your runtimes
-# in particular, adding  +setcpuaffinity  flag may improve performance
-
-# commands for NAMD version 3.0.1
 module load StdEnv/2023  gcc/12.3 namd-multicore/3.0.1
-namd3 +p$SLURM_CPUS_PER_TASK  +idlepoll apoa1.namd
-
-# commands for NAMD version 2.14
-module load StdEnv/2020 namd-multicore/2.14
-namd2 +p$SLURM_CPUS_PER_TASK  +idlepoll apoa1.namd
+namd3 +p$SLURM_CPUS_PER_TASK  +idlepoll +setcpuaffinity stmv.namd
 }}
 
-<span id="Parallel_CPU_jobs"></span>
+<span id="Multi-node_CPU_jobs"></span>
+<div class="mw-translate-fuzzy">
 == Tâches parallèles sur CPU ==
+</div>
 
 
 
+<div class="mw-translate-fuzzy">
 ===Tâches UCX===
 L'exemple suivant utilise 80 processus à raison de 40 processus par nœud sur 2 nœuds et utilise ainsi pleinement les 80 cœurs. Le script  suppose que des nœuds entiers sont utilisés; ainsi, sur Béluga, <code>ntasks-per-node</code> devrait être 40. Les tâches NAMD qui utilisent des nœuds entiers offrent la meilleure performance.
+</div>
 
 {{File
   |name=ucx_namd_job.sh
@@ -62,28 +61,23 @@ L'exemple suivant utilise 80 processus à raison de 40 processus par nœud sur 2
 #!/bin/bash
 #
 #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=40
+#SBATCH --ntasks-per-node=192
 #SBATCH --mem=0            # memory per node, 0 means all memory
 #SBATCH -o slurm.%N.%j.out    # STDOUT
 #SBATCH -t 0:05:00            # time (D-HH:MM)
 #SBATCH --account=def-specifyaccount
 
-# these are simple examples, please experiment with additional flags to improve your runtimes
-# in particular, adding  +setcpuaffinity  flag may improve performance
-
-# commands for NAMD version 3.0.1
 module load StdEnv/2023 gcc/13.3 namd-ucx/3.0.1
-srun --mpi=pmi2 namd3 apoa1.namd
+srun --mpi=pmi2 namd3 stmv.namd
 
-# commands for NAMD version 2.14
-module load StdEnv/2020 namd-ucx/2.14
-srun --mpi=pmi2 namd2 apoa1.namd
 }}
 
 
 
+<div class="mw-translate-fuzzy">
 === Tâches utilisant 1 GPU ===
 Le prochain exemple utilise huit cœurs CPU et un GPU P100 sur un seul nœud.
+</div>
 
 '''Important''' : NAMD 3 offre un nouveau paramètre d’entrée, ce qui dirige plus de calculs vers le GPU. Cela peut améliorer considérablement la performance.
 
@@ -97,38 +91,45 @@ Pour l'utiliser, ajoutez la ligne suivante à votre fichier en entrée&nbsp;:
   |contents=
 #!/bin/bash
 
-#SBATCH --cpus-per-task=8 
-#SBATCH --mem=2048            
+#SBATCH --cpus-per-task=16 
+#SBATCH --mem=10g    
 #SBATCH --time=0:15:00
-#SBATCH --gpus-per-node=p100:1
+#SBATCH --gpus-per-node=h100:1
 #SBATCH --account=def-specifyaccount
-
-# these are simple examples, please experiment with additional flags to improve your runtimes
-# in particular, adding  +setcpuaffinity  flag may improve performance
 
 # commands for NAMD version 3.0.1
 module load StdEnv/2023  gcc/12.3  cuda/12.2 namd-multicore/3.0.1
 namd3 +p$SLURM_CPUS_PER_TASK  +idlepoll stmv.namd
 
-# commands for NAMD version 2.14
-module load StdEnv/2020 cuda/11.0 namd-multicore/2.14
-namd2 +p$SLURM_CPUS_PER_TASK  +idlepoll apoa1.namd
 }}
 
 
+<div class="mw-translate-fuzzy">
 == Tâches utilisant plusieurs GPU ==
 === Tâches UCX avec GPU ===
-Cet exemple est pour Béluga et suppose que des nœuds entiers sont utilisés, ce qui offre une meilleure performance pour les tâches NAMD. L'exemple utilise 8 processus sur 2 nœuds, chaque processus utilisant 10 fils et 1 GPU. Ceci utilise pleinement les nœuds GPU de Béluga qui ont 40 cœurs et 4 GPU par nœud. Remarquez que 1 cœur par tâche est réservé à un fil de communication; il est donc normal que NAMD ne rapporte que 72 cœurs utilisés.  
+Cet exemple est pour Béluga et suppose que des nœuds entiers sont utilisés, ce qui offre une meilleure performance pour les tâches NAMD. L'exemple utilise 8 processus sur 2 nœuds, chaque processus utilisant 10 fils et 1 GPU. Ceci utilise pleinement les nœuds GPU de Béluga qui ont 40 cœurs et 4 GPU par nœud. Remarquez que 1 cœur par tâche est réservé à un fil de communication; il est donc normal que NAMD ne rapporte que 72 cœurs utilisés.
+</div>
+
+This example is for narval and it assumes that full nodes are used, which gives best performance for NAMD jobs. It uses 8 processes in total on 2 nodes, each process(task) using 12 threads and 1 GPU.   This fully utilizes Narval GPU nodes which have 48 cores and 4 GPUs per node.  Note that 1 core per task has to be reserved for a communications thread, so NAMD will report that only 88 cores are being used but this is normal.  
 
 Pour utiliser ce script sur une autre grappe, voyez les caractéristiques des nœuds disponibles sur la grappe et ajustez les options --cpus-per-task et --gpus-per-node en conséquence.
 
+<div class="mw-translate-fuzzy">
 '''NOTE''' : Les versions UCX peuvent être utilisées sur toutes les grappes.
 {{File
   |name=ucx_namd_job.sh
   |lang="sh"
   |contents=
 #!/bin/bash
+</div>
 
+{{File
+  |name=ucx_namd_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+
+<div class="mw-translate-fuzzy">
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=4
 #SBATCH --cpus-per-task=10 # number of threads per task (process)
@@ -136,11 +137,14 @@ Pour utiliser ce script sur une autre grappe, voyez les caractéristiques des n�
 #SBATCH --mem=0            # memory per node, 0 means all memory
 #SBATCH --time=0:15:00
 #SBATCH --account=def-specifyaccount
+</div>
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2020  intel/2020.1.217  cuda/11.0 namd-ucx-smp/2.14
 NUM_PES=$(expr $SLURM_CPUS_PER_TASK - 1 )
 srun --cpus-per-task=$SLURM_CPUS_PER_TASK --mpi=pmi2 namd2 ++ppn $NUM_PES apoa1.namd
 }}
+</div>
 
 
 

@@ -15,6 +15,7 @@ Un serveur JupyterLab devrait toujours se trouver sur un nœud de calcul ou sur 
 
 Si vous recherchez un environnement Jupyter préconfiguré, consultez la page [[Jupyter/fr|Jupyter]].
 
+<span id="Installing_JupyterLab"></span>
 = Installer JupyterLab =
 
 Ces directives installent JupyterLab avec la commande <code>pip</code> dans un
@@ -52,6 +53,7 @@ Ces directives installent JupyterLab avec la commande <code>pip</code> dans un
 }}
 </li>
 </ol>
+<span id="Installing_extensions"></span>
 = Installer des modules d'extension =
 
 Les modules d'extension ajoutent des fonctionnalités et peuvent modifier l'interface utilisateur de JupyterLab. 
@@ -85,8 +87,10 @@ RStudio Server vous permet de développer du code R dans un environnement RStudi
 </ol>
 Toutes les autres étapes de configuration et d'utilisation sont les mêmes. Vous devriez voir une application RStudio sous l'onglet <i>Launcher</i>.
 
+<span id="Using_your_installation"></span>
 = Utiliser votre installation =
 
+<span id="Activating_the_environment"></span>
 == Activer l'environnement ==
 
 Assurez-vous que l'environnement virtuel Python dans lequel vous avez installé JupyterLab est activé. Par exemple, quand vous vous connectez à la grappe, vous devez l'activer à nouveau avec{{Command2
@@ -103,6 +107,7 @@ jupyterlab==3.1.7+computecanada
 jupyterlab-pygments==0.1.2+computecanada
 jupyterlab-server==2.3.0+computecanada
 }}
+<span id="Starting_JupyterLab"></span>
 == Lancer JupyterLab ==
 
 Pour démarrer un serveur JupyterLab, soumettez une tâche interactive avec <code>salloc</code>. Ajustez les paramètres selon vos besoins. Pour plus d'information, voyez [[Running jobs/fr|Exécuter des tâches]].
@@ -122,10 +127,12 @@ Pour démarrer un serveur JupyterLab, soumettez une tâche interactive avec <cod
         http://node_name.int.cluster.computecanada.ca:8888/lab?token=101c3688298e78ab554ef86d93a196deaf5bcd2728fad4eb
      or http://127.0.0.1:8888/lab?token=101c3688298e78ab554ef86d93a196deaf5bcd2728fad4eb
 }}
+<span id="Connecting_to_JupyterLab"></span>
 == Se connecter à JupyterLab ==
 
 Pour avoir accès au serveur JupyterLab dans un nœud de calcul à partir de votre navigateur web, vous devez créer un [[SSH tunnelling/fr|tunnel SSH]] de votre ordinateur vers la grappe puisque les nœuds de calcul ne sont pas accessibles directement à partir de l'internet.
 
+<span id="From_Linux_or_macOS"></span>
 === Sous Linux ou macOS ===
 
 Nous recommandons l'utilisation du paquet Python [https://sshuttle.readthedocs.io sshuttle].
@@ -133,37 +140,40 @@ Nous recommandons l'utilisation du paquet Python [https://sshuttle.readthedocs.i
 Sur votre ordinateur, ouvrez une nouvelle fenêtre de terminal et créez le tunnel SSH avec la commande <code>sshuttle</code> où vous remplacerez <code><username></code> par le nom d'utilisateur pour votre compte avec l'Alliance et <code><cluster></code> par la grappe sur laquelle vous avez lancé JupyterLab.
 {{Command2
 |prompt=[name@local ~]$
-|sshuttle --dns -Nr <username>@<cluster>.computecanada.ca
+|sshuttle --dns -Nr <username>@<cluster>.alliancecan.ca
 }}
 Copiez et collez la première adresse HTTP dans votre navigateur web; dans l'exemple <code>salloc</code> ci-dessus, ce serait
 <pre>
-http://node_name.int.cluster.computecanada.ca:8888/lab?token=101c3688298e78ab554ef86d93a196deaf5bcd2728fad4eb
+http://node_name.int.cluster.alliancecan.ca:8888/lab?token=101c3688298e78ab554ef86d93a196deaf5bcd2728fad4eb
 </pre>
+<span id="From_Windows"></span>
 === Sous Windows ===
 
 Pour créer un [[SSH tunnelling/fr|tunnel SSH]] à partir de Windows, utilisez [[Connecting_with_MobaXTerm/fr|MobaXTerm]] ou n’importe quel terminal qui supporte la commande <code>ssh</code>.
 
 <ol>
 <li>Une fois que JupyterLab est lancé sur un nœud de calcul (voir [[Advanced Jupyter configuration/fr#Lancer_JupyterLab|Lancer JupyterLab]]), vous pouvez extraire le <code>hostname:port</code> et le <code>token</code> de la première adresse HTTP fournie, par exemple<pre>
-http://node_name.int.cluster.computecanada.ca:8888/lab?token=101c368829...2728fad4eb
+http://node_name.int.cluster.alliancecan.ca:8888/lab?token=101c368829...2728fad4eb
        └────────────────────┬────────────────────┘           └──────────┬──────────┘
                       hostname:port                                   token
 </pre>
 </li><li>Ouvrez un nouvel onglet <i>Terminal</i> dans MobaXTerm. Dans la commande suivante, remplacez <code><hostname:port></code> par la valeur correspondante (voir l'image ci-dessus); remplacez <code><username></code> par le nom d'utilisateur pour votre compte avec l'Alliance; remplacez <code><cluster></code> par la grappe sur laquelle vous avez lancé JupyterLab.{{Command2
 |prompt=[name@local ~]$
-|ssh -L 8888:<hostname:port> <username>@<cluster>.computecanada.ca
+|ssh -L 8888:<hostname:port> <username>@<cluster>.alliancecan.ca
 }}
 </li><li>Ouvrez votre navigateur web et allez à l'adresse suivante, où <code><token></code> doit être remplacé par la valeur alphanumérique provenant de l'adresse illustrée ci-dessus.<pre>
 http://localhost:8888/?token=<token>
 </pre>
 </li>
 </ol>
+<span id="Shutting_down_JupyterLab"></span>
 == Fermer JupyterLab ==
 
 Pour arrêter le serveur JupyterLab avant la fin du temps d'exécution, appuyez deux fois sur <b>CTRL-C</b> dans le terminal où la tâche interactive a été lancée.
 
 Si vous avez utilisé MobaXterm pour créer un tunnel SSH, appuyez sur <b>Ctrl-D</b> pour fermer le tunnel.
 
+<span id="Adding_kernels"></span>
 = Ajouter des noyaux =
 
 Il est possible d'ajouter des noyaux pour d'autres langages de programmation, pour une version différente de Python ou pour un environnement virtuel persistant qui a tous les paquets et bibliothèques nécessaires à votre projet. Pour plus d'information, voyez [http://jupyter-client.readthedocs.io/en/latest/kernels.html Making kernels for Jupyter].
@@ -174,6 +184,7 @@ L'installation d'un nouveau noyau se fait en deux étapes&nbsp;:
 
 Les prochaines sections présentent des exemples de procédures d'installation d'un noyau.
 
+<span id="Julia_Kernel"></span>
 == Noyau Julia ==
 
 Prérequis :
@@ -196,6 +207,7 @@ Une fois que l'environnement virtuel Python est disponible et activé, vous pouv
 
 Pour plus d'information, consultez la [https://github.com/JuliaLang/IJulia.jl documentation sur IJulia].
 
+<span id="Installing_more_Julia_packages"></span>
 === Installer d'autres paquets Julia ===
 
 Comme pour la procédure d'installation ci-dessus, il faut installer les paquets Julia à partir d'un nœud de connexion, mais l'environnement virtuel Python peut rester désactivé.
@@ -210,6 +222,7 @@ Comme pour la procédure d'installation ci-dessus, il faut installer les paquets
 </li><li>Les paquets Julia nouvellement installés devraient être utilisés dans un notebook exécuté par le noyau Julia.</li>
 </ol>
 
+<span id="Python_kernel"></span>
 == Noyau Python ==
 
 Dans un terminal avec une session active sur un serveur distant,
@@ -253,6 +266,7 @@ La configuration la plus simple de Jupyter dans un nouvel environnement virtuel 
 
 Pour plus d'information, consultez la [http://ipython.readthedocs.io/en/stable/install/kernel_install.html documentation IPython kernel].
 
+<span id="Installing_more_Python_libraries"></span>
 === Installer d'autres bibliothèques Python ===
 
 Selon l'environnement virtuel Python configuré dans la section précédente&nbsp;:
@@ -265,6 +279,7 @@ Selon l'environnement virtuel Python configuré dans la section précédente&nbs
 </li><li>Vous pouvez maintenant importer les bibliothèques Python dans un notebook exécuté par le <code>Python 3.x Kernel</code>.</li>
 </ol>
 
+<span id="R_Kernel"></span>
 ==  Noyau R ==
 
 Prérequis :
@@ -296,6 +311,7 @@ Une fois que l'environnement virtuel Python est disponible et activé, vous pouv
 
 Pour plus d'information, consultez la [https://irkernel.github.io/docs/ documentation IRkernel].
 
+<span id="Installing_more_R_packages"></span>
 === Installer d'autres paquets R ===
 
 L'installation de paquets R ne peut se faire à partir de notebooks parce qu'il n'y a pas d'accès à CRAN. Comme dans la procédure d'installation ci-dessus, il faut installer les paquets R dans un nœud de connexion, mais l'environnement virtuel Python peut rester désactivé.

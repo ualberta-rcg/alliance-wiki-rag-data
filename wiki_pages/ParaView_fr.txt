@@ -1,201 +1,247 @@
+{{draft}}
 <languages />
 [[Category:Software]]
 __FORCETOC__
-<span id="Client-server_visualization"></span>
-= Visualisation client-serveur =
 
-'''NOTE 1 :''' Une option importante des préférences est le seuil défini avec ''Render View -> Remote/Parallel Rendering Options -> Remote Render Threshold.'' Avec la valeur par défaut (20Mo) ou une autre valeur semblable, les petites tâches de rendu s'effectueront avec le GPU de votre ordinateur; la rotation à l'aide de la souris sera rapide, mais toute tâche quelque peu intensive (sous 20Mo) sera dirigée vers votre ordinateur et dépendant de la connexion, la visualisation pourrait être lente. Avec 0Mo, tous les rendus s'effectueront à distance; les ressources de la grappe feront tout le travail, ce qui est une bonne chose pour les traitements intensifs, mais moins souhaitable pour l'aspect interactif. Expérimentez avec différentes valeurs pour trouver un seuil acceptable.
+= Remote visualization with ParaView on the clusters =
 
-'''NOTE 2 :''' La même version majeure doit être installée sur le client local et sur l'ordinateur hôte à distance; dans le cas contraire, certaines incompatibilités peuvent empêcher la connexion client-serveur. Par exemple, pour utiliser la version 5.13.1 du serveur ParaView sur nos grappes, vous avez besoin de la version client 5.13.x sur votre ordinateur.
+== Introduction ==
 
-Sélectionnez l'onglet approprié.
+This page describes remote visualization of your dataset residing on one of the Alliance's HPC clusters. Your workflow will fall into one of these scenarios:
+
+# If your dataset is only a few GBs (either the entire dataset, if no time dependency, or each timestep in a time-dependent simulation), you can visualize it interactively using a small number of CPU cores. In this workflow, you start a remote desktop session -- through JupyterHub or Open OnDemand, depending on the cluster -- and run ParaView interactively inside it. For more details, see the "Small-scale interactive visualization" tab.
+# If you want to interactively visualize a larger dataset, we recommend using a client-server setup, where the ParaView client runs on your computer, and the server runs in parallel inside a Slurm job on the HPC cluster. What counts as "large" depends on the cluster: on Trillium, only whole-node jobs in multiples of 192 cores are allowed, so your dataset should be 50–100 GB to utilize all 192 cores efficiently. On other clusters (Rorqual, Nibi, Fir, Narval), you can schedule by core, making it possible to visualize much smaller datasets -- even on a single core -- though using more cores in parallel speeds up rendering. This setup is more complex, so JupyterHub or Open OnDemand is generally recommended for smaller datasets before attempting a client-server configuration. For more details, see the "Large-scale interactive visualization" tab.
+# Ideally, all production visualizations -- such as generating 1,000 frames for a movie -- should be scripted and run as batch, off-screen jobs on the clusters, without opening interactive windows and rendering directly to files. The GUI workflows described in Tab 1 or 2 should be considered as interactive steps to set up your visualization and save it as a ParaView Python script, which can then be executed as a batch job on the cluster, either in serial or, more commonly, in parallel. For more details, see the "Batch production visualization" tab.
+
+== Note on GPU rendering ==
+
+In all cases, please do not use the clusters' H100 GPUs for visualization, as they are not optimized for graphics rendering. While H100 cards can run OpenGL and Vulkan applications, they utilize only 2 of the 66 on-board thread controllers (this number may vary), resulting in roughly 3% GPU utilization. This not only leads to poor cluster utilization but also renders at speeds comparable to a mid-range laptop GPU. Note that MIGs (static GPU partitions) cannot run graphics APIs such as OpenGL or Vulkan.
+
+If GPU rendering is absolutely necessary -- although this should only be done in very specific corner cases -- use Nibi's AMD MI300A nodes or older NVIDIA GPUs (e.g., T4) where available. We plan to benchmark and document all non-H100 rendering options on this page.
+
+== Workflows ==
+
+Please use the tabs below to select your visualization workflow type.
 
 <tabs>
+<tab name="Small-scale interactive">
 
-<tab name="Fir, Nibi, Rorqual, Narval">
-== Visualisation client-serveur avec Fir, Nibi, Rorqual et Narval ==
+This tab describes interactive visualization through remote desktop via JupyterHub and Open OnDemand. If you are on [[Fir]], [[Rorqual/en|Rorqual]] or [[Narval/en|Narval]], please see one of the JupyterLab sections below. If you are on [[Nibi]] or [[Trillium]], please scroll down to one of the Open OnDemand sections below.
 
-Sur [[Fir/fr|Fir]], [[Nibi/fr|Nibi]], [[Rorqual]] et [[Narval]], les rendus en mode client-serveur peuvent s’effectuer avec un CPU (par le logiciel) et un GPU (par le matériel). Étant donné que le rendu avec GPU est quelque peu compliqué, nous recommandons de n’utiliser que des CPU et d’allouer autant de cœurs qu’il faut. 
+== Single-core visualization via JupyterLab ==
 
-Le moyen le plus facile d’estimer le nombre de cœurs est de diviser par ~3.5Go/cœur la quantité de mémoire que vous croyez nécessaire. Par exemple, 40Go de données (chargés en bloc en une seule étape) nécessiterait au moins 12 cœurs seulement pour contenir les données. 
+On [[Fir]], [[Rorqual/en|Rorqual]], or [[Narval/en|Narval]], you can launch a JupyterLab instance through a portal:
 
-Puisque les rendus par le logiciel exigent beaucoup du CPU, nous recommandons de ne pas dépasser 4Go/cœur. Il faut aussi allouer une certaine quantité de mémoire pour les filtres et le traitement des données (comme exemple, la conversion d’un jeu de données structuré en un jeu non structuré exigerait environ trois fois plus de mémoire); si vos tâches le permettent, vous pourriez commencer avec 32 ou 64 cœurs. Si le serveur ParaView s’arrête en cours d’exécution, vous devrez augmenter le nombre de cœurs.
+# Sign in https://jupyterhub.fir.alliancecan.ca (Fir), or https://jupyterhub.rorqual.alliancecan.ca (Rorqual), or https://jupyterhub.narval.alliancecan.ca (Narval) with your Alliance account.
+# In the job submission form:
+#* under Account select one of the CPU accounts (do not use GPUs!)
+#* under GPU configuration select None
+#* under Number of Cores, select 1
+#* set your required Time, Memory
+#* under User interface select JupyterLab
+# Wait for the Slurm job to start and for the JupyterLab dashboard to appear in your browser.
 
-<span id="CPU-based_visualization"></span>
-=== Avec CPU ===
+After this, you have two options. One is:
 
-ParaView peut aussi être utilisé sur le CPU d'une grappe. Dans certains cas, les librairies pour CPU modernes, par exemple OSPray ou OpenSWR, offrent une performance comparable à celle obtenue avec un GPU. Aussi, étant donné que le serveur ParaView utilise MPI en mémoire distribuée, les très grands jeux de données peuvent être traités en parallèle avec plusieurs cœurs CPU sur un seul nœud ou sur plusieurs nœuds distribués.
-
-1. Sur votre ordinateur, installez la même version de ParaView que celle présente sur la grappe que vous utiliserez; connectez-vous à Fir ou Nibi et lancez une tâche interactive en série avec un CPU.
-
-{{Command|salloc --time{{=}}1:00:0 --ntasks{{=}}1 --mem-per-cpu{{=}}3600 --account{{=}}def-someprof}}
-
-:La tâche devrait commencer automatiquement sur un des nœuds interactif CPU.
-
-2. À l'invite dans votre tâche, chargez le module ParaView et  démarrez le serveur.
-
-{{Command|module load paraview/5.13.1}}
-et ensuite
-{{Command|pvserver --force-offscreen-rendering
-|result=
-Waiting for client...
-Connection URL: cs://fc30107:11111
-Accepting connection(s): fc30107:11111
-}}
-
-:Attendez que le serveur soit prêt à accepter la connexion client.
-
-3. Prenez note du nœud (ici fc30107) et du port (habituellement 11111); dans un autre terminal sur votre ordinateur Mac/Linux (sous Windows, utilisez un émulateur de terminal), liez le port 11111 à votre ordinateur et le même port au nœud de calcul (assurez-vous d'utiliser le bon nœud de calcul).
-
-{{Command|prompt=[name@computer $]|ssh <username>@fir.alliancecan.ca -L 11111:fc30107:11111}}
-
-4. Sur votre ordinateur, démarrez ParaView; allez à ''File -> Connect'' (ou cliquez sur le bouton vert ''Connect'' dans la barre d'outils); cliquez sur ''Add Server''. Pointez ParaView à votre port local 11111 pour avoir des paramètres semblables à ''name = fir, server type = Client/Server, host = localhost, port = 11111''; cliquez sur ''Configure''; cliquez sur ''Manual'' puis sur ''Save''.
-:Une fois que la connexion est ajoutée à la configuration, sélectionnez le serveur dans la liste affichée et cliquez sur ''Connect''. Dans la première fenêtre de terminal, le message  ''Accepting connection ...'' se lit maintenant ''Client connected''.
-
-5. Ouvrez un fichier ParaView (qui vous a dirigé vers le système de fichiers distant) pour le visualiser.
-
-'''NOTE :''' Une option importante des préférences est le seuil défini avec ''Render View -> Remote/Parallel Rendering Options -> Remote Render Threshold.'' Avec la valeur par défaut (20Mo) ou une autre valeur semblable, les petites tâches de rendu s'effectueront avec le GPU de votre ordinateur; la rotation à l'aide de la souris sera rapide, mais toute tâche quelque peu intensive (sous 20Mo) sera dirigée vers votre ordinateur et dépendant de la connexion, la visualisation pourrait être lente. Avec 0Mo, tous les rendus s'effectueront à distance; les ressources de la grappe feront tout le travail, ce qui est une bonne chose pour les traitements intensifs, mais moins souhaitable pour l'aspect interactif. Expérimentez avec différentes valeurs pour trouver un seuil acceptable. 
-<br>
-
-Pour des rendus parallèles avec plusieurs CPU, lancez une tâche parallèle sans oublier d'indiquer la limite pour le temps réel maximum d'exécution.
-
-{{Command|salloc --time{{=}}0:30:0 --ntasks{{=}}8 --mem-per-cpu{{=}}3600 --account{{=}}def-someprof}}
-
-Démarrez le serveur ParaView avec <code>srun</code>.
-
-{{Commands
-|module load paraview/5.13.1
-|srun pvserver --force-offscreen-rendering
-}}
-
-Pour vérifier que le rendu s'effectue en parallèle, utilisez le filtre ''Process Id Scalars'' et appliquez la couleur avec ''process id''.
-
-<span id="GPU-based_ParaView_visualization"></span>
-===Avec GPU ===
-
-Fir et Nibi offrent plusieurs nœuds interactifs avec GPU pour travailler en mode client-serveur.
-
-1. Sur votre ordinateur, installez la même version que celle présente sur la grappe que vous utiliserez; connectez-vous à Fir ou Nibi et lancez une tâche interactive en série avec un GPU.
-
-{{Command|salloc --time{{=}}1:00:0 --ntasks{{=}}1 --mem-per-cpu{{=}}3600 --gres{{=}}gpu:1 --account{{=}}def-someprof}}
-
-:La tâche devrait commencer automatiquement sur un des nœuds interactifs GPU.
-2. À l'invite dans votre tâche, chargez le module GPU+EGL; modifiez la variable d'affichage pour éviter que ParaView utilise le contexte de rendu X11; démarrez le serveur ParaView.
-
-{{Commands
-|module load paraview/5.13.1
-|unset DISPLAY
-}}
-{{Command|pvserver
-|result=
-Waiting for client...
-Connection URL: cs://fc30107:11111
-Accepting connection(s): fc30107:11111
-}}
-
-:Attendez que le serveur soit prêt à accepter la connexion client.
-
-3. Prenez note du nœud (ici fc30107) et du port (habituellement 11111); dans un autre terminal sur votre ordinateur Mac/Linux (sous Windows, utilisez un émulateur de terminal), liez le port 11111 à votre ordinateur et le même port au nœud de calcul (assurez-vous d'utiliser le bon nœud de calcul).
-
-{{Command|prompt=[name@computer $]|ssh <username>@fir.alliancecan.ca -L 11111:fc30107:11111}}
-
-4. Sur votre ordinateur, démarrez ParaView; allez à ''File -> Connect'' (ou cliquez sur le bouton vert ''Connect'' dans la barre d'outils); cliquez sur ''Add Server''. Pointez ParaView à votre port local 11111 pour avoir des paramètres semblables à ceci  ''name = fir, server type = Client/Server, host = localhost, port = 11111''; cliquez sur ''Configure'', sélectionnez ''Manual'' et cliquez sur ''Save''.
-:Une fois que la connexion est ajoutée à la configuration, sélectionnez le serveur dans la liste affichée et cliquez sur ''Connect''. Dans la première fenêtre de terminal, le message  ''Accepting connection ...'' se lit maintenant ''Client connected''.
-
-5. Ouvrez un fichier ParaView (qui vous a dirigé vers le système de fichiers distant) pour le visualiser.
-
-<span id="Rendering_with_NVIDIA&#039;s_IndeX_plugin"></span>
-=== Utiliser NVDIA IndeX pour produire des rendus ===
-
-NVIDIA IndeX est un moteur de rendu volumétrique interactif 3D qui s’installe comme un plugiciel avec ParaView. Pour l’utiliser il faut se connecter en mode client-serveur à ParaView qui est en opération dans une tâche interactive avec GPU, comme décrit ci-dessus. Dans votre client, allez à ''Tools -> Manage Plugins'' et activez d’abord <code> pvNVIDIAIndeX</code> localement et ensuite à distance. Il n’est peut-être pas nécessaire d'activer le plugiciel localement sur toutes les plateformes, mais dans plusieurs configurations, un bogue cause la fermeture anormale de ParaView si le plugiciel local n’est pas activé en premier. Une fois que le plugiciel est activé, chargez votre ensemble de données, puis sélectionnez NVIDIA IndeX dans le menu déroulant ''Representation''.
-
-Avec notre licence, vous pouvez utiliser NVIDIA IndeX en parallèle sur plusieurs GPU, mais l'accélération laisse beaucoup à désirer. Avant de passer en production avec plusieurs GPU, nous vous recommandons de tester votre scalabilité en parallèle et de vérifier que le fait d’employer plusieurs GPU procure une meilleure performance; si ce n’est pas le cas, vous devriez utiliser un seul GPU.
-
-</tab>
-<tab name="Trillium">
-{{Panel
-  |title=Obsolète
-  |panelstyle=outdated
-  |content='''Cette partie contient de l'information obsolète et certains énoncés ne sont peut-être pas valides.''' Notre équipe technique travaille présentement à sa mise à jour. La seule différence entre Niagara et Trillium est que le module <tt>StdEnv/2023</tt> doit être chargé avant le module <tt>paraview</tt> module.
-[[Category:Outdated]]
-}}
-== Visualisation client-serveur sur Trillium==
-
-Comme Trillium n'a pas de GPU, il faut se limiter à des rendus par le logiciel. Il faut explicitement utiliser un des indicateurs mesa pour que ParaView n'utilise pas l'accélération OpenGL par le matériel.
-
-{{Commands
-|module load paraview
-|paraview --mesa-swr
-}}
-
-ou utilisez un des indicateurs ci-dessous.
-
-Pour avoir accès aux [https://docs.scinet.utoronto.ca/index.php/Trillium_Quickstart#Testing ressources interactives de Trillium], lancez une tâche <code>debugjob</code> ainsi&nbsp;:
-
-<ol>
-<li> Lancez une tâche interactive (<code>debugjob</code>).</li>
-
-{{Command|debugjob}}
-
-<li> Une fois connecté au nœud de calcul (par exemple '' niaXYZW''), chargez le module ParaView et démarrez un serveur ParaView.</li>
-
-{{Command
-|module load paraview
-|pvserver --mesa-swr-ax2
-}}
-
-Avec la bibliothèque OpenSWR, le rendu est quelquefois plus rapide avec l'indicateur <code>--mesa-swr-avx2</code>.
-
-<li> Attendez quelques secondes que le serveur soit prêt à accepter les connexions client.</li>
-
-{{Command|prompt=|Waiting for client...
- Connection URL: cs://niaXYZW.scinet.local:11111
- Accepting connection(s): niaXYZW.scinet.local:11111
-}}
-
-<li> Ouvrez un nouveau terminal sans fermer <code>debugjob</code> et connectez-vous via SSH.</li>
-
-{{Command|prompt=[name@computer $]|ssh YOURusername@trillium.alliancecan.ca -L11111:niaXYZW:11111 -N}}
-
-Ceci définit un tunnel qui associe le port 11111 de votre ordinateur (<code>localhost</code>) au port 11111 du nœud de calcul <code>niaXYZW</code> où le serveur ParaView attend les connexions.
-
-<li> Démarrez ParaView sur votre ordinateur. Sélectionnez ''File -> Connect'' et cliquez sur ''Add Server''.
-Pour diriger ParaView vers votre port local <code>11111</code>, vous pouvez faire comme suit :</li>
- name = trillium
- server type = Client/Server
- host = localhost
- port = 11111
-Cliquez ensuite sur ''Configure'', sélectionnez ''Manual'' et cliquez sur ''Save''.
-
-<li> Une fois que le serveur à distance fait partie de la configuration, sélectionnez-le dans la liste et cliquez sur ''Connect''.
-Le contenu de la fenêtre terminal change de <code>Accepting connection...</code> à <code>Client connected</code>.
-
-<li> Ouvrez un fichier dans ParaView (vous serez dirigé au système de fichiers à distance) et visualisez les données comme à l'habitude.
-
+<ol start="4">
+  <li>On the left-hand side, under Software Modules, load "boost/1.85.0" module and then "paraview/6.0.0" module.</li>
+  <li>A ParaView VNC button should appear, click on it -- this opens a virtual desktop with a ParaView shortcut button.</li>
+  <li>Click on the button and wait for ParaView to start.</li>
 </ol>
 
-<span id="Multiple_CPUs"></span>
-=== CPU multiples ===
+Alternatively, in the JupyterLab dashboard you can:
 
-Pour effectuer des rendus parallèles avec plusieurs CPU, le <code>pvserver</code> devrait être exécuté avec <code>mpiexec</code>, c'est-à-dire que vous soumettez un script de tâche ou demandez une tâche avec
-
+<ol start="4">
+  <li>Click on your preferred desktop button.</li>
+  <li>Inside this desktop open a terminal and type the following:</li>
 {{Commands
-|salloc --ntasks{{=}}N*40 --nodes{{=}}N --time{{=}}1:00:00
-|module load paraview
-|srun pvserver --mesa
+|module load boost/1.85.0 paraview/6.0.0
+|paraview
+}}
+A ParaView window should come up, ready to be used.
+</ol>
+
+== Multi-core visualization via JupyterLab ==
+
+The ParaView GUI application itself is single-threaded and cannot directly use multiple cores. Some filters -- such as contouring, clipping, or resampling -- do support multithreading via VTK backends like TBB or OpenMP. For true parallel rendering, however, you need to connect the single-core ParaView client to a parallel ParaView server. Both can be launched within JupyterHub, as documented below.
+
+* In JupyterHub settings, under Number of Cores, select your desired number of cores, let's say 4.
+* Under Memory, scale your request accordingly, e.g. for 4 cores select 14400 MB memory.
+
+When JupyterHub starts, inside it you will have access to 1 MPI task with 4 CPU cores. Open your preferred remote desktop, then a terminal inside it, and type:
+
+{{Command|module load boost/1.85.0 paraview/6.0.0}}
+:and then
+{{Command|mpirun --oversubscribe -np 4 pvserver
+|result=
+Waiting for client...
+Connection URL: cs://fc30669:11111
+Accepting connection(s): fc30669:11111
 }}
 
-:où <code>N</code> est remplacé par le nombre de nœuds et <code>N*40</code> est remplacé par le nombre simple (le produit de la multiplication).
+Next, inside the remote desktop, start another terminal and type:
+
+{{Commands
+|module load boost/1.85.0 paraview/6.0.0
+|paraview
+}}
+
+In ParaView GUI, click Connect button, click Add Server, select Server Type = Client/Server, Host = localhost, Port = 11111, Startup Type = Manual. Next, click Connect again to connect the remote ParaView client to the remote parallel server (both running inside the JupyterHub session). Now you can load a dataset and render it in parallel on 4 cores.
+
+To check that you are doing parallel rendering, you can colour your dataset by the Process Id variable (this variable is unavailable when running in serial).
+
+== Single-core visualization via Open OnDemand ==
+
+On [[Nibi]] or [[Trillium]], you can launch an Open OnDemand instance through a portal. Sign in to https://ondemand.sharcnet.ca (Nibi) or https://ondemand.scinet.utoronto.ca/pun/sys/dashboard
+(Trillium) with your Alliance account.
+
+Once logged in, find "Desktop" in the menu. On Nibi you will find it under Compute Nodes | Nibi
+Desktop. Specify a CPU-only Slurm account and other resources (1 CPU core) and click Launch. Wait for the job
+to start ("Starting" should change to "Running") and then click Launch Nibi Desktop. Inside the desktop, open
+a terminal and type:
+
+{{Commands
+|module load paraview/6.0.0
+|paraview
+}}
+
+Load you dataset and start working on your visualization.
+
+== Multi-core visualization via Open OnDemand ==
+
+The ParaView GUI application itself is single-threaded and cannot directly use multiple cores. Some filters -- such as contouring, clipping, or resampling -- do support multithreading via VTK backends like TBB or OpenMP. For true parallel rendering, however, you need to connect the single-core ParaView client to a parallel ParaView server. Both can be launched within Open OnDemand, as documented below.
+
+Follow the same steps as for Serial Open OnDemand above. When you specify resources, on Nibi's Open OnDemand
+you can ask up to 128GB memory and up to 8 cores.
+
+Let's say, you specified 4 cores. Inside your Open OnDemand desktop session, you will have access to 1 MPI
+task with 4 CPU cores. Open a terminal inside your remote desktop and type:
+
+{{Command|module load paraview/6.0.0}}
+:and then
+{{Command|mpirun --oversubscribe -np 4 pvserver
+|result=
+Waiting for client...
+Connection URL: cs://g4.nibi.sharcnet:11111
+Accepting connection(s): g4.nibi.sharcnet:11111
+}}
+
+Next, still inside the remote desktop, start another terminal and type:
+
+{{Commands
+|module load paraview/6.0.0
+|paraview
+}}
+
+In ParaView GUI, click Connect button, click Add Server, select Server Type = Client/Server, Host = localhost, Port = 11111, Startup Type = Manual. Next, click Connect again to connect the remote ParaView client to the remote parallel server (both running inside the JupyterHub session). Now you can load a dataset and render it in parallel on 4 cores.
+
+To check that you are doing parallel rendering, you can colour your dataset by the Process Id variable (this variable is unavailable when running in serial).
 
 </tab>
-<tab name="Cloud">
-{{Outdated/fr}}
-== Visualisation client-serveur sur le cloud ==
 
-<span id="Prerequisites"></span>
-=== Prérequis ===
+<tab name="Large-scale interactive">
 
-La page [[Cloud Quick Start/fr|Cloud&nbsp;:&nbsp;Guide de démarrage]] décrit la création d'une instance. Une fois connecté à l’instance, vous devrez installer certains paquets pour pouvoir compiler ParaView et VisIt; par exemple, sur une instance CentOS,
+This tab describes interactive client-server setup on all our HPC clusters ([[Rorqual/en|Rorqual]], [[Nibi]], [[Fir]], [[Trillium]], and [[Narval/en|Narval]]), where a client runs on your computer, and the server runs on the remote cluster.
+
+'''NOTE 1:''' ParaView requires the same major version on the local client and the remote host; this prevents incompatibility that typically shows as a failed handshake when establishing the client-server connection. For example, to use ParaView server version 6.0.0 on the cluster, you need client version 6.0.x on your computer.
+
+'''NOTE 2:''' An important setting in ParaView's preferences is ''Render View -> Remote/Parallel Rendering Options -> Remote Render Threshold.'' If you set it to default (20MB) or similar, small rendering will be done on your computer's GPU, the rotation with a mouse will be fast, but anything modestly intensive (under 20MB) will be shipped to your computer and (depending on your connection) visualization might be slow. If you set it to 0MB, all rendering will be remote including rotation, so you will really be using the cluster resources for everything, which is good for large data processing but not so good for interactivity. Experiment with the threshold to find a suitable value.
+
+You can do both rasterization and ray tracing on cluster CPUs, allocating as many cores as necessary to your rendering. Modern CPU-based libraries such as OSPRay and OpenSWR offer performance quite similar to GPU-based rendering. Also, since the ParaView server uses MPI for distributed-memory processing, for very large datasets one can do parallel rendering on a large number of CPU cores, either on a single node, or scattered across multiple nodes.
+
+The easiest way to estimate the number of necessary cores is to look at the amount of memory that you think you will need for your rendering and divide it by ~3.5 GB/core. For example, a 40GB dataset (that you load into memory at once, e.g. a single timestep) would require at least 12 cores just to hold the data. Since software rendering is CPU-intensive, we do not recommend allocating more than 4GB/core. In addition, it is important to allocate some memory for filters and data processing (e.g. a structured to unstructured dataset conversion will increase your memory footprint by ~3X); depending on your workflow, you may want to start this rendering with 32 cores or 64 cores. If your ParaView server gets killed when processing these data, you will need to increase the number of cores.
+
+'''NOTE 3:''' On Trillium, you must schedule on whole nodes, i.e. in multiples of 192 cores. Therefore, the minimum example on Trillium will require 192 cores.
+
+1. First, install on your computer the same ParaView version as the one available on the cluster you will be using. Next, log into the cluster and start a parallel CPU interactive job.
+
+{{Command|salloc --time{{=}}1:00:0 --ntasks{{=}}... --mem-per-cpu{{=}}3600 --account{{=}}def-someprof}}
+
+:On Trillium -- assuming you are using one node for visualization -- this command will be:
+
+{{Command|salloc --time{{=}}1:00:0 --ntasks{{=}}192 --account{{=}}def-someprof}}
+
+:The job should automatically start on one of the CPU interactive nodes.
+
+2. At the prompt that is now running inside your job, load the ParaView module and start the server. Note that on Trillium you must load <code>StdEnv/2023</code> before attempting to load <code>paraview/6.0.0</code>.
+
+{{Command|module load paraview/6.0.0}}
+:and then
+{{Command|srun pvserver --force-offscreen-rendering --opengl-window-backend OSMesa
+|result=
+Waiting for client...
+Connection URL: cs://fc30669:11111
+Accepting connection(s): fc30669:11111
+}}
+
+:Wait for the server to be ready to accept client connection.
+
+3. Make a note of the node (in this case fc30669) and the port (usually 11111) and in another terminal on your computer (on Mac/Linux; in Windows use a terminal emulator) link the port 11111 on your computer and the same port on the compute node (make sure to use the correct compute node). Note that "fir" must be replaced by the actual cluster name.
+
+{{Command|prompt=[name@computer $]|ssh <username>@fir.alliancecan.ca -L 11111:fc30669:11111}}
+
+4. Start ParaView on your computer, go to ''File -> Connect'' (or click on the green ''Connect'' button in the toolbar) and click on ''Add Server.'' You will need to point ParaView to your local port 11111, so you can do something like name = fir, server type = Client/Server, host = localhost, port = 11111; click ''Configure'', select ''Manual'' and click ''Save.''
+:Once the remote is added to the configuration, simply select the server from the list and click on ''Connect.'' The first terminal window that read ''Accepting connection'' will now read ''Client connected.''
+
+5. Open a file in ParaView (it will point you to the remote filesystem) and visualize it as usual.
+
+To check that you are doing parallel rendering, you can colour your dataset by the Process Id variable (this variable is unavailable when running in serial).
+
+</tab>
+
+<tab name="Batch production">
+
+For large-scale and automated visualization, we strongly recommend switching from interactive client-server to off-screen batch visualization. ParaView supports Python scripting, so you can script your workflow and submit it as a regular, possibly parallel production job on a cluster. If you need any help with this, please contact [[Technical support]].
+
+With serial rendering, your workflow should look like this:
+
+{{Commands
+|module load paraview/6.0.0
+|sbatch serial.sh
+}}
+: where a Slurm job submission script "serial.sh" might look like this:
+{{File
+  |name=serial.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --time=3:0:0
+#SBATCH --mem-per-cpu=3600
+#SBATCH --account=def-someuser
+pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py
+}}
+
+With parallel rendering, your workflow should look like this:
+
+{{Commands
+|module load paraview/6.0.0
+|sbatch distributed.sh
+}}
+: where a Slurm job submission script "distributed.sh" might look like this:
+{{File
+  |name=distributed.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --time=3:0:0
+#SBATCH --mem-per-cpu=3600
+#SBATCH --ntasks=4
+#SBATCH --account=def-someuser
+srun pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py
+}}
+
+</tab>
+</tabs>
+
+<br>
+
+= Client-server visualization in a cloud VM =
+
+In this section, we describe the setup and workflow for running a ParaView server on a cloud VM. This is a less common approach and should be used only if you require a custom setup that is not supported by the cluster-installed ParaView.
+
+== Prerequisites ==
+
+The [[Cloud Quick Start|Cloud Quick Start Guide]] explains how to launch a new virtual machine (VM). Once you log into the VM, you will need to install some additional packages to be able to compile ParaView or VisIt. For example, on a CentOS VM you can type:
 
 {{Commands|prompt=[name@VM $]
 |sudo yum install xauth wget gcc gcc-c++ ncurses-devel python-devel libxcb-devel
@@ -204,29 +250,28 @@ La page [[Cloud Quick Start/fr|Cloud&nbsp;:&nbsp;Guide de démarrage]] décrit l
 |sudo ln -s /usr/include/GL/glx.h /usr/local/include/GL/glx.h
 }}
 
-Si vous avez votre propre paire de clés SSH (et non la clé générée par OpenStack pour le nuage), vous pourriez copier la clé publique dans l'instance pour simplifier la connexion; pour ce faire, lancez la commande suivante sur votre ordinateur :
+If you have your own private-public SSH key pair (as opposed to the cloud key), you may want to copy the public key to the VM to simplify logins, by issuing the following command on your computer
 
-{{Command|prompt=[name@laptop $]|cat ~/.ssh/id_rsa.pub {{!}} ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'}}
+{{Command|prompt=[name@computer $]|cat ~/.ssh/id_rsa.pub {{!}} ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'}}
 
-<span id="Compiling_with_OSMesa"></span>
-=== Compiler avec OSMesa ===
+== Compiling with OSMesa ==
 
-Comme les instances n'ont pas accès à un GPU, et c'est le cas pour la plupart des instances dans Artbutus, il faut compiler ParaView avec OSMesa pour obtenir un rendu hors écran (''offscreen rendering''). La configuration par défaut de OSMesa active OpenSWR, la librairie logicielle de tramage (''rasterization'') d'Intel qui permet d'opérer OpenGL. Le résultat sera un serveur ParaView qui utilise OSMesa pour construire un rendu sans X hors écran avec un processeur, mais avec les pilotes <code>llvmpipe</code> et <code>SWR</code> plus récents et plus rapides. Nous recommandons SWR.
+Since the VM does not have access to a GPU (most Arbutus VMs don't), we need to compile ParaView with OSMesa support so that it can do offscreen (software) rendering. The default configuration of OSMesa will enable OpenSWR (Intel's software rasterization library to run OpenGL). What you will end up with is a ParaView server that uses OSMesa for offscreen CPU-based rendering without X but with both <code>llvmpipe</code> (older and slower) and <code>SWR</code> (newer and faster) drivers built. We recommend using SWR.
 
-De retour dans l'instance, compilez <code>cmake::</code>.
+Back on the VM, compile <code>cmake::</code>
 
 {{Commands|prompt=[name@VM $]
-|wget https://cmake.org/files/v3.7/cmake-3.7.0.tar.gz
+|wget https://cmake.org/files/v4.1/cmake-4.1.1.tar.gz
 |unpack and cd there
 |./bootstrap
 |make
 |sudo make install
 }}
 
-Ensuite, compilez <code>llvm</code>.
+Next, compile <code>llvm</code>:
 <source lang="console">
 cd
- wget http://releases.llvm.org/3.9.1/llvm-3.9.1.src.tar.xz
+ wget https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.0/LLVM-21.1.0-Linux-X64.tar.xz
  unpack and cd there
  mkdir -p build && cd build
  cmake \
@@ -240,10 +285,10 @@ cd
  sudo make install
 </source>
 
-Ensuite, compilez Mesa avec OSMesa.
+Next, compile Mesa with OSMesa:
 <source lang="console">
 cd
- wget ftp://ftp.freedesktop.org/pub/mesa/mesa-17.0.0.tar.gz
+ wget https://archive.mesa3d.org/mesa-25.2.3.tar.xz
  unpack and cd there
  ./configure \
   --enable-opengl --disable-gles1 --disable-gles2 \
@@ -260,10 +305,10 @@ cd
  sudo make install
 </source>
 
-Ensuite, compilez le serveur ParaView.
+Next, compile the ParaView server:
 <source lang="console">
 cd
- wget http://www.paraview.org/files/v5.2/ParaView-v5.2.0.tar.gz
+ wget https://www.paraview.org/files/v6.0/ParaView-v6.0.0.tar.gz
  unpack and cd there
  mkdir -p build && cd build
  cmake \
@@ -280,48 +325,17 @@ cd
  make install
 </source>
 
-<span id="Client-server_mode"></span>
-=== Mode client-serveur === 
+== Client-server mode ==
 
-Vous pouvez maintenant démarrer le serveur ParaView sur l'instance pour un rendu SWR.
+You are now ready to start ParaView server on the VM with SWR rendering:
 <source lang="console">
-./paraview/bin/pvserver --mesa-swr-avx2
+./paraview/bin/pvserver --force-offscreen-rendering --opengl-window-backend OSMesa
 </source>
 
-De votre ordinateur, organisez un tunnel SSH tunnel du port local 11111 au port 11111 de l'instance.
+Back on your computer, organize an SSH tunnel from the local port 11111 to the VM's port 11111:
 <source lang="console">
 ssh centos@vm.ip.address -L 11111:localhost:11111
 </source>
 
-Démarrez maintenant le client ParaView sur votre ordinateur et connectez-vous à localhost:11111; vous deriez pouvoir ouvrir les fichiers de l'instance à distance. Pendant le rendu, la console affichera ''SWR detected AVX2.''
+Finally, start the ParaView client on your computer and connect to localhost:11111. If successful, you should be able to open files on the remote VM. During rendering in the console you should see the message ''SWR detected AVX2.''
 </tab>
-</tabs>
-
-= Bureau distant VNC via JupyterLab = 
-Pour certaines visualisations, vous pouvez utiliser [[JupyterLab/fr#ParaView|ParaView via JupyterLab]]. Contrairement au mode client-serveur, vous utiliserez un bureau distant VNC. 
-
-Pour ce faire, lancez une instance [[JupyterLab/fr|JupyterLab]] via l'une des [[JupyterLab/fr#Lancer_JupyterLab|options prises en charge]], puis chargez un module <code>paraview</code>. Une icône de lancement pour ParaView apparaîtra et vous permettra de commencer votre visualisation.
-
-= Bureau distant VNC sur Nibi Open OnDemand =
-{{Outdated/fr}}
-
-Pour les petites visualisations interactives qui exigent jusqu'à 250Go et 16 cœurs, vous pouvez utiliser Nibi Open OnDemand. Contrairement aux visualisations client-serveur, vous utiliserez un bureau distant VNC en suivant ces étapes&nbsp;ː
-
-Vous devez utiliser un client VNC (Tiger VNC de préférence) pour vous connecter au nœud VDI.
-
-2. Ouvrez une fenêtre de terminal et lancez les commandes suivantes&nbsp;:
-
-3. Vérifiez comment charger une version particulière, par exemple
- module spider paraview/5.11.0
-
-4. Chargez les modules requis et lancez Paraview.
- module load StdEnv/2020  gcc/9.3.0  openmpi/4.0.3
- module load paraview/5.11.0
- paraview
-Avec la plus récente version de ParaView, la commande <code>paraview</code> doit d'abord désactiver le faux éditeur de liens dynamiques originalement utilisé pour VirtualGL.
- LD_PRELOAD=${LD_PRELOAD/libdlfaker.so/} paraview
-
-<span id="Batch_rendering"></span>
-= Rendus non interactifs =
-
-Pour des visualisations intensives et automatiques, nous recommandons d'utiliser des tâches non interactives hors écran. Comme il est possible de travailler avec des scripts Python, vous pouvez préparer votre travail et soumettre le script comme une tâche possiblement parallèle. Pour de l'assistance, contactez le [[Technical support/fr|soutien technique]].

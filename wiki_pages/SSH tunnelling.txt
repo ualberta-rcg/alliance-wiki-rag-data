@@ -66,11 +66,11 @@ three commands in your job script. You will need the following information:
 <!--T:12-->
 You should obtain this information from whoever maintains the license server.
 That server also must allow connections from the login nodes; for
-Niagara, the outgoing IP address will either be 142.1.174.227 or 142.1.174.228.
+Trillium, the outgoing IP address will be 142.150.188.58.
 
 <!--T:13-->
 With this information, one can now set up the SSH tunnel.  For nibi, an alternative solution is to request a firewall exception
-for the license server LICSERVER and its specific port LICPORT. The gateway server (GATEWAY) on Niagara is nia-gw while on nibi you would pick one of the login nodes (l1, l2, ... l5). You also need to choose which port number (COMPUTEPORT) to use on the compute node.  The SSH command to issue in the job script is then:
+for the license server LICSERVER and its specific port LICPORT. The gateway server (GATEWAY) on Trillium is tri-gw while on nibi you would pick one of the login nodes (l1, l2, ... l5). You also need to choose which port number (COMPUTEPORT) to use on the compute node.  The SSH command to issue in the job script is then:
 
 <!--T:16-->
 <source lang="bash">
@@ -104,7 +104,7 @@ The following job script sets up an SSH tunnel to contact licenseserver.institut
 <source lang="bash">
 #!/bin/bash
 #SBATCH --nodes 1
-#SBATCH --ntasks 40
+#SBATCH --ntasks 192
 #SBATCH --time 3:00:00
 
 <!--T:23-->
@@ -113,7 +113,7 @@ REMOTEPORT=9999
 LOCALHOST=localhost
 for ((i=0; i<10; ++i)); do
   LOCALPORT=$(shuf -i 1024-65535 -n 1)
-  ssh nia-gw -L $LOCALPORT:$REMOTEHOST:$REMOTEPORT -N -f && break
+  ssh tri-gw -L $LOCALPORT:$REMOTEHOST:$REMOTEPORT -N -f && break
 done || { echo "Giving up forwarding license port after $i attempts..."; exit 1; }
 export MLM_LICENSE_FILE=$LOCALPORT@$LOCALHOST
 

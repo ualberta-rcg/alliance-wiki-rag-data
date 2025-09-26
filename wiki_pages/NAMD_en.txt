@@ -19,38 +19,31 @@ To run jobs that span nodes, use UCX.
 
 Please refer to the [[Running jobs]] page for help on using the SLURM workload manager.
 
-== Serial and threaded jobs ==
-Below is a simple job script for a serial simulation (using only one core).  You can increase the number for --cpus-per-task to use more cores, up to the maximum number of cores available on a cluster node.
+== Threaded jobs ==
+Below is a job script for a threaded simulation.  You can increase the number for --cpus-per-task to use more cores, up to the maximum number of cores available on a cluster node.  Check below in "Performance and benchmarking" section for advice on how to choose the number of cores to use.
+
 {{File
   |name=serial_namd_job.sh
   |lang="sh"
   |contents=
 #!/bin/bash
 #
-#SBATCH --cpus-per-task=1
-#SBATCH --mem 2048            # memory in Mb, increase as needed    
+#SBATCH --cpus-per-task=8
+#SBATCH --mem 10g            # memory in Mb, increase as needed    
 #SBATCH -o slurm.%N.%j.out    # STDOUT file
 #SBATCH -t 0:05:00            # time (D-HH:MM), increase as needed
 #SBATCH --account=def-specifyaccount
 
-# these are simple examples, please experiment with additional flags to improve your runtimes
-# in particular, adding  +setcpuaffinity  flag may improve performance
-
-# commands for NAMD version 3.0.1
 module load StdEnv/2023  gcc/12.3 namd-multicore/3.0.1
-namd3 +p$SLURM_CPUS_PER_TASK  +idlepoll apoa1.namd
-
-# commands for NAMD version 2.14
-module load StdEnv/2020 namd-multicore/2.14
-namd2 +p$SLURM_CPUS_PER_TASK  +idlepoll apoa1.namd
+namd3 +p$SLURM_CPUS_PER_TASK  +idlepoll +setcpuaffinity stmv.namd
 }}
 
-== Parallel CPU jobs ==
+== Multi-node CPU jobs ==
 
 
 
 === UCX jobs ===
-This example uses 80 processes in total on 2 nodes, each node running 40 processes, thus fully utilizing its 80 cores.  This script assumes full nodes are used, thus <code>ntasks-per-node</code> should be 40 (on Béluga).  For best performance, NAMD jobs should use full nodes.
+This example uses 384 processes in total on 2 nodes, each node running 192 processes.  This script assumes full nodes are used, thus <code>ntasks-per-node</code> should be equal to the number of cores available on the node (192 on fir, rorqual, nibi and trillium).  For best performance, NAMD UCX jobs should use full nodes. Only use UCX version if the multicore version of NAMD is not sufficient for your needs and you need to run on multiple nodes.
 
 {{File
   |name=ucx_namd_job.sh
@@ -59,28 +52,21 @@ This example uses 80 processes in total on 2 nodes, each node running 40 process
 #!/bin/bash
 #
 #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=40
+#SBATCH --ntasks-per-node=192
 #SBATCH --mem=0            # memory per node, 0 means all memory
 #SBATCH -o slurm.%N.%j.out    # STDOUT
 #SBATCH -t 0:05:00            # time (D-HH:MM)
 #SBATCH --account=def-specifyaccount
 
-# these are simple examples, please experiment with additional flags to improve your runtimes
-# in particular, adding  +setcpuaffinity  flag may improve performance
-
-# commands for NAMD version 3.0.1
 module load StdEnv/2023 gcc/13.3 namd-ucx/3.0.1
-srun --mpi=pmi2 namd3 apoa1.namd
+srun --mpi=pmi2 namd3 stmv.namd
 
-# commands for NAMD version 2.14
-module load StdEnv/2020 namd-ucx/2.14
-srun --mpi=pmi2 namd2 apoa1.namd
 }}
 
 
 
-== Single GPU jobs ==
-This example uses 8 CPU cores and 1 P100 GPU on a single node.
+== Threaded GPU jobs ==
+This example uses 16 CPU cores and 1 H100 GPU on a single node.  You can increase the number of GPUs and CPU cores up to the maximum available on the node.
 
 '''Important''': NAMD 3 added an input flag, which shifts more calculations to the GPU. This can improve performance considerably.
 
@@ -94,32 +80,29 @@ To use it, add this line to your NAMD input file:
   |contents=
 #!/bin/bash
 
-#SBATCH --cpus-per-task=8 
-#SBATCH --mem=2048            
+#SBATCH --cpus-per-task=16 
+#SBATCH --mem=10g    
 #SBATCH --time=0:15:00
-#SBATCH --gpus-per-node=p100:1
+#SBATCH --gpus-per-node=h100:1
 #SBATCH --account=def-specifyaccount
-
-# these are simple examples, please experiment with additional flags to improve your runtimes
-# in particular, adding  +setcpuaffinity  flag may improve performance
 
 # commands for NAMD version 3.0.1
 module load StdEnv/2023  gcc/12.3  cuda/12.2 namd-multicore/3.0.1
 namd3 +p$SLURM_CPUS_PER_TASK  +idlepoll stmv.namd
 
-# commands for NAMD version 2.14
-module load StdEnv/2020 cuda/11.0 namd-multicore/2.14
-namd2 +p$SLURM_CPUS_PER_TASK  +idlepoll apoa1.namd
 }}
 
 
-== Parallel GPU jobs ==
+== Multi-node GPU jobs ==
 === UCX GPU jobs ===
-This example is for Béluga and it assumes that full nodes are used, which gives best performance for NAMD jobs. It uses 8 processes in total on 2 nodes, each process(task) using 10 threads and 1 GPU.   This fully utilizes Béluga GPU nodes which have 40 cores and 4 GPUs per node.  Note that 1 core per task has to be reserved for a communications thread, so NAMD will report that only 72 cores are being used but this is normal.  
+Note that a single GPU node provides a great deal of computational power, so using multiple nodes is justified only when your job can use them efficiently.
+
+This example is for narval and it assumes that full nodes are used, which gives best performance for NAMD jobs. It uses 8 processes in total on 2 nodes, each process(task) using 12 threads and 1 GPU.   This fully utilizes Narval GPU nodes which have 48 cores and 4 GPUs per node.  Note that 1 core per task has to be reserved for a communications thread, so NAMD will report that only 88 cores are being used but this is normal.  
 
 To use this script on other clusters, please look up the specifications of their available nodes and adjust --cpus-per-task and --gpus-per-node options accordingly.
 
-'''NOTE''': UCX can be used on all clusters.
+'''NOTE''': NAMD 2.14 in this example should not be used on clusters with H100 GPUs.  UCX version of NAMD 3.0.1 able to run on H100 is not yet installed on Alliance clusters.
+
 {{File
   |name=ucx_namd_job.sh
   |lang="sh"
@@ -128,15 +111,15 @@ To use this script on other clusters, please look up the specifications of their
 
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=4
-#SBATCH --cpus-per-task=10 # number of threads per task (process)
-#SBATCH --gpus-per-node=v100:4
+#SBATCH --cpus-per-task=12 # number of threads per task (process)
+#SBATCH --gpus-per-node=a100:4
 #SBATCH --mem=0            # memory per node, 0 means all memory
 #SBATCH --time=0:15:00
 #SBATCH --account=def-specifyaccount
 
 module load StdEnv/2020  intel/2020.1.217  cuda/11.0 namd-ucx-smp/2.14
 NUM_PES=$(expr $SLURM_CPUS_PER_TASK - 1 )
-srun --cpus-per-task=$SLURM_CPUS_PER_TASK --mpi=pmi2 namd2 ++ppn $NUM_PES apoa1.namd
+srun --cpus-per-task=$SLURM_CPUS_PER_TASK --mpi=pmi2 namd2 ++ppn $NUM_PES stmv.namd
 }}
 
 

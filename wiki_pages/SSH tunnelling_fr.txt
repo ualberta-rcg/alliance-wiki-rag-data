@@ -36,9 +36,9 @@ Souvent, la mise en place d’un tunnel pour une tâche en série ne nécessite 
 * de l’adresse IP ou nom du serveur de licence (ici LICSERVER);
 * du numéro du port du serveur de licence  (ici LICPORT). 
 
-Ces renseignements peuvent être obtenus de la personne qui gère le serveur de licence. Le serveur doit aussi permettre la connexion à partir des nœuds de connexion; dans le cas de Niagara, l’adresse IP vers l’extérieur est 142.1.174.227 ou 142.1.174.228.
+Ces renseignements peuvent être obtenus de la personne qui gère le serveur de licence. Le serveur doit aussi permettre la connexion à partir des nœuds de connexion; dans le cas de Trillium, l’adresse IP vers l’extérieur est 142.150.188.58.
 
-Le tunnel peut maintenant être mis en place. Sur Nibi, une autre solution serait de demander une exception de pare-feu pour LICSERVER et son port LICPORT. Le serveur de passerelle (GATEWAY) sur Niagara est nia-gw, tandis que sur Nibi vous devez choisir l'un des nœuds de connexion (l1, l2, ... l5). Vous devez également choisir le numéro de port (COMPUTEPORT) à utiliser sur le nœud de calcul. La commande SSH à exécuter dans le script de tâche est alors&nbsp;:
+Le tunnel peut maintenant être mis en place. Sur Nibi, une autre solution serait de demander une exception de pare-feu pour LICSERVER et son port LICPORT. Le serveur de passerelle (GATEWAY) sur Trillium est tri-gw, tandis que sur Nibi vous devez choisir l'un des nœuds de connexion (l1, l2, ... l5). Vous devez également choisir le numéro de port (COMPUTEPORT) à utiliser sur le nœud de calcul. La commande SSH à exécuter dans le script de tâche est alors&nbsp;:
 
 <source lang="bash">
 ssh GATEWAY -L COMPUTEPORT:LICSERVER:LICPORT -N -f
@@ -63,7 +63,7 @@ Le script suivant met en place un tunnel SSH pour entrer en contact avec license
 <source lang="bash">
 #!/bin/bash
 #SBATCH --nodes 1
-#SBATCH --ntasks 40
+#SBATCH --ntasks 192
 #SBATCH --time 3:00:00
 
 REMOTEHOST=licenseserver.institution.ca
@@ -71,7 +71,7 @@ REMOTEPORT=9999
 LOCALHOST=localhost
 for ((i=0; i<10; ++i)); do
   LOCALPORT=$(shuf -i 1024-65535 -n 1)
-  ssh nia-gw -L $LOCALPORT:$REMOTEHOST:$REMOTEPORT -N -f && break
+  ssh tri-gw -L $LOCALPORT:$REMOTEHOST:$REMOTEPORT -N -f && break
 done || { echo "Giving up forwarding license port after $i attempts..."; exit 1; }
 export MLM_LICENSE_FILE=$LOCALPORT@$LOCALHOST
 
@@ -84,9 +84,7 @@ mpirun thesoftware .....
 
 Un tunnel crypté peut être mis en place dans un nœud de connexion d’une grappe  pour connecter l’ordinateur d’un utilisateur à un nœud de calcul de cette grappe. L’ordinateur de l’utilisateur peut ainsi afficher de façon transparente des [[Visualization/fr|visualisations]] et des graphiques de [[Jupyter/fr|Jupyter Notebook]] exécutés dans un nœud de calcul de la grappe. Lorsque la seule façon d’accéder à un serveur de bases de données est par un nœud de connexion, un tunnel SSH peut transférer un port réseau arbitraire d’un nœud de calcul vers le nœud de connexion de la grappe et l’associer au serveur de bases de données.
 
-<div class="mw-translate-fuzzy">
-Graham et Cedar effectuent une NAT (<i>network address translation</i>) pour que les utilisateurs puissent avoir accès à l’Internet à partir des nœuds de calcul. Le pare-feu de Graham bloque cependant l’accès par défaut. Il faut faire une demande au [[Technical support/fr|soutien technique]] pour faire ouvrir un port IP particulier; indiquez l'adresse ou les adresses IP qui utiliseront ce port.
-</div> 
+Nibi et Fir effectuent une NAT (<i>network address translation</i>) pour que les utilisateurs puissent avoir accès à l’Internet à partir des nœuds de calcul. 
 
 <span id="From_Linux_or_MacOS_X"></span>
 == De Linux ou MacOS X ==
@@ -100,12 +98,10 @@ Sur votre ordinateur, ouvrez une nouvelle fenêtre de terminal et lancez la comm
 |prompt=[name@my_computer $]
 |sshuttle --dns -Nr userid@machine_name}}
 
-<div class="mw-translate-fuzzy">
 Copiez et collez l’URL de l'application dans votre navigateur. Si votre application est  [[Jupyter/fr#Lancer_Jupyter_Notebook|Jupyter Notebook]] par exemple, l'URL comprendra un ''token'' :
 <pre>
- http://cdr544.int.cedar.computecanada.ca:8888/?token=7ed7059fad64446f837567e32af8d20efa72e72476eb72ca
+ http://fc3281.int.fir.alliancecan.ca:8888/?token=7ed7059fad64446f837567e32af8d20efa72e72476eb72ca
 </pre>
-</div>
 
 <span id="From_Windows"></span>
 == De Windows == 
@@ -114,21 +110,15 @@ Un tunnel SSH peut être créé avec [[Connecting with MobaXTerm/fr|MobaXTerm]] 
 
 Lancez deux sessions MobaXterm. 
 
-<div class="mw-translate-fuzzy">
-*La session 1 devrait servir à la connexion à la grappe. Lancez ici votre tâche selon les directives de votre application, par exemple avec [[Jupyter/fr#Lancer_Jupyter_Notebook| Jupyter Notebook]]. Vous devriez recevoir une URL qui contient le nom et un port du nœud hôte, par exemple <code>cdr544.int.cedar.computecanada.ca:8888</code>.
-</div>
+*La session 1 devrait servir à la connexion à la grappe. Lancez ici votre tâche selon les directives de votre application, par exemple avec [[Jupyter/fr#Lancer_Jupyter_Notebook| Jupyter Notebook]]. Vous devriez recevoir une URL qui contient le nom et un port du nœud hôte, par exemple <code>fc3281.int.fir.alliancecan.ca:8888</code>.
 
 *La session 2 est un terminal local dans lequel le tunnel SSH sera mis en place. Lancez la prochaine commande en remplaçant le nom du nœud par l'URL obtenue dans la session 1. 
 
-<div class="mw-translate-fuzzy">
 {{Command
 |prompt=[name@my_computer ]$
-| ssh -L 8888:cdr544.int.cedar.computecanada.ca:8888 someuser@cedar.computecanada.ca}}
-</div>
+| ssh -L 8888:fc3281.int.fir.alliancecan.ca:8888 someuser@fir.alliancecan.ca}}
 
-<div class="mw-translate-fuzzy">
-Cette commande effectue une redirection des connexions au port local 8888 vers le port 8888 sur cdr544.int.cedar.computecanada.ca, nom donné au <b>port distant</b>. Il n'est pas nécessaire que les numéros soient identiques, mais il s'agit d'une convention qui permet d'identifier facilement le port local et le port distant.
-</div>
+Cette commande effectue une redirection des connexions au port local 8888 vers le port 8888 sur fc3281.int.fir.alliancecan.ca, nom donné au <b>port distant</b>. Il n'est pas nécessaire que les numéros soient identiques, mais il s'agit d'une convention qui permet d'identifier facilement le port local et le port distant.
 
 Modifiez l'URL obtenue dans la session 1 en remplaçant le nom du nœud par <code>localhost</code>. 
 Suivant l'exemple avec [[Jupyter/fr#Lancer_Jupyter_Notebook|Jupyter Notebook]], l'URL à copier dans le fureteur est :
@@ -137,18 +127,14 @@ Suivant l'exemple avec [[Jupyter/fr#Lancer_Jupyter_Notebook|Jupyter Notebook]], 
 </pre>
 
 <span id="Example_for_connecting_to_a_database_server_on_Fir_from_your_desktop"></span>
-<div class="mw-translate-fuzzy">
-== Se connecter à un serveur de base de données sur Cedar à partir de votre ordinateur  ==
-</div>
+== Se connecter à un serveur de base de données sur Fir à partir de votre ordinateur  ==
 
 Les commandes suivantes créent un tunnel SSH de votre ordinateur aux serveurs PostgreSQL et MySQL.
 
-<div class="mw-translate-fuzzy">
 <pre> 
-ssh -L PORT:cedar-pgsql-vm.int.cedar.computecanada.ca:5432 someuser@cedar.computecanada.ca
-ssh -L PORT:cedar-mysql-vm.int.cedar.computecanada.ca:3306 someuser@cedar.computecanada.ca
+ssh -L PORT:cedar-pgsql-vm.int.cedar.computecanada.ca:5432 someuser@fir.alliancecan.ca
+ssh -L PORT:cedar-mysql-vm.int.cedar.computecanada.ca:3306 someuser@fir.alliancecan.ca
 </pre>
-</div>
 
 Ces commandes connectent le numéro de port PORT de votre ordinateur local à cedar.computecanada.ca:PORT; la valeur du numéro de port doit être inférieure à 32768 (2^15). Dans cet exemple, <i>someuser</i> est le nom d’utilisateur associé à votre compte. En lançant une de ces commandes, vous serez connecté à Cedar comme toute autre connexion SSH. La seule différence entre cette connexion et une connexion SSH ordinaire est que vous pouvez ainsi utiliser un autre terminal pour vous connecter directement au serveur de base de données à partir de votre ordinateur personnel. Sur votre ordinateur personnel, exécuter la commande usuelle, par exemple pour PostgreSQL et MySQL :
 
@@ -157,7 +143,5 @@ psql -h 127.0.0.1 -p PORT -U <your username> -d <your database>
 mysql -h 127.0.0.1 -P PORT -u <your username> --protocol=TCP -p 
 </pre>
 
-<div class="mw-translate-fuzzy">
-Un mot de passe est requis pour MySQL; il se trouve dans le fichier <i>.my.cnf</i> situé dans votre répertoire home de Cedar.
+Un mot de passe est requis pour MySQL; il se trouve dans le fichier <i>.my.cnf</i> situé dans votre répertoire /home de Fir.
 La connexion à la base de données est maintenue tant que la connexion SSH est active.
-</div>
