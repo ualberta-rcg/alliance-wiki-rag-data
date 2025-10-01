@@ -1,0 +1,50 @@
+[
+  {
+    "question": "How do you run a single Ansys Additive Manufacturing task on gra-vdi?",
+    "answer": "Launch Workbench, open your project file (e.g., 'test.wbpj'), reset the workspace, use Mechanical to clear generated data, select 'Distributed', specify the number of cores, then 'File -> Save Project -> Solve'."
+  },
+  {
+    "question": "What is the maximum number of cores that can be used for a single Ansys Additive Manufacturing task on gra-vdi?",
+    "answer": "A single Ansys Additive Manufacturing task on gra-vdi can use up to 16 cores."
+  },
+  {
+    "question": "How can you check the resource usage of your running Ansys task on gra-vdi?",
+    "answer": "Open another terminal and run either `top -u $USER` or `ps u -u $USER | grep ansys`."
+  },
+  {
+    "question": "What command can be used to terminate unnecessary Ansys processes on gra-vdi?",
+    "answer": "You can terminate unnecessary Ansys processes with `pkill -9 -e -u $USER -f \"ansys|mwrpcss|mwfwrapper|ENGINE\"`."
+  },
+  {
+    "question": "What can cause persistent Ansys processes on gra-vdi?",
+    "answer": "Persistent Ansys processes can occur if an Ansys GUI session (Fluent, Workbench, etc.) is not properly terminated before vncviewer is closed manually or unexpectedly, such as due to a temporary network outage or a blocked filesystem."
+  },
+  {
+    "question": "What is the consequence of persistent Ansys processes?",
+    "answer": "Persistent processes can block licenses between gra-vdi login sessions or cause other unusual errors when attempting to start the graphical interface."
+  },
+  {
+    "question": "What preparations are needed before submitting an Additive project to a cluster queue?",
+    "answer": "You need to open your simulation with the Workbench GUI in the same directory where the task will be submitted, save it again using the same Ansys module version, and create a Slurm script."
+  },
+  {
+    "question": "How do you configure a Slurm script for parametric studies in Ansys Additive Manufacturing?",
+    "answer": "For parametric studies, replace `Update()` with `UpdateAllDesignPoints()` in your Slurm script."
+  },
+  {
+    "question": "How can you avoid manually clearing the solution and recreating design points when performing test runs for Ansys Additive Manufacturing?",
+    "answer": "You can either replace `Save(Overwrite=True)` with `Save(Overwrite=False)` in your script, or save a copy of the original `YOURPROJECT.wbpj` file and its corresponding `YOURPROJECT_files` directory."
+  },
+  {
+    "question": "How can you use a replay file for Ansys Additive Manufacturing on a cluster?",
+    "answer": "You can manually create and execute a replay file on the cluster by loading the Ansys module (e.g., `module load ansys/2019R3`), removing `.lock` files (e.g., `rm -f test_files/.lock`), and running `runwb2 -R myreplay.wbjn`."
+  },
+  {
+    "question": "How do you obtain a snapshot of resource usage for a running Ansys task on compute nodes?",
+    "answer": "After a few minutes, you can get a snapshot of resource usage by running `srun --jobid=myjobid top -bn1 -u $USER | grep R | grep -v top`."
+  },
+  {
+    "question": "How do you perform scalability tests for Ansys tasks?",
+    "answer": "After a task is completed, obtain its 'Job Wall-clock time' with `seff jobid`. Then, submit short tasks, doubling the number of cores, and continue as long as the Wall-clock time decreases by approximately 50%."
+  }
+]

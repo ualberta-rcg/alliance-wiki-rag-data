@@ -1,0 +1,42 @@
+[
+  {
+    "question": "How do you build data in the virtual environment during the AlphaFold3 inference stage?",
+    "answer": "You can build the data by running the `build_data` command in your virtual environment: `build_data`."
+  },
+  {
+    "question": "What is the recommended workaround for compilation time in AlphaFold3 inference?",
+    "answer": "To work around compilation time, you should export the `XLA_FLAGS` environment variable as: `export XLA_FLAGS=\"--xla_gpu_enable_triton_gemm=false\"`."
+  },
+  {
+    "question": "How do you configure GPU memory preallocation for AlphaFold3 inference?",
+    "answer": "You can configure GPU memory preallocation by setting the environment variables: `export XLA_PYTHON_CLIENT_PREALLOCATE=true` and `export XLA_CLIENT_MEM_FRACTION=0.95`."
+  },
+  {
+    "question": "What is the command to run the AlphaFold3 inference stage?",
+    "answer": "The AlphaFold3 inference stage is run using the `python run_alphafold.py` command with the `--norun_data_pipeline` flag, specifying directories for database, input, output, and JAX cache. An example is: `python run_alphafold.py --db_dir=$DOWNLOAD_DIR --input_dir=$INPUT_DIR --output_dir=$OUTPUT_DIR --jax_compilation_cache_dir=$HOME/.cache --norun_data_pipeline`."
+  },
+  {
+    "question": "How do you submit AlphaFold3 data and inference jobs independently?",
+    "answer": "First, submit the data pipeline job: `sbatch alphafold3-data.sh`. After it completes, submit the inference job: `sbatch alphafold3-inference.sh`."
+  },
+  {
+    "question": "How can you submit AlphaFold3 data and inference jobs as dependent tasks?",
+    "answer": "You can submit them as dependent tasks using `sbatch` with job IDs: `jid1=$(sbatch alphafold3-data.sh)` and `jid2=$(sbatch --dependency=afterok:$jid1 alphafold3-inference.sh)`."
+  },
+  {
+    "question": "What should you do if the first stage of a dependent AlphaFold3 job fails?",
+    "answer": "If the first stage fails, you must manually cancel the second stage by running: `scancel -u $USER -n alphafold3-inference`."
+  },
+  {
+    "question": "When should unified memory be enabled for AlphaFold3 GPU runs?",
+    "answer": "Unified memory should be enabled if you are running AlphaFold3 on inputs larger than 5,120 tokens or on a GPU with less memory (e.g., an A100 with 40 GB of memory)."
+  },
+  {
+    "question": "Which environment variables are needed to enable unified memory in the AlphaFold3 inference script?",
+    "answer": "To enable unified memory, add these environment variables to your inference submission script: `export XLA_PYTHON_CLIENT_PREALLOCATE=false`, `export TF_FORCE_UNIFIED_MEMORY=true`, and `export XLA_CLIENT_MEM_FRACTION=2.0` (adjusting the fraction as needed)."
+  },
+  {
+    "question": "How should the memory allocation be adjusted in the SLURM script when enabling unified memory?",
+    "answer": "When enabling unified memory, you should adjust the memory allocated to your job in the SLURM script accordingly, for instance, setting `#SBATCH --mem=80G` if `XLA_CLIENT_MEM_FRACTION=2.0` and using a 40GB GPU."
+  }
+]

@@ -1,58 +1,94 @@
 [
   {
-    "question": "What are the two main parts a model is split into for model parallelism in the `pytorch-modelpar-pipelined-rpc.py` example?",
-    "answer": "The model is split into a convolutional/pooling part (`ConvPart`) and a dense feedforward part (`MLPPart`)."
+    "question": "What does PyTorch offer as high-level features?",
+    "answer": "PyTorch provides Tensor computation (like NumPy) with strong GPU acceleration and deep neural networks built on a tape-based autograd system."
   },
   {
-    "question": "How is the `ConvPart` class structured in the `pytorch-modelpar-pipelined-rpc.py` script?",
-    "answer": "The `ConvPart` consists of two `nn.Conv2d` layers, two `nn.MaxPool2d` layers, and uses `nn.ReLU` activation functions. It also includes a flattening operation (`x.view(-1, 16 * 5 * 5)`)."
+    "question": "What is the relationship between PyTorch and Torch?",
+    "answer": "PyTorch has a distant connection with Torch, but for all practical purposes, they can be treated as separate projects."
   },
   {
-    "question": "How is the `MLPPart` class structured in the `pytorch-modelpar-pipelined-rpc.py` script?",
-    "answer": "The `MLPPart` consists of three `nn.Linear` layers and uses `nn.ReLU` activation functions."
+    "question": "What is LibTorch?",
+    "answer": "LibTorch allows one to implement extensions to PyTorch using C++ and to implement pure C++ machine learning applications. It includes all headers, libraries, and CMake configuration files required to depend on PyTorch."
   },
   {
-    "question": "How are the model parts distributed across GPUs in the `pytorch-modelpar-pipelined-rpc.py` example for model parallelism?",
-    "answer": "The `ConvPart` is loaded onto `cuda:0` (the first GPU), and the `MLPPart` is loaded onto `cuda:1` (the second GPU)."
+    "question": "How can models written in Python using PyTorch be used in pure C++?",
+    "answer": "Models written in Python using PyTorch can be converted and used in pure C++ through TorchScript."
   },
   {
-    "question": "What is the role of `torch.distributed.rpc.init_rpc` in the model parallelism example?",
-    "answer": "`torch.distributed.rpc.init_rpc('worker', rank=0, world_size=1)` is used to initialize PyTorch's RPC module, which is required by the `Pipe` class for Pipeline Parallelism."
+    "question": "How can I see the latest available version of PyTorch wheels?",
+    "answer": "Run the command `avail_wheels torch`."
   },
   {
-    "question": "How is pipeline parallelism implemented using the split model parts?",
-    "answer": "The `ConvPart` and `MLPPart` are first combined into an `nn.Sequential` model, and then this sequential model is wrapped with `torch.distributed.pipeline.sync.Pipe` with a specified number of `chunks` (e.g., `chunks=32`)."
+    "question": "What are the preferred steps to install a PyTorch wheel?",
+    "answer": "1. Load a Python module using `module load python`. 2. Create and start a virtual environment. 3. Install PyTorch in the virtual environment with `pip install --no-index torch`."
   },
   {
-    "question": "Where is the `nn.CrossEntropyLoss` function placed in the `pytorch-modelpar-pipelined-rpc.py` example?",
-    "answer": "The `nn.CrossEntropyLoss` function is loaded onto the last GPU (`cuda:1`), matching the GPU where the final part of the model (`MLPPart`) resides."
+    "question": "Which PyTorch version is required for H100 GPUs?",
+    "answer": "Torch 2.3 and higher is required for H100 GPUs."
   },
   {
-    "question": "How are input data and target labels moved to the correct GPUs during the training loop in the single GPU model parallelism script?",
-    "answer": "Input data (`inputs`) are moved to `cuda:0` and target labels (`targets`) are moved to `cuda:1`."
+    "question": "How do you install additional PyTorch packages like torchvision, torchtext, and torchaudio?",
+    "answer": "Run `pip install --no-index torch torchvision torchtext torchaudio` within your virtual environment."
   },
   {
-    "question": "How do you retrieve outputs from a model wrapped with `Pipe()`?",
-    "answer": "Models wrapped with `Pipe()` return a `RRef` object, so you call `.local_value()` on it to get the actual outputs, for example, `outputs = net(inputs).local_value()`."
+    "question": "What does a 'CUDA error: no kernel image is available for execution on the device' mean?",
+    "answer": "This exception means that the current torch installation does not support the compute architecture or the GPU device being used."
   },
   {
-    "question": "Under what conditions is combining model and data parallelism a viable option for high performance?",
-    "answer": "It is viable when a model is too large to fit inside a single GPU and needs to be trained using a very large dataset."
+    "question": "How can you resolve a 'CUDA error: no kernel image is available for execution on the device'?",
+    "answer": "You should either update `torch` to a more recent version or request a different GPU compatible with the current version used."
   },
   {
-    "question": "What is the general strategy for combining model and data parallelism?",
-    "answer": "The strategy involves splitting a large model into smaller parts (each on its own GPU), performing pipeline parallelism on the inputs, and then creating replicas of this entire process to be trained in parallel over separate subsets of the training data."
+    "question": "What modules are required to set up the LibTorch environment using StdEnv/2023?",
+    "answer": "For StdEnv/2023, you need to load `StdEnv/2023 gcc cuda/12.2 cmake protobuf cudnn python/3.11 abseil cusparselt opencv/4.8.1`."
   },
   {
-    "question": "How does gradient aggregation work in combined model and data parallelism?",
-    "answer": "Gradients are computed independently within each model replica, and then an aggregation of these gradients is used to update all replicas synchronously or asynchronously."
+    "question": "How do you create and activate a Python virtual environment for LibTorch installation?",
+    "answer": "Run `virtualenv --no-download --clear ~/ENV && source ~/ENV/bin/activate`."
   },
   {
-    "question": "What is an important caveat when using Torch RPC for combining model and data parallelism?",
-    "answer": "A significant limitation is that Torch RPC currently only supports splitting models inside a single node."
+    "question": "How do you install PyTorch and NumPy in the LibTorch virtual environment?",
+    "answer": "After activating the virtual environment, run `pip install --no-index torch numpy`."
   },
   {
-    "question": "What tool is recommended for very large models that cannot fit within the combined memory of all GPUs on a single compute node?",
-    "answer": "DeepSpeed is recommended for such scenarios."
+    "question": "How can you determine the versions of modules like abseil, cusparselt, and opencv used to compile the PyTorch wheel?",
+    "answer": "You can use the command `ldd $VIRTUAL_ENV/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so | sed -n 's&^.*/\\(\\(opencv\\|abseil\\|cusparselt\\)/[^/]*\\).*&\\1&p' | sort -u` (adjusting python version as needed)."
+  },
+  {
+    "question": "What are the specific versions for abseil, cusparselt, and opencv shown in the StdEnv/2023 example output?",
+    "answer": "The example output shows `abseil/20230125.3`, `cusparselt/0.5.0.1`, and `opencv/4.8.1`."
+  },
+  {
+    "question": "What modules are required to set up the LibTorch environment using StdEnv/2020?",
+    "answer": "For StdEnv/2020, you need to load `gcc cuda/11.4 cmake protobuf cudnn python/3.10`."
+  },
+  {
+    "question": "What is a minimal C++ example for LibTorch to check CUDA availability and create a tensor?",
+    "answer": "The `example.cpp` code includes `torch/torch.h` and checks `torch::cuda::is_available()` to set the device, then creates and prints a random tensor `torch::rand({2, 3}).to(device)`."
+  },
+  {
+    "question": "What does the `CMakeLists.txt` file for a minimal LibTorch example contain?",
+    "answer": "It specifies `cmake_minimum_required(VERSION 3.0 FATAL_ERROR)`, `project(example)`, `find_package(Torch REQUIRED)`, `add_executable(example example.cpp)`, `target_link_libraries(example \"${TORCH_LIBRARIES}\")`, and `set_property(TARGET example PROPERTY CXX_STANDARD 14)`."
+  },
+  {
+    "question": "How do you configure a LibTorch project for compilation in StdEnv/2023?",
+    "answer": "You configure with `cmake -B build -S . -DCMAKE_PREFIX_PATH=$VIRTUAL_ENV/lib/python3.11/site-packages -DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath=$VIRTUAL_ENV/lib/python3.11/site-packages/torch/lib,-L$EBROOTCUDA/extras/CUPTI/lib64 -DCMAKE_SKIP_RPATH=ON -DTORCH_CUDA_ARCH_LIST=\"6.0;7.0;7.5;8.0;9.0\"`."
+  },
+  {
+    "question": "How do you compile a LibTorch program after configuring it?",
+    "answer": "After configuration, compile using `cmake --build build`."
+  },
+  {
+    "question": "How do you run a compiled LibTorch example program?",
+    "answer": "Run the program using `build/example`."
+  },
+  {
+    "question": "What is required to test a LibTorch application with CUDA?",
+    "answer": "To test a LibTorch application with CUDA, you need to request an interactive job with a GPU."
+  },
+  {
+    "question": "Where can I find additional resources for LibTorch?",
+    "answer": "You can refer to the official documentation at `https://pytorch.org/cppdocs/`."
   }
 ]

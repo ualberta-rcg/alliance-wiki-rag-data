@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What is the purpose of the `resubmit.run` command in META-Farm?",
+    "answer": "The `resubmit.run` command analyzes `status.*` files to identify cases that failed or never ran, creates or overwrites a secondary `table.dat_` file listing these cases, and then launches a new farm for them."
+  },
+  {
+    "question": "What arguments can be passed to the `resubmit.run` command?",
+    "answer": "The `resubmit.run` command takes the same arguments as `submit.run`: `N` (number of jobs), an optional `-auto` switch, and optional `sbatch` arguments."
+  },
+  {
+    "question": "When can you run the `resubmit.run` command?",
+    "answer": "You cannot run `resubmit.run` until all the jobs from the original run are done or killed."
+  },
+  {
+    "question": "How can you automatically resubmit a farm until all cases are processed?",
+    "answer": "If the optional switch `-auto` is present when executing `resubmit.run` (or `submit.run`), the farm will resubmit itself automatically at the end, more than once if necessary, until all cases from `table.dat` have been processed."
+  },
+  {
+    "question": "What command displays the statuses of all processed cases in a farm?",
+    "answer": "The command `Status.run` (with a capital 'S') displays the statuses for all computed cases."
+  },
+  {
+    "question": "How can `Status.run` help in identifying failed cases more easily?",
+    "answer": "With the optional argument `-f`, `Status.run` will sort the output according to the exit status, showing cases with non-zero status at the bottom to make them easier to spot."
+  },
+  {
+    "question": "What problems can arise when using SIMPLE mode for a very large number of cases (e.g., >500)?",
+    "answer": "When the number of cases is much greater than 500, SIMPLE mode can lead to issues such as exceeding cluster job limits and wasting CPU cycles due to scheduling overheads if individual case computations are short (<20 min)."
+  },
+  {
+    "question": "How does META mode address the challenges of processing a large number of cases?",
+    "answer": "META mode addresses these problems by submitting a smaller number of 'metajobs', each designed to process multiple cases, rather than a separate job for each case."
+  },
+  {
+    "question": "How do you enable META mode when submitting a farm?",
+    "answer": "To enable META mode, the first argument to `submit.run` should be a positive integer `N`, representing the desired number of metajobs. For example, you would use `$ submit.run 32`."
+  },
+  {
+    "question": "Describe the dynamic workload-balancing scheme used in META mode.",
+    "answer": "In META mode, each job executes `task.run`, which contains a `while` loop for cases. Each loop iteration goes through a serialized code portion to get the next case from `table.dat`, then executes `single_case.sh` for that case. This ensures a dynamic balance where metajobs handling shorter cases process more of them."
+  },
+  {
+    "question": "What are the benefits of dynamic workload balancing in META mode?",
+    "answer": "Dynamic workload balancing ensures all metajobs finish around the same time, regardless of individual case runtimes, CPU speeds, or metajob start times. It also allows cases to be processed even if not all metajobs start, and if a metajob dies, at most one case is lost, which can be easily rectified with `resubmit.run`."
+  },
+  {
+    "question": "What script is executed by each metajob in META mode?",
+    "answer": "Each metajob in META mode executes the `task.run` script."
+  },
+  {
+    "question": "What happens if a metajob dies in META mode due to a node crash?",
+    "answer": "If a metajob dies in META mode (e.g., due to a node crash), at most one case will be lost, which can be easily rectified by using `resubmit.run`."
+  }
+]

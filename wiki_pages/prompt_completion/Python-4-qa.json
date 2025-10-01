@@ -1,82 +1,106 @@
 [
   {
-    "question": "How do you create and set up a virtual environment on each allocated node in a multi-node job using `srun`?",
-    "answer": "You can use `srun --ntasks $SLURM_NNODES --tasks-per-node=1 bash << EOF` followed by `virtualenv --no-download $SLURM_TMPDIR/env`, `source $SLURM_TMPDIR/env/bin/activate`, `pip install --no-index --upgrade pip`, and `pip install --no-index -r requirements.txt` within the EOF block."
+    "question": "How do you create a virtual environment on each allocated node in a multi-node job?",
+    "answer": "Within your submission script, use `srun --ntasks $SLURM_NNODES --tasks-per-node=1 bash << EOF` to encapsulate the virtual environment creation commands, which include `virtualenv --no-download $SLURM_TMPDIR/env`, `source $SLURM_TMPDIR/env/bin/activate`, and package installation commands like `pip install --no-index --upgrade pip` and `pip install --no-index -r requirements.txt`."
   },
   {
-    "question": "How do you activate the virtual environment on the main node after it's been created on all nodes?",
+    "question": "How do you activate the virtual environment on the main node for a multi-node job?",
     "answer": "Activate it using `source $SLURM_TMPDIR/env/bin/activate;` on the main node."
   },
   {
-    "question": "How do you run a Python script across multiple nodes after setting up node-local virtual environments?",
-    "answer": "Use `srun python myscript.py;` after activating the virtual environment on the main node. The `srun` command will export the current environment variables to other tasks."
+    "question": "How do you run a Python script using `srun` after activating the virtual environment in a multi-node job?",
+    "answer": "After activating the virtual environment on the main node, use `srun python myscript.py;` to run your script, as `srun` exports the current environment, including `$VIRTUAL_ENV` and `$PATH` variables."
   },
   {
-    "question": "What is an example SLURM job submission script for a multi-node Python job with node-local virtual environments?",
-    "answer": "An example script named `submit-nnodes-venv.sh` would include `srun --ntasks $SLURM_NNODES --tasks-per-node=1 bash << EOF ... EOF` for environment setup on each node, followed by `source $SLURM_TMPDIR/env/bin/activate;` on the main node, and `srun python myscript-mpi.py;` to run the script."
+    "question": "What is the command to list currently available Python wheels?",
+    "answer": "You can run the command `avail_wheels` on the cluster."
   },
   {
-    "question": "Where can I find a list of currently available Python wheels?",
-    "answer": "Currently available wheels are listed on the `Available Python wheels` page or by running the `avail_wheels` command on the cluster."
+    "question": "Where can I find a list of available Python wheels?",
+    "answer": "Available wheels are listed on the 'Available Python wheels' page or by running the `avail_wheels` command on the cluster."
   },
   {
     "question": "What are the default behaviors of the `avail_wheels` command?",
-    "answer": "By default, `avail_wheels` shows only the latest version of a specific package, versions compatible with the loaded Python module or activated virtual environment, and versions compatible with the CPU architecture and software environment."
+    "answer": "By default, `avail_wheels` shows only the latest version of a package, versions compatible with the loaded Python module or activated virtual environment, and versions compatible with the current CPU architecture and software environment (StdEnv)."
   },
   {
-    "question": "How can I list Python wheels that contain a specific string, like 'cdf', in their name?",
-    "answer": "You can list them using the command `avail_wheels \"*cdf*\"`."
+    "question": "How can I list wheels that contain 'cdf' in their name (case insensitive)?",
+    "answer": "You can use the command `avail_wheels \"*cdf*\"`."
   },
   {
-    "question": "How do you find a Python wheel by its exact name using the `avail_wheels` command?",
-    "answer": "You can find it by its exact name using the command `avail_wheels numpy`."
+    "question": "How do I list a specific package by its exact name, for example, 'numpy'?",
+    "answer": "Use the command `avail_wheels numpy`."
   },
   {
-    "question": "How can I list a specific version of a package, such as Numpy 1.23, using `avail_wheels`?",
-    "answer": "You can list a specific version using `avail_wheels numpy==1.23` or `avail_wheels numpy --version 1.23`."
+    "question": "How can I list a specific version of a package using `avail_wheels`, for example, 'numpy' version '1.23'?",
+    "answer": "You can use `avail_wheels numpy==1.23` or `avail_wheels numpy --version 1.23`."
   },
   {
-    "question": "What operators can be used with `avail_wheels` to filter packages by version?",
-    "answer": "You can use `==`, `<`, `>`, `~=`, `<=`, `>=`, and `!=` operators to filter packages by version."
+    "question": "What operators can be used to specify package versions with `avail_wheels` in pip format?",
+    "answer": "You can use `==`, `<`, `>`, `~=`, `<=`, `>=`, and `!=`."
   },
   {
-    "question": "How do you list versions of a package that are older than a specific version, like Numpy < 1.23?",
-    "answer": "You can list inferior versions using the command `avail_wheels 'numpy<1.23'`."
+    "question": "How do I list all available versions of a wheel using `avail_wheels`?",
+    "answer": "Use the `--all-version` option, for example, `avail_wheels \"*cdf*\" --all-version`."
   },
   {
-    "question": "How can I list all available versions of wheels containing a specific string?",
-    "answer": "You can list all versions using `avail_wheels \"*cdf*\" --all-version`."
+    "question": "How can I list available wheels for a specific Python version, such as Python 3.9?",
+    "answer": "You can use the `--python` option, for example, `avail_wheels 'numpy<1.23' --python 3.9`."
   },
   {
-    "question": "How do you list available wheels that are compatible with a specific Python version, such as Python 3.9?",
-    "answer": "You can list them using the command `avail_wheels 'numpy<1.23' --python 3.9`."
+    "question": "What does 'cp39' in the `avail_wheels` output signify?",
+    "answer": "'cp39' stands for cpython 3.9, indicating the Python version for which the wheel is available."
   },
   {
-    "question": "What does 'cp39' in the `python` column of `avail_wheels` output signify?",
-    "answer": "The `cp39` in the `python` column stands for `cpython 3.9`, indicating compatibility with that Python version."
+    "question": "How can I list available wheels based on a `requirements.txt` file?",
+    "answer": "Use the command `avail_wheels -r requirements.txt`."
   },
   {
-    "question": "How do you list available wheels based on a `requirements.txt` file?",
-    "answer": "You can list them using the command `avail_wheels -r requirements.txt`."
+    "question": "How can I display wheels that are specified in a `requirements.txt` file but are not available?",
+    "answer": "Use the command `avail_wheels -r requirements.txt --not-available`."
   },
   {
-    "question": "How can you display wheels listed in a `requirements.txt` file that are *not* available?",
-    "answer": "You can display them using `avail_wheels -r requirements.txt --not-available`."
+    "question": "What is the first step to pre-download a package like `tensorboardX` on a login node?",
+    "answer": "Run `pip download --no-deps tensorboardX`."
   },
   {
-    "question": "What are the steps to pre-download a package on a login node and install it on a compute node?",
-    "answer": "First, run `pip download --no-deps tensorboardX` on a login node. If the filename ends with `none-any`, then install it on a compute node using `pip install tensorboardX-1.9-py2.py3-none-any.whl` (or similar)."
+    "question": "What should be done if a pre-downloaded wheel's filename ends with `linux_x86_64` or `manylinux*_x86_64` instead of `none-any`?",
+    "answer": "You should contact Technical support to have the wheel compiled and made available on the systems, as it might not function correctly."
   },
   {
-    "question": "What should you do if a pre-downloaded wheel's filename does not end with `none-any` but instead with `linux_x86_64` or `manylinux*_x86_64`?",
-    "answer": "You should contact Technical support to request that they compile the wheel and make it available on the systems, as it might not function correctly otherwise."
+    "question": "How do you install a package that has been pre-downloaded as a wheel file?",
+    "answer": "Use the path to the downloaded wheel file with `pip install`, for example, `pip install tensorboardX-1.9-py2.py3-none-any.whl`."
   },
   {
-    "question": "What Python module is commonly used for parallel programming on a single compute node?",
-    "answer": "The `multiprocessing` module is commonly used for parallel programming with Python."
+    "question": "What Python module is commonly used for parallel programming to achieve faster results?",
+    "answer": "The `multiprocessing` module is commonly used."
   },
   {
-    "question": "Which class within the `multiprocessing` module is useful for controlling parallel processes and applying calculations to multiple data?",
-    "answer": "The `Pool` class within the `multiprocessing` module is of particular interest for these tasks."
+    "question": "Which class in the `multiprocessing` module is particularly useful for controlling processes and applying calculations to multiple data?",
+    "answer": "The `Pool` class is of particular interest."
+  },
+  {
+    "question": "How can you ensure your `multiprocessing` Pool uses the correct number of cores allocated by a scheduler on a cluster?",
+    "answer": "You should set the number of processes in `mp.Pool()` to the value of the `SLURM_CPUS_PER_TASK` environment variable, which can be retrieved using `ncpus = int(os.environ.get('SLURM_CPUS_PER_TASK',default=1))`."
+  },
+  {
+    "question": "What happens if you launch more parallel processes than the cores allocated to your job on a cluster?",
+    "answer": "Launching more processes than allocated cores will slow down your calculation and potentially overload the compute node."
+  },
+  {
+    "question": "What happens if you launch fewer parallel processes than the cores allocated to your job on a cluster?",
+    "answer": "Launching fewer processes than allocated cores will result in wasted resources and idle cores."
+  },
+  {
+    "question": "What is a limitation of the Python `multiprocessing` module?",
+    "answer": "The `multiprocessing` module is restricted to using a single compute node, limiting the speedup to the total number of CPU cores in that node."
+  },
+  {
+    "question": "What alternatives are suggested for parallel programming in Python if you need to use multiple nodes?",
+    "answer": "Consider using mpi4py or PySpark for multi-node parallel programming."
+  },
+  {
+    "question": "What general advice is given for optimizing Python code before parallelizing it?",
+    "answer": "You should first ensure your Python program is written efficiently, as this can greatly improve performance."
   }
 ]

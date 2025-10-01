@@ -1,0 +1,50 @@
+[
+  {
+    "question": "What is the procedure for installing gurobipy for Gurobi versions 10.0.3 and older in a Python virtual environment?",
+    "answer": "First, load the `gurobi/10.0.3` and `python` modules, create a virtual environment with `virtualenv --no-download ~/env_gurobi`, and activate it. Then install any other Python packages like `pandas`. To install `gurobipy`, create a directory such as `/tmp/$USER`, copy `$EBROOTGUROBI/{lib,setup.py}` into it, navigate to that directory, and run `python setup.py install`."
+  },
+  {
+    "question": "Why would `python setup.py install` fail when trying to install gurobipy for Gurobi 10.0.3 and older directly from `$EBROOTGUROBI`?",
+    "answer": "It would fail with an error like `error: could not create 'gurobipy.egg-info': Read-only file system` because `$EBROOTGUROBI` is a read-only location, requiring files to be copied to a writable location like `/tmp/$USER` first."
+  },
+  {
+    "question": "Which Gurobi version is recommended for use over 11.0.0 due to observed segfaults?",
+    "answer": "Version 11.0.1 is recommended over 11.0.0, as Gurobi 11.0.0 has been observed to segfault in examples, while 11.0.1 runs smoothly."
+  },
+  {
+    "question": "How do you set up a Python virtual environment for Gurobi versions 11.0.1 and newer?",
+    "answer": "Load the `gurobi/11.0.1` and `python` modules, then create the virtual environment using `virtualenv --no-download ~/env_gurobi`, and activate it with `source ~/env_gurobi/bin/activate`."
+  },
+  {
+    "question": "What method for installing Gurobi for Python is deprecated starting with Gurobi 11 versions?",
+    "answer": "The use of `setup.py` to install Gurobi for Python is deprecated starting with Gurobi 11 versions."
+  },
+  {
+    "question": "What are the recommended alternatives for installing Gurobi for Python for Gurobi 11 versions and newer?",
+    "answer": "Both `pip` and `conda` are given as alternatives, but `conda` should not be used on the described systems. The `pip` approach is demonstrated."
+  },
+  {
+    "question": "Why are standard `pip install gurobipy` or offline wheel installations challenging for Gurobi 11.0.1 on these Linux systems?",
+    "answer": "The standard commands are problematic because the Linux systems are set up with a Gentoo prefix, requiring a specialized script to convert the wheel into a usable format."
+  },
+  {
+    "question": "What is the detailed process for installing gurobipy for Gurobi 11.0.1 and newer in a Python virtual environment on these systems?",
+    "answer": "After creating and activating the virtual environment and installing other Python packages like `pandas`, download `unmanylinuxize.sh`, make it executable, and run it with `--package gurobipy --version 11.0.1` and the specific `--url` of the Gurobi wheel file (obtained from `pypi.org`). Finally, install the converted wheel using `python -m pip install --find-links $PWD --no-index gurobipy`."
+  },
+  {
+    "question": "What is the caveat when using the `unmanylinuxize.sh` script for Gurobi 11+ installation?",
+    "answer": "For each new Gurobi version, you must manually go to `https://pypi.org/project/gurobipy/<VERSION>/#history`, click on the desired version, then 'Download files', and copy the HTTPS link for the wheel file to use as the `--url` argument for `unmanylinuxize.sh`."
+  },
+  {
+    "question": "How do you run a Gurobi Python script once the virtual environment is activated and necessary modules are loaded?",
+    "answer": "After loading `gurobi/11.0.1` and `scipy-stack` (if needed) and activating the virtual environment, you can run Python scripts using `python $EBROOTGUROBI/examples/python/matrix1.py` for examples, or `python my_gurobi_script.py` for custom scripts."
+  },
+  {
+    "question": "What modules should be loaded in addition to activating the virtual environment to run a Gurobi Python script that requires `scipy` and `numpy`?",
+    "answer": "You should load `gurobi/11.0.1` (to define `$EBROOTGUROBI`) and `scipy-stack` (to make `scipy` available), ensuring `numpy` is already installed in the virtual environment."
+  },
+  {
+    "question": "How can a custom Gurobi Python script be submitted as a batch job to the queue?",
+    "answer": "Prepare a Slurm script with `#SBATCH` directives for account, time, CPUs, and memory. Within the script, load `StdEnv/2023`, `gurobi/11.0.1` (and `scipy-stack` if needed), activate your virtual environment, and then execute your Python script with `python my_gurobi_script.py`. Submit the job using `sbatch my_slurm_script.sh`."
+  }
+]

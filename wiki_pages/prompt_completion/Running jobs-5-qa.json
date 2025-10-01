@@ -1,30 +1,74 @@
 [
   {
-    "question": "What is the primary requirement for long-running computations that exceed system time limits?",
-    "answer": "The application must support checkpointing, meaning it should be able to save its state to a file and restart from that saved state."
+    "question": "What does the `.bat+` record signify in `sacct` output?",
+    "answer": "The `.bat+` record represents your submission script, which is typically where the main work and resource consumption for a job occur."
   },
   {
-    "question": "What are the two recommended methods for automatically restarting jobs on the clusters?",
-    "answer": "The two recommended methods are using SLURM job arrays and resubmitting from the end of the job script."
+    "question": "When does a `.0` step appear in `sacct` output?",
+    "answer": "A `.0` step is created in `sacct` output if you use `srun` within your job submission script, and it consumes most of the resources."
   },
   {
-    "question": "How do job arrays facilitate restarting long-running computations?",
-    "answer": "Using the `--array=1-100%10` syntax, a collection of identical jobs can be submitted with the condition that only one job runs at a time, and the script ensures the last checkpoint is used for the next job."
+    "question": "What is the purpose of the `.ext+` step in `sacct` output?",
+    "answer": "The `.ext+` step is for prologue and epilogue tasks and normally does not consume any significant resources."
   },
   {
-    "question": "Can you give an example of how a job array can be used to split a long simulation?",
-    "answer": "A molecular dynamics simulation requiring 1,000,000 steps that exceeds time limits can be split into 10 smaller jobs of 100,000 steps, run one after another using a job array."
+    "question": "How can I view all records for a job that may have been restarted due to a node failure?",
+    "answer": "To see all records related to a job that might have been restarted, you should add the `--duplicates` option to the `sacct` command."
   },
   {
-    "question": "What is the purpose of the `if test -e state.cpt; then mdrun --restart state.cpt; else mdrun fi` block in a job array restart script?",
-    "answer": "This block checks for the existence of a checkpoint file (`state.cpt`). If it exists, the simulation restarts from the checkpoint; otherwise, a new simulation is started."
+    "question": "Which `sacct` field should be used to determine the memory a job needed?",
+    "answer": "Use the `MaxRSS` accounting field with `sacct` to determine how much memory a job needed."
   },
   {
-    "question": "How does resubmission from the job script work for long-running calculations?",
-    "answer": "A job is submitted to run a chunk of the calculation and save a checkpoint. Before the allocated run-time elapses, the script checks if the calculation is finished; if not, it submits a copy of itself to continue working."
+    "question": "What does the `MaxRSS` value represent?",
+    "answer": "The `MaxRSS` value represents the largest resident set size for any of the tasks in a job."
   },
   {
-    "question": "What is an important consideration when defining the `work_should_continue` function in a job resubmission script?",
-    "answer": "The test to determine whether to submit a follow-up job should be a *positive test*, checking if work *should* continue, rather than a negative test for a stopping condition, to prevent indefinite job chains in case of unforeseen errors."
+    "question": "How can I find out which task and node had the maximum resident set size?",
+    "answer": "To find out which task and node had the maximum resident set size, you should print the `MaxRSSTask` and `MaxRSSNode` fields along with `MaxRSS`."
+  },
+  {
+    "question": "What is the `sstat` command used for?",
+    "answer": "The `sstat` command works on a running job in a similar way that `sacct` works on a completed job, providing information about its status and resource usage."
+  },
+  {
+    "question": "What are some reasons to attach to a running job?",
+    "answer": "Attaching to a running job can be useful for troubleshooting or monitoring the progress of the job."
+  },
+  {
+    "question": "How do you monitor GPU usage on a node where a job is running?",
+    "answer": "You can monitor GPU usage by running `srun --jobid 123456 --pty watch -n 30 nvidia-smi` on the node assigned to your job."
+  },
+  {
+    "question": "How can you launch multiple monitoring commands for a running job?",
+    "answer": "You can launch multiple monitoring commands using `tmux` with `srun`, for example: `srun --jobid 123456 --pty tmux new-session -d 'htop -u $USER' \\; split-window -h 'watch nvidia-smi' \\; attach`."
+  },
+  {
+    "question": "What should you be careful about when launching processes with `srun` to monitor a job?",
+    "answer": "You should be careful not to launch processes that would use a significant portion of the resources allocated for the job, as this could lead to the job being killed or slowed down."
+  },
+  {
+    "question": "Do `srun` commands for monitoring work for interactive jobs?",
+    "answer": "No, the `srun` commands described work only to monitor a job submitted with `sbatch`. To monitor an interactive job, you should create multiple panes with `tmux` and start each process in its own pane."
+  },
+  {
+    "question": "How do you cancel a specific job?",
+    "answer": "Use `scancel` followed by the job ID to cancel a specific job, for example: `scancel <jobid>`."
+  },
+  {
+    "question": "How can you cancel all your jobs?",
+    "answer": "You can cancel all your jobs by running `scancel -u $USER`."
+  },
+  {
+    "question": "How do you cancel only your pending jobs?",
+    "answer": "To cancel only your pending jobs, use the command `scancel -t PENDING -u $USER`."
+  },
+  {
+    "question": "What is required for an application to support long-running computations that exceed system time limits?",
+    "answer": "The application must support checkpointing, meaning it should be able to save its state to a checkpoint file and restart from that saved state."
+  },
+  {
+    "question": "What are the two recommended methods for automatic restarting of long-running computations?",
+    "answer": "The two recommended methods for automatic restarting are using SLURM job arrays and resubmitting from the end of the job script."
   }
 ]

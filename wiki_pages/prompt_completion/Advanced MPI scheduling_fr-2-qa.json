@@ -1,0 +1,94 @@
+[
+  {
+    "question": "Combien de c\u0153urs sont allou\u00e9s dans un script Slurm configur\u00e9 avec `--ntasks=16`, `--cpus-per-task=4` et `--mem-per-cpu=3G`?",
+    "answer": "64 c\u0153urs sont allou\u00e9s (16 processus MPI multipli\u00e9s par 4 c\u0153urs par processus)."
+  },
+  {
+    "question": "Combien de processus MPI (t\u00e2ches) sont initialis\u00e9s avec les param\u00e8tres Slurm `--ntasks=16` et `--cpus-per-task=4`?",
+    "answer": "Seulement 16 processus (t\u00e2ches) MPI sont et seront initialis\u00e9s."
+  },
+  {
+    "question": "Dans le cas d'une application OpenMP hybride avec `--ntasks=16` et `--cpus-per-task=4`, combien de fils chaque processus d\u00e9marrera-t-il?",
+    "answer": "Chacun des processus d\u00e9marrera 4 fils, soit un par c\u0153ur."
+  },
+  {
+    "question": "Quelle quantit\u00e9 de m\u00e9moire chaque processus peut-il utiliser dans une t\u00e2che Slurm configur\u00e9e avec `--ntasks=16`, `--cpus-per-task=4` et `--mem-per-cpu=3G`?",
+    "answer": "Chaque processus pourra utiliser 12 Go."
+  },
+  {
+    "question": "Comment les t\u00e2ches peuvent-elles \u00eatre allou\u00e9es sur les n\u0153uds pour une configuration avec 4 c\u0153urs par t\u00e2che, telle que celle utilisant `--ntasks=16` et `--cpus-per-task=4`?",
+    "answer": "Les t\u00e2ches pourraient \u00eatre allou\u00e9es sur 2 \u00e0 16 n\u0153uds, peu importe lesquels."
+  },
+  {
+    "question": "Pourquoi est-il n\u00e9cessaire de sp\u00e9cifier `--cpus-per-task=$SLURM_CPUS_PER_TASK` pour la commande `srun`?",
+    "answer": "Cette sp\u00e9cification est exig\u00e9e depuis Slurm 22.05 et ne nuit pas aux versions les moins r\u00e9centes."
+  },
+  {
+    "question": "Comment configurer une t\u00e2che Slurm pour obtenir exactement 2 n\u0153uds entiers avec 16 t\u00e2ches MPI et 4 fils chacune, allouant 96 Go de m\u00e9moire par n\u0153ud?",
+    "answer": "Utilisez `--nodes=2 --ntasks-per-node=8 --cpus-per-task=4 --mem=96G` suivi de `srun --cpus-per-task=$SLURM_CPUS_PER_TASK application.exe`."
+  },
+  {
+    "question": "Que signifie le param\u00e8tre `--mem` lorsqu'il est utilis\u00e9 dans un script Slurm?",
+    "answer": "L'option `--mem` pr\u00e9cise la quantit\u00e9 de m\u00e9moire *par n\u0153ud*."
+  },
+  {
+    "question": "Quelle est la principale diff\u00e9rence entre la premi\u00e8re et la seconde configuration de t\u00e2che hybride pr\u00e9sent\u00e9e?",
+    "answer": "La deuxi\u00e8me configuration garantit l'obtention d'exactement 2 n\u0153uds entiers, alors que la premi\u00e8re permet une allocation plus flexible sur un nombre variable de n\u0153uds."
+  },
+  {
+    "question": "Quel est l'objectif de la commande `mpirun`?",
+    "answer": "`mpirun` permet la communication entre processus ex\u00e9cut\u00e9s sur des ordinateurs diff\u00e9rents."
+  },
+  {
+    "question": "Est-il n\u00e9cessaire de fournir \u00e0 `mpirun` la liste des n\u0153uds ou le nombre de processus avec Torque/Moab?",
+    "answer": "Non, avec Torque/Moab, il n'est pas n\u00e9cessaire de fournir ces informations \u00e0 `mpirun` car l'ordonnanceur s'en charge."
+  },
+  {
+    "question": "Comment Slurm g\u00e8re-t-il l'affinit\u00e9 des t\u00e2ches, en comparaison avec l'approche `mpirun`?",
+    "answer": "Avec Slurm, c'est l'ordonnanceur qui d\u00e9cide de l'affinit\u00e9 des t\u00e2ches, ce qui \u00e9vite d'avoir \u00e0 pr\u00e9ciser des param\u00e8tres complexes comme `--map-by node:pe=4 -n 16` pour `mpirun`."
+  },
+  {
+    "question": "Comment `srun application.exe` distribue-t-il les processus aux ressources allou\u00e9es?",
+    "answer": "`srun application.exe` distribue automatiquement les processus aux ressources pr\u00e9cises allou\u00e9es \u00e0 la t\u00e2che."
+  },
+  {
+    "question": "Quelle est la relation entre `srun` et `mpirun` en termes de niveaux d'abstraction?",
+    "answer": "`srun` est au-dessus de `mpirun` en termes de niveaux d'abstraction; `srun` peut faire tout ce que fait `mpirun` et davantage."
+  },
+  {
+    "question": "Pourquoi `srun` est-il l'outil de pr\u00e9dilection pour lancer tous les types de calcul avec Slurm?",
+    "answer": "`srun` est l'outil de pr\u00e9dilection car il est plus polyvalent que le `pbsdsh` de Torque et il est consid\u00e9r\u00e9 comme l'outil Slurm universel pour la distribution des t\u00e2ches en parall\u00e8le."
+  },
+  {
+    "question": "Que signifie le fait que `srun` soit l'outil Slurm universel pour la distribution des t\u00e2ches en parall\u00e8le?",
+    "answer": "Cela signifie qu'une fois les ressources allou\u00e9es, la nature de l'application (MPI, OpenMP, hybride, distribution s\u00e9rielle, pipeline, multiprogramme ou autre) n'importe peu, `srun` peut la g\u00e9rer."
+  },
+  {
+    "question": "Comment `srun` est-il sp\u00e9cifiquement adapt\u00e9 \u00e0 Slurm?",
+    "answer": "`srun` est parfaitement adapt\u00e9 \u00e0 Slurm car il amorce la premi\u00e8re \u00e9tape de la t\u00e2che, initialise correctement les variables d'environnement `SLURM_STEP_ID` et `SLURM_PROCID` et fournit les renseignements de suivi appropri\u00e9s."
+  },
+  {
+    "question": "O\u00f9 peut-on trouver des exemples des diff\u00e9rences entre `srun` et `mpiexec`?",
+    "answer": "Des exemples des diff\u00e9rences entre `srun` et `mpiexec` peuvent \u00eatre trouv\u00e9s sur le forum OpenMPI."
+  },
+  {
+    "question": "Est-ce que `mpiexec` peut offrir une meilleure performance que `srun` dans certains cas?",
+    "answer": "Oui, dans certains cas, `mpiexec` offrira une meilleure performance que `srun`."
+  },
+  {
+    "question": "Quel est l'avantage de `srun` par rapport \u00e0 `mpiexec` concernant la gestion des ressources?",
+    "answer": "`srun` diminue le risque de conflit entre les ressources allou\u00e9es par Slurm et celles utilis\u00e9es par OpenMPI."
+  },
+  {
+    "question": "O\u00f9 peut-on consulter la documentation officielle de la commande `sbatch`?",
+    "answer": "La documentation de `sbatch` est disponible sur [https://slurm.schedmd.com/sbatch.html]."
+  },
+  {
+    "question": "O\u00f9 peut-on trouver la documentation officielle de la commande `srun`?",
+    "answer": "La documentation de `srun` est disponible sur [https://slurm.schedmd.com/srun.html]."
+  },
+  {
+    "question": "O\u00f9 peut-on trouver des informations relatives \u00e0 Open MPI et Slurm?",
+    "answer": "Des informations sur Open MPI et Slurm sont disponibles sur [https://www.open-mpi.org/faq/?category=slurm]."
+  }
+]

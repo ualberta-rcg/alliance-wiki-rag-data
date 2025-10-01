@@ -1,0 +1,74 @@
+[
+  {
+    "question": "What does it mean if Maximum Force and RMS Force have converged but Maximum Displacement and RMS Displacement have not?",
+    "answer": "This indicates that the forces are often converged, but the step sizes (displacements) are not."
+  },
+  {
+    "question": "How can I resolve an optimization issue where forces are converged but displacements are not?",
+    "answer": "If the forces are converged but the step sizes are not, you can try using `Opt=ReadFC`, `Opt=CalcFC`, or rarely `Opt=CalcAll` in a series of linked jobs. This is particularly useful if your starting force constants matrix is poor or there is a large geometry change."
+  },
+  {
+    "question": "What should I do if my optimization algorithm fails due to issues with the coordinate system, especially when using a z-matrix?",
+    "answer": "If coordinates are specified with a z-matrix and lead to three of four atoms defining a torsion angle being collinear (angle close to 0 or 180 degrees), causing the optimization to fail, you should either formulate a better z-matrix or use the default redundant internal coordinates."
+  },
+  {
+    "question": "What alternative optimization methods can I use if the default ones fail?",
+    "answer": "If default methods fail, you can change the optimization method to `opt=ef` (if the number of variables is less than 50) or `opt=gdiis` (for floppy molecules)."
+  },
+  {
+    "question": "What causes the 'angle Alpha is outside the valid range of 0 to 180' error in Gaussian?",
+    "answer": "This error means that the Gaussian job terminated abnormally because an angle 'x' in the z-matrix changed to become outside the allowed range of 0 < x < 180."
+  },
+  {
+    "question": "How do I fix the 'angle Alpha is outside the valid range of 0 to 180' error?",
+    "answer": "This error often occurs with large geometry changes in a molecule, especially one composed of interacting fragments. You should re-define the z-matrix or use a different coordinate system."
+  },
+  {
+    "question": "What does the 'End of file reading basis center' error indicate?",
+    "answer": "This is an input error where you attempted to read in a general basis set but forgot to include the basis set itself."
+  },
+  {
+    "question": "How can I fix the 'End of file reading basis center' error?",
+    "answer": "To fix this, you need to either put in the basis set or remove the `gen` keyword from the route line and specify an internal basis set."
+  },
+  {
+    "question": "What is the reason for the 'Operation on file out of range' error in Gaussian?",
+    "answer": "This error typically occurs when you try to retrieve something from the checkpoint file (using commands like `Opt=ReadFC`, `guess=read`, or `geom=allcheck/modify`) that is not present, either because it wasn't calculated previously or the information wasn't written to the checkpoint file due to disk space or time limits in an earlier job."
+  },
+  {
+    "question": "How do I resolve the 'Operation on file out of range' error?",
+    "answer": "You need to re-calculate the information that was missing or manually type in the required information."
+  },
+  {
+    "question": "What does the 'End of file in GetChg' error mean?",
+    "answer": "This error indicates an input problem where the charge/multiplicity line is required but was omitted, or you forgot to put `geom=allcheck` in the route section when intending to read charge/multiplicity from the checkpoint file."
+  },
+  {
+    "question": "How can I fix the 'End of file in GetChg' error?",
+    "answer": "You should either put the charge/multiplicity line in your input file or add `geom=allcheck` to the route section."
+  },
+  {
+    "question": "What causes the 'Change in point group or standard orientation' error during a Gaussian job?",
+    "answer": "This error occurs during the optimization process when either the standard orientation or the point group of the molecule has changed, which might be visualized as a sudden flipping of the structure by 180 degrees. This error is less common since Gaussian 03."
+  },
+  {
+    "question": "How can I fix an error related to a 'Change in point group or standard orientation'?",
+    "answer": "Fixes include ensuring your z-matrix is correctly specified (avoiding changes from a point group to a subgroup), desymmetrizing your starting structure if it has too high symmetry, reformulating your z-matrix with more symmetry if the point group shown is incorrect, or turning symmetry completely off if it's not a concern."
+  },
+  {
+    "question": "Why do I get an 'Unrecognized atomic symbol' error in Gaussian?",
+    "answer": "This is an input error. It happens when you are reading in a general basis set and the atomic symbol you've specified (e.g., 'ic2') does not match any standard atomic symbol. It can also occur in a link job if `geom=modify` is used after a previous step that cleared the z-matrix, causing Gaussian to misinterpret the input as basis set information."
+  },
+  {
+    "question": "How do I correct an 'Unrecognized atomic symbol' error?",
+    "answer": "You need to type in the correct atomic symbol."
+  },
+  {
+    "question": "What does 'Convergence failure -- run terminated' indicate in an SCF calculation?",
+    "answer": "This message indicates that the Self-Consistent Field (SCF) procedure has failed to converge, typically due to a poor initial guess for the molecular orbitals."
+  },
+  {
+    "question": "How can I resolve an SCF convergence failure?",
+    "answer": "To fix an SCF convergence failure, you can try using a better guess for molecular orbitals (e.g., `guess=read` from an SCF run at a lower level of theory like HF/STO-3G), use an alternate SCF converger like `SCF=QC` or `SCF=XQC`, fix a poor initial geometry if bonds are too long or short, or resubmit the job with the penultimate (or earlier) geometry and a newly evaluated Hessian."
+  }
+]

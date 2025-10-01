@@ -1,0 +1,50 @@
+[
+  {
+    "question": "Comment les attributs \u00e9tendus des syst\u00e8mes de fichiers Lustre sont-ils g\u00e9r\u00e9s par `dar` lors de l'archivage ?",
+    "answer": "Certains attributs \u00e9tendus des syst\u00e8mes de fichiers Lustre (typiquement dans `/home`, `/project` ou `/scratch` sur les grappes de calcul) sont automatiquement sauvegard\u00e9s lorsque les fichiers sont archiv\u00e9s."
+  },
+  {
+    "question": "Comment afficher les attributs \u00e9tendus associ\u00e9s \u00e0 chaque fichier archiv\u00e9 ?",
+    "answer": "Utilisez l'indicateur `-alist-ea` avec la commande `dar -l <nom_de_base>`."
+  },
+  {
+    "question": "Quel est un exemple d'attribut \u00e9tendu que l'on peut trouver pour les fichiers Lustre ?",
+    "answer": "Un exemple est `Extended Attribute: [lustre.lov]`."
+  },
+  {
+    "question": "Que se passe-t-il lors de l'extraction de fichiers avec des attributs Lustre vers un emplacement non Lustre, comme `$SLURM_TMPDIR` ?",
+    "answer": "Vous obtiendrez des messages d'erreur tels que `Error while adding EA lustre.lov : Operation not supported`."
+  },
+  {
+    "question": "Comment \u00e9viter les erreurs lors de l'extraction de fichiers provenant d'un syst\u00e8me Lustre vers un emplacement qui n'est pas au format Lustre ?",
+    "answer": "Utilisez l'indicateur `-u 'lustre*'` pour exclure les attributs de type Lustre lors de l'extraction, par exemple `dar -R restore/ -O -w -x all -v -g test -u 'lustre*'`. Alternativement, vous pouvez supprimer l'attribut `lustre.lov` \u00e0 la cr\u00e9ation de l'archive avec le m\u00eame indicateur `-u`."
+  },
+  {
+    "question": "Quand est-il n\u00e9cessaire d'exclure les attributs Lustre lors de la cr\u00e9ation ou de l'extraction d'une archive ?",
+    "answer": "Ceci est n\u00e9cessaire uniquement si vous avez l'intention d'extraire des fichiers vers un endroit qui n'a pas le format Lustre."
+  },
+  {
+    "question": "Comment cr\u00e9er une sauvegarde compl\u00e8te de base avec `dar` ?",
+    "answer": "Utilisez la commande `dar -w -c <nom_de_base> -g <r\u00e9pertoire_ou_fichier>`, par exemple `dar -w -c monday -g test`."
+  },
+  {
+    "question": "Comment cr\u00e9er une sauvegarde incr\u00e9mentale ou diff\u00e9rentielle avec `dar` ?",
+    "answer": "Pour cr\u00e9er une sauvegarde incr\u00e9mentale, joignez \u00e0 l'indicateur `-A` le nom de base de l'archive r\u00e9f\u00e9renc\u00e9e. Par exemple, `dar -w -A monday -c tuesday -g test` cr\u00e9era une sauvegarde incr\u00e9mentale `tuesday` bas\u00e9e sur `monday`."
+  },
+  {
+    "question": "Si j'ai plusieurs sauvegardes incr\u00e9mentales (monday, tuesday, wednesday), que contient le fichier `wednesday.1.dar` ?",
+    "answer": "Le fichier `wednesday.1.dar` contient uniquement les fichiers modifi\u00e9s le mercredi, mais pas les fichiers de lundi ou mardi."
+  },
+  {
+    "question": "Comment restaurer tous les fichiers \u00e0 partir d'une s\u00e9rie de sauvegardes incr\u00e9mentales ?",
+    "answer": "Vous devez restaurer toutes les sauvegardes dans l'ordre chronologique, en commen\u00e7ant par la sauvegarde compl\u00e8te, puis les sauvegardes incr\u00e9mentales successives. Par exemple : `dar -R restore -O -w -x monday`, puis `dar -R restore -O -w -x tuesday`, et enfin `dar -R restore -O -w -x wednesday`."
+  },
+  {
+    "question": "Comment limiter la taille maximale de chaque tranche d'une archive `dar` ?",
+    "answer": "Utilisez l'indicateur `-s` suivi d'un nombre et d'une unit\u00e9 de mesure (k, M, G ou T). Par exemple, `dar -s 100M -w -c monday -g test` pour cr\u00e9er des tranches de 100 Mo."
+  },
+  {
+    "question": "Comment extraire des fichiers d'une archive qui a \u00e9t\u00e9 divis\u00e9e en plusieurs tranches ?",
+    "answer": "Utilisez simplement le nom de base de l'archive avec l'indicateur d'extraction. Par exemple, si l'archive est nomm\u00e9e `monday.{1..14}.dar`, la commande sera `dar -O -x monday`."
+  }
+]

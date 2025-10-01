@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What factors influence the optimal mdrun performance parameters in GROMACS?",
+    "answer": "The best parameters depend on the size of the system (number of particles, size and shape of the simulation box) and the simulation parameters (cutoffs, use of Particle-Mesh-Ewald (PME) method)."
+  },
+  {
+    "question": "Where can users find performance information and bottleneck identification in GROMACS?",
+    "answer": "GROMACS prints performance information and statistics at the end of the `md.log` file, which is helpful in identifying bottlenecks and often contains notes for performance improvement."
+  },
+  {
+    "question": "How is GROMACS simulation performance typically quantified?",
+    "answer": "Simulation performance is typically quantified by the number of nanoseconds of MD-trajectory that can be simulated within a day (ns/day)."
+  },
+  {
+    "question": "How is parallel scaling defined in GROMACS?",
+    "answer": "Parallel scaling (S) is defined as S = pN / (N * p1), where pN is the performance using N CPU cores, and it measures how effectively compute resources are used."
+  },
+  {
+    "question": "What is considered ideal parallel scaling?",
+    "answer": "Ideally, parallel scaling increases linearly with the number of CPU cores, meaning S = 1."
+  },
+  {
+    "question": "How can the number of MPI processes be increased in a GROMACS job script?",
+    "answer": "The number of MPI processes (MPI-ranks) can be increased by using Slurm's `--ntasks` or `--ntasks-per-node` parameters in the job script."
+  },
+  {
+    "question": "What is Domain Decomposition (DD) in GROMACS?",
+    "answer": "Domain Decomposition (DD) is used by GROMACS to distribute the work of solving non-bonded Particle-Particle (PP) interactions across multiple CPU cores by cutting the simulation box into domains and assigning each to an MPI process."
+  },
+  {
+    "question": "When does Domain Decomposition become less effective?",
+    "answer": "Domain Decomposition becomes less effective when the time needed for communication becomes large relative to the size (number of particles or volume) of the domain, causing parallel scaling to drop significantly."
+  },
+  {
+    "question": "What is Dynamic Load Balancing in GROMACS and what is its default setting?",
+    "answer": "Dynamic Load Balancing in GROMACS shifts the boundaries between domains to prevent some domains from taking significantly longer to solve. The default `mdrun` parameter for this is `-dlb auto`."
+  },
+  {
+    "question": "What is the minimum size for domains in GROMACS Domain Decomposition?",
+    "answer": "Domains cannot be smaller in any direction than the longest cutoff radius."
+  },
+  {
+    "question": "What is the purpose of the Particle-Mesh-Ewald (PME) method in GROMACS?",
+    "answer": "The Particle-Mesh-Ewald (PME) method is often used to calculate long-range non-bonded interactions, specifically those beyond the cutoff radius."
+  },
+  {
+    "question": "How does GROMACS prevent performance degradation when using PME with many MPI processes?",
+    "answer": "Performance degradation is avoided by dedicating specific MPI processes (PME-ranks) solely to performing PME calculations, rather than calculating both short-range and long-range interactions."
+  },
+  {
+    "question": "When does GROMACS mdrun automatically dedicate MPI processes for PME, and how can this be controlled manually?",
+    "answer": "GROMACS mdrun by default uses heuristics to dedicate MPI processes to PME when the total number of MPI processes is 12 or greater. The `-npme` mdrun parameter can be used to manually select the number of PME ranks."
+  },
+  {
+    "question": "How can a load imbalance between PP and PME ranks be addressed, and when does mdrun attempt this automatically?",
+    "answer": "A load imbalance can be addressed by increasing the cutoff radius, shifting work from PP to PME ranks without affecting the result. Mdrun attempts this automatically since version 4.6, unless the `-notunepme` parameter is used."
+  },
+  {
+    "question": "Can PME be offloaded to a GPU in GROMACS, and what is a limitation as of version 2018.1?",
+    "answer": "Yes, since version 2018, PME can be offloaded to the GPU. However, as of version 2018.1, one limitation is that only a single GPU rank can be dedicated to PME."
+  }
+]

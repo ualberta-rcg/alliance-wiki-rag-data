@@ -1,0 +1,106 @@
+[
+  {
+    "question": "What is the recommended Memory Efficiency percentage for jobs when observed through the `seff` command?",
+    "answer": "Your `Memory Efficiency` in the output from the `seff` command should be at least 80% to 85% in most cases."
+  },
+  {
+    "question": "How can you request all available memory on a whole node in your job submission script?",
+    "answer": "You can express this using the line `#SBATCH --mem=0` in your job submission script."
+  },
+  {
+    "question": "What is a potential consequence of using `#SBATCH --mem=0` to request memory?",
+    "answer": "Most of our clusters offer nodes with variable amounts of memory available, so using this approach means your job will likely be assigned a node with less memory."
+  },
+  {
+    "question": "How would you request a large memory node, for example, one with 1500 GB of memory?",
+    "answer": "You will want to use a line like `#SBATCH --mem=1500G` in your job submission script."
+  },
+  {
+    "question": "What consideration should be made before requesting a large memory node?",
+    "answer": "There are relatively few of these large memory nodes, so your job will wait much longer to run \u2013 make sure your job really needs all this extra memory."
+  },
+  {
+    "question": "Why do jobs typically get assigned only one core on one node by default?",
+    "answer": "By default your job will get one core on one node because most software is serial: it can only ever make use of a single core."
+  },
+  {
+    "question": "Will requesting more CPU cores or nodes make a serial program run faster?",
+    "answer": "Asking for more cores and/or nodes will not make the serial program run any faster because for it to run in parallel the program's source code needs to be modified."
+  },
+  {
+    "question": "What are two ways to determine if a software package can run in parallel?",
+    "answer": "The best approach is to look in the software's documentation for a section on parallel execution; if you can't find anything, it's usually serial. You can also contact the development team."
+  },
+  {
+    "question": "What does a 'shared memory environment' imply for parallel programs?",
+    "answer": "Many programming techniques for parallel programs assume a 'shared memory environment,' meaning multiple cores can be used but must all be located on the same node."
+  },
+  {
+    "question": "How should one determine the optimal number of CPU cores for a parallel program?",
+    "answer": "To choose the optimal number of CPU cores, you need to study the software's scalability."
+  },
+  {
+    "question": "What type of parallelism is required for software to run across multiple nodes?",
+    "answer": "The software you are running must support distributed memory parallelism."
+  },
+  {
+    "question": "What standard is commonly used by software capable of running over more than one node?",
+    "answer": "Most software able to run over more than one node uses the MPI standard."
+  },
+  {
+    "question": "If software documentation only mentions 'threading' and 'thread-based parallelism,' what does this suggest about running across multiple nodes?",
+    "answer": "If the documentation consistently refers to threading and thread-based parallelism, this likely means you will need to restrict yourself to a single node."
+  },
+  {
+    "question": "Which command should be used to start programs parallelized across multiple nodes?",
+    "answer": "Programs that have been parallelized to run across multiple nodes should be started using `srun` rather than `mpirun`."
+  },
+  {
+    "question": "Why is it advisable to avoid scattering parallel processes across more nodes than necessary?",
+    "answer": "A more compact distribution will usually help your job's performance, as highly fragmented parallel jobs often exhibit poor performance and also make the scheduler's job more complicated."
+  },
+  {
+    "question": "On a cluster with 40 cores per node, what integral multiples of processes should you aim for when submitting parallel jobs?",
+    "answer": "On a cluster with 40 cores/node, you would always submit parallel jobs asking for 40, 80, 120, 160, 240, etc. processes."
+  },
+  {
+    "question": "Provide an example of a job script header that would assign 120 MPI processes in a compact fashion on a cluster with 40 cores per node.",
+    "answer": "The job script header would include `#SBATCH --nodes=3` and `#SBATCH --ntasks-per-node=40`."
+  },
+  {
+    "question": "What is the desired CPU efficiency for jobs as measured by the `seff` command?",
+    "answer": "The goal should be to ensure that the CPU efficiency of your jobs is very close to 100%, as measured by the field `CPU Efficiency` in the output from the `seff` command."
+  },
+  {
+    "question": "What does a CPU efficiency value of less than 90% indicate?",
+    "answer": "Any value of CPU efficiency less than 90% is poor and means that your use of whatever software your job executes needs to be improved."
+  },
+  {
+    "question": "Why do jobs requesting GPUs typically experience longer wait times?",
+    "answer": "The nodes with GPUs are relatively uncommon, so any job which asks for a GPU will wait significantly longer in most cases."
+  },
+  {
+    "question": "What is recommended to verify that a GPU is being used efficiently and improves performance?",
+    "answer": "It is wiser to first test a small sample calculation both with and without a GPU to see what kind of speed-up you obtain from the use of this GPU."
+  },
+  {
+    "question": "When might it not be worthwhile to wait for a GPU node?",
+    "answer": "If your job only finishes 5% or 10% more quickly with a GPU, it's probably not worth the effort of waiting to get a node with a GPU as it will be idle during much of your job's execution."
+  },
+  {
+    "question": "Name three tools for monitoring the efficiency of GPU-based jobs.",
+    "answer": "Tools for monitoring the efficiency of your GPU-based jobs include `nvidia-smi`, `nvtop`, and `TensorBoard` (if using TensorFlow-based software)."
+  },
+  {
+    "question": "What command should generally be avoided in job scripts to prevent resource waste?",
+    "answer": "Your jobs should never contain the command `sleep`."
+  },
+  {
+    "question": "What alternatives are recommended over Conda for environment management on clusters?",
+    "answer": "We strongly recommend against the use of Conda and its variants on the clusters, in favour of solutions like a Python virtual environment or Apptainer."
+  },
+  {
+    "question": "How should read and write operations be optimized to avoid wasting resources?",
+    "answer": "Read and write operations should be optimized by using node-local storage."
+  }
+]

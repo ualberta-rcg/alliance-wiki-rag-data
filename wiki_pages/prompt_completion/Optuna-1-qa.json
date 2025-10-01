@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What is Optuna?",
+    "answer": "Optuna is an automatic hyperparameter optimization (HPO) software framework, specifically designed for machine learning."
+  },
+  {
+    "question": "Where can one find documentation for Optuna?",
+    "answer": "One can refer to the Optuna Documentation for definitions of terms, tutorials, API, and more."
+  },
+  {
+    "question": "What is the name of the example SBATCH script for HPO with Optuna?",
+    "answer": "The example SBATCH script for HPO with Optuna is named `hpo_with_optuna.sh`."
+  },
+  {
+    "question": "How is the number of parallel jobs controlled in the SBATCH script for Optuna?",
+    "answer": "The `#SBATCH --array 1-N%M` argument controls this, launching N jobs but allowing only M to run in parallel."
+  },
+  {
+    "question": "What is the recommended relationship between M and N in the SBATCH array argument for Optuna HPO?",
+    "answer": "It's important for `M` to be much smaller than `N`."
+  },
+  {
+    "question": "Why should M be much smaller than N for Optuna HPO?",
+    "answer": "This allows the optimization process to benefit from 'past knowledge'; if all trials execute simultaneously, they won't benefit and it will be equivalent to a random search."
+  },
+  {
+    "question": "How is the Optuna study name set in the SBATCH script?",
+    "answer": "The `OPTUNA_STUDY_NAME` variable is set, for example, `OPTUNA_STUDY_NAME=my_optuna_study1`."
+  },
+  {
+    "question": "How is the Optuna database path specified in the SBATCH script?",
+    "answer": "The `OPTUNA_DB` variable is set, typically pointing to a path in the user's home or project directory, e.g., `OPTUNA_DB=$HOME/${OPTUNA_STUDY_NAME}.db`."
+  },
+  {
+    "question": "How is the Python script launched with Optuna arguments in the SBATCH script?",
+    "answer": "The script is launched using `python train.py --optuna-db $OPTUNA_DB --optuna-study-name $OPTUNA_STUDY_NAME`."
+  },
+  {
+    "question": "How should an Optuna study be created within the `train.py` script?",
+    "answer": "It should be created using `optuna.create_study(storage='sqlite:///' + args.optuna_db, study_name=args.optuna_study_name, load_if_exists=True)`."
+  },
+  {
+    "question": "How many trials should `study.optimize` execute at a time in the Python script?",
+    "answer": "`study.optimize` should execute only a single trial at a time using `n_trials=1`."
+  },
+  {
+    "question": "Why is it important for the Python script to stop after a single trial?",
+    "answer": "Because a separate job is launched for each trial; if the script continues to a subsequent trial, the job will be killed while it's running."
+  },
+  {
+    "question": "What kind of database storage is used for the Optuna study in the example?",
+    "answer": "The example uses an SQLite database for storage, specified as `'sqlite:///' + args.optuna_db`."
+  }
+]

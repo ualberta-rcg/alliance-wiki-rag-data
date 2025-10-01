@@ -1,0 +1,70 @@
+[
+  {
+    "question": "Where are evaluators saved by default when using the Hugging Face `evaluate` package?",
+    "answer": "Evaluators are saved at the default location `$HOME/.cache/huggingface/evaluate`."
+  },
+  {
+    "question": "How can the default storage location for Hugging Face evaluators be changed?",
+    "answer": "You can change the default storage location for evaluators by pointing the environment variable `HF_HOME` to your desired storage location."
+  },
+  {
+    "question": "What is the impact of setting the `HF_HOME` environment variable?",
+    "answer": "Setting the `HF_HOME` environment variable will change the storage location for all Hugging Face ecosystem libraries, including Transformers, Datasets, and Evaluate."
+  },
+  {
+    "question": "What is the purpose of the Hugging Face Accelerate package?",
+    "answer": "Accelerate is a package that enables any PyTorch code to be run across any distributed configuration by adding just four lines of code, making training and inference at scale simple, efficient, and adaptable."
+  },
+  {
+    "question": "What are the recommended steps to install the Accelerate package?",
+    "answer": "To install Accelerate, first load a Python module (e.g., `module load python`), then create and start a virtual environment, and finally install Accelerate in the virtual environment with `pip install --no-index accelerate`."
+  },
+  {
+    "question": "What command is used to install Accelerate in a virtual environment?",
+    "answer": "The command `pip install --no-index accelerate` is used to install Accelerate in a virtual environment."
+  },
+  {
+    "question": "How does using Accelerate for multi-GPU and multi-node jobs differ from a standard PyTorch tutorial?",
+    "answer": "With Accelerate, only one task is requested per node, allowing Accelerate to handle starting the appropriate number of processes (one per GPU) on each node. Additionally, the number of nodes (`num_machines`) and individual node IDs (`machine_rank`) are passed to Accelerate, which then handles setting global and local ranks internally."
+  },
+  {
+    "question": "What is the name of the example SLURM script provided for multi-GPU and multi-node jobs with Accelerate?",
+    "answer": "The example SLURM script provided is named `accelerate-example.sh`."
+  },
+  {
+    "question": "What SLURM resources are requested in the `accelerate-example.sh` script for the Accelerate example?",
+    "answer": "The `accelerate-example.sh` script requests 2 nodes, 1 task per node, 2 GPUs per task, 4 CPUs per task, 16000M memory, and a time limit of 10 minutes."
+  },
+  {
+    "question": "What is the purpose of the `config_env.sh` script in the Accelerate multi-GPU example?",
+    "answer": "The `config_env.sh` script is used to load the Python module, create and activate a virtual environment in `$SLURM_TMPDIR`, upgrade pip, and install `torchvision` and `accelerate` packages on all nodes."
+  },
+  {
+    "question": "What commands are executed within the `config_env.sh` script?",
+    "answer": "The `config_env.sh` script executes `module load python`, `virtualenv --no-download $SLURM_TMPDIR/ENV`, `source $SLURM_TMPDIR/ENV/bin/activate`, `pip install --upgrade pip --no-index`, and `pip install --no-index torchvision accelerate`."
+  },
+  {
+    "question": "What does the `launch_training_accelerate.sh` script do in the Accelerate example?",
+    "answer": "The `launch_training_accelerate.sh` script activates the virtual environment, exports `NCCL_ASYNC_ERROR_HANDLING=1`, and then launches the `pytorch-accelerate.py` script using `accelerate launch` with various distributed training arguments."
+  },
+  {
+    "question": "What are some of the arguments passed to `accelerate launch` in `launch_training_accelerate.sh`?",
+    "answer": "Some arguments passed to `accelerate launch` include `--multi_gpu`, `--gpu_ids=\"all\"`, `--num_machines=$SLURM_NNODES`, `--machine_rank=$SLURM_NODEID`, `--num_processes=4`, `--main_process_ip=\"$HEAD_NODE\"`, and `--main_process_port=$HEAD_NODE_PORT`."
+  },
+  {
+    "question": "In the `launch_training_accelerate.sh` script, what does `--num_processes=4` refer to?",
+    "answer": "In the `launch_training_accelerate.sh` script, `--num_processes=4` refers to the total number of GPUs across all nodes being used for the job."
+  },
+  {
+    "question": "How is the `Accelerator` object initialized within the `pytorch-accelerate.py` script?",
+    "answer": "The `Accelerator` object is initialized by calling `accelerator = Accelerator()`."
+  },
+  {
+    "question": "Which dataset is intended to be used for training in the `pytorch-accelerate.py` script?",
+    "answer": "The `pytorch-accelerate.py` script uses the CIFAR10 dataset for training."
+  },
+  {
+    "question": "What kind of neural network model is defined in the `pytorch-accelerate.py` script?",
+    "answer": "The `pytorch-accelerate.py` script defines a `Net` class, which is a convolutional neural network (CNN) with layers such as `Conv2d`, `MaxPool2d`, and `Linear` layers, commonly used for classification tasks like CIFAR10."
+  }
+]

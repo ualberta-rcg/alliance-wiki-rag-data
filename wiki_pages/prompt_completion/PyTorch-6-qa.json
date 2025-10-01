@@ -1,0 +1,46 @@
+[
+  {
+    "question": "How is the current CUDA device determined and set in a DistributedDataParallel PyTorch script?",
+    "answer": "The `local_rank` is obtained from the `SLURM_LOCALID` environment variable, which is then used to set the current CUDA device with `torch.cuda.set_device(current_device)`."
+  },
+  {
+    "question": "How is the process group initialized for distributed training in a PyTorch script?",
+    "answer": "The process group is initialized by calling `dist.init_process_group()`, passing `backend`, `init_method`, `world_size`, and `rank` as arguments."
+  },
+  {
+    "question": "What is the sequence for preparing a PyTorch model for DistributedDataParallel training?",
+    "answer": "After defining the `Net` model and compiling it with `torch.compile()`, the model is moved to CUDA (`net.cuda()`) and then wrapped with `torch.nn.parallel.DistributedDataParallel(net, device_ids=[current_device])`."
+  },
+  {
+    "question": "How is the training dataset prepared for use with DistributedDataParallel in PyTorch?",
+    "answer": "The dataset is loaded (e.g., `CIFAR10`), then a `torch.utils.data.distributed.DistributedSampler` is created for it. This sampler is then passed to a `DataLoader` to manage batching and distribution."
+  },
+  {
+    "question": "What happens to the inputs, targets, model, and loss function within each training step when using GPUs in PyTorch?",
+    "answer": "The inputs and targets are moved to the CUDA device (`inputs.cuda()`, `targets.cuda()`), the model and loss function are also placed on the CUDA device, and then standard forward pass, loss calculation, backward pass, and optimizer step are performed."
+  },
+  {
+    "question": "Why is `train_sampler.set_epoch(epoch)` called at the beginning of each epoch in a DistributedDataParallel setup?",
+    "answer": "Calling `train_sampler.set_epoch(epoch)` ensures that the data is correctly shuffled and distributed across processes for the current training epoch."
+  },
+  {
+    "question": "What is PyTorch Lightning and what benefit does it offer?",
+    "answer": "PyTorch Lightning is a Python package that provides high-level interfaces to PyTorch, simplifying many common and code-heavy tasks, including training on multiple GPUs."
+  },
+  {
+    "question": "How does PyTorch Lightning simplify multi-GPU training compared to directly using DistributedDataParallel?",
+    "answer": "PyTorch Lightning offers a more straightforward approach to multi-GPU training by handling much of the underlying complexity that would otherwise require explicit leveraging of the DistributedDataParallel class."
+  },
+  {
+    "question": "What command is used to install PyTorch Lightning and torchvision within a virtual environment in a SLURM job script?",
+    "answer": "The command `pip install torchvision pytorch-lightning --no-index` is used after loading the Python module and activating the virtual environment."
+  },
+  {
+    "question": "What are the SLURM requirements for running a PyTorch Lightning job for multi-GPU training?",
+    "answer": "PyTorch Lightning expects the user to request one task per GPU (e.g., `--tasks-per-node=2` for two GPUs) and to run the script using `srun`."
+  },
+  {
+    "question": "What is the purpose of `export TORCH_NCCL_ASYNC_HANDLING=1` in a PyTorch Lightning SLURM script?",
+    "answer": "This line exports an environment variable `TORCH_NCCL_ASYNC_HANDLING=1`, which is related to NCCL (NVIDIA Collective Communications Library) asynchronous handling in PyTorch."
+  }
+]

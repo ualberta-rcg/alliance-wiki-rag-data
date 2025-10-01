@@ -1,90 +1,42 @@
 [
   {
-    "question": "How do you build an Apptainer image from a Docker image for RAPIDS?",
-    "answer": "You can build an Apptainer image (e.g., 'rapids.sif') using the command `apptainer build rapids.sif docker://nvcr.io/nvidia/rapidsai/rapidsai:cuda11.0-runtime-centos7`, based on the Docker `pull` tag."
+    "question": "Quand faut-il soumettre une t\u00e2che RAPIDS \u00e0 l'ordonnanceur?",
+    "answer": "Une t\u00e2che RAPIDS peut \u00eatre soumise \u00e0 l'ordonnanceur quand le code RAPIDS est pr\u00eat."
   },
   {
-    "question": "What is the typical duration for building a RAPIDS Apptainer image?",
-    "answer": "The process usually takes 30 to 60 minutes."
+    "question": "Quelle est la bonne pratique pour travailler avec un conteneur sur un n\u0153ud de calcul?",
+    "answer": "La bonne pratique est d'utiliser le disque local."
   },
   {
-    "question": "What resources are important to consider when building a large Apptainer image for RAPIDS?",
-    "answer": "Ensure you have enough memory and disk space on the server, as the image size is large."
+    "question": "Quelles sont les directives SLURM (`#SBATCH`) incluses dans l'exemple de script de soumission?",
+    "answer": "Les directives incluses sont `--gres=gpu:t4:1`, `--cpus-per-task=2`, `--mem=10G`, `--time=dd:hh:mm`, et `--account=def-someuser`."
   },
   {
-    "question": "What are the two main ways to utilize an Apptainer image for RAPIDS on a cluster?",
-    "answer": "You can either request an interactive session on a GPU node or submit a batch job to the scheduler."
+    "question": "Comment charger le module Apptainer dans un script de soumission?",
+    "answer": "Il faut utiliser la commande `module load apptainer`."
   },
   {
-    "question": "Which type of Docker image is required for interactive work with Jupyter Notebooks in a RAPIDS Apptainer environment?",
-    "answer": "The Apptainer image must have been built with a Docker image of type 'notebooks' to include a Jupyter Notebook server."
+    "question": "Comment les fichiers, comme l'image du conteneur et le code RAPIDS, doivent-ils \u00eatre copi\u00e9s sur le disque local d'un n\u0153ud de calcul?",
+    "answer": "Les fichiers doivent \u00eatre copi\u00e9s via `$SLURM_TMPDIR` en utilisant des commandes `cp`, par exemple `cp /path/to/rapids.sif ./` et `cp /path/to/your_rapids_code.py ./`."
   },
   {
-    "question": "How do you request an interactive session on a GPU node, specifically a T4 GPU on Graham?",
-    "answer": "Use the command `salloc --ntasks=1 --cpus-per-task=2 --mem=10G --gres=gpu:t4:1 --time=1:0:0 --account=def-someuser`."
+    "question": "Comment ex\u00e9cuter un script Python RAPIDS \u00e0 l'int\u00e9rieur d'un conteneur Apptainer?",
+    "answer": "Il faut utiliser la commande `apptainer exec --nv rapids.sif python ./my_rapids_code.py`."
   },
   {
-    "question": "What command is used to load the Apptainer module on a compute node?",
-    "answer": "The command `module load apptainer` is used to load the Apptainer module."
+    "question": "Comment sauvegarder les r\u00e9sultats d'un job RAPIDS sur le disque local vers le r\u00e9pertoire de projet?",
+    "answer": "Il faut copier les r\u00e9sultats du `$SLURM_TMPDIR` vers le r\u00e9pertoire de projet, par exemple `cp -r your_results ~/projects/def-someuser/username/`."
   },
   {
-    "question": "How do you launch the RAPIDS interpreter on a GPU node using Apptainer?",
-    "answer": "Launch it with the command `apptainer shell --nv -B /home -B /project -B /scratch rapids.sif`."
+    "question": "O\u00f9 peut-on trouver la documentation compl\u00e8te pour RAPIDS?",
+    "answer": "La documentation compl\u00e8te est disponible sur les 'RAPIDS Docs' \u00e0 l'adresse [https://docs.rapids.ai/]."
   },
   {
-    "question": "What is the purpose of the `--nv` option when using `apptainer shell` for RAPIDS?",
-    "answer": "The `--nv` option performs a 'bind mount' of the host's GPU device onto the container, enabling GPU access from within the Apptainer container."
+    "question": "O\u00f9 trouver des exemples de notebooks RAPIDS?",
+    "answer": "Des exemples sont disponibles sur 'RAPIDS Notebooks' sur GitHub \u00e0 l'adresse [https://github.com/rapidsai/notebooks]."
   },
   {
-    "question": "What does the `-B` option do in the Apptainer shell command?",
-    "answer": "The `-B` option performs a 'bind mount' of the file systems you wish to access from within the container."
-  },
-  {
-    "question": "How can you verify GPU access and statistics inside the Apptainer interpreter?",
-    "answer": "After the prompt changes to `Apptainer>`, you can run `nvidia-smi` to consult GPU statistics."
-  },
-  {
-    "question": "What command launches the Jupyter Notebook server within the RAPIDS environment inside an Apptainer container?",
-    "answer": "Once the prompt is `Apptainer>`, you can launch the Jupyter Notebook server with `jupyter-lab --ip $(hostname -f) --no-browser`."
-  },
-  {
-    "question": "Is it necessary to activate RAPIDS after Conda starts for versions 23.08 and later?",
-    "answer": "No, starting from version 23.08, RAPIDS packages are included in the base Conda environment, which is activated by default, so explicit activation is not needed."
-  },
-  {
-    "question": "Why is an SSH tunnel needed for connecting to Jupyter Notebook on a Graham compute node?",
-    "answer": "An SSH tunnel is required to redirect ports between your computer and the GPU node because a compute node on Graham is not directly connected to the internet."
-  },
-  {
-    "question": "What is the recommended practice for handling data and containers when submitting a RAPIDS job on a compute node?",
-    "answer": "It is good practice to use node-local storage (e.g., `$SLURM_TMPDIR`) when working with a container on a compute node."
-  },
-  {
-    "question": "How would you specify a request for one T4 GPU in a SLURM submission script for a RAPIDS job?",
-    "answer": "You would include `#SBATCH --gres=gpu:t4:1` in your submission script."
-  },
-  {
-    "question": "In a SLURM script, how do you copy your Apptainer image, RAPIDS code, and datasets to the node-local scratch directory?",
-    "answer": "After `cd $SLURM_TMPDIR`, use `cp /path/to/rapids.sif ./`, `cp /path/to/your_rapids_code.py ./`, and `cp -r /path/to/your_datasets ./`."
-  },
-  {
-    "question": "What command is used to execute a Python RAPIDS script inside an Apptainer container within a SLURM job script?",
-    "answer": "Use `apptainer exec --nv rapids.sif python ./my_rapids_code.py`."
-  },
-  {
-    "question": "How should results from a RAPIDS job on a compute node be saved before the job ends?",
-    "answer": "Any results should be copied to your `/project` directory, for example, `cp -r your_results ~/projects/def-someuser/username/`."
-  },
-  {
-    "question": "Where can users find comprehensive documentation for RAPIDS?",
-    "answer": "Users can find comprehensive documentation on the RAPIDS Docs website: https://docs.rapids.ai/."
-  },
-  {
-    "question": "Where can users access example notebooks for RAPIDS?",
-    "answer": "Example notebooks are available on GitHub at RAPIDS Notebooks: https://github.com/rapidsai/notebooks."
-  },
-  {
-    "question": "Where can users find RAPIDS use cases and blog posts?",
-    "answer": "RAPIDS use cases and blog posts are available on RAPIDS on Medium: https://medium.com/rapids-ai."
+    "question": "O\u00f9 sont publi\u00e9s les cas d\u2019usage et les blogs concernant RAPIDS?",
+    "answer": "Les cas d'usage et les blogs RAPIDS sont publi\u00e9s sur 'RAPIDS on Medium' \u00e0 l'adresse [https://medium.com/rapids-ai]."
   }
 ]

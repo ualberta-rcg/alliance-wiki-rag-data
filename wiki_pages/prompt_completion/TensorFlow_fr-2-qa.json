@@ -1,0 +1,62 @@
+[
+  {
+    "question": "How should TensorBoard be launched within an SBATCH job?",
+    "answer": "TensorBoard should be launched in the background before the Python script, for example: `tensorboard --logdir=/tmp/your_log_dir --host 0.0.0.0 --load_fast false & python train.py`."
+  },
+  {
+    "question": "Why is it recommended to run TensorBoard within the same job as the TensorFlow process?",
+    "answer": "TensorBoard requires too much computing power to be run on a login node, so it is recommended to run it in the same job as the TensorFlow process."
+  },
+  {
+    "question": "How can I access TensorBoard from my local computer while it's running on a compute node?",
+    "answer": "You need to create an SSH tunnel from your local machine to the compute node where TensorFlow and TensorBoard are running, using a command like `ssh -N -f -L localhost:6006:computenode:6006 userid@cluster.computecanada.ca`."
+  },
+  {
+    "question": "What information do I need to create the SSH tunnel for TensorBoard?",
+    "answer": "You need the `hostname` of the compute node, your Alliance username (`userid`), and the `hostname` of the cluster (e.g., `rorqual`, `fir`, `nibi`)."
+  },
+  {
+    "question": "How do I find the hostname of the compute node running my TensorFlow task?",
+    "answer": "You can find the hostname by displaying the list of your tasks with the `sq` command and locating the task; the hostname will be in the `NODELIST` column."
+  },
+  {
+    "question": "What should I do if port 6006 is already in use when trying to access TensorBoard?",
+    "answer": "If port 6006 is already used, TensorBoard will use another port (e.g., 6007, 6008, etc.)."
+  },
+  {
+    "question": "What is the URL to access TensorBoard in my local browser after setting up the SSH tunnel?",
+    "answer": "Once the connection is established, navigate to `http://localhost:6006` in your browser."
+  },
+  {
+    "question": "Which high-level API does TensorFlow offer for using multiple GPUs?",
+    "answer": "TensorFlow offers different strategies for using multiple GPUs with the high-level `tf.distribute` API."
+  },
+  {
+    "question": "What is the name of the SBATCH script provided for using the Mirrored Strategy on a single node?",
+    "answer": "The SBATCH script for using the Mirrored Strategy on a single node is named `tensorflow-singleworker.sh`."
+  },
+  {
+    "question": "What are the SBATCH resource requests for a single-node, multi-GPU TensorFlow job using the Mirrored Strategy?",
+    "answer": "The SBATCH resource requests are: `--nodes 1`, `--gres=gpu:4`, `--mem=8G`, `--time=0-00:30`, and `--output=%N-%j.out`."
+  },
+  {
+    "question": "How is the Python environment typically set up in the `tensorflow-singleworker.sh` script?",
+    "answer": "The Python environment is set up by loading the `python/3` module, creating a virtual environment in `$SLURM_TMPDIR/env` with `virtualenv --no-download`, and then activating it with `source $SLURM_TMPDIR/env/bin/activate`."
+  },
+  {
+    "question": "How is TensorFlow installed in the virtual environment for a single-node multi-GPU job?",
+    "answer": "TensorFlow is installed using `pip install --no-index tensorflow`."
+  },
+  {
+    "question": "What environment variable can be set to use the NCCL backend for inter-GPU communication?",
+    "answer": "You can set the environment variable `NCCL_BLOCKING_WAIT=1`."
+  },
+  {
+    "question": "How is the `MirroredStrategy` initialized in the Python script for a single-node setup?",
+    "answer": "The `MirroredStrategy` is initialized with `strategy = tf.distribute.MirroredStrategy()`."
+  },
+  {
+    "question": "What dataset is used in the `tensorflow-singleworker.py` example for classification?",
+    "answer": "The example uses the CIFAR10 dataset, loaded with `tf.keras.datasets.cifar10.load_data()`."
+  }
+]

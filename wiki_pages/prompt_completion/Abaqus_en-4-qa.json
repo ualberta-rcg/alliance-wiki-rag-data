@@ -1,0 +1,50 @@
+[
+  {
+    "question": "What types of parallelization do Abaqus solvers support for explicit analysis?",
+    "answer": "Abaqus solvers support thread-based and MPI-based parallelization for explicit analysis."
+  },
+  {
+    "question": "Are scripts available for running explicit analysis type jobs on single or multiple nodes?",
+    "answer": "Yes, scripts for running explicit analysis type jobs are provided for both single and multiple nodes."
+  },
+  {
+    "question": "Are template scripts currently provided for multinode job restarts in explicit analysis?",
+    "answer": "No, template scripts for multinode job restarts in explicit analysis are not currently provided, pending further testing."
+  },
+  {
+    "question": "How do you specify a job's account, time, memory, and CPU cores in a single node explicit analysis project directory script?",
+    "answer": "These are specified using SLURM parameters like `#SBATCH --account=def-group`, `#SBATCH --time=00-06:00`, `#SBATCH --mem=8000M`, and `#SBATCH --cpus-per-task=4`."
+  },
+  {
+    "question": "Which Abaqus module is loaded in the `scriptep1.txt` for single node explicit analysis?",
+    "answer": "The `abaqus/2021` module is loaded in the `scriptep1.txt` script."
+  },
+  {
+    "question": "How do you write restart data for a total of 12 time increments in an explicit analysis input file?",
+    "answer": "Specify `*RESTART, WRITE, OVERLAY, NUMBER INTERVAL=12, TIME MARKS=NO` in the input file."
+  },
+  {
+    "question": "How can you check for completed restart information for explicit analysis jobs?",
+    "answer": "You can check using the command `egrep -i \"step|restart\" testep*.com testep*.msg testep*.sta` in relevant output files."
+  },
+  {
+    "question": "What is the Abaqus command used to restart an explicit analysis job from a project directory?",
+    "answer": "The command is `abaqus job=testep2 input=myexp-sim.inp recover ...`."
+  },
+  {
+    "question": "Are input file modifications required to restart an explicit analysis using the `scriptep2.txt` script?",
+    "answer": "No input file modifications are required to restart the analysis using the `scriptep2.txt` script."
+  },
+  {
+    "question": "What is the primary purpose of the 'temporary directory script' (`scriptet1.txt`) for explicit analysis?",
+    "answer": "The 'temporary directory script' is designed to write large restart data to the local disk using the `SLURM_TMPDIR` environment variable to benefit job performance."
+  },
+  {
+    "question": "How does the `scriptet1.txt` ensure data from the temporary directory is saved back to the submission directory?",
+    "answer": "It includes a loop `while sleep 6h; do cp -f * $SLURM_SUBMIT_DIR 2>/dev/null; done &` to periodically copy files and a final `cp -f * $SLURM_SUBMIT_DIR` command upon job completion."
+  },
+  {
+    "question": "How often does the `scriptet2.txt` (temporary directory restart script) save data from the temporary directory to the submit directory?",
+    "answer": "The `scriptet2.txt` saves data from the temporary directory to the submit directory every 3 hours."
+  }
+]

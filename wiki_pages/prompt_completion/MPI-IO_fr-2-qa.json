@@ -1,0 +1,66 @@
+[
+  {
+    "question": "How is MPI initialized in the provided C code example for using views?",
+    "answer": "MPI is initialized using `MPI_Init(&argc, &argv);`."
+  },
+  {
+    "question": "How are the process rank and size obtained in the C code example using MPI views?",
+    "answer": "The process rank is obtained using `MPI_Comm_rank(MPI_COMM_WORLD, &rank);` and the size using `MPI_Comm_size(MPI_COMM_WORLD, &size);`."
+  },
+  {
+    "question": "How is the buffer initialized for writing in the C example for MPI-IO with views?",
+    "answer": "The buffer is initialized with characters ('a' plus the process rank) for `BLOCKSIZE` bytes, and the last character is set to a newline (`\\n`). This is achieved with `memset(buffer, 'a'+rank, BLOCKSIZE);` and `buffer[BLOCKSIZE - 1] = '\\n';`."
+  },
+  {
+    "question": "What MPI function is used to open a file for writing and creation in the C code example using views?",
+    "answer": "A file is opened for writing and creation using `MPI_File_open(MPI_COMM_WORLD, filename, (MPI_MODE_WRONLY | MPI_MODE_CREATE), MPI_INFO_NULL, &f);`."
+  },
+  {
+    "question": "How is a contiguous MPI datatype defined and committed for writing in the example code?",
+    "answer": "A contiguous MPI datatype is defined using `MPI_Type_contiguous(BLOCKSIZE, MPI_CHAR, &type_intercomp);` and then committed with `MPI_Type_commit(&type_intercomp);`."
+  },
+  {
+    "question": "How is the file view set for writing data within the loop in the provided example?",
+    "answer": "The file view is set in a loop using `MPI_File_set_view(f, rank*BLOCKSIZE+i*size*BLOCKSIZE, MPI_CHAR, type_intercomp, \"native\", MPI_INFO_NULL);`."
+  },
+  {
+    "question": "Which MPI function is used to write data to the file once the view is set in the example?",
+    "answer": "Data is written using `MPI_File_write(f, buffer, BLOCKSIZE, MPI_CHAR, MPI_STATUS_IGNORE);`."
+  },
+  {
+    "question": "How is the file closed after write operations are complete in the C example?",
+    "answer": "The file is closed using `MPI_File_close(&f);`."
+  },
+  {
+    "question": "What MPI function is used to open a file for reading in the C code example using views?",
+    "answer": "A file is opened for reading using `MPI_File_open(MPI_COMM_WORLD, filename, MPI_MODE_RDONLY, MPI_INFO_NULL, &f);`."
+  },
+  {
+    "question": "How is a contiguous MPI datatype defined and committed for reading in the example code?",
+    "answer": "A contiguous MPI datatype for reading is defined using `MPI_Type_contiguous(NBRBLOCKS*BLOCKSIZE, MPI_CHAR, &type_contiguous);` and committed with `MPI_Type_commit(&type_contiguous);`."
+  },
+  {
+    "question": "How is the file view set for reading data in the example code?",
+    "answer": "The file view for reading is set using `MPI_File_set_view(f, rank*NBRBLOCKS*BLOCKSIZE, MPI_CHAR, type_contiguous, \"native\", MPI_INFO_NULL);`."
+  },
+  {
+    "question": "How is data read from the file using the defined view in the C example?",
+    "answer": "Data is read within a loop using `MPI_File_read(f, buffer, BLOCKSIZE, MPI_CHAR, MPI_STATUS_IGNORE);`."
+  },
+  {
+    "question": "What MPI function is called at the end of the program to finalize MPI?",
+    "answer": "`MPI_Finalize();` is called at the end of the program."
+  },
+  {
+    "question": "What is a known limitation when using views on certain file systems?",
+    "answer": "Some file systems do not support file locks, which can prevent operations such as using views on disjoint sections of a file."
+  },
+  {
+    "question": "Where can one find documentation for OpenMPI?",
+    "answer": "Documentation for OpenMPI is available at [http://www.open-mpi.org/doc/current/ Documentation OpenMPI]."
+  },
+  {
+    "question": "Is there a recommended course on parallel I/O?",
+    "answer": "Yes, a course on parallel I/O is referenced at [https://scinet.courses/215 Course on parallel I/O]."
+  }
+]

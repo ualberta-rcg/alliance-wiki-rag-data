@@ -1,0 +1,58 @@
+[
+  {
+    "question": "How do you set up a recovery directory for COMSOL jobs running on multiple nodes?",
+    "answer": "A recovery directory can be set up by creating `$SCRATCH/comsol/recoverydir` and then specifying it with `-recoverydir $RECOVERYDIR` in the `comsol batch` command."
+  },
+  {
+    "question": "How are `comsolbatch.ini` and `java.opts` configured for a multi-node COMSOL job?",
+    "answer": "The `comsolbatch.ini` and `java.opts` files should be copied from `${EBROOTCOMSOL}/bin/glnxa64/comsolbatch.ini` and `${EBROOTCOMSOL}/mli/startup/java.opts` respectively to the current directory, and `comsolbatch.ini` specified with the `-comsolinifile` argument."
+  },
+  {
+    "question": "What MPI setting might be necessary for COMSOL jobs on the Narval cluster?",
+    "answer": "On the Narval cluster, you might need to uncomment the line `export I_MPI_COLL_EXTERNAL=0` for COMSOL jobs."
+  },
+  {
+    "question": "What command-line arguments are used when running a COMSOL batch job across multiple nodes?",
+    "answer": "Key command-line arguments include `-inputfile`, `-outputfile`, `-np` (CPUs per node), `-nn` (number of nodes), `-recoverydir`, `-tmpdir`, `-comsolinifile`, and `-alivetime 15`. Additionally, `-recover -continue` can be used to restart interrupted jobs."
+  },
+  {
+    "question": "How can a Java segmentation fault during a multi-node COMSOL job startup be resolved?",
+    "answer": "To resolve a Java segmentation fault, increase the Java heap memory by adding `sed -i 's/-Xmx2g/-Xmx4g/g' comsolbatch.ini` and `sed -i 's/-Xmx768m/-Xmx4g/g' java.opts` after the `cp -f` lines. If needed, further increase both '4g' values to '8g'."
+  },
+  {
+    "question": "What should be done if COMSOL jobs run slowly on Narval with `comsol/6.0.0.405`?",
+    "answer": "If COMSOL jobs run slowly on Narval with `comsol/6.0.0.405`, it is recommended to use `comsol/6.0` instead and open a ticket to report the problem."
+  },
+  {
+    "question": "How should slow or hanging single-node COMSOL jobs on Graham be addressed?",
+    "answer": "If a single-node COMSOL job runs slowly or hangs on Graham, use the multiple-node script (`script-dis.sh`) but set `#SBATCH --nodes=1` and open a ticket to report the issue."
+  },
+  {
+    "question": "Can COMSOL be run with a graphical user interface?",
+    "answer": "Yes, COMSOL can be run interactively in full graphical mode using methods for either cluster nodes or VDI nodes."
+  },
+  {
+    "question": "What are the steps to run COMSOL Multiphysics 6.2 (or newer) graphically on cluster nodes?",
+    "answer": "To run COMSOL 6.2+ graphically on cluster nodes, connect via TigerVNC, open a terminal, run `export XDG_RUNTIME_DIR=${SLURM_TMPDIR}`, then load `module load StdEnv/2023` and `module load comsol/6.3`, and finally execute `comsol`."
+  },
+  {
+    "question": "What are the suitable uses and limitations for running COMSOL graphically on VDI nodes (gra-vdi)?",
+    "answer": "VDI nodes (gra-vdi) are suitable for interactive use, including compute calculations with up to 12 cores and 128GB memory, creating/modifying simulation input files, and post-processing/data visualization. For more resources, cluster compute nodes should be used."
+  },
+  {
+    "question": "How do you start COMSOL Multiphysics 6.2 (or newer) graphically on VDI nodes?",
+    "answer": "To start COMSOL 6.2+ graphically on VDI nodes, connect via TigerVNC, open a terminal, load `module load CcEnv StdEnv/2023` and `module load comsol/6.3`, then run `comsol -np 12 -Dosgi.locking=none`."
+  },
+  {
+    "question": "What should be done if COMSOL's graphical interface menu items are greyed out after startup?",
+    "answer": "If COMSOL's GUI menu items are greyed out, your `~/.comsol` directory may be corrupted. To fix this, remove it by running `rm -rf ~/.comsol` and then restart COMSOL."
+  },
+  {
+    "question": "How are parametric problems solved interactively within the COMSOL GUI?",
+    "answer": "Parametric problems can be solved using the \"Batch Sweep\" approach when working interactively in the COMSOL GUI."
+  },
+  {
+    "question": "How do you perform a parameter sweep on a cluster using COMSOL?",
+    "answer": "To run a parameter sweep on a cluster, a job must be submitted to the scheduler from the command line using `sbatch slurmscript`, as submitting via the graphical interface's 'Cluster Sweep node' is not currently supported."
+  }
+]

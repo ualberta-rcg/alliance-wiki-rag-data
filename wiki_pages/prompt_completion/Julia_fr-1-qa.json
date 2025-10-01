@@ -1,0 +1,74 @@
+[
+  {
+    "question": "Qu'est-ce que Julia?",
+    "answer": "Julia est un langage de programmation con\u00e7u pour \u00eatre performant, facile d'utilisation et portable."
+  },
+  {
+    "question": "Comment peut-on utiliser Julia sur les grappes mentionn\u00e9es?",
+    "answer": "Sur nos grappes, vous pouvez utiliser Julia en installant un module."
+  },
+  {
+    "question": "Que se passe-t-il la premi\u00e8re fois qu'un paquet est ajout\u00e9 \u00e0 un projet Julia?",
+    "answer": "La premi\u00e8re fois qu'un paquet est ajout\u00e9 \u00e0 un projet Julia (avec `Pkg.add` ou en mode paquet), il est t\u00e9l\u00e9charg\u00e9, install\u00e9 dans `~/.julia` et pr\u00e9compil\u00e9."
+  },
+  {
+    "question": "Les donn\u00e9es d'un paquet Julia install\u00e9 peuvent-elles \u00eatre r\u00e9utilis\u00e9es par diff\u00e9rents projets?",
+    "answer": "Oui, le m\u00eame paquet peut \u00eatre ajout\u00e9 \u00e0 plusieurs projets, et les donn\u00e9es dans `~/.julia` seront r\u00e9utilis\u00e9es."
+  },
+  {
+    "question": "Est-il possible d'utiliser diff\u00e9rentes versions d'un m\u00eame paquet Julia pour des projets distincts?",
+    "answer": "Oui, des versions diff\u00e9rentes d'un m\u00eame paquet peuvent \u00eatre ajout\u00e9es \u00e0 des projets diff\u00e9rents, et les versions requises coexisteront dans `~/.julia`."
+  },
+  {
+    "question": "Comment les projets Julia se comparent-ils aux environnements virtuels Python?",
+    "answer": "Les projets Julia remplacent les environnements virtuels Python en \u00e9vitant la duplication du code."
+  },
+  {
+    "question": "Quelle est la particularit\u00e9 des paquets Julia \u00e0 partir de la version 1.6 concernant leurs d\u00e9pendances binaires?",
+    "answer": "\u00c0 partir de Julia 1.6, les paquets Julia incluent leurs d\u00e9pendances binaires, ce qui rend inutile le chargement d'un module logiciel."
+  },
+  {
+    "question": "Quels probl\u00e8mes pouvaient survenir avec les paquets Julia jusqu'\u00e0 la version 1.5 si un paquet d\u00e9pendait de binaires syst\u00e8me sur les grappes?",
+    "answer": "Jusqu'\u00e0 Julia 1.5, des probl\u00e8mes pouvaient survenir si un paquet d\u00e9pendait de binaires fournis par le syst\u00e8me (comme HDF5), car Julia tentait d'installer ces d\u00e9pendances via `yum` ou `apt` sur un ordinateur personnel, ce qui ne fonctionne pas sur les grappes."
+  },
+  {
+    "question": "Comment configurer Julia pour qu'il trouve une biblioth\u00e8que HDF5 syst\u00e8me pour un paquet comme JLD sur les grappes (pour Julia 1.5 et versions ant\u00e9rieures)?",
+    "answer": "Il faut charger les modules `gcc/7.3.0`, `hdf5` et `julia/1.4.1`, puis, dans Julia, utiliser `Libdl` pour \u00e9tendre `Libdl.DL_LOAD_PATH` avec la variable d'environnement `HDF5_DIR` (par exemple, `push!(Libdl.DL_LOAD_PATH, ENV[\"HDF5_DIR\"] * \"/lib\")`), avant d'ajouter le paquet `JLD`."
+  },
+  {
+    "question": "Pourquoi la modification de `Libdl.DL_LOAD_PATH` est-elle la meilleure solution pour les biblioth\u00e8ques HDF5 sur tous les syst\u00e8mes de grappes?",
+    "answer": "C'est la meilleure solution car elle charge le module appropri\u00e9 et utilise la variable d'environnement d\u00e9finie par le module (`HDF5_DIR`) pour \u00e9tendre `Libdl.DL_LOAD_PATH`, ce qui fonctionne de la m\u00eame mani\u00e8re sur tous les syst\u00e8mes."
+  },
+  {
+    "question": "Quel paquet a remplac\u00e9 JLD et pourquoi est-il plus portable?",
+    "answer": "Le paquet JLD a \u00e9t\u00e9 remplac\u00e9 par JLD2, qui est plus portable car il ne n\u00e9cessite plus de biblioth\u00e8que HDF5 install\u00e9e sur le syst\u00e8me."
+  },
+  {
+    "question": "Quel probl\u00e8me sp\u00e9cifique peut survenir sur la grappe Narval lors de l'installation d'un paquet Julia dans le r\u00e9pertoire /home?",
+    "answer": "Sur Narval, Julia peut planter (se terminer avec une erreur de segmentation) \u00e0 l'\u00e9tape de la pr\u00e9compilation quand un paquet est install\u00e9 dans le r\u00e9pertoire /home, en raison d'un bogue dans le logiciel de gestion du syst\u00e8me de fichiers."
+  },
+  {
+    "question": "Quelle est la recommandation pour l'emplacement du d\u00e9p\u00f4t Julia sur la grappe Narval pour \u00e9viter les plantages?",
+    "answer": "Jusqu'\u00e0 ce que le probl\u00e8me soit r\u00e9solu, il est recommand\u00e9 d'utiliser le r\u00e9pertoire `/project` pour le d\u00e9p\u00f4t Julia sur la grappe Narval."
+  },
+  {
+    "question": "Pourquoi est-il conseill\u00e9 de modifier le chemin du d\u00e9p\u00f4t Julia par d\u00e9faut de `~/.julia`?",
+    "answer": "Il est conseill\u00e9 de modifier le chemin du d\u00e9p\u00f4t Julia pour \u00e9viter de d\u00e9passer le quota de fichiers dans le r\u00e9pertoire `/home`, car l'installation de paquets peut y cr\u00e9er un grand nombre de fichiers."
+  },
+  {
+    "question": "Combien d'espace et de fichiers peut prendre l'installation du paquet `Gadfly.jl`?",
+    "answer": "Dans un r\u00e9pertoire `~/.julia` vide, l'installation du paquet `Gadfly.jl` occupe environ 96Mo avec pr\u00e8s de 37000 fichiers, soit 7% de la quantit\u00e9 maximale de fichiers permise par le quota."
+  },
+  {
+    "question": "Comment modifier le chemin du d\u00e9p\u00f4t Julia personnel?",
+    "answer": "Pour modifier le chemin du d\u00e9p\u00f4t Julia personnel, vous pouvez exporter la variable d'environnement `JULIA_DEPOT_PATH` en y ajoutant le nouveau r\u00e9pertoire d\u00e9sir\u00e9, par exemple: `export JULIA_DEPOT_PATH=\"/project/def-bob/alice/julia:$JULIA_DEPOT_PATH\"`."
+  },
+  {
+    "question": "Que se passe-t-il si `JULIA_DEPOT_PATH` est modifi\u00e9, par rapport au r\u00e9pertoire `~/.julia`?",
+    "answer": "Si `JULIA_DEPOT_PATH` est modifi\u00e9, le nouveau r\u00e9pertoire sera utilis\u00e9 de pr\u00e9f\u00e9rence, mais les fichiers dans `~/.julia` seront toujours pris en compte et `~/.julia` sera toujours utilis\u00e9 pour certains fichiers comme l'historique des commandes."
+  },
+  {
+    "question": "Quelle action est recommand\u00e9e avant de d\u00e9placer le d\u00e9p\u00f4t Julia vers un nouvel emplacement?",
+    "answer": "Il est pr\u00e9f\u00e9rable de supprimer d'abord le d\u00e9p\u00f4t `~/.julia` existant (s'il y a lieu) avant de d\u00e9placer votre d\u00e9p\u00f4t Julia dans un autre endroit."
+  }
+]

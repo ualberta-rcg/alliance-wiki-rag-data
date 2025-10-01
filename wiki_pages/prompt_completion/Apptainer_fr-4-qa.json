@@ -1,0 +1,82 @@
+[
+  {
+    "question": "How do you display the help message for an Apptainer container?",
+    "answer": "You can display the help message by running `apptainer run-help your-container-name.sif`, where `your-container-name.sif` is the name of your container."
+  },
+  {
+    "question": "How do you get help for a specific application within an Apptainer container?",
+    "answer": "To get help for a specific application, use the command `apptainer run-help --app appname your-container-name.sif`, replacing `appname` with the application's name and `your-container-name.sif` with your container's name."
+  },
+  {
+    "question": "How can you list all applications available inside an Apptainer container?",
+    "answer": "You can list the applications within a container by running `apptainer inspect --list-apps your-container-name.sif`, specifying the container's name."
+  },
+  {
+    "question": "What is the primary difference between `apptainer run` and `apptainer exec`?",
+    "answer": "`apptainer run` launches the container, executes the `%runscript` (if defined), and then runs the specified command. In contrast, `apptainer exec` does not execute the `%runscript`."
+  },
+  {
+    "question": "Which command is recommended for launching software: `apptainer run` or `apptainer exec`?",
+    "answer": "It is recommended to always use `apptainer run`."
+  },
+  {
+    "question": "How would you compile a C++ program and then execute it within an Apptainer container?",
+    "answer": "You would first compile it using `apptainer run your-container-name.sif g++ -O2 -march=broadwell ./myprog.cpp`, and then execute it with `apptainer run your-container-name.sif ./a.out`."
+  },
+  {
+    "question": "What options are commonly added to `apptainer run` commands on clusters to ensure disk space is available for programs?",
+    "answer": "On clusters, options like `-C`, `-W $SLURM_TMPDIR`, `-B /project`, and `-B /scratch` are typically added for disk space availability, such as in `apptainer run -C -W $SLURM_TMPDIR -B /project -B /scratch your-container-name.sif g++ -O2 -march=broadwell ./myprog.cpp`."
+  },
+  {
+    "question": "When is it appropriate to use `apptainer shell`?",
+    "answer": "`apptainer shell` is useful when interactive work is needed inside a container, as commands like `apptainer run`, `apptainer exec`, and `apptainer instance` execute programs immediately, suitable for batch scripts."
+  },
+  {
+    "question": "How do you start an interactive session within an Apptainer container?",
+    "answer": "You can start an interactive session using `apptainer shell your-container-name.sif`."
+  },
+  {
+    "question": "What prompt indicates that you are in an active Apptainer shell session?",
+    "answer": "When the container is ready, the `Apptainer>` prompt (or `Singularity>` for older versions) will appear."
+  },
+  {
+    "question": "How do you exit an interactive Apptainer shell session?",
+    "answer": "To exit an interactive shell session, type `exit` and press Enter/Return."
+  },
+  {
+    "question": "What options are suggested for `apptainer shell` on clusters to enable bind mounts and temporary directory usage?",
+    "answer": "On clusters, you would add options like `-C -W $SLURM_TMPDIR -B /home:/cluster_home -B /project -B /scratch` before the container name, for example: `apptainer shell -C -W $SLURM_TMPDIR -B /home:/cluster_home -B /project -B /scratch your-container-name.sif`."
+  },
+  {
+    "question": "What option is crucial for saving modifications made within an `apptainer shell` session when using a persistent overlay image?",
+    "answer": "To ensure modifications are saved, you must pass the `-w` or `--writable` option to the container, in addition to other necessary options."
+  },
+  {
+    "question": "What is `apptainer instance` designed for?",
+    "answer": "`apptainer instance` is designed for correctly executing daemons for computational tasks on clusters."
+  },
+  {
+    "question": "Why is it recommended to use `apptainer instance` for daemons instead of running them manually?",
+    "answer": "Using `apptainer instance` prevents daemons from being blocked or leaving defunct processes if a task crashes or is canceled, and it allows control over daemons and programs within the same container."
+  },
+  {
+    "question": "What happens to daemons launched with `apptainer instance` if the scheduler cancels the associated task?",
+    "answer": "If the scheduler cancels the task, all daemons attached to it will also be canceled."
+  },
+  {
+    "question": "Where should daemons that need to remain active beyond the execution time of a task be run?",
+    "answer": "Such daemons should be run in a virtual machine or in the cloud; technical support can be contacted for assistance."
+  },
+  {
+    "question": "What specific configuration is needed for running MPI programs on multiple nodes within an Apptainer container?",
+    "answer": "Running MPI programs on multiple nodes in an Apptainer container requires particular configuration to leverage the interconnect hardware effectively."
+  },
+  {
+    "question": "Under what condition is special MPI configuration generally not a concern when using Apptainer?",
+    "answer": "Special MPI configuration is not a concern when all MPI processes run within a container on a single node (e.g., with `--nodes=1` in an `sbatch` script), as the interconnect hardware is not used."
+  },
+  {
+    "question": "What are the two main functionalities Apptainer offers for external disk access and container modification?",
+    "answer": "Apptainer offers 'bind mounts' for accessing disk space outside the container, and 'persistent overlays' for superimposing a read/write file system onto an immutable (read-only) container."
+  }
+]

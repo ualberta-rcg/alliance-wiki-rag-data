@@ -1,0 +1,98 @@
+[
+  {
+    "question": "What does the \"Processes and threads\" graph indicate when 8 cores are requested for a serial task but only one is active?",
+    "answer": "The graph shows only one active execution thread (orange line), confirming that a serial task cannot run in parallel and requesting more than one core is unnecessary."
+  },
+  {
+    "question": "How can the \"Processes and threads\" graph help determine if a task is serial or parallel?",
+    "answer": "By observing the number of active execution threads indicated on the graph."
+  },
+  {
+    "question": "What is a multithreaded task?",
+    "answer": "A multithreaded task (or 'multifil' in French) is capable of using multiple execution threads to perform operations in parallel."
+  },
+  {
+    "question": "Which SBATCH parameter typically has a value greater than 1 for a multithreaded task?",
+    "answer": "The `--cpus-per-task` parameter will be greater than 1."
+  },
+  {
+    "question": "Can a multithreaded task be executed across multiple nodes?",
+    "answer": "No, a multithreaded task only requires a single node, as only distributed tasks can utilize multiple nodes."
+  },
+  {
+    "question": "How is memory handled by execution threads in a multithreaded task?",
+    "answer": "The execution threads share the allocated memory."
+  },
+  {
+    "question": "How can the number of cores be represented within a multithreaded program?",
+    "answer": "The environment variable `$SLURM_CPUS_PER_TASK` can be used to represent the number of cores in the program."
+  },
+  {
+    "question": "How does an efficiently running multithreaded task appear on the CPU graph in the portal?",
+    "answer": "The vertical scale of the CPU graph is set to the requested number of cores (e.g., 16), and the utilization of each core is represented by a different color, filling the entire graph to indicate 100% usage."
+  },
+  {
+    "question": "What is the approximate memory-per-core ratio on the most common nodes of the Narval cluster?",
+    "answer": "The most common nodes on the Narval cluster have approximately 4 GB of memory per core (249 GB \u00f7 64 cores \u2248 4 GB)."
+  },
+  {
+    "question": "What optimization can be made if the allocated memory for a multithreaded task is not fully utilized?",
+    "answer": "It is possible to reduce the memory request to a value closer to the maximum observed utilization (e.g., from 64 GB to 15 GB if only about 10 GB is used), which can lead to faster job submission without affecting CPU-equivalent metrics."
+  },
+  {
+    "question": "What should the \"Processes and threads\" graph show for an optimally configured multithreaded task?",
+    "answer": "The graph should indicate a number of active execution threads similar to the number of cores requested (e.g., 16 active threads for 16 requested cores)."
+  },
+  {
+    "question": "How can you tell if you're requesting more cores than necessary for a multithreaded task?",
+    "answer": "The CPU graph will display in red, and the maximum number of cores utilized will be significantly less than what was requested (e.g., 10 cores used out of 32 requested)."
+  },
+  {
+    "question": "What is the recommended fix for a multithreaded task requesting 32 cores but only using 10?",
+    "answer": "The correction would be to change `#SBATCH --cpus-per-task=32` to `#SBATCH --cpus-per-task=10`."
+  },
+  {
+    "question": "If cores for a multithreaded task are reduced from 32 to 10, and memory per CPU was 1G, what memory adjustment might be needed?",
+    "answer": "It might be necessary to increase `#SBATCH --mem-per-cpu` from 1G to 3G, resulting in a total of 30 GB for 10 cores."
+  },
+  {
+    "question": "What does the \"Processes and threads\" graph show when a multithreaded task effectively uses 10 cores?",
+    "answer": "It indicates an average of 10 active execution threads."
+  },
+  {
+    "question": "Define a multiprocessor task.",
+    "answer": "A multiprocessor task distributes its work among several independent processes, often executing them in parallel across multiple cores or nodes to speed up processing."
+  },
+  {
+    "question": "What are the characteristics of a multiprocessor task?",
+    "answer": "It uses multiple processes (often via MPI), can execute on multiple cores and nodes, and each process has its own dedicated memory (unlike multithreaded tasks where memory is shared)."
+  },
+  {
+    "question": "How does memory allocation differ between multithreaded and multiprocessor tasks?",
+    "answer": "In multithreaded tasks, threads share memory, whereas in multiprocessor tasks, each process has its own separate memory."
+  },
+  {
+    "question": "When is it appropriate to use the `#SBATCH --mem=0` parameter in a submission script?",
+    "answer": "This option is valid only when all cores on the node are also allocated and fully utilized, allowing you to request the entirety of the node's available memory."
+  },
+  {
+    "question": "What does the CPU graph look like for an efficiently running multiprocessor task that uses 64 cores across 4 nodes?",
+    "answer": "The CPU graph will show a total of 256 cores (64 cores x 4 nodes), with each core utilized at 100%, indicating that the sum of all utilizations completely fills the graph."
+  },
+  {
+    "question": "What is a sign that you are requesting too many cores for a multiprocessor task?",
+    "answer": "The CPU utilization graph will show that fewer cores are being used than requested (e.g., only 16 cores active out of 24 requested), and the graph will not be fully colored."
+  },
+  {
+    "question": "If a multiprocessor task requests 24 tasks but only utilizes 16, what is the recommended correction?",
+    "answer": "The correction would be to change `#SBATCH --ntasks=24` to `#SBATCH --ntasks=16`."
+  },
+  {
+    "question": "What is a potential memory optimization for a multiprocessor task if the requested amount is excessive?",
+    "answer": "It would be prudent to test by reducing the `#SBATCH --mem-per-cpu` value (e.g., to 1G)."
+  },
+  {
+    "question": "How can the \"Processes and threads\" graph help estimate necessary cores for a multiprocessor task if curves are superimposed?",
+    "answer": "By individually selecting each execution thread, one can determine the total number of active threads (e.g., 16), which serves as a complementary method to estimate the truly needed cores."
+  }
+]

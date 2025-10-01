@@ -1,94 +1,134 @@
 [
   {
-    "question": "What is the primary purpose of the scratch filesystem on the clusters?",
+    "question": "What is the primary purpose of the scratch filesystem on our clusters?",
     "answer": "The scratch filesystem is intended as temporary, fast storage for data being used during job execution."
   },
   {
-    "question": "Where should data intended for long-term storage be kept?",
-    "answer": "Data needed for long-term storage and reference should be kept in either `/project` or other archival storage areas."
+    "question": "Where should data for long-term storage and reference be kept?",
+    "answer": "Data needed for long-term storage and reference should be kept in either /project or other archival storage areas."
   },
   {
-    "question": "What is the policy for deleting files from the scratch filesystem?",
-    "answer": "Files older than 60 days are periodically deleted from the scratch filesystem to ensure adequate space."
+    "question": "What is the general policy for deleting files on the scratch filesystem?",
+    "answer": "Files older than 60 days are periodically deleted to ensure adequate space."
   },
   {
-    "question": "Will moving a file to a different directory within scratch prevent it from being purged?",
-    "answer": "No, simply moving a file from one directory in scratch to another will not prevent it from being purged, as the purging is based on the file's age, not its location within scratch."
+    "question": "Does moving a file from one directory to another within scratch prevent it from being purged?",
+    "answer": "No, the purging of a file is based on its age, not its location within scratch, so moving it will not generally prevent it from being purged."
   },
   {
-    "question": "How does the scratch filesystem policy on the Graham cluster differ from others?",
-    "answer": "On Graham, the scratch filesystem does not explicitly expire but uses quota to enforce transient use."
+    "question": "How does the scratch filesystem policy on Graham and Nibi differ from the general policy?",
+    "answer": "On Graham and Nibi, the scratch filesystem does not explicitly expire by age, but uses a quota system to enforce transient use."
   },
   {
-    "question": "When are files checked to identify candidates for expiration?",
-    "answer": "The scratch filesystem is checked at the end of the month for files which will be candidates for expiry on the 15th of the following month."
+    "question": "What is the soft limit for scratch usage on Graham and Nibi clusters?",
+    "answer": "If your usage is under 1T, you never have to do anything (no expiration, etc.)."
   },
   {
-    "question": "What happens on the first day of the month regarding file expiration notifications?",
-    "answer": "On the first day of the month, a login message is posted and a notification e-mail is sent to users with candidate files, including the location of a file that lists all candidates for purging."
+    "question": "What happens when a user exceeds the 1T soft limit on Graham or Nibi?",
+    "answer": "Exceeding the soft limit triggers an over-quota condition, which includes a 60-day grace period."
   },
   {
-    "question": "How much time do users have to move candidate data after the initial notification?",
-    "answer": "Users have two weeks to make arrangements to copy data to their project space or another location after the initial notification on the first day of the month."
+    "question": "What happens when the 60-day grace period expires on Graham or Nibi if usage is still over the soft limit?",
+    "answer": "Over-quota enforcement starts, disallowing any new allocation. Existing files are still accessible, but adding files or increasing file sizes will fail."
   },
   {
-    "question": "What notification is sent on the 12th of the month concerning file expiration?",
-    "answer": "On the 12th of the month, a final notification e-mail is sent with an updated assessment of candidate files, giving users 72 hours to make arrangements for moving them."
+    "question": "How can a user resolve an over-quota condition on Graham or Nibi?",
+    "answer": "To resolve an over-quota condition, the user must bring their usage under the soft limit, which resets the clock."
   },
   {
-    "question": "When are files officially deleted from the scratch filesystem?",
-    "answer": "At the end of the day on the 15th of the month, any remaining files on the scratch filesystem for which both the `ctime` and the `atime` are older than 60 days will be deleted."
+    "question": "What is the hard quota for scratch usage on Graham and Nibi?",
+    "answer": "There is a hard quota of 20T on Graham and Nibi."
   },
   {
-    "question": "Whose ultimate responsibility is it to manage files on the scratch space?",
-    "answer": "It is the user's ultimate responsibility to keep files older than 60 days from being located in the scratch space."
+    "question": "When is the scratch filesystem checked for files that are candidates for expiry?",
+    "answer": "The scratch filesystem is checked at the end of the month for files that will be candidates for expiry on the 15th of the following month."
   },
   {
-    "question": "Can copying or using `rsync` prevent a file from being deleted from scratch?",
-    "answer": "Yes, simply copying or using the `rsync` command will update the `atime` for the original data on scratch, making them ineligible for deletion. However, users are advised to delete the original files in scratch after moving them."
+    "question": "When do files on the scratch filesystem get deleted if they are candidates for purging?",
+    "answer": "At the end of the day on the 15th of the month, any remaining files on the scratch filesystem for which both the ctime and the atime are older than 60 days will be deleted."
   },
   {
-    "question": "Where can users on Cedar, Beluga, and Narval clusters find a list of files slated for purging?",
-    "answer": "On Cedar, Beluga, and Narval clusters, users can go to the `/scratch/to_delete/` path and look for a file with their name."
+    "question": "When do users receive the first notification about files slated for purging?",
+    "answer": "On the first day of the month, a login message is posted, and a notification e-mail is sent to all users who have at least one file that is a candidate for purging."
   },
   {
-    "question": "Where can users on the Niagara cluster find a list of files slated for purging?",
-    "answer": "On Niagara, users should go to `/scratch/t/to_delete/` (which is a symlink to `/scratch/t/todelete/current`)."
+    "question": "How much time do users have after the first notification to move their data?",
+    "answer": "Users have two weeks (until the 15th) after the first notification to make arrangements to copy data."
   },
   {
-    "question": "What kind of information is contained in the file listing candidates for purging?",
-    "answer": "The file will contain a list of filenames with full path, possibly other information about `atime`, `ctime`, and `size`."
+    "question": "When is the final notification email sent for file expiration?",
+    "answer": "On the 12th of the month, a final notification e-mail will be sent with an updated assessment of candidate files for expiration."
   },
   {
-    "question": "How often is the file listing candidate files for purging updated?",
-    "answer": "The file listing candidate files for purging is updated only on the 1st and the 12th of each month."
+    "question": "What is the deadline for moving files after the final notification email?",
+    "answer": "Users have 72 hours after the final notification email on the 12th to make arrangements for moving their files before deletion on the 15th."
   },
   {
-    "question": "If a user accesses or moves candidate files between the 1st and 11th of the month, will the assessment file immediately reflect these changes?",
+    "question": "Can copying or rsyncing files prevent them from being deleted from scratch?",
+    "answer": "Simply copying or using the rsync command to displace your files will update the atime for the original data on scratch, making them ineligible for deletion. However, users are still responsible for managing their data."
+  },
+  {
+    "question": "What is the recommended action after copying data from scratch to another location?",
+    "answer": "Once you have put the data in another location, you should delete the original files and directories in scratch instead of depending on automatic purging."
+  },
+  {
+    "question": "Where can users check which files are candidates for purging on Cedar, Beluga, and Narval clusters?",
+    "answer": "On Cedar, Beluga, and Narval clusters, users can go to the /scratch/to_delete/ path and look for a file with their name."
+  },
+  {
+    "question": "Where can users check which files are candidates for purging on Niagara?",
+    "answer": "On Niagara, users can go to /scratch/t/to_delete/ (which is a symlink to /scratch/t/todelete/current)."
+  },
+  {
+    "question": "What information does the file listing purge candidates contain?",
+    "answer": "The file will contain a list of filenames with full path, possibly other information about atime, ctime, and size."
+  },
+  {
+    "question": "How often is the file listing purge candidates updated?",
+    "answer": "The file listing purge candidates will be updated only on the 1st and the 12th of each month."
+  },
+  {
+    "question": "If I access, read, move, or delete some candidate files between the 1st and the 11th of the month, will the assessment file change immediately?",
     "answer": "No, if you access, read, move, or delete some of the candidates between the 1st and the 11th, there won't be any changes in the assessment until the 12th."
   },
   {
-    "question": "What does it mean if an assessment file was present until the 11th but is no longer there on the 12th?",
-    "answer": "If there was an assessment file up until the 11th, but no longer on the 12th, it means you don't have anything to be purged anymore that month."
+    "question": "How is a file's age defined for the purpose of scratch deletion?",
+    "answer": "A file's age is defined as the most recent of its access time (atime) and change time (ctime)."
   },
   {
-    "question": "How is a file's age defined for the purpose of deletion on the scratch filesystem?",
-    "answer": "A file's age is defined as the most recent of its access time (`atime`) and its change time (`ctime`)."
+    "question": "How can I find the change time (ctime) of a file?",
+    "answer": "You can find the ctime of a file using the command 'ls -lc <filename>'."
   },
   {
-    "question": "How can I check the `ctime` of a file?",
-    "answer": "You can find the `ctime` of a file using the command `ls -lc <filename>`."
+    "question": "How can I find the access time (atime) of a file?",
+    "answer": "The atime of a file can be obtained with the command 'ls -lu <filename>'."
   },
   {
-    "question": "How can I check the `atime` of a file?",
-    "answer": "The `atime` of a file can be obtained with the command `ls -lu <filename>`."
+    "question": "Why is the modify time (mtime) not used to determine a file's age for purging?",
+    "answer": "The modify time (mtime) of the file is not used because it can be modified by the user or by other programs to display incorrect information."
   },
   {
-    "question": "Why is the modify time (`mtime`) not used to determine a file's age for purging?",
-    "answer": "The `mtime` of the file is not used because it can be modified by the user or by other programs to display incorrect information."
+    "question": "Why is ctime used as a fallback for atime when determining file age?",
+    "answer": "While atime is usually sufficient, userspace programs can alter atime to times in the past, potentially causing early expiration. The use of ctime as a fallback guards against this undesirable behavior."
   },
   {
-    "question": "Why is `ctime` used as a fallback alongside `atime` for determining file age?",
-    "answer": "While `atime` is usually sufficient, `ctime` is used as a fallback to guard against userspace programs altering `atime` to times in the past, which could result in early expiration of a file."
+    "question": "What is considered an abuse of the file age tracking method?",
+    "answer": "Periodically running a recursive 'touch' command on files to prevent them from being flagged for expiration is considered an abuse of the file age tracking method."
+  },
+  {
+    "question": "How do staff address users who attempt to circumvent the purging policy?",
+    "answer": "Staff have methods for detecting such tactics; users who employ them will be contacted and asked to modify their behavior, specifically to move the 'retouched' data to a more appropriate location."
+  },
+  {
+    "question": "What issues can arise when copying directories with symbolic links from scratch using 'cp' or 'rsync'?",
+    "answer": "If you have symbolic links in scratch, copying them with 'cp' or 'rsync' will cause problems because they will still point back to scratch."
+  },
+  {
+    "question": "What is the recommended method for safely copying a directory with symbolic links from scratch to project space?",
+    "answer": "To avoid issues with symbolic links, you can use 'tar' to make an archive of your files on scratch and extract this archive in your project space."
+  },
+  {
+    "question": "Provide the bash command to safely copy a directory with symbolic links using 'tar'.",
+    "answer": "cd /scratch/.../your_data && mkdir /project/.../your_data && tar cf - ./* | (cd /project/.../your_data && tar xf -)"
   }
 ]

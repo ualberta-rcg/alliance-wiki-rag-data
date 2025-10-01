@@ -1,0 +1,50 @@
+[
+  {
+    "question": "What is the primary purpose of the 'Multinode (by node + restart)' Slurm script for Ansys Fluent?",
+    "answer": "This script is designed to automate restarting very large Ansys Fluent jobs that might exceed the typical seven-day maximum runtime window available on most clusters."
+  },
+  {
+    "question": "What are the fundamental file requirements to use the Fluent solution restart script?",
+    "answer": "A working set of `sample.cas`, `sample.dat`, and `sample.jou` files must be present."
+  },
+  {
+    "question": "How should the initial `sample.jou` file be configured for a restart job?",
+    "answer": "The `sample.jou` file must include the commands `/solve/dual-time-iterate 1` and `/file/auto-save/data-frequency 1`."
+  },
+  {
+    "question": "How do you prepare the `sample-restart.jou` file for a Fluent restart job?",
+    "answer": "Create `sample-restart.jou` by copying `sample.jou`. Then, edit `sample-restart.jou` to contain `/file/read-cas-data sample-restart` instead of `sample`, and comment out any initialization line (e.g., `;/solve/initialize/initialize-flow`)."
+  },
+  {
+    "question": "What is the maximum time limit that can be specified in the Slurm script for a restart job?",
+    "answer": "The `--time` limit can be set up to `07-00:00` (seven days)."
+  },
+  {
+    "question": "What does the `#SBATCH --array=1-5%1` directive mean in the restart script?",
+    "answer": "It specifies the number of solution restarts, with a minimum of 2 attempts and 5 attempts shown as an example."
+  },
+  {
+    "question": "Which Ansys Fluent module versions are typically loaded for this restart script?",
+    "answer": "The script typically loads `StdEnv/2023` and `ansys/2023R2` or newer versions."
+  },
+  {
+    "question": "How does the script calculate the total number of cores (`NCORES`)?",
+    "answer": "The total number of cores is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "What happens if a job attempt completes successfully but more restarts are scheduled?",
+    "answer": "If `SLURM_ARRAY_TASK_ID` is less than `SLURM_ARRAY_TASK_COUNT`, the script creates symbolic links to the most recent output `.cas` and `.dat` files for the next restart."
+  },
+  {
+    "question": "How does the script handle the final successful completion of an array job?",
+    "answer": "If `SLURM_ARRAY_TASK_ID` equals `SLURM_ARRAY_TASK_COUNT` and the job completes successfully, it prints 'Job completed successfully! Exiting now.' and cancels the entire SLURM array job ID."
+  },
+  {
+    "question": "What is the consequence if the simulation fails during an attempt?",
+    "answer": "The script will output 'Simulation failed. Exiting \u2026' and the job will terminate."
+  },
+  {
+    "question": "How can the `sample-restart.jou` be adjusted to minimize solution restarts if subsequent steps run faster?",
+    "answer": "If the second and subsequent time steps are known to run twice as fast, edit `sample-restart.jou` to specify `/solve/dual-time-iterate 2`."
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "question": "How do you set the ownership and permissions for the private key of a self-signed SSL certificate?",
+    "answer": "You set the correct ownership and permissions of the private key with the commands `sudo chown root:ssl-cert /etc/ssl/private/server.key` and `sudo chmod 640 /etc/ssl/private/server.key`."
+  },
+  {
+    "question": "What configuration file needs to be edited in Apache to use a self-signed SSL certificate?",
+    "answer": "Apache's SSL configuration file, `/etc/apache2/sites-available/default-ssl.conf`, needs to be edited."
+  },
+  {
+    "question": "How do you configure Apache to use a self-signed SSL certificate in `default-ssl.conf`?",
+    "answer": "Edit `/etc/apache2/sites-available/default-ssl.conf` and change the lines `SSLCertificateFile      /etc/ssl/certs/ssl-cert-snakeoil.pem` and `SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key` to point to `SSLCertificateFile      /etc/ssl/certs/server.crt`, `SSLCertificateKeyFile /etc/ssl/private/server.key`, and add `SSLCertificateChainFile /etc/ssl/certs/server.crt`."
+  },
+  {
+    "question": "What common variable should be consistent between `default-ssl.conf` and `000-default.conf`?",
+    "answer": "Both `default-ssl.conf` and `000-default.conf` should have the same `DocumentRoot` variables."
+  },
+  {
+    "question": "How can you tighten security for a self-signed certificate configuration in Apache?",
+    "answer": "You can tighten security by editing `/etc/apache2/sites-available/default-ssl.conf` to add `ServerName`, `SSLProtocol all -SSLv2 -SSLv3`, `SSLCipherSuite HIGH:MEDIUM:!aNULL:!MD5:!SEED:!IDEA:!RC4`, and `SSLHonorCipherOrder on` inside the `<VirtualHost>` tag, and by editing `/etc/apache2/sites-available/000-default.conf` to add a permanent redirect from HTTP to HTTPS."
+  },
+  {
+    "question": "Which Apache configuration file is edited to force all HTTP traffic to HTTPS?",
+    "answer": "The `/etc/apache2/sites-available/000-default.conf` file is edited to add a `Redirect permanent` directive inside the `<VirtualHost>` tag."
+  },
+  {
+    "question": "What SSL protocol and cipher suite settings are recommended to tighten security in Apache's SSL configuration?",
+    "answer": "It is recommended to use `SSLProtocol all -SSLv2 -SSLv3` and `SSLCipherSuite HIGH:MEDIUM:!aNULL:!MD5:!SEED:!IDEA:!RC4`, along with `SSLHonorCipherOrder on`."
+  },
+  {
+    "question": "How do you enable the SSL-enabled website after configuring Apache for a self-signed certificate?",
+    "answer": "You enable the SSL-enabled website by running `sudo a2ensite default-ssl.conf` and then restarting Apache with `sudo service apache2 restart`."
+  }
+]

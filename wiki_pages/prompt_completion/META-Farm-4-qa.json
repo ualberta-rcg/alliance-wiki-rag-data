@@ -1,0 +1,66 @@
+[
+  {
+    "question": "What are the essential modifications required for the `job_script.sh` file?",
+    "answer": "You should at least change the account name (using the `-A` switch) and set an appropriate metajob runtime (using the `-t` switch)."
+  },
+  {
+    "question": "Is it mandatory to include a runtime switch in `job_script.sh`?",
+    "answer": "Yes, your `job_script.sh` *must* include the runtime switch (either `-t` or `--time`)."
+  },
+  {
+    "question": "Can the runtime switch for a job be passed to `sbatch` via `submit.run` arguments?",
+    "answer": "No, the runtime switch cannot be passed as an optional argument to `submit.run`; it must be included directly in `job_script.sh`."
+  },
+  {
+    "question": "How can one prevent a metajob from failing due to a defective node, such as a missing GPU?",
+    "answer": "You can add tests to `job_script.sh` before the `task.run` line. For example, you can test for the presence of an NVidia GPU and force the metajob to exit if none is found."
+  },
+  {
+    "question": "What command can be used in `job_script.sh` to check for an NVidia GPU?",
+    "answer": "The `nvidia-smi` command can be used; if it returns a non-zero exit code, it indicates a problem."
+  },
+  {
+    "question": "Is there a utility available on Nibi for GPU testing?",
+    "answer": "Yes, there is a `gpu_test` utility on Nibi which can be copied to your `~/bin` directory from `~syam/bin/gpu_test`."
+  },
+  {
+    "question": "How does the META package detect and handle metajobs that process cases too quickly, potentially indicating an issue?",
+    "answer": "The META package has a built-in mechanism that uses parameters `N_failed_max` and `dt_failed` (set in `config.h`). It triggers if the first `N_failed_max` cases complete in less than `dt_failed` seconds, causing the metajob to stop."
+  },
+  {
+    "question": "What are the default values for `N_failed_max` and `dt_failed`?",
+    "answer": "The default values for both `N_failed_max` and `dt_failed` are 5, meaning a metajob will stop if its first 5 cases all finish in less than 5 seconds."
+  },
+  {
+    "question": "What should be done if the protective mechanism falsely triggers for normal cases with short runtimes?",
+    "answer": "If false triggering occurs, you should reduce the value of `dt_failed` in `config.h`."
+  },
+  {
+    "question": "What output files are created in the farm directory when metajobs are running?",
+    "answer": "The following files are created: `OUTPUT/slurm-$JOBID.out` for each metajob's standard output, and `STATUSES/status.$JOBID` for the status of each case processed by that metajob."
+  },
+  {
+    "question": "What does `$JOBID` represent in the output file names `OUTPUT/slurm-$JOBID.out` and `STATUSES/status.$JOBID`?",
+    "answer": "`$JOBID` stands for the job ID of the corresponding metajob."
+  },
+  {
+    "question": "What other auxiliary directory is created inside the root farm directory?",
+    "answer": "A directory named `MISC` is created, which contains some auxiliary data."
+  },
+  {
+    "question": "Where does `submit.run` create temporary scratch files and directories?",
+    "answer": "Every time `submit.run` is executed, it creates a unique subdirectory inside `/home/$USER/tmp` for scratch files, such as those used by `lockfile`."
+  },
+  {
+    "question": "How are the temporary subdirectories in `/home/$USER/tmp` named?",
+    "answer": "These subdirectories are named `$NODE.$PID`, where `$NODE` is the name of the current node and `$PID` is the unique process ID for the script."
+  },
+  {
+    "question": "Can the temporary subdirectories created in `/home/$USER/tmp` be deleted?",
+    "answer": "Yes, once the farm execution is complete, these subdirectories can be safely erased."
+  },
+  {
+    "question": "Which command automatically deletes temporary files and other farm data, and what is the caution associated with it?",
+    "answer": "The `clean.run` command automatically deletes all files in the farm directory (except specific configuration files) and associated files in `/home/$USER/tmp`. Users must be careful as `clean.run` also deletes all the results produced by the farm."
+  }
+]

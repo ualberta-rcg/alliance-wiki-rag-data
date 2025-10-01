@@ -1,0 +1,114 @@
+[
+  {
+    "question": "What is GAMESS?",
+    "answer": "GAMESS, the General Atomic and Molecular Electronic Structure System, is a general *ab initio* quantum chemistry package."
+  },
+  {
+    "question": "Which scheduler is used on Compute Canada clusters for GAMESS jobs?",
+    "answer": "Compute Canada clusters use the Slurm scheduler for job submission and monitoring."
+  },
+  {
+    "question": "What are the two main files required to run a GAMESS job?",
+    "answer": "You need to prepare a GAMESS input file (e.g., \"name.inp\") containing molecular geometry and calculation specifications, and a job script (e.g., \"gamess_job.sh\") to define compute resources. Both files must be in the same directory."
+  },
+  {
+    "question": "Where can I find detailed documentation on the GAMESS input file format and keywords?",
+    "answer": "Refer to the GAMESS Documentation, particularly Chapter 2 \"Input Description\"."
+  },
+  {
+    "question": "How do you submit a GAMESS job to the scheduler?",
+    "answer": "Use the command `sbatch gamess_job.sh`."
+  },
+  {
+    "question": "What is the default number of CPUs requested per task in the example GAMESS job script?",
+    "answer": "The example `gamess_job.sh` script requests `--cpus-per-task=1`."
+  },
+  {
+    "question": "What is the default memory requested per CPU in the example GAMESS job script?",
+    "answer": "The example `gamess_job.sh` script requests `--mem-per-cpu=4000M`."
+  },
+  {
+    "question": "What is the default time limit specified in the example GAMESS job script?",
+    "answer": "The example `gamess_job.sh` script specifies `--time=0-00:30`, meaning 30 minutes."
+  },
+  {
+    "question": "Where are GAMESS temporary binary files (scratch files) stored by default?",
+    "answer": "By default, temporary binary files are written to local disk on the compute node, specifically `$SLURM_TMPDIR`."
+  },
+  {
+    "question": "What happens to the data in `$SLURM_TMPDIR` after a GAMESS job finishes?",
+    "answer": "The data in `$SLURM_TMPDIR` will be deleted after the job finishes."
+  },
+  {
+    "question": "How can you specify `/scratch` for GAMESS temporary binary files instead of local disk?",
+    "answer": "You can use `/scratch` by uncommenting and setting the `SCR` environment variable in the job script, for example: `export SCR=\"$SCRATCH/gamess_${SLURM_JOB_ID}/\"`."
+  },
+  {
+    "question": "Where are GAMESS supplementary output files written by default?",
+    "answer": "Supplementary output files are written to a location defined by the `USERSCR` environment variable, which defaults to the user's `$SCRATCH` directory."
+  },
+  {
+    "question": "Which environment variable controls the location of GAMESS temporary binary files?",
+    "answer": "The `SCR` environment variable controls the location of GAMESS temporary binary files."
+  },
+  {
+    "question": "Which environment variable controls the location of GAMESS supplementary output files?",
+    "answer": "The `USERSCR` environment variable controls the location of GAMESS supplementary output files."
+  },
+  {
+    "question": "How does GAMESS determine the number of CPUs available for a calculation?",
+    "answer": "The number of CPUs available for a calculation is determined by the `--cpus-per-task` setting in the job script."
+  },
+  {
+    "question": "Why can GAMESS only use CPU cores located on the same compute node for parallelization?",
+    "answer": "GAMESS has been built using sockets for parallelization, which means it can only use CPU cores that are located on the same compute node."
+  },
+  {
+    "question": "What dictates the maximum number of CPU cores a GAMESS job can use?",
+    "answer": "The maximum number of CPU cores is dictated by the size of the nodes in the cluster, for example, 32 CPU cores per node on Graham."
+  },
+  {
+    "question": "Do quantum chemistry calculations scale well with a large number of CPUs?",
+    "answer": "No, quantum chemistry calculations are known to not scale well to large numbers of CPUs, meaning they don't use large numbers of CPUs efficiently compared to other types of calculations."
+  },
+  {
+    "question": "What factors affect the efficient use of CPUs in GAMESS calculations?",
+    "answer": "The efficiency depends on the number of atoms, the number of basis functions, and the level of theory."
+  },
+  {
+    "question": "How can you determine a reasonable number of CPUs for a GAMESS calculation?",
+    "answer": "You should run a scaling test by running the same input file with different numbers of CPUs and comparing execution times."
+  },
+  {
+    "question": "What is considered an ideal outcome for a GAMESS scaling test?",
+    "answer": "Ideally, the execution time should be half as long when using twice as many CPUs."
+  },
+  {
+    "question": "What does it mean for quantum chemistry calculations to be 'memory bound'?",
+    "answer": "It means that larger molecules at a high level of theory require a significant amount of memory (RAM), often more than is typically available, leading GAMESS to use disk storage (SCRATCH) for intermediate results."
+  },
+  {
+    "question": "What is the two-step process for assigning sufficient memory to GAMESS?",
+    "answer": "First, request memory for the job in the submission script (e.g., using `--mem-per-cpu=4000M`). Second, define the `MWORDS` and `MEMDDI` options in the `$SYSTEM` group of the GAMESS input file."
+  },
+  {
+    "question": "What is `MWORDS` in the GAMESS input file?",
+    "answer": "`MWORDS` is the maximum replicated memory a job can use on every core, specified in units of 1,000,000 words, where a word is 64 bits (8 bytes)."
+  },
+  {
+    "question": "What is `MEMDDI` in the GAMESS input file?",
+    "answer": "`MEMDDI` is the grand total memory needed for the distributed data interface (DDI) storage, specified in units of 1,000,000 words."
+  },
+  {
+    "question": "How is the memory required per processor core calculated for a GAMESS run?",
+    "answer": "For a run using `p` CPU-cores, the memory required on each processor core is calculated as `MEMDDI/p + MWORDS`."
+  },
+  {
+    "question": "Why is it important to leave a safety margin of memory between what is requested from the scheduler and what GAMESS is allowed to use?",
+    "answer": "It's important to leave a few hundred MB as a safety margin to prevent Slurm from terminating the job if GAMESS tries to use slightly more memory than explicitly requested, which would result in an 'Exceeded step/job memory limit' error."
+  },
+  {
+    "question": "What should you do if a GAMESS job is terminated by Slurm due to exceeding the memory limit?",
+    "answer": "You should either reduce the `MWORDS` or `MEMDDI` values in the input file, or increase the `--mem-per-cpu` value in the submission script."
+  }
+]

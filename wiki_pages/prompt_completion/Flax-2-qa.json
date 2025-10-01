@@ -1,0 +1,74 @@
+[
+  {
+    "question": "What is the purpose of the `CastToJnp` class in the Flax examples?",
+    "answer": "The `CastToJnp` class is a helper class used to cast NumPy arrays to JAX arrays with a `jnp.float32` data type."
+  },
+  {
+    "question": "How are model weights initialized in the single GPU/CPU Flax example?",
+    "answer": "Model weights are initialized using `model.init(seed, jnp.ones([3,32,32]))['params']`, which takes a JAX random PRNG key and a `jnp.ones()` array of the same shape as the model's inputs."
+  },
+  {
+    "question": "Which library is used for data pre-processing and loading in the Flax examples, as Flax and JAX do not provide this functionality?",
+    "answer": "PyTorch is used for data pre-processing and loading in the Flax examples."
+  },
+  {
+    "question": "What transformations are applied to the training data in the single GPU/CPU Flax example?",
+    "answer": "The training data undergoes a sequence of transformations: `transforms.ToTensor()`, `transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))`, and `CastToJnp()`."
+  },
+  {
+    "question": "How is the `train_step` function optimized for performance in the single GPU/CPU Flax example?",
+    "answer": "The `train_step` function is optimized using `jax.jit`, which Just-In-Time compiles the entire training step (forward and backward pass) into a single function call."
+  },
+  {
+    "question": "What is the role of the `backward` function within the `train_step`?",
+    "answer": "The `backward` function is created by `jax.value_and_grad(compute_loss)` and returns a function that automatically computes gradients with respect to its input (the model parameters) while also returning the loss value."
+  },
+  {
+    "question": "How are weight updates applied after gradients are computed in the single GPU/CPU Flax example?",
+    "answer": "Weight updates are applied by calling `state.apply_gradients(grads=grads)` within the `update_state` function, which is also JIT compiled using `jax.jit`."
+  },
+  {
+    "question": "What is Data Parallelism in the context of Flax with multiple GPUs?",
+    "answer": "Data Parallelism refers to methods that perform training over multiple replicas of a model in parallel, where each replica receives a different chunk of training data at each iteration."
+  },
+  {
+    "question": "What is a significant speed-up benefit of using Data Parallelism?",
+    "answer": "Data Parallelism can provide a significant speed-up by iterating through all examples in a large dataset approximately N times faster, where N is the number of model replicas."
+  },
+  {
+    "question": "What is an important caveat when using Data Parallelism to ensure the trained model is equivalent to one trained without it?",
+    "answer": "The user must scale either the learning rate or the desired batch size in proportion to the number of model replicas when using Data Parallelism."
+  },
+  {
+    "question": "What is the model size constraint when using Data Parallelism where each GPU hosts a replica?",
+    "answer": "The model must be small enough to fit inside the memory of a single GPU."
+  },
+  {
+    "question": "How are model replicas broadcast to all GPUs in the `flax-example-multigpu.py` script for single-node multi-GPU training?",
+    "answer": "Model replicas are broadcast to all GPUs using `state = jax_utils.replicate(state)`."
+  },
+  {
+    "question": "How are input batches split for distribution across multiple GPUs in the `flax-example-multigpu.py` script?",
+    "answer": "Input batches are split into `n_devices` sub-batches using `inputs = inputs.reshape(n_devices, inputs.shape[0] // n_devices, *inputs.shape[1:])` and similarly for targets, where `n_devices` is the number of GPUs available to the job."
+  },
+  {
+    "question": "What is the function of `jax.pmap` in the multi-GPU `train_step` function?",
+    "answer": "`jax.pmap` parallelizes inputs, function evaluation, and outputs over a given axis (by default, the first dimension of the inputs, which corresponds to the number of GPUs), and it also JIT compiles the function."
+  },
+  {
+    "question": "How are gradients aggregated across model replicas in the multi-GPU `train_step` function?",
+    "answer": "Gradients are aggregated across all model replicas by computing their average using `grads = jax.lax.pmean(grads, axis_name='gpus')`."
+  },
+  {
+    "question": "What type of optimizer is used in the provided Flax examples?",
+    "answer": "The examples use the Stochastic Gradient Descent (SGD) optimizer from `optax`, specifically `optax.sgd(args.lr)`."
+  },
+  {
+    "question": "What is the final activation function applied in the `Net` model before the output layer?",
+    "answer": "The final activation function applied before the output layer (`nn.Dense(features=10)`) is `nn.relu`."
+  },
+  {
+    "question": "What is the purpose of the `collate_jax` function?",
+    "answer": "The `collate_jax` function is used to combine a batch of individual samples into a single batch tensor, handling NumPy arrays, tuples, and lists appropriately by stacking or recursively calling itself."
+  }
+]

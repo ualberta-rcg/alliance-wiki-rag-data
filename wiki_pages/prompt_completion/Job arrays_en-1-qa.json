@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What is a job array in SLURM?",
+    "answer": "A job array, also known as a task array or an array job, is a convenient way to submit many tasks at once when they differ only in some parameter."
+  },
+  {
+    "question": "How are individual tasks within a SLURM job array differentiated?",
+    "answer": "The individual tasks in a SLURM job array are distinguished by an environment variable called `$SLURM_ARRAY_TASK_ID`, which Slurm sets to a different value for each task."
+  },
+  {
+    "question": "Which parameter is used to define the range of values for `$SLURM_ARRAY_TASK_ID`?",
+    "answer": "The range of values for `$SLURM_ARRAY_TASK_ID` is set using the `--array` parameter."
+  },
+  {
+    "question": "How can you submit a SLURM job array where `$SLURM_ARRAY_TASK_ID` takes values from 0 to 7?",
+    "answer": "You can submit it using `sbatch --array=0-7`."
+  },
+  {
+    "question": "What is the syntax to specify specific, non-sequential task IDs for a SLURM job array?",
+    "answer": "You can list the values directly, for example, `sbatch --array=1,3,5,7`."
+  },
+  {
+    "question": "How do you define a step size for task IDs in a SLURM job array?",
+    "answer": "You can use the syntax `sbatch --array=1-7:2`, which would set a step size of 2, resulting in task IDs 1, 3, 5, and 7."
+  },
+  {
+    "question": "How can you limit the number of concurrently running jobs within a SLURM job array?",
+    "answer": "You can use the percentage notation with the `--array` parameter, such as `sbatch --array=1-100%10`, which allows no more than 10 of the jobs to run simultaneously."
+  },
+  {
+    "question": "How does a script within a job array typically use the `$SLURM_ARRAY_TASK_ID` variable?",
+    "answer": "The script references `$SLURM_ARRAY_TASK_ID` to select an input file (e.g., `input.$SLURM_ARRAY_TASK_ID`) or to set a command-line argument for the application."
+  },
+  {
+    "question": "What are the advantages of using a job array over submitting many separate serial jobs?",
+    "answer": "A job array produces only one line of output in squeue, making it easier to read. Also, the scheduler runs more efficiently as it does not have to analyze job requirements for each task in the array separately."
+  },
+  {
+    "question": "When should SLURM job arrays not be used?",
+    "answer": "You should not use a job array to submit tasks with very short run times, e.g., much less than an hour."
+  },
+  {
+    "question": "What alternatives are suggested for grouping tasks with very short run times?",
+    "answer": "Tasks with run times of only a few minutes should be grouped into longer jobs using META, GLOST, GNU Parallel, or a shell loop inside a job."
+  },
+  {
+    "question": "How can a SLURM job array be used to run a script in multiple directories with non-systematic names?",
+    "answer": "You can create a file (e.g., `case_list`) with the directory names, and then within the job array script, use `sed -n \"${SLURM_ARRAY_TASK_ID}p\" case_list` to select the specific directory for each task before changing into it."
+  },
+  {
+    "question": "What are the cautions when using a file like `case_list` with a job array for multiple directories?",
+    "answer": "Take care that the number of tasks you request with `--array` matches the number of entries in the file. Also, the `case_list` file should not be changed until all the tasks in the array have run, as it will be read each time a new task starts."
+  }
+]

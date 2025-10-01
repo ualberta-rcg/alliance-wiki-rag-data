@@ -1,42 +1,46 @@
 [
   {
-    "question": "What additional packages might be needed on a CentOS VM to compile ParaView or VisIt?",
-    "answer": "You may need to install `mesa-libGLU`, `mesa-libGLU-devel`, `bzip2`, `bzip2-libs`, `libXt-devel`, `zlib-devel`, `flex`, and `byacc`. Additionally, a symbolic link `glx.h` might be required."
+    "question": "How do you set up an SSH tunnel from your local computer to a Cloud VM for ParaView client-server mode?",
+    "answer": "You can organize an SSH tunnel from the local port 11111 to the VM's port 11111 using the command `ssh centos@vm.ip.address -L 11111:localhost:11111`."
   },
   {
-    "question": "How can you simplify logins to a VM using an existing private-public SSH key pair?",
-    "answer": "You can copy your public SSH key to the VM's `~/.ssh/authorized_keys` file by executing `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'` on your computer."
+    "question": "Once the SSH tunnel to a Cloud VM is established, how do you connect the ParaView client?",
+    "answer": "Start the ParaView client on your computer and connect to `localhost:11111`."
   },
   {
-    "question": "Why is it necessary to compile ParaView with OSMesa support on a cloud VM?",
-    "answer": "Compiling with OSMesa support is necessary because most Arbutus VMs do not have GPU access, and it enables offscreen (software) rendering for ParaView using CPU-based resources."
+    "question": "What message indicates successful SWR rendering when connected to a ParaView server on a Cloud VM?",
+    "answer": "During rendering in the console, you should see the message 'SWR detected AVX2'."
   },
   {
-    "question": "Which software rasterization driver is recommended for OSMesa-enabled ParaView servers on a VM?",
-    "answer": "The SWR (Software Rasterization) driver is recommended, as it is newer and faster than the `llvmpipe` driver."
+    "question": "What kind of remote desktop is used for interactive visualization with ParaView in JupyterLab?",
+    "answer": "Remote VNC desktop is used for ParaView visualization through JupyterLab, unlike client-server visualizations."
   },
   {
-    "question": "What are the basic steps to compile CMake on a VM for ParaView compilation?",
-    "answer": "First, download the CMake tarball, then unpack and change into its directory. After that, run `./bootstrap`, `make`, and finally `sudo make install`."
+    "question": "What are the steps to start ParaView for visualization within JupyterLab?",
+    "answer": "To start ParaView in JupyterLab, launch a JupyterLab instance through one of the supported options, then load a `paraview` module. A launcher icon for ParaView will then appear, allowing you to start your visualization."
   },
   {
-    "question": "What are the key CMake flags used when compiling the ParaView server for offscreen rendering on a VM?",
-    "answer": "Key CMake flags include `-DCMAKE_BUILD_TYPE=Release`, `-DCMAKE_INSTALL_PREFIX=/home/centos/paraview`, `-DPARAVIEW_USE_MPI=OFF`, `-DPARAVIEW_ENABLE_PYTHON=ON`, `-DPARAVIEW_BUILD_QT_GUI=OFF`, `-DVTK_OPENGL_HAS_OSMESA=ON`, `-DVTK_USE_OFFSCREEN=ON`, and `-DVTK_USE_X=OFF`."
+    "question": "What are the typical resource limits for small interactive visualizations on Nibi's Open OnDemand?",
+    "answer": "Small interactive visualizations on Nibi's Open OnDemand can require up to 256GB memory and 16 cores."
   },
   {
-    "question": "How do you start the ParaView server on the VM once it has been compiled with SWR rendering?",
-    "answer": "You can start the ParaView server by running `./paraview/bin/pvserver --mesa-swr-avx2`."
+    "question": "How do you prepare the environment and load ParaView modules on Nibi's Open OnDemand for a VNC remote desktop session?",
+    "answer": "First, connect to `gra-vdi` (as described in TigerVNC) and open a terminal, then run `module load CcEnv`. You can then use `module spider paraview` to see available versions, and `module load StdEnv/2020 gcc/9.3.0 openmpi/4.0.3 paraview/5.11.0` to load the specific modules."
   },
   {
-    "question": "How do you establish an SSH tunnel from your local computer to the VM for a ParaView client-server connection?",
-    "answer": "On your computer, organize an SSH tunnel from local port 11111 to the VM's port 11111 using the command `ssh centos@vm.ip.address -L 11111:localhost:11111`."
+    "question": "What special command is needed to start recent versions of ParaView on Nibi's Open OnDemand to avoid issues with VirtualGL dynamic linker faker?",
+    "answer": "For recent ParaView versions, you need to disable the VirtualGL dynamic linker faker `LD_PRELOAD` by running `LD_PRELOAD=${LD_PRELOAD/libdlfaker.so/} paraview`."
   },
   {
-    "question": "What message indicates successful SWR rendering when connected to the ParaView server on a VM?",
-    "answer": "If SWR rendering is successful, you should see the message \"SWR detected AVX2\" in the console during rendering."
+    "question": "What is the recommended approach for large-scale and automated visualization with ParaView?",
+    "answer": "For large-scale and automated visualization, it is strongly recommended to switch from interactive client-server to off-screen batch visualization."
   },
   {
-    "question": "Which systems can utilize Graham VDI nodes for remote VNC desktop interactive visualizations?",
-    "answer": "Graham VDI nodes can be used for small interactive visualizations requiring up to 256GB memory and 16 cores."
+    "question": "How can you automate visualization workflows using ParaView?",
+    "answer": "ParaView supports Python scripting, which allows you to script your workflow and submit it as a regular, potentially parallel production job on a cluster."
+  },
+  {
+    "question": "Who should be contacted for assistance with batch rendering in ParaView?",
+    "answer": "If you need any help with batch rendering, you should contact Technical support."
   }
 ]

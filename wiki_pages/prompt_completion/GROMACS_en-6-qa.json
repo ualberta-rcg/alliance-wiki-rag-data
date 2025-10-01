@@ -1,0 +1,110 @@
+[
+  {
+    "question": "Is it efficient to use more than one GPU for GROMACS simulations?",
+    "answer": "Using more than a single GPU usually leads to poor efficiency with GROMACS simulations."
+  },
+  {
+    "question": "What should be done before deciding to use multiple GPUs for GROMACS simulations?",
+    "answer": "Users should carefully test and compare multi-GPU and single-GPU performance before deciding to use more than one GPU."
+  },
+  {
+    "question": "Which GROMACS versions have a known bug when used on Volta or newer generation GPUs with the `-update gpu` option?",
+    "answer": "GROMACS versions 2020.0 up to and including 2021.5 contain a bug when used on GPUs of Volta or newer generations (V100, T4, A100) with the `mdrun` option `-update gpu`."
+  },
+  {
+    "question": "Under what conditions does the GROMACS GPU bug (versions 2020.0-2021.5) manifest?",
+    "answer": "The GPU bug in GROMACS versions 2020.0-2021.5 can only appear in simulations where the `-update gpu` option was manually selected, as it is not enabled by default."
+  },
+  {
+    "question": "Where can users find more information about the GROMACS GPU bug (GitLab issue #4393)?",
+    "answer": "Further discussion of this bug can be found in GitLab issue #4393 of the GROMACS project."
+  },
+  {
+    "question": "Where can users find information about GPU node configurations on the clusters?",
+    "answer": "Users can find information about different GPU node configurations (GPU models and number of GPUs and CPUs per node) on the 'Using GPUs with Slurm#Available GPUs' page."
+  },
+  {
+    "question": "What is a constraint for GROMACS 2018.2 regarding the number of MPI tasks and GPUs per node?",
+    "answer": "For GROMACS 2018.2, the number of `--tasks-per-node` always needs to be the same as, or a multiple of, the number of GPUs (`--gpus-per-node`)."
+  },
+  {
+    "question": "Will GROMACS run GPU simulations with only one OpenMP thread by default?",
+    "answer": "GROMACS will not run GPU runs with only 1 OpenMP thread unless forced by setting the `-ntomp` option."
+  },
+  {
+    "question": "What is the recommended number of OpenMP threads per MPI process for GPU runs according to GROMACS developers?",
+    "answer": "According to GROMACS developers, the optimum number of `--cpus-per-task` (OpenMP threads per MPI process) is between 2 and 6."
+  },
+  {
+    "question": "What resource allocation should be avoided when running GROMACS GPU jobs?",
+    "answer": "Users should avoid using a larger fraction of CPUs and memory than the fraction of GPUs requested in a node."
+  },
+  {
+    "question": "Where can GROMACS GPU benchmark results be found?",
+    "answer": "Benchmark results can be explored on the MDBench portal."
+  },
+  {
+    "question": "Why might GROMACS not fully utilize recent GPU models like Nvidia A100 or H100?",
+    "answer": "GROMACS and other MD simulation programs are unable to fully use recent GPU models such as the Nvidia A100 and H100 unless the molecular system is very large (millions of atoms)."
+  },
+  {
+    "question": "What are the two recommended solutions for inefficient GPU usage with GROMACS when running typical simulations on powerful GPUs?",
+    "answer": "The two recommended solutions are to run multiple similar simulations on a single GPU using `mdrun -multidir`, or to use a Multi-Instance GPU (MIG) instance (a fraction of a GPU)."
+  },
+  {
+    "question": "When is using `mdrun -multidir` for multiple simulations on a single GPU the preferred approach?",
+    "answer": "It is the preferred solution if you run multiple similar simulations, such as repeating the same simulation, simulating multiple protein variants, ligands, or ensemble-based simulations like replica exchange."
+  },
+  {
+    "question": "Why are similar simulations required for proper load balancing when using `mdrun -multidir` on a single GPU?",
+    "answer": "Similar simulations are needed to ensure proper load balancing; if simulations are dissimilar, some will progress faster and finish earlier, leading to idle resources."
+  },
+  {
+    "question": "When is using a Multi-Instance GPU (MIG) instance the preferred solution for GROMACS simulations?",
+    "answer": "Using a MIG instance is the preferred solution if you have a single simulation or if your simulations are dissimilar, such as systems with different sizes, shapes, or compositions."
+  },
+  {
+    "question": "Should Hyper-Q / MPS be used with GROMACS?",
+    "answer": "No, Hyper-Q / MPS should never be used with GROMACS because the built-in `-multidir` option achieves the same functionality more efficiently."
+  },
+  {
+    "question": "What is a `tpr` file in GROMACS and what information does it contain?",
+    "answer": "A `tpr` file is a portable binary run input file containing the starting structure of the simulation, the molecular topology, and all simulation parameters."
+  },
+  {
+    "question": "How are `tpr` files created in GROMACS?",
+    "answer": "`Tpr` files are created with the `gmx grompp` command (or simply `grompp` for versions older than 5.0)."
+  },
+  {
+    "question": "What input files are required to create a `tpr` file?",
+    "answer": "To create a `tpr` file, one needs a coordinate file with the starting structure (e.g., `.gro`, `.pdb`, or `.cpt`), a system topology (`.top`) file, and a run parameter (`.mdp`) file."
+  },
+  {
+    "question": "What is the purpose of the system topology (`.top`) file?",
+    "answer": "The system topology (`.top`) file defines which force field is used and how the force field parameters are applied to the simulated system."
+  },
+  {
+    "question": "Are GROMACS `tpr` files portable across different machines?",
+    "answer": "Yes, `tpr` files are portable; they can be `grompp`'ed on one machine, copied, and used as an input file for `mdrun` on a different machine."
+  },
+  {
+    "question": "Is it important to use the same GROMACS version for both `grompp` and `mdrun`?",
+    "answer": "One should always use the same version for both `grompp` and `mdrun` because using `tpr` files created with an older `grompp` version can lead to unexpected simulation results with a newer `mdrun`."
+  },
+  {
+    "question": "Why do Molecular Dynamics (MD) simulations often need to be restarted?",
+    "answer": "MD simulations often need to be restarted because they can take much longer than the maximum walltime allowed for a job to complete."
+  },
+  {
+    "question": "What is a good strategy for requesting walltime to balance waiting and running time for MD simulations?",
+    "answer": "Requesting a walltime of 24 hours or 72 hours (three days) is often a good trade-off between waiting time and running time to maximize access to nodes."
+  },
+  {
+    "question": "What is the function of the `-maxh` parameter in GROMACS `mdrun`?",
+    "answer": "The `-maxh` parameter tells `mdrun` the requested walltime so that it can gracefully finish the current timestep when reaching 99% of this walltime, creating a checkpoint file and properly closing all output files."
+  },
+  {
+    "question": "How should the `-maxh` parameter be set in an `mdrun` command for a 24-hour Slurm job?",
+    "answer": "For a 24-hour job, `#SBATCH --time=24:00` should be used with `gmx mdrun -maxh 24`."
+  }
+]

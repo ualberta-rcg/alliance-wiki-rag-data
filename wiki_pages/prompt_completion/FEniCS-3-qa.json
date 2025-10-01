@@ -1,0 +1,34 @@
+[
+  {
+    "question": "How do you fix the pip certificate bundle path inside a FEniCS Legacy sandbox?",
+    "answer": "Inside the sandbox, you need to create a certs folder and symlink the CA bundle using the command: `apptainer exec --writable fenics-legacy.sandbox sh -c \"mkdir -p /etc/pki/tls/certs && ln -s /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt\"`"
+  },
+  {
+    "question": "After making modifications, how do you freeze an Apptainer sandbox into a new read-only SIF image?",
+    "answer": "You can freeze your sandbox into a new read-only SIF image using the command: `apptainer build fenics-legacy-updated.sif fenics-legacy.sandbox`"
+  },
+  {
+    "question": "How can you run a quick test to verify the `ufl_legacy` package within a FEniCS Legacy Apptainer SIF?",
+    "answer": "To run a quick test, use the command: `apptainer exec --bind $PWD:/root/shared --pwd /root/shared fenics-legacy-updated.sif python3 -c \"import ufl_legacy; print('ufl_legacy ok. version:', ufl_legacy.__version__)\"`"
+  },
+  {
+    "question": "What is the purpose of the `--bind` and `--pwd` options when executing a command with Apptainer?",
+    "answer": "`--bind $PWD:/root/shared` mounts your current host directory into the container at `/root/shared`, and `--pwd /root/shared` sets the working directory inside the container to that mounted location."
+  },
+  {
+    "question": "What are the important notes regarding UFL in FEniCS Legacy (2019.1.x)?",
+    "answer": "FEniCS Legacy (2019.1.x) requires UFL Legacy, which is already bundled. The Python package is named `ufl_legacy` (compatible version 2022.3.0), not `ufl`. A plain `import ufl` should fail, while `import ufl_legacy` should succeed."
+  },
+  {
+    "question": "Why would someone need to alias `ufl_legacy` as `ufl`?",
+    "answer": "Some downstream packages, such as Oasis, assume `import ufl`. To avoid patching all these packages, you can provide a shim package that re-exports `ufl_legacy` as `ufl`."
+  },
+  {
+    "question": "How do you create a shim package to alias `ufl_legacy` as `ufl`?",
+    "answer": "You need to create the file `/pyshims/ufl/__init__.py` with the following contents:\n```python\nimport sys\nimport ufl_legacy as ufl\n\napi = [k for k in ufl.__dict__.keys() if not k.startswith('__') and not k.endswith('__')]\nfor key in api:\n    sys.modules['ufl.{}'.format(key)] = getattr(ufl, key)\ndel api\n```"
+  },
+  {
+    "question": "How can you test the aliasing of `ufl_legacy` to `ufl` inside an Apptainer container?",
+    "answer": "To test the aliasing, you need to prepend the shim path to `PYTHONPATH` when launching the container, for example: `APPTAINERENV_PYTHONPATH=<path_to_shim>:$PYTHONPATH apptainer exec --bind /scratch:/scratch ~/fenics-legacy-updated.sif python3 -c \"from ufl.tensors import ListTensor; print('UFL tensors ok')\"`"
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "question": "How do you configure Fluent to use the more efficient .cas.h5/.dat.h5 file formats?",
+    "answer": "For Fluent versions 2020R1 and later, you should add the command `/file/cff-files yes` to your journal file."
+  },
+  {
+    "question": "What is the purpose of the `sample1.jou` journal file?",
+    "answer": "`sample1.jou` is an example journal file designed for a steady Fluent simulation. It reads an input case, runs the solver for a specified number of iterations, writes a final output data file, and can optionally generate a simulation report before exiting Fluent cleanly."
+  },
+  {
+    "question": "How can you prevent Fluent from overwriting files by default in a journal file?",
+    "answer": "To prevent files from being overwritten by default, include the command `/file/confirm-overwrite no` in your journal file."
+  },
+  {
+    "question": "How do you set Fluent to write a data file every 100 iterations using a journal file?",
+    "answer": "You can set Fluent to write a data file every 100 iterations by including the command `/file/auto-save/data-frequency 100` in your journal file."
+  },
+  {
+    "question": "How do you configure Fluent to retain only the 5 most recent data files during auto-saving?",
+    "answer": "To retain only the 5 most recent data files, add the command `/file/auto-save/retain-most-recent-files y` to your journal file."
+  },
+  {
+    "question": "How can you specify an output sub-directory and root name for auto-saved data files in Fluent?",
+    "answer": "You can specify an output sub-directory and root name for auto-saved data files using the command `/file/auto-save/root-name output/FFF-out` in your journal file."
+  },
+  {
+    "question": "What command is used to run the Fluent solver for a specific number of iterations in a journal file?",
+    "answer": "The command `/solve/iterate [number_of_iterations]` is used, for example, `/solve/iterate 1000` to run for 1000 iterations."
+  },
+  {
+    "question": "How do you set the physical time step size for a transient simulation in a Fluent journal file?",
+    "answer": "The physical time step size for a transient simulation is set using the command `/solve/set/time-step [value]`, for example, `/solve/set/time-step 0.0001`."
+  },
+  {
+    "question": "What command initiates hybrid initialization in a Fluent journal file?",
+    "answer": "The command `/solve/initialize/hyb-initialization` initiates hybrid initialization in a Fluent journal file."
+  },
+  {
+    "question": "How do you perform a dual-time iteration with 1000 time steps and 75 maximum iterations per time step in a Fluent journal file?",
+    "answer": "You can perform this by using the command `/solve/dual-time-iterate 1000 75` in your Fluent journal file."
+  },
+  {
+    "question": "What is the initial step for using User-Defined Functions (UDFs) with Fluent on a cluster?",
+    "answer": "The first step is to transfer your UDF source file (e.g., `sampleudf.c`) and any additional dependency files to the cluster."
+  },
+  {
+    "question": "What is important when transferring a UDF source file from a Windows machine to a Linux cluster?",
+    "answer": "It is crucial to ensure that the text mode of your transfer client is used; otherwise, Fluent may not be able to read the file correctly on the Linux cluster."
+  },
+  {
+    "question": "Where should the UDF file be placed on the cluster?",
+    "answer": "The UDF file must be placed in the same directory where your journal, case, and data files reside."
+  },
+  {
+    "question": "What should be checked in Fluent's dialog boxes before submitting tasks that use UDFs?",
+    "answer": "Before submitting UDF tasks, verify that the 'Interpreted UDFs' and 'UDF Library Manager' dialog boxes in Fluent are not configured to use a UDF. This ensures that only the commands in your journal file control UDF usage."
+  },
+  {
+    "question": "How do you instruct Fluent to interpret a UDF at runtime using a journal file?",
+    "answer": "To instruct Fluent to interpret your UDF at runtime, add the command `define/user-defined/interpreted-functions \"sampleudf.c\" \"cpp\" 10000 no` to your journal file before reading or initializing case/data files."
+  },
+  {
+    "question": "What is required for an interpreted UDF to work with parallel Fluent tasks?",
+    "answer": "For an interpreted UDF to work with parallel Fluent tasks, it must be parallelized as described in the relevant documentation section."
+  },
+  {
+    "question": "What is the first requirement for using a compiled UDF on the cluster?",
+    "answer": "Your UDF must be compiled on one of the clusters at least once. This process creates a `libudf` subdirectory containing the necessary `libudf.so` shared library."
+  },
+  {
+    "question": "Why can't a `libudf` directory be directly copied from a remote system (like a laptop) to the Alliance clusters?",
+    "answer": "It cannot be directly copied because the shared library dependencies will not be satisfied, which would cause Fluent to crash upon startup."
+  },
+  {
+    "question": "If a UDF has already been compiled on one cluster, can its `libudf` directory be transferred to another?",
+    "answer": "Yes, once compiled on one of our clusters, the `libudf` directory can be transferred to any other cluster, provided that your account loads the same version of the `StdEnv` environment module."
+  },
+  {
+    "question": "How do you load a compiled UDF using a journal file for a Fluent task?",
+    "answer": "You can load a compiled UDF by uncommenting the line `define/user-defined/compiled-functions load libudf` in your journal file when submitting a task."
+  },
+  {
+    "question": "Why should both the `compile` and `load` commands for a compiled UDF not be left uncommented in a journal file during task submission?",
+    "answer": "Leaving both uncommented will cause your UDF to be automatically recompiled for each task, which is inefficient and can lead to 'racetime' build conflicts if multiple tasks are executed from the same directory."
+  },
+  {
+    "question": "How can you compile a UDF using the Fluent graphical interface?",
+    "answer": "To compile a UDF via the Fluent graphical interface, you add the UDF source file in the 'Compiled UDFs' dialog box and then click 'Build'."
+  },
+  {
+    "question": "What must be done before a UDF can be used with a parallel Fluent task (SMP or MPI)?",
+    "answer": "Before a UDF can be used with a parallel Fluent task, it must be parallelized by adding compilation directives, predicates, and reduction macros to your sequential UDF."
+  },
+  {
+    "question": "Where can detailed information about parallelizing UDFs be found?",
+    "answer": "Detailed information about parallelizing UDFs is available in the 'Fluent Customization Manual, Part I: Chapter 7: Parallel Considerations' within the online documentation."
+  }
+]

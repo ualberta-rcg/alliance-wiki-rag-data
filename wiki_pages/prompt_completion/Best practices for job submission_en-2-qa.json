@@ -1,0 +1,102 @@
+[
+  {
+    "question": "What is the primary goal when requesting memory for a job?",
+    "answer": "The goal is to ensure that the amount of memory requested is sufficient, allowing for a certain margin of error."
+  },
+  {
+    "question": "How can you request all available memory on a node for your job?",
+    "answer": "You can use the line `#SBATCH --mem=0` in your job submission script to request all available memory on a whole node."
+  },
+  {
+    "question": "What is a potential consequence of using `#SBATCH --mem=0` to request all available memory?",
+    "answer": "Using this approach means your job will likely be assigned a node with less memory, as most clusters offer nodes with variable amounts of memory."
+  },
+  {
+    "question": "How do you request a large memory node, for example, 1500 GB?",
+    "answer": "You would use a line like `#SBATCH --mem=1500G` in your job submission script to request a node with 1500 GB (or 1.46 TB) of memory."
+  },
+  {
+    "question": "What should you consider before requesting a large memory node?",
+    "answer": "You should make sure your job really needs all the extra memory, as there are relatively few large memory nodes, causing your job to wait much longer to run."
+  },
+  {
+    "question": "What is the default core allocation for a job on the cluster?",
+    "answer": "By default, a job will get one core on one node, as most software is serial and can only use a single core."
+  },
+  {
+    "question": "Will asking for more cores make a serial program run faster?",
+    "answer": "No, asking for more cores or nodes will not make a serial program run any faster; its source code needs modification for parallel execution."
+  },
+  {
+    "question": "How can you determine if software can run in parallel?",
+    "answer": "The best approach is to look for a section on parallel execution in the software's documentation; if you can't find anything, it's usually a sign it's serial. You can also contact the development team."
+  },
+  {
+    "question": "What factor determines the maximum number of cores you can use if a parallel program assumes a shared memory environment?",
+    "answer": "The maximum number of cores available on a single node provides a ceiling for the number of cores you can use in a shared memory environment."
+  },
+  {
+    "question": "Why is requesting 'as many cores as possible' often not the best approach for parallel programs?",
+    "answer": "Adding an excessive number of CPU cores can have the perverse effect of slowing down a program, similar to too many cooks in a small kitchen."
+  },
+  {
+    "question": "What should you study to choose the optimal number of CPU cores for a parallel program?",
+    "answer": "To choose the optimal number of CPU cores, you need to study the software's scalability."
+  },
+  {
+    "question": "What type of parallelism must software support to run across multiple nodes?",
+    "answer": "The software must support distributed memory parallelism to run over more than one node."
+  },
+  {
+    "question": "Which standard is most commonly used by software running over more than one node?",
+    "answer": "Most software able to run over more than one node uses the MPI standard."
+  },
+  {
+    "question": "How should programs parallelized to run across multiple nodes be started?",
+    "answer": "Programs parallelized to run across multiple nodes should be started using `srun` rather than `mpirun`."
+  },
+  {
+    "question": "Why should you avoid scattering parallel processes across more nodes than necessary?",
+    "answer": "A more compact distribution will usually help your job's performance, as highly fragmented parallel jobs often exhibit poor performance and complicate the scheduler's job."
+  },
+  {
+    "question": "How can you submit parallel jobs to ensure compact distribution on a cluster with 40 cores/node?",
+    "answer": "You should submit jobs where the number of parallel processes is an integral multiple of the number of cores per node, such as 40, 80, 120, or 160 processes."
+  },
+  {
+    "question": "What is the goal for the CPU efficiency of your jobs?",
+    "answer": "The goal is to ensure that the CPU efficiency of your jobs is very close to 100%, as measured by the `CPU Efficiency` field in the output from the `seff` command."
+  },
+  {
+    "question": "What does a CPU efficiency value less than 90% indicate?",
+    "answer": "A CPU efficiency value less than 90% is poor and means that your use of the software needs to be improved."
+  },
+  {
+    "question": "What is a characteristic of nodes with GPUs on the clusters?",
+    "answer": "Nodes with GPUs are relatively uncommon, meaning any job requesting a GPU will wait significantly longer in most cases."
+  },
+  {
+    "question": "How can you test if using a GPU will actually improve your job's performance?",
+    "answer": "It is wiser to first test a small sample calculation both with and without a GPU to see what kind of speed-up you obtain from its use."
+  },
+  {
+    "question": "When is it generally not worth waiting for a GPU node?",
+    "answer": "If your job only finishes 5% or 10% more quickly with a GPU, it's probably not worth the effort of waiting, as the GPU will be idle during much of the job's execution."
+  },
+  {
+    "question": "Name some tools for monitoring the efficiency of GPU-based jobs.",
+    "answer": "Tools for monitoring GPU-based jobs include `nvidia-smi`, `nvtop`, and `TensorBoard` (if using TensorFlow-based software)."
+  },
+  {
+    "question": "What command should generally not be included in your job scripts?",
+    "answer": "Your jobs should never contain the command `sleep`."
+  },
+  {
+    "question": "What is recommended instead of using Conda and its variants on the clusters?",
+    "answer": "It is strongly recommended against using Conda and its variants, in favor of solutions like a Python virtual environment or Apptainer."
+  },
+  {
+    "question": "How should read and write operations be optimized?",
+    "answer": "Read and write operations should be optimized by using node-local storage."
+  }
+]

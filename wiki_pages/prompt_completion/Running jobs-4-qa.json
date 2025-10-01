@@ -1,70 +1,62 @@
 [
   {
-    "question": "How can I find detailed information about a completed Slurm job?",
-    "answer": "You can get detailed information about a completed job using the `sacct` command, typically with the job ID: `$ sacct -j <jobid>`."
+    "question": "How do you start an interactive session on a compute node?",
+    "answer": "You can start an interactive session on a compute node with `salloc`. An example command is: `salloc --time=1:0:0 --mem-per-cpu=3G --ntasks=1 --account=def-someuser`."
   },
   {
-    "question": "How do I specify which fields `sacct` should display for a completed job?",
-    "answer": "You can control what `sacct` prints by using the `--format` option, for example: `$ sacct -j <jobid> --format=JobID,JobName,MaxRSS,Elapsed`."
+    "question": "How can you run graphical programs interactively on a compute node?",
+    "answer": "It is possible to run graphical programs interactively on a compute node by adding the `--x11` flag to your `salloc` command. For this to work, you must first connect to the cluster with X11 forwarding enabled."
   },
   {
-    "question": "What do the `.bat+` and `.ext+` records in `sacct` output represent?",
-    "answer": "The `.bat+` record (batch step) represents your submission script, which is where the main part of the work and resource consumption typically occur. The `.ext+` record (extern step) refers to prologue and epilogue and usually does not consume significant resources."
+    "question": "How does the duration of an interactive job affect its start time?",
+    "answer": "An interactive job with a duration of three hours or less will likely start very soon after submission on dedicated test nodes. Interactive jobs requesting more than three hours run on regular nodes and may wait for many hours or even days before starting."
   },
   {
-    "question": "When would a `.0` step appear in `sacct` output?",
-    "answer": "If you use `srun` in your submission script, that would create a `.0` step which would consume most of the resources."
+    "question": "How do you check the status of your own jobs in Slurm?",
+    "answer": "You can list only your own jobs using `squeue -u $USER` or the utility `sq`."
   },
   {
-    "question": "How do I see all records for a job if it was restarted due to a node failure?",
-    "answer": "If a node fails and a job is restarted, `sacct` normally shows only the record for the last run. To see all records related to a given job, add the `--duplicates` option."
+    "question": "How can you display only running jobs?",
+    "answer": "To show only running jobs, use the command `squeue -u <username> -t RUNNING`."
   },
   {
-    "question": "How can I determine the maximum memory a completed job utilized?",
-    "answer": "You can determine how much memory a job needed by using the `MaxRSS` accounting field with `sacct`. This value will be the largest resident set size for any of the tasks."
+    "question": "How can you display only pending jobs?",
+    "answer": "To show only pending jobs, use the command `squeue -u <username> -t PENDING`."
   },
   {
-    "question": "What command provides similar information to `sacct` but for a running job?",
-    "answer": "The `sstat` command works on a running job much the same way that `sacct` works on a completed job."
+    "question": "How do you get detailed information for a specific Slurm job?",
+    "answer": "You can show detailed information for a specific job using `scontrol show job <jobid>`."
   },
   {
-    "question": "Why might I want to connect to a node where my job is running?",
-    "answer": "You might want to connect to the node running a job to execute new processes there for troubleshooting or to monitor the job's progress."
+    "question": "Is it recommended to run `squeue` from a script at high frequency?",
+    "answer": "No, it is not recommended to run `squeue` from a script or program at high frequency (e.g., every few seconds), as it adds load to Slurm and may interfere with its performance."
   },
   {
-    "question": "How can I monitor GPU usage on a compute node assigned to my `sbatch` job?",
-    "answer": "You can monitor GPU usage by running `nvidia-smi` using `srun` on the node assigned to your job, for example: `$ srun --jobid 123456 --pty watch -n 30 nvidia-smi`."
+    "question": "How can you set up email notifications for job conditions?",
+    "answer": "You can ask to be notified by email of certain job conditions by supplying options to `sbatch`, such as `#SBATCH --mail-user=your.email@example.com` and `#SBATCH --mail-type=ALL`."
   },
   {
-    "question": "How can I launch multiple monitoring commands like `htop` and `nvidia-smi` on a running `sbatch` job's node?",
-    "answer": "You can launch multiple monitoring commands using `tmux` with `srun`, for example: `$ srun --jobid 123456 --pty tmux new-session -d 'htop -u $USER' \\; split-window -h 'watch nvidia-smi' \\; attach`."
+    "question": "What caution should be exercised when enabling email notifications for jobs?",
+    "answer": "You should not turn on email notification options unless you intend to read the emails they generate, as generating a huge volume of unnecessary emails can lead to email service providers restricting mail flow."
   },
   {
-    "question": "What considerations should I keep in mind when launching processes with `srun` on a node where my job is running?",
-    "answer": "You should be careful not to launch processes that would use a significant portion of the resources allocated for the job, as using too much memory might kill the job, or too many CPU cycles will slow it down."
+    "question": "What is output buffering in non-interactive Slurm jobs?",
+    "answer": "Output from a non-interactive Slurm job is normally buffered, meaning there's a delay between when data is written by the job and when you can see the output on a login node. This delay can range from less than a second to many minutes or until the job completes."
   },
   {
-    "question": "Can `srun --jobid` be used to monitor an interactive job?",
-    "answer": "No, the `srun --jobid` commands only work to monitor a job submitted with `sbatch`. To monitor an interactive job, you should create multiple panes with `tmux` and start each process in its own pane."
+    "question": "How can you monitor the output from a job in real time?",
+    "answer": "If you need to monitor the output from a job in real time, it is recommended to run an interactive job."
   },
   {
-    "question": "How do I cancel a specific Slurm job?",
-    "answer": "Use `scancel` with the job ID to cancel a job, for example: `$ scancel <jobid>`."
+    "question": "How can you get a summary of a job's CPU and memory efficiency?",
+    "answer": "You can get a short summary of the CPU and memory efficiency of a job with the `seff` command, for example: `seff 12345678`."
   },
   {
-    "question": "How can I cancel all my Slurm jobs?",
-    "answer": "You can cancel all your jobs using the command: `$ scancel -u $USER`."
+    "question": "How do you get detailed information about a completed job?",
+    "answer": "You can find more detailed information about a completed job with `sacct -j <jobid>`, and optionally control what it prints using `--format`, such as `sacct -j <jobid> --format=JobID,JobName,MaxRSS,Elapsed`."
   },
   {
-    "question": "How do I cancel only my pending Slurm jobs?",
-    "answer": "To cancel only your pending jobs, use the command: `$ scancel -t PENDING -u $USER`."
-  },
-  {
-    "question": "What must an application support if it needs to run for a duration longer than system time limits?",
-    "answer": "If a computation is going to require a long time to complete, the application you are running must support checkpointing, allowing it to save its state to a file and restart from that saved state."
-  },
-  {
-    "question": "What are the two recommended methods for automatically restarting long-running computations?",
-    "answer": "The two recommended methods for automatic restarting are using SLURM job arrays and resubmitting from the end of the job script."
+    "question": "What do the labels `.bat+`, `.ext+`, and `.0` mean in `sacct` output?",
+    "answer": "In `sacct` output, `.bat+` refers to the batch step (your submission script), `.ext+` is the extern step (prologue and epilogue), and a `.0` step (or similar) is created if `srun` is used in your submission script, consuming most of the resources."
   }
 ]

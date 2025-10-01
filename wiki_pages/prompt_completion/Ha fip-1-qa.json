@@ -1,0 +1,126 @@
+[
+  {
+    "question": "What problem does a single VM hosting an application present?",
+    "answer": "A single VM hosting an application can fail and be offline, which also makes the application inaccessible."
+  },
+  {
+    "question": "How can application inaccessibility due to VM failure be avoided?",
+    "answer": "It is possible to make the floating IP (FIP) high-available, which in turn can be used to make the application high available too."
+  },
+  {
+    "question": "What is the public IP address mentioned in the setup diagram?",
+    "answer": "The public IP the world is connecting to is 206.12.93.117."
+  },
+  {
+    "question": "What is the internal Virtual IP (VIP) used in this high availability setup?",
+    "answer": "The internal Virtual IP is 192.168.27.251, owned by the current active system."
+  },
+  {
+    "question": "What does VRRP stand for and what is its function?",
+    "answer": "VRRP stands for virtual router redundancy protocol, and it determines the systems' status."
+  },
+  {
+    "question": "How do the two systems determine which one is MASTER and which is BACKUP?",
+    "answer": "The 2 systems communicate via VRRP and determine their status; as long as the MASTER system responds, the other system will stay in BACKUP mode."
+  },
+  {
+    "question": "What happens if the MASTER system stops responding?",
+    "answer": "If the MASTER system stops responding, the BACKUP system will change into MASTER mode and bring up the internal IP address 192.168.27.251."
+  },
+  {
+    "question": "When will the application be reachable through the public IP?",
+    "answer": "The application will be reachable as long as there is a system reachable via the VIP, because the public IP 206.12.93.117 will always forward traffic to the VIP."
+  },
+  {
+    "question": "Describe an active-passive high-availability system.",
+    "answer": "In an active-passive system, one system owns the VIP and receives all network traffic for that IP address, while the other simply stands by as a backup system if the current active one fails or becomes unreachable."
+  },
+  {
+    "question": "What aspects of application availability does the described setup not cover?",
+    "answer": "The setup will only make sure that a system is reachable via IP; it will not take care of the availability of application data, such as files, or its services, such as a running webserver software."
+  },
+  {
+    "question": "What are the key components used in this example high-availability setup?",
+    "answer": "This example setup will use 2 VMs hosting the application, 1 VIP (shared IP) RFC1918 from within your project, and 1 HA Floating IP."
+  },
+  {
+    "question": "What applications need to be installed on both VMs for this setup?",
+    "answer": "Nginx and keepalived need to be installed on both VMs."
+  },
+  {
+    "question": "What command is used to install nginx and keepalived on the VMs?",
+    "answer": "The command `apt-get update && apt-get -y dist-upgrade && apt-get install -y nginx keepalived` is used to install nginx and keepalived."
+  },
+  {
+    "question": "Why is it important to select an unused IP address for the VIP?",
+    "answer": "IP addresses are unique identifiers, so it's important to select a VIP which is not already used within an internal, private network."
+  },
+  {
+    "question": "How do you check for currently allocated IP addresses to find an unused VIP?",
+    "answer": "In the left menu, go to `Network --> Networks --> your-projectname-network`, then select `Ports` in the upper tab to view all currently allocated addresses."
+  },
+  {
+    "question": "What are the steps to add a chosen VIP to a VM's configuration?",
+    "answer": "Go to `Compute --> Instances`, select the VM, then in the `Interfaces` tab, use the `Allowed Address Pair` tab and enter the VIP via the `Add Allowed Address Pair` button. This must be repeated for the second server."
+  },
+  {
+    "question": "What is the path to the keepalived configuration file?",
+    "answer": "The keepalived configuration file is located at `/etc/keepalived/keepalived.conf`."
+  },
+  {
+    "question": "What `state` and `priority` are configured for the active system in `keepalived.conf`?",
+    "answer": "The active system is configured with `state MASTER` and `priority 100`."
+  },
+  {
+    "question": "What `state` and `priority` are configured for the passive system in `keepalived.conf`?",
+    "answer": "The passive system is configured with `state BACKUP` and `priority 50`."
+  },
+  {
+    "question": "Which IP address is specified as the `virtual_ipaddress` in the keepalived configuration for both active and passive systems?",
+    "answer": "The `virtual_ipaddress` configured for both systems is 192.168.27.251."
+  },
+  {
+    "question": "What is the purpose of the `unicast_peer` setting in the keepalived configuration?",
+    "answer": "The `unicast_peer` setting specifies the internal IP address of the other system in the HA pair (e.g., the standby system's IP in the active system's config, and vice versa)."
+  },
+  {
+    "question": "What must be configured in Security Groups for VRRP traffic?",
+    "answer": "You must allow VRRP traffic between the systems in your Security Groups and make sure it is attached to your systems."
+  },
+  {
+    "question": "What command is used to enable and start the keepalived service immediately?",
+    "answer": "The command `systemctl enable --now keepalived` is used to enable and start the keepalived service."
+  },
+  {
+    "question": "How can you verify if the Virtual IP has been brought up on the active system's interface?",
+    "answer": "You can verify by running `ip a s dev ens3`, which should show the VIP (e.g., 192.168.27.251/32) listed for the `ens3` interface."
+  },
+  {
+    "question": "How can you test the failover functionality of the VIP?",
+    "answer": "To test the failover, simply stop keepalived on the active node and check if the IP is taken over by the standby node, either via `ip a s dev ens3` or `systemctl status keepalived`."
+  },
+  {
+    "question": "What happens when keepalived is stopped on the active system (web-srv-1)?",
+    "answer": "When keepalived is stopped on the active system (web-srv-1), the passive system (web-srv-2) will take over the Virtual IP and enter the MASTER state."
+  },
+  {
+    "question": "If the active system restarts keepalived after a failover, will it reclaim the VIP?",
+    "answer": "Yes, if the active system restarts keepalived, it will take the VIP over again due to its higher priority (100 vs 50)."
+  },
+  {
+    "question": "How do you prevent the original MASTER system from reclaiming the VIP automatically if it comes back online?",
+    "answer": "To prevent the original MASTER system from reclaiming the VIP automatically, set the priority for both systems to equal numbers in their `keepalived.conf` files."
+  },
+  {
+    "question": "What is the first step to bind a Floating IP to the VIP address?",
+    "answer": "The first step is to allocate a port for the Floating IP by creating a port with the VIP as a fixed address in `Network --> Networks --> your-projectname-network`."
+  },
+  {
+    "question": "How do you associate the Floating IP with the VIP?",
+    "answer": "Select the Floating IP in `Network --> Floating IPs`, click `Associate`, and then select the VIP as the port to associate the FIP with."
+  },
+  {
+    "question": "How can you confirm that the Floating IP has been successfully associated with the VIP?",
+    "answer": "You can confirm the association by waiting for the `Status` field to show up as `Active` in `Network --> Floating IPs`."
+  }
+]

@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What is a job array in Slurm?",
+    "answer": "A job array, also known as a task array or an array job, is used to conveniently submit a large number of tasks that differ only in some parameter, allowing them to be submitted all at once."
+  },
+  {
+    "question": "How are individual tasks in a Slurm job array distinguished?",
+    "answer": "Individual tasks in a Slurm job array are distinguished by the environment variable `$SLURM_ARRAY_TASK_ID`, which Slurm sets to a different value for each task."
+  },
+  {
+    "question": "How do you specify the range of values for `$SLURM_ARRAY_TASK_ID`?",
+    "answer": "You set the range of values for `$SLURM_ARRAY_TASK_ID` using the `--array` parameter with the `sbatch` command."
+  },
+  {
+    "question": "What are some ways to use the `--array` parameter?",
+    "answer": "The `--array` parameter can be used to specify a range (e.g., `0-7`), a list of values (e.g., `1,3,5,7`), a range with a step size (e.g., `1-7:2`), or a range with a concurrency limit (e.g., `1-100%10`)."
+  },
+  {
+    "question": "In the `sbatch --array=1-100%10` example, what does `%10` signify?",
+    "answer": "The `%10` in `sbatch --array=1-100%10` means that no more than 10 of the jobs from the array will be allowed to run simultaneously."
+  },
+  {
+    "question": "How does the `simple_array.sh` script use `$SLURM_ARRAY_TASK_ID`?",
+    "answer": "In `simple_array.sh`, `$SLURM_ARRAY_TASK_ID` is used to select an input file (e.g., `program_x <input.$SLURM_ARRAY_TASK_ID`) or to set a command-line argument for an application (e.g., `program_y $SLURM_ARRAY_TASK_ID some_arg another_arg`)."
+  },
+  {
+    "question": "What are the advantages of using a job array over many separate serial jobs?",
+    "answer": "Job arrays produce only one line of output in `squeue`, making it easier to read. Additionally, the scheduler can run more efficiently as it does not have to analyze job requirements for each task separately."
+  },
+  {
+    "question": "When should you avoid using a job array?",
+    "answer": "You should not use a job array to submit tasks with very short run times (e.g., much less than an hour). Tasks with run times of only a few minutes should be grouped into longer jobs using tools like META, GLOST, GNU Parallel, or a shell loop inside a job."
+  },
+  {
+    "question": "How does the scheduler load for an array job compare to an equivalent number of non-array jobs?",
+    "answer": "Other than the initial job-submission step with `sbatch`, the load on the scheduler is the same for an array job as for the equivalent number of non-array jobs. The cost of dispatching each array task is the same as dispatching a non-array job."
+  },
+  {
+    "question": "How can you use a Slurm job array to run a script in multiple directories with non-systematic names?",
+    "answer": "You can create a file (e.g., `case_list`) containing the names of the directories, and then use `sed` within the Slurm script to select the directory name corresponding to the `$SLURM_ARRAY_TASK_ID` to `cd` into it."
+  },
+  {
+    "question": "What are the cautions when using a `case_list` file for job arrays?",
+    "answer": "Cautions include ensuring the number of tasks requested matches the number of entries in the file, and that the `case_list` file should not be changed until all tasks in the array have completed, as it's read each time a new task starts."
+  },
+  {
+    "question": "How can a Python script with multiple parameters be processed in parallel using a Slurm job array?",
+    "answer": "The `$SLURM_ARRAY_TASK_ID` can be passed as a command-line argument to the Python script, which then uses this value (e.g., `sys.argv[1]`) as an index to select the appropriate parameter from a list or NumPy array for parallel processing."
+  },
+  {
+    "question": "What is an example of a Slurm job submission script for a parallel Python task?",
+    "answer": "An example script, `data_parallel_python.sh`, would typically include `#SBATCH --array=0-99`, `#SBATCH --time=1:00:00`, module loading (e.g., `module load scipy-stack`), and the command `python my_script_parallel.py $SLURM_ARRAY_TASK_ID`."
+  }
+]

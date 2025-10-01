@@ -1,0 +1,58 @@
+[
+  {
+    "question": "How do you copy data from the host to the device in a CUDA C program?",
+    "answer": "To copy data from the host to the device, you use the `cudaMemcpy` function with `cudaMemcpyHostToDevice` as the direction, specifying the device pointer, host pointer, and size."
+  },
+  {
+    "question": "How do you copy data from the device back to the host in a CUDA C program?",
+    "answer": "To copy data from the device to the host, you use the `cudaMemcpy` function with `cudaMemcpyDeviceToHost` as the direction, specifying the host pointer, device pointer, and size."
+  },
+  {
+    "question": "How do you deallocate memory on the GPU in CUDA C?",
+    "answer": "Memory on the GPU is deallocated using the `cudaFree` function, which requires the pointer to the allocated data on the device."
+  },
+  {
+    "question": "How can a CUDA kernel be launched to execute in parallel across multiple blocks?",
+    "answer": "To execute N different CUDA blocks simultaneously, the kernel launch syntax `<<< 1, 1 >>>` is modified to `<<< N, 1 >>>`."
+  },
+  {
+    "question": "What modifications are needed in the kernel code itself to enable block-level parallelism?",
+    "answer": "For block-level parallelism, the kernel code needs to be modified to use `blockIdx.x` to uniquely identify each block, allowing each block to process a different part of the data, such as `c[blockIdx.x] = a[blockIdx.x] + b[blockIdx.x];`."
+  },
+  {
+    "question": "What is the purpose of `blockIdx.x` in a parallelized CUDA kernel?",
+    "answer": "`blockIdx.x` is a unique identifier for a CUDA block, enabling each block to work on distinct data elements when paralleling across blocks."
+  },
+  {
+    "question": "How can a CUDA kernel be launched to distribute tasks across parallel threads within a single block?",
+    "answer": "To distribute tasks across N parallel threads within a single block, the kernel launch syntax is modified from `<<< 1, 1 >>>` to `<<< 1, N >>>`."
+  },
+  {
+    "question": "What is the advantage of parallelizing tasks over threads within a block compared to parallelizing over blocks?",
+    "answer": "Threads within the same block can communicate with each other, which is beneficial for tasks requiring intense inter-thread communication. Code portions with little or no communication are better suited for distribution across parallel blocks."
+  },
+  {
+    "question": "Why is shared memory advantageous for GPU computing?",
+    "answer": "Shared memory significantly accelerates inter-thread memory transfers within a block, addressing the issue of slow communication via regular (global) GPU memory, which often diminishes performance."
+  },
+  {
+    "question": "What is a key restriction when using shared memory in CUDA?",
+    "answer": "Only threads within the same block can communicate with each other using shared memory."
+  },
+  {
+    "question": "How is a variable declared to reside in shared memory within a CUDA kernel?",
+    "answer": "A variable is declared in shared memory using the `__shared__` keyword, for example, `__shared__ int temp[N];`."
+  },
+  {
+    "question": "What is the role of `__syncthreads()` when using shared memory in a CUDA kernel?",
+    "answer": "`__syncthreads()` acts as a synchronization barrier, ensuring that all threads within a block have completed their operations up to that point before any thread proceeds, which is vital for maintaining data consistency when threads share data."
+  },
+  {
+    "question": "What is a major performance bottleneck for memory transfers in GPU computing?",
+    "answer": "PCI-e is an extremely slow bottleneck for memory transfers, operating at 4-6 GB/s, significantly slower than the memory speeds of both the host and the graphics card."
+  },
+  {
+    "question": "What are the recommended strategies to optimize memory transfers in GPU programs?",
+    "answer": "To optimize memory transfers, one should minimize copies in both directions (host to device and vice-versa), keep data on the graphics card for as long as possible, and sometimes perform non-optimal tasks on the GPU itself rather than moving data to the CPU and back, as it might be faster due to transfer overhead."
+  }
+]

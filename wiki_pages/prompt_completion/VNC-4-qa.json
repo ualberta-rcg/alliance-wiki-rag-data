@@ -1,82 +1,34 @@
 [
   {
-    "question": "How can you reset your VNC server password?",
-    "answer": "You can reset your VNC server password using the `vncpasswd` command."
+    "question": "How do you determine which TCP port your VNC server is listening on?",
+    "answer": "You can determine the listening port by running `grep -iE \"\\sport|kill\" /home/yourusername/.vnc/c48.nibi.sharcnet:1.log` on the VNC server's log file, which will show a line like 'Listening for VNC connections on TCP port 5901'."
   },
   {
-    "question": "What is an alternative way to remove your VNC server password and configuration?",
-    "answer": "You can completely remove your VNC configuration, including your password, by deleting your `~/.vnc` directory. The next time you run `vncserver`, you will be prompted to set a new password."
+    "question": "How do you set up an SSH tunnel to a VNC server on clusters other than nibi?",
+    "answer": "For clusters except nibi, use the tunnel command `ssh username@clustername -L localforwardedport:computnode:remotelisteningport`, for example, `ssh username@rorqual.alliancecan.ca -L 5905:rc12509:5901`."
   },
   {
-    "question": "How do you terminate a single running VNC server?",
-    "answer": "To terminate a running vncserver, use the command `vncserver -kill :DISPLAY#`, replacing `DISPLAY#` with the specific display number."
+    "question": "What is the SSH tunnel command specific to the nibi cluster?",
+    "answer": "For nibi, the tunnel command is `ssh -J username@clustername -L localforwardedport:localhost:remotelisteningport computenode`, as shown in the example: `ssh -J username@nibi.alliancecan.ca -L 5905:localhost:5901 c48`."
   },
   {
-    "question": "How can you list all running TurboVNC sessions?",
-    "answer": "You can list all running TurboVNC sessions using the `vncserver -list` command."
+    "question": "What is required on the laptop to use the new SSH tunnel command for nibi?",
+    "answer": "An SSH key pair must be created on your laptop, and the public key's contents must be entered into your `~/.ssh/authorized_keys` file on nibi."
   },
   {
-    "question": "How can you instantly kill all VNC servers running under your username on a node?",
-    "answer": "To instantly kill all vncservers running under your username, execute the command `pkill Xvnc -u $USER`."
+    "question": "If you exit the node connected to your SSH tunnel, can you still access the VNC server?",
+    "answer": "If you exit the node your tunnel is connected to, you will no longer be able to connect to the VNC server with vncviewer. However, the vncserver will continue running, and you can regain access by starting a new tunnel."
   },
   {
-    "question": "How can a VNC server be configured to allow multiple concurrent connections?",
-    "answer": "A VNC server can allow multiple connections if it was started with the `vncserver -AlwaysShared` option."
+    "question": "How do you connect to the VNC server from a Linux desktop after setting up an SSH tunnel?",
+    "answer": "From a Linux desktop, open a new local terminal window and use the command `vncviewer localhost:port`, for example, `vncviewer localhost:5905`."
   },
   {
-    "question": "What happens if a VNC server is *not* started with the `-AlwaysShared` option regarding connections?",
-    "answer": "If a VNC server was not started with the `-AlwaysShared` option, only one vncviewer connection will be possible, and additional connection attempts will immediately fail."
+    "question": "What is required to authenticate when connecting to the VNC server with `vncviewer`?",
+    "answer": "You will be prompted for the VNC password that you set up earlier in order to connect."
   },
   {
-    "question": "What might cause repeated failures to connect to a VNC server?",
-    "answer": "Repeated failing attempts to establish a new vncserver/vncviewer connection may be due to an old SSH tunnel still running on your desktop tying up ports."
-  },
-  {
-    "question": "How can you identify and kill old SSH tunnels on your desktop?",
-    "answer": "To identify and kill old SSH tunnels, open a terminal window on your desktop and run `ps ux | grep ssh` followed by `kill PID` for the identified process IDs."
-  },
-  {
-    "question": "What password should you use if your VNC screensaver times out and requests one?",
-    "answer": "If your VNC screensaver times out and requests a password, you should enter your cluster account password, not your vncserver password."
-  },
-  {
-    "question": "What command can be used if the MATE desktop screensaver will not unlock?",
-    "answer": "If you are running the MATE desktop and the screensaver will not unlock, try running `killall -9 .mate-screensaver`."
-  },
-  {
-    "question": "Is the VNC screensaver still an issue on the current clusters?",
-    "answer": "No, the VNC screensaver has been disabled on the clusters and should no longer be a problem."
-  },
-  {
-    "question": "What is the two-step login procedure for `gra-vdi.alliancecan.ca`?",
-    "answer": "The login procedure for `gra-vdi.alliancecan.ca` involves two steps: first, entering your username and ccdb password, and second, entering your username and Duo two-factor MFA passcode."
-  },
-  {
-    "question": "What should you do if you are unable to log in to `gra-vdi.alliancecan.ca` after being returned to the first login screen?",
-    "answer": "If you are returned to the first login screen after sending your username/passcode, it indicates you likely entered the wrong username/password in the first step. You should try again, ensuring you enter the correct username/password combination."
-  },
-  {
-    "question": "Where can you reset your Alliance ccdb password if you forget it?",
-    "answer": "You can visit `https://ccdb.alliancecan.ca/security/forgot` to reset your Alliance ccdb password, assuming your account is not pending renewal by your PI."
-  },
-  {
-    "question": "What capabilities do VDI nodes offer for graphical applications?",
-    "answer": "VDI nodes support direct vncviewer connections and GPU-accelerated OpenGL graphics for appropriately-configured software applications."
-  },
-  {
-    "question": "Are software modules automatically loaded on VDI nodes like on regular login nodes?",
-    "answer": "No, on VDI nodes, a standard software environment and default modules are not automatically loaded when you log in."
-  },
-  {
-    "question": "What command would show that no modules are loaded on a gra-vdi node?",
-    "answer": "The `module list` command would show 'No modules loaded' on a gra-vdi node if no modules have been manually loaded."
-  },
-  {
-    "question": "What must users do before running any graphical software on gra-vdi?",
-    "answer": "Before running any graphical software on gra-vdi, users must first manually load one of the available software environment modules, such as StdEnv."
-  },
-  {
-    "question": "What is the benefit of loading the StdEnv module on gra-vdi?",
-    "answer": "Loading the StdEnv module on gra-vdi provides access to the same software modules that are loaded by default on the clusters."
+    "question": "What version of TigerVNC viewer is shown in the provided connection example?",
+    "answer": "The example shows TigerVNC viewer v1.15.0, built on 2025-02-16 03:59."
   }
 ]

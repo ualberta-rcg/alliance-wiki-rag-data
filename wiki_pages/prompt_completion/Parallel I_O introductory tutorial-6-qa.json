@@ -1,0 +1,50 @@
+[
+  {
+    "question": "What are the required parameters for opening a file using MPI-IO?",
+    "answer": "Opening a file with MPI-IO requires a communicator, the file name, a file handle (for future reference), and a file access mode ('amode')."
+  },
+  {
+    "question": "What are some of the available file access modes in MPI-IO?",
+    "answer": "MPI-IO offers modes like MPI_MODE_RDONLY (Read only), MPI_MODE_RDWR (Read and writing), MPI_MODE_WRONLY (Write only), MPI_MODE_CREATE (Create file if it does not exist), MPI_MODE_EXCL (Error if creating file that exists), MPI_MODE_DELETE_ON_CLOSE (Delete file on close), MPI_MODE_UNIQUE_OPEN (File not to be opened elsewhere), MPI_MODE_SEQUENTIAL (File to be accessed sequentially), and MPI_MODE_APPEND (Position all file pointers to end)."
+  },
+  {
+    "question": "How can multiple file access modes be combined in MPI-IO?",
+    "answer": "File access modes can be combined using a bitwise OR operator ('|') in C or an addition operator ('+') in FORTRAN."
+  },
+  {
+    "question": "What is the usual value for the 'info' argument when opening an MPI-IO file?",
+    "answer": "The 'info' argument is usually set to 'MPI_INFO_NULL'."
+  },
+  {
+    "question": "How do you open a file for read-only access in C using MPI-IO?",
+    "answer": "In C, you can open a file for read-only access using `MPI_File_open (MPI_COMM_WORLD, \"test.dat\", MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);`."
+  },
+  {
+    "question": "How do you open a file for read-only access in Fortran 90 using MPI-IO?",
+    "answer": "In Fortran 90, you can open a file for read-only access using `call MPI_FILE_OPEN(MPI_COMM_WORLD,\"test.dat\", MPI_MODE_RDONLY, MPI_INFO_NULL, fh, ierr)`."
+  },
+  {
+    "question": "How does MPI-IO facilitate writing contiguous data from multiple processes to a single file?",
+    "answer": "In MPI-IO, each process can write its data into a designated, contiguous portion of the same file. The writing proceeds in a coordinated fashion (e.g., from process 0 to 3) where each process determines its starting offset."
+  },
+  {
+    "question": "In the C example for writing contiguous data, what is `MPI_Offset displace` used for?",
+    "answer": "`MPI_Offset displace` is used to define the starting byte offset within the file where each process will begin writing its data, ensuring contiguous sections for different processes."
+  },
+  {
+    "question": "How is the `displace` offset calculated in the MPI-IO C example for contiguous writing?",
+    "answer": "The `displace` offset is calculated by `rank * n * sizeof(char)`, where `rank` is the process ID, `n` is the size of the array each process writes, and `sizeof(char)` is the size of each element."
+  },
+  {
+    "question": "What is the purpose of `MPI_File_set_view` in the MPI-IO C example?",
+    "answer": "`MPI_File_set_view` is used to assign specific regions of the file (views) to separate processes. It sets the displacement, etype (elementary datatype), filetype, and data representation for each process's view of the file."
+  },
+  {
+    "question": "What does \"native\" mean when used as the `datarep` argument in `MPI_File_set_view`?",
+    "answer": "When `datarep` is set to \"native\", it means the data in the file is stored exactly as it is represented in memory."
+  },
+  {
+    "question": "What are the key characteristics of MPI-IO?",
+    "answer": "MPI-IO is part of the standard MPI-2 library, is widely installed on HPC systems, and doesn't require additional libraries. However, it writes raw data to files, making it non-portable across platforms, difficult to append new variables, and it doesn't include data descriptions."
+  }
+]

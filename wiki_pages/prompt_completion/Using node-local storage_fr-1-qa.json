@@ -1,42 +1,62 @@
 [
   {
-    "question": "Que se passe-t-il quand l'ordonnanceur Slurm d\u00e9marre une t\u00e2che concernant les r\u00e9pertoires temporaires ?",
-    "answer": "Un r\u00e9pertoire temporaire est cr\u00e9\u00e9 sur chacun des n\u0153uds assign\u00e9s \u00e0 la t\u00e2che, et Slurm configure son chemin complet via la variable d'environnement `SLURM_TMPDIR`."
+    "question": "Qu'est-ce qui est cr\u00e9\u00e9 quand l'ordonnanceur Slurm d\u00e9marre une t\u00e2che?",
+    "answer": "Un r\u00e9pertoire temporaire est cr\u00e9\u00e9 sur chacun des n\u0153uds assign\u00e9s \u00e0 cette t\u00e2che."
   },
   {
-    "question": "Pourquoi le r\u00e9pertoire `$SLURM_TMPDIR` est-il plus rapide pour les op\u00e9rations d'entr\u00e9e et de sortie que le stockage sur le r\u00e9seau ?",
-    "answer": "Le r\u00e9pertoire `$SLURM_TMPDIR` se trouve sur un disque local, ce qui rend les op\u00e9rations I/O presque toujours plus rapides qu'avec le stockage sur le r\u00e9seau (/project, /scratch et /home)."
+    "question": "Comment Slurm configure-t-il le chemin complet du r\u00e9pertoire temporaire?",
+    "answer": "Slurm configure le chemin complet pour ce r\u00e9pertoire par la variable d'environnement `SLURM_TMPDIR`."
   },
   {
-    "question": "Pour quels types de transactions et t\u00e2ches le stockage sur disque local (`$SLURM_TMPDIR`) est-il particuli\u00e8rement recommand\u00e9 ?",
-    "answer": "Le stockage sur disque local est \u00e0 privil\u00e9gier pour les transactions fr\u00e9quentes de petites quantit\u00e9s de donn\u00e9es, et les t\u00e2ches qui font beaucoup de lecture et d'\u00e9criture seront probablement ex\u00e9cut\u00e9es plus rapidement en l'utilisant."
+    "question": "Pourquoi les op\u00e9rations en entr\u00e9e et en sortie (I/O) sont-elles plus rapides avec `$SLURM_TMPDIR` qu'avec le stockage sur le r\u00e9seau?",
+    "answer": "Parce que le r\u00e9pertoire `$SLURM_TMPDIR` se trouve sur un disque local, ce qui rend les op\u00e9rations I/O presque toujours plus rapides."
   },
   {
-    "question": "Quelles sont les implications de la nature temporaire de `$SLURM_TMPDIR` pour la gestion des donn\u00e9es ?",
-    "answer": "Les donn\u00e9es en entr\u00e9e doivent \u00eatre copi\u00e9es du r\u00e9seau vers `$SLURM_TMPDIR` avant d'\u00eatre lues, et les donn\u00e9es en sortie doivent \u00eatre copi\u00e9es de `$SLURM_TMPDIR` vers le r\u00e9seau avant la fin de la t\u00e2che pour \u00eatre conserv\u00e9es."
+    "question": "Pour quel type de transactions le stockage sur disque local est-il \u00e0 privil\u00e9gier?",
+    "answer": "Le stockage sur disque local est \u00e0 privil\u00e9gier pour les transactions fr\u00e9quentes de petites quantit\u00e9s de donn\u00e9es."
   },
   {
-    "question": "Comment peut-on copier des donn\u00e9es en entr\u00e9e vers `$SLURM_TMPDIR` dans les cas les plus simples ?",
-    "answer": "Dans les cas les plus simples, on peut utiliser les commandes `cp` ou `rsync`, par exemple `cp /project/def-someone/you/input.files.* $SLURM_TMPDIR/`."
+    "question": "Quand les t\u00e2ches seront-elles probablement ex\u00e9cut\u00e9es plus rapidement en utilisant `$SLURM_TMPDIR`?",
+    "answer": "Toutes les t\u00e2ches qui font beaucoup de lecture et d'\u00e9criture seront probablement ex\u00e9cut\u00e9es plus rapidement en utilisant `$SLURM_TMPDIR` plut\u00f4t que le stockage sur le r\u00e9seau."
   },
   {
-    "question": "Pourquoi est-il recommand\u00e9 de cr\u00e9er un environnement virtuel Python dans vos t\u00e2ches avec `$SLURM_TMPDIR` ?",
-    "answer": "Les applications ex\u00e9cut\u00e9es dans un environnement virtuel Python g\u00e9n\u00e8rent un tr\u00e8s grand nombre de transactions I/O, c'est pourquoi il est recommand\u00e9 de le cr\u00e9er dans `$SLURM_TMPDIR`."
+    "question": "Pourquoi l'utilisation de `$SLURM_TMPDIR` est-elle plus compliqu\u00e9e que le stockage sur le r\u00e9seau?",
+    "answer": "De par sa nature temporaire, `$SLURM_TMPDIR` est plus compliqu\u00e9 \u00e0 utiliser car les donn\u00e9es en entr\u00e9e doivent \u00eatre copi\u00e9es avant la lecture, et les donn\u00e9es en sortie doivent \u00eatre copi\u00e9es vers le r\u00e9seau avant la fin de la t\u00e2che pour \u00eatre conserv\u00e9es."
   },
   {
-    "question": "Que faut-il faire avec les donn\u00e9es en sortie de `$SLURM_TMPDIR` avant la fin d'une t\u00e2che ?",
-    "answer": "Les donn\u00e9es en sortie doivent \u00eatre copi\u00e9es de `$SLURM_TMPDIR` vers un espace de stockage permanent sur le r\u00e9seau avant que la t\u00e2che ne se termine, afin d'\u00e9viter leur perte si la t\u00e2che s'arr\u00eate pr\u00e9matur\u00e9ment."
+    "question": "Que doit-on faire avec les donn\u00e9es en entr\u00e9e avant de pouvoir les lire depuis `$SLURM_TMPDIR`?",
+    "answer": "Les donn\u00e9es en entr\u00e9e doivent \u00eatre copi\u00e9es du r\u00e9seau \u00e0 `$SLURM_TMPDIR` avant qu'elles puissent \u00eatre lues."
   },
   {
-    "question": "Quelles solutions existent pour assurer la conservation des donn\u00e9es en sortie de `$SLURM_TMPDIR` si une t\u00e2che s'arr\u00eate par manque de temps ?",
-    "answer": "Les solutions possibles incluent demander plus de temps pour l'application, placer des points de contr\u00f4le dans l'espace de stockage sur le r\u00e9seau, ou \u00e9crire une fonction pour intercepter un signal."
+    "question": "Que doit-on faire avec les donn\u00e9es en sortie pour qu'elles soient conserv\u00e9es apr\u00e8s la fin d'une t\u00e2che?",
+    "answer": "Les donn\u00e9es en sortie doivent \u00eatre copi\u00e9es de `$SLURM_TMPDIR` au r\u00e9seau avant que la t\u00e2che soit termin\u00e9e."
   },
   {
-    "question": "Comment utiliser un signal Slurm pour copier des donn\u00e9es de `$SLURM_TMPDIR` vers le r\u00e9seau ?",
-    "answer": "Vous pouvez demander \u00e0 Slurm d'envoyer un signal \u00e0 la t\u00e2che peu avant sa limite de temps, puis utiliser une fonction shell et la commande `trap` pour associer cette fonction \u00e0 la copie des r\u00e9sultats de `$SLURM_TMPDIR` vers le r\u00e9seau."
+    "question": "Quelles commandes peuvent \u00eatre utilis\u00e9es pour copier des donn\u00e9es en entr\u00e9e vers `$SLURM_TMPDIR` dans les cas les plus simples?",
+    "answer": "Dans les cas les plus simples, on peut utiliser `cp` ou `rsync`."
   },
   {
-    "question": "Quels sont les risques li\u00e9s \u00e0 l'utilisation de la m\u00e9thode d'interception de signal pour la conservation des donn\u00e9es de `$SLURM_TMPDIR` ?",
-    "answer": "Avec cette m\u00e9thode, le contenu de `$SLURM_TMPDIR` ne sera pas conserv\u00e9 si un n\u0153ud tombe en panne ou si le syst\u00e8me de fichiers r\u00e9seau conna\u00eet un probl\u00e8me."
+    "question": "Dans quels cas la simple copie avec `cp` ou `rsync` vers `$SLURM_TMPDIR` pourrait-elle ne pas fonctionner?",
+    "answer": "Cela pourrait ne pas fonctionner avec une grande quantit\u00e9 de donn\u00e9es ou si les donn\u00e9es doivent \u00eatre lues par des processus ex\u00e9cut\u00e9s sur des n\u0153uds diff\u00e9rents."
+  },
+  {
+    "question": "Quelle est la recommandation pour la cr\u00e9ation d'environnements virtuels Python dans les t\u00e2ches Slurm?",
+    "answer": "La recommandation est de cr\u00e9er un environnement virtuel dans vos t\u00e2ches avec `$SLURM_TMPDIR`, car les applications Python g\u00e9n\u00e8rent un tr\u00e8s grand nombre de transactions I/O."
+  },
+  {
+    "question": "Quelles sont les solutions possibles si une t\u00e2che s'arr\u00eate par manque de temps et que les donn\u00e9es en sortie n'ont pas \u00e9t\u00e9 copi\u00e9es?",
+    "answer": "Les solutions sont de demander plus de temps, placer des points de contr\u00f4le dans l'espace de stockage sur le r\u00e9seau (et non `$SLURM_TMPDIR`), ou \u00e9crire une fonction pour intercepter un signal."
+  },
+  {
+    "question": "Comment peut-on s'assurer que les r\u00e9sultats d'une t\u00e2che sont copi\u00e9s m\u00eame si le temps d'ex\u00e9cution est incertain?",
+    "answer": "On peut demander \u00e0 Slurm d'envoyer un signal \u00e0 la t\u00e2che peu avant qu'elle n'atteigne sa limite de temps, pour qu'elle copie le r\u00e9sultat de `$SLURM_TMPDIR` vers l'espace de stockage sur le r\u00e9seau."
+  },
+  {
+    "question": "Comment impl\u00e9menter l'interception d'un signal pour copier les donn\u00e9es en sortie?",
+    "answer": "Pour ce faire, il faut \u00e9crire une fonction pour l'interpr\u00e9teur (shell) afin que la copie soit faite et utiliser la commande `trap` pour associer la fonction avec le signal."
+  },
+  {
+    "question": "Quelles sont les limites de la m\u00e9thode d'interception de signal pour la conservation des donn\u00e9es de `$SLURM_TMPDIR`?",
+    "answer": "Le contenu de `$SLURM_TMPDIR` ne sera pas conserv\u00e9 si un n\u0153ud tombe en panne ou si le syst\u00e8me de fichiers r\u00e9seau conna\u00eet un probl\u00e8me avec cette m\u00e9thode."
   }
 ]

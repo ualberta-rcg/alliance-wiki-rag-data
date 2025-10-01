@@ -1,0 +1,34 @@
+[
+  {
+    "question": "What is the most important question to answer when creating a self-signed SSL certificate, and what should be its value for a virtual machine on a cloud?",
+    "answer": "The most important question is 'Common Name', which should be the domain name of your server. For a virtual machine on a cloud, it should be the floating IP associated with the virtual machine."
+  },
+  {
+    "question": "Which commands are used to set the correct ownership and permissions for the private key `/etc/ssl/private/server.key`?",
+    "answer": "Use `sudo chown root:ssl-cert /etc/ssl/private/server.key` and `sudo chmod 640 /etc/ssl/private/server.key`."
+  },
+  {
+    "question": "Which Apache configuration file needs to be edited to configure it to use a self-signed SSL certificate?",
+    "answer": "You need to edit Apache's SSL configuration file located at `/etc/apache2/sites-available/default-ssl.conf`."
+  },
+  {
+    "question": "What changes should be made in `default-ssl.conf` to configure Apache to use the new `server.crt` and `server.key` files?",
+    "answer": "Change `SSLCertificateFile` to `/etc/ssl/certs/server.crt`, `SSLCertificateKeyFile` to `/etc/ssl/private/server.key`, and add `SSLCertificateChainFile /etc/ssl/certs/server.crt`."
+  },
+  {
+    "question": "What variable needs to be consistent between `default-ssl.conf` and `000-default.conf`?",
+    "answer": "The `DocumentRoot` variables must be the same in both `default-ssl.conf` and `000-default.conf`."
+  },
+  {
+    "question": "What security configurations should be added to `default-ssl.conf` inside the `<VirtualHost>` tag to tighten security?",
+    "answer": "You should add `ServerName`, `SSLProtocol all -SSLv2 -SSLv3`, `SSLCipherSuite HIGH:MEDIUM:!aNULL:!MD5:!SEED:!IDEA:!RC4`, and `SSLHonorCipherOrder on`."
+  },
+  {
+    "question": "How do you configure Apache to force all HTTP traffic to HTTPS for a virtual host?",
+    "answer": "Edit the default website configuration file (`/etc/apache2/sites-available/000-default.conf`) and add `Redirect permanent / https://XXX-XXX-XXX-XXX.cloud.computecanada.ca` inside the `<VirtualHost>` tag, replacing XXX-XXX-XXX-XXX with your VM's public IP."
+  },
+  {
+    "question": "What commands are used to enable the SSL-enabled website and restart Apache?",
+    "answer": "Run `sudo a2ensite default-ssl.conf` followed by `sudo service apache2 restart`."
+  }
+]

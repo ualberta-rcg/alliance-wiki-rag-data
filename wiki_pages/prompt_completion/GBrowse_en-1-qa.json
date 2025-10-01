@@ -1,0 +1,118 @@
+[
+  {
+    "question": "What is GBrowse?",
+    "answer": "GBrowse is a combination of database and interactive web pages used for manipulating and displaying annotations on genomes."
+  },
+  {
+    "question": "Where is GBrowse installed?",
+    "answer": "GBrowse is installed on Cedar."
+  },
+  {
+    "question": "What is the web address for the GBrowse installation on Cedar?",
+    "answer": "The web address of the installation is https://gateway.cedar.computecanada.ca."
+  },
+  {
+    "question": "How does the Cedar installation of GBrowse differ from the standard setup?",
+    "answer": "The Cedar installation differs from the standard GBrowse setup described at http://gmod.org/wiki/GBrowse, particularly with regard to authentication and authorization."
+  },
+  {
+    "question": "How does GBrowse access user files and directories?",
+    "answer": "Our staff will create a shared account for each research group that requests access to GBrowse, allowing it to access files and directories."
+  },
+  {
+    "question": "What are the file security implications of using GBrowse?",
+    "answer": "While using GBrowse, any member of a research group can read GBrowse config files and input files belonging to any other member of that group."
+  },
+  {
+    "question": "Who must agree to the shared account implications for GBrowse access?",
+    "answer": "The Principal Investigator (PI) of your group must agree to the change from usual file security practices."
+  },
+  {
+    "question": "How can a Principal Investigator request a GBrowse account for their group?",
+    "answer": "The PI should write to technical support indicating that they want a GBrowse account created for the group and understand the implications of a shared account."
+  },
+  {
+    "question": "What other requirement is necessary for GBrowse access besides PI agreement?",
+    "answer": "You must also have a database account on Cedar."
+  },
+  {
+    "question": "What should you do if you don't have a database account on Cedar?",
+    "answer": "You should read [[Database servers]] carefully and answer the questions given there for setting up a database."
+  },
+  {
+    "question": "Where should GBrowse config files be placed?",
+    "answer": "GBrowse config files should be placed in the directory /project/GROUPID/gbrowse/USERNAME/conf, where GROUPID is your group id and USERNAME is your user name."
+  },
+  {
+    "question": "Is there a symbolic link created for the GBrowse config directory?",
+    "answer": "Yes, a symbolic link from ${HOME}/gbrowse-config/ will be created to this directory for convenience."
+  },
+  {
+    "question": "What is the required permission for GBrowse config files in the shared directory?",
+    "answer": "Files in this directory should be readable by all members of the group, so the group permission should not be changed."
+  },
+  {
+    "question": "How do you configure a MySQL database connection in GBrowse config files?",
+    "answer": "You need to include the following in your GBrowse config files: [username_example_genome:database] db_adaptor = Bio::DB::SeqFeature::Store db_args = -adaptor DBI::mysql -dsn DATABASE;mysql_read_default_file=/home/SHARED/.my.cnf"
+  },
+  {
+    "question": "What do 'DATABASE' and 'SHARED' refer to in the MySQL GBrowse configuration?",
+    "answer": "'DATABASE' is the name of your database, and 'SHARED' is the shared account."
+  },
+  {
+    "question": "What is the .my.cnf file used for in MySQL GBrowse configuration?",
+    "answer": "The .my.cnf file is a text file created by staff that contains information required for the shared account to connect to MySQL."
+  },
+  {
+    "question": "How do you configure a Postgres database connection in GBrowse config files?",
+    "answer": "You need to include the following in your GBrowse config files: [username_example_genome:database] db_adaptor = Bio::DB::SeqFeature::Store db_args = -adaptor DBI::Pg -dsn = dbi:Pg:dbname=DATABASE"
+  },
+  {
+    "question": "Can GBrowse read .bam files directly?",
+    "answer": "Yes, GBrowse is able to read .bam files directly; you do not need to upload them to the database to display them."
+  },
+  {
+    "question": "What are the requirements for GBrowse to read .bam files directly from the /project directory?",
+    "answer": "Files need to be copied to your /project directory, be readable by the group, the directory containing them must have the setgid and group-execute bits turned on, and the .bam file's group ownership must be set to your group."
+  },
+  {
+    "question": "How should the directory containing .bam files be configured for direct reading by GBrowse?",
+    "answer": "The directory must have the setgid and group-execute bits turned on, so 'ls \u2013l' output shows a small 's' in the group-execute field."
+  },
+  {
+    "question": "How should the group ownership of .bam files be set for GBrowse to read them directly?",
+    "answer": "Make sure the .bam file's group ownership is set to your group (e.g., jsmith:def-kjones), not to your username (e.g., jsmith:jsmith)."
+  },
+  {
+    "question": "How do you specify the path to a .bam file in the GBrowse config file?",
+    "answer": "Edit your config file to include a section like: [example_bam:database] db_adaptor = Bio::DB::Sam db_args = -bam /project/GROUPID/USERNAME/gbrowse_bam_files/example_file.bam search options = default"
+  },
+  {
+    "question": "How can files be uploaded to the database for GBrowse visualization?",
+    "answer": "Files can be uploaded using BioPerl by running specific commands after loading the bioperl module."
+  },
+  {
+    "question": "What BioPerl module needs to be loaded to upload files?",
+    "answer": "The bioperl/1.7.1 module needs to be loaded using `module load bioperl/1.7.1`."
+  },
+  {
+    "question": "What is the BioPerl command to upload a FASTA file and header file to a MySQL database?",
+    "answer": "The command is: `bp_seqfeature_load.pl -c \u2013d DATABASE:mysql_read_default_file=/home/USERNAME/.my.cnf example_genomic_sequence.fa header_file`."
+  },
+  {
+    "question": "What is `example_genomic_sequence.fa` in the BioPerl upload command?",
+    "answer": "It is the FASTA file containing the entire genome you want to visualize with GBrowse."
+  },
+  {
+    "question": "What does `header_file` contain in the BioPerl upload command?",
+    "answer": "`header_file` contains details about the length of the chromosomes, such as ##sequence-region lines."
+  },
+  {
+    "question": "Where should BioPerl upload commands be run?",
+    "answer": "These commands should be run via the job scheduler, not on the head node."
+  },
+  {
+    "question": "What needs to be done after uploading data to the database to allow GBrowse to access it?",
+    "answer": "You need to grant view access to the 'SHARED' account so that GBrowse can read your database, as described in [[Database servers#How_to_share_your_MySQL_data|How to share your MySQL data]]."
+  }
+]

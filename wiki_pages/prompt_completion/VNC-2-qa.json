@@ -1,82 +1,50 @@
 [
   {
-    "question": "What are the primary connection options for a VNC server?",
-    "answer": "You can connect to a persistent VNC server on dedicated VDI nodes, a temporary VNC server on a cluster compute node, or run lightweight sessions on cluster login nodes."
+    "question": "What are the two main types of VNC servers you can connect to?",
+    "answer": "You can connect to either a persistent VNC server running on dedicated VDI nodes or a temporary VNC server started on a cluster compute node. Lightweight sessions can also be run on cluster login nodes."
   },
   {
-    "question": "What are VDI nodes, and what are their primary use cases?",
-    "answer": "VDI (Virtual Desktop Infrastructure) nodes are dedicated remote desktop environments, like those on Graham (gra-vdi), that provide accelerated OpenGL and are intended for demanding and complex interactive graphical tasks."
+    "question": "What are Graham's VDI nodes used for?",
+    "answer": "Graham's VDI nodes (gra-vdi) provide a remote desktop environment equipped with accelerated OpenGL, intended for the most demanding and complex interactive graphical tasks like visualization and post-processing."
   },
   {
-    "question": "What file systems do Graham's VDI nodes share?",
-    "answer": "The VDI nodes on Graham share the `/home`, `/project`, and `/scratch` filesystems."
+    "question": "How do VDI nodes integrate with Graham's filesystems for data access?",
+    "answer": "VDI nodes share Graham's `/home`, `/project`, and `/scratch` filesystems, making data created by jobs on Graham immediately accessible on gra-vdi for visualization and post-processing without the need for transfer."
   },
   {
-    "question": "How can data from Graham jobs be accessed on VDI nodes?",
-    "answer": "Any data files or directories created on Graham by running jobs in the queue are immediately accessible on gra-vdi for visualization and post-processing purposes, without requiring data transfer."
+    "question": "What is the process for connecting to gra-vdi?",
+    "answer": "To connect, start VNC viewer (TigerVNC) on your laptop and enter `gra-vdi.alliancecan.ca` or `gra-vdi3.sharcnet.ca` as the VNC server, then enter your Alliance credentials at the login screen."
   },
   {
-    "question": "How do you connect to gra-vdi using a VNC viewer?",
-    "answer": "To connect to gra-vdi, start the VNC viewer (tigervnc) on your laptop and enter `VNC server: gra-vdi.alliancecan.ca`."
+    "question": "What should users know about the `$SCRATCH` directory on gra-vdi?",
+    "answer": "On gra-vdi, `$SCRATCH` is defined as `/local/tmp/$USER` and any data left there will eventually be deleted (potentially in 60 days) due to limited disk space, so it should not be used for permanent storage."
   },
   {
-    "question": "What happens after connecting to `gra-vdi.alliancecan.ca`?",
-    "answer": "You will see a login screen to enter your Alliance credentials, after which a desktop session will be started on either gra-vdi3 or gra-vdi4 using a round robin algorithm."
+    "question": "Are VDI nodes suitable for long-running computations?",
+    "answer": "No, gra-vdi is a shared resource intended for visualization tasks. Long-running 'heavy' computations should be performed on a cluster compute node or using interactive OpenOnDemand infrastructure to ensure resources are available for others' graphical work."
   },
   {
-    "question": "Can I connect directly to a specific VDI machine instead of `gra-vdi.alliancecan.ca`?",
-    "answer": "Yes, you can connect directly to specific VDI machines by specifying `VNC server: gra-vdi3.sharcnet.ca` or `VNC server: gra-vdi4.sharcnet.ca`."
+    "question": "What kind of applications can be run on a VNC desktop on a cluster login node?",
+    "answer": "You may run lightweight applications that do not require much memory, cputime, or a GPU, as login node limits will apply."
   },
   {
-    "question": "Why would someone choose to connect directly to `gra-vdi3.sharcnet.ca` or `gra-vdi4.sharcnet.ca`?",
-    "answer": "Direct connection may be useful if one machine is overloaded and unresponsive, or if you consistently want to use the local `$SCRATCH` directory on a particular server."
+    "question": "How do you log in to a cluster login node from your laptop to prepare for a VNC server?",
+    "answer": "You must login to a cluster login node using SSH, for example, by running `ssh nibi.alliancecan.ca` from your laptop."
   },
   {
-    "question": "What is the definition of the `$SCRATCH` directory on gra-vdi nodes versus other clusters?",
-    "answer": "On gra-vdi, `$SCRATCH` is defined as `/local/tmp/$USER`, whereas on clusters it is `/scratch/$USER` and is shared by all nodes."
+    "question": "Before starting a new VNC server on a login node, how can you check for and kill existing unused servers?",
+    "answer": "First, run `vncserver -list` to check for old unused VNC servers, then kill them all by running the command `pkill Xvnc -u $USER`."
   },
   {
-    "question": "What is the data retention policy for `$SCRATCH` directories on gra-vdi?",
-    "answer": "Data left on `$SCRATCH` on gra-vdi will eventually be deleted due to limited disk space, and users are advised not to store files there for more than 60 days."
+    "question": "How do you start a VNC server on a login node with an idle timeout, and what is the purpose of this option?",
+    "answer": "You can start it with `vncserver -idletimeout seconds` (e.g., `vncserver -idletimeout 86400`). The `-idletimeout` option ensures the VNC server terminates after the specified number of seconds if there are no VNC viewer connections."
   },
   {
-    "question": "When should VDI nodes not be used, and what is the alternative?",
-    "answer": "VDI nodes are intended for visualization tasks. For long-running computations within GUI applications, users should log out of gra-vdi and connect to a cluster compute node instead to preserve VDI resources."
+    "question": "What is required the first time you start a VNC server?",
+    "answer": "The first time you start a VNC server, you will be required to set a password, which is necessary to remotely connect to your desktop with a VNC client."
   },
   {
-    "question": "What kind of applications are suitable for running on cluster login nodes via VNC?",
-    "answer": "Only lightweight applications that do not require significant memory, cputime, or a GPU, as login node resource limits will apply."
-  },
-  {
-    "question": "How do you check for and terminate old VNC server sessions on a login node?",
-    "answer": "First, SSH into `graham.alliancecan.ca`, then run `vncserver -list` to check for old sessions, and `pkill Xvnc -u $USER` to kill them."
-  },
-  {
-    "question": "What option should be used when starting a new VNC server on a login node to ensure it automatically terminates?",
-    "answer": "The `-idletimeout seconds` option should be added to the `vncserver` command."
-  },
-  {
-    "question": "What is the purpose of the `-alwaysshared` option when starting a VNC server?",
-    "answer": "When a VNC server is started with the `-alwaysshared` option, it allows multiple VNC viewer connections to the same desktop session."
-  },
-  {
-    "question": "How can you find the TCP port that a new VNC server is listening on after it starts?",
-    "answer": "You can determine the port by examining the VNC server's log file, for example, by running `grep -iE \"\\sport|kill\" /home/username/.vnc/gra-login2:2.log`."
-  },
-  {
-    "question": "How do you set up an SSH tunnel from your laptop to a VNC server on a login node?",
-    "answer": "On your desktop, open a terminal and run an SSH command in the format `ssh graham.computecanada.ca -L local_port:remote_node:remote_port`, for example, `ssh graham.computecanada.ca -L 5901:gra-login2:5903`."
-  },
-  {
-    "question": "How do you connect to the VNC server using vncviewer after establishing an SSH tunnel?",
-    "answer": "On your desktop, run `vncviewer localhost:local_port` (e.g., `vncviewer localhost:5901`). Mac or Windows users should enter `localhost:local_port` in the TigerVNC Viewer application."
-  },
-  {
-    "question": "What are the memory and CPU time limits on Graham's cluster login nodes?",
-    "answer": "On Graham, cluster login nodes have strict limits of 8GB of memory and 1 CPU-hour per process."
-  },
-  {
-    "question": "What should be done if an application requires more resources than what a login node provides for a VNC session?",
-    "answer": "If more resources are needed, the VNC server should be run on a cluster compute node or a VDI node instead."
+    "question": "Which VNC server option allows for multiple connections to the same desktop session?",
+    "answer": "If the VNC server was started by appending the `-alwaysshared` option, then multiple connections to it can be made."
   }
 ]

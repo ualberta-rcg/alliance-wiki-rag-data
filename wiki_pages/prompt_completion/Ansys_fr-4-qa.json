@@ -1,0 +1,78 @@
+[
+  {
+    "question": "Why are Ansys MPI implementations not directly compatible with the Slurm scheduler?",
+    "answer": "None of the MPI implementations included in the Ansys suite are compatible with the Slurm scheduler."
+  },
+  {
+    "question": "How should parallel Ansys tasks be launched given the incompatibility with Slurm?",
+    "answer": "Special directives specific to each Ansys package must be used to launch parallel tasks."
+  },
+  {
+    "question": "What is the initial step for running an Ansys Fluent task on a cluster?",
+    "answer": "Prepare your task with Fluent from Ansys Workbench up to the point where the calculations would be executed."
+  },
+  {
+    "question": "How do you export a case file from Ansys Fluent for cluster submission?",
+    "answer": "Export the case file using 'File > Export > Case\u2026' or locate the directory where Fluent saves project files. Case file names often follow a format like `FFF-1.cas.gz`."
+  },
+  {
+    "question": "If I want to continue a previous calculation, how do I export the necessary data file?",
+    "answer": "Export a data file using 'File > Export > Data\u2026' or find it in the same project directory, typically named `FFF-1.dat.gz`."
+  },
+  {
+    "question": "Where should Fluent case and data files be transferred on the cluster?",
+    "answer": "Transfer the case and data files to the `/project` or `/scratch` file system of the cluster."
+  },
+  {
+    "question": "What is recommended for naming exported files before transferring them to the cluster?",
+    "answer": "Save them with names that are easier to identify than `FFF-1.*` or rename them during the upload process."
+  },
+  {
+    "question": "What is the purpose of creating a journal file for Ansys Fluent tasks?",
+    "answer": "A journal file is created to load case and data files, launch the solver, and record the results."
+  },
+  {
+    "question": "What needs to be adjusted in the journal file before submitting a Fluent task?",
+    "answer": "The names of the files and the number of iterations need to be adjusted."
+  },
+  {
+    "question": "How can frequent task failures due to licensing issues be addressed?",
+    "answer": "You can modify your script to re-queue the task (up to 4 times), similar to the script under the 'Plusieurs n\u0153uds (par c\u0153ur + remise en attente)' tab."
+  },
+  {
+    "question": "What is a disadvantage of re-queuing tasks due to license problems?",
+    "answer": "This method also re-queues simulations that failed for other reasons, such as divergence, which wastes computational time."
+  },
+  {
+    "question": "What action should be taken if a re-queued task fails due to a simulation issue rather than a license problem?",
+    "answer": "Immediately cancel the task with `scancel jobid` and correct the simulation problem."
+  },
+  {
+    "question": "What is the final step after an Ansys Fluent task is completed on the cluster?",
+    "answer": "You can download the data file and import it back into Fluent using 'File > Import > Data\u2026'."
+  },
+  {
+    "question": "Which type of Slurm script is generally recommended for Fluent tasks to optimize performance and reduce wait times?",
+    "answer": "The 'par n\u0153ud' (per-node) script is recommended to minimize wait time and maximize performance by using the fewest possible nodes."
+  },
+  {
+    "question": "When might a 'par c\u0153ur' (per-core) script be more suitable for Fluent tasks?",
+    "answer": "Tasks requiring a large number of CPU cores might experience shorter queue times with a 'par c\u0153ur' script."
+  },
+  {
+    "question": "What are the risks associated with running intensive tasks on a large, indeterminate number of nodes using 'par c\u0153ur' scripts?",
+    "answer": "Such tasks are more likely to crash if a compute node fails during the simulation, and starting them can take significantly longer."
+  },
+  {
+    "question": "How do the Fluent Slurm scripts manage memory for tasks?",
+    "answer": "They use shared memory for single-node tasks and distributed memory (with MPI and appropriate CHP interconnect) for multi-node tasks."
+  },
+  {
+    "question": "What options are available if Fluent crashes during initial automatic mesh partitioning on Narval with standard Intel scripts?",
+    "answer": "The 'Plusieurs n\u0153uds' tabs for Narval offer a more robust alternative, or you can manually partition the mesh in the Fluent graphical interface before re-submitting the task."
+  },
+  {
+    "question": "What is the recommended best practice for mesh partitioning efficiency in Fluent?",
+    "answer": "The number of mesh partitions should be an integer multiple of the number of cores, and ideally, there should be at least 10,000 cells per core."
+  }
+]

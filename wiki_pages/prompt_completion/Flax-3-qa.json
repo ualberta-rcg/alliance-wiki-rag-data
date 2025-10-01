@@ -1,0 +1,50 @@
+[
+  {
+    "question": "How are weight updates computed in a single-node, multi-GPU Flax training setup?",
+    "answer": "Weight updates are computed with averaged gradients from all model replicas."
+  },
+  {
+    "question": "What is the purpose of the `collate_jax` function?",
+    "answer": "The `collate_jax` function converts batches of data, which might be NumPy arrays or lists/tuples, into stacked NumPy arrays suitable for JAX processing."
+  },
+  {
+    "question": "How do you specify multiple nodes and GPUs per node in a SLURM script for Flax distributed training?",
+    "answer": "Use `#SBATCH --nodes N` to specify N nodes and `#SBATCH --gres=gpu:M` to specify M GPUs per node in the SLURM script."
+  },
+  {
+    "question": "What is the command to run a multi-node Flax distributed training script on a SLURM cluster?",
+    "answer": "The command `srun python flax-example-distributed.py --coord_addr $MASTER_ADDR:34567` is used, where `MASTER_ADDR` is obtained from the hostname."
+  },
+  {
+    "question": "How does a Flax script determine the total number of nodes and the current node's rank in a SLURM environment?",
+    "answer": "The script retrieves the total number of nodes (`world_size`) from the `SLURM_NNODES` environment variable and the current node's rank from `SLURM_NODEID`."
+  },
+  {
+    "question": "How is JAX initialized for distributed training across multiple nodes?",
+    "answer": "JAX is initialized using `jax.distributed.initialize(coordinator_address=args.coord_addr, num_processes=world_size, process_id=rank)`, where `coordinator_address`, `num_processes`, and `process_id` are provided."
+  },
+  {
+    "question": "What is the role of `jax_utils.replicate(state)` in multi-node Flax training?",
+    "answer": "`jax_utils.replicate(state)` broadcasts the model replicas to all GPUs on all nodes, ensuring each GPU has a copy of the model state."
+  },
+  {
+    "question": "How is data loading modified to ensure each node processes a unique portion of the dataset in multi-node Flax training?",
+    "answer": "A `DistributedSampler` is added to the `DataLoader` (`torch.utils.data.distributed.DistributedSampler`), configured with `num_replicas` (world size) and `rank` (node ID) to ensure each node sees only a portion of the dataset."
+  },
+  {
+    "question": "How are input batches split for multi-node, multi-GPU training in the provided example?",
+    "answer": "Input batches are reshaped to `n_devices` sub-batches, where `n_devices` is the number of GPUs *per node*, not the total number of GPUs across all nodes."
+  },
+  {
+    "question": "How does `jax.pmap` function in a multi-node distributed Flax setup?",
+    "answer": "`jax.pmap` parallelizes inputs, function evaluation, and outputs over a given axis (defaulting to the first dimension for local GPUs). Due to `jax.distributed.initialize`, computations are also parallelized across nodes."
+  },
+  {
+    "question": "How are gradients and loss averaged across all model replicas (GPUs and nodes) in the distributed `train_step` function?",
+    "answer": "Gradients are averaged using `jax.lax.pmean(grads, axis_name='gpus')`, and loss is averaged using `jax.lax.pmean(loss, axis_name='gpus')`, both across GPUs and nodes."
+  },
+  {
+    "question": "What is the class name for the neural network model defined in the multi-node Flax example?",
+    "answer": "The neural network model is defined by the `Net` class."
+  }
+]

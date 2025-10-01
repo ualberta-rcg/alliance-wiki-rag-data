@@ -1,0 +1,58 @@
+[
+  {
+    "question": "What are the initial steps to compile the `petscFoam` solver?",
+    "answer": "First, load the necessary modules, then download and extract the `external-solver-main.tar.gz` package."
+  },
+  {
+    "question": "Which modules need to be loaded before compiling the `petscFoam` solver?",
+    "answer": "You need to load `StdEnv/2023`, `gcc/12.3`, `openmpi/4.1.5`, `openfoam/v2412`, and `petsc/3.21.6`."
+  },
+  {
+    "question": "How do you download the `external-solver-main.tar.gz` package?",
+    "answer": "You can download it using the command `wget https://develop.openfoam.com/modules/external-solver/-/archive/main/external-solver-main.tar.gz`."
+  },
+  {
+    "question": "What command is used to extract the `external-solver-main.tar.gz` package?",
+    "answer": "The command `tar xvfz external-solver-main.tar.gz` is used to extract the package."
+  },
+  {
+    "question": "How do you compile the `petscFoam` solver after downloading and extracting it?",
+    "answer": "After navigating to the extracted directory, run the command `./Allwmake` to compile the solver."
+  },
+  {
+    "question": "How can you confirm that the `petscFoam` solver is functional after compilation?",
+    "answer": "You can perform a few quick tests: check if OpenFOAM can load `petscFoam`, verify the dynamic library location, and check if `libpetscFoam.so` can find its dependencies."
+  },
+  {
+    "question": "What command verifies if OpenFOAM can load the `petscFoam` library?",
+    "answer": "The command `foamHasLibrary -verbose petscFoam` is used to check if OpenFOAM can load `petscFoam`."
+  },
+  {
+    "question": "How do you check the location of the `libpetscFoam.so` dynamic library?",
+    "answer": "You can use the command `ls $FOAM_USER_LIBBIN` to check if `libpetscFoam.so` is located in the `$FOAM_USER_LIBBIN` directory."
+  },
+  {
+    "question": "What command checks the dependencies of `libpetscFoam.so`?",
+    "answer": "To check the dependencies, use the command `ldd $FOAM_USER_LIBBIN/libpetscFoam.so | grep petsc`."
+  },
+  {
+    "question": "What potential performance issue can OpenFOAM cause on shared filesystems?",
+    "answer": "OpenFOAM can emit a lot of debugging information through very frequent small writes (e.g., hundreds per second), which may lead to poor performance on shared filesystems."
+  },
+  {
+    "question": "How can OpenFOAM's debugging output be reduced or disabled to improve performance?",
+    "answer": "You can reduce or disable debugging output by creating a custom `controlDict` file in `$HOME/.OpenFOAM/$WM_PROJECT_VERSION/` and modifying the `debugSwitches` dictionary within it to set flags from values greater than zero to zero."
+  },
+  {
+    "question": "What steps are required to create a custom `controlDict` for performance tuning?",
+    "answer": "First, create the directory `$HOME/.OpenFOAM/$WM_PROJECT_VERSION` with `mkdir -p`, then copy the default `controlDict` using `cp $WM_PROJECT_DIR/etc/controlDict $HOME/.OpenFOAM/$WM_PROJECT_VERSION/`."
+  },
+  {
+    "question": "What is an alternative solution to address OpenFOAM's performance issues related to frequent disk writes?",
+    "answer": "Another solution is to make use of the local scratch directory, `$SLURM_TMPDIR`, which is a disk attached directly to the compute node."
+  },
+  {
+    "question": "Where can users find documentation on run-time parameters to reduce OpenFOAM's disk output?",
+    "answer": "Run-time parameters are documented for OpenFOAM versions 6 and 7 in their respective user guides on `cfd.direct`."
+  }
+]

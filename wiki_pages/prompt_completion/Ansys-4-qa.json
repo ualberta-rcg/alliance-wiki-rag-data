@@ -1,0 +1,94 @@
+[
+  {
+    "question": "How do you export a data file from Ansys Fluent if you want to continue a previous calculation?",
+    "answer": "You can export a \"data\" file using \"File > Export > Data\u2026\" or find it in the same project folder (e.g., `FFF-1.dat.gz`)."
+  },
+  {
+    "question": "Where should Fluent case and data files be transferred on a cluster?",
+    "answer": "The case file and, if needed, the data file should be transferred to a directory on the `/project` or `/scratch` filesystem on the cluster."
+  },
+  {
+    "question": "Can Fluent case and data files be renamed during export or upload?",
+    "answer": "Yes, you can save the file(s) under a more instructive name than `FFF-1.*` when exporting, or rename them when they are uploaded."
+  },
+  {
+    "question": "What is the primary purpose of a journal file in Ansys Fluent simulations?",
+    "answer": "Its purpose is to load the case file (and optionally the data file), run the solver, and finally write the results."
+  },
+  {
+    "question": "What should be considered if Ansys Fluent jobs frequently fail due to license shortages?",
+    "answer": "Consider modifying your script to requeue your job (up to 4 times) as shown under the 'by node + requeue' tab."
+  },
+  {
+    "question": "What is a potential issue with using job requeue for license shortages in Fluent?",
+    "answer": "It can also requeue simulations that fail due to non-license related issues (such as divergence), resulting in lost compute time."
+  },
+  {
+    "question": "How should a user respond if a requeued Fluent job fails due to a simulation issue instead of a license problem?",
+    "answer": "Immediately manually kill the job progression with `scancel jobid` and correct the problem."
+  },
+  {
+    "question": "How do you import a data file back into Fluent after a job has run?",
+    "answer": "You can download the data file and import it back into Fluent with \"File > Import > Data\u2026\"."
+  },
+  {
+    "question": "Which type of Slurm script is generally recommended for most Fluent jobs?",
+    "answer": "Most Fluent jobs should use the 'by node' script to minimize solution latency and maximize performance over as few nodes as possible."
+  },
+  {
+    "question": "When might a 'by core' script be advantageous for Fluent jobs?",
+    "answer": "Very large jobs might wait less in the queue if they use a 'by core' script."
+  },
+  {
+    "question": "What are the potential drawbacks of running large Fluent jobs with many nodes using a 'by core' script?",
+    "answer": "The startup time can be significantly longer, and the jobs will be far more vulnerable to crashing if any of the compute nodes fail during the simulation."
+  },
+  {
+    "question": "How do Fluent Slurm scripts handle communication for single-node versus multi-node runs?",
+    "answer": "The scripts ensure Fluent uses shared memory for communication when run on a single node or distributed memory (utilizing MPI and the appropriate HPC interconnect) when run over multiple nodes."
+  },
+  {
+    "question": "When are the Narval-specific Fluent scripts with Open MPI useful?",
+    "answer": "The two narval tabs may be useful to provide a more robust alternative if Fluent crashes during the initial auto mesh partitioning phase when using the standard Intel-based scripts with the parallel solver."
+  },
+  {
+    "question": "What is an alternative approach if Fluent crashes during automatic mesh partitioning?",
+    "answer": "Manually perform the mesh partitioning in the Fluent GUI to inspect partition statistics and specify the partitioning method for an optimal result, then rerun the job with Intel scripts."
+  },
+  {
+    "question": "What are the recommendations for mesh partition efficiency in Fluent?",
+    "answer": "The number of mesh partitions should be an integral multiple of the number of cores, and for optimal efficiency, ensure at least 10,000 cells per core."
+  },
+  {
+    "question": "What Slurm directive specifies the account name in a Fluent by-node Intel script?",
+    "answer": "The directive `#SBATCH --account=def-group` specifies the account name."
+  },
+  {
+    "question": "How do you set the time limit for a Fluent job in a Slurm script?",
+    "answer": "The `#SBATCH --time=00-03:00` directive specifies the time limit in `dd-hh:mm` format, such as 3 hours."
+  },
+  {
+    "question": "Which Slurm directive is used to specify the number of compute nodes for a Fluent job?",
+    "answer": "The directive `#SBATCH --nodes=1` specifies the number of compute nodes (e.g., 1 node)."
+  },
+  {
+    "question": "How do you specify the number of cores per node in a Fluent by-node Intel Slurm script?",
+    "answer": "Use `#SBATCH --ntasks-per-node=32` to specify the number of cores per node (e.g., 32 cores for Graham)."
+  },
+  {
+    "question": "What memory allocation setting is recommended for a Fluent by-node Intel Slurm script?",
+    "answer": "The `#SBATCH --mem=0` directive is recommended to allocate all memory per compute node."
+  },
+  {
+    "question": "What is the recommended `cpus-per-task` setting for Fluent by-node Intel Slurm scripts?",
+    "answer": "The `#SBATCH --cpus-per-task=1` setting should not be changed."
+  },
+  {
+    "question": "Which modules should be loaded for Ansys Fluent 2023R2 using the by-node Intel script?",
+    "answer": "You should load `module load StdEnv/2023` and `module load ansys/2023R2` (or newer versions)."
+  },
+  {
+    "question": "How do you define the journal file name and Fluent version in a by-node Intel Slurm script?",
+    "answer": "Set `MYJOURNALFILE=sample.jou` for the journal file name and `MYVERSION=3d` (e.g., for 3D double precision) for the Fluent version."
+  }
+]

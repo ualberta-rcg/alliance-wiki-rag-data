@@ -1,0 +1,62 @@
+[
+  {
+    "question": "Quel est le r\u00f4le du fichier `final.sh` dans META-Farm ?",
+    "answer": "Si un fichier `final.sh` est pr\u00e9sent dans le r\u00e9pertoire du groupe de cas, `submit.run` le traitera comme un script de t\u00e2che de post-traitement et le lancera automatiquement une fois que tous les cas de `table.dat` auront \u00e9t\u00e9 trait\u00e9s avec succ\u00e8s."
+  },
+  {
+    "question": "Comment passer des arguments optionnels \u00e0 la commande `sbatch` lors de l'utilisation de `submit.run` ?",
+    "answer": "Tous les arguments suppl\u00e9mentaires fournis \u00e0 `submit.run` seront transmis directement \u00e0 la commande `sbatch` de l\u2019ordonnanceur pour le lancement de toutes les m\u00e9tat\u00e2ches pour ce groupe de cas."
+  },
+  {
+    "question": "Que fait le script `single_case.sh` dans META-Farm ?",
+    "answer": "Le script `single_case.sh` lit une ligne du fichier `table.dat`, l\u2019analyse et utilise son contenu pour lancer le code de l'utilisateur pour un cas sp\u00e9cifique."
+  },
+  {
+    "question": "Comment la version par d\u00e9faut de `single_case.sh` traite-t-elle les lignes de `table.dat` ?",
+    "answer": "La version par d\u00e9faut de `single_case.sh` traite chaque ligne de `table.dat` comme une commande litt\u00e9rale et l\u2019ex\u00e9cute dans son propre r\u00e9pertoire nomm\u00e9 `RUNyyy`, o\u00f9 `yyy` est le num\u00e9ro du cas."
+  },
+  {
+    "question": "Quelles sont les variables pr\u00e9d\u00e9finies disponibles dans `single_case.sh` et \u00e0 quoi servent-elles ?",
+    "answer": "Les variables pr\u00e9d\u00e9finies sont `$ID` (identifiant du cas), `$COMM` (la ligne correspondant \u00e0 l'ID du cas dans `table.dat` sans le champ ID), et `$METAJOB_ID` (identifiant de la t\u00e2che pour la m\u00e9tat\u00e2che en cours)."
+  },
+  {
+    "question": "Quel type de contenu le fichier `table.dat` doit-il avoir si `single_case.sh` n'est pas modifi\u00e9 ?",
+    "answer": "Si `single_case.sh` n\u2019est pas modifi\u00e9, chaque ligne de `table.dat` doit contenir une commande compl\u00e8te, pouvant \u00eatre une commande compos\u00e9e (plusieurs commandes s\u00e9par\u00e9es par des points-virgules)."
+  },
+  {
+    "question": "Comment modifier `single_case.sh` si l'on souhaite ex\u00e9cuter la m\u00eame commande pour chaque cas avec des arguments diff\u00e9rents ?",
+    "answer": "On peut modifier `single_case.sh` pour inclure la commande commune, puis modifier `table.dat` pour qu\u2019il contienne uniquement les arguments ou/et des redirections pour chaque cas."
+  },
+  {
+    "question": "Que doit contenir le fichier `table.dat` si le code n'a pas besoin de lire d'arguments de ce fichier ?",
+    "answer": "M\u00eame si le code n\u2019a pas besoin de lire d\u2019arguments dans le fichier `table.dat`, ce fichier doit quand m\u00eame \u00eatre g\u00e9n\u00e9r\u00e9 avec un nombre de lignes \u00e9gal au nombre de cas \u00e0 traiter, car seul le nombre total de lignes importe."
+  },
+  {
+    "question": "Est-il obligatoire d'inclure des num\u00e9ros de ligne au d\u00e9but de chaque ligne de `table.dat` ?",
+    "answer": "Non, il n\u2019est pas n\u00e9cessaire d\u2019inclure les num\u00e9ros de ligne au d\u00e9but de chaque ligne de `table.dat`. Si le script `submit.run` ne les trouve pas, il modifiera le fichier pour les ajouter."
+  },
+  {
+    "question": "Quelle est l'importance de la variable `STATUS` dans `single_case.sh` ?",
+    "answer": "La variable `STATUS` est tr\u00e8s importante car sa valeur devrait \u00eatre 0 si le cas a \u00e9t\u00e9 trait\u00e9 correctement, et positive (plus grande que 0) en cas d'\u00e9chec, ce que `resubmit.run` utilise pour identifier les cas \u00e0 relancer."
+  },
+  {
+    "question": "Comment peut-on modifier la d\u00e9finition de `STATUS` dans `single_case.sh` pour une meilleure gestion des erreurs ?",
+    "answer": "On peut changer la d\u00e9finition de `STATUS` en modifiant `single_case.sh`, par exemple, en effectuant un test pour savoir si un fichier de sortie comme `out.dat` existe ou est vide, et en changeant la valeur de `STATUS` en cons\u00e9quence."
+  },
+  {
+    "question": "\u00c0 quoi sert le fichier `job_script.sh` ?",
+    "answer": "Le fichier `job_script.sh` est le script qui sera soumis \u00e0 l\u2019ordonnanceur pour toutes les m\u00e9tat\u00e2ches du groupe de cas."
+  },
+  {
+    "question": "Quelles options Sbatch sont obligatoires de configurer dans `job_script.sh` ?",
+    "answer": "Vous devez configurer le nom du compte (option `-A`) et la dur\u00e9e d\u2019ex\u00e9cution (option `-t` ou `--time`) de la m\u00e9tat\u00e2che dans `job_script.sh`."
+  },
+  {
+    "question": "Quelle dur\u00e9e d'ex\u00e9cution doit-on indiquer pour `job_script.sh` en mode SIMPLE ?",
+    "answer": "En mode SIMPLE, il faut indiquer une dur\u00e9e d\u2019ex\u00e9cution un peu plus longue que celle pr\u00e9vue pour le cas individuel qui est de plus longue dur\u00e9e."
+  },
+  {
+    "question": "Comment pr\u00e9venir l'\u00e9chec d'une m\u00e9tat\u00e2che due \u00e0 un n\u0153ud d\u00e9fectueux avant que des cas ne soient trait\u00e9s ?",
+    "answer": "Pour pr\u00e9venir ce probl\u00e8me, il faut ajouter des tests \u00e0 `job_script.sh` avant la ligne `task.run`, par exemple en testant la pr\u00e9sence d'un GPU NVidia, et forcer la fin d\u2019une m\u00e9tat\u00e2che si le test \u00e9choue."
+  }
+]

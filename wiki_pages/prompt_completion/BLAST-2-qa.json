@@ -1,0 +1,62 @@
+[
+  {
+    "question": "How can the results from a BLAST job array be combined into a single file?",
+    "answer": "The results can be concatenated into a single file (e.g., `seq.ref`) using `cat seq.ref.{0..9} > seq.ref`, either from the login node or as a dependent job after all array tasks are complete."
+  },
+  {
+    "question": "What is GNU Parallel used for in the context of BLAST searches?",
+    "answer": "GNU Parallel is a tool used to pack many small BLAST jobs into a single job and parallelize it, which helps alleviate issues with too many small files in a parallel filesystem by processing fixed-size chunks of query files on one node with multiple cores."
+  },
+  {
+    "question": "Why is block size important when using GNU Parallel for sequence queries?",
+    "answer": "The block size is important because an inappropriate size can lead to wasted cores. For example, processing a 3MB file in 1MB blocks with 10 requested cores would waste 7 cores."
+  },
+  {
+    "question": "Can GNU Parallel automatically determine the optimal block size?",
+    "answer": "Yes, GNU Parallel can be configured to evaluate and adapt the block size itself, as indicated by using `--block -1`."
+  },
+  {
+    "question": "Where can users find more information about handling large files with GNU Parallel?",
+    "answer": "More information can be found in the 'Handling large files' section of the GNU Parallel page."
+  },
+  {
+    "question": "What are the SBATCH directives specified in the `blastn_gnu.sh` example script for a GNU Parallel job?",
+    "answer": "The SBATCH directives specify `--account=def-<user>`, `--time=00:02:00`, `--cpus-per-task=4`, and `--mem-per-cpu=512M`."
+  },
+  {
+    "question": "Which modules are loaded before running a GNU Parallel BLAST job according to the example script?",
+    "answer": "The `gcc/7.3.0` and `blast+/2.9.0` modules are loaded."
+  },
+  {
+    "question": "How is the BLAST command prepared for use with GNU Parallel in the example script?",
+    "answer": "The BLAST command is stored in a variable `cmd='blastn -db ref.fa -query - '`, where `-query -` indicates that query sequences will be piped as input."
+  },
+  {
+    "question": "What are the key arguments used with the `parallel` command in the example script?",
+    "answer": "Key arguments include `--jobs $SLURM_CPUS_PER_TASK` (number of cores), `--keep-order` (maintain output order), `--block -1` (let GNU Parallel decide block size), `--recstart '>'` (record start delimiter), and `--pipepart` (for fast piping)."
+  },
+  {
+    "question": "Why is `--pipepart` preferred over `--pipe` when using GNU Parallel?",
+    "answer": "`--pipepart` is preferred because it is significantly faster, capable of speeds up to 5GB/s, while `--pipe` is limited to 500MB/s."
+  },
+  {
+    "question": "Must the input file for GNU Parallel be compressed or uncompressed?",
+    "answer": "The input file for GNU Parallel must not be compressed."
+  },
+  {
+    "question": "How can a GNU Parallel BLAST job be submitted as a dependent job after database creation?",
+    "answer": "A GNU Parallel BLAST job can be submitted using `sbatch --dependency=afterok:$(sbatch makeblastdb.sh) blastn_gnu.sh`."
+  },
+  {
+    "question": "What is a recommended tip for improving performance if the FASTA database fits into the node's local storage?",
+    "answer": "If the FASTA database fits into the node's local storage, copy it to the local scratch space (`$SLURM_TMPDIR`) to improve performance."
+  },
+  {
+    "question": "Which BLAST parameters can help reduce the number of returned hits?",
+    "answer": "The `-max_target_seqs` and `-max_hsps` parameters can help reduce the number of returned hits, if reasonable for the research."
+  },
+  {
+    "question": "How can the BLAST hit list be limited to nearly identical hits?",
+    "answer": "The hit list can be limited to nearly identical hits using `-evalue` filters, if reasonable for the research."
+  }
+]

@@ -1,34 +1,50 @@
 [
   {
-    "question": "How does TensorFlow 2.x offer strategies for utilizing multiple GPUs?",
-    "answer": "TensorFlow 2.x provides different strategies for using multiple GPUs through its high-level API `tf.distribute`."
+    "question": "What are the Slurm parameters specified in `tensorflow-multiworker.sh` related to memory, time, and output?",
+    "answer": "The `tensorflow-multiworker.sh` script specifies `--mem=8G` for memory, `--time=0-00:30` for job duration, and `--output=%N-%j.out` for the output file naming convention."
   },
   {
-    "question": "Which strategy is recommended for TensorFlow 2.x multi-GPU training on a single node?",
-    "answer": "For multi-GPU training on a single node in TensorFlow 2.x, the `tf.distribute.MirroredStrategy()` is recommended."
+    "question": "Which modules are loaded in the `tensorflow-multiworker.sh` script for the multi-GPU setup?",
+    "answer": "The `tensorflow-multiworker.sh` script loads the `gcc/9.3.0` and `cuda/11.8` modules."
   },
   {
-    "question": "What SLURM parameters are used to request resources for a single-node TensorFlow 2.x MirroredStrategy job with 4 GPUs?",
-    "answer": "The SLURM script for a single-node MirroredStrategy job requests resources using `#SBATCH --nodes 1` and `#SBATCH --gres=gpu:4`."
+    "question": "What environment variables are set in `tensorflow-multiworker.sh` for inter-GPU communication and XLA flags?",
+    "answer": "The `NCCL_BLOCKING_WAIT=1` environment variable is set for the NCCL backend for inter-GPU communication, and `XLA_FLAGS=--xla_gpu_cuda_data_dir=$CUDA_HOME` is set for XLA flags."
   },
   {
-    "question": "How do you install TensorFlow within a virtual environment for a single-node MirroredStrategy job?",
-    "answer": "After loading the `python/3` module and creating/activating a virtual environment in `$SLURM_TMPDIR/env`, TensorFlow is installed using `pip install --no-index tensorflow`."
+    "question": "What is the purpose of the `config_env.sh` script in the multi-worker TensorFlow setup?",
+    "answer": "The `config_env.sh` script is responsible for loading the Python module, creating and activating a Python virtual environment, upgrading pip, and installing TensorFlow into that environment using `--no-index`."
   },
   {
-    "question": "What environment variable can be set to use the NCCL backend for inter-GPU communication with MirroredStrategy?",
-    "answer": "You can set the environment variable `export NCCL_BLOCKING_WAIT=1` to use the NCCL backend for inter-GPU communication."
+    "question": "How is the Python virtual environment created and activated within `config_env.sh`?",
+    "answer": "The virtual environment is created using `virtualenv --no-download $SLURM_TMPDIR/ENV` and activated with `source $SLURM_TMPDIR/ENV/bin/activate`."
   },
   {
-    "question": "What is the primary difference in strategy implementation for multi-node TensorFlow 2.x GPU training compared to single-node?",
-    "answer": "For multiple nodes, `tf.distribute.MultiWorkerMirroredStrategy()` is used instead of `tf.distribute.MirroredStrategy()`, and `tf.distribute.cluster_resolver.SlurmClusterResolver()` is employed to get job information from SLURM."
+    "question": "What does the `launch_training.sh` script do?",
+    "answer": "The `launch_training.sh` script activates the Python virtual environment from `$SLURM_TMPDIR/ENV` and then executes the `tensorflow-multiworker.py` Python script."
   },
   {
-    "question": "Why is `CommunicationImplementation.NCCL` explicitly added to `MultiWorkerMirroredStrategy` but not `MirroredStrategy`?",
-    "answer": "It is necessary to explicitly add `CommunicationImplementation.NCCL` to `MultiWorkerMirroredStrategy()` because NCCL is the default backend for `MirroredStrategy()` in the single-node case but needs to be specified for multi-worker setups."
+    "question": "How does `tensorflow-multiworker.py` configure TensorFlow for distributed training across multiple nodes?",
+    "answer": "It uses `tf.distribute.cluster_resolver.SlurmClusterResolver()` to acquire job information from SLURM and `tf.distribute.MultiWorkerMirroredStrategy()` with `tf.distribute.experimental.CommunicationOptions(implementation=tf.distribute.experimental.CommunicationImplementation.NCCL)` for distributed training."
   },
   {
-    "question": "If the CIFAR10 dataset is not stored locally, how can it be obtained for the example TensorFlow 2.x scripts?",
-    "answer": "The CIFAR10 dataset can be downloaded from `https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz`, renamed to 'cifar-10-batches-py.tar.gz', and placed under `~/.keras/datasets`, or by running the dataset loading line on a login node prior to job submission."
+    "question": "What type of Keras model architecture is defined in the `tensorflow-multiworker.py` script?",
+    "answer": "The script defines a `tf.keras.Sequential` model comprising multiple `Conv2D`, `Activation('relu')`, `MaxPooling2D`, `Dropout`, `Flatten`, and `Dense` layers."
+  },
+  {
+    "question": "How is the Keras model compiled in `tensorflow-multiworker.py`?",
+    "answer": "The model is compiled with `loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)`, `optimizer=tf.keras.optimizers.SGD(learning_rate=args.lr)`, and `metrics=['accuracy']`."
+  },
+  {
+    "question": "What is a model checkpoint in the context of TensorFlow training?",
+    "answer": "A model checkpoint is a snapshot of your model at a given point during the training process (e.g., after a certain number of iterations or epochs) that is saved to disk and can be loaded at a later time."
+  },
+  {
+    "question": "What are the benefits of creating model checkpoints during training?",
+    "answer": "Creating checkpoints is a good habit for breaking long-running jobs into multiple shorter jobs that may get allocated more quickly on a cluster, and for avoiding loss of progress in case of unexpected errors or node failures."
+  },
+  {
+    "question": "How can you create a checkpoint at the end of every training epoch when using Keras?",
+    "answer": "To create a checkpoint with Keras, you can use the `callbacks` parameter of the `model.fit()` method. An example is `callbacks = [tf.keras.callbacks.ModelCheckpoint(filepath=\"./ckpt\",save_freq=\"epoch\")]` which is then passed to `model.fit(dataset, epochs=10, callbacks=callbacks)`."
   }
 ]

@@ -1,0 +1,150 @@
+[
+  {
+    "question": "How do you upload a Cinder volume to Glance as an image using the command line, with force option?",
+    "answer": "Use the command: `cinder --os-volume-api-version 2 upload-to-image <volumename> <imagename> --force`."
+  },
+  {
+    "question": "Where can a newly created image be found in the Horizon interface after uploading a volume to an image?",
+    "answer": "The image will be listed under 'Compute -> Images'."
+  },
+  {
+    "question": "How do you obtain the identifier of a created image in the Horizon interface?",
+    "answer": "Click on the name of the image to get its identifier."
+  },
+  {
+    "question": "What command is used to download an image from the Ouest cloud to the migration server?",
+    "answer": "Run `glance image-download --progress --file <filename> <image-id>`, replacing `<filename>` and `<image-id>` with the appropriate values."
+  },
+  {
+    "question": "How do you upload an image to the Arbutus cloud from the migration server using the command line?",
+    "answer": "Use the command `glance image-create --progress --visibility private --container-format bare --disk-format qcow2 --name <imagename> --file <filename>`, replacing `<filename>` and `<imagename>` with the appropriate values."
+  },
+  {
+    "question": "In the Arbutus cloud user interface, how can you create a volume from an uploaded image?",
+    "answer": "Go to 'Compute -> Images', find the uploaded image, and select the 'Cr\u00e9er le volume' (Create Volume) option from its dropdown menu."
+  },
+  {
+    "question": "What is the final step after migrating and testing instances/volumes and updating DNS records?",
+    "answer": "Delete the old volumes and instances on the Ouest cloud."
+  },
+  {
+    "question": "What is the initial step for volume migration using the Linux 'dd' option?",
+    "answer": "Launch the smallest possible instance (e.g., p1-1.5gb) on the Ouest cloud to act as a temporary migration server, preferably with CentOS 7."
+  },
+  {
+    "question": "How do you install the OpenStack CLI on a CentOS 7 instance for temporary migration?",
+    "answer": "Connect via SSH as root and run `yum install epel-release`, `yum install python-devel python-pip gcc`, and `pip install python-openstackclient`."
+  },
+  {
+    "question": "How can you verify that the OpenStack CLI is correctly installed?",
+    "answer": "Launch the `openstack` command in the command line."
+  },
+  {
+    "question": "After copying and sourcing the Arbutus RC file on the temporary migration server, how can you test connectivity to the OpenStack API?",
+    "answer": "Run the command `openstack image list`."
+  },
+  {
+    "question": "When migrating a volume using the 'dd' method, what should be done with the original instance associated with the volume?",
+    "answer": "Delete the instance, but *do not* delete the associated volume."
+  },
+  {
+    "question": "How do you attach a volume to the temporary migration server in the Ouest cloud's user interface?",
+    "answer": "Navigate to 'Compute -> Volumes', select 'G\u00e9rer les pi\u00e8ces jointes' (Manage Attachments) from the volume's dropdown menu, and attach it to the temporary migration server."
+  },
+  {
+    "question": "What are the common accelerator device names for attached volumes?",
+    "answer": "Generally `/dev/vdb` or `/dev/vdc`."
+  },
+  {
+    "question": "How do you create an image from an attached disk using the `dd` utility and OpenStack CLI?",
+    "answer": "Use the command `dd if=/dev/vdb | openstack image create --private --container-format bare --disk-format raw \"volumemigrate\"`, replacing `/dev/vdb` with the correct device and \"volumemigrate\" with the desired image name."
+  },
+  {
+    "question": "Where can the image created using the `dd` command be found in the Arbutus interface?",
+    "answer": "The image should be visible under 'Compute -> Images'."
+  },
+  {
+    "question": "To ensure data persistence when launching an instance from a `dd`-created image on Arbutus, what step is necessary?",
+    "answer": "Ensure a new volume is created at the launch of the instance."
+  },
+  {
+    "question": "Is the use of images recommended for migrating large volumes?",
+    "answer": "No, it is not recommended for large volumes."
+  },
+  {
+    "question": "What alternative methods are recommended for migrating large volumes?",
+    "answer": "Copy data to new volumes using `rsync` or another copying tool, or use the `dd` command for bootable volumes to create an identical copy."
+  },
+  {
+    "question": "What important precaution should be taken before migrating large volumes with Linux 'dd'?",
+    "answer": "Back up important data before executing the procedure."
+  },
+  {
+    "question": "What type of temporary instances should be created for migrating large volumes using Linux 'dd'?",
+    "answer": "Create a temporary instance on Ouest (e.g., p1-1.5gb) and another on Arbutus, both using the CentOS 7 operating system."
+  },
+  {
+    "question": "How do you enable SSH connectivity to the temporary instances for large volume migration?",
+    "answer": "Assign floating IP addresses to both instances."
+  },
+  {
+    "question": "Which packages need to be installed on the temporary Ouest instance for large volume migration with `dd`?",
+    "answer": "`epel-release`, `pv`, and `screen`."
+  },
+  {
+    "question": "What command should be run on the temporary Arbutus instance as part of the large volume migration setup?",
+    "answer": "Run `chmod u+s /bin/dd`."
+  },
+  {
+    "question": "What SSH key is required on the temporary Ouest instance to connect to the temporary Arbutus instance for large volume migration?",
+    "answer": "The private SSH key used to connect as the 'centos' user to the temporary Arbutus instance."
+  },
+  {
+    "question": "What security setting needs verification to ensure SSH connectivity between temporary instances for large volume migration?",
+    "answer": "Verify that SSH security rules allow the temporary Ouest instance to connect to the temporary Arbutus instance."
+  },
+  {
+    "question": "What are the steps for preparing each volume for migration from Ouest to Arbutus using the `dd` method?",
+    "answer": "Create an empty volume of the same size in Arbutus (marking it 'bootable' if applicable), attach this new volume to the temporary Arbutus instance, and attach the volume to be copied from Ouest to the temporary Ouest instance (potentially deleting its original associated instance, but *not* the volume itself)."
+  },
+  {
+    "question": "What commands are used on the temporary Ouest instance to perform a large volume migration using `dd` over SSH?",
+    "answer": "First, `screen`, then `sudo dd bs=16M if=/dev/vdb | pv -s 96G | ssh -i key.pem centos@xxx.xx.xx.xx \"dd bs=16M of=/dev/vdb\"`, replacing `/dev/vdb` (source), `96G` (volume size), `key.pem` (SSH key), and `xxx.xx.xx.xx` (Arbutus instance IP) with appropriate values."
+  },
+  {
+    "question": "Why is the `screen` command recommended during the `dd` migration process for large volumes?",
+    "answer": "The `screen` command is used to prevent losing the session in case of SSH disconnection."
+  },
+  {
+    "question": "What is the outcome of successfully migrating a volume using the described Linux 'dd' method?",
+    "answer": "An identical copy of the Ouest volume will be available in Arbutus, ready to be used for launching instances."
+  },
+  {
+    "question": "What defines an ephemeral instance?",
+    "answer": "An ephemeral instance is one that is not associated with any volume."
+  },
+  {
+    "question": "For what size of volumes is the 'Glance images and volume snapshots' scenario recommended when migrating ephemeral instances?",
+    "answer": "It is recommended for volumes less than 150GB."
+  },
+  {
+    "question": "What migration method is preferred for larger volumes when dealing with ephemeral instances?",
+    "answer": "Manual or orchestrated migration is preferable for volumes larger than 150GB."
+  },
+  {
+    "question": "When migrating ephemeral instances, what data must always be copied separately?",
+    "answer": "Data from ephemeral storage not used for booting (i.e., not mounted on `/mnt`) must be copied separately."
+  },
+  {
+    "question": "How many sessions should be opened on the `cloudmigration.calculcanada.ca` server for ephemeral instance migration?",
+    "answer": "Two sessions should be opened on the `cloudmigration.calculcanada.ca` server."
+  },
+  {
+    "question": "What files need to be sourced in the two sessions on the migration server for ephemeral instance migration?",
+    "answer": "The RC file for the Ouest cloud in one session and the RC file for the Arbutus cloud in the other."
+  },
+  {
+    "question": "Which command is recommended to use within SSH sessions during ephemeral instance migration to prevent session loss?",
+    "answer": "The `screen` command is recommended."
+  }
+]

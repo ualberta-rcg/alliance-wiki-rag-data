@@ -1,0 +1,94 @@
+[
+  {
+    "question": "How do you specify the time limit for a Slurm batch job using the options file script?",
+    "answer": "You specify the time limit using `#SBATCH --time=00-01:00` in the script, which sets it to 1 hour (DD-HH:MM format)."
+  },
+  {
+    "question": "How much memory should be requested for a Slurm batch job using the options file script?",
+    "answer": "The script specifies `#SBATCH --mem=16G` for 16GB of memory, but you can set it to 0 to allocate all compute node memory."
+  },
+  {
+    "question": "How many cores are specified for a Slurm batch job in the options file script, and what are the core limits for different clusters?",
+    "answer": "The script specifies `#SBATCH --ntasks=8` for 8 cores. Core limits are: Beluga 40, Cedar 32 or 48, Graham 32 or 44, and Narval 64."
+  },
+  {
+    "question": "How many nodes should be requested for a single-node Slurm batch job?",
+    "answer": "You should request one node using `#SBATCH --nodes=1`."
+  },
+  {
+    "question": "Which module versions are loaded in the provided Slurm script for AnsysEDT?",
+    "answer": "The script loads `StdEnv/2023` and `ansysedt/2023R2` (or newer)."
+  },
+  {
+    "question": "How can a test example file be copied for an AnsysEDT batch job?",
+    "answer": "A test example can be copied by using the command `cp -f $EBROOTANSYSEDT/AnsysEM21.2/Linux64/Examples/HFSS/Antennas/TransientGeoRadar.aedt .`."
+  },
+  {
+    "question": "How do you specify the input filename for an AnsysEDT batch job using the provided script?",
+    "answer": "You specify the input filename by setting the `YOUR_AEDT_FILE` variable, for example: `YOUR_AEDT_FILE=\"TransientGeoRadar.aedt\"`."
+  },
+  {
+    "question": "How are previous output files removed before running an AnsysEDT batch job?",
+    "answer": "Previous output can be removed using `rm -rf $YOUR_AEDT_FILE.* ${YOUR_AEDT_FILE}results`."
+  },
+  {
+    "question": "How do you create a sample options file for an AnsysEDT batch job?",
+    "answer": "A sample options file named `Options.txt` can be created using a heredoc block with `cat > $OPTIONS_TXT <<EOF ... EOF`, including settings like `TempDirectory`, `HPCLicenseType`, and `HFSS/EnableGPU`."
+  },
+  {
+    "question": "What configuration options are included in the sample AnsysEDT options file?",
+    "answer": "The sample options file includes `TempDirectory='$SLURM_TMPDIR'`, `HPCLicenseType='pool'`, and `HFSS/EnableGPU=0`."
+  },
+  {
+    "question": "What is the command to submit an AnsysEDT batch job using an options file?",
+    "answer": "The command is `ansysedt -monitor -UseElectronicsPPE -ng -distributed -machinelist list=localhost:1:$SLURM_NTASKS -batchoptions $OPTIONS_TXT -batchsolve \"$YOUR_AEDT_FILE\"`."
+  },
+  {
+    "question": "How can Ansys programs be run in graphical mode?",
+    "answer": "Ansys programs can be run interactively in GUI mode on cluster compute nodes or Graham VDI Nodes."
+  },
+  {
+    "question": "What is the maximum duration for running AnsysEDT interactively on a single compute node?",
+    "answer": "AnsysEDT can be run interactively on a single compute node for up to 24 hours."
+  },
+  {
+    "question": "How do you start an interactive session on a compute node for graphical AnsysEDT use?",
+    "answer": "You start an interactive session using `salloc --time=3:00:00 --nodes=1 --cores=8 --mem=16G --account=def-group`."
+  },
+  {
+    "question": "What commands are needed after 'salloc' to launch the GUI environment and AnsysEDT on a compute node?",
+    "answer": "After `salloc`, run `xfwm4 --replace &` (and hit enter twice), then load the required modules (e.g., `module load StdEnv/2023 ansysedt/2023R2`), and finally type `ansysedt`."
+  },
+  {
+    "question": "What initial configuration steps are required in the AnsysEDT GUI on a compute node?",
+    "answer": "Once in the GUI, click `Tools -> Options -> HPC and Analysis Options -> Edit`. Then, untick 'Use Automatic Settings' (once only) and do not change the 'Cores' setting under the 'Machines' tab."
+  },
+  {
+    "question": "How do you run an interactive analysis in AnsysEDT GUI mode?",
+    "answer": "To run an interactive analysis, click `Project -> Analyze All`."
+  },
+  {
+    "question": "What are the time, core, and memory limits for Ansys programs on Graham VDI nodes?",
+    "answer": "Ansys programs can run for up to 7 days on Graham VDI nodes using 8 cores (16 cores max) and 128GB memory."
+  },
+  {
+    "question": "What are Graham VDI nodes ideal for when using Ansys programs?",
+    "answer": "Graham VDI nodes are ideal for tasks benefiting from high-performance graphics, such as creating/modifying simulation input files, post-processing data, or visualizing simulation results, due to their GPU OpenGL acceleration."
+  },
+  {
+    "question": "How do you connect to Graham VDI nodes?",
+    "answer": "You connect with [[VNC#VDI_Nodes|TigerVNC]] to gra-vdi.alliancecan.ca."
+  },
+  {
+    "question": "What is the maximum job size for parallel jobs on gra-vdi to avoid overloading servers?",
+    "answer": "The maximum job size for any parallel job run on gra-vdi should be limited to 16 cores."
+  },
+  {
+    "question": "How can you run two simultaneous GUI jobs on gra-vdi?",
+    "answer": "To run two simultaneous GUI jobs (16 cores max each), establish two independent VNC sessions: connect the first to `gra-vdi3.sharcnet.ca` and the second to `gra-vdi4.sharcnet.ca`."
+  },
+  {
+    "question": "Is there a time limit constraint when running simulations on gra-vdi?",
+    "answer": "No, unlike compute node VNC connections, there is no time limit constraint on gra-vdi when running simulations."
+  }
+]

@@ -1,0 +1,110 @@
+[
+  {
+    "question": "What is GLOST?",
+    "answer": "GLOST, the Greedy Launcher Of Small Tasks, is a tool for running many sequential jobs of short or variable duration, or for doing parameter sweeps."
+  },
+  {
+    "question": "How does GLOST compare to GNU Parallel or Job arrays?",
+    "answer": "GLOST works like GNU Parallel or Job arrays but with a simpler syntax."
+  },
+  {
+    "question": "What wrapper does GLOST use?",
+    "answer": "GLOST uses a wrapper called `glost_launch`."
+  },
+  {
+    "question": "Which MPI commands does GLOST utilize?",
+    "answer": "GLOST uses `srun`, `mpiexec`, and `mpirun` commands."
+  },
+  {
+    "question": "How are jobs organized for GLOST?",
+    "answer": "Jobs are grouped into a single text file, `list_glost_tasks.txt`, which serves as an argument for `glost_launch`."
+  },
+  {
+    "question": "In what scenarios is GLOST useful?",
+    "answer": "GLOST can be used for a large number of serial jobs with comparative runtime, a large number of short serial jobs, or serial jobs with different parameters (parameter sweeps)."
+  },
+  {
+    "question": "What is the main concept behind using GLOST?",
+    "answer": "The idea behind using GLOST is to bundle serial jobs and run them as an MPI job."
+  },
+  {
+    "question": "What is an advantage of GLOST regarding the job queue and scheduler?",
+    "answer": "GLOST reduces the number of jobs on the queue and consequently reduces stress on the scheduler by bundling many serial jobs into a single MPI job."
+  },
+  {
+    "question": "What alternative software package is mentioned for job farming?",
+    "answer": "The META software package is mentioned as an alternative for job farming."
+  },
+  {
+    "question": "What are some advantages of META over GLOST?",
+    "answer": "META offers shorter queue wait times, smaller overheads (fewer wasted CPU cycles), a convenient mechanism for re-submitting failed computations, and can handle all kinds of jobs (serial, multi-threaded, MPI, GPU, or hybrid) unlike GLOST."
+  },
+  {
+    "question": "What should a user do if their workflow fits the GLOST framework?",
+    "answer": "Users should contact Technical support for assistance in changing their workflow to fit the GLOST framework."
+  },
+  {
+    "question": "How does GLOST alleviate stress on the Slurm scheduler?",
+    "answer": "By bundling a set of serial jobs into one or more MPI jobs, GLOST reduces the number of individual job submissions, preventing the scheduler from slowing down and experiencing frequent timeouts."
+  },
+  {
+    "question": "What software does GLOST use for running serial tasks as an MPI job?",
+    "answer": "GLOST uses OpenMPI to run a set of serial tasks as an MPI job."
+  },
+  {
+    "question": "How do you enable GLOST in your environment?",
+    "answer": "To use GLOST, you must load both the OpenMPI and GLOST modules."
+  },
+  {
+    "question": "How can you check for installed GLOST modules?",
+    "answer": "You can use the command `module spider glost` to see the current installed GLOST modules."
+  },
+  {
+    "question": "What modules are required to load `glost/0.3.1`?",
+    "answer": "You need to load either `StdEnv/2023 gcc/12.3 openmpi/4.1.5` or `StdEnv/2023 intel/2023.2.1 openmpi/4.1.5` before `glost/0.3.1` is available."
+  },
+  {
+    "question": "What is the general syntax for launching GLOST jobs?",
+    "answer": "The general syntax forms for GLOST are `srun glost_launch list_glost_tasks.txt`, `mpiexec glost_launch list_glost_tasks.txt`, or `mpirun glost_launch list_glost_tasks.txt`."
+  },
+  {
+    "question": "How does GLOST distribute serial jobs across available cores?",
+    "answer": "GLOST uses a cyclic distribution, assigning one processor to each job from the list and reassigning tasks to processors as they become available until all jobs are complete or the job runs out of time."
+  },
+  {
+    "question": "Is it necessary for the number of cores to match the number of jobs in GLOST?",
+    "answer": "No, the number of cores may not necessarily match the number of requested jobs in the list."
+  },
+  {
+    "question": "How can one optimize resource utilization with GLOST?",
+    "answer": "To optimize resource utilization, it's recommended to ensure that serial jobs have similar runtimes so they can be distributed evenly among the requested cores."
+  },
+  {
+    "question": "How do you estimate the wall time for a GLOST job?",
+    "answer": "To estimate wall time, first determine the runtime (`t0`) for a single job. Then, calculate `wt = t0 * Njobs / Ncores`, where `Njobs` is the total number of jobs and `Ncores` is the number of cores used for the GLOST job."
+  },
+  {
+    "question": "Does GLOST have high communication overhead like traditional MPI jobs?",
+    "answer": "No, GLOST uses MPI only to launch entirely serial jobs, which means communication overhead is relatively infrequent."
+  },
+  {
+    "question": "How should memory be specified in a Slurm script for a GLOST job?",
+    "answer": "For a GLOST job, memory should be specified using `--mem-per-cpu` instead of `--mem` in your Slurm script."
+  },
+  {
+    "question": "What is the first step to using GLOST before submitting a job?",
+    "answer": "Before submitting a GLOST job, you must create a text file, typically named `list_glost_tasks.txt`, that contains all the commands needed to run the serial jobs, with one job per line."
+  },
+  {
+    "question": "How should multiple commands within a single job in the `list_glost_tasks.txt` file be structured?",
+    "answer": "Multiple commands within a single job should be separated by `&&`."
+  },
+  {
+    "question": "What modules are loaded in the example `run_glost_test.sh` script?",
+    "answer": "The example `run_glost_test.sh` script loads `intel/2023.2.1`, `openmpi/4.1.5`, and `glost/0.3.1` modules."
+  },
+  {
+    "question": "What command does the example Slurm script use to launch GLOST?",
+    "answer": "The example Slurm script uses `srun glost_launch list_glost_example.txt` to launch GLOST."
+  }
+]

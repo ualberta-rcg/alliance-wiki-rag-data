@@ -1,0 +1,166 @@
+[
+  {
+    "question": "How can I check if my files are scheduled for deletion from /scratch?",
+    "answer": "You can check by listing files in `/scratch/t/todelete/current` and filtering by your user ID. For example, `ls -1 /scratch/t/todelete/current |grep xxyz` for user xxyz."
+  },
+  {
+    "question": "What information does the purging schedule file name provide?",
+    "answer": "The filename (e.g., `3110001___xxyz_______abc_________1.00T_____9560files`) indicates the user ID (xxyz), group ID (abc), total size (1.0TB), and number of files (9560) scheduled for deletion."
+  },
+  {
+    "question": "How do I view the full list of files scheduled for deletion for my user account?",
+    "answer": "You can view the list using a standard command like `more`, `less`, or `cat` on the specific file in `/scratch/t/todelete/current`. For example, `more /scratch/t/todelete/current/3110001___xxyz_______abc_________1.00T_____9560files`."
+  },
+  {
+    "question": "Can I check which other members of my group have files scheduled for purging?",
+    "answer": "Yes, you can check for other group members by using `ls -1 /scratch/t/todelete/current |grep abc`, replacing `abc` with your group name."
+  },
+  {
+    "question": "Do members of the same group have access to each other's files listed for deletion?",
+    "answer": "Yes, members of the same group have access to the content of each other's files."
+  },
+  {
+    "question": "If I change the access or modification time of a file, will it immediately be removed from the purge list?",
+    "answer": "No, changes to the access/modification time of a file will not be detected until the next cycle because preparing these assessments takes several hours."
+  },
+  {
+    "question": "How can I get immediate feedback on a file's ctime or mtime to see if it will be purged?",
+    "answer": "You can use `ls -lu` to verify the ctime (change time) and `ls -lc` for the mtime (modification time) of the file."
+  },
+  {
+    "question": "What happens if a file's atime/ctime is updated before the purge date?",
+    "answer": "If the file's atime/ctime has been updated, it will no longer be deleted on the 15th of the month."
+  },
+  {
+    "question": "What methods are available for moving data to and from Niagara?",
+    "answer": "Data can be moved using `rsync/scp` or `Globus`."
+  },
+  {
+    "question": "What is the recommended method for moving less than 10GB of data?",
+    "answer": "For less than 10GB, it's recommended to use `scp` or `rsync` via the login nodes."
+  },
+  {
+    "question": "Are SciNet login nodes accessible from outside?",
+    "answer": "Yes, the login and copy nodes are visible from outside SciNet."
+  },
+  {
+    "question": "What are the addresses to connect to Niagara using scp or rsync?",
+    "answer": "You can use `niagara.scinet.utoronto.ca` or `niagara.computecanada.ca` (there is no difference)."
+  },
+  {
+    "question": "What happens if I try to move more than 10GB of data through the login nodes?",
+    "answer": "There will be an interruption if you move more than approximately 10GB through the login nodes."
+  },
+  {
+    "question": "How should I move more than 10GB of data to or from Niagara?",
+    "answer": "For transfers larger than 10GB, you should use the data mover nodes (`nia-datamover1` or `nia-datamover2`). You can `ssh` to them from a login node or connect directly from outside."
+  },
+  {
+    "question": "What are the addresses for the data mover nodes?",
+    "answer": "The data mover node addresses are `nia-datamover1.scinet.utoronto.ca` and `nia-datamover2.scinet.utoronto.ca`."
+  },
+  {
+    "question": "What tool is recommended for frequent data transfers?",
+    "answer": "If you transfer data frequently, consider using Globus, which is a web-based data transfer tool."
+  },
+  {
+    "question": "Where can I find documentation for using Globus?",
+    "answer": "Documentation for Globus can be found on the Calcul Canada wiki page and the SciNet wiki page."
+  },
+  {
+    "question": "What are the Globus endpoints for Niagara and HPSS?",
+    "answer": "The Globus endpoint for Niagara is `computecanada#niagara`, and for HPSS, it's `computecanada#hpss`."
+  },
+  {
+    "question": "What is HPSS designed for?",
+    "answer": "HPSS is designed for long-duration storage."
+  },
+  {
+    "question": "What is HPSS?",
+    "answer": "HPSS is a tape-based storage solution employed as 'nearline' space by SciNet."
+  },
+  {
+    "question": "How is storage space on HPSS allocated?",
+    "answer": "Storage space on HPSS is allocated as part of the resource allocation competition."
+  },
+  {
+    "question": "What are the default file permissions for users within the same group at SciNet?",
+    "answer": "By default, users within the same group have read permission to each other's files, but not write permission."
+  },
+  {
+    "question": "What is the purpose of Access Control Lists (ACLs) in file management?",
+    "answer": "ACLs allow a supervisor or another user within your group to manage files (create, move, rename, delete) while retaining the original owner's access, and also allow users in other groups to access (read, execute) your files."
+  },
+  {
+    "question": "Which commands should be used to manage ACLs on GPFS file systems like Niagara?",
+    "answer": "You should use GPFS' native `mmputacl` and `mmgetacl` commands."
+  },
+  {
+    "question": "What are the advantages of using `mmputacl` and `mmgetacl`?",
+    "answer": "The advantages are that you can set 'control' permission and that POSIX or NFS v4 style ACLs are supported."
+  },
+  {
+    "question": "What is the first step to apply an ACL using `mmputacl`?",
+    "answer": "You need to create a temporary ACL file, such as `/tmp/supervisor.acl`, with the desired permissions."
+  },
+  {
+    "question": "What is an example content for a supervisor.acl file?",
+    "answer": "An example content includes `user::rwxc`, `group::----`, `other::----`, `mask::rwxc`, `user:[owner]:rwxc`, `user:[supervisor]:rwxc`, and `group:[othegroup]:r-xc`."
+  },
+  {
+    "question": "How do you apply an ACL to a directory using `mmputacl`?",
+    "answer": "You use the command `mmputacl -i /tmp/supervisor.acl /project/g/group/[owner]`."
+  },
+  {
+    "question": "How can new files and directories inherit ACL ownership from a supervisor?",
+    "answer": "You can use the command `mmputacl -d -i /tmp/supervisor.acl /project/g/group/[owner]`."
+  },
+  {
+    "question": "How do I determine the current ACL attributes for a directory?",
+    "answer": "You can determine the current ACL attributes using the command `mmgetacl /project/g/group/[owner]`."
+  },
+  {
+    "question": "How can I remove a previously set ACL?",
+    "answer": "To remove a previously set ACL, use `mmdelacl -d /project/g/group/[owner]`."
+  },
+  {
+    "question": "How do I create or change a GPFS access control list interactively?",
+    "answer": "You can use `mmeditacl /project/g/group/[owner]`, but you must first set the `EDITOR` environment variable (e.g., `export EDITOR=/usr/bin/vi`)."
+  },
+  {
+    "question": "Is there a built-in GPFS command to recursively add or remove ACL attributes to existing files?",
+    "answer": "No, there is no built-in GPFS command for recursive ACL operations; you'll need to use the `-i` option for each file or directory individually, or use a sample bash script."
+  },
+  {
+    "question": "How does `mmputacl` interact with existing Linux group permissions?",
+    "answer": "`mmputacl` will not overwrite the original Linux group permissions for a directory. If you want to give `rwx` permissions to everyone in your group, you should use the plain Unix `chmod g+rwx` command."
+  },
+  {
+    "question": "Who is responsible for setting appropriate ACLs on `/project` for cross-group access?",
+    "answer": "For `/project`, the person responsible for your group must define the appropriate ACL at the `/project/G/GROUP` level to allow users from other groups to access your files."
+  },
+  {
+    "question": "Can I grant permissions for files or directories that I do not own using ACLs?",
+    "answer": "No, ACLs do not allow you to grant permissions for files or directories that you do not own."
+  },
+  {
+    "question": "What is the recommendation regarding granting write permissions at the top level of my home directory using ACLs?",
+    "answer": "It is strongly recommended never to grant write authorization to others at the top level of your personal directory (`/home/G/GROUP/[owner]`), as this would severely compromise your privacy."
+  },
+  {
+    "question": "If I need to grant access to my home directory, how should I do it?",
+    "answer": "You should create specific subdirectories under your home directory to allow others to access and manipulate files within those subdirectories, rather than granting top-level access."
+  },
+  {
+    "question": "Which ACL commands are used on Lustre file systems (Cedar/Graham) versus GPFS (Niagara)?",
+    "answer": "`setfacl/getfacl` are used on Lustre (Cedar/Graham), while `mmputacl`, `mmgetacl`, `mmdelacl`, and `mmeditacl` are used with GPFS on Niagara."
+  },
+  {
+    "question": "Where can I find additional information on `mmputacl` and `mmgetacl`?",
+    "answer": "More information can be found in the IBM knowledge center documentation for `mmputacl` and `mmgetacl`."
+  },
+  {
+    "question": "Is there a script available for recursive ACL operations?",
+    "answer": "Yes, a sample bash script is available on the SciNet wiki page (Recursive ACL script) that you can use and adapt to recursively add or remove ACL attributes."
+  }
+]

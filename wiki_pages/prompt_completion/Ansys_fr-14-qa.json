@@ -1,0 +1,66 @@
+[
+  {
+    "question": "Is multi-node execution supported for Ansys Workbench Slurm scripts?",
+    "answer": "No, multi-node execution is not supported for Ansys Workbench Slurm scripts; they are designed for single-node use."
+  },
+  {
+    "question": "How is the MEMPAR variable configured in Ansys Workbench Slurm scripts?",
+    "answer": "The MEMPAR variable is set to 0 for Shared Memory Parallel (SMP) and 1 for Distributed Memory Parallel (DMP), based on the SLURM_NNODES value (which is typically 1 for Workbench scripts)."
+  },
+  {
+    "question": "What environment variables are typically exported before running Ansys Workbench projects in batch mode?",
+    "answer": "The environment variables `KMP_AFFINITY=disabled` and `I_MPI_HYDRA_BOOTSTRAP=ssh` are exported."
+  },
+  {
+    "question": "What is the command to run an Ansys Workbench project in batch mode to update it?",
+    "answer": "The command is `runwb2 -B -E \"Update()\" -F YOURPROJECT.wbpj`."
+  },
+  {
+    "question": "How can I prevent the Ansys Workbench solution from being overwritten when performing scaling tests?",
+    "answer": "You can prevent overwriting by removing or commenting out `Save(Overwrite=True)` from the last line of the Slurm script."
+  },
+  {
+    "question": "How do you generate an input file for Ansys Mechanical (APDL) from Workbench?",
+    "answer": "In your interactive Workbench Mechanical session, click `Solution -> Tools -> Write Input Files`, then specify `File name:` as YOURAPDLFILE.inp and `Save as type:` as 'APDL input files (*.inp)'."
+  },
+  {
+    "question": "On which clusters have the Ansys Mechanical Slurm scripts been tested?",
+    "answer": "The Ansys Mechanical Slurm scripts have been tested on Graham, Narval, Cedar, and Beluga."
+  },
+  {
+    "question": "What command is used to run Ansys Mechanical in Shared Memory Parallel (SMP) mode on CPU?",
+    "answer": "The command is `mapdl -smp -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp`."
+  },
+  {
+    "question": "Which MPI implementation is used for Ansys Mechanical Distributed Memory Parallel (DMP) on CPU for different clusters?",
+    "answer": "Intel MPI is used for Beluga, while Open MPI is used for other clusters."
+  },
+  {
+    "question": "What is the command to run Ansys Mechanical in Shared Memory Parallel (SMP) mode with GPU acceleration?",
+    "answer": "The command is `mapdl -smp -acc nvidia -na $SLURM_GPUS_ON_NODE -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp`, after exporting `ANSGPU_PRINTDEVICES=1`."
+  },
+  {
+    "question": "What are the default memory allocations for Ansys APDL tasks?",
+    "answer": "Ansys APDL tasks are allocated 1024MB of total memory and 1024MB for databases by default."
+  },
+  {
+    "question": "How can the default memory allocation for Ansys APDL tasks be manually adjusted?",
+    "answer": "You can manually adjust memory allocation by adding `-m <value>` for total memory and/or `-db <value>` for database memory to the `mapdl` command line."
+  },
+  {
+    "question": "What additional arguments might be necessary for Ansys Mechanical tasks using a remote institutional license server with multiple licenses?",
+    "answer": "It may be necessary to add arguments such as `-p aa_r` or `-ppf anshpc`, depending on the module being used."
+  },
+  {
+    "question": "Which type of parallel script is generally recommended for better performance in Ansys Mechanical?",
+    "answer": "Single node Shared Memory Parallel (SMP) scripts are generally recommended over multi-node Distributed Memory Parallel (DMP) scripts for better performance."
+  },
+  {
+    "question": "How can one check the Workbench version used to create an APDL input file?",
+    "answer": "You can check the Workbench version by running `cat YOURAPDLFILE.inp | grep version`."
+  },
+  {
+    "question": "What is the importance of matching the Ansys module version with the input file for Mechanical tasks?",
+    "answer": "To prevent compatibility issues, the module loaded in your script should ideally match the version used to generate the input file."
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "question": "\u00c0 quoi sert le fichier 'mdp' dans GROMACS ?",
+    "answer": "Le fichier 'mdp' contient les param\u00e8tres d'ex\u00e9cution d'une simulation GROMACS. Pour une description d\u00e9taill\u00e9e des options, il faut consulter le guide GROMACS."
+  },
+  {
+    "question": "Qu'est-ce qu'un fichier 'tpr' GROMACS et comment peut-il \u00eatre utilis\u00e9 ?",
+    "answer": "Les fichiers 'tpr' sont des fichiers d'entr\u00e9e binaires portables qui peuvent \u00eatre 'grompp-ed' sur une grappe, copi\u00e9s sur une autre et utilis\u00e9s comme fichier d'entr\u00e9e pour 'mdrun'."
+  },
+  {
+    "question": "Est-il important d'utiliser la m\u00eame version de GROMACS pour 'grompp' et 'mdrun' ?",
+    "answer": "Oui, il est recommand\u00e9 d'utiliser toujours la m\u00eame version de GROMACS pour 'grompp' et 'mdrun' afin d'\u00e9viter des r\u00e9sultats inattendus."
+  },
+  {
+    "question": "Que se passe-t-il si 'mdrun' utilise des fichiers 'tpr' cr\u00e9\u00e9s avec une version ant\u00e9rieure de 'grompp' ?",
+    "answer": "La simulation peut donner des r\u00e9sultats inattendus."
+  },
+  {
+    "question": "Pourquoi les simulations de dynamique mol\u00e9culaire (MD) doivent-elles souvent \u00eatre red\u00e9marr\u00e9es ?",
+    "answer": "Les simulations MD prennent souvent plus de temps \u00e0 compl\u00e9ter que la dur\u00e9e maximale permise en temps r\u00e9el pour une t\u00e2che, elles doivent donc \u00eatre red\u00e9marr\u00e9es."
+  },
+  {
+    "question": "Comment peut-on minimiser le temps d'attente avant le lancement d'une t\u00e2che de simulation MD ?",
+    "answer": "Pour minimiser le temps d'attente, il est conseill\u00e9 de choisir une dur\u00e9e d'ex\u00e9cution plus courte, ce qui peut maximiser le nombre de n\u0153uds auxquels vous avez acc\u00e8s."
+  },
+  {
+    "question": "Quelle est une dur\u00e9e d'ex\u00e9cution recommand\u00e9e pour les t\u00e2ches de simulation MD afin d'\u00e9quilibrer temps d'attente et dur\u00e9e d'ex\u00e9cution ?",
+    "answer": "Un bon compromis entre le temps d'attente et la dur\u00e9e d'ex\u00e9cution est souvent de demander une dur\u00e9e en temps r\u00e9el de 24 ou 72 heures."
+  },
+  {
+    "question": "Quel est le r\u00f4le du param\u00e8tre <code>-maxh</code> dans la commande <code>mdrun</code> ?",
+    "answer": "Le param\u00e8tre <code>-maxh</code> indique \u00e0 <code>mdrun</code> la dur\u00e9e en temps r\u00e9el pour que l'\u00e9tape en cours se termine correctement lorsque la dur\u00e9e atteint 99%, cr\u00e9ant un fichier de point de contr\u00f4le et fermant les fichiers de sortie."
+  },
+  {
+    "question": "Que permet le param\u00e8tre <code>-maxh</code> \u00e0 <code>mdrun</code> de faire \u00e0 la fin d'une \u00e9tape de simulation ?",
+    "answer": "Il permet \u00e0 <code>mdrun</code> de cr\u00e9er un fichier de point de contr\u00f4le ('checkpoint file') et de bien fermer tous les fichiers de sortie (trajectoires, \u00e9nergie, journalisation, etc.)."
+  },
+  {
+    "question": "Comment configurer un temps limite de 24 heures pour une t\u00e2che GROMACS avec Slurm et <code>mdrun</code> ?",
+    "answer": "Il faut utiliser <code>#SBATCH --time=24:00</code> dans le script Slurm et le param\u00e8tre <code>gmx mdrun -maxh 24</code> pour la commande d'ex\u00e9cution."
+  },
+  {
+    "question": "Comment red\u00e9marrer une simulation GROMACS ?",
+    "answer": "On peut red\u00e9marrer une simulation en utilisant la m\u00eame commande <code>mdrun</code> que pour la simulation originale et en ajoutant le param\u00e8tre <code>-cpi state.cpt</code>, o\u00f9 <code>state.cpt</code> est le nom du dernier fichier de point de contr\u00f4le."
+  },
+  {
+    "question": "Quel est le comportement par d\u00e9faut de <code>mdrun</code> concernant les fichiers existants depuis la version 4.5 ?",
+    "answer": "Depuis la version 4.5, <code>mdrun</code> tente par d\u00e9faut d'utiliser les fichiers existants (trajectoires, \u00e9nergie, journalisation, etc.)."
+  },
+  {
+    "question": "Comment GROMACS assure-t-il la coh\u00e9rence des donn\u00e9es lors du red\u00e9marrage d'une simulation ?",
+    "answer": "GROMACS v\u00e9rifie la coh\u00e9rence entre les fichiers de sortie et rejette les \u00e9tapes plus r\u00e9centes que le fichier de point de contr\u00f4le si n\u00e9cessaire."
+  },
+  {
+    "question": "Quelle est la commande Slurm et GROMACS pour ex\u00e9cuter une t\u00e2che s\u00e9quentielle sur un n\u0153ud unique avec un temps limite de 24 heures ?",
+    "answer": "Voici un exemple de script : <pre>#!/bin/bash\n#SBATCH --nodes=1\n#SBATCH --tasks-per-node=32\n#SBATCH --mem-per-cpu=4000\n#SBATCH --time=24:00:00\nmodule purge\nmodule load StdEnv/2023 gcc/12.3 openmpi/4.1.5 gromacs/2024.4\nexport OMP_NUM_THREADS=\"${SLURM_CPUS_PER_TASK:-1}\"\nsrun gmx_mpi mdrun -deffnm md -maxh 24</pre>"
+  },
+  {
+    "question": "Donnez un exemple de script Slurm pour red\u00e9marrer une simulation GROMACS avec un temps limite de 24 heures.",
+    "answer": "Voici un exemple de script : <pre>#!/bin/bash\n#SBATCH --nodes=1\n#SBATCH --tasks-per-node=32\n#SBATCH --mem-per-cpu=4000\n#SBATCH --time=24:00:00\nmodule purge\nmodule load StdEnv/2023 gcc/12.3 openmpi/4.1.5 gromacs/2024.4\nexport OMP_NUM_THREADS=\"${SLURM_CPUS_PER_TASK:-1}\"\nsrun gmx_mpi mdrun -deffnm md -maxh 24.0 -cpi md.cpt</pre>"
+  }
+]

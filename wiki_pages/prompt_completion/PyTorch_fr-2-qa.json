@@ -1,46 +1,50 @@
 [
   {
-    "question": "What is the primary purpose of the `pytorch-multi-cpu.sh` and `cifar10-cpu.py` example scripts?",
-    "answer": "These scripts demonstrate intra-op parallelism using multiple CPUs, showing how increasing CPU cores can affect performance without modifying the Python code."
+    "question": "Quelle est la seule grappe qui offre des GPU Ampere en octobre 2022?",
+    "answer": "En date d'octobre 2022, la seule grappe qui offre des GPU Ampere est Narval."
   },
   {
-    "question": "How can I configure a SLURM job to test intra-op parallelism with multiple CPUs for PyTorch?",
-    "answer": "You can use the `pytorch-multi-cpu.sh` script, specifically by changing the `#SBATCH --cpus-per-task` parameter to values like 2, 4, 6, etc., to observe the effect on performance."
+    "question": "Quels effets peut-on observer lors de l'utilisation de PyTorch sur Narval avec des versions de `torch` diff\u00e9rentes (ant\u00e9rieures et sup\u00e9rieures \u00e0 1.12.0)?",
+    "answer": "Lors de l'utilisation de PyTorch sur Narval, vous pourriez remarquer un fort ralentissement ou obtenir des r\u00e9sultats diff\u00e9rents dans l'ex\u00e9cution sur GPU du m\u00eame code avec `torch < 1.12.0` et `torch >= 1.12.0`."
   },
   {
-    "question": "What is the role of the `SLURM_CPUS_PER_TASK` environment variable in the `cifar10-cpu.py` script?",
-    "answer": "The `cifar10-cpu.py` script uses `os.environ['SLURM_CPUS_PER_TASK']` to set the number of threads for PyTorch's intra-op parallelism via `torch.set_num_threads()`."
+    "question": "Comment peut-on activer ou d\u00e9sactiver le mode TF32 pour les multiplications matricielles avec `torch >= 1.12.0`?",
+    "answer": "Pour activer ou d\u00e9sactiver TF32 pour les multiplications matricielles avec `torch >= 1.12.0`, il faut donner la valeur `True` ou `False` \u00e0 l'indicateur `torch.backends.cuda.matmul.allow_tf32`."
   },
   {
-    "question": "Is it always recommended to train a model with a GPU on shared clusters?",
-    "answer": "No, it is not always recommended on shared clusters. Training very small models might be faster with one or more CPUs, and requesting a GPU should be avoided if your code cannot make reasonable use of its computational capacity."
+    "question": "Quel indicateur utilise-t-on pour activer ou d\u00e9sactiver le mode TF32 pour les convolutions avec `torch >= 1.12.0`?",
+    "answer": "Pour les convolutions avec `torch >= 1.12.0`, on utilise l'indicateur `torch.backends.cudnn.allow_tf32` pour activer ou d\u00e9sactiver le mode TF32."
   },
   {
-    "question": "What are the two main sources of performance advantage for GPUs in deep learning tasks?",
-    "answer": "The performance advantage of GPUs comes from their ability to parallelize key operations across thousands of computation cores and their significantly higher memory bandwidth compared to CPUs."
+    "question": "O\u00f9 trouver plus d'informations sur le mode TF32 dans la documentation PyTorch?",
+    "answer": "Pour plus d'information sur le mode TF32, consultez le paragraphe https://pytorch.org/docs/stable/notes/cuda.html#tf32-on-ampere de la documentation PyTorch."
   },
   {
-    "question": "How does PyTorch leverage GPUs for parallel operations in deep learning?",
-    "answer": "PyTorch provides parallel implementations for common deep learning operations, such as matrix multiplication and convolution, by utilizing specialized GPU libraries like CUDNN or MIOpen, depending on the hardware platform."
+    "question": "Quelles sont les deux m\u00e9thodes de parall\u00e9lisme par d\u00e9faut offertes par PyTorch avec plusieurs CPU?",
+    "answer": "PyTorch permet le parall\u00e9lisme avec plusieurs CPU de deux fa\u00e7ons : intra-op et inter-op."
   },
   {
-    "question": "What characteristics should a deep learning task possess to justify using a GPU?",
-    "answer": "A deep learning task should involve elements that can be scaled for massive parallelism, either due to a large number of operations, a large quantity of data, or ideally both. Examples include large models with many units and layers, or models with substantial input data."
+    "question": "Qu'est-ce que le parall\u00e9lisme intra-op dans PyTorch avec les CPU?",
+    "answer": "Le parall\u00e9lisme intra-op dans PyTorch permet l'impl\u00e9mentation parall\u00e8le d'op\u00e9rateurs d'apprentissage profond comme le produit matriciel ou le produit de convolution, en utilisant OpenMP ou des biblioth\u00e8ques comme MKL et OneDNN, et utilise automatiquement de multiples fils avec tous les c\u0153urs CPU disponibles."
   },
   {
-    "question": "Which two parameters are crucial for optimizing performance when using a single GPU with PyTorch, and what is their impact?",
-    "answer": "The `batch_size` and `num_workers` parameters are crucial. `batch_size` improves performance by increasing input size per iteration, better utilizing GPU capacity. `num_workers` enhances performance by facilitating data movement between host (CPU) and GPU memory, reducing GPU idle time."
+    "question": "Comment fonctionne le parall\u00e9lisme inter-op avec PyTorch sur des CPU?",
+    "answer": "Le parall\u00e9lisme inter-op permet d'ex\u00e9cuter diff\u00e9rentes parties de code de mani\u00e8re concurrente, n\u00e9cessitant un programme con\u00e7u pour la parall\u00e9lisation, par exemple avec le compilateur `torch.jit` pour des t\u00e2ches asynchrones dans un programme TorchScript."
   },
   {
-    "question": "What are the two key conclusions for maximizing single GPU utilization mentioned in the document?",
-    "answer": "1. Increase the `batch_size` to the maximum possible for the GPU's memory to optimize performance. 2. Use a `DataLoader` with as many workers as `cpus-per-task` to facilitate data input to the GPU efficiently."
+    "question": "Est-il recommand\u00e9 d'utiliser un GPU pour l'entra\u00eenement de petits mod\u00e8les avec PyTorch?",
+    "answer": "Pour les petits mod\u00e8les, il est fortement recommand\u00e9 d'utiliser plusieurs CPU plut\u00f4t qu'un GPU."
   },
   {
-    "question": "How do you request a single GPU for a PyTorch training job using a SLURM script like `pytorch-single-gpu.sh`?",
-    "answer": "You request a single GPU by including `#SBATCH --gres=gpu:1` in your SLURM submission script."
+    "question": "Pourquoi l'utilisation d'un GPU pour les petits mod\u00e8les n'est-elle pas toujours optimale, m\u00eame si elle est plus rapide?",
+    "answer": "Pour les petits mod\u00e8les et jeux de donn\u00e9es, m\u00eame si un GPU est plus rapide, la vitesse gagn\u00e9e ne sera pas tr\u00e8s importante et la t\u00e2che n\u2019utilisera qu\u2019une petite part de la capacit\u00e9 de calcul du GPU."
   },
   {
-    "question": "What modifications are typically made in a Python script (like `cifar10-gpu.py`) to adapt it for GPU usage compared to a CPU-only version?",
-    "answer": "To utilize the GPU, the Python script needs to explicitly move the neural network model (`net`), the loss function (`criterion`), input data (`inputs`), and target data (`targets`) to the GPU by calling the `.cuda()` method on these objects."
+    "question": "Quelles sont les implications de l'utilisation d'un GPU pour de petits mod\u00e8les dans un environnement de grappe partag\u00e9?",
+    "answer": "Dans un environnement de grappe partag\u00e9, l'utilisation d'un GPU pour de petits mod\u00e8les bloquerait une ressource pour d'autres projets, diminuerait l'allocation de votre groupe et impacterait la priorit\u00e9 des t\u00e2ches de vos coll\u00e8gues."
+  },
+  {
+    "question": "Quel type de parall\u00e9lisme est mis en \u00e9vidence dans l'exemple de code `cifar10-cpu.py`?",
+    "answer": "L'exemple de code `cifar10-cpu.py` pr\u00e9sente plusieurs occasions d'utiliser le parall\u00e9lisme intra-op."
   }
 ]

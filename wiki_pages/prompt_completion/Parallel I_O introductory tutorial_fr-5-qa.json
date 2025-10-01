@@ -1,38 +1,34 @@
 [
   {
-    "question": "How do multiple processes write data contiguously to a single file using MPI-IO?",
-    "answer": "Each process writes its data into a designated portion in the same file, with writing proceeding in a contiguous fashion from process 0 to 3."
+    "question": "What MPI-IO function is used to open a file in the C example provided?",
+    "answer": "The `MPI_File_open` function is used, with parameters like `MPI_COMM_WORLD`, the filename \"data.out\", and `MPI_MODE_CREATE|MPI_MODE_WRONLY` for the access mode."
   },
   {
-    "question": "In the C MPI-IO example, how is the array `a` initialized for each process?",
-    "answer": "For each process, the array `a` is initialized such that `a[i] = (char)('0' + rank)` for `i` from 0 to 9. For example, processor 3 creates an array `a[0:9]` filled with '3' characters."
+    "question": "How is the offset calculated for each process when writing data contiguously in the MPI-IO C example?",
+    "answer": "The offset is calculated as `rank * n * sizeof(char)`, where `rank` is the process ID, `n` is the size of the array for each process, and `sizeof(char)` determines the byte size of each character."
   },
   {
-    "question": "What MPI-IO function is used to open a file for writing in the C example for contiguous data, and what modes are typically combined?",
-    "answer": "`MPI_File_open` is used. In the example, `MPI_MODE_CREATE|MPI_MODE_WRONLY` are combined, meaning the file is created if it doesn't exist and opened for write-only access."
+    "question": "Which MPI-IO function is used to assign writing regions to each process?",
+    "answer": "The `MPI_File_set_view` function is used to assign writing regions to each process, taking parameters such as the file handle, displacement, elementary datatype (`MPI_CHAR`), filetype (`MPI_CHAR`), and data representation (\"native\")."
   },
   {
-    "question": "How is the `displace` offset calculated for each process in the C MPI-IO contiguous data example?",
-    "answer": "The `displace` offset is calculated by `rank * n * sizeof(char)`, where `rank` is the process ID and `n` is the array size (e.g., 10)."
+    "question": "How is data written to a file by each process in the MPI-IO C example?",
+    "answer": "Data is written using the `MPI_File_write` function, specifying the file handle, the buffer (`a`), the count of elements (`n`), the datatype (`MPI_CHAR`), and the status."
   },
   {
-    "question": "What is the role of `MPI_File_set_view` in the C MPI-IO example for contiguous data writing?",
-    "answer": "`MPI_File_set_view` is used to assign specific writing regions to each process. The `displacement` is set, and `etype` and `filetype` are both set to `MPI_CHAR`, with 'native' indicating that data is stored in the file exactly as it is in memory."
+    "question": "How is a file closed in the MPI-IO C example?",
+    "answer": "A file is closed using the `MPI_File_close` function, passing the address of the file handle (`&fh`)."
   },
   {
-    "question": "Is MPI-IO a part of a standard library?",
-    "answer": "Yes, MPI-IO is a part of the standard MPI-2 library."
+    "question": "What are the main characteristics of MPI-IO, according to the summary?",
+    "answer": "MPI-IO is part of the standard MPI-2 library, widely installed on HPC systems with modern MPI versions (like OpenMPI), and does not require additional libraries. However, it writes raw data, making it not portable across platforms, difficult to append new variables, and lacking data descriptions."
   },
   {
-    "question": "How widely available is MPI-IO on HPC systems?",
-    "answer": "MPI-IO is very widely installed on almost all HPC systems with modern MPI versions. For example, OpenMPI, which supports MPI-IO, is installed on all described clusters."
+    "question": "What is NetCDF and how does it relate to MPI-IO?",
+    "answer": "NetCDF (Network Common Data Format) is a popular package for storing large arrays. It uses MPI-IO \"under the hood\" to handle data storage but simplifies the process by allowing users to specify arrays to store rather than managing offsets directly."
   },
   {
-    "question": "Does MPI-IO require additional library installations?",
-    "answer": "No, MPI-IO does not require additional library installations beyond the standard MPI library."
-  },
-  {
-    "question": "What are the limitations of MPI-IO regarding data portability and description?",
-    "answer": "MPI-IO writes raw data to files, which means it is not portable across platforms, it is hard to append new variables, and it does not include data description."
+    "question": "What are the advantages of using NetCDF for data storage?",
+    "answer": "NetCDF stores data as binary, is self-describing with metadata in the header, portable across different architectures, and offers optional compression. It also supports various visualization packages like Paraview."
   }
 ]

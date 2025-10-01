@@ -1,38 +1,50 @@
 [
   {
-    "question": "What are the two main recommendations for optimizing performance when using PyTorch with a single GPU?",
-    "answer": "To optimize performance, you should increase your `batch_size` to as much as you can fit in the GPU's memory and use a `DataLoader` with as many workers as you have `cpus-per-task` to streamline feeding data to the GPU."
+    "question": "How can I download the CIFAR10 dataset for use with PyTorch if it's not already stored locally?",
+    "answer": "You can either run the dataset line with `download=True` on a login node before submitting your job, or manually download the data from `https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz` and place it under a `./data` directory."
   },
   {
-    "question": "When is Data Parallelism with a single GPU a viable option, especially for a small model?",
-    "answer": "It is a viable option when a model is fairly small, not taking up much GPU memory or compute capacity, but you have a very large dataset and need to perform training with a small batch size."
+    "question": "What are the command-line steps to manually download and extract the CIFAR10 dataset?",
+    "answer": "First, create and navigate into a `data` directory using `mkdir -p data && cd data`. Then, download the dataset with `wget https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz` and extract it using `tar zxf cifar-10-python.tar.gz`. Finally, navigate back to the parent directory with `cd ..`."
   },
   {
-    "question": "What does Data Parallelism mean in the context of single GPU training?",
-    "answer": "Data Parallelism refers to training over multiple replicas of a model in parallel, where each replica receives a different chunk of training data at each iteration, and gradients are aggregated to update the parameters."
+    "question": "How can I observe the impact of PyTorch's native support for CPU parallelism on performance?",
+    "answer": "You can observe the effect by simply requesting more CPUs in your job submission script without making any code changes to your Python application."
   },
   {
-    "question": "What is the primary benefit of using Data Parallelism?",
-    "answer": "Data Parallelism can provide a significant speed-up by iterating through all examples in a large dataset approximately 'N' times faster, where 'N' is the number of model replicas."
+    "question": "What is an example SLURM script for running a PyTorch job with multi-CPU parallelism?",
+    "answer": "The `pytorch-multi-cpu.sh` script, which loads a Python module, creates and activates a virtual environment, installs `torch` and `torchvision`, sets the `OMP_NUM_THREADS` environment variable to `$SLURM_CPUS_PER_TASK`, and then executes `python cifar10-cpu.py`."
   },
   {
-    "question": "What is an important consideration for Data Parallelism to ensure the trained model is equivalent to one trained without it?",
-    "answer": "An important caveat is that the user must scale either the learning rate or the desired batch size in function of the number of replicas."
+    "question": "How can I adjust the number of CPUs requested for a PyTorch multi-CPU job using a SLURM script?",
+    "answer": "In the `pytorch-multi-cpu.sh` SLURM script, you can change the `--cpus-per-task` parameter (e.g., to 2, 4, 6, etc.) to control the number of CPUs."
   },
   {
-    "question": "Which PyTorch class is recommended for best performance when implementing Data Parallelism, even with a single GPU?",
-    "answer": "The `DistributedDataParallel` class is recommended by PyTorch maintainers for best performance."
+    "question": "What environment variable controls the number of OpenMP threads for PyTorch multi-CPU jobs?",
+    "answer": "The `OMP_NUM_THREADS` environment variable, which is typically set to `$SLURM_CPUS_PER_TASK` in the job submission script."
   },
   {
-    "question": "How does the provided example for single-GPU Data Parallelism handle a small model that doesn't fully utilize a GPU?",
-    "answer": "The example uses Nvidia's Multi-Process Service (MPS) along with MPI to efficiently place multiple model replicas (e.g., 14 or 15 replicas of a small model on a V100 GPU) on a single GPU, thereby increasing resource utilization and speed."
+    "question": "Is it always recommended to use a GPU for model training on HPC clusters if one is available?",
+    "answer": "No, it's not always recommended. You should not request a GPU if your code is not capable of making reasonable use of its compute capacity, especially since training very small models can sometimes be faster on CPUs."
   },
   {
-    "question": "What are the key steps in the `pytorch-gpu-mps.sh` job submission script for single GPU data parallelism?",
-    "answer": "The script requests a single GPU, sets `--tasks-per-node` to the number of model replicas, loads the Python module, creates and activates a virtual environment, installs `torch` and `torchvision`, activates Nvidia MPS, and then executes the Python training script using `srun`."
+    "question": "What are the primary sources of performance advantage for GPUs in Deep Learning tasks?",
+    "answer": "GPUs derive their performance advantage from their ability to parallelize key numerical operations (like multiply-accumulate) over many thousands of compute cores, and from their much higher memory bandwidth compared to CPUs, which allows for processing larger amounts of data efficiently."
   },
   {
-    "question": "What PyTorch components are used in the `cifar10-gpu-mps.py` script for single-GPU data parallelism?",
-    "answer": "The script uses `torch.cuda.set_device`, `dist.init_process_group` with `backend=\"mpi\"`, `torch.nn.parallel.DistributedDataParallel` to wrap the model, and `torch.utils.data.distributed.DistributedSampler` for the `DataLoader`."
+    "question": "What characteristics make a learning task suitable for GPU execution?",
+    "answer": "A learning task is suitable for GPU execution if it involves elements that scale with massive parallelism, either in terms of the number of operations, the amount of data required, or ideally both. This typically means large models with many units and layers, large inputs, or both."
+  },
+  {
+    "question": "What GPU-specific libraries does PyTorch utilize for parallel operations like matrix multiplication and convolution?",
+    "answer": "PyTorch uses GPU-specific libraries such as CUDNN or MIOpen for parallel implementations of operators, depending on the hardware platform."
+  },
+  {
+    "question": "Which two parameters are crucial for optimizing GPU performance in PyTorch, and what role do they play?",
+    "answer": "The `batch_size` and `num_workers` parameters are crucial. `batch_size` influences performance by increasing the input size per iteration, thereby utilizing more of the GPU's capacity. `num_workers` streamlines data movement from the host's (CPU's) memory to the GPU's memory, reducing GPU idle time."
+  },
+  {
+    "question": "What are the key recommendations for optimizing GPU compute performance and data feeding in PyTorch?",
+    "answer": "To optimize compute performance, increase your `batch_size` to as much as can fit in the GPU's memory. To streamline data feeding, use a `DataLoader` with as many `num_workers` as you have `cpus-per-task`."
   }
 ]

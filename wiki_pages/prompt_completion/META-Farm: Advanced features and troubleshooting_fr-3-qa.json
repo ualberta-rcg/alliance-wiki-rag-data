@@ -1,0 +1,38 @@
+[
+  {
+    "question": "How do you handle applications that require an input file with a prescribed and unchangeable name, like 'INPUT', in META-Farm?",
+    "answer": "Each case must run in its own subdirectory, and you must create an input file with the prescribed name in each subdirectory, typically by copying it using `cp` in `single_case.sh`."
+  },
+  {
+    "question": "What modification is needed in `single_case.sh` to copy a case-specific input file (`data.X`) to a fixed-name input file (`INPUT`) within its subdirectory?",
+    "answer": "You should add `cp /path/to/data.$ID INPUT` as the first line in `single_case.sh` before the `$COMM` command."
+  },
+  {
+    "question": "How can individual parameters or columns from a case line in `table.dat` be accessed within `single_case.sh`?",
+    "answer": "By modifying `single_case.sh` to convert the `$COMM` variable into a bash array using `COMM=( $COMM )`, then individual columns can be accessed as `${COMM[i]}`."
+  },
+  {
+    "question": "In the `single_case.sh` script, what do the variables `$ID` and `$COMM` represent?",
+    "answer": "`$ID` contains the case ID from the original table, and `$COMM` is the line corresponding to the case `$ID` in the original table, without the ID field."
+  },
+  {
+    "question": "If a cases table contains `/path/to/IC.1 0.1` where the first part is an input file and the rest are arguments, how is `single_case.sh` configured to pass both standard input and command-line arguments to the user code?",
+    "answer": "The `single_case.sh` script can be configured to call the user code as `/path/to/code ${COMM[@]:1} < ${COMM[0]}`."
+  },
+  {
+    "question": "What is the problem of 'reducing waste' in META-Farm when running multiple cases per job?",
+    "answer": "If meta-jobs hit their run-time limit before processing all cases, they might die mid-computation, leading to interrupted calculations and wasted CPU cycles, estimated at `0.5 x N_jobs x average_case_run_time`."
+  },
+  {
+    "question": "How does `task.run` help mitigate wasted CPU cycles when meta-jobs approach their run-time limits?",
+    "answer": "`task.run` measures individual case run-times, estimates a `dt_cutoff` (conservative run-time estimate), and meta-jobs exit early if they determine they don't have enough time to finish the next case before hitting their limit."
+  },
+  {
+    "question": "How is the `dt_cutoff` estimate calculated and updated by `task.run`?",
+    "answer": "After the first 8 cases, `dt_cutoff` is calculated as the largest 12.5% quantile of current case run-times. It is recomputed at every subsequent power of two number of computed cases (e.g., 16, 32, 64) to improve accuracy."
+  },
+  {
+    "question": "Where are the individual run-times for all cases stored when a farm is run?",
+    "answer": "Individual run-times for all cases are stored as one line per case in a scratch file named `times` within the `/home/$USER/tmp/$NODE.$PID/` directory."
+  }
+]

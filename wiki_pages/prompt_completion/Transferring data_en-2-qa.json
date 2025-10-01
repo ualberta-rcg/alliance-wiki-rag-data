@@ -1,78 +1,58 @@
 [
   {
-    "question": "What is the default behavior of a Globus transfer?",
-    "answer": "Normally, a Globus transfer will overwrite files on the destination with files from the source, transferring all files from the source."
+    "question": "How does Globus determine if files with the same size but different content should be transferred during synchronization?",
+    "answer": "Globus can transfer files if their checksums are different. This is the slowest but most accurate option, catching changes or errors that result in the same size of file but with different contents."
   },
   {
-    "question": "How can I prevent Globus from transferring files that already exist and match on the destination?",
-    "answer": "You should go to the 'Transfer & Timer Options' and choose to 'sync' instead of the default transfer behavior."
+    "question": "Which Globus sync option is best for transferring only newly created files since the last synchronization?",
+    "answer": "The 'File doesn't exist on destination' option will only transfer files that have been created since the last sync, which is useful for incrementally creating files."
   },
   {
-    "question": "What is the slowest but most accurate option for Globus to decide which files to transfer during a sync?",
-    "answer": "Globus can decide based on whether their checksums are different. This option catches changes or errors that result in the same file size but different contents."
+    "question": "What is a quick way for Globus to decide if a file needs to be re-transferred?",
+    "answer": "Globus can use the 'File size is different' option as a quick test. If the file size has changed, its contents must have changed, and it will be re-transferred."
   },
   {
-    "question": "Which Globus sync option is useful for incrementally creating files?",
-    "answer": "The option 'File doesn't exist on destination' will only transfer files that have been created since the last sync."
+    "question": "What Globus option should be used to transfer files only if the source version is newer than the destination, and what accompanying setting is important?",
+    "answer": "The 'Modification time is newer' option will check the file's recorded modification time and only transfer the file if it is newer on the source than the destination. If you want to depend on this, it is important to check the 'preserve source file modification times' option when initiating a Globus transfer."
   },
   {
-    "question": "How does Globus use file size to decide if a file needs to be transferred?",
-    "answer": "Globus performs a quick test; if the file size is different, its contents must have changed, and it will be re-transferred."
+    "question": "What is Rsync used for, and what factors can make it slow?",
+    "answer": "Rsync is a popular tool for ensuring that two separate datasets are the same. It can be quite slow if there are a lot of files or there is a lot of latency between the two sites, such as when they are geographically apart or on different networks."
   },
   {
-    "question": "What Globus sync option uses modification times to determine file transfers, and what related setting is important?",
-    "answer": "The 'Modification time is newer' option checks the file's recorded modification time and only transfers the file if it's newer on the source. If relying on this, it's important to check the 'preserve source file modification times' option during transfer initiation."
+    "question": "How does Rsync typically decide which files to transfer?",
+    "answer": "Running rsync will check the modification time and size of each file, and will only transfer the file if one or the other does not match."
   },
   {
-    "question": "What is Rsync used for?",
-    "answer": "Rsync is a popular tool for ensuring that two separate datasets (files or directories) are the same."
+    "question": "When should the `-c` option be used with `rsync`?",
+    "answer": "If you expect modification times not to match on the two systems, you can use the `-c` option, which will compute checksums at the source and destination, and transfer only if the checksums do not match."
   },
   {
-    "question": "Under what conditions can Rsync be slow?",
-    "answer": "Rsync can be quite slow if there are a lot of files or if there is a lot of latency between the two sites (e.g., geographically apart or on different networks)."
+    "question": "Which `rsync` flags should not be used when transferring files to `/project` file systems, and why?",
+    "answer": "When transferring files into `/project` file systems, do not use `-p` (preserve permissions) and `-g` (preserve group ownership) flags. This is because quotas in `/project` are enforced based on group ownership, and preserving group ownership can lead to a 'Disk quota exceeded' error."
   },
   {
-    "question": "How does `rsync` determine by default if a file needs to be transferred?",
-    "answer": "By default, `rsync` checks the modification time and size of each file, and will only transfer the file if one or both do not match."
+    "question": "How should the `rsync -a` command be modified when transferring to `/project` directories to avoid issues?",
+    "answer": "Since `-a` (archive mode) includes `-p` and `-g` by default, the `--no-g --no-p` options should be added, for example: `rsync -avzh --no-g --no-p LOCALNAME someuser@nibi.alliancecan.ca:projects/def-professor/someuser/somedir/`."
   },
   {
-    "question": "How can `rsync` be configured to use checksums instead of modification time and size for file comparison?",
-    "answer": "You can use the `-c` option, which will compute checksums at the source and destination, and transfer only if the checksums do not match."
+    "question": "What do the `-z` and `-h` options do in an `rsync` command?",
+    "answer": "The `-z` option compresses files (though it requires additional CPU resources) and the `-h` option makes transferred file sizes human readable."
   },
   {
-    "question": "Which `rsync` flags should be avoided when transferring files into `/project` file systems, and why?",
-    "answer": "Do not use the `-p` (preserve permissions) and `-g` (preserve group) flags when transferring into `/project` file systems, because quotas in `/project` are based on group ownership, and preserving group ownership can lead to 'Disk quota exceeded' errors."
+    "question": "What option should be used with `rsync` to allow interrupted transfers of very large files to be restarted?",
+    "answer": "If you are transferring very large files, add the `--partial` option so interrupted transfers may be restarted."
   },
   {
-    "question": "What `rsync` options should be added when using the `-a` (archive) flag for transfers into `/project` file systems?",
-    "answer": "Since `-a` includes `-p` and `-g` by default, the `--no-g --no-p` options should be added."
+    "question": "How can `rsync` display the transfer progress for each file versus a single progress bar for all files?",
+    "answer": "The `--progress` option will display the percent progress of each file as it's transferred. If transferring many smaller files, `--info=progress2` is more desirable to display a single progress bar for the transfer progress of all files."
   },
   {
-    "question": "Provide an example command for `rsync` to transfer a local file or directory into a project directory on a remote cluster, including recommended flags for `/project` filesystems.",
-    "answer": "An example command is `rsync -avzh --no-g --no-p LOCALNAME someuser@graham.alliancecan.ca:projects/def-professor/someuser/somedir/`."
+    "question": "Provide an example command for using `rsync` to transfer files from a remote system to a local project directory.",
+    "answer": "An example command for transferring files from a remote system to a local project directory is: `rsync -avzh --no-g --no-p someuser@nibi.alliancecan.ca:REMOTENAME ~/projects/def-professor/someuser/somedir/` where REMOTENAME is the remote file/directory and somedir is the local destination directory."
   },
   {
-    "question": "What is the purpose of the `-z` option in `rsync`?",
-    "answer": "The `-z` option compresses files (excluding those in the default `--skip-compress` list) during transfer, requiring additional CPU resources."
-  },
-  {
-    "question": "What does the `-h` option do in `rsync`?",
-    "answer": "The `-h` option makes transferred file sizes human-readable."
-  },
-  {
-    "question": "How can `rsync` transfers be restarted if they are interrupted, especially for very large files?",
-    "answer": "Add the `--partial` option to the `rsync` command, like `rsync -avzh --no-g --no-p --partial --progress LOCALNAME someuser@graham.alliancecan.ca:projects/def-professor/someuser/somedir/`."
-  },
-  {
-    "question": "How can a single progress bar be displayed for an `rsync` transfer involving many smaller files?",
-    "answer": "Use the `--info=progress2` option, for example: `rsync -azh --no-g --no-p --info=progress2 LOCALNAME someuser@graham.alliancecan.ca:projects/def-professor/someuser/somedir/`."
-  },
-  {
-    "question": "Can `rsync` be used to transfer files from a remote system to a local project directory, and if so, how?",
-    "answer": "Yes, `rsync` can be used this way, for example: `rsync -avzh --no-g --no-p someuser@graham.alliancecan.ca:REMOTENAME ~/projects/def-professor/someuser/somedir/` where REMOTENAME is the path on the remote system."
-  },
-  {
-    "question": "How can `rsync` be used for local file transfers within a single system, such as from a home or scratch directory to a project directory?",
-    "answer": "For local transfers, the cluster name can be dropped, like `rsync -avh --no-g --no-p LOCALNAME ~/projects/def-professor/someuser/somedir/`."
+    "question": "How does `rsync` differ from `cp` when copying a directory to a non-existent destination directory locally?",
+    "answer": "Unlike `rsync`, if `LOCALNAME` is a directory and `somedir` does not exist when using `cp`, the `cp` command will rename `LOCALNAME` to `somedir`."
   }
 ]

@@ -1,46 +1,42 @@
 [
   {
-    "question": "What is the primary purpose of the `deepspeed-stage3.sh` example script?",
-    "answer": "The script is designed to train a model using ZeRO stage 3, distributing optimizer states, model parameters, and model gradients across a group of GPUs."
+    "question": "How do I configure the LibTorch environment for StdEnv/2023?",
+    "answer": "First, load the necessary modules: `StdEnv/2023 gcc cuda/12.2 cmake protobuf cudnn python/3.11 abseil cusparselt opencv/4.8.1`. Then, create and activate a virtual environment using `virtualenv --no-download --clear ~/ENV && source ~/ENV/bin/activate`, and finally install `torch` and `numpy` with `pip install --no-index torch numpy`."
   },
   {
-    "question": "How does DeepSpeed ZeRO stage 3 improve memory efficiency compared to pure data parallelism?",
-    "answer": "ZeRO stage 3 distributes the optimizer states, model parameters, and model gradients across multiple GPUs, making it more efficient than loading a complete model copy on each GPU."
+    "question": "How can I check which module versions (like abseil, cusparselt, opencv) were used to compile the PyTorch wheel?",
+    "answer": "You can determine the module versions by running the command: `ldd $VIRTUAL_ENV/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so | sed -n 's&^.*/\\(\\(opencv\\|abseil\\|cusparselt\\)/[^/]*\\).*&\\1&p' | sort -u`."
   },
   {
-    "question": "Which specific optimizer is used in the `deepspeed-stage3.py` script to maintain performance comparable to pure data parallelism with ZeRO stage 3?",
-    "answer": "The `FusedAdam` optimizer from DeepSpeed is used to achieve performance comparable to pure data parallelism."
+    "question": "What are the setup steps for LibTorch using StdEnv/2020?",
+    "answer": "You should load the `gcc cuda/11.4 cmake protobuf cudnn python/3.10` modules. Then, create and activate a virtual environment with `virtualenv --no-download --clear ~/ENV && source ~/ENV/bin/activate`, and install `torch` and `numpy` using `pip install --no-index torch numpy`."
   },
   {
-    "question": "What is a prerequisite for using DeepSpeed optimizers in terms of loaded modules?",
-    "answer": "A `cuda/<version>` module must be loaded, and its version must match the version used to compile the PyTorch package being used."
+    "question": "Can you provide a minimal C++ example for LibTorch?",
+    "answer": "A minimal `example.cpp` would include `<torch/torch.h>` and `<iostream>`, and in `main()`, it would check `torch::cuda::is_available()`, set the device, create a tensor like `torch::rand({2, 3}).to(device)`, and print it."
   },
   {
-    "question": "What SLURM resources are requested by the `deepspeed-stage3.sh` script for the training job?",
-    "answer": "The script requests 1 node, 2 GPUs (`--gres=gpu:2`), 2 tasks per node (`--tasks-per-node=2`), 32GB of memory (`--mem=32G`), and a time limit of 20 minutes (`--time=0-00:20`)."
+    "question": "What should the `CMakeLists.txt` file contain for a simple LibTorch project?",
+    "answer": "The `CMakeLists.txt` file should define the minimum CMake version, project name (`project(example)`), find the Torch package (`find_package(Torch REQUIRED)`), add an executable (`add_executable(example example.cpp)`), link Torch libraries (`target_link_libraries(example \"${TORCH_LIBRARIES}\")`), and set the C++ standard (`set_property(TARGET example PROPERTY CXX_STANDARD 14)`)."
   },
   {
-    "question": "Which Python libraries are installed in the virtual environment within the `deepspeed-stage3.sh` script?",
-    "answer": "The script installs `torchvision`, `pytorch-lightning`, and `deepspeed` in the virtual environment."
+    "question": "How do I compile a LibTorch example with CMake using StdEnv/2023?",
+    "answer": "After activating your Python virtual environment, configure the project with `cmake -B build -S . -DCMAKE_PREFIX_PATH=$VIRTUAL_ENV/lib/python3.11/site-packages -DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath=$VIRTUAL_ENV/lib/python3.11/site-packages/torch/lib,-L$EBROOTCUDA/extras/CUPTI/lib64 -DCMAKE_SKIP_RPATH=ON -DTORCH_CUDA_ARCH_LIST=\"6.0;7.0;7.5;8.0;9.0\"`, then build with `cmake --build build`."
   },
   {
-    "question": "What environment variable related to NCCL is set in the `deepspeed-stage3.sh` script?",
-    "answer": "The `TORCH_NCCL_ASYNC_HANDLING` environment variable is exported with a value of `1`."
+    "question": "What are the CMake commands for compiling a LibTorch application in a StdEnv/2020 environment?",
+    "answer": "First, activate the Python virtual environment. Then, use `cmake -B build -S . -DCMAKE_PREFIX_PATH=$VIRTUAL_ENV/lib/python3.10/site-packages -DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath=$VIRTUAL_ENV/lib/python3.10/site-packages/torch/lib -DCMAKE_SKIP_RPATH=ON` to configure, and `cmake --build build` to compile the program."
   },
   {
-    "question": "How is the `pytorch_lightning.Trainer` configured to utilize DeepSpeed ZeRO stage 3 in the `deepspeed-stage3.py` script?",
-    "answer": "The `pl.Trainer` is initialized with `accelerator=\"gpu\"`, `devices=2`, `num_nodes=1`, and `strategy=\"deepspeed_stage_3\"`."
+    "question": "How can I run the compiled LibTorch example program?",
+    "answer": "You can run the compiled program by executing `build/example`."
   },
   {
-    "question": "What is the default batch size passed to the `deepspeed-stage3.py` script when executed by `srun`?",
-    "answer": "The `srun` command passes `--batch_size 256` to the Python script."
+    "question": "What is required to test a LibTorch application that uses CUDA?",
+    "answer": "To test a CUDA application, you need to request an interactive job with a GPU."
   },
   {
-    "question": "According to the comments in `deepspeed-stage3.sh`, what does PyTorch Lightning expect regarding tasks per GPU in a SLURM batch job?",
-    "answer": "PyTorch Lightning expects the user to have requested one task per GPU when running inside a SLURM batch job."
-  },
-  {
-    "question": "Describe the architecture of the neural network model defined in `deepspeed-stage3.py`.",
-    "answer": "The `Net` class defines a neural network model composed of a `ConvPart` (convolutional and pooling layers) and an `MLPPart` (dense feedforward layers), which are then combined into a `nn.Sequential` block."
+    "question": "Where can I find more documentation about LibTorch?",
+    "answer": "Further documentation for LibTorch is available at `https://pytorch.org/cppdocs/`."
   }
 ]

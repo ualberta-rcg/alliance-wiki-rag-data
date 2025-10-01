@@ -1,38 +1,70 @@
 [
   {
-    "question": "What is the primary limitation for client-server visualization on Niagara?",
-    "answer": "Niagara does not have GPUs, which limits visualization to software rendering."
+    "question": "How do you copy a public SSH key to a cloud VM?",
+    "answer": "From your computer, use the command `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'` to copy the public key to the VM's authorized_keys."
   },
   {
-    "question": "How can you explicitly enable software rendering for ParaView on Niagara?",
-    "answer": "You need to specify a mesa flag, such as `paraview --mesa-swr`, to disable OpenGL hardware acceleration."
+    "question": "Why is OSMesa support necessary for ParaView on Cloud VMs?",
+    "answer": "OSMesa support is needed because most Cloud VMs, like Arbutus VMs, do not have access to a GPU, requiring ParaView to perform offscreen (software) rendering."
   },
   {
-    "question": "What command should be used to launch an interactive job to access visualization resources on Niagara?",
-    "answer": "You must launch an interactive job by running the `debugjob` command."
+    "question": "What does the default configuration of OSMesa enable for ParaView?",
+    "answer": "The default configuration of OSMesa enables OpenSWR, Intel's software rasterization library for running OpenGL."
   },
   {
-    "question": "What steps are required to start the ParaView server on a Niagara compute node after obtaining an interactive job?",
-    "answer": "First, load the ParaView module using `module load paraview`, then start the server with `pvserver --mesa-swr-ax2`."
+    "question": "Which CPU rendering drivers are built with OSMesa, and which is recommended?",
+    "answer": "Both `llvmpipe` (older and slower) and `SWR` (newer and faster) drivers are built, with SWR being the recommended driver for offscreen CPU-based rendering."
   },
   {
-    "question": "What is the advantage of using the `--mesa-swr-avx2` flag when starting the ParaView server on Niagara?",
-    "answer": "This flag has been reported to provide faster software rendering by utilizing the OpenSWR library."
+    "question": "What are the steps to compile CMake on a Cloud VM?",
+    "answer": "First, download the source using `wget https://cmake.org/files/v3.7/cmake-3.7.0.tar.gz`. Then unpack and change into the directory, run `./bootstrap`, `make`, and finally `sudo make install`."
   },
   {
-    "question": "How do you set up an SSH tunnel from your local computer to a Niagara compute node for a ParaView client-server connection?",
-    "answer": "Open a new terminal on your computer and run `ssh YOURusername@niagara.scinet.utoronto.ca -L11111:niaXYZW:11111 -N`, replacing `YOURusername` and `niaXYZW` with the appropriate values."
+    "question": "How do you compile LLVM on a Cloud VM for ParaView?",
+    "answer": "Download `llvm-3.9.1.src.tar.xz`, unpack it, create and navigate into a `build` directory, run a specific `cmake` command with flags like `-DCMAKE_BUILD_TYPE=Release` and `-DLLVM_TARGETS_TO_BUILD:STRING=X86`, then `make`, and `sudo make install`."
   },
   {
-    "question": "What configuration details are required when adding a new server connection in the ParaView client for Niagara?",
-    "answer": "The server should be configured with `name = niagara`, `server type = Client/Server`, `host = localhost`, and `port = 11111`, then set to `Manual` and saved."
+    "question": "What is the process for compiling Mesa with OSMesa support on a Cloud VM?",
+    "answer": "Download `mesa-17.0.0.tar.gz`, unpack it, navigate into the directory, then run a `./configure` command with various flags including `--enable-opengl`, `--enable-gallium-osmesa`, and `--with-gallium-drivers=swrast,swr`, followed by `make` and `sudo make install`."
   },
   {
-    "question": "How can you verify that the ParaView client has successfully established a connection with the server on Niagara?",
-    "answer": "The terminal where the ParaView server is running will display `Client connected` after the connection is established."
+    "question": "What are the steps to compile the ParaView server on a Cloud VM?",
+    "answer": "Download `ParaView-v5.2.0.tar.gz`, unpack it, create and navigate into a `build` directory, run a `cmake` command with flags such as `-DVTK_OPENGL_HAS_OSMESA=ON` and `-DVTK_USE_OFFSCREEN=ON`, then run `make` and `make install`."
   },
   {
-    "question": "What commands are used to initiate parallel rendering with multiple CPUs on Niagara?",
-    "answer": "Request a job using `salloc --ntasks=N*40 --nodes=N --time=1:00:00`, then load `module load paraview`, and execute `srun pvserver --mesa`."
+    "question": "Which CMake flags are crucial when compiling the ParaView server for offscreen rendering on a VM?",
+    "answer": "Key CMake flags include `-DVTK_OPENGL_HAS_OSMESA=ON`, `-DVTK_USE_OFFSCREEN=ON`, and `-DVTK_USE_X=OFF`."
+  },
+  {
+    "question": "How do you start the ParaView server on a Cloud VM with SWR rendering?",
+    "answer": "On the VM, run the command `./paraview/bin/pvserver --mesa-swr-avx2`."
+  },
+  {
+    "question": "How do you set up an SSH tunnel for a ParaView client-server connection from your local computer to a Cloud VM?",
+    "answer": "From your local computer, use the command `ssh centos@vm.ip.address -L 11111:localhost:11111` to create an SSH tunnel from local port 11111 to the VM's port 11111."
+  },
+  {
+    "question": "How do you connect the ParaView client on your local computer to a ParaView server running on a Cloud VM?",
+    "answer": "Start the ParaView client on your computer and connect to `localhost:11111`."
+  },
+  {
+    "question": "What message indicates successful SWR rendering in the ParaView server console on a VM?",
+    "answer": "The message \"SWR detected AVX2\" will be displayed in the console during rendering."
+  },
+  {
+    "question": "What is an alternative method for interactive ParaView visualization besides client-server mode?",
+    "answer": "ParaView can be used in JupyterLab for interactive visualization, which utilizes VNC remote desktop."
+  },
+  {
+    "question": "How do you launch ParaView within JupyterLab?",
+    "answer": "Launch a JupyterLab instance through one of the supported options, then load a `paraview` module, which will make a launcher icon for ParaView appear."
+  },
+  {
+    "question": "What type of remote access does Nibi's Open OnDemand use for visualization?",
+    "answer": "Nibi's Open OnDemand uses VNC remote desktop for visualization, unlike client-server visualizations."
+  },
+  {
+    "question": "What are the initial steps to use Nibi's Open OnDemand for ParaView visualization?",
+    "answer": "First, connect to `gra-vdi` as described in the TigerVNC documentation, then open a terminal window and run `module load CcEnv`."
   }
 ]

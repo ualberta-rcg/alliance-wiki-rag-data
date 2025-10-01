@@ -1,0 +1,66 @@
+[
+  {
+    "question": "What is the purpose of the MPI_Recv function in MPI?",
+    "answer": "MPI_Recv is used to receive data from another process in a distributed memory environment."
+  },
+  {
+    "question": "In the C language, what does the 'message' parameter of MPI_Recv represent?",
+    "answer": "The 'message' parameter in C for MPI_Recv is a void pointer that serves as a reference to the buffer where the received data will be stored."
+  },
+  {
+    "question": "What does the 'count' parameter specify in the C MPI_Recv function signature?",
+    "answer": "The 'count' parameter in C's MPI_Recv function specifies the number of items of the given 'datatype' that are expected to be received."
+  },
+  {
+    "question": "What is the role of the 'datatype' parameter in the C MPI_Recv function?",
+    "answer": "The 'datatype' parameter in C for MPI_Recv identifies the MPI data type of each item expected to be received into the buffer."
+  },
+  {
+    "question": "How is the sender specified in the C MPI_Recv function?",
+    "answer": "The 'source' parameter in C's MPI_Recv function specifies the rank of the process from which the message is expected to be received."
+  },
+  {
+    "question": "What is the 'tag' parameter in the C MPI_Recv function used for?",
+    "answer": "The 'tag' parameter in C's MPI_Recv is an integer identifier defined by the programmer and associated with the type of message to be received, helping to distinguish communications."
+  },
+  {
+    "question": "What does the 'comm' parameter refer to in C's MPI_Recv function?",
+    "answer": "The 'comm' parameter in C's MPI_Recv is a 'communicator', which is an object representing a group of processes that can send and receive messages among themselves."
+  },
+  {
+    "question": "What information does the 'status' parameter provide after a C MPI_Recv call?",
+    "answer": "Upon return, the 'status' parameter in C's MPI_Recv (a pointer to an MPI_Status structure) will contain information about the message received, such as the actual source, tag, and count."
+  },
+  {
+    "question": "How is the MPI_Recv function typically called in Fortran?",
+    "answer": "In Fortran, MPI_RECV is typically called with the following parameters: MESSAGE, COUNT, DATATYPE, SOURCE, TAG, COMM, STATUS, and IERR (for error handling)."
+  },
+  {
+    "question": "What are the common ways to use MPI_Recv with `mpi4py` in Python?",
+    "answer": "In `mpi4py`, `MPI.Intracomm.recv` is used for general Python objects (pickled), and `MPI.Intracomm.Recv` is used for `numpy` arrays (fast), both taking `buf`, `source`, `tag`, and optional `status` parameters."
+  },
+  {
+    "question": "What is the circular communication pattern implemented in the phello2 example?",
+    "answer": "In the phello2 example, each process sends a message to the process at `(rank + 1) % size` and receives a message from the process at `(rank + size - 1) % size`, creating a circular exchange."
+  },
+  {
+    "question": "What is the hidden problem with the communication design of the phello2 program?",
+    "answer": "The hidden problem is that the MPI standard does not guarantee that `MPI_Send` will return before the message has been delivered. This means if temporary buffers are not used or are saturated, the program could block."
+  },
+  {
+    "question": "Why might an MPI_Send call return quickly even if the message hasn't been delivered?",
+    "answer": "In most MPI implementations, data sent via `MPI_Send` is copied into a temporary memory buffer, allowing `MPI_Send` to return without waiting for the actual delivery of the message."
+  },
+  {
+    "question": "What is a potential deadlock scenario if the MPI library doesn't use buffers for MPI_Send in a program like phello2?",
+    "answer": "If an MPI library does not buffer `MPI_Send` messages, all processes in `phello2` would call `MPI_Send` and then wait for their neighbors to call `MPI_Recv`. Since all neighbors would also be stuck in `MPI_Send`, all processes would wait indefinitely, leading to a deadlock."
+  },
+  {
+    "question": "Why did the phello2 program work without blocking on Calcul Canada systems?",
+    "answer": "The phello2 program worked without blocking on Calcul Canada systems because their MPI libraries utilize temporary buffers for `MPI_Send` operations, preventing the deadlock in that specific instance."
+  },
+  {
+    "question": "Is the communication model used in phello2 reliable, given its dependence on MPI buffering?",
+    "answer": "No, the communication model in phello2 is not considered reliable because its correct functioning depends on the MPI library providing sufficient temporary buffering, which is not a guarantee of the MPI standard and can lead to deadlocks if buffers are not present or become saturated."
+  }
+]

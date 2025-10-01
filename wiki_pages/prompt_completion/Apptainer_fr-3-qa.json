@@ -1,0 +1,50 @@
+[
+  {
+    "question": "Que fait l'option `-e` lors de l'ex\u00e9cution d'une commande Apptainer ?",
+    "answer": "L'option `-e` supprime certaines variables de l'environnement de l'interpr\u00e9teur avant le lancement des commandes et configure les param\u00e8tres pour une meilleure compatibilit\u00e9 OCI/Docker."
+  },
+  {
+    "question": "Quelles options sont implicitement activ\u00e9es lorsque l'option `-e` est utilis\u00e9e avec Apptainer ?",
+    "answer": "L'option `-e` ajoute implicitement `--containall`, `--no-init`, `--no-umask` et `--writable-tmpfs`."
+  },
+  {
+    "question": "Pourquoi l'option `-W` ou `--workdir` est-elle importante pour Apptainer sur les grappes de calcul ?",
+    "answer": "Sur les grappes, les syst\u00e8mes de fichiers temporaires comme `/tmp` utilisent souvent la m\u00e9moire RAM, ce qui peut entra\u00eener l'annulation des t\u00e2ches si elles consomment trop de m\u00e9moire. L'option `-W` permet \u00e0 Apptainer d'utiliser un disque physique pour son r\u00e9pertoire de travail afin de contourner ce probl\u00e8me."
+  },
+  {
+    "question": "Comment sp\u00e9cifier un r\u00e9pertoire de travail temporaire avec Apptainer ?",
+    "answer": "On utilise l'option `-W` suivie du chemin vers un disque o\u00f9 Apptainer peut lire et \u00e9crire des fichiers temporaires, par exemple : `apptainer run -W /path/to/a/workdir myimage.sif myprogram`."
+  },
+  {
+    "question": "Quel r\u00e9pertoire de travail doit \u00eatre utilis\u00e9 pour Apptainer lors de t\u00e2ches lanc\u00e9es via `salloc`, `sbatch` ou JupyterHub sur les grappes ?",
+    "answer": "Le r\u00e9pertoire de travail doit \u00eatre `${SLURM_TMPDIR}`, par exemple en utilisant `-W ${SLURM_TMPDIR}`."
+  },
+  {
+    "question": "O\u00f9 ne doit-on pas ex\u00e9cuter de programmes intensifs, y compris Apptainer, sur les grappes de calcul ?",
+    "answer": "Aucun programme intensif (incluant Apptainer) ne doit \u00eatre ex\u00e9cut\u00e9 sur les n\u0153uds de connexion. Il faut plut\u00f4t utiliser `salloc` pour d\u00e9marrer une t\u00e2che interactive."
+  },
+  {
+    "question": "Quelles options Apptainer sont n\u00e9cessaires pour utiliser le mat\u00e9riel NVIDIA dans un conteneur ?",
+    "answer": "Il faut passer l'option `--nv` aux commandes Apptainer pour le mat\u00e9riel NVIDIA."
+  },
+  {
+    "question": "Quelles options Apptainer sont n\u00e9cessaires pour utiliser le mat\u00e9riel AMD dans un conteneur ?",
+    "answer": "Il faut passer l'option `--rocm` aux commandes Apptainer pour le mat\u00e9riel AMD."
+  },
+  {
+    "question": "Que font les options `--nv` et `--rocm` lors de l'utilisation de GPU avec Apptainer ?",
+    "answer": "Ces options incluent les entr\u00e9es appropri\u00e9es dans `/dev` dans le bind mount \u00e0 l'int\u00e9rieur du conteneur, localisent les biblioth\u00e8ques pour les GPU et les attachent \u00e0 l'h\u00f4te, en plus de configurer la variable d'environnement `LD_LIBRARY_PATH`."
+  },
+  {
+    "question": "Que faut-il s'assurer concernant l'application elle-m\u00eame lors de l'utilisation d'un GPU dans un conteneur Apptainer ?",
+    "answer": "Il faut s'assurer que l'application qui utilise le GPU dans le conteneur a \u00e9t\u00e9 correctement compil\u00e9e pour pouvoir utiliser le GPU et ses biblioth\u00e8ques."
+  },
+  {
+    "question": "Quel bind mount est requis pour utiliser OpenCL dans un conteneur Apptainer ?",
+    "answer": "Pour utiliser OpenCL dans le conteneur, il faut ajouter le bind mount `-B /etc/OpenCL`."
+  },
+  {
+    "question": "Que faut-il faire pour lancer des programmes MPI dans un conteneur Apptainer ?",
+    "answer": "Pour lancer des programmes MPI dans un conteneur, il faut ajuster certaines choses dans l'environnement h\u00f4te."
+  }
+]

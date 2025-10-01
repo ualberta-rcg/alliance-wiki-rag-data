@@ -1,74 +1,74 @@
 [
   {
-    "question": "What are the main benefits of using Globus for data transfers?",
-    "answer": "Globus usually gives the best performance and reliability for data transfers."
+    "question": "What are the primary advantages of using Globus for data transfers?",
+    "answer": "Globus typically offers the best performance and reliability for data transfers."
   },
   {
-    "question": "What is the default behavior when initiating a Globus transfer?",
-    "answer": "Normally, a Globus transfer will overwrite files on the destination with files from the source, meaning all files from the source will be transferred."
+    "question": "What is the default behavior of Globus when initiating a transfer if files already exist at the destination?",
+    "answer": "Normally, a Globus transfer will overwrite existing files on the destination with files from the source, meaning all source files will be transferred."
   },
   {
-    "question": "How can I make Globus only transfer files that don't match existing files on the destination?",
+    "question": "How can you prevent Globus from overwriting all destination files and instead only transfer files that don't match?",
     "answer": "You should go to the 'Transfer & Timer Options' and choose to 'sync' instead of performing a normal transfer."
   },
   {
-    "question": "What is the slowest but most accurate option for Globus to decide which files to transfer during a sync?",
-    "answer": "Choosing to transfer files if 'Their checksums are different' is the slowest option but most accurate, as it catches changes even if file sizes remain the same."
+    "question": "What are the different criteria Globus can use to decide which files to transfer during a sync operation?",
+    "answer": "Globus can decide based on whether their checksums are different, if the file doesn't exist on the destination, if the file size is different, or if the modification time is newer."
   },
   {
-    "question": "When would you use the 'File doesn't exist on destination' option in a Globus sync?",
-    "answer": "This option is useful for incrementally creating files, as it will only transfer files that have been created since the last sync."
+    "question": "Which Globus sync option is the most accurate but also the slowest?",
+    "answer": "Comparing files by checking if their checksums are different is the slowest but most accurate option, as it catches changes even if file sizes remain the same."
   },
   {
-    "question": "How does Globus determine if a file needs to be re-transferred using the 'File size is different' option?",
-    "answer": "It performs a quick test: if the file size has changed, its contents must have changed, and it will be re-transferred."
+    "question": "Which Globus sync option is useful when incrementally creating files?",
+    "answer": "The option 'File doesn't exist on destination' is useful as it will only transfer files that have been created since the last sync."
   },
   {
-    "question": "What is important to check when depending on 'Modification time is newer' for a Globus transfer?",
+    "question": "What must be done to depend on the 'Modification time is newer' option for Globus sync?",
     "answer": "It is important to check the 'preserve source file modification times' option when initiating a Globus transfer."
   },
   {
-    "question": "What is Rsync primarily used for?",
-    "answer": "Rsync is a popular tool for ensuring that two separate datasets are the same."
+    "question": "What is Rsync used for and when might it be slow?",
+    "answer": "Rsync is a popular tool for ensuring two separate datasets are the same, but it can be quite slow if there are many files or significant latency between the two sites (e.g., geographically apart or on different networks)."
   },
   {
-    "question": "Under what conditions might Rsync be slow?",
-    "answer": "Rsync can be quite slow if there are a lot of files or if there is a lot of latency between the two sites (e.g., geographically apart or on different networks)."
+    "question": "How does Rsync normally decide which files to transfer?",
+    "answer": "Running 'rsync' will check the modification time and size of each file, and will only transfer the file if one or the other does not match."
   },
   {
-    "question": "How does Rsync typically decide which files to transfer?",
-    "answer": "Rsync checks the modification time and size of each file, and only transfers the file if one or both do not match."
+    "question": "What Rsync option can be used for a more accurate comparison of files if modification times are not reliable?",
+    "answer": "You can use the '-c' option, which will compute checksums at the source and destination, and transfer only if the checksums do not match."
   },
   {
-    "question": "Which Rsync option should be used if modification times are not reliable for syncing between systems?",
-    "answer": "You can use the `-c` option, which will compute checksums at the source and destination, and transfer only if the checksums do not match."
+    "question": "Which Rsync flags should be avoided when transferring files into '/project' file systems and why?",
+    "answer": "Do not use '-p' (preserve permissions) and '-g' (preserve group) flags, because quotas in '/project' are enforced based on group ownership, and preserving group ownership can lead to 'Disk quota exceeded' errors."
   },
   {
-    "question": "Why should the `-p` and `-g` flags be avoided when using Rsync to transfer files into `/project` file systems?",
-    "answer": "These flags should be avoided because `/project` quotas are enforced based on group ownership, and preserving group ownership can lead to 'Disk quota exceeded' errors."
+    "question": "What Rsync options should be used to avoid `-p` and `-g` when transferring to `/project`, especially when using `-a`?",
+    "answer": "Since `-a` includes `-p` and `-g` by default, the `--no-g --no-p` options should be added."
   },
   {
-    "question": "How do you correctly use the `rsync -a` (archive) flag when transferring to `/project` file systems to prevent quota issues?",
-    "answer": "Since `-a` includes `-p` and `-g` by default, the `--no-g --no-p` options should be added, for example: `rsync -avzh --no-g --no-p LOCALNAME someuser@graham.alliancecan.ca:projects/def-professor/someuser/somedir/`."
+    "question": "What does the `-z` option do in Rsync?",
+    "answer": "The `-z` option compresses files (not in the default file suffixes `--skip-compress` list) but requires additional CPU resources."
   },
   {
-    "question": "What is the purpose of the `-z` option in Rsync?",
-    "answer": "The `-z` option compresses files (excluding those in `--skip-compress` list) but requires additional CPU resources."
-  },
-  {
-    "question": "What is the purpose of the `-h` option in Rsync?",
+    "question": "How can Rsync display transferred file sizes in a human-readable format?",
     "answer": "The `-h` option makes transferred file sizes human readable."
   },
   {
-    "question": "Which Rsync option allows interrupted transfers of very large files to be restarted?",
-    "answer": "The `--partial` option allows interrupted transfers to be restarted."
+    "question": "Which Rsync option should be used for very large files to allow interrupted transfers to be restarted?",
+    "answer": "Add the `--partial` option so interrupted transfers may be restarted."
   },
   {
-    "question": "How can you display the transfer progress of each individual file during an Rsync operation?",
-    "answer": "The `--progress` option will display the percent progress of each file as it's transferred."
+    "question": "How can you display the progress of each file during an Rsync transfer?",
+    "answer": "The `--progress` option will display the percentage progress of each file as it's transferred."
   },
   {
-    "question": "How can you display a single progress bar for the entire transfer when using Rsync for many smaller files?",
-    "answer": "You can use the `--info=progress2` option to display a single progress bar representing the transfer progress of all files."
+    "question": "How can a single progress bar be displayed for the transfer of many smaller files using Rsync?",
+    "answer": "Use the `--info=progress2` option to display a single progress bar representing the transfer progress of all files."
+  },
+  {
+    "question": "Can Rsync be used for local file transfers within a single system?",
+    "answer": "Yes, Rsync can also be used locally within a single system to transfer a directory or file (e.g., from home or scratch) into a project directory by dropping the cluster name from the command."
   }
 ]

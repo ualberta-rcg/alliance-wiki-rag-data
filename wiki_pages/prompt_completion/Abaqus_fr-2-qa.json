@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What parallelization modes do Abaqus solvers support for standard analysis?",
+    "answer": "Abaqus solvers support parallelization with both threads (fils) and MPI (MPI) for standard analysis."
+  },
+  {
+    "question": "Are restart scripts available for multi-node tasks in standard analysis?",
+    "answer": "No, restart scripts for multi-node tasks are not presented for standard analysis at this time."
+  },
+  {
+    "question": "What is the recommended Slurm account to specify in a single-node standard analysis script?",
+    "answer": "The recommended Slurm account to specify in a single-node standard analysis script is `def-group` (e.g., `#SBATCH --account=def-group`)."
+  },
+  {
+    "question": "How do you specify the number of CPU cores per task in a single-node standard analysis Slurm script?",
+    "answer": "You specify the number of CPU cores per task using `#SBATCH --cpus-per-task=N`, where N is the desired number of cores, for example, `#SBATCH --cpus-per-task=4`."
+  },
+  {
+    "question": "What is the Abaqus command to run a standard analysis job in thread mode for a single node?",
+    "answer": "The Abaqus command is `abaqus job=testsp1 input=mystd-sim.inp scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive mp_mode=threads memory=\"$((${SLURM_MEM_PER_NODE}-3072))MB\"`."
+  },
+  {
+    "question": "How can you configure the input file to write restart data every 12 increments in standard analysis?",
+    "answer": "To write restart data every 12 increments, the input file should contain `*RESTART, WRITE, OVERLAY, FREQUENCY=12`."
+  },
+  {
+    "question": "How can you verify complete restart information for a standard analysis job?",
+    "answer": "You can verify complete restart information by running the command `egrep -i \"step|start\" testsp*.com testsp*.msg testsp*.sta`."
+  },
+  {
+    "question": "How do you restart a standard analysis job from a previous job using a script from the /project directory?",
+    "answer": "You use an Abaqus command like `abaqus job=testsp2 oldjob=testsp1 input=mystd-sim-restart.inp ...` where `testsp1` is the name of the previous job."
+  },
+  {
+    "question": "What content is required in the input file for restarting a standard analysis job?",
+    "answer": "The input file for restarting a standard analysis job must contain `*HEADING` and `*RESTART, READ`."
+  },
+  {
+    "question": "What is the purpose of using a 'script pour r\u00e9pertoire temporaire' for standard analysis?",
+    "answer": "These scripts are used to write large restart files to local disk via the `SLURM_TMPDIR` environment variable, which can improve performance and ensure data saving due to time limits or unexpected hardware failures."
+  },
+  {
+    "question": "How does the temporary directory script (`scriptst1.txt`) save data periodically?",
+    "answer": "It includes a loop `while sleep 6h; do echo \"Saving data due to time limit ...\"; cp -fv * $SLURM_SUBMIT_DIR 2>/dev/null; done &` that copies files back to the submit directory every 6 hours."
+  },
+  {
+    "question": "What Slurm parameter specifies memory per CPU core for multi-node standard analysis?",
+    "answer": "The Slurm parameter `--mem-per-cpu=4G` specifies the memory per CPU core, for example, 4GB."
+  },
+  {
+    "question": "What is the Abaqus command to run a standard analysis job in MPI mode for multiple nodes?",
+    "answer": "The Abaqus command is `abaqus job=testsp1-mpi input=mystd-sim.inp scratch=$SLURM_TMPDIR cpus=$SLURM_NTASKS interactive mp_mode=mpi`."
+  }
+]

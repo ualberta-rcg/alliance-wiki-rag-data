@@ -1,54 +1,58 @@
 [
   {
-    "question": "What is the command to download ParaView version 5.2.0 for compilation on a cloud instance?",
-    "answer": "The command to download ParaView is `wget http://www.paraview.org/files/v5.2/ParaView-v5.2.0.tar.gz`."
+    "question": "How do you compile LLVM?",
+    "answer": "First, download the source (`wget http://releases.llvm.org/3.9.1/llvm-3.9.1.src.tar.xz`), then unpack it, create a build directory, and run `cmake` with specific flags (`-DCMAKE_BUILD_TYPE=Release`, `-DLLVM_BUILD_LLVM_DYLIB=ON`, etc.), followed by `make` and `sudo make install`."
   },
   {
-    "question": "What cmake options are specified when compiling the ParaView server for offscreen rendering on a cloud instance?",
-    "answer": "The cmake options include `-DCMAKE_BUILD_TYPE=Release`, `-DCMAKE_INSTALL_PREFIX=/home/centos/paraview`, `-DPARAVIEW_USE_MPI=OFF`, `-DPARAVIEW_ENABLE_PYTHON=ON`, `-DPARAVIEW_BUILD_QT_GUI=OFF`, `-DVTK_OPENGL_HAS_OSMESA=ON`, `-DVTK_USE_OFFSCREEN=ON`, and `-DVTK_USE_X=OFF`."
+    "question": "What are the configuration flags for compiling Mesa with OSMesa?",
+    "answer": "When running `./configure`, use the flags: `--enable-opengl --disable-gles1 --disable-gles2 --disable-va --disable-xvmc --disable-vdpau --enable-shared-glapi --disable-texture-float --enable-gallium-llvm --enable-llvm-shared-libs --with-gallium-drivers=swrast,swr --disable-dri --disable-egl --disable-gbm --disable-glx --disable-osmesa --enable-gallium-osmesa`."
   },
   {
-    "question": "How do you start the ParaView server on a cloud instance for SWR rendering?",
-    "answer": "You can start the ParaView server by executing `./paraview/bin/pvserver --mesa-swr-avx2`."
+    "question": "How do you compile the ParaView server for offscreen rendering with OSMesa?",
+    "answer": "Download the ParaView source (`wget http://www.paraview.org/files/v5.2/ParaView-v5.2.0.tar.gz`), unpack it, create a build directory, and run `cmake` with specific flags (`-DCMAKE_BUILD_TYPE=Release`, `-DCMAKE_INSTALL_PREFIX=/home/centos/paraview`, `-DPARAVIEW_USE_MPI=OFF`, `-DPARAVIEW_ENABLE_PYTHON=ON`, `-DPARAVIEW_BUILD_QT_GUI=OFF`, `-DVTK_OPENGL_HAS_OSMESA=ON`, `-DVTK_USE_OFFSCREEN=ON`, `-DVTK_USE_X=OFF`), then run `make` and `make install`."
   },
   {
-    "question": "What command is used to create an SSH tunnel from a local computer to a cloud instance for ParaView client-server connection?",
-    "answer": "The command is `ssh centos@vm.ip.address -L 11111:localhost:11111`."
+    "question": "How do you start the ParaView server on an instance for SWR rendering?",
+    "answer": "You can start the server using the command `./paraview/bin/pvserver --mesa-swr-avx2`."
   },
   {
-    "question": "How do you connect the local ParaView client to a ParaView server on a cloud instance after setting up an SSH tunnel?",
-    "answer": "Start the ParaView client on your computer and connect to `localhost:11111`."
+    "question": "How do you set up an SSH tunnel from your computer to an instance for ParaView client-server mode?",
+    "answer": "Use the command `ssh centos@vm.ip.address -L 11111:localhost:11111` from your computer to tunnel local port 11111 to the instance's port 11111."
   },
   {
-    "question": "What message indicates that SWR has been detected by the ParaView server on the console during rendering in client-server mode on a cloud instance?",
-    "answer": "The console will display `SWR detected AVX2.`"
+    "question": "After setting up the SSH tunnel, how do you connect the ParaView client to the instance?",
+    "answer": "Start the ParaView client on your computer and connect it to `localhost:11111`."
   },
   {
-    "question": "What are Graham VDI nodes used for?",
-    "answer": "Graham VDI nodes are used for small interactive visualizations that require up to 250GB of memory and 16 cores."
+    "question": "What message indicates that SWR is detected during ParaView rendering in client-server mode?",
+    "answer": "The console will display \"SWR detected AVX2\" during rendering."
   },
   {
-    "question": "Which VNC client is recommended for connecting to Graham VDI nodes?",
-    "answer": "Tiger VNC is the preferred client for connecting to Graham VDI nodes."
+    "question": "What is an alternative to client-server mode for some ParaView visualizations?",
+    "answer": "You can use ParaView via JupyterLab, which utilizes a VNC remote desktop."
   },
   {
-    "question": "How do you load the ParaView 5.11.0 module and launch ParaView on Graham VDI nodes?",
-    "answer": "You first load `StdEnv/2020`, `gcc/9.3.0`, `openmpi/4.0.3`, then `paraview/5.11.0`, and finally launch ParaView using `LD_PRELOAD=${LD_PRELOAD/libdlfaker.so/} paraview`."
+    "question": "How do you launch ParaView through JupyterLab?",
+    "answer": "First, launch a JupyterLab instance, then load a `paraview` module. A ParaView launch icon will appear, allowing you to start your visualization."
   },
   {
-    "question": "Why is `LD_PRELOAD=${LD_PRELOAD/libdlfaker.so/} paraview` used to launch ParaView on Graham VDI nodes?",
-    "answer": "This command is used to disable the fake dynamic linker that was originally utilized for VirtualGL with the latest version of ParaView."
+    "question": "What is Nibi Open OnDemand used for in ParaView visualizations?",
+    "answer": "It's used for small interactive visualizations requiring up to 250GB and 16 cores, using a VNC remote desktop."
   },
   {
-    "question": "What is the recommended approach for intensive and automatic visualizations?",
-    "answer": "For intensive and automatic visualizations, it is recommended to use non-interactive off-screen tasks."
+    "question": "What VNC client is preferred for Nibi Open OnDemand?",
+    "answer": "Tiger VNC is the preferred VNC client."
   },
   {
-    "question": "How can users prepare their work for non-interactive renderings?",
-    "answer": "Users can prepare their work using Python scripts and submit them as potentially parallel tasks."
+    "question": "How do you launch ParaView on Nibi Open OnDemand, particularly with newer versions?",
+    "answer": "After loading the necessary modules (e.g., `module load StdEnv/2020 gcc/9.3.0 openmpi/4.0.3 paraview/5.11.0`), launch ParaView using `LD_PRELOAD=${LD_PRELOAD/libdlfaker.so/} paraview` to disable the fake dynamic linker used for VirtualGL."
   },
   {
-    "question": "Where can users find assistance for non-interactive rendering tasks?",
-    "answer": "Users can contact technical support for assistance with non-interactive rendering tasks."
+    "question": "What is recommended for intensive and automatic ParaView visualizations?",
+    "answer": "Non-interactive offscreen batch rendering is recommended, possibly by preparing Python scripts and submitting them as parallel tasks."
+  },
+  {
+    "question": "Where can you get assistance for batch rendering ParaView visualizations?",
+    "answer": "You can contact technical support for assistance with batch rendering."
   }
 ]

@@ -1,0 +1,58 @@
+[
+  {
+    "question": "What is the primary function of the `deepspeed-stage3.sh` script?",
+    "answer": "The script is a SLURM batch job configuration used to set up the environment and execute a PyTorch Lightning training script (`deepspeed-stage3.py`) with DeepSpeed ZeRO Stage 3."
+  },
+  {
+    "question": "How many GPUs are requested for the job specified in `deepspeed-stage3.sh`?",
+    "answer": "The script requests 2 GPUs (`#SBATCH --gres=gpu:2`) and configures 2 tasks per node (`#SBATCH --tasks-per-node=2`), implying one process per GPU."
+  },
+  {
+    "question": "What Python packages are installed within the virtual environment by `deepspeed-stage3.sh`?",
+    "answer": "The script installs `torchvision`, `pytorch-lightning`, and `deepspeed` using `pip install --no-index`."
+  },
+  {
+    "question": "Why is the `cuda` module loaded in the `deepspeed-stage3.sh` script?",
+    "answer": "The `cuda` module must be loaded if a DeepSpeed optimizer is being used."
+  },
+  {
+    "question": "What happens if `srun` is not used to launch the PyTorch Lightning script within a SLURM batch job, according to `deepspeed-stage3.sh`?",
+    "answer": "The job will fail if `srun` is not used and the user has not requested one task per GPU, as PyTorch Lightning expects this configuration."
+  },
+  {
+    "question": "What is the purpose of the `deepspeed-stage3.py` Python script?",
+    "answer": "It is a Python script for CIFAR10 classification models designed to test DeepSpeed ZeRO Stage 3 with PyTorch Lightning."
+  },
+  {
+    "question": "Which specific DeepSpeed optimizer is utilized in `deepspeed-stage3.py`?",
+    "answer": "The `FusedAdam` optimizer from `deepspeed.ops.adam` is used."
+  },
+  {
+    "question": "How is the PyTorch Lightning `Trainer` configured for DeepSpeed ZeRO Stage 3 in `deepspeed-stage3.py`?",
+    "answer": "The `Trainer` is initialized with `accelerator=\"gpu\"`, `devices=2`, `num_nodes=1`, and `strategy=\"deepspeed_stage_3\"`."
+  },
+  {
+    "question": "What batch size is used when `deepspeed-stage3.py` is executed by `deepspeed-stage3.sh`?",
+    "answer": "A batch size of 256 (`--batch_size 256`) is passed to the Python script from the shell script."
+  },
+  {
+    "question": "What dataset is used for training in the `deepspeed-stage3.py` script?",
+    "answer": "The CIFAR10 dataset is used for training."
+  },
+  {
+    "question": "What image transformations are applied to the training data in `deepspeed-stage3.py`?",
+    "answer": "Images are transformed using `transforms.ToTensor()` followed by `transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))`."
+  },
+  {
+    "question": "What does ZeRO Stage 3 entail for model training?",
+    "answer": "ZeRO Stage 3 means that optimizer states, model parameters, and model gradients are split (sharded) between all GPUs, which is more memory-efficient than pure Data Parallelism."
+  },
+  {
+    "question": "What is the role of `configure_sharded_model` in the `Net` class of `deepspeed-stage3.py`?",
+    "answer": "It defines `self.block` as a sequential module that combines the `ConvPart` (convolutional layers) and `MLPPart` (dense layers) of the model."
+  },
+  {
+    "question": "What is the maximum number of epochs configured by default in `deepspeed-stage3.py`?",
+    "answer": "The script defines a default `max_epochs` of 2."
+  }
+]

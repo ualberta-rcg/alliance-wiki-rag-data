@@ -1,0 +1,126 @@
+[
+  {
+    "question": "What is BLAST used for?",
+    "answer": "BLAST (Basic Local Alignment Search Tool) is used to find similar regions between two or more nucleotide or amino acid sequences and to perform an alignment of these homologous regions."
+  },
+  {
+    "question": "Where can users find more information about BLAST arguments?",
+    "answer": "More information on arguments can be found in the user manual at https://www.ncbi.nlm.nih.gov/books/NBK279684/ or by running the command 'blastn -help'."
+  },
+  {
+    "question": "What command provides help on BLAST arguments?",
+    "answer": "The command 'blastn -help' provides information on BLAST arguments."
+  },
+  {
+    "question": "Where are frequently used BLAST sequence databases located on the clusters?",
+    "answer": "Frequently used BLAST sequence databases are located on the clusters in `/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2022_03_23/`."
+  },
+  {
+    "question": "How can you view the content of the BLAST database directory?",
+    "answer": "You can view the content of the BLAST database directory and its subdirectories using a command like `ls /cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2022_03_23/`."
+  },
+  {
+    "question": "What file types are used as reference and query in the BLAST examples?",
+    "answer": "The `ref.fa` file is used as a FASTA-formatted reference database, and `seq.fa` is used for queries."
+  },
+  {
+    "question": "What is the first step before executing a BLAST search?",
+    "answer": "Before executing a search, the database must be prepared using a pre-processing task with `makeblastdb`."
+  },
+  {
+    "question": "What command is used to create a BLAST database?",
+    "answer": "The `makeblastdb` command is used to create a BLAST database."
+  },
+  {
+    "question": "What modules are loaded for a `makeblastdb` job in the provided script?",
+    "answer": "The `gcc/7.3.0` and `blast+/2.9.0` modules are loaded for a `makeblastdb` job."
+  },
+  {
+    "question": "How do you create a nucleotide database named 'reference' from `ref.fa` using `makeblastdb`?",
+    "answer": "You can create a nucleotide database using the command `makeblastdb -in ref.fa -title reference -dbtype nucl -out ref.fa`."
+  },
+  {
+    "question": "How can data parallelism improve BLAST searches?",
+    "answer": "Data parallelism can greatly improve searches by dividing the query file into several smaller queries that are then executed against the database."
+  },
+  {
+    "question": "How should the query file (`seq.fa`) be prepared to accelerate searches with task vectors?",
+    "answer": "The query file (`seq.fa`) should be divided into several small parts, each at least `1Mo` in size, to accelerate searches with task vectors."
+  },
+  {
+    "question": "What is the minimum recommended size for parts when splitting the query file?",
+    "answer": "The parts should be at least `1Mo`; smaller parts could negatively affect the parallel file system."
+  },
+  {
+    "question": "What utility is used to split a sequence file for data parallelism?",
+    "answer": "The `faSplit` utility is used to split a sequence file."
+  },
+  {
+    "question": "How do you split `seqs.fa` into 10 files named `seqN.fa` using `faSplit`?",
+    "answer": "First, load the `kentutils/20180716` module, then use the command `faSplit sequence seqs.fa 10 seq`."
+  },
+  {
+    "question": "Which module needs to be loaded to use `faSplit`?",
+    "answer": "The `kentutils/20180716` module needs to be loaded to use `faSplit`."
+  },
+  {
+    "question": "How does a task vector utilize separated query files?",
+    "answer": "For each separated `seq.fa.N` file, a task is created in a task vector, where the task ID corresponds to the query file name."
+  },
+  {
+    "question": "What modules are loaded for a `blastn_array.sh` job?",
+    "answer": "The `gcc/7.3.0` and `blast+/2.9.0` modules are loaded for a `blastn_array.sh` job."
+  },
+  {
+    "question": "How is a `blastn` query executed within an array job using the task ID?",
+    "answer": "Within an array job, the `blastn` query is executed using `blastn -db ref.fa -query seq.fa.${SLURM_ARRAY_TASK_ID} > seq.ref.${SLURM_ARRAY_TASK_ID}`, where `$SLURM_ARRAY_TASK_ID` represents the index of the current task."
+  },
+  {
+    "question": "How do you submit a BLAST array job with a dependency on a `makeblastdb` script?",
+    "answer": "You submit the array job using `sbatch --dependency=afterok:$(sbatch makeblastdb.sh) blastn_array.sh`."
+  },
+  {
+    "question": "How do you concatenate the results from an array of 10 BLAST tasks?",
+    "answer": "You concatenate the results using the command `cat seq.ref.{0..9} > seq.ref`."
+  },
+  {
+    "question": "What is GNU Parallel used for in the context of BLAST?",
+    "answer": "GNU Parallel is a tool for grouping multiple small tasks into one and parallelizing them, which helps reduce issues with many small files in a parallel file system."
+  },
+  {
+    "question": "Why is the block size important when using GNU Parallel?",
+    "answer": "The block size is important because an inefficient block size can lead to wasted cores; for example, if a 100MB file is processed in 10MB blocks using 3 cores, but 10 cores are requested, 7 cores would be wasted."
+  },
+  {
+    "question": "What modules are loaded for a `blastn_gnu.sh` job?",
+    "answer": "The `gcc/7.3.0` and `blast+/2.9.0` modules are loaded for a `blastn_gnu.sh` job."
+  },
+  {
+    "question": "What command is used with GNU Parallel to run `blastn` queries from `seq.fa` across multiple cores?",
+    "answer": "The command `parallel --jobs $SLURM_CPUS_PER_TASK --keep-order --block -1 --recstart '>' --pipepart $cmd :::: seq.fa > seq.ref` is used."
+  },
+  {
+    "question": "What is the purpose of the `--pipepart` argument in GNU Parallel?",
+    "answer": "The `--pipepart` argument is used to pipe parts of the command together, and it is faster than `--pipe`, capable of reaching 5GB/s according to Ole Tange."
+  },
+  {
+    "question": "What is a requirement for the input file when using GNU Parallel for BLAST?",
+    "answer": "The input file for GNU Parallel must not be compressed."
+  },
+  {
+    "question": "How do you submit a GNU Parallel BLAST job with a dependency on a `makeblastdb` script?",
+    "answer": "You submit the GNU Parallel job using `sbatch --dependency=afterok:$(sbatch makeblastdb.sh) blastn_gnu.sh`."
+  },
+  {
+    "question": "What is a tip to improve BLAST performance if local storage is available?",
+    "answer": "If the node's local storage allows, copy your FASTA database to the local `/scratch` space (represented by `$SLURM_TMPDIR`)."
+  },
+  {
+    "question": "How can you reduce the number of responses in a BLAST search?",
+    "answer": "You can reduce the number of responses by using the `-max_target_seqs` and `-max_hsps` arguments."
+  },
+  {
+    "question": "How can you limit BLAST responses to only nearly identical matches?",
+    "answer": "You can limit the list of responses with `evalue` filters to keep only nearly identical matches."
+  }
+]

@@ -1,0 +1,102 @@
+[
+  {
+    "question": "What are the key learning objectives for data management in OpenACC?",
+    "answer": "The learning objectives include understanding data locality and data movement, structured and unstructured data clauses, how to move data explicitly, and how to compile and run OpenACC code with data movement directives."
+  },
+  {
+    "question": "What was the main limitation of using CUDA Unified Memory for accelerating code in terms of portability?",
+    "answer": "CUDA Unified Memory made the code not portable, being specific to PGI with the \u2013ta=tesla:managed flag and NVIDIA-only."
+  },
+  {
+    "question": "What are the advantages of explicitly managing data in OpenACC?",
+    "answer": "Explicitly managing data will make the code portable and may improve performance."
+  },
+  {
+    "question": "What is the function of the `data` directive in OpenACC structured data regions?",
+    "answer": "The `data` directive defines a region of code in which GPU arrays remain on the GPU and are shared among all kernels in that region."
+  },
+  {
+    "question": "In the context of structured data regions, what does 'data locality' refer to?",
+    "answer": "Data locality means that arrays used within the data region will remain on the GPU until the end of the data region."
+  },
+  {
+    "question": "When are unstructured data directives typically used in OpenACC?",
+    "answer": "Unstructured data directives are used when scoping does not allow the use of normal data regions, such as when using constructors or destructors."
+  },
+  {
+    "question": "What are the two primary directives for unstructured data management in OpenACC?",
+    "answer": "The two primary directives are `enter data`, which defines the start of an unstructured data lifetime, and `exit data`, which defines the end."
+  },
+  {
+    "question": "What clauses are associated with the `enter data` directive?",
+    "answer": "The `enter data` directive has `copyin(list)` and `create(list)` clauses."
+  },
+  {
+    "question": "What clauses are associated with the `exit data` directive?",
+    "answer": "The `exit data` directive has `copyout(list)` and `delete(list)` clauses."
+  },
+  {
+    "question": "How do unstructured data clauses benefit C++ classes?",
+    "answer": "Unstructured data clauses enable OpenACC to be used in C++ classes and can be used whenever data is allocated and initialized in a different piece of code than where it is freed."
+  },
+  {
+    "question": "What does the `copyin(list)` data clause do?",
+    "answer": "The `copyin(list)` clause allocates memory on the GPU and copies data from the host to the GPU when entering the region."
+  },
+  {
+    "question": "Describe the function of the `copyout(list)` data clause.",
+    "answer": "The `copyout(list)` clause allocates memory on the GPU and copies data from the GPU to the host when exiting the region."
+  },
+  {
+    "question": "What is the `copy(list)` data clause used for, and in which type of data region?",
+    "answer": "The `copy(list)` clause allocates memory on the GPU, copies data from the host to the GPU when entering the region, and copies data to the host when exiting the region. It is used only in Structured Data Regions."
+  },
+  {
+    "question": "What is the purpose of the `create(list)` data clause?",
+    "answer": "The `create(list)` data clause allocates memory on the GPU but does not copy any data."
+  },
+  {
+    "question": "When is the `delete(list)` data clause used, and what does it do?",
+    "answer": "The `delete(list)` data clause is used only in Unstructured Data Regions to deallocate memory on the GPU without copying."
+  },
+  {
+    "question": "What does the `present(list)` data clause indicate to the compiler?",
+    "answer": "The `present(list)` data clause indicates that data is already present on the GPU from another containing data region."
+  },
+  {
+    "question": "Why might it be necessary to explicitly specify the array 'shape' with data clauses?",
+    "answer": "It is necessary to explicitly specify the size with data clauses and array 'shape' because sometimes the compiler cannot determine the size of arrays."
+  },
+  {
+    "question": "What are the two steps involved in copying a matrix to the device using OpenACC explicit data movement?",
+    "answer": "The two steps involve copying the structure of the matrix first, and then copying its members."
+  },
+  {
+    "question": "How is memory for a matrix freed on the device using `exit data` directives?",
+    "answer": "To free device memory for a matrix, first delete the members of the matrix, and then delete the structure of the matrix."
+  },
+  {
+    "question": "Why is the `present` clause important when managing memory at a higher level?",
+    "answer": "The `present` clause is necessary to inform the compiler that data is already present on the device, which is often critical to good performance for high-level data management."
+  },
+  {
+    "question": "How do you modify the compiler flags to rebuild OpenACC code without managed memory?",
+    "answer": "To rebuild the code without managed memory, you should change `-ta=tesla:managed` to `-ta-tesla` in the Makefile."
+  },
+  {
+    "question": "What is the purpose of the `update` directive in OpenACC?",
+    "answer": "The `update` directive is used to specify an array or part of an array that should be refreshed within a data region."
+  },
+  {
+    "question": "How do you use the `update` directive to copy data from the GPU to the CPU?",
+    "answer": "To copy data from the GPU to the CPU, you use `!$acc update self(a)`."
+  },
+  {
+    "question": "How do you use the `update` directive to copy data from the CPU to the GPU?",
+    "answer": "To copy data from the CPU to the GPU, you use `!$acc update device(a)`."
+  },
+  {
+    "question": "What do the benchmark results suggest about data locality when most operations occur on the GPU?",
+    "answer": "The results suggest that data locality indeed works, meaning when most of the operations are on the GPU and data stays on the GPU for a long time, data movement does not play a significant role in the performance."
+  }
+]

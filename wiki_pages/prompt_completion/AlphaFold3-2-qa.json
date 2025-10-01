@@ -1,0 +1,94 @@
+[
+  {
+    "question": "Where can I find reference documentation for AlphaFold3's inputs, outputs, and performance?",
+    "answer": "You can find reference documentation for AlphaFold3 inputs at [https://github.com/google-deepmind/alphafold3/blob/main/docs/input.md], outputs at [https://github.com/google-deepmind/alphafold3/blob/main/docs/output.md], and performance at [https://github.com/google-deepmind/alphafold3/blob/main/docs/performance.md]."
+  },
+  {
+    "question": "What is the recommended filename for the AlphaFold3 data pipeline submission script?",
+    "answer": "The recommended filename is `alphafold3-data.sh`."
+  },
+  {
+    "question": "What is the suggested job name for the AlphaFold3 data pipeline in an SBATCH script?",
+    "answer": "The suggested job name is `--job-name=alphafold3-data`."
+  },
+  {
+    "question": "What is the maximum number of CPU cores recommended for the AlphaFold3 data pipeline stage?",
+    "answer": "A maximum of 8 CPU cores (`--cpus-per-task=8`) is recommended, as AlphaFold has no benefit to use more for this stage."
+  },
+  {
+    "question": "What is the suggested memory allocation for the AlphaFold3 data pipeline?",
+    "answer": "The suggested memory allocation is `--mem=64G`."
+  },
+  {
+    "question": "Which modules should be loaded for the AlphaFold3 data pipeline (CPU stage)?",
+    "answer": "The modules to load are `StdEnv/2023 hmmer/3.4 rdkit/2024.03.5 python/3.12`."
+  },
+  {
+    "question": "Where should the AlphaFold3 data pipeline output be stored temporarily?",
+    "answer": "The output data should be directed to `$SLURM_TMPDIR/alphafold/output`."
+  },
+  {
+    "question": "How do you create and activate a Python virtual environment within the AlphaFold3 data pipeline script?",
+    "answer": "You can create and activate a virtual environment using `virtualenv --no-download $SLURM_TMPDIR/env` followed by `source $SLURM_TMPDIR/env/bin/activate`."
+  },
+  {
+    "question": "How are AlphaFold3 and its Python dependencies installed in the data pipeline script?",
+    "answer": "They are installed using `pip install --no-index --upgrade pip` and `pip install --no-index --requirement ~/alphafold3-requirements.txt`."
+  },
+  {
+    "question": "What command builds the necessary data files within the virtual environment during the data pipeline stage?",
+    "answer": "The `build_data` command is used to build data files."
+  },
+  {
+    "question": "What XLA_FLAGS environment variable is set in the data pipeline script for a compilation time workaround?",
+    "answer": "The environment variable `XLA_FLAGS=\"--xla_gpu_enable_triton_gemm=false\"` is exported."
+  },
+  {
+    "question": "What is the key argument to specify that the AlphaFold3 Python script should only run the data stage?",
+    "answer": "The `--norun_inference` argument is used to run only the data stage."
+  },
+  {
+    "question": "How are the output files from the AlphaFold3 data pipeline copied back to the user's scratch directory?",
+    "answer": "They are copied back by creating a directory `$SCRATCH/alphafold/output` and then running `cp -vr $OUTPUT_DIR $SCRATCH/alphafold/output`."
+  },
+  {
+    "question": "What is the recommended filename for the AlphaFold3 model inference submission script?",
+    "answer": "The recommended filename is `alphafold3-inference.sh`."
+  },
+  {
+    "question": "What is the minimum GPU compute capability required for AlphaFold3 model inference?",
+    "answer": "AlphaFold3 model inference requires compute capability 8.0 or greater."
+  },
+  {
+    "question": "Which specific GPU type is compatible with AlphaFold3 model inference?",
+    "answer": "AlphaFold3 inference is compatible with A100s or greater."
+  },
+  {
+    "question": "How many CPU cores are recommended for the AlphaFold3 model inference stage?",
+    "answer": "Only 1 CPU core (`--cpus-per-task=1`) is recommended, as AlphaFold has no benefit to use more for the inference stage."
+  },
+  {
+    "question": "What is the suggested GPU allocation for AlphaFold3 model inference?",
+    "answer": "The suggested GPU allocation is `--gpus=a100:1`, meaning one A100 GPU or greater."
+  },
+  {
+    "question": "Which modules should be loaded for the AlphaFold3 model inference stage?",
+    "answer": "The modules to load are `StdEnv/2023 hmmer/3.4 rdkit/2024.03.5 python/3.12 cuda/12.2 cudnn/9.2`."
+  },
+  {
+    "question": "Where should the AlphaFold3 model inference output data be stored?",
+    "answer": "The output data should be stored in `$SCRATCH/alphafold/output`."
+  },
+  {
+    "question": "What environment variables are set in the model inference script to manage GPU memory?",
+    "answer": "The environment variables `XLA_PYTHON_CLIENT_PREALLOCATE=true` and `XLA_CLIENT_MEM_FRACTION=0.95` are set."
+  },
+  {
+    "question": "What is the key argument to specify that the AlphaFold3 Python script should only run the inference stage?",
+    "answer": "The `--norun_data_pipeline` argument is used to run only the inference stage."
+  },
+  {
+    "question": "How are CPU resources for `nhmmer` and `jackhmmer` configured in the AlphaFold3 data pipeline script?",
+    "answer": "CPU resources are allocated using `--nhmmer_n_cpu=$SLURM_CPUS_PER_TASK` and `--jackhmmer_n_cpu=$SLURM_CPUS_PER_TASK`."
+  }
+]

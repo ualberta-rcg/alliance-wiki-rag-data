@@ -1,0 +1,98 @@
+[
+  {
+    "question": "What is the recommended naming convention for Gaussian script and input files (e.g., G16)?",
+    "answer": "For consistency, files like `name.sh`, `name.com`, and `name.log` should share the same base name but have different extensions."
+  },
+  {
+    "question": "How do you specify the memory for a G16 job in a Slurm submission script?",
+    "answer": "Memory is specified using `#SBATCH --mem=32G`, which should be roughly two times the `%mem` defined in the input `name.com` file."
+  },
+  {
+    "question": "How is the expected runtime for a G16 job defined in a Slurm script?",
+    "answer": "The expected runtime is set using `#SBATCH --time=DD-HH:MM`, for example, `#SBATCH --time=02-00:00` for 2 days."
+  },
+  {
+    "question": "How do you specify the number of CPUs per task for a G16 job in a Slurm script?",
+    "answer": "The number of CPUs per task is defined using `#SBATCH --cpus-per-task=32`, which corresponds to `%nprocs` in the `name.com` file."
+  },
+  {
+    "question": "What module needs to be loaded to use Gaussian G16?",
+    "answer": "The module `gaussian/g16.c01` needs to be loaded."
+  },
+  {
+    "question": "How is a G16 command executed within a submission script?",
+    "answer": "The G16 command is executed as `G16 name.com`, where `name.com` is the input file and `name.log` is the output."
+  },
+  {
+    "question": "How do you run Gaussian 09 or Gaussian 03 instead of G16 in a submission script?",
+    "answer": "Replace `gaussian/g16.c01` with `gaussian/g09.e01` or `gaussian/g03.d01` respectively, and change `G16` to `G09` or `G03` in the script."
+  },
+  {
+    "question": "What is 'Option 2: g16' for Gaussian tasks, regarding file storage?",
+    "answer": "With Option 2, the default execution files (like .rwf, .inp) are temporarily stored in `$SLURM_TMPDIR` (`/localscratch/username.jobid.0/`) on the compute node, and the scheduler deletes them after the task finishes."
+  },
+  {
+    "question": "When should 'Option 2: g16' be used?",
+    "answer": "Option 2 can be used if you do not need the `.rwf` file to restart the task later."
+  },
+  {
+    "question": "What is the capacity of `/localscratch` and is it dedicated to a single task?",
+    "answer": "`localscratch` is approximately 800GB and is shared by all tasks executed on the same node."
+  },
+  {
+    "question": "When should 'Option 1: G16' be preferred over 'Option 2: g16' based on file size?",
+    "answer": "If your files are similar in size to or larger than 800GB, you should use 'Option 1: G16' instead of 'Option 2: g16'."
+  },
+  {
+    "question": "How is the `g16` command executed in a submission script using Option 2?",
+    "answer": "The `g16` command is executed as `g16 < name.com >& name.log`, where `name.com` is the input and `name.log` is the output."
+  },
+  {
+    "question": "What command is used to submit a Gaussian task script (e.g., mysub.sh)?",
+    "answer": "To submit the task, use the command `sbatch mysub.sh`."
+  },
+  {
+    "question": "Is it possible to run Gaussian tasks interactively?",
+    "answer": "Yes, it is possible to run interactive Gaussian tasks for testing purposes."
+  },
+  {
+    "question": "Where should interactive Gaussian tasks not be run?",
+    "answer": "Interactive Gaussian tasks should not be run on a login node."
+  },
+  {
+    "question": "How do you open an interactive session on a compute node for Gaussian testing with specific resources?",
+    "answer": "Open an interactive session using `salloc --time=1:0:0 --cpus-per-task=8 --mem=10g` for one hour, 8 CPUs, and 10GB of memory."
+  },
+  {
+    "question": "How do you run an interactive G16 task (Option 1 behavior) after allocating resources?",
+    "answer": "After allocating resources, load the module `module load gaussian/g16.c01` and then run `G16 g16_test2.com`."
+  },
+  {
+    "question": "Where does an interactive G16 task (Option 1 behavior) save its runtime files?",
+    "answer": "An interactive G16 task saves runtime files (like .rwf) to `/scratch/yourid/93288/`."
+  },
+  {
+    "question": "How do you run an interactive g16 task (Option 2 behavior) after allocating resources?",
+    "answer": "After allocating resources, load the module `module load gaussian/g16.c01` and then run `g16 < g16_test2.com >& g16_test2.log &`."
+  },
+  {
+    "question": "Where does an interactive g16 task (Option 2 behavior) save its runtime files?",
+    "answer": "An interactive g16 task saves runtime files to `/localscratch/yourid/`."
+  },
+  {
+    "question": "From what file type can a Gaussian task be restarted?",
+    "answer": "A Gaussian task can be restarted from the previous `.rwf` file. Geometric optimization can be restarted from the `.chk` file."
+  },
+  {
+    "question": "What types of calculations can be restarted using an `.rwf` file?",
+    "answer": "The `.rwf` file allows restarting single-step calculations such as analytical frequency calculations (including properties like ROA and VCD with ONIOM), CCSD and EOM-CCSD calculations, NMR, Polar=OptRot, and CID, CISD, CCD, QCISD, and BD energies."
+  },
+  {
+    "question": "What information is necessary to restart a Gaussian task from an `.rwf` file?",
+    "answer": "You need to know the location of the previous `.rwf` file."
+  },
+  {
+    "question": "How do you configure a Gaussian input file to restart a task from an `.rwf` file?",
+    "answer": "Indicate the path to the previous `.rwf` file using `%rwf=/scratch/yourid/jobid/name.rwf`, modify the keyword line to `#p restart`, and leave a blank line at the end."
+  }
+]

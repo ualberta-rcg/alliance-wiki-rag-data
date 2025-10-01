@@ -1,0 +1,70 @@
+[
+  {
+    "question": "What is an ephemeral instance?",
+    "answer": "An ephemeral instance is an instance without a backing volume."
+  },
+  {
+    "question": "What is the recommended size limit for ephemeral instances when using Glance images and volume snapshots for migration?",
+    "answer": "This method is recommended for instances with ephemeral storage less than 150GB in size."
+  },
+  {
+    "question": "Which migration approach is preferred for ephemeral instances larger than 150GB?",
+    "answer": "For instances larger than 150GB, the 'Manual or orchestrated migration' approach is preferred."
+  },
+  {
+    "question": "What kind of data needs to be copied separately during ephemeral instance migration, regardless of the method?",
+    "answer": "Data from any non-boot ephemeral storage (i.e., mounted under `/mnt`) needs to be copied separately."
+  },
+  {
+    "question": "What are the initial steps for migrating ephemeral instances using Glance images and volume snapshots?",
+    "answer": "The initial steps involve opening two SSH sessions to `cloudmigration.computecanada.ca` with your account credentials, sourcing the OpenStack RC file for West Cloud in one and for Arbutus Cloud in the other, and using the `screen` command for session maintenance."
+  },
+  {
+    "question": "How do you create a snapshot of an instance using the West Cloud web UI for ephemeral instance migration?",
+    "answer": "In the West Cloud web UI, navigate to 'Compute -> Instances' and select 'Create Snapshot' from the drop-down menu for the desired instance."
+  },
+  {
+    "question": "What CLI command can be used to create an image (snapshot) from an instance?",
+    "answer": "The CLI command `nova image-create --poll <instancename> <snapshotname>` can be used to create an image (snapshot) from an instance."
+  },
+  {
+    "question": "How do you download a snapshot from West Cloud using the CLI in the migration host session?",
+    "answer": "In the West Cloud session on the migration host, use the command `glance image-download --progress --file <filename> <imageid>`."
+  },
+  {
+    "question": "How do you upload a snapshot to Arbutus Cloud using the CLI in the migration host session?",
+    "answer": "In the Arbutus Cloud session on the migration host, use the command `glance image-create --progress --visibility private --container-format bare --disk-format qcow2 --name <imagename> --file <filename>`."
+  },
+  {
+    "question": "What should be done after successfully migrating and validating ephemeral instances to Arbutus Cloud and updating DNS records?",
+    "answer": "After validating and updating DNS records, delete the old instances on the legacy West Cloud."
+  },
+  {
+    "question": "What is a crucial preliminary step when migrating an ephemeral instance using Linux 'dd'?",
+    "answer": "It is important to shut down as many services as possible on the instance prior to migration, ideally leaving only SSH running."
+  },
+  {
+    "question": "How can you install the OpenStack CLI on a CentOS-based instance if it's not already installed?",
+    "answer": "As root, run `yum install epel-release`, then `yum install python-devel python-pip gcc`, and finally `pip install python-openstackclient`."
+  },
+  {
+    "question": "How do you verify connectivity to the OpenStack API on Arbutus after copying and sourcing the RC file on the instance?",
+    "answer": "Execute the command `openstack image list`."
+  },
+  {
+    "question": "What is the typical root disk device on an instance, and how can you verify it?",
+    "answer": "The root disk on the instance is typically `/dev/vda1`; verify this using the `df` command."
+  },
+  {
+    "question": "How do you create an image from an ephemeral instance's root disk using the `dd` utility and OpenStack CLI?",
+    "answer": "Use the command `dd if=/dev/vda | openstack image create --private --container-format bare --disk-format raw \"ephemeralmigrate\"`."
+  },
+  {
+    "question": "Where can you find the image created from an ephemeral instance's root disk after using the 'dd' method?",
+    "answer": "The image should be visible under 'Compute -> Images' in the Arbutus Cloud web UI."
+  },
+  {
+    "question": "What factor determines the most appropriate method for copying data between instances in West Cloud and Arbutus Cloud?",
+    "answer": "The most appropriate method depends upon the size of the data volumes in your tenant."
+  }
+]

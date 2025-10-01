@@ -1,0 +1,114 @@
+[
+  {
+    "question": "How do you specify the input filename for an AnsysEDT batch job in a Slurm script using an options file?",
+    "answer": "You specify the input filename by setting the `YOUR_AEDT_FILE` variable, for example: `YOUR_AEDT_FILE=\"TransientGeoRadar.aedt\"`."
+  },
+  {
+    "question": "How do you remove previous output files for an AnsysEDT batch job?",
+    "answer": "You can remove previous output files using the command: `rm -rf $YOUR_AEDT_FILE.* ${YOUR_AEDT_FILE}results`."
+  },
+  {
+    "question": "How do you define options like `TempDirectory` and `HPCLicenseType` in an AnsysEDT batch job using an options file?",
+    "answer": "You create an `Options.txt` file with content like:\n```\n$begin 'Config'\n'TempDirectory'='$SLURM_TMPDIR'\n'HPCLicenseType'='pool'\n'HFSS/EnableGPU'=0\n$end 'Config'\n```"
+  },
+  {
+    "question": "What modules are loaded for AnsysEDT 2023R2 in the sample batch script?",
+    "answer": "The modules loaded are `StdEnv/2023` and `ansysedt/2023R2`."
+  },
+  {
+    "question": "What is the final AnsysEDT command used for batch solving with an options file?",
+    "answer": "The command is: `ansysedt -monitor -UseElectronicsPPE -ng -distributed -machinelist list=localhost:1:$SLURM_NTASKS -batchoptions $OPTIONS_TXT -batchsolve \"$YOUR_AEDT_FILE\"`."
+  },
+  {
+    "question": "Where can Ansys programs be run interactively in GUI mode?",
+    "answer": "Ansys programs can be run interactively in GUI mode on cluster compute nodes or Graham VDI Nodes."
+  },
+  {
+    "question": "What is the maximum duration for running AnsysEDT interactively on a single compute node?",
+    "answer": "AnsysEDT can be run interactively on a single compute node for up to 24 hours."
+  },
+  {
+    "question": "How do you start an interactive session on a compute node for AnsysEDT with specific resources?",
+    "answer": "You can use an `salloc` command, for example: `salloc --time=3:00:00 --nodes=1 --cores=8 --mem=16G --account=def-group`."
+  },
+  {
+    "question": "What steps are required to load AnsysEDT modules and start the GUI on a compute node?",
+    "answer": "After starting an interactive session and running `xfwm4 --replace &`, you load modules like `module load StdEnv/2023 ansysedt/2023R2` and then type `ansysedt`."
+  },
+  {
+    "question": "What one-time configuration is needed in the AnsysEDT GUI for HPC and Analysis Options on compute nodes?",
+    "answer": "You need to click `Tools -> Options -> HPC and Analysis Options -> Edit`, then untick 'Use Automatic Settings box'."
+  },
+  {
+    "question": "How do you initiate an interactive analysis in the AnsysEDT GUI?",
+    "answer": "To run an interactive analysis, click `Project -> Analyze All`."
+  },
+  {
+    "question": "What are the specifications for Ansys programs run on Graham VDI nodes?",
+    "answer": "Ansys programs can run for up to 7 days on Graham VDI nodes (gra-vdi.alliancecan.ca) using 8 cores (16 cores max) and 128GB memory."
+  },
+  {
+    "question": "What are the benefits of using Graham VDI nodes for Ansys programs?",
+    "answer": "The VDI System provides GPU OpenGL acceleration, making it ideal for tasks benefiting from high-performance graphics such as creating/modifying simulation input files, post-processing data, or visualizing simulation results."
+  },
+  {
+    "question": "What is the maximum recommended job size for parallel jobs on gra-vdi?",
+    "answer": "The maximum job size for any parallel job run on gra-vdi should be limited to 16 cores to avoid overloading the servers."
+  },
+  {
+    "question": "How can a user run two simultaneous Ansys GUI jobs on gra-vdi?",
+    "answer": "To run two simultaneous GUI jobs, establish two independent VNC sessions: connect to `gra-vdi3.sharcnet.ca` for the first and `gra-vdi4.sharecnet.ca` for the second, then start Ansys in GUI mode within each session."
+  },
+  {
+    "question": "Are there time limits for simulations run on gra-vdi?",
+    "answer": "Unlike compute nodes, there is no time limit constraint on gra-vdi when running simulations."
+  },
+  {
+    "question": "What modules should be loaded to run AnsysEDT 2023R2 on VDI nodes?",
+    "answer": "You should open a terminal and load `module load SnEnv` followed by `module load ansysedt/2023R2`."
+  },
+  {
+    "question": "What one-time configuration is needed in the AnsysEDT GUI for the HPC License type on VDI nodes?",
+    "answer": "You need to click `Tools -> Options -> HPC and Analysis Options -> Options`, then change the `HPC License` pulldown to 'Pool' to allow more than 4 cores to be used, and then click 'OK'."
+  },
+  {
+    "question": "How do you copy the 2023R2 Antennas examples directory into your account for AnsysEDT?",
+    "answer": "Log in to a cluster (like graham), load `module load ansysedt/2023R2`, then run `mkdir -p ~/Ansoft/$EBVERSIONANSYSEDT; cd ~/Ansoft/$EBVERSIONANSYSEDT; rm -rf Antennas` followed by `cp -a $EBROOTANSYSEDT/v232/Linux64/Examples/HFSS/Antennas ~/Ansoft/$EBVERSIONANSYSEDT`."
+  },
+  {
+    "question": "What steps are involved in running an example simulation within the AnsysEDT GUI?",
+    "answer": "Open a simulation .aedt file, click `HFSS -> Validation Check` (repeat if errors), then click `Project -> Analyze All` to run the simulation."
+  },
+  {
+    "question": "How do you quit AnsysEDT without saving a converged solution?",
+    "answer": "To quit without saving the converged solution, click `File -> Close -> No`."
+  },
+  {
+    "question": "What commands can be used to troubleshoot AnsysEDT if it crashes and won't restart?",
+    "answer": "You can try running `pkill -9 -u $USER -f \"ansys*|mono|mwrpcss|apip-standalone-service\"` and `rm -rf ~/.mw` (this will make ansysedt re-run first-time configuration on startup)."
+  },
+  {
+    "question": "Can the SHARCNET Ansys license be used for AnsysEDT modules on any Alliance cluster?",
+    "answer": "Yes, the SHARCNET Ansys license can be used for AnsysEDT modules on any Alliance cluster by any researcher for free."
+  },
+  {
+    "question": "How do you configure your `ansys.lic` file to use the SHARCNET Ansys license?",
+    "answer": "Your `~/.licenses/ansys.lic` file should contain:\n```bash\nsetenv(\"ANSYSLMD_LICENSE_FILE\", \"1055@license3.sharcnet.ca\")\nsetenv(\"ANSYSLI_SERVERS\", \"2325@license3.sharcnet.ca\")\n```"
+  },
+  {
+    "question": "Why might a user choose to use local Ansys modules instead of global environment modules?",
+    "answer": "Local modules may be preferred if a specific version is not yet installed into the global environment on all systems, either because it's very new or due to technical issues."
+  },
+  {
+    "question": "What are suitable uses for AnsysEDT on gra-vdi when using local modules?",
+    "answer": "Suitable uses include running a single test job interactively with up to 8 cores and/or 128G RAM, creating or modifying simulation input files, or post-processing and visualizing data."
+  },
+  {
+    "question": "What are the steps to load a local AnsysEDT module and run it graphically on gra-vdi?",
+    "answer": "Connect to `gra-vdi.computecanada.ca` with TigerVNC, open a terminal, load `module load SnEnv` and then `module load ansysedt/2024R2.1` (or older), and finally type `ansysedt` to start the program."
+  },
+  {
+    "question": "How do you choose the license server (SHARCNET or CMC) when starting AnsysEDT from local modules on gra-vdi?",
+    "answer": "After starting `ansysedt`, press `y` and `Enter` to accept conditions. Then, press `Enter` to use the SHARCNET license server by default (accepting 'n' option), or change 'n' to 'y' and hit enter to use the CMC license server."
+  }
+]

@@ -1,58 +1,70 @@
 [
   {
-    "question": "How can I use rsync for local file transfers within a single system to a project directory?",
-    "answer": "You can use the command `rsync -avh --no-g --no-p LOCALNAME ~/projects/def-professor/someuser/somedir/`. The `somedir` will be created if it does not already exist before copying `LOCALNAME` into it."
+    "question": "How can `rsync` be used to transfer a directory or file locally within a single system?",
+    "answer": "Rsync can be used locally by dropping the cluster name, for example: `rsync -avh --no-g --no-p LOCALNAME ~/projects/def-professor/someuser/somedir/`."
   },
   {
-    "question": "How does the `cp` command behave differently from `rsync` when transferring a directory locally?",
-    "answer": "The `cp` command, like `cp -rv --preserve=\"mode,timestamps\" LOCALNAME ~/projects/def-professor/someuser/somedir/`, can transfer files locally. However, unlike `rsync`, if `LOCALNAME` is a directory and `somedir` does not exist, `LOCALNAME` will be renamed to `somedir`."
+    "question": "What happens if the destination directory (`somedir`) does not exist during a local `rsync` transfer?",
+    "answer": "The `somedir` will be created if it doesn't already exist."
   },
   {
-    "question": "Under what circumstances should I use checksums to verify if files match between two systems?",
-    "answer": "You should use a checksum utility if Globus is unavailable for synchronization between two systems and Rsync is taking too long to determine if files match."
+    "question": "How does the `cp` command differ from `rsync` when transferring a local directory to a non-existent destination directory?",
+    "answer": "Unlike `rsync`, if the `LOCALNAME` is a directory, `cp` will rename it to `somedir` if `somedir` does not exist."
   },
   {
-    "question": "Which checksum utility is mentioned as an example for checking file matches?",
-    "answer": "The `sha1sum` utility is used as an example for checking if files match."
+    "question": "What `cp` command can be used for local file transfers while preserving mode and timestamps?",
+    "answer": "The command `cp -rv --preserve=\"mode,timestamps\" LOCALNAME ~/projects/def-professor/someuser/somedir/` can be used."
   },
   {
-    "question": "How do I generate SHA1 checksums for all files in a directory and save them to a log file?",
-    "answer": "You can use the command `find /home/username/ -type f -print0 | xargs -0 sha1sum | tee checksum-result.log` to generate checksums and save them to `checksum-result.log`."
+    "question": "When should checksum utilities be used to verify if files match between two systems?",
+    "answer": "Checksum utilities should be used if Globus is unavailable and Rsync is taking too long to synchronize files between two systems."
   },
   {
-    "question": "What information is stored in the `checksum-result.log` file?",
-    "answer": "The `checksum-result.log` file will contain all of the checksums for the files found in the specified directory (e.g., `/home/username/`)."
+    "question": "Which specific checksum utility is used in the provided example to check if files match?",
+    "answer": "`sha1sum` is used as the checksum utility in the example."
   },
   {
-    "question": "What is recommended when running the checksum command for a large number of files or very large files?",
-    "answer": "For many or very large files, it is recommended to run the checksum command in the background, in a `screen` or `tmux` session, to ensure it continues even if your SSH connection times out."
+    "question": "What command generates SHA1 checksums for all files in a user's home directory and logs them to a file?",
+    "answer": "The command `find /home/username/ -type f -print0 | xargs -0 sha1sum | tee checksum-result.log` generates and logs SHA1 checksums."
   },
   {
-    "question": "After generating checksum log files on two systems, how can I find files that don't match?",
+    "question": "What is the purpose of the `checksum-result.log` file created by the checksum generation command?",
+    "answer": "The `checksum-result.log` file contains all of the checksums for the files in `/home/username/`."
+  },
+  {
+    "question": "What is recommended if generating checksums for many files or very large files that might cause an SSH connection to time out?",
+    "answer": "It is recommended to run the checksum generation command in the background, in a `GNU Screen` or `tmux` session, to prevent interruption if the SSH connection times out."
+  },
+  {
+    "question": "How do you find files that don't match after generating checksum logs on two different systems?",
     "answer": "After running the checksum command on both systems, you can use the `diff` utility, such as `diff checksum-result-silo.log checksum-dtn.log`, to find files that don't match."
   },
   {
-    "question": "What should I do if `diff` shows many false differences when comparing checksum log files?",
-    "answer": "If `diff` shows many false differences because the `find` command may have crawled directories in a different order, you should `sort` both files by their second column before running `diff`, for example: `sort -k2 checksum-result-silo.log -o checksum-result-silo.log` and `sort -k2 checksum-dtn.log -o checksum-dtn.log`."
+    "question": "Why might `diff` produce false differences when comparing checksum logs generated by the `find` command?",
+    "answer": "The `find` command might crawl through directories in a different order, which can result in a lot of false differences when comparing checksum logs with `diff`."
   },
   {
-    "question": "What is SFTP and what protocol does it use for data transfer?",
-    "answer": "SFTP stands for Secure File Transfer Protocol and it uses the SSH protocol to transfer files between machines, which encrypts the data being transferred."
+    "question": "How can you correct for directory order differences before comparing checksum logs with `diff`?",
+    "answer": "You can correct for directory order differences by running `sort -k2` on both checksum log files before running `diff`, for example: `sort -k2 checksum-result-silo.log -o checksum-result-silo.log`."
   },
   {
-    "question": "How do I initiate an SFTP connection to a remote machine using a username and address?",
-    "answer": "You can initiate an SFTP connection using the command `sftp USERNAME@ADDRESS`."
+    "question": "What is SFTP and what protocol does it use for file transfer?",
+    "answer": "SFTP stands for Secure File Transfer Protocol and it uses the SSH protocol to encrypt data being transferred between machines."
   },
   {
-    "question": "How can I connect to a remote machine via SFTP using an SSH key for authentication?",
-    "answer": "You can connect using the `-i` option to specify your private key, for example: `sftp -i /home/name/.ssh/id_rsa USERNAME@ADDRESS`."
+    "question": "How do you initiate an SFTP connection to a remote machine using a username and its address?",
+    "answer": "You can connect to a remote machine using SFTP with the command `sftp USERNAME@ADDRESS`."
   },
   {
-    "question": "Once connected to the SFTP prompt, how can I view the available commands?",
-    "answer": "At the `sftp>` prompt, you can type `help` to get a list of available commands."
+    "question": "How can you connect to a remote machine via SFTP using an SSH Key for authentication?",
+    "answer": "You can connect using the `-i` option, for example: `sftp -i /home/name/.ssh/id_rsa USERNAME@ADDRESS`."
   },
   {
-    "question": "What are some graphical SFTP programs available for different operating systems?",
-    "answer": "Graphical SFTP programs include WinSCP and MobaXterm for Windows, FileZilla for Windows, Mac, and Linux, and Cyberduck for Mac and Windows."
+    "question": "What prompt indicates a successful SFTP connection, and how do you list available commands?",
+    "answer": "A successful SFTP connection returns the `sftp>` prompt, and you can get a list of available commands by entering `help`."
+  },
+  {
+    "question": "Which graphical programs are available for SFTP transfers on Windows, Linux, and Mac OS?",
+    "answer": "Graphical programs available for SFTP include WinSCP and MobaXterm (Windows), FileZilla (Windows, Mac, and Linux), and Cyberduck (Mac and Windows)."
   }
 ]

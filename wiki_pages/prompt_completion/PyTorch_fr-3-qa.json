@@ -1,62 +1,46 @@
 [
   {
-    "question": "What features does PyTorch offer?",
-    "answer": "PyTorch provides tensor computation with strong GPU acceleration (similar to NumPy) and deep learning neural networks within a tape-based gradient system."
+    "question": "What is the purpose of the `Net` class in the `cifar10-cpu.py` script?",
+    "answer": "The `Net` class defines a convolutional neural network (CNN) model with convolutional layers, pooling layers, and fully connected layers for classification."
   },
   {
-    "question": "What is LibTorch used for?",
-    "answer": "LibTorch allows implementing C++ extensions to PyTorch and pure C++ machine learning applications. Python models written with PyTorch can be converted and used in C++ with TorchScript."
+    "question": "How is the CIFAR10 dataset handled by default in the `cifar10-cpu.py` script?",
+    "answer": "The `cifar10-cpu.py` script attempts to load the CIFAR10 dataset from the `./data` directory, with `download=False` set. Users are advised to download the data manually beforehand."
   },
   {
-    "question": "How do you install PyTorch wheels?",
-    "answer": "First, load a Python module with `module load python`. Then, create and activate a virtual environment. Finally, install PyTorch within the virtual environment using `pip install --no-index torch`."
+    "question": "What are the command-line steps to download the CIFAR10 dataset as instructed?",
+    "answer": "First, create the directory with `mkdir -p data && cd data`, then download using `wget https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz`, extract with `tar zxf cifar-10-python.tar.gz`, and finally `cd ..`."
   },
   {
-    "question": "What are the components of the `Net` class in the `cifar10-gpu.py` example?",
-    "answer": "The `Net` class consists of two convolutional layers (`conv1`, `conv2`), max-pooling layers (`pool`), and three fully connected linear layers (`fc1`, `fc2`, `fc3`)."
+    "question": "What optimizer and loss function are configured in the `cifar10-cpu.py` example?",
+    "answer": "The example uses `optim.SGD` (Stochastic Gradient Descent) as the optimizer and `nn.CrossEntropyLoss()` as the loss function."
   },
   {
-    "question": "How is a PyTorch model loaded onto the GPU in the `cifar10-gpu.py` example?",
-    "answer": "The model is loaded onto the GPU by calling `.cuda()` on the `Net` instance, like `net = Net().cuda()`."
+    "question": "What is the `pytorch-multi-cpu.sh` script used for?",
+    "answer": "The `pytorch-multi-cpu.sh` script is an example SLURM job submission script for running the `cifar10-cpu.py` application, specifically designed to observe the effect of CPU core allocation on performance."
   },
   {
-    "question": "How is the loss function loaded onto the GPU in the `cifar10-gpu.py` example?",
-    "answer": "The loss function is loaded onto the GPU by calling `.cuda()` on the `nn.CrossEntropyLoss()` instance, like `criterion = nn.CrossEntropyLoss().cuda()`."
+    "question": "How does `pytorch-multi-cpu.sh` prepare the Python environment for the job?",
+    "answer": "It loads a Python module, creates a virtual environment in `$SLURM_TMPDIR/env` without downloading, activates it, and then installs `torch` and `torchvision` using `pip install --no-index`."
   },
   {
-    "question": "When is it appropriate to use data parallelism with a single GPU?",
-    "answer": "Data parallelism with a single GPU is a good option for models of relatively small size combined with a very large dataset, especially if training needs to be performed with small batch sizes."
+    "question": "Which environment variable should be set to control the number of CPU threads in the `pytorch-multi-cpu.sh` script?",
+    "answer": "The `OMP_NUM_THREADS` environment variable should be set to `$SLURM_CPUS_PER_TASK`."
   },
   {
-    "question": "What does data parallelism refer to in the context of deep learning?",
-    "answer": "Data parallelism refers to methods for training multiple copies of a model in parallel, where each copy receives a portion of the training data during each iteration. Gradients are then aggregated, and parameters are updated synchronously or asynchronously."
+    "question": "Is it always advisable to use a GPU for model training on clusters?",
+    "answer": "No, it is not always advisable. For very small models, training might be faster with one or more CPUs, and users should not request a GPU if their code cannot make reasonable use of its compute capacity."
   },
   {
-    "question": "What important adjustment might be necessary when employing data parallelism?",
-    "answer": "To ensure that the trained model is equivalent to a model trained without parallelism, you must adjust the learning rate or the desired batch size based on the number of model copies."
+    "question": "What two factors contribute to the performance advantage of GPUs for deep learning tasks?",
+    "answer": "GPUs offer performance advantages due to their ability to parallelize key operations on thousands of computing cores and their much larger memory bandwidth compared to CPUs."
   },
   {
-    "question": "Which PyTorch class is recommended by developers for data parallelism, even with a single GPU?",
-    "answer": "The `DistributedDataParallel` class is recommended by PyTorch developers for data parallelism, and it can be employed with a single GPU despite being designed for multiple GPUs."
+    "question": "What specialized libraries does PyTorch use for parallel operations on GPUs?",
+    "answer": "PyTorch uses specialized libraries such as CUDNN or MIOpen, depending on the hardware platform, for parallel implementations of deep learning operators like matrix product and convolution."
   },
   {
-    "question": "What is the purpose of NVIDIA Multi-Process Service (MPS) when using data parallelism with a single GPU?",
-    "answer": "NVIDIA Multi-Process Service (MPS) is used with MPI to efficiently place multiple copies of a model onto a single GPU, increasing resource utilization and speed, especially for smaller models."
-  },
-  {
-    "question": "How is the process group initialized for `DistributedDataParallel` when using a single GPU and MPS in the `cifar10-gpu-mps.py` example?",
-    "answer": "The process group is initialized using `dist.init_process_group(backend=\"mpi\", init_method=args.init_method)`. The backend \"mpi\" or \"gloo\" is used because NCCL does not work on a single GPU due to a hard-coded multi-GPU topology check."
-  },
-  {
-    "question": "What are the SLURM directives used in `pytorch-gpu-mps.sh` to request a single GPU and multiple model replicas?",
-    "answer": "The SLURM script uses `#SBATCH --gres=gpu:1` to request one GPU and `#SBATCH --tasks-per-node=8` to specify the number of model replicas that will be placed on that GPU."
-  },
-  {
-    "question": "How is NVIDIA MPS activated in the `pytorch-gpu-mps.sh` script?",
-    "answer": "NVIDIA MPS is activated by setting the environment variables `export CUDA_MPS_PIPE_DIRECTORY=/tmp/nvidia-mps` and `export CUDA_MPS_LOG_DIRECTORY=/tmp/nvidia-log`, and then running `nvidia-cuda-mps-control -d`."
-  },
-  {
-    "question": "What is a known issue with PyTorch 1.10 concerning distributed training with `DistributedDataParallel`?",
-    "answer": "With PyTorch 1.10 (`torch-1.10.0+computecanada`), code using `DistributedDataParallel` might fail unpredictably if the backend is set to `'nccl'` or `'gloo'`. It is recommended to use a more recent PyTorch version or PyTorch 1.9.1."
+    "question": "Under what conditions is it beneficial to use a GPU for an AI task?",
+    "answer": "It is beneficial to use a GPU when the task involves elements that can be massively parallelized, either in terms of the number of operations or the quantity of data to be processed, or ideally both, such as with large models or large input datasets."
   }
 ]

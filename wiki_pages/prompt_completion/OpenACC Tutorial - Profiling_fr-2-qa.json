@@ -1,0 +1,74 @@
+[
+  {
+    "question": "How do you load the CUDA module containing `nvprof` on a cluster?",
+    "answer": "You load it by executing the command `module load cuda/11.7`."
+  },
+  {
+    "question": "What arguments are necessary to profile a pure CPU executable with `nvprof`?",
+    "answer": "You must add the arguments `--cpu-profiling on` to the command line when running `nvprof` for a pure CPU executable."
+  },
+  {
+    "question": "Provide an example command to profile a CPU executable named `cg.x` using `nvprof`.",
+    "answer": "The command to profile `cg.x` would be `nvprof --cpu-profiling on ./cg.x`."
+  },
+  {
+    "question": "Which function consumed the most execution time according to the `nvprof` output provided?",
+    "answer": "The `matvec()` function used 83.5% of the execution time."
+  },
+  {
+    "question": "From which function is `matvec()` called, based on the `nvprof` results?",
+    "answer": "The `matvec()` function is called from the `main()` function."
+  },
+  {
+    "question": "What key questions should be considered to understand compiler behavior before optimizing code?",
+    "answer": "One should ask: What automatic optimizations were applied by the compiler? What prevented further optimization? And, how would small modifications affect performance?"
+  },
+  {
+    "question": "Which NVIDIA compiler flag is used to obtain information about compiler optimizations?",
+    "answer": "The `-Minfo` indicator is used to get information about compiler optimizations from the NVIDIA compiler."
+  },
+  {
+    "question": "What types of information are included when using the `all` option with the `-Minfo` flag?",
+    "answer": "The `all` option prints nearly all types of information, including `accel` for accelerator-related operations, `inline` for function inlining, and `loop,mp,par,stdpar,vect` for loop optimization and vectorization details."
+  },
+  {
+    "question": "What does the `accel` sub-option of `-Minfo` provide?",
+    "answer": "The `accel` sub-option provides information on compiler operations related to the accelerator."
+  },
+  {
+    "question": "What does the `inline` sub-option of `-Minfo` provide?",
+    "answer": "The `inline` sub-option provides information on extracted and aligned functions."
+  },
+  {
+    "question": "Which `-Minfo` sub-options provide details on loop optimization and vectorization?",
+    "answer": "The `loop,mp,par,stdpar,vect` sub-options provide information on loop optimization and vectorization."
+  },
+  {
+    "question": "How can you get information about loop intensity from the NVIDIA compiler?",
+    "answer": "You can use the `intensity` option with the `-Minfo` flag, for example, `-Minfo=intensity`."
+  },
+  {
+    "question": "What is the default behavior of the `-Minfo` flag if no specific options are provided?",
+    "answer": "When no options are specified, `-Minfo` produces the same result as the `all` option, but without the information provided by `inline`."
+  },
+  {
+    "question": "How can you modify a Makefile to enable comprehensive compiler information, including intensity?",
+    "answer": "You need to set `CXX=nvc++`, `CXXFLAGS=-fast -Minfo=all,intensity`, and `LDFLAGS=${CXXFLAGS}` in the Makefile, and then perform a new build."
+  },
+  {
+    "question": "What optimization did the compiler apply to the `initialize_vector` function when `Intensity = 0.0`?",
+    "answer": "The compiler applied a 'Memory set idiom' optimization, replacing the loop with a call to `__c_mset8`."
+  },
+  {
+    "question": "What compiler optimizations were applied to the `dot` function loop with `Intensity = 1.00`?",
+    "answer": "The compiler generated vector SIMD code for the loop containing reductions and generated FMA (fused multiply-add) instruction(s)."
+  },
+  {
+    "question": "Why was the `waxpby` loop not vectorized despite having an `Intensity = 1.00`?",
+    "answer": "The `waxpby` loop was not vectorized due to a data dependency, although vector SIMD code was generated and the loop was unrolled 2 times."
+  },
+  {
+    "question": "What does an `Intensity = 0.0` for `allocate_3d_poisson_matrix` suggest regarding loop optimizations?",
+    "answer": "It suggests that loops were not fused due to different trip counts, not vectorized/parallelized due to small loop counts, or completely unrolled."
+  }
+]

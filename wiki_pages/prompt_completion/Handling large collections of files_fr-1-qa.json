@@ -1,0 +1,102 @@
+[
+  {
+    "question": "What kind of challenges arise when managing hundreds of thousands of small files in domains like AI and Machine Learning?",
+    "answer": "When dealing with hundreds of thousands of files, particularly small ones, in AI and Machine Learning, significant problems occur with file system performance, automated backups of `/home` and `/project`, and it becomes crucial to consider file system object limits imposed by quotas."
+  },
+  {
+    "question": "How can one identify directories that contain a large number of files recursively within the current directory for optimization?",
+    "answer": "You can use the following code to recursively count files in subdirectories: `for FOLDER in $(find . -maxdepth 1 -type d | tail -n +2); do echo -ne \"$FOLDER:\\t\"; find $FOLDER -type f | wc -l; done`."
+  },
+  {
+    "question": "What command can be used to list the 10 directories that occupy the most disk space in the current directory?",
+    "answer": "The command `du -sh * | sort -hr | head -10` lists the 10 directories that occupy the most disk space in the current directory."
+  },
+  {
+    "question": "How does the performance of local disks on compute nodes compare to `/project` and `/scratch` file systems?",
+    "answer": "Local disks connected to compute nodes (SSD SATA or better) generally offer far superior performance compared to `/project` and `/scratch` file systems."
+  },
+  {
+    "question": "Is local disk usage managed by the scheduler on compute nodes?",
+    "answer": "No, a local disk is shared by all tasks executed simultaneously on one of its compute nodes, meaning the scheduler does not manage disk usage."
+  },
+  {
+    "question": "What is the approximate local disk capacity for CPU nodes on B\u00e9luga?",
+    "answer": "B\u00e9luga offers approximately 370GB of local disk for CPU nodes."
+  },
+  {
+    "question": "What type of local storage is available on B\u00e9luga GPU nodes and for what specific purpose?",
+    "answer": "B\u00e9luga GPU nodes have a 1.6TB NVMe disk to assist with AI image datasets that contain millions of small files."
+  },
+  {
+    "question": "Does the Niagara cluster provide local storage on its compute nodes?",
+    "answer": "Niagara does not offer local storage on its compute nodes."
+  },
+  {
+    "question": "How can local disk be accessed from within a task?",
+    "answer": "You can access the local disk from within a task using the environment variable `$SLURM_TMPDIR`."
+  },
+  {
+    "question": "Describe a common strategy for using local disk with large datasets within a compute task.",
+    "answer": "A common strategy is to keep your dataset in a single `tar` archive in `/project`, copy it to the local disk (`$SLURM_TMPDIR`) at the beginning of your task, extract it, use the data, and if changes occurred, archive the content and copy it back to `/project`."
+  },
+  {
+    "question": "What technology is used to implement `/tmp` as a RAM disk on compute nodes?",
+    "answer": "The `/tmp` file system can be used as a RAM disk on compute nodes and is implemented with `tmpfs`."
+  },
+  {
+    "question": "What happens to the contents of `/tmp` when a task finishes?",
+    "answer": "`/tmp` is emptied at the end of the task."
+  },
+  {
+    "question": "How does the memory usage of `/tmp` (`tmpfs`) interact with task limits?",
+    "answer": "Like all other memory usages by a task, `/tmp` (as `tmpfs`) counts towards the limit imposed by the `cgroup` associated with the `sbatch` request."
+  },
+  {
+    "question": "What is `dar`?",
+    "answer": "`dar` is a disk archiving utility designed to improve upon the `tar` tool."
+  },
+  {
+    "question": "What is HDF5 used for?",
+    "answer": "HDF5 is a binary file format for storing various types of data, including extended objects like matrices and images."
+  },
+  {
+    "question": "What is a primary benefit of using SQLite for data storage?",
+    "answer": "SQLite allows the use of relational databases contained in a single file recorded on disk, without the need for a server."
+  },
+  {
+    "question": "How can SQLite be useful for managing image files?",
+    "answer": "SQLite can be used to group binary large objects (BLOBs) like millions of image files (PNG or JPEG) into a single SQLite file, which is more practical than storing them individually."
+  },
+  {
+    "question": "What are the prerequisites for using SQLite effectively?",
+    "answer": "To use SQLite, you need to know SQL and be able to create a simple relational database."
+  },
+  {
+    "question": "When might SQLite's performance degrade, and what alternatives are suggested?",
+    "answer": "The performance of SQLite can degrade with very large databases (starting from several gigabytes); in such cases, more traditional approaches like MySQL or PostgreSQL with a database server are suggested."
+  },
+  {
+    "question": "What is the executable name for SQLite and how is it typically accessed on the systems described?",
+    "answer": "The SQLite executable is named `sqlite3` and is available through the `nixpkgs` module, which is loaded by default on these systems."
+  },
+  {
+    "question": "What tool is recommended for parallel compression of archives with a large number of files?",
+    "answer": "For creating an archive with a large number of files, it could be advantageous to use `pigz` for compression rather than `gzip`."
+  },
+  {
+    "question": "How can you compress a directory using `tar` with `pigz` leveraging 4 cores?",
+    "answer": "You can use the command `tar -vc --use-compress-program=\"pigz -p 4\" -f dir.tar.gz dir_to_tar` to compress a directory with `pigz` using 4 cores."
+  },
+  {
+    "question": "Is it always necessary to extract the entire content of an archive file?",
+    "answer": "No, it is not always necessary to extract all the content of an archive file."
+  },
+  {
+    "question": "How can a specific subdirectory be extracted from a gzipped tar archive to `$SLURM_TMPDIR`?",
+    "answer": "A specific subdirectory can be extracted from a gzipped tar archive to the local disk using `tar -zxf /path/to/archive.tar.gz dir/subdir --directory $SLURM_TMPDIR`."
+  },
+  {
+    "question": "What command can be used to accelerate Git performance when the number of files in the hidden subdirectory increases?",
+    "answer": "To accelerate Git performance when the number of files in the hidden subdirectory increases, you can use the command `git repack`, which groups many files into a few large databases."
+  }
+]

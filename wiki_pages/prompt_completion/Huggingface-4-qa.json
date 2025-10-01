@@ -1,0 +1,66 @@
+[
+  {
+    "question": "What are the convolutional layers defined in the `Net` model?",
+    "answer": "The `Net` model defines two convolutional layers: `self.conv1 = nn.Conv2d(3, 6, 5)` and `self.conv2 = nn.Conv2d(6, 16, 5)`."
+  },
+  {
+    "question": "What are the fully connected layers in the `Net` model?",
+    "answer": "The `Net` model includes three fully connected layers: `self.fc1 = nn.Linear(16 * 5 * 5, 120)`, `self.fc2 = nn.Linear(120, 84)`, and `self.fc3 = nn.Linear(84, 10)`."
+  },
+  {
+    "question": "How does the `forward` method process input in the `Net` model?",
+    "answer": "The `forward` method applies a sequence of operations: pooling after a ReLU activation on the first convolution, then pooling after a ReLU activation on the second convolution, followed by reshaping (`x.view(-1, 16 * 5 * 5)`), and then applying ReLU to the first two fully connected layers before the final output."
+  },
+  {
+    "question": "What data transformations are applied for training the `Net` model?",
+    "answer": "The training data undergoes `transforms.ToTensor()` and `transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))`."
+  },
+  {
+    "question": "Which dataset is used for training in the `pytorch-accelerate.py` example?",
+    "answer": "The `CIFAR10` dataset is used, loaded with `CIFAR10(root='./data', train=True, download=False, transform=transform_train)`."
+  },
+  {
+    "question": "What kind of sampler and loader are used for the training dataset?",
+    "answer": "A `torch.utils.data.distributed.DistributedSampler(dataset_train)` is used as a sampler, and a `DataLoader` is created with this sampler."
+  },
+  {
+    "question": "What loss function and optimizer are configured for the `Net` model?",
+    "answer": "The loss function is `nn.CrossEntropyLoss().cuda()` and the optimizer is `optim.SGD` with parameters `net.parameters()`, `lr=args.lr`, `momentum=0.9`, and `weight_decay=1e-4`."
+  },
+  {
+    "question": "What is the primary goal of the LLM training tutorial?",
+    "answer": "The goal of the LLM training tutorial is to illustrate best practices for training LLMs using Huggingface libraries on Alliance's clusters, and to avoid common pitfalls."
+  },
+  {
+    "question": "Which specific Large Language Model (LLM) and dataset are used for fine-tuning in the tutorial?",
+    "answer": "The tutorial fine-tunes Huggingface\u2019s `Zephyr model` (HuggingFaceH4/zephyr-7b-beta) on the `ultrachat_200k` dataset (HuggingFaceH4/ultrachat_200k)."
+  },
+  {
+    "question": "How should the `Zephyr-7b-beta` model be downloaded for LLM training?",
+    "answer": "The `Zephyr-7b-beta` model should be downloaded on a login node by navigating to the project directory, loading the `git-lfs` module, and then running `git clone https://huggingface.co/HuggingFaceH4/zephyr-7b-beta`."
+  },
+  {
+    "question": "What are the steps to download the `ultrachat_200k` dataset for LLM training?",
+    "answer": "On a login node, load `python/3.11`, `gcc`, and `arrow` modules, create and activate a virtual environment, install `datasets` via `pip install --no-index datasets`, create a directory `ultrachat_dataset`, set `HF_DATASETS_CACHE` to this directory, and run `python get_ultrachat.py`."
+  },
+  {
+    "question": "What is the content of the `get_ultrachat.py` script used for downloading the dataset?",
+    "answer": "The `get_ultrachat.py` script imports `load_dataset` from `datasets` and then calls `dataset = load_dataset('HuggingFaceH4/ultrachat_200k', split='train_gen')`."
+  },
+  {
+    "question": "What are the main factors that can impede LLM training performance?",
+    "answer": "The main factors are that the model might be too large to fit entirely into a single GPU's memory, or the training set, while small in size, consists of a large number of very small examples."
+  },
+  {
+    "question": "What strategies are recommended to mitigate performance issues during LLM training?",
+    "answer": "Recommended strategies include employing a method to shard the LLM across multiple GPUs and reading the dataset from the compute node\u2019s local storage (like `$SLURM_TMPDIR`) instead of the cluster\u2019s parallel filesystem, storing it in the node's memory afterwards."
+  },
+  {
+    "question": "How is the LLM sharded across multiple devices for efficient training?",
+    "answer": "The LLM is sharded across multiple devices using the `accelerate` library, along with a configuration file that describes a Fully Sharded Data Parallel (FSDP) strategy."
+  },
+  {
+    "question": "How is the dataset stored for LLM training to improve reading performance?",
+    "answer": "To improve reading performance, the dataset is copied over to `$SLURM_TMPDIR` (the compute node\u2019s local storage) before training starts."
+  }
+]

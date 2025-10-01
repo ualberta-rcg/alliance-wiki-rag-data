@@ -1,0 +1,102 @@
+[
+  {
+    "question": "What is the primary purpose of Fluent journal files?",
+    "answer": "Fluent journal files are used to automate simulations by including commands from Fluent's Text-User-Interface (TUI) to change simulation parameters, load files, run the solver, and write results."
+  },
+  {
+    "question": "How do you specify the file format (legacy or HDF5) for Fluent in a journal file?",
+    "answer": "You can use `/file/cff-files no` for the legacy .cas/.dat file format or `/file/cff-files yes` for the more efficient .cas.h5/.dat.h5 file format."
+  },
+  {
+    "question": "What is the default Fluent file format for module versions 2019R3 or older?",
+    "answer": "For Fluent module versions 2019R3 or older, the default file format is the legacy .cas/.dat format."
+  },
+  {
+    "question": "What is the default Fluent file format for module versions 2020R1 or newer?",
+    "answer": "For Fluent module versions 2020R1 or newer, the default file format is the more efficient .cas.h5/.dat.h5 format."
+  },
+  {
+    "question": "How can a Fluent journal file ensure that output files are overwritten by default?",
+    "answer": "A Fluent journal file can ensure output files are overwritten by default using the command `/file/confirm-overwrite no`."
+  },
+  {
+    "question": "What command runs the Fluent solver for a specified number of iterations in a journal file?",
+    "answer": "The command `/solve/iterate 1000` (where 1000 is the number of iterations) runs the Fluent solver in a journal file."
+  },
+  {
+    "question": "How do you auto-save data files at a specific frequency during a steady Fluent simulation?",
+    "answer": "You can auto-save data files at a specific frequency using `/file/auto-save/data-frequency 100`, which saves a data file every 100 iterations."
+  },
+  {
+    "question": "What Fluent journal command retains only the most recent auto-saved data files?",
+    "answer": "The command `/file/auto-save/retain-most-recent-files y` retains only the most recent data files, typically the last 5 by default."
+  },
+  {
+    "question": "How do you specify a subdirectory and naming convention for auto-saved Fluent data files in a journal?",
+    "answer": "Use `/file/auto-save/root-name output/FFF-out` to write data files to the `output/` subdirectory, appending the iteration number to the specified root name."
+  },
+  {
+    "question": "What journal commands are used to configure a transient simulation with a specific time step size and reporting interval?",
+    "answer": "You would use `/solve/set/time-step 0.0001` to set the physical time step size and `/solve/set/reporting-interval 1` to set the convergence monitors reporting interval."
+  },
+  {
+    "question": "How do you initialize a transient Fluent simulation using the hybrid initialization method via a journal file?",
+    "answer": "You can initialize a transient Fluent simulation with the hybrid initialization method using the command `/solve/initialize/hyb-initialization` in a journal file."
+  },
+  {
+    "question": "What command sets the total number of time steps and maximum iterations per time step for a transient Fluent simulation in a journal file?",
+    "answer": "The command `/solve/dual-time-iterate 1000 75` sets the simulation to run for 1000 time steps with a maximum of 75 iterations per time step."
+  },
+  {
+    "question": "What is the first step to using a User-Defined Function (UDF) on a cluster for Fluent?",
+    "answer": "The first step is to transfer your UDF source file (e.g., `sampleudf.c`) and any dependency files to the cluster, ensuring the text mode setting of your transfer client is used if coming from Windows."
+  },
+  {
+    "question": "Where should a UDF source file be placed on the cluster for a Fluent job?",
+    "answer": "The UDF should be placed in the same directory where your journal, case, and data files reside."
+  },
+  {
+    "question": "How should a Fluent case file be prepared to ensure journal file commands control UDF usage?",
+    "answer": "Before uploading your case file, ensure that neither the Interpreted UDFs Dialog Box nor the UDF Library Manager Dialog Box are configured to use any UDFs in the Fluent GUI, so that only journal file commands are in control."
+  },
+  {
+    "question": "What journal file command is used to interpret a UDF at runtime in Fluent?",
+    "answer": "To interpret a UDF at runtime, add `define/user-defined/interpreted-functions \"sampleudf.c\" \"cpp\" 10000 no` to your journal file before commands that read simulation files."
+  },
+  {
+    "question": "Can a compiled UDF be simply copied from a local machine (e.g., laptop) to the Alliance cluster?",
+    "answer": "No, a compiled UDF cannot be simply copied from a remote system (like a laptop) to the Alliance cluster because its library dependencies will not be satisfied, causing Fluent to crash."
+  },
+  {
+    "question": "How do you compile a UDF on an Alliance cluster for use with Fluent?",
+    "answer": "To compile a UDF, you must run it on an Alliance cluster at least once using the journal command `define/user-defined/compiled-functions compile libudf yes sampleudf.c \"\" \"\"` or by compiling it through the Fluent GUI."
+  },
+  {
+    "question": "What journal command should be used to load an already compiled UDF for Fluent, assuming the `libudf` directory exists?",
+    "answer": "Once a UDF is compiled and the `libudf` directory exists, you can load it using the journal command `define/user-defined/compiled-functions load libudf`."
+  },
+  {
+    "question": "Why is it inefficient to compile a UDF with every job submission using the journal file?",
+    "answer": "Compiling a UDF for each job is highly inefficient and can lead to race-time-like build conflicts if multiple jobs are run from the same directory."
+  },
+  {
+    "question": "What steps are necessary to parallelize a UDF for use in Fluent parallel jobs?",
+    "answer": "Parallelizing a UDF involves adding compiler directives, predicates, and reduction macros into your working serial UDF to control how different processes execute the code."
+  },
+  {
+    "question": "Where can users find detailed documentation on parallel considerations for Fluent UDFs?",
+    "answer": "Detailed documentation can be found under `Part I: Chapter 7: Parallel Considerations` of the Ansys 2024 `Fluent Customization Manual`."
+  },
+  {
+    "question": "How can UDFs be used to customize Discrete Phase Models (DPM) in Fluent?",
+    "answer": "UDFs can customize DPM by interacting with its features, as described in the `2024R2 Fluent Users Guide` (Chapter 24) and `2024R2 Fluent Customization Manual` (Chapter 2)."
+  },
+  {
+    "question": "What journal command enables updating DPM source terms every flow iteration in Fluent?",
+    "answer": "The command `/define/models/dpm/interaction/coupled-calculations yes` enables updating DPM source terms every flow iteration in a Fluent journal file."
+  },
+  {
+    "question": "How can DPM injection creation be automated in a Fluent journal file using an injection text file?",
+    "answer": "After solution initialization, you can use a command like `/define/models/dpm/injections/create injection-0:1 no yes file no zinjection01.inj no no no no` to create an injection from a specified text file."
+  }
+]

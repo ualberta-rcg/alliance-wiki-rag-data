@@ -1,0 +1,26 @@
+[
+  {
+    "question": "How can I add new users to a VM via cloudInit while also preserving the default user created by the distribution?",
+    "answer": "To preserve the default user (e.g., `debian`, `centos`, `ubuntu`) when adding new users with cloudInit, you must include `- default` in the `users:` section of your cloudInit script, along with the definitions for your new users."
+  },
+  {
+    "question": "Provide an example cloudInit script that preserves the default user and adds 'gretzky' with sudo access and 'lemieux' without sudo access.",
+    "answer": "The following cloudInit script preserves the default user and adds 'gretzky' with sudo permissions and 'lemieux' without:\n```yaml\n#cloud-config\nusers:\n  - default\n  - name: gretzky\n    shell: /bin/bash\n    sudo: ALL=(ALL) NOPASSWD:ALL\n    ssh_authorized_keys:\n      - <Gretzky's public key goes here>\n  - name: lemieux\n    shell: /bin/bash\n    ssh_authorized_keys:\n      - <Lemieux's public key goes here>\n```"
+  },
+  {
+    "question": "How do I verify if the public keys for newly added users have been correctly applied after a VM has launched?",
+    "answer": "After the VM has finished spawning, you should check the instance's log to ensure that the public keys have been added correctly for the specified users."
+  },
+  {
+    "question": "Where can I find the log for an OpenStack instance to confirm user key additions?",
+    "answer": "The log for an instance can be found by clicking on the name of the instance on the \"Compute->Instances\" panel and then selecting the \"log\" tab."
+  },
+  {
+    "question": "What should the VM log display if public keys have been successfully added for users like 'gretzky' and 'lemieux'?",
+    "answer": "The log should show entries such as \"ci-info: ++++++++Authorized keys from /home/gretzky/.ssh/authorized_keys for user gretzky++++++++\" and \"ci-info: ++++++++++++Authorized keys from /home/lemieux/.ssh/authorized_keys for user lemieux++++++++++++\", detailing the key type, fingerprint, options, and comment for each user."
+  },
+  {
+    "question": "After successfully adding users and their public keys via cloudInit, how do these users log into the VM?",
+    "answer": "Once the public keys are added correctly, users can log into the VM using their corresponding private keys as usual."
+  }
+]

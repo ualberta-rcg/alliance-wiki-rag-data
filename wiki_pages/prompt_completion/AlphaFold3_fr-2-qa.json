@@ -1,0 +1,38 @@
+[
+  {
+    "question": "How are GPU memory preallocation settings configured for AlphaFold3 inference?",
+    "answer": "GPU memory preallocation is configured by setting `export XLA_PYTHON_CLIENT_PREALLOCATE=true` and `export XLA_CLIENT_MEM_FRACTION=0.95`."
+  },
+  {
+    "question": "What is the primary command to run the AlphaFold3 model inference stage?",
+    "answer": "The command is `python run_alphafold.py --db_dir=$DOWNLOAD_DIR --input_dir=$INPUT_DIR --output_dir=$OUTPUT_DIR --jax_compilation_cache_dir=$HOME/.cache --norun_data_pipeline`."
+  },
+  {
+    "question": "What does the `--norun_data_pipeline` argument signify in the AlphaFold3 inference command?",
+    "answer": "It signifies that the command should 'Run inference stage' and not the data pipeline."
+  },
+  {
+    "question": "How do you submit independent AlphaFold3 data and inference jobs to the scheduler?",
+    "answer": "First, submit the data stage with `sbatch alphafold3-data.sh`. After it completes, submit the inference stage with `sbatch alphafold3-inference.sh`."
+  },
+  {
+    "question": "How do you submit AlphaFold3 data and inference jobs with a dependency so the inference job only runs after the data job succeeds?",
+    "answer": "You can use `jid1=$(sbatch alphafold3-data.sh)` to get the first job ID, then `jid2=$(sbatch --dependency=afterok:$jid1 alphafold3-inference.sh)` to submit the dependent inference job."
+  },
+  {
+    "question": "What action is required if the first AlphaFold3 job stage (data pipeline) fails when using dependent tasks?",
+    "answer": "If the first stage fails, you must manually cancel the second stage using `scancel -u $USER -n alphafold3-inference`."
+  },
+  {
+    "question": "Under what conditions should unified memory be activated for AlphaFold3 to address insufficient GPU memory?",
+    "answer": "Unified memory should be activated if you want to run AlphaFold3 with more than 5120 tokens or on a GPU with less memory, such as an A100 with 40GB."
+  },
+  {
+    "question": "Which environment variables should be added to the inference submission script to enable unified memory for AlphaFold3?",
+    "answer": "Add `export XLA_PYTHON_CLIENT_PREALLOCATE=false`, `export TF_FORCE_UNIFIED_MEMORY=true`, and `export XLA_CLIENT_MEM_FRACTION=2.0` (adjusting the fraction as needed)."
+  },
+  {
+    "question": "What SBATCH parameter needs to be adjusted when enabling unified memory for AlphaFold3, and what is an example value?",
+    "answer": "The `#SBATCH --mem` parameter needs to be adjusted, for example, to `#SBATCH --mem=80G`."
+  }
+]

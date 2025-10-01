@@ -1,0 +1,74 @@
+[
+  {
+    "question": "Comment peut-on ajouter une v\u00e9rification de la pr\u00e9sence d'un GPU fonctionnel dans le script `job_script.sh` ?",
+    "answer": "Pour v\u00e9rifier la pr\u00e9sence d'un GPU fonctionnel, on peut ajouter un script bash qui ex\u00e9cute `nvidia-smi` et v\u00e9rifie son code de retour. Si `nvidia-smi` \u00e9choue (code de retour non nul), la m\u00e9tat\u00e2che s'arr\u00eate avec `exit 1` avant d'ex\u00e9cuter `task.run`."
+  },
+  {
+    "question": "Quel utilitaire peut \u00eatre utilis\u00e9 pour tester la pr\u00e9sence d'un GPU sur Nibi ?",
+    "answer": "L'utilitaire `gpu_test` peut \u00eatre utilis\u00e9. Pour l'obtenir sur Nibi, il faut le copier dans votre r\u00e9pertoire `~/bin` avec la commande `cp ~syam/bin/gpu_test ~/bin`."
+  },
+  {
+    "question": "Quel est le but du m\u00e9canisme int\u00e9gr\u00e9 \u00e0 META pour la d\u00e9tection des probl\u00e8mes de m\u00e9tat\u00e2ches ?",
+    "answer": "Le m\u00e9canisme int\u00e9gr\u00e9 \u00e0 META tente de d\u00e9tecter les probl\u00e8mes et d'interrompre une m\u00e9tat\u00e2che qui passerait trop rapidement sur les cas, ce qui pourrait indiquer un dysfonctionnement du n\u0153ud allou\u00e9."
+  },
+  {
+    "question": "Quels sont les param\u00e8tres utilis\u00e9s par le m\u00e9canisme de protection de META et o\u00f9 sont-ils d\u00e9finis ?",
+    "answer": "Les param\u00e8tres utilis\u00e9s sont `N_failed_max` et `dt_failed`, et ils sont d\u00e9finis dans le fichier `config.h`."
+  },
+  {
+    "question": "Quand le m\u00e9canisme de protection de META se d\u00e9clenche-t-il ?",
+    "answer": "Le m\u00e9canisme de protection se d\u00e9clenche lorsque les `$N_failed_max` premiers cas sont d'une dur\u00e9e inf\u00e9rieure \u00e0 `$dt_failed` secondes."
+  },
+  {
+    "question": "Quelles sont les valeurs par d\u00e9faut pour les param\u00e8tres `N_failed_max` et `dt_failed` du m\u00e9canisme de protection ?",
+    "answer": "Les valeurs par d\u00e9faut pour `N_failed_max` et `dt_failed` sont toutes deux de 5. Cela signifie que la m\u00e9tat\u00e2che s'arr\u00eate par d\u00e9faut si les 5 premiers cas sont termin\u00e9s en moins de 5 secondes."
+  },
+  {
+    "question": "Que faut-il faire si le m\u00e9canisme de protection de META se d\u00e9clenche parce que certains cas ont une dur\u00e9e d'ex\u00e9cution tr\u00e8s courte ?",
+    "answer": "Si le m\u00e9canisme se d\u00e9clenche \u00e0 cause de cas ayant une dur\u00e9e d'ex\u00e9cution naturellement courte, il faut diminuer la valeur de `dt_failed` dans le fichier `config.h`."
+  },
+  {
+    "question": "Quels fichiers de sortie sont cr\u00e9\u00e9s dans le r\u00e9pertoire du groupe de cas lorsqu'une ou plusieurs m\u00e9tat\u00e2ches sont en cours d'ex\u00e9cution ?",
+    "answer": "Les fichiers `OUTPUT/slurm-$JOBID.out` (contenant la sortie standard par m\u00e9tat\u00e2che) et `STATUSES/status.$JOBID` (contenant l'\u00e9tat de chaque cas trait\u00e9 par m\u00e9tat\u00e2che) sont cr\u00e9\u00e9s, ainsi qu'un r\u00e9pertoire `MISC`."
+  },
+  {
+    "question": "Que repr\u00e9sente `$JOBID` dans les noms des fichiers de sortie cr\u00e9\u00e9s par META ?",
+    "answer": "`$JOBID` repr\u00e9sente l'identifiant de la t\u00e2che (Job ID) pour la m\u00e9tat\u00e2che correspondante."
+  },
+  {
+    "question": "O\u00f9 META cr\u00e9e-t-il des sous-r\u00e9pertoires temporaires contenant de petits fichiers de travail ?",
+    "answer": "Chaque fois que `submit.run` est ex\u00e9cut\u00e9, un sous-r\u00e9pertoire unique est cr\u00e9\u00e9 dans `/home/$USER/tmp` pour les petits fichiers de travail, tels que ceux utilis\u00e9s par `lockfile`."
+  },
+  {
+    "question": "Comment sont nomm\u00e9s les sous-r\u00e9pertoires temporaires cr\u00e9\u00e9s dans `/home/$USER/tmp` ?",
+    "answer": "Les noms de ces sous-r\u00e9pertoires contiennent `$NODE.$PID`, o\u00f9 `$NODE` est le nom du n\u0153ud actuel (g\u00e9n\u00e9ralement un n\u0153ud de connexion) et `$PID` est l'identifiant unique du processus pour le script."
+  },
+  {
+    "question": "Quand un sous-r\u00e9pertoire temporaire cr\u00e9\u00e9 dans `/home/$USER/tmp` peut-il \u00eatre supprim\u00e9 ?",
+    "answer": "Ce sous-r\u00e9pertoire peut \u00eatre supprim\u00e9 une fois que le traitement complet du groupe de cas est termin\u00e9."
+  },
+  {
+    "question": "Quelle commande permet de supprimer les fichiers temporaires et les r\u00e9sultats d'un groupe de cas ?",
+    "answer": "La commande `clean.run` permet de supprimer les fichiers temporaires et tous les fichiers et sous-r\u00e9pertoires dans le r\u00e9pertoire du groupe de cas (\u00e0 l'exception de quelques fichiers importants), y compris ceux de `/home/$USER/tmp`."
+  },
+  {
+    "question": "Quel est le r\u00f4le de la commande `resubmit.run` ?",
+    "answer": "`resubmit.run` analyse tous les fichiers `status.*`, d\u00e9termine les cas qui ont \u00e9chou\u00e9 ou n'ont jamais \u00e9t\u00e9 ex\u00e9cut\u00e9s, cr\u00e9e un fichier `table.dat_` r\u00e9pertoriant ces cas, et lance un nouveau groupe de cas pour les traiter de nouveau."
+  },
+  {
+    "question": "Quels sont les arguments que la commande `resubmit.run` accepte ?",
+    "answer": "La commande `resubmit.run` accepte les m\u00eames arguments que `submit.run`: un nombre `N` (pour le mode META), l'option `-auto`, et des arguments `sbatch` optionnels."
+  },
+  {
+    "question": "Quand peut-on ex\u00e9cuter la commande `resubmit.run` ?",
+    "answer": "La commande `resubmit.run` ne peut \u00eatre ex\u00e9cut\u00e9e qu'une fois que toutes les t\u00e2ches de l'ex\u00e9cution d'origine sont termin\u00e9es ou annul\u00e9es."
+  },
+  {
+    "question": "Que peut-on faire si des cas continuent d'\u00e9chouer apr\u00e8s avoir utilis\u00e9 `resubmit.run` \u00e0 plusieurs reprises ?",
+    "answer": "Si des cas \u00e9chouent \u00e0 plusieurs reprises, il est probable qu'il y ait un probl\u00e8me avec le programme ou son entr\u00e9e. Dans ce cas, il est conseill\u00e9 d'utiliser la commande `Status.run -f` pour identifier plus facilement les cas en \u00e9chec."
+  },
+  {
+    "question": "Comment l'option `-f` de `Status.run` aide-t-elle au traitement des erreurs ?",
+    "answer": "L'option `-f` de `Status.run` trie le r\u00e9sultat en fonction de l'\u00e9tat de sortie, affichant les cas avec un \u00e9tat diff\u00e9rent de z\u00e9ro (c'est-\u00e0-dire les cas \u00e9chou\u00e9s) \u00e0 la fin de la liste pour mieux les rep\u00e9rer."
+  }
+]

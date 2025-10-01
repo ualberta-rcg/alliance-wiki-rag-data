@@ -1,0 +1,94 @@
+[
+  {
+    "question": "How do you verify the OpenStack CLI connection to Arbutus Cloud after sourcing the RC file on a temporary migration host?",
+    "answer": "You can verify the connection by executing the command `openstack image list`."
+  },
+  {
+    "question": "What should be done with the instance to be moved when using the Linux 'dd' migration method for volume-backed instances?",
+    "answer": "The instance to be moved should be deleted, but its attached volume must NOT be deleted."
+  },
+  {
+    "question": "How do you attach a detached volume to the temporary migration host in the West Cloud web UI?",
+    "answer": "Go to Compute -> Volumes, select 'Manage Attachments' from the drop-down menu for the desired volume, and then attach it to the temporary migration host."
+  },
+  {
+    "question": "What are the typical device names for an attached volume on a temporary migration host?",
+    "answer": "The typical device names are `/dev/vdb` or `/dev/vdc`."
+  },
+  {
+    "question": "How can an image be created from an attached disk of an instance using the `dd` utility?",
+    "answer": "You can use the command `dd if=/dev/vdb | openstack image create --private --container-format bare --disk-format raw \"volumemigrate\"`, replacing `/dev/vdb` with the actual device and `volumemigrate` with your chosen image name."
+  },
+  {
+    "question": "Where can a newly created image from the 'dd' utility be viewed in the Arbutus Cloud web UI?",
+    "answer": "The image should be visible under Compute -> Images in the Arbutus Cloud web UI."
+  },
+  {
+    "question": "What is important to consider when launching an instance from a 'dd'-created image if persistent data is desired?",
+    "answer": "Make sure to create a new volume when launching the instance if you want the data to be persistent."
+  },
+  {
+    "question": "What is the final step after migrating and validating volumes and instances, and updating associated DNS records?",
+    "answer": "Please delete your old instances and volumes on the legacy West Cloud."
+  },
+  {
+    "question": "What methods are recommended for migrating large volumes when image-based methods are not suitable?",
+    "answer": "Copying data using rsync or similar file copy tools is recommended. If that's not possible, especially for bootable volumes, the `dd` command can be used."
+  },
+  {
+    "question": "What crucial step should always be taken before performing large volume migrations with the `dd` command?",
+    "answer": "Always back up any important data prior to performing the steps."
+  },
+  {
+    "question": "What type of temporary instances should be created on both West Cloud and Arbutus Cloud for large volume migration using 'dd'?",
+    "answer": "Create a temporary instance with the smallest flavor possible (p1-1.5gb) using CentOS 7 as the OS on both West Cloud and Arbutus Cloud."
+  },
+  {
+    "question": "How should network access be configured for the temporary instances created for large volume migration?",
+    "answer": "Assign floating IP addresses to both temporary instances so you can SSH into them."
+  },
+  {
+    "question": "Which packages need to be installed on the temporary West Cloud instance for large volume migration?",
+    "answer": "You need to install `epel-release`, `pv`, and `screen`."
+  },
+  {
+    "question": "What specific command needs to be executed on the temporary Arbutus instance during large volume migration?",
+    "answer": "The command `chmod u+s /bin/dd` needs to be executed on the temporary Arbutus instance."
+  },
+  {
+    "question": "What SSH key should be copied to the temporary West Cloud instance for large volume migration?",
+    "answer": "The SSH private key used to log in as the 'centos' user on the temporary Arbutus instance should be copied."
+  },
+  {
+    "question": "What security rule adjustment is necessary to enable SSH connectivity between the temporary West Cloud and Arbutus instances?",
+    "answer": "Ensure SSH security rules allow the temporary West Cloud instance to SSH into the temporary Arbutus instance."
+  },
+  {
+    "question": "What are the steps to prepare volumes for migration using `dd` for large volumes?",
+    "answer": "For each volume: create an empty volume of the same size on Arbutus (marking it bootable if needed), attach it to the temporary Arbutus instance, and attach the source volume from West Cloud to the temporary West Cloud instance (you may need to detach/delete its associated instance first, but do NOT delete the volume)."
+  },
+  {
+    "question": "What `dd` command is used on the temporary West Cloud instance to copy a large volume to Arbutus?",
+    "answer": "First, start a screen session with `screen`, then execute `sudo dd bs=16M if=/dev/vdb | pv -s 96G | ssh -i key.pem centos@xxx.xx.xx.xx \"dd bs=16M of=/dev/vdb\"`, substituting `/dev/vdb` for the source and destination devices, `96G` for the volume size, `key.pem` for your SSH key, and `xxx.xx.xx.xx` for the Arbutus instance's IP."
+  },
+  {
+    "question": "Why is the `screen` command recommended when performing a large volume `dd` migration?",
+    "answer": "The `screen` command is recommended to maintain the session in case of SSH disconnections."
+  },
+  {
+    "question": "What is the outcome after successfully migrating a large volume using the `dd` command?",
+    "answer": "You will have an exact copy of the volume from West Cloud on Arbutus, which can then be used to launch instances on Arbutus."
+  },
+  {
+    "question": "For what size of ephemeral storage is the Glance image and volume snapshots method recommended for ephemeral instance migration?",
+    "answer": "This method is recommended for instances with ephemeral storage less than 150GB in size."
+  },
+  {
+    "question": "What approach is preferred for migrating ephemeral instances larger than 150GB?",
+    "answer": "For instances larger than 150GB, the 'Manual or orchestrated migration' approach is preferred."
+  },
+  {
+    "question": "How should data from non-boot ephemeral storage be handled during ephemeral instance migration?",
+    "answer": "Data from any non-boot ephemeral storage (i.e., mounted under `/mnt`) needs to be copied separately, referring to the 'Methods to copy data' section."
+  }
+]

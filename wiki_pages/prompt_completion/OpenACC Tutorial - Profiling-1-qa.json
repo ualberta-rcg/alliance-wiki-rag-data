@@ -1,0 +1,122 @@
+[
+  {
+    "question": "What are the primary learning objectives related to code profiling?",
+    "answer": "The learning objectives include understanding what a profiler is, how to use the NVPROF profiler, how code is performing, and where to focus time to rewrite time-consuming routines."
+  },
+  {
+    "question": "Why is code profiling necessary?",
+    "answer": "Code profiling is necessary to understand where time is being spent (hotspots), how the code is performing, and where to focus development time."
+  },
+  {
+    "question": "What does Amdahl's Law state about code optimization?",
+    "answer": "Amdahl's Law states that parallelizing the most time-consuming routines (i.e., the hotspots) will have the most impact on performance."
+  },
+  {
+    "question": "Where can one find the sample code used in this tutorial?",
+    "answer": "The sample code is available from the 'calculquebec/cq-formation-openacc' Git repository."
+  },
+  {
+    "question": "What is the goal of using the sample code in this example?",
+    "answer": "The goal is to compile and link the code, obtain an executable, and then profile its source code with a profiler."
+  },
+  {
+    "question": "Which compilers are recommended for advanced OpenACC support?",
+    "answer": "Compilers pushed by Cray and NVIDIA (through its HPC SDK, formerly Portland Group) offer the most advanced OpenACC support."
+  },
+  {
+    "question": "Which GNU GCC versions support OpenACC 2.6 as of July 2022?",
+    "answer": "As of July 2022, GCC versions 10, 11, and 12 support OpenACC version 2.6."
+  },
+  {
+    "question": "Which compiler and version are used for this tutorial?",
+    "answer": "The NVIDIA HPC SDK, version 22.7, is used for this tutorial."
+  },
+  {
+    "question": "Are NVIDIA compilers free for academic use?",
+    "answer": "Yes, NVIDIA compilers are free for academic usage."
+  },
+  {
+    "question": "What happens when the 'nvhpc/22.7' module is loaded?",
+    "answer": "Loading 'nvhpc/22.7' automatically replaces 'intel/2020.1.217' and reloads 'gcccore', 'libfabric', 'openmpi', and 'ucx' with newer versions."
+  },
+  {
+    "question": "How is the 'cg.x' executable created from 'main.cpp'?",
+    "answer": "It is created by compiling 'main.cpp' into 'main.o' using 'nvc++ -c -o main.o main.cpp', and then linking 'main.o' into 'cg.x' using 'nvc++ main.o -o cg.x'."
+  },
+  {
+    "question": "What are the system requirements for properly testing the 'cg.x' executable?",
+    "answer": "A proper test environment should have at least 4GB of available memory and at least two (2) CPU cores, as the executable uses about 3GB of memory and one CPU core at near 100%."
+  },
+  {
+    "question": "What two profilers are used in this tutorial?",
+    "answer": "The tutorial uses NVIDIA `nvprof` (a command-line text-based profiler) and NVIDIA Visual Profiler `nvvp` (a graphical analyzing tool)."
+  },
+  {
+    "question": "What type of code can NVIDIA `nvprof` analyze?",
+    "answer": "NVIDIA `nvprof` is a command-line text-based profiler that can analyze non-GPU codes."
+  },
+  {
+    "question": "When is NVIDIA Visual Profiler `nvvp` typically used?",
+    "answer": "NVIDIA Visual Profiler `nvvp` is a graphical cross-platform analyzing tool for codes written with OpenACC and CUDA C/C++ instructions."
+  },
+  {
+    "question": "Which profiler is used first for the `cg.x` executable and why?",
+    "answer": "The `nvprof` profiler is used first because the `cg.x` executable is not yet using the GPU."
+  },
+  {
+    "question": "How do you load the CUDA module to use `nvprof`?",
+    "answer": "You load the CUDA module by executing `module load cuda/11.7`."
+  },
+  {
+    "question": "What arguments are needed to profile a pure CPU executable with `nvprof`?",
+    "answer": "The arguments `--cpu-profiling on` need to be added to the command line, for example: `nvprof --cpu-profiling on ./cg.x`."
+  },
+  {
+    "question": "According to the `nvprof` output, which function is the main hotspot and what percentage of execution time does it consume?",
+    "answer": "The `matvec()` function is the main hotspot, responsible for 83.54% of the execution time."
+  },
+  {
+    "question": "What questions should one ask to understand compiler feedback before optimizing a routine?",
+    "answer": "One should ask what optimizations were applied automatically, what prevented further optimizations, and if minor code modifications can affect performance."
+  },
+  {
+    "question": "Which flag does the NVIDIA compiler offer for detailed compilation information?",
+    "answer": "The NVIDIA compiler offers the `-Minfo` flag for detailed compilation information."
+  },
+  {
+    "question": "What information is included with the `all` option of the `-Minfo` flag?",
+    "answer": "The `all` option prints almost all types of compilation information, including compiler operations related to the accelerator (`accel`), information about inlined functions (`inline`), and various information about loop optimization and vectorization (`loop,mp,par,stdpar,vect`)."
+  },
+  {
+    "question": "What does the `intensity` option for the `-Minfo` flag provide?",
+    "answer": "The `intensity` option prints compute intensity information about loops."
+  },
+  {
+    "question": "What happens if the `-Minfo` flag is used without any specific options?",
+    "answer": "If used without any options, `-Minfo` is equivalent to the `all` option, but without the `inline` information."
+  },
+  {
+    "question": "How can compiler feedback for 'all' and 'intensity' be enabled in the Makefile?",
+    "answer": "By editing the `Makefile` and setting `CXXFLAGS=-fast -Minfo=all,intensity` and `LDFLAGS=${CXXFLAGS}`."
+  },
+  {
+    "question": "What was the compiler feedback for the `initialize_vector` function after enabling `Minfo=all,intensity`?",
+    "answer": "The feedback showed an `Intensity = 0.0`, a 'Memory set idiom', and that the loop was replaced by a call to `__c_mset8`."
+  },
+  {
+    "question": "What optimization feedback did the `dot` function receive?",
+    "answer": "The `dot` function received feedback showing an `Intensity = 1.00`, 'Generated vector simd code for the loop containing reductions', and that 'FMA (fused multiply-add) instruction(s) generated'."
+  },
+  {
+    "question": "What compiler feedback was given for the `waxpby` function regarding vectorization and unrolling?",
+    "answer": "For `waxpby`, the feedback indicated an `Intensity = 1.00`, 'Loop not vectorized: data dependency', 'Generated vector simd code for the loop', and 'Loop unrolled 2 times', along with 'FMA (fused multiply-add) instruction(s) generated'."
+  },
+  {
+    "question": "What were some reasons given by the compiler for loops not being optimized in `allocate_3d_poisson_matrix`?",
+    "answer": "Reasons included 'Loop not fused: different loop trip count', 'Loop not vectorized/parallelized: loop count too small', and 'Loop not vectorized: data dependency'."
+  },
+  {
+    "question": "Did the compiler inline functions into `main`? Provide an example from the feedback.",
+    "answer": "Yes, several functions were inlined into `main`. For example, `allocate_3d_poisson_matrix(matrix &, int) inlined, size=41 (inline) file main.cpp (29)`."
+  }
+]

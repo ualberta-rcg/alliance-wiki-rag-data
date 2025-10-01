@@ -1,70 +1,58 @@
 [
   {
-    "question": "Comment peut-on mettre en place l'interception d'un signal pour la copie de donn\u00e9es de $SLURM_TMPDIR vers le stockage r\u00e9seau?",
-    "answer": "Pour ce faire, il faut \u00e9crire une fonction pour l'interpr\u00e9teur (shell) afin que la copie soit faite et utiliser la commande `trap` pour associer la fonction avec le signal."
+    "question": "Quels sont les risques li\u00e9s \u00e0 la conservation des donn\u00e9es dans `$SLURM_TMPDIR` en utilisant la m\u00e9thode d'interception de signal ?",
+    "answer": "Le contenu de `$SLURM_TMPDIR` ne sera pas conserv\u00e9 si un n\u0153ud tombe en panne ou si le syst\u00e8me de fichiers r\u00e9seau conna\u00eet un probl\u00e8me."
   },
   {
-    "question": "O\u00f9 peut-on trouver plus d'informations sur les signaux envoy\u00e9s par Slurm?",
-    "answer": "Pour plus d'information, consultez la page du CRIANN : [https://services.criann.fr/en/services/hpc/cluster-myria/guide/signals-sent-by-slurm/]."
+    "question": "Quelles sont les limitations de `cp` ou `tar -x` pour les t\u00e2ches multi-n\u0153uds Slurm o\u00f9 chaque n\u0153ud doit utiliser des donn\u00e9es ?",
+    "answer": "Pour les t\u00e2ches r\u00e9parties sur plusieurs n\u0153uds o\u00f9 chacun doit utiliser les donn\u00e9es, `cp` ou `tar -x` seuls ne sont pas suffisants."
   },
   {
-    "question": "Quels sont les risques de la m\u00e9thode d'interception de signal pour la conservation du contenu de $SLURM_TMPDIR?",
-    "answer": "Avec cette m\u00e9thode, le contenu de $SLURM_TMPDIR ne sera pas conserv\u00e9 si un n\u0153ud tombe en panne ou si le syst\u00e8me de fichiers r\u00e9seau conna\u00eet un probl\u00e8me."
-  },
-  {
-    "question": "Dans quel cas les commandes `cp` ou `tar -x` sont-elles insuffisantes pour g\u00e9rer les donn\u00e9es avec $SLURM_TMPDIR?",
-    "answer": "Elles ne sont pas suffisantes si une t\u00e2che est r\u00e9partie sur plusieurs n\u0153uds et que chacun d'eux doit utiliser les donn\u00e9es."
-  },
-  {
-    "question": "Comment copier des fichiers sur le $SLURM_TMPDIR de chacun des n\u0153uds allou\u00e9s pour une t\u00e2che multi-n\u0153uds?",
+    "question": "Comment copier des fichiers vers `$SLURM_TMPDIR` sur chacun des n\u0153uds allou\u00e9s dans une t\u00e2che multi-n\u0153uds ?",
     "answer": "Utilisez la commande `srun --ntasks=$SLURM_NNODES --ntasks-per-node=1 cp file [files...] $SLURM_TMPDIR`."
   },
   {
-    "question": "Comment extraire une archive ZIP vers $SLURM_TMPDIR sur plusieurs n\u0153uds?",
+    "question": "Quelle commande permet d'extraire une archive ZIP vers `$SLURM_TMPDIR` sur tous les n\u0153uds d'une t\u00e2che multi-n\u0153uds ?",
     "answer": "Utilisez la commande `srun --ntasks=$SLURM_NNODES --ntasks-per-node=1 unzip archive.zip -d $SLURM_TMPDIR`."
   },
   {
-    "question": "Comment extraire un fichier Tarball vers $SLURM_TMPDIR sur plusieurs n\u0153uds?",
+    "question": "Comment extraire une archive Tarball (par exemple, .tar.gz) vers `$SLURM_TMPDIR` sur tous les n\u0153uds d'une t\u00e2che multi-n\u0153uds ?",
     "answer": "Utilisez la commande `srun --ntasks=$SLURM_NNODES --ntasks-per-node=1 tar -xvf archive.tar.gz -C $SLURM_TMPDIR`."
   },
   {
-    "question": "Comment $SLURM_TMPDIR est-il impl\u00e9ment\u00e9 sur la grappe Niagara et quelles sont les implications pour l'espace disponible?",
-    "answer": "Sur Niagara, $SLURM_TMPDIR est impl\u00e9ment\u00e9 comme RAMdisk, ce qui signifie que l'espace disponible est limit\u00e9 par la m\u00e9moire du n\u0153ud, moins la capacit\u00e9 de RAM utilis\u00e9e par l'application."
+    "question": "Comment `$SLURM_TMPDIR` est-il impl\u00e9ment\u00e9 sur la grappe Trillium et quelle est la limitation d'espace ?",
+    "answer": "Sur Trillium, `$SLURM_TMPDIR` est impl\u00e9ment\u00e9 comme un RAMdisk; l'espace disponible est donc limit\u00e9 par la m\u00e9moire du n\u0153ud moins la capacit\u00e9 de RAM utilis\u00e9e par votre application."
   },
   {
-    "question": "De quoi d\u00e9pend la quantit\u00e9 d'espace disponible dans $SLURM_TMPDIR pour les grappes d'usage g\u00e9n\u00e9ral?",
+    "question": "De quoi d\u00e9pend la quantit\u00e9 d'espace `$SLURM_TMPDIR` sur les grappes d'usage g\u00e9n\u00e9ral ?",
     "answer": "La quantit\u00e9 d'espace disponible d\u00e9pend de la grappe et du n\u0153ud auquel votre t\u00e2che est assign\u00e9e."
   },
   {
-    "question": "Quelle est la capacit\u00e9 de $SLURM_TMPDIR et la capacit\u00e9 disque pour la grappe B\u00e9luga?",
-    "answer": "Pour B\u00e9luga, la capacit\u00e9 $SLURM_TMPDIR est de 370G et la capacit\u00e9 disque est de 480G."
+    "question": "Quelle est la capacit\u00e9 de `$SLURM_TMPDIR` pour la grappe Fir ?",
+    "answer": "La capacit\u00e9 de `$SLURM_TMPDIR` pour la grappe Fir est de 7T."
   },
   {
-    "question": "Quelle est la capacit\u00e9 de $SLURM_TMPDIR et la capacit\u00e9 disque pour la grappe Cedar?",
-    "answer": "Pour Cedar, la capacit\u00e9 $SLURM_TMPDIR est de 840G et la capacit\u00e9 disque est de 960G."
+    "question": "Quelle est la capacit\u00e9 de `$SLURM_TMPDIR` pour la grappe Narval ?",
+    "answer": "La capacit\u00e9 de `$SLURM_TMPDIR` pour la grappe Narval est de 800G."
   },
   {
-    "question": "Quelle est la capacit\u00e9 de $SLURM_TMPDIR et la capacit\u00e9 disque pour la grappe Graham?",
-    "answer": "Pour Graham, la capacit\u00e9 $SLURM_TMPDIR est de 750G et la capacit\u00e9 disque est de 960G."
+    "question": "Quelle est la capacit\u00e9 de `$SLURM_TMPDIR` pour la grappe Nibi ?",
+    "answer": "La capacit\u00e9 de `$SLURM_TMPDIR` pour la grappe Nibi est de 3T."
   },
   {
-    "question": "Quelle est la capacit\u00e9 de $SLURM_TMPDIR et la capacit\u00e9 disque pour la grappe Narval?",
-    "answer": "Pour Narval, la capacit\u00e9 $SLURM_TMPDIR est de 800G et la capacit\u00e9 disque est de 960G."
+    "question": "Quelle est la capacit\u00e9 de `$SLURM_TMPDIR` pour la grappe Rorqual ?",
+    "answer": "La capacit\u00e9 de `$SLURM_TMPDIR` pour la grappe Rorqual est de 375G."
   },
   {
-    "question": "Que repr\u00e9sente la capacit\u00e9 indiqu\u00e9e pour $SLURM_TMPDIR dans le tableau des grappes?",
-    "answer": "La capacit\u00e9 indiqu\u00e9e pour $SLURM_TMPDIR est celle du plus petit n\u0153ud de chaque grappe."
+    "question": "Comment la r\u00e9servation de n\u0153uds entiers influence-t-elle l'espace `$SLURM_TMPDIR` disponible ?",
+    "answer": "Si votre t\u00e2che r\u00e9serve des n\u0153uds entiers, il est raisonnable de penser qu'autant d'espace `$SLURM_TMPDIR` sera disponible sur chaque n\u0153ud."
   },
   {
-    "question": "Si une t\u00e2che r\u00e9serve des n\u0153uds entiers, quelle quantit\u00e9 d'espace $SLURM_TMPDIR sera disponible sur chaque n\u0153ud?",
-    "answer": "Si une t\u00e2che r\u00e9serve des n\u0153uds entiers, il est raisonnable de penser qu'autant d'espace $SLURM_TMPDIR que la capacit\u00e9 indiqu\u00e9e sera disponible sur chaque n\u0153ud."
+    "question": "Que se passe-t-il avec l'espace `$SLURM_TMPDIR` si une t\u00e2che demande moins qu'un n\u0153ud entier ?",
+    "answer": "Si une t\u00e2che demande moins qu'un n\u0153ud entier, d'autres t\u00e2ches pourront aussi \u00e9crire dans le m\u00eame syst\u00e8me de fichiers, limitant ainsi l'espace disponible pour votre t\u00e2che."
   },
   {
-    "question": "Que se passe-t-il si une t\u00e2che demande moins qu'un n\u0153ud entier en termes d'espace $SLURM_TMPDIR?",
-    "answer": "Si une t\u00e2che demande moins qu'un n\u0153ud entier, d'autres t\u00e2ches pourront aussi \u00e9crire dans le m\u00eame syst\u00e8me de fichiers (mais non dans le m\u00eame r\u00e9pertoire) et ainsi limiter l'espace disponible pour votre t\u00e2che."
-  },
-  {
-    "question": "Est-ce que tous les n\u0153uds ont la m\u00eame capacit\u00e9 d'espace disque local que celle indiqu\u00e9e dans le tableau?",
-    "answer": "Non, certains n\u0153uds ont plus d'espace disque local qu'indiqu\u00e9 dans le tableau; il faut consulter la section 'Caract\u00e9ristiques des n\u0153uds' pour chaque grappe pour plus de d\u00e9tails."
+    "question": "O\u00f9 trouver des informations sur les n\u0153uds ayant plus d'espace disque local que ce qui est indiqu\u00e9 dans le tableau des capacit\u00e9s ?",
+    "answer": "Ces informations se trouvent dans la section 'Caract\u00e9ristiques des n\u0153uds' pour chacune des grappes (Fir, Narval, Nibi, Rorqual)."
   }
 ]

@@ -1,0 +1,90 @@
+[
+  {
+    "question": "How should most users submit MPI or distributed memory parallel jobs?",
+    "answer": "Most users should follow the example given at 'Running jobs' and simply request a number of processes with `--ntasks` or `-n`, trusting the scheduler to allocate them efficiently."
+  },
+  {
+    "question": "Where can users find more detailed control over job allocation in Slurm?",
+    "answer": "Users can find more control over job allocation on SchedMD's page about multicore support, which details how options to the `sbatch` command constrain process placement."
+  },
+  {
+    "question": "What is the simplest way to specify the number of MPI processes for a Slurm job?",
+    "answer": "The simplest way to specify the number of MPI processes for a Slurm job is by using the `--ntasks` option."
+  },
+  {
+    "question": "Why might a user need to specify memory allocation for an MPI job if they are using `--ntasks`?",
+    "answer": "The default memory allocation of 256MB per core is often insufficient, so users may wish to specify more memory using `--mem-per-cpu` since the number of cores per node is not known in advance when using `--ntasks`."
+  },
+  {
+    "question": "Provide an example of a basic Slurm job script requesting 15 MPI processes with 3GB of memory per CPU.",
+    "answer": "A basic job script would look like this: `#!/bin/bash #SBATCH --ntasks=15 #SBATCH --mem-per-cpu=3G srun application.exe`"
+  },
+  {
+    "question": "How would Slurm allocate 15 MPI processes requested with `--ntasks=15`?",
+    "answer": "Slurm could allocate the 15 MPI processes on a single node, on 15 different nodes, or on any number of nodes in between."
+  },
+  {
+    "question": "When is it advisable to request whole nodes for a parallel job?",
+    "answer": "It is advisable to request whole nodes for large parallel jobs that can efficiently use 32 cores or more."
+  },
+  {
+    "question": "What are the typical CPU and usable memory configurations for B\u00e9luga cluster nodes?",
+    "answer": "Typical B\u00e9luga nodes have 40 cores and 186 GiB of usable memory (approximately 4.6 GiB/core)."
+  },
+  {
+    "question": "What are the typical CPU and usable memory configurations for Graham cluster nodes?",
+    "answer": "Typical Graham nodes have 32 cores and 125 GiB of usable memory (approximately 3.9 GiB/core)."
+  },
+  {
+    "question": "What are the typical CPU and usable memory configurations for Cedar (Skylake) cluster nodes?",
+    "answer": "Typical Cedar (Skylake) nodes have 48 cores and 187 GiB of usable memory (approximately 3.9 GiB/core)."
+  },
+  {
+    "question": "What are the typical CPU and usable memory configurations for Narval cluster nodes?",
+    "answer": "Typical Narval nodes have 64 cores and 249 GiB of usable memory (approximately 3.9 GiB/core) and feature AMD EPYC Rome processors."
+  },
+  {
+    "question": "What is a unique characteristic of job submission on the Niagara cluster?",
+    "answer": "Only whole-node jobs are possible at Niagara, where nodes have 40 cores and 188 GiB of memory."
+  },
+  {
+    "question": "What does `--mem=0` signify when requested in a Slurm job script?",
+    "answer": "Slurm interprets `--mem=0` as a request to reserve all the available memory on each node assigned to the job."
+  },
+  {
+    "question": "When should a user explicitly request memory instead of using `--mem=0` for whole node jobs?",
+    "answer": "Users should explicitly request the memory amount if they need more memory per node than the smallest node provides (e.g., more than 125 GiB at Graham), because some memory is reserved for the operating system."
+  },
+  {
+    "question": "How can a user request a job with 15 cores on a single node and a total of 45GB of memory?",
+    "answer": "A user can use a job script with `#SBATCH --nodes=1 #SBATCH --ntasks-per-node=15 #SBATCH --mem=45G srun application.exe`."
+  },
+  {
+    "question": "What is the advantage of using `--mem=45G` over `--mem-per-cpu=3G` for a multi-process job on a single node?",
+    "answer": "Using `--mem=45G` ensures the job runs as long as the total memory consumed by all processes doesn't exceed 45GB. If `--mem-per-cpu=3G` were used instead, the job would be cancelled if any single process exceeded 3GB."
+  },
+  {
+    "question": "For a hybrid job combining MPI processes and OpenMP/Posix threads, how should MPI process count and thread count be specified in Slurm?",
+    "answer": "The MPI process count should be set using `--ntasks` or `--ntasks-per-node`, and the thread count should be set with `--cpus-per-task`."
+  },
+  {
+    "question": "In a hybrid job script, what does the `--ntasks` option refer to?",
+    "answer": "In a hybrid job script, `--ntasks` refers to the number of MPI processes that will be started by `srun`."
+  },
+  {
+    "question": "Provide an example of Slurm options for a hybrid job with 16 MPI processes, each spawning 4 threads, and 3GB memory per CPU core.",
+    "answer": "The Slurm options would be `--ntasks=16 --cpus-per-task=4 --mem-per-cpu=3G`, and the `srun` command should include `--cpus-per-task=$SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "How much memory will each MPI process be allocated in a hybrid job configured with `--cpus-per-task=4` and `--mem-per-cpu=3G`?",
+    "answer": "Each MPI process will be allocated 12GB of memory (4 cores * 3GB/core)."
+  },
+  {
+    "question": "Since which Slurm version is it required to specify `--cpus-per-task=$SLURM_CPUS_PER_TASK` for `srun` in hybrid jobs?",
+    "answer": "It is a requirement since Slurm 22.05, though it also functions correctly with older versions."
+  },
+  {
+    "question": "How can a user submit a hybrid job that uses exactly two whole nodes, with 8 MPI processes per node, 4 threads per process, and 96GB of memory per node?",
+    "answer": "A user can submit such a job using the options `--nodes=2 --ntasks-per-node=8 --cpus-per-task=4 --mem=96G`, along with `srun --cpus-per-task=$SLURM_CPUS_PER_TASK application.exe`."
+  }
+]

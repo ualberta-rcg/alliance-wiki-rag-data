@@ -1,70 +1,82 @@
 [
   {
-    "question": "What is the importance of checking the last line of the `terraform plan` output?",
-    "answer": "It is important to check the last line, such as \"Plan: 1 to add, 0 to change, 0 to destroy,\" to confirm if Terraform intends to add, change, or destroy resources as expected, preventing unintended operations."
+    "question": "What should you check in the Terraform plan output before applying changes?",
+    "answer": "You should double-check the last line of the plan, such as \"Plan: 1 to add, 0 to change, 0 to destroy.\""
   },
   {
-    "question": "Does Terraform manage or affect OpenStack resources that were created manually or outside of its configuration?",
-    "answer": "No, Terraform has no knowledge of resources already defined in the project that are not part of its configuration and will not affect them."
+    "question": "Does Terraform affect existing OpenStack resources that are not defined in its configuration?",
+    "answer": "No, Terraform has no knowledge of resources already defined in the project and does not attempt to determine their existing state; therefore, it will not affect them."
   },
   {
-    "question": "Can pre-existing OpenStack resources be brought under Terraform management?",
-    "answer": "Yes, it is possible to import previously defined OpenStack resources into Terraform, but the document notes it is not a trivial amount of work."
+    "question": "What does Terraform base its actions on?",
+    "answer": "Terraform bases its actions on the given configuration and previously determined state relevant to that configuration."
   },
   {
-    "question": "What command is used to apply the changes outlined in a Terraform plan?",
-    "answer": "The `terraform apply` command is used to actually effect the changes described in the plan."
+    "question": "Is it possible to import existing OpenStack resources into Terraform?",
+    "answer": "Yes, it is possible to import previously defined OpenStack resources into Terraform, but it is not a trivial amount of work."
   },
   {
-    "question": "What is required to confirm the actions during a `terraform apply` execution?",
-    "answer": "You must explicitly type 'yes' when prompted to approve the actions Terraform will perform."
+    "question": "How do you apply the changes described in a Terraform plan?",
+    "answer": "Use the command `terraform apply` to actually effect the changes described in the plan."
   },
   {
-    "question": "What error might occur if you try to create an OpenStack VM with Terraform without specifying a network?",
-    "answer": "An 'Error creating OpenStack server: Expected HTTP response code [...] but got 409 instead {\"conflictingRequest\": {\"message\": \"Multiple possible networks found, use a Network ID to be more specific.\", \"code\": 409}}' error might occur."
+    "question": "What input is required to confirm `terraform apply` actions?",
+    "answer": "You must type 'yes' to approve and perform the actions described by `terraform apply`."
   },
   {
-    "question": "Why does Terraform produce a 'Multiple possible networks found' error during VM creation?",
-    "answer": "This error occurs because OpenStack projects typically have at least two networks (one private and one public), and Terraform needs to know which one to use for the VM."
+    "question": "What error might occur if Terraform cannot identify the correct network for an OpenStack VM?",
+    "answer": "An error stating \"Multiple possible networks found, use a Network ID to be more specific.\" might occur."
   },
   {
-    "question": "How can you specify a network for an OpenStack VM in Terraform to resolve the 'Multiple possible networks found' error?",
-    "answer": "You can resolve this by adding a `network` resource sub-block to your VM definition, specifying the private network's name, for example: `network { name = \"my-tenant-net\" }`."
+    "question": "Why does Terraform need to know which network to use when creating an OpenStack VM?",
+    "answer": "OpenStack projects typically have at least two networks defined (one private and one public), and Terraform needs to know which specific one to use for the VM."
   },
   {
-    "question": "Where can you find the name of your OpenStack project's private network?",
+    "question": "How can you find the name of the private network in OpenStack?",
     "answer": "The private network name can be found in the OpenStack CLI using `network list` or on Horizon under 'Network -> Networks'."
   },
   {
-    "question": "What file is created in the Terraform workspace upon successful application of a configuration?",
-    "answer": "A file named `terraform.tfstate` is created in your workspace."
+    "question": "How do you specify a private network for an OpenStack VM in Terraform configuration?",
+    "answer": "You add a `network` resource sub-block to your VM definition, specifying the network's name, like `network { name = \"my-tenant-net\" }`."
   },
   {
-    "question": "What is the function of the `terraform.tfstate` file?",
-    "answer": "The `terraform.tfstate` file contains details about the managed resources that Terraform uses to determine how to achieve a new state based on configuration updates."
+    "question": "What indicates a successful Terraform apply operation for creating a VM?",
+    "answer": "A successful operation will show \"Creation complete\" for the resource and \"Apply complete! Resources: 1 added, 0 changed, 0 destroyed.\" at the end of the output."
   },
   {
-    "question": "What are the consequences of deleting the `terraform.tfstate` file?",
-    "answer": "If you delete the `terraform.tfstate` file, Terraform cannot properly manage resources, and you would need to restore or recreate it, or manage those resources without Terraform."
+    "question": "How can you verify that a VM has been created by Terraform in OpenStack?",
+    "answer": "You can check Horizon or use the `server list` command in your OpenStack terminal window to see the new VM."
   },
   {
-    "question": "Why might a VM created by Terraform not be directly accessible from outside the tenant?",
-    "answer": "A VM might not be directly accessible from outside the tenant if it has not been assigned a floating IP."
+    "question": "What is the purpose of the `terraform.tfstate` file?",
+    "answer": "The `terraform.tfstate` file contains details about the managed resources Terraform uses to determine how to arrive at a new state described by configuration updates."
   },
   {
-    "question": "How can a VM without a direct public IP be accessed if it's within a tenant?",
-    "answer": "If another host in the same tenant has a floating IP, it can be used as a jump host (or bastion host) to access the new VM, as they are on the same private network."
+    "question": "What happens if the `terraform.tfstate` file is deleted?",
+    "answer": "If `terraform.tfstate` is deleted, Terraform cannot properly manage resources, and you would need to restore it, recreate it, or manage those resources without Terraform."
   },
   {
-    "question": "How are floating IPs allocated and associated with VMs in OpenStack?",
-    "answer": "Floating IPs are allocated to the project from a pool and then associated with the VM\u2019s private network interface, rather than being created directly on the VM."
+    "question": "Why might you not be able to log in to a newly created OpenStack VM immediately?",
+    "answer": "You might not be able to log in because a floating IP has not yet been assigned to the host, making it not directly accessible from outside the tenant."
   },
   {
-    "question": "What Terraform resource is used to allocate a floating IP?",
-    "answer": "The `openstack_networking_floatingip_v2` resource is used to declare and allocate a floating IP."
+    "question": "What is a jump host (or bastion host) used for in OpenStack?",
+    "answer": "A jump host is used to access VMs that do not need to be directly accessible from the internet, by using another host in the same tenant with a floating IP as an intermediary."
   },
   {
-    "question": "What essential information is needed to declare an `openstack_networking_floatingip_v2` resource?",
-    "answer": "You need to know the `pool` from which to allocate the floating IP; for example, `pool = \"ext_net\"`."
+    "question": "How are Floating IPs handled in OpenStack?",
+    "answer": "Floating IPs are allocated to the project from a pool and then associated with the VM\u2019s private network interface; they are not created directly on a VM."
+  },
+  {
+    "question": "What information is needed to allocate a floating IP in Terraform for OpenStack?",
+    "answer": "You need to know the pool from which to allocate the floating IP; for example, on our clouds, this is the external network (`ext_net`)."
+  },
+  {
+    "question": "How do you declare a floating IP resource in Terraform for OpenStack?",
+    "answer": "You declare it using `resource \"openstack_networking_floatingip_v2\"` and specify the `pool` attribute, such as `pool = \"ext_net\"`."
+  },
+  {
+    "question": "Can you preview changes before applying a floating IP resource in Terraform?",
+    "answer": "Yes, you can use `terraform plan` to show what would happen before applying the changes for a floating IP resource."
   }
 ]

@@ -1,0 +1,50 @@
+[
+  {
+    "question": "How can I check the full version number of COMSOL on a cluster?",
+    "answer": "You can either start COMSOL in graphical (GUI) mode and inspect the lower right corner messages window, or log in to a cluster and run `comsol batch -version` after loading the COMSOL module."
+  },
+  {
+    "question": "What is the command to display the COMSOL version in batch mode?",
+    "answer": "After allocating resources (e.g., with `salloc`) and loading the COMSOL module (e.g., `module load comsol/6.2`), you can run `comsol batch -version`."
+  },
+  {
+    "question": "How does COMSOL's version numbering work for new releases versus product updates?",
+    "answer": "When a new COMSOL release is installed, it uses an abbreviated 6.X version format (e.g., 6.2). As additional product updates are released, they utilize the full 6.X.Y.Z version format (e.g., 6.2.0.290, 6.2.0.415)."
+  },
+  {
+    "question": "Which COMSOL update is generally recommended to use?",
+    "answer": "It is recommended to use the most recent update to take advantage of all the latest improvements."
+  },
+  {
+    "question": "How do I check which COMSOL versions are available in my current standard environment?",
+    "answer": "You can run the `module avail comsol` command."
+  },
+  {
+    "question": "How do I check which COMSOL versions are available across ALL standard environments?",
+    "answer": "You can use the `module spider comsol` command."
+  },
+  {
+    "question": "Is COMSOL version 6.3 available on all clusters?",
+    "answer": "Yes, a module `comsol/6.3` corresponding to version 6.3.0.290 is now available on all clusters."
+  },
+  {
+    "question": "What is a sample Slurm script for running a COMSOL job on a single compute node with 8 cores?",
+    "answer": "```bash\n#!/bin/bash\n#SBATCH --time=0-03:00             # Specify (d-hh:mm)\n#SBATCH --account=def-group        # Specify (some account)\n#SBATCH --mem=32G                  # Specify (set to 0 to use all memory on each node)\n#SBATCH --cpus-per-task=8          # Specify (set to 32or44 graham, 32or48 cedar, 40 beluga, 48or64 narval to use all cores)\n#SBATCH --nodes=1                  # Do not change\n#SBATCH --ntasks-per-node=1        # Do not change\n\nINPUTFILE=\"ModelToSolve.mph\"       # Specify input filename\nOUTPUTFILE=\"SolvedModel.mph\"       # Specify output filename\n\nmodule load StdEnv/2023\nmodule load comsol/6.2\n\ncomsol batch -inputfile ${INPUTFILE} -outputfile ${OUTPUTFILE} -np $SLURM_CPUS_ON_NODE\n```"
+  },
+  {
+    "question": "What advice is given for optimizing core usage for a COMSOL simulation on a single compute node?",
+    "answer": "It is advisable to test the scaling of your simulation by gradually increasing the number of cores. If near-linear speedup is obtained using all cores on a compute node, consider running the job over multiple full nodes."
+  },
+  {
+    "question": "What features are supported by the sample script for running COMSOL jobs on multiple compute nodes?",
+    "answer": "The script supports restarting interrupted jobs, allocating large temporary files to `/scratch`, utilizing the default `comsolbatch.ini` file settings, and provides an option to modify the Java heap memory."
+  },
+  {
+    "question": "How can you restart an interrupted COMSOL job using the multiple node Slurm script?",
+    "answer": "You can uncomment the `-recover -continue` options in the `comsol batch` command line within the Slurm script to restart solving from the latest recovery files."
+  },
+  {
+    "question": "How do you increase the Java heap memory for a COMSOL multiple node job if it crashes on startup with a Java segmentation fault?",
+    "answer": "You can add the following `sed` lines after the `cp -f` commands in the script: `sed -i 's/-Xmx2g/-Xmx4g/g' comsolbatch.ini` and `sed -i 's/-Xmx768m/-Xmx4g/g' java.opts`. You can further increase both `4g` values to `8g` if needed."
+  }
+]

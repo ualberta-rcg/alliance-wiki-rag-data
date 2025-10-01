@@ -1,0 +1,178 @@
+[
+  {
+    "question": "What is an \"association\" in Slurm documentation?",
+    "answer": "In Slurm documentation, an \"association\" refers to the project itself or a user within a project."
+  },
+  {
+    "question": "How is the `Account` represented in Slurm documentation?",
+    "answer": "The `Account` is represented as the project name with `_cpu` or `_gpu` appended."
+  },
+  {
+    "question": "Does the first line of `sshare` output include a user name?",
+    "answer": "No, the first line of the `sshare` output, which describes the project status, does not include a user name."
+  },
+  {
+    "question": "What does `RawShares` represent?",
+    "answer": "`RawShares` represents a value proportional to the number of CPU-years granted to a project in the Resource Allocation Competition."
+  },
+  {
+    "question": "How are `RawShares` handled for inactive accounts?",
+    "answer": "Inactive accounts, which do not have pending or running jobs, are given only one `RawShare` for numeric reasons."
+  },
+  {
+    "question": "How long does it take for `RawShares` to update for an inactive account after submitting a job?",
+    "answer": "It may take up to 15 minutes for an inactive account to show the expected `RawShares` and `LevelFS` after a job is submitted."
+  },
+  {
+    "question": "How is `NormShares` calculated?",
+    "answer": "`NormShares` is calculated by dividing the number of shares assigned to a user or account by the total number of assigned shares within that specific level."
+  },
+  {
+    "question": "What does `NormShares` indicate for a project?",
+    "answer": "For a project, `NormShares` indicates the fraction of the shares held by that project relative to all other projects."
+  },
+  {
+    "question": "What does `NormShares` indicate for individual users within a project?",
+    "answer": "For individual users, `NormShares` indicates the fraction of shares held by that member relative to other members within the same project."
+  },
+  {
+    "question": "How is `RawUsage` determined?",
+    "answer": "`RawUsage` is determined by the total number of resource-seconds (including CPU time, GPU time, and memory) that have been charged to an account."
+  },
+  {
+    "question": "How does past usage affect `RawUsage` and priority?",
+    "answer": "Past usage is discounted with a half-life of one week, meaning usage from more than a few weeks in the past will have only a small effect on priority."
+  },
+  {
+    "question": "What does `EffectvUsage` represent?",
+    "answer": "`EffectvUsage` represents an association's usage normalized with its parent, meaning a project's usage relative to other projects, or a user's usage relative to other users in that project."
+  },
+  {
+    "question": "How is `LevelFS` calculated?",
+    "answer": "`LevelFS` is calculated as `NormShares / EffectvUsage`, representing an association's fairshare value compared to its siblings."
+  },
+  {
+    "question": "What does a `LevelFS` value between 0 and 1 indicate?",
+    "answer": "A `LevelFS` value between 0 and 1 indicates that an association is over-served."
+  },
+  {
+    "question": "What does a `LevelFS` value greater than 1 indicate?",
+    "answer": "A `LevelFS` value greater than 1 indicates that an association is under-served."
+  },
+  {
+    "question": "What `LevelFS` value do associations with no usage receive?",
+    "answer": "Associations with no usage receive the highest possible `LevelFS` value, which is infinity."
+  },
+  {
+    "question": "What `LevelFS` value do inactive accounts receive?",
+    "answer": "Inactive accounts receive a meaningless small `LevelFS` value close to 0.0001."
+  },
+  {
+    "question": "What `LevelFS` value indicates a project is consistently using its target amount?",
+    "answer": "A `LevelFS` value near 1.0 indicates a project is consistently using its target amount."
+  },
+  {
+    "question": "How does a project's `LevelFS` affect job priority if it uses more than its target?",
+    "answer": "If a project uses more than its target, its `LevelFS` will be below 1.0, resulting in low priority for new jobs from that project."
+  },
+  {
+    "question": "How does a project's `LevelFS` affect job priority if it uses less than its target?",
+    "answer": "If a project uses less than its target usage, its `LevelFS` will be greater than 1.0, leading to high priority for new jobs."
+  },
+  {
+    "question": "What types of calculations benefit from `whole node` scheduling?",
+    "answer": "Parallel calculations that can efficiently use 32 or more cores may benefit from being scheduled on whole nodes."
+  },
+  {
+    "question": "What is considered abuse of the system regarding whole-node scheduling?",
+    "answer": "Requesting an inefficient number of processors or underutilizing memory when using whole nodes to gain a scheduling advantage is considered abuse of the system."
+  },
+  {
+    "question": "When else is whole-node scheduling recommended?",
+    "answer": "Whole-node scheduling is also recommended for users with large amounts of serial work who can efficiently pack serial processes onto a single node using tools like GNU Parallel or GLOST."
+  },
+  {
+    "question": "What is the maximum job run-time on Trillium?",
+    "answer": "Trillium accepts jobs with a maximum run-time of 24 hours."
+  },
+  {
+    "question": "What is the maximum job run-time on Fir, Narval, Nibi, and Rorqual?",
+    "answer": "Fir, Narval, Nibi, and Rorqual accept jobs with a maximum run-time of 7 days."
+  },
+  {
+    "question": "Can job time limits change?",
+    "answer": "Yes, job time limits are subject to change at the discretion of each site's sysadmin team."
+  },
+  {
+    "question": "How are longer jobs restricted on general-purpose clusters?",
+    "answer": "Longer jobs on general-purpose clusters are restricted to using only a fraction of the cluster via various partitions."
+  },
+  {
+    "question": "What are the available time limit partitions for jobs on general-purpose clusters?",
+    "answer": "Available time limit partitions for jobs include 3 hours or less, 12 hours or less, 24 hours or less, 72 hours or less, and 7 days or less."
+  },
+  {
+    "question": "Do shorter jobs have more scheduling opportunities than longer jobs?",
+    "answer": "Yes, shorter jobs have more scheduling opportunities because they can always run in partitions with longer time-limits."
+  },
+  {
+    "question": "What mechanism does the scheduler use to improve overall system usage?",
+    "answer": "The scheduler uses backfilling to improve overall system usage."
+  },
+  {
+    "question": "How does backfill scheduling work?",
+    "answer": "Backfill scheduling starts lower priority jobs if doing so does not delay the expected start time of any higher priority jobs."
+  },
+  {
+    "question": "Why are accurate time limits important for backfill scheduling?",
+    "answer": "Reasonably accurate time limits are important for backfill scheduling to work well because the expected start time of pending jobs depends on the expected completion time of running jobs."
+  },
+  {
+    "question": "What type of jobs primarily benefit from backfilling?",
+    "answer": "Backfilling primarily benefits jobs with short time limits, such as those under 3 hours."
+  },
+  {
+    "question": "What are the main categories of node partitions in general-purpose clusters like Fir, Narval, Nibi, and Rorqual?",
+    "answer": "The main categories of node partitions are Base nodes (4 or 8 GB memory/core), Large memory nodes (16 to 96 GB memory/core), and GPU nodes."
+  },
+  {
+    "question": "How much memory do Base nodes typically have per core?",
+    "answer": "Base nodes typically have 4 or 8 GB of memory per core."
+  },
+  {
+    "question": "How much memory do Large memory nodes typically have per core?",
+    "answer": "Large memory nodes typically have 16 to 96 GB of memory per core."
+  },
+  {
+    "question": "How are jobs routed to node categories?",
+    "answer": "Jobs are routed to one of the node categories (Base, Large Memory, GPU) based on the resources requested during submission."
+  },
+  {
+    "question": "What are \"by-node\" and \"by-core\" partitions?",
+    "answer": "\"By-node\" partitions are reserved for jobs that use all resources on allocated nodes, while \"by-core\" partitions are for jobs that use only a few cores or a single core out of each node."
+  },
+  {
+    "question": "How does requested walltime affect node access?",
+    "answer": "Nodes are partitioned based on requested walltime, and shorter jobs generally have access to more resources because they can run on more nodes."
+  },
+  {
+    "question": "What information does the `partition-stats` utility provide?",
+    "answer": "The `partition-stats` utility shows the number of queued jobs, running jobs, idle nodes, and nodes assigned to each partition."
+  },
+  {
+    "question": "What do the `partition-stats` values `12:170` under \"Regular | 3 hr\" signify for queued jobs?",
+    "answer": "`12:170` signifies 12 queued jobs requested whole nodes with less than 8GB memory/core and 3 hours or less run time, while 170 queued jobs requested less than whole nodes (individual cores) with less than 8GB memory/core and 3 hours or less run time."
+  },
+  {
+    "question": "What information is *not* provided by the `partition-stats` utility?",
+    "answer": "The `partition-stats` utility does not provide information about the number of cores represented by running or waiting jobs, free cores in partly-assigned by-core nodes, or available memory associated with free cores in by-core partitions."
+  },
+  {
+    "question": "Is it recommended to run `partition-stats` repeatedly via a script?",
+    "answer": "No, it is not recommended to write a script that automatically calls `partition-stats` repeatedly because it is costly to the scheduler."
+  },
+  {
+    "question": "Who should be contacted if automatic parsing of `partition-stats` information is needed?",
+    "answer": "If a workflow would benefit from automatic parsing of `partition-stats` information, Technical support should be contacted for guidance."
+  }
+]

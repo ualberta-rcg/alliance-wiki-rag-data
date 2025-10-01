@@ -1,0 +1,46 @@
+[
+  {
+    "question": "How are Intel MPI modules loaded for Ansys Fluent on the Narval cluster when using Gentoo 2020?",
+    "answer": "If `CC_CLUSTER` is narval and `EBVERSIONGENTOO` is 2020, you must load `intel/2021 intelmpi` and set `INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest` and `HCOLL_RCACHE=^ucs`."
+  },
+  {
+    "question": "What modules are required for Ansys Fluent on the Narval cluster if the Gentoo version is 2023?",
+    "answer": "For Narval with Gentoo 2023, you need to load `intel/2023 intelmpi` and export `INTELMPI_ROOT=$I_MPI_ROOT`."
+  },
+  {
+    "question": "Which Intel MPI environment variables are unset when configuring Ansys Fluent on the Narval cluster?",
+    "answer": "`I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS` and `I_MPI_ROOT` are unset."
+  },
+  {
+    "question": "How is the machine file created for Ansys Fluent jobs in the provided Slurm scripts?",
+    "answer": "The machine file is created using the command `slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID`."
+  },
+  {
+    "question": "How is the total number of cores (`NCORES`) calculated in the 'Multinode (by node)' Fluent Slurm script?",
+    "answer": "The total number of cores (`NCORES`) is calculated as the product of `SLURM_NNODES`, `SLURM_NTASKS_PER_NODE`, and `SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "What is the command to run a single-node Ansys Fluent job using Intel MPI in the 'Multinode (by node)' script?",
+    "answer": "For a single node (`SLURM_NNODES == 1`), the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE`."
+  },
+  {
+    "question": "How is an Ansys Fluent job executed across multiple nodes using Intel MPI in the 'Multinode (by node)' script?",
+    "answer": "For multiple nodes, the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
+  },
+  {
+    "question": "How is the total number of cores (`NCORES`) calculated in the 'Multinode (by core)' Fluent Slurm script?",
+    "answer": "The total number of cores (`NCORES`) is calculated as the product of `SLURM_NTASKS` and `SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "What is the command to run a single-node Ansys Fluent job using Intel MPI in the 'Multinode (by core)' script?",
+    "answer": "For a single node (`SLURM_NNODES == 1`), the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE`."
+  },
+  {
+    "question": "How do you execute an Ansys Fluent job across multiple nodes using Intel MPI in the 'Multinode (by core)' script?",
+    "answer": "For multiple nodes, the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
+  },
+  {
+    "question": "For which clusters might the `export I_MPI_HYDRA_BOOTSTRAP=ssh` line be uncommented in single-node Fluent Slurm scripts?",
+    "answer": "The line `export I_MPI_HYDRA_BOOTSTRAP=ssh` might need to be uncommented for single-node Fluent jobs on Beluga or Cedar clusters."
+  }
+]

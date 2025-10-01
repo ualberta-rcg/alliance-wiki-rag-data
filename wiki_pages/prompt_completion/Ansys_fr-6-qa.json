@@ -1,0 +1,50 @@
+[
+  {
+    "question": "What type of Slurm scripts for Ansys Fluent are detailed in this section?",
+    "answer": "This section details Slurm scripts for Ansys Fluent, including an Intel MPI based 'by core' script and two Open MPI based scripts specific to Narval (one 'by node' and one 'by core')."
+  },
+  {
+    "question": "How is the Intel MPI environment configured for Narval when using `StdEnv/2023` in the 'by core' Fluent script?",
+    "answer": "For Narval with `StdEnv/2023` in the Intel MPI 'by core' Fluent script, the environment loads `intel/2023 intelmpi` and sets `export INTELMPI_ROOT=$I_MPI_ROOT`."
+  },
+  {
+    "question": "How is the total number of cores (`NCORES`) determined in the Intel MPI 'by core' Ansys Fluent script?",
+    "answer": "The total number of cores (`NCORES`) is calculated by multiplying `SLURM_NTASKS` by `SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "What command is used to launch Fluent on a single node in the Intel MPI 'by core' script?",
+    "answer": "Fluent is launched with `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE` for a single node job in the Intel MPI 'by core' script."
+  },
+  {
+    "question": "What command is used to launch Fluent on multiple nodes in the Intel MPI 'by core' script?",
+    "answer": "Fluent is launched with `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE` for a multiple node job in the Intel MPI 'by core' script."
+  },
+  {
+    "question": "What Open MPI specific environment variables are set in the Narval-specific Ansys Fluent scripts?",
+    "answer": "The Narval-specific Ansys Fluent scripts set `export OPENMPI_ROOT=$EBROOTOPENMPI` and `export OMPI_MCA_hwloc_base_binding_policy=core`."
+  },
+  {
+    "question": "How is the total number of cores (`NCORES`) calculated in the Narval 'by node' Open MPI Fluent script?",
+    "answer": "The total number of cores (`NCORES`) in the Narval 'by node' Open MPI Fluent script is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "How is the total number of cores (`NCORES`) calculated in the Narval 'by core' Open MPI Fluent script?",
+    "answer": "The total number of cores (`NCORES`) in the Narval 'by core' Open MPI Fluent script is calculated as `SLURM_NTASKS * SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "How do the Narval-specific Open MPI Fluent scripts generate the machinefile?",
+    "answer": "The Narval-specific Open MPI Fluent scripts first use `slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/mf-$SLURM_JOB_ID` and then process this output to create `/tmp/machinefile-$SLURM_JOB_ID` with hostnames and core counts."
+  },
+  {
+    "question": "What Fluent command is used for a single node job in the Narval-specific Open MPI scripts?",
+    "answer": "The Fluent command for a single node job in the Narval-specific Open MPI scripts is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pshmem -i $MYJOURNALFILE`."
+  },
+  {
+    "question": "What Fluent command is used for a multiple node job in the Narval-specific Open MPI scripts?",
+    "answer": "The Fluent command for a multiple node job in the Narval-specific Open MPI scripts is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
+  },
+  {
+    "question": "What modules are loaded for Narval with `StdEnv/2020` when configuring Intel MPI in the Fluent script?",
+    "answer": "For Narval with `StdEnv/2020`, the script loads `intel/2021 intelmpi` and exports `INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest`."
+  }
+]

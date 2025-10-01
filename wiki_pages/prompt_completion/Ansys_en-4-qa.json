@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What should be done if Fluent jobs frequently fail to start due to license shortages?",
+    "answer": "Consider modifying your script to requeue your job, up to 4 times."
+  },
+  {
+    "question": "What is a potential drawback of using job requeue for license shortages?",
+    "answer": "It may also requeue simulations that fail due to non-license related issues, such as divergence, leading to lost compute time."
+  },
+  {
+    "question": "If a requeued job fails due to a simulation issue, what action should be taken?",
+    "answer": "Immediately manually kill the job progression with `scancel jobid` and correct the problem."
+  },
+  {
+    "question": "What is the recommended Fluent script type for minimizing solution latency and maximizing performance?",
+    "answer": "Most Fluent jobs should use the 'by node' script."
+  },
+  {
+    "question": "When might a 'by core' script be preferable for Fluent jobs?",
+    "answer": "Very large jobs might wait less in the queue if they use a 'by core' script."
+  },
+  {
+    "question": "What are some disadvantages of running large Fluent jobs with a 'by core' script over many nodes?",
+    "answer": "The startup time can be significantly longer, and such jobs are more vulnerable to crashing if compute nodes fail during the simulation."
+  },
+  {
+    "question": "How do Fluent scripts manage memory communication for single-node versus multi-node runs?",
+    "answer": "They use shared memory for communication when run on a single node and distributed memory (utilizing MPI and HPC interconnect) when run over multiple nodes."
+  },
+  {
+    "question": "What is an alternative approach if Fluent crashes during the initial auto mesh partitioning phase using standard Intel-based scripts on Narval?",
+    "answer": "You can use the OpenMPI-based 'narval' tabs or manually perform mesh partitioning in the Fluent GUI and then run the job with Intel scripts."
+  },
+  {
+    "question": "What is the recommended cell-to-core ratio for optimal efficiency in Fluent mesh partitioning?",
+    "answer": "For optimal efficiency, ensure at least 10000 cells per core."
+  },
+  {
+    "question": "In a Fluent Slurm script for multinode (by node) with Intel MPI, what module is loaded for the standard environment?",
+    "answer": "`StdEnv/2023` is loaded."
+  },
+  {
+    "question": "How is the total number of cores calculated in the 'Multinode (by node)' Fluent Slurm script?",
+    "answer": "The total number of cores (NCORES) is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "What command is used to run Fluent for a single node in the 'Multinode (by node)' Intel MPI script?",
+    "answer": "`fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE`"
+  },
+  {
+    "question": "What command is used to run Fluent for multiple nodes in the 'Multinode (by node)' Intel MPI script?",
+    "answer": "`fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`"
+  }
+]

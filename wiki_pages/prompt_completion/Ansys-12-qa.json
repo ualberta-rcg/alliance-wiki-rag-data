@@ -1,0 +1,78 @@
+[
+  {
+    "question": "How do you configure Fluent to interpret a User-Defined Function (UDF) at runtime?",
+    "answer": "Add the command line `define/user-defined/interpreted-functions \"sampleudf.c\" \"cpp\" 10000 no` into your journal file before the cas/dat files are read or initialized, replacing 'sampleudf.c' with your source file's name."
+  },
+  {
+    "question": "Does the command for interpreting a UDF change if Fluent is run in serial or parallel mode?",
+    "answer": "No, the command for interpreting a UDF remains the same regardless if the simulation is being run in serial or parallel."
+  },
+  {
+    "question": "What is required to ensure an interpreted UDF can be found by Fluent?",
+    "answer": "Open your cas file in the Fluent GUI, remove any managed definitions, and resave it to ensure the UDF can be found in the same directory as the journal file."
+  },
+  {
+    "question": "What is the initial requirement for using a compiled UDF on an Alliance cluster?",
+    "answer": "Your UDF must be compiled on an Alliance cluster at least once."
+  },
+  {
+    "question": "What is created when a UDF is compiled on an Alliance cluster?",
+    "answer": "Compiling a UDF on an Alliance cluster creates a `libudf` subdirectory structure containing the required `libudf.so` shared library."
+  },
+  {
+    "question": "Can a `libudf` directory be copied from a remote system (like a laptop) to an Alliance cluster?",
+    "answer": "No, a `libudf` directory cannot simply be copied from a remote system to the Alliance, as the library dependencies of the shared library will not be satisfied, leading to Fluent crashing on startup."
+  },
+  {
+    "question": "How can a compiled UDF be used after it has been compiled on an Alliance cluster?",
+    "answer": "Once compiled, the UDF can be used by uncommenting the second (load) `libudf` line (`define/user-defined/compiled-functions load libudf`) in your journal file when submitting jobs to the cluster."
+  },
+  {
+    "question": "Why should both compile and load `libudf` lines not be left uncommented in the journal file?",
+    "answer": "If both compile and load `libudf` lines are uncommented, your UDF will automatically (re)compiled for each job, which is inefficient and can lead to build conflicts if multiple jobs run from the same directory."
+  },
+  {
+    "question": "What is an alternative method to configuring the journal file for compiling a UDF?",
+    "answer": "The Fluent GUI can also be used; navigate to the Compiled UDFs Dialog Box, add the UDF source file, and click Build."
+  },
+  {
+    "question": "What is necessary for a UDF to be used with a Fluent parallel job?",
+    "answer": "Before a UDF can be used with a Fluent parallel job (single node SMP and multinode MPI), it will need to be parallelized."
+  },
+  {
+    "question": "What does the UDF parallelization procedure involve?",
+    "answer": "The instrumenting procedure involves adding compiler directives, predicates, and reduction macros into your working serial UDF."
+  },
+  {
+    "question": "Where can detailed information on parallelizing UDFs for Fluent be found?",
+    "answer": "Detailed information is available under 'Part I: Chapter 7: Parallel Considerations' of the Ansys 2024 Fluent Customization Manual."
+  },
+  {
+    "question": "What can UDFs customize in Discrete Phase Models (DPM)?",
+    "answer": "UDFs can be used to customize Discrete Phase Models (DPM)."
+  },
+  {
+    "question": "How do you define the injection of particles for a DPM simulation in the Fluent GUI?",
+    "answer": "In the GUI, click the Physics panel, then Discrete Phase to open the `Discrete Phase Model` box, and then click the `Injections` button to open an `Injections` dialog box where you can create new injections."
+  },
+  {
+    "question": "What types of injection are available in the 'Injection Type' pulldown in Fluent?",
+    "answer": "The first four types available are \"single, group, surface, flat-fan-atomizer\"."
+  },
+  {
+    "question": "How can 'Point Properties' for DPM injections be specified using a text file?",
+    "answer": "Select \"file\" from the 'Injection Type' pulldown, specify the 'Injection Name', and then click the `File` button to select either an Injection Sample File (.dpm extension) or a manually created injection text file (.inj extension)."
+  },
+  {
+    "question": "What setting in the Discrete Phase Model Dialog Box enables updating DPM source terms every flow iteration?",
+    "answer": "Selecting 'Interaction with Continuous Phase' in the Discrete Phase Model Dialog Box enables updating DPM source terms every flow iteration."
+  },
+  {
+    "question": "How can DPM settings, such as enabling coupled calculations and creating an injection from a file, be automated in a journal file?",
+    "answer": "Commands like `/define/models/dpm/interaction/coupled-calculations yes` and `/define/models/dpm/injections/create injection-0:1 no yes file no zinjection01.inj no no no no` can be added to the journal file after solution initialization."
+  },
+  {
+    "question": "What does a basic manually created steady injection file format look like for DPM simulations?",
+    "answer": "An example format is `(z=4 12)\n( x          y        z    u         v    w    diameter  t         mass-flow  mass  frequency  time name )\n(( 2.90e-02  5.00e-03 0.0 -1.00e-03  0.0  0.0  1.00e-04  2.93e+02  1.00e-06   0.0   0.0        0.0 ) injection-0:1 )`."
+  }
+]

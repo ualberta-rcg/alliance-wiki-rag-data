@@ -1,0 +1,58 @@
+[
+  {
+    "question": "Why is the block size important when using GNU Parallel for splitting tasks?",
+    "answer": "The block size is important because an inefficient block size can lead to wasted cores. For example, if a 3MB file is read in 1MB blocks creating 3 jobs, but 10 cores are requested, 7 cores would be wasted."
+  },
+  {
+    "question": "Can GNU Parallel automatically determine the optimal block size?",
+    "answer": "Yes, you can let GNU Parallel decide the block size, as indicated by `--block -1` in the example script."
+  },
+  {
+    "question": "How many CPU cores are requested per task in the `blastn_gnu.sh` SLURM script?",
+    "answer": "The `blastn_gnu.sh` script requests 4 CPU cores per task (`#SBATCH --cpus-per-task=4`)."
+  },
+  {
+    "question": "What is the memory requested per core in the `blastn_gnu.sh` SLURM script?",
+    "answer": "The script requests 512MB of memory per core (`#SBATCH --mem-per-cpu=512M`)."
+  },
+  {
+    "question": "Which modules are loaded before running BLAST with GNU Parallel in the example script?",
+    "answer": "The `gcc/7.3.0` and `blast+/2.9.0` modules are loaded."
+  },
+  {
+    "question": "What is the purpose of the `--jobs $SLURM_CPUS_PER_TASK` argument in the GNU Parallel command?",
+    "answer": "It tells GNU Parallel to use the number of cores specified by the `$SLURM_CPUS_PER_TASK` environment variable, which corresponds to the number of cores requested for the SLURM task."
+  },
+  {
+    "question": "How do you ensure that the output order is maintained when using GNU Parallel?",
+    "answer": "You can use the `--keep-order` argument with GNU Parallel to maintain the same order as given in the input."
+  },
+  {
+    "question": "What does `--recstart '>'` signify in the GNU Parallel command for BLAST?",
+    "answer": "It specifies that the record start character is `>` (greater than symbol), typically used to identify the beginning of a sequence in FASTA format."
+  },
+  {
+    "question": "Why is `--pipepart` preferred over `--pipe` in GNU Parallel according to Ole Tange?",
+    "answer": "`--pipepart` is faster than `--pipe`, with `--pipepart` capable of easily reaching 5GB/s, whereas `--pipe` is limited to 500MB/s."
+  },
+  {
+    "question": "What is a crucial requirement for the input file when using GNU Parallel with the described method?",
+    "answer": "The input file (e.g., `seq.fa`) must not be compressed."
+  },
+  {
+    "question": "How do you submit the `blastn_gnu.sh` script to run only after the `makeblastdb.sh` script has successfully completed?",
+    "answer": "You submit it using a SLURM dependency: `sbatch --dependency=afterok:$(sbatch makeblastdb.sh) blastn_gnu.sh`."
+  },
+  {
+    "question": "What is an additional tip for improving performance if your FASTA database fits on the node?",
+    "answer": "Copy your FASTA database to the node's local scratch space (`$SLURM_TMPDIR`) if it fits."
+  },
+  {
+    "question": "How can you reduce the number of hits returned from a BLAST search?",
+    "answer": "You can reduce the number of hits returned by using the `-max_target_seqs` or `-max_hsps` options, if reasonable for your research."
+  },
+  {
+    "question": "Which filter can be used to limit BLAST hit lists to only nearly identical hits?",
+    "answer": "The `-evalue` filter can be used to limit the hit list to nearly identical hits, if reasonable for your research."
+  }
+]

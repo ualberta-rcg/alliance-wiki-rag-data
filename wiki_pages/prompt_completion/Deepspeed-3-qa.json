@@ -1,0 +1,58 @@
+[
+  {
+    "question": "What is the purpose of using ZeRO stage 3 with offload to CPU?",
+    "answer": "ZeRO stage 3 with offload to CPU enables storing model parameters and optimizer states in the compute node's CPU memory."
+  },
+  {
+    "question": "What is a practical benefit of offloading model parameters and optimizer states to the CPU?",
+    "answer": "For practical purposes, offloading to CPU can make it seem as though GPUs gain an extra 32GB of memory, allowing for an increase in batch size or model size."
+  },
+  {
+    "question": "Which DeepSpeed optimizer should be used when enabling ZeRO stage 3 with CPU offloading?",
+    "answer": "The DeepSpeed optimizer `DeepSpeedCPUAdam` should be used when offloading to CPU."
+  },
+  {
+    "question": "How does the performance of `DeepSpeedCPUAdam` compare to pure Data Parallelism?",
+    "answer": "When using `DeepSpeedCPUAdam` with CPU offloading, performance remains at par with pure Data Parallelism."
+  },
+  {
+    "question": "What module must be loaded when using DeepSpeed's optimizers with CPU or NVMe offloading?",
+    "answer": "The `cuda/<version>` module must be loaded, where `<version>` matches the version used to compile PyTorch."
+  },
+  {
+    "question": "In the `deepspeed-stage3-offload-cpu.sh` script, how many GPUs are requested per node?",
+    "answer": "The script requests 2 GPUs per node (`#SBATCH --gres=gpu:2`)."
+  },
+  {
+    "question": "What is the recommended number of tasks per node for PyTorch Lightning in a SLURM batch job?",
+    "answer": "PyTorch Lightning expects the user to have requested one task per GPU, so if you do not ask for 1 task per GPU, and you do not run your script with \"srun\", your job will fail."
+  },
+  {
+    "question": "What strategy parameters are set for the `pl.Trainer` to enable ZeRO stage 3 with CPU offloading in `deepspeed-stage3-offload-cpu.py`?",
+    "answer": "The `pl.Trainer` uses `strategy=DeepSpeedStrategy(stage=3, offload_optimizer=True, offload_parameters=True)` for CPU offloading."
+  },
+  {
+    "question": "What is the purpose of ZeRO stage 3 with offload to NVMe?",
+    "answer": "ZeRO stage 3 with offload to NVMe enables storing model parameters and optimizer states to the local disk."
+  },
+  {
+    "question": "When offloading to local disk (NVMe), where are optimizer steps computed?",
+    "answer": "Optimizer steps are computed on the CPU when offloading to local disk (NVMe)."
+  },
+  {
+    "question": "How does offloading to local disk impact training performance?",
+    "answer": "Offloading to local disk can significantly degrade performance."
+  },
+  {
+    "question": "What type of storage is recommended for ZeRO offloading to local disk to achieve the best performance?",
+    "answer": "NVMe-enabled drives are recommended for ZeRO offloading to local disk because they have higher throughput and faster response times, minimizing performance degradation."
+  },
+  {
+    "question": "How does the `deepspeed-stage3-offload-nvme.py` script determine the path for local storage?",
+    "answer": "The script obtains the local scratch path by accessing the `SLURM_TMPDIR` environment variable via `os.environ['SLURM_TMPDIR']`."
+  },
+  {
+    "question": "What DeepSpeedStrategy parameters are specified for NVMe offloading in `deepspeed-stage3-offload-nvme.py`?",
+    "answer": "The `DeepSpeedStrategy` parameters for NVMe offloading are `stage=3`, `offload_optimizer=True`, `offload_parameters=True`, `remote_device=\"nvme\"`, `offload_params_device=\"nvme\"`, `offload_optimizer_device=\"nvme\"`, and `nvme_path=\"local_scratch\"`."
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "question": "Quelles sont les exigences Slurm en mati\u00e8re de m\u00e9moire pour le script de red\u00e9marrage d'analyse explicite `scriptep2.txt` ?",
+    "answer": "Le script demande `--mem=8000M` (8 Go) de m\u00e9moire totale, qui doit \u00eatre sup\u00e9rieure \u00e0 5 Mo."
+  },
+  {
+    "question": "Combien de c\u0153urs de CPU par t\u00e2che sont sp\u00e9cifi\u00e9s dans le script de red\u00e9marrage d'analyse explicite `scriptep2.txt` ?",
+    "answer": "Le script sp\u00e9cifie `--cpus-per-task=4`, ce qui doit \u00eatre sup\u00e9rieur \u00e0 1."
+  },
+  {
+    "question": "Quel est le param\u00e8tre d'allocation de n\u0153ud pour le script de red\u00e9marrage d'analyse explicite `scriptep2.txt` ?",
+    "answer": "Il alloue `--nodes=1`, et cette valeur ne doit pas \u00eatre modifi\u00e9e."
+  },
+  {
+    "question": "Quelles versions de modules sont charg\u00e9es dans le script `scriptep2.txt` pour une analyse explicite ?",
+    "answer": "Les modules `StdEnv/2020` et `abaqus/2021` sont charg\u00e9s."
+  },
+  {
+    "question": "Quelle est la fonction de la commande `rm -f testep2* testep1.lck` dans le script `scriptep2.txt` ?",
+    "answer": "Elle supprime les fichiers de sortie pr\u00e9c\u00e9dents (`testep2*`) et le fichier de verrouillage (`testep1.lck`) avant de d\u00e9marrer la nouvelle t\u00e2che."
+  },
+  {
+    "question": "Comment le script `scriptep2.txt` pr\u00e9pare-t-il les fichiers pour un red\u00e9marrage d'analyse explicite ?",
+    "answer": "Il copie tous les fichiers commen\u00e7ant par `testep1` vers de nouveaux fichiers commen\u00e7ant par `testep2` (par exemple, `testep1.fil` devient `testep2.fil`)."
+  },
+  {
+    "question": "Quelle commande Abaqus lance la t\u00e2che de red\u00e9marrage d'analyse explicite dans le script `scriptep2.txt` ?",
+    "answer": "La commande est `abaqus job=testep2 input=myexp-sim.inp recover scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive mp_mode=threads memory=\"$((${SLURM_MEM_PER_NODE}-3072))MB\"`."
+  },
+  {
+    "question": "Le fichier d'entr\u00e9e (`myexp-sim.inp`) doit-il \u00eatre modifi\u00e9 pour un red\u00e9marrage d'analyse explicite utilisant `scriptep2.txt` ?",
+    "answer": "Non, le fichier d'entr\u00e9e ne requiert aucune modification pour le red\u00e9marrage de cette analyse."
+  },
+  {
+    "question": "Quel est le but du script `scriptet1.txt` pour l'analyse explicite ?",
+    "answer": "Ce script ex\u00e9cute une t\u00e2che d'analyse explicite en utilisant un r\u00e9pertoire temporaire (`$SLURM_TMPDIR`) pour les fichiers scratch et copie p\u00e9riodiquement les donn\u00e9es vers le r\u00e9pertoire de soumission (`$SLURM_SUBMIT_DIR`)."
+  },
+  {
+    "question": "\u00c0 quelle fr\u00e9quence le script `scriptet1.txt` sauvegarde-t-il les donn\u00e9es du r\u00e9pertoire temporaire vers le r\u00e9pertoire de soumission ?",
+    "answer": "Il sauvegarde les donn\u00e9es toutes les 6 heures en copiant tous les fichiers de `$SLURM_TMPDIR` vers `$SLURM_SUBMIT_DIR`."
+  },
+  {
+    "question": "Quelle est la commande Abaqus pour l'ex\u00e9cution initiale dans le script `scriptet1.txt` ?",
+    "answer": "La commande est `abaqus job=testet1 input=$SLURM_SUBMIT_DIR/myexp-sim.inp scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive mp_mode=threads memory=\"$((${SLURM_MEM_PER_NODE}-3072))MB\"`."
+  },
+  {
+    "question": "Comment configurer le fichier d'entr\u00e9e pour \u00e9crire les donn\u00e9es de red\u00e9marrage pour un total de 12 incr\u00e9ments avec le script `scriptet1.txt` ?",
+    "answer": "Le fichier d'entr\u00e9e doit inclure `*RESTART, WRITE, OVERLAY, NUMBER INTERVAL=12, TIME MARKS=NO`."
+  },
+  {
+    "question": "Comment v\u00e9rifier les informations compl\u00e8tes de red\u00e9marrage pour les t\u00e2ches d'analyse explicite utilisant `scriptet1.txt` ?",
+    "answer": "Vous pouvez utiliser la commande `egrep -i \"step|restart\" testet*.com testet*.msg testet*.sta`."
+  },
+  {
+    "question": "Quel est le but du script de red\u00e9marrage d'analyse explicite `scriptet2.txt` ?",
+    "answer": "Ce script est con\u00e7u pour red\u00e9marrer une t\u00e2che d'analyse explicite qui utilise un r\u00e9pertoire temporaire, en copiant les fichiers initiaux et en sauvegardant p\u00e9riodiquement la progression vers le r\u00e9pertoire de soumission."
+  },
+  {
+    "question": "Comment le script `scriptet2.txt` pr\u00e9pare-t-il le r\u00e9pertoire temporaire pour un red\u00e9marrage \u00e0 partir d'une t\u00e2che pr\u00e9c\u00e9dente (`testet1`) ?",
+    "answer": "Il copie tous les fichiers de `testet1*` du r\u00e9pertoire de soumission vers `$SLURM_TMPDIR`, en les renommant en `testet2*`."
+  },
+  {
+    "question": "\u00c0 quelle fr\u00e9quence le script `scriptet2.txt` sauvegarde-t-il les donn\u00e9es vers le r\u00e9pertoire de soumission pendant une t\u00e2che de red\u00e9marrage ?",
+    "answer": "Il copie tous les fichiers de `$SLURM_TMPDIR` vers `$SLURM_SUBMIT_DIR` toutes les 3 heures."
+  },
+  {
+    "question": "Quelle commande Abaqus lance la t\u00e2che de red\u00e9marrage d'analyse explicite dans le script `scriptet2.txt` ?",
+    "answer": "La commande est `abaqus job=testet2 input=$SLURM_SUBMIT_DIR/myexp-sim.inp recover scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive mp_mode=threads memory=\"$((${SLURM_MEM_PER_NODE}-3072))MB\"`."
+  },
+  {
+    "question": "Le fichier d'entr\u00e9e pour le red\u00e9marrage d'analyse explicite (`myexp-sim.inp`) est-il modifi\u00e9 lors de l'utilisation du script `scriptet2.txt` ?",
+    "answer": "Non, le fichier d'entr\u00e9e ne requiert aucune modification pour le red\u00e9marrage de l'analyse."
+  }
+]

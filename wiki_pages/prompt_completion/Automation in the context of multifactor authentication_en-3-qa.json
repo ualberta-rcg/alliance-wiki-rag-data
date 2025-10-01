@@ -1,0 +1,26 @@
+[
+  {
+    "question": "How can you determine if an SSH connection is using IPv4 or IPv6 from the debug output?",
+    "answer": "You can determine this by looking for the 'Connecting to...' message in the SSH debug output: an address like '199.241.166.5' indicates IPv4, while an address like '2620:123:7002:4::5' indicates IPv6."
+  },
+  {
+    "question": "What are the primary solutions for an SSH connection problem caused by an IPv4/IPv6 mismatch with an automation node key?",
+    "answer": "You can explicitly use either IPv4 or IPv6 with the SSH client using the `-4` or `-6` options, try using an IP address instead of the hostname for the automation node, or as a last resort, disable IPv6 addressing on your computer."
+  },
+  {
+    "question": "How can you force an SSH client to use IPv4 addresses when connecting to an automation node?",
+    "answer": "You can force an SSH client to use IPv4 by adding the `-4` option to your SSH command, or by connecting directly to the automation node's IPv4 address instead of its hostname, for example: `ssh -i ~/.ssh/automation_key -vvv username@132.219.138.79 \"ls -l\"`."
+  },
+  {
+    "question": "What Python module is mentioned for automating workflows with automation nodes?",
+    "answer": "The Paramiko Python module is mentioned for automating workflows with automation nodes."
+  },
+  {
+    "question": "How should Paramiko be installed to ensure support for Ed25519 key types?",
+    "answer": "Paramiko should be installed using the command `pip install paramiko[all]` to ensure that support for the Ed25519 key type is also installed."
+  },
+  {
+    "question": "Can you provide a basic Python code snippet using Paramiko to connect to an automation node and execute a command?",
+    "answer": "The following Python code snippet connects to the 'robot.rorqual.alliancecan.ca' automation node, loads an Ed25519 key, and executes the 'ls -l' command:\n\n```python\nimport paramiko\n\nkey = paramiko.Ed25519Key.from_private_key_file(\"/home/username/.ssh/cc_allowed\")\nuser = \"username\"\nhost = \"robot.rorqual.alliancecan.ca\"\nssh = paramiko.SSHClient()\nssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())\nssh.connect(hostname=host, username=user, pkey=key)\ncmd = \"ls -l\"\nstdin, stdout, stderr = ssh.exec_command(cmd)\nprint(\"\".join(stdout.readlines()))\nssh.close()\n```"
+  }
+]

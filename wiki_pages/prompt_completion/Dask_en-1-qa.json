@@ -1,0 +1,70 @@
+[
+  {
+    "question": "What is Dask?",
+    "answer": "Dask is a flexible library for parallel computing in Python, providing distributed NumPy array and Pandas DataFrame objects, and enabling distributed computing with access to the PyData stack."
+  },
+  {
+    "question": "What is the preferred way to install Dask?",
+    "answer": "The preferred option is to install Dask using its provided Python wheel."
+  },
+  {
+    "question": "What are the general steps to install Dask using its Python wheel?",
+    "answer": "1. Load a Python module (e.g., `module load python/3.11`). 2. Create and start a virtual environment. 3. Install `dask`, and optionally `dask-distributed`, in the virtual environment with `pip install`."
+  },
+  {
+    "question": "What is the command to install Dask and dask-distributed without an index in a virtual environment?",
+    "answer": "The command is `pip install --no-index dask distributed`."
+  },
+  {
+    "question": "What is the purpose of the `dask-example.sh` script in the single-node example?",
+    "answer": "The `dask-example.sh` script spawns a single-node Dask cluster with 6 CPUs and computes the mean of a column of a parallelized dataframe."
+  },
+  {
+    "question": "What SLURM parameters are used to request 6 CPUs and 8000MB memory for a single-node Dask job?",
+    "answer": "The SLURM parameters are `#SBATCH --ntasks=1`, `#SBATCH --cpus-per-task=6`, and `#SBATCH --mem=8000M`."
+  },
+  {
+    "question": "How are the Dask scheduler and workers launched within the `dask-example.sh` script for a single node?",
+    "answer": "The scheduler is launched with `dask scheduler --host $DASK_SCHEDULER_ADDR --port $DASK_SCHEDULER_PORT &`, and workers with `dask worker \"tcp://$DASK_SCHEDULER_ADDR:$DASK_SCHEDULER_PORT\" --no-dashboard --nworkers=6 --nthreads=1 --local-directory=$SLURM_TMPDIR &`."
+  },
+  {
+    "question": "How does the `dask-example.py` script determine the number of workers for a Dask cluster?",
+    "answer": "It determines the number of workers (`n_workers`) by reading the `SLURM_CPUS_PER_TASK` environment variable: `n_workers = int(os.environ['SLURM_CPUS_PER_TASK'])`."
+  },
+  {
+    "question": "How does `dask-example.py` establish a connection to the Dask cluster?",
+    "answer": "It connects to the Dask cluster by initializing a Client object with the scheduler's address and port: `client = Client(f\"tcp://{os.environ['DASK_SCHEDULER_ADDR']}:{os.environ['DASK_SCHEDULER_PORT']}\")`."
+  },
+  {
+    "question": "How is a pandas DataFrame converted into a Dask DataFrame with partitions in `dask-example.py`?",
+    "answer": "A pandas DataFrame `df` is converted to a Dask DataFrame `ddf` and split into `n_workers` chunks using `ddf = dd.from_pandas(df, npartitions=n_workers)`."
+  },
+  {
+    "question": "What SLURM parameters are used for a two-node Dask cluster with 6 CPUs per node (2 tasks per node, 3 cpus per task) and 16000MB total memory?",
+    "answer": "The SLURM parameters are `#SBATCH --nodes 2`, `#SBATCH --tasks-per-node=2`, `#SBATCH --mem=16000M`, and `#SBATCH --cpus-per-task=3`."
+  },
+  {
+    "question": "How is the virtual environment configured across multiple nodes in the multi-node Dask example?",
+    "answer": "The `srun -N 2 -n 2 config_virtualenv.sh` command is used to configure the virtual environment on all specified nodes."
+  },
+  {
+    "question": "What Dask-related libraries are installed in the virtual environment within the `config_virtualenv.sh` script for multi-node setups?",
+    "answer": "`dask[distributed,dataframe]` is installed using `pip install --no-index dask[distributed,dataframe]`."
+  },
+  {
+    "question": "How are Dask workers launched across multiple nodes in the multi-node example's `dask-example.sh` script?",
+    "answer": "Dask workers are launched using `srun launch_dask_workers.sh &`."
+  },
+  {
+    "question": "How are Dask worker memory and threads allocated in `launch_dask_workers.sh` based on `SLURM_PROCID`?",
+    "answer": "On the SLURM task with Rank 0 (`SLURM_PROCID -eq \"0\"`), the worker gets 40% of the job's memory and `SLURM_CPUS_PER_TASK-1` threads. On all other SLURM tasks, each worker gets 50% of the job's allocated memory and all `SLURM_CPUS_PER_TASK` cores."
+  },
+  {
+    "question": "How is the Dask cluster shut down in the multi-node `dask-example.sh` script?",
+    "answer": "The Dask cluster is shut down by killing the Dask cluster process ID (`dask_cluster_pid`) using `kill $dask_cluster_pid` after the Python process exits."
+  },
+  {
+    "question": "How does `test_dask.py` in the multi-node example differ from `dask-example.py` in setting `npartitions`?",
+    "answer": "In `test_dask.py` (multi-node), `npartitions` is explicitly set to `6`, whereas in `dask-example.py` (single-node), it is dynamically set to `n_workers` based on the `SLURM_CPUS_PER_TASK` environment variable."
+  }
+]

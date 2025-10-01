@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What is the primary benefit of using job arrays for checkpointing GROMACS simulations?",
+    "answer": "Job arrays allow long simulations to be split into multiple shorter jobs, which typically experience shorter queue wait times and can be eligible for backfill scheduling, especially if they request 3 hours or less."
+  },
+  {
+    "question": "How does a job array automate the process of resuming a GROMACS simulation from a checkpoint?",
+    "answer": "A single `sbatch` call submits multiple short jobs. The jobs run one at a time, and as each finishes, the next one becomes eligible to start and resume the simulation. This continues until the simulation is complete or an error occurs, at which point any remaining pending jobs are automatically cancelled."
+  },
+  {
+    "question": "Which modules are necessary for a CPU-based GROMACS checkpointing job using `StdEnv/2023` according to the example script?",
+    "answer": "The necessary modules are `StdEnv/2023`, `gcc/12.3`, `openmpi/4.1.5`, and `gromacs/2024.4`."
+  },
+  {
+    "question": "What are the SLURM resource requests for a CPU-based GROMACS checkpointing job on Narval, as shown in the example?",
+    "answer": "The SLURM resource requests include 1 node, 32 MPI tasks per node, 2 OpenMP threads per MPI task, 2000MB memory per CPU, a 3-hour time limit, and a job array range of 1-20 with 1 job running at a time."
+  },
+  {
+    "question": "How is the `OMP_NUM_THREADS` environment variable configured in the example GROMACS checkpointing scripts?",
+    "answer": "The `OMP_NUM_THREADS` environment variable is set using `export OMP_NUM_THREADS=\"${SLURM_CPUS_PER_TASK:-1}\"`."
+  },
+  {
+    "question": "What `gmx_mpi mdrun` command is used in the CPU checkpointing script, including parameters for threads, definition file, checkpoint, and time limit?",
+    "answer": "The `gmx_mpi mdrun` command used is `srun gmx_mpi mdrun -ntomp $nt -deffnm $simname -cpi \"$simname.cpt\" -maxh $nhours`."
+  },
+  {
+    "question": "Which modules are loaded for a GPU-based GROMACS checkpointing job using `StdEnv/2023` according to the example script?",
+    "answer": "The necessary modules are `StdEnv/2023`, `gcc/12.3`, `openmpi/4.1.5`, `cuda/12.2`, and `gromacs/2024.4`."
+  },
+  {
+    "question": "What SLURM resource requests are specified for a GPU-based GROMACS checkpointing job in the example script?",
+    "answer": "The SLURM resource requests include 1 GPU per node, 4 OpenMP threads per MPI process, 2000MB memory per CPU core, a 3-hour time limit, and a job array range of 1-20 with 1 job running at a time."
+  },
+  {
+    "question": "What actions are taken by the GROMACS checkpointing job scripts if a simulation exits with an error or completes successfully?",
+    "answer": "If the simulation exits with an error, a message is printed, and all pending jobs in the array are cancelled. If the simulation finishes successfully (indicated by writing the final checkpoint at the total number of steps), pending jobs are also cancelled."
+  },
+  {
+    "question": "Who developed the \"Molecular Dynamics Performance Guide\" for Alliance clusters?",
+    "answer": "A team at ACENET developed the \"Molecular Dynamics Performance Guide\" for Alliance clusters."
+  },
+  {
+    "question": "What is the purpose of the \"Molecular Dynamics Performance Guide\"?",
+    "answer": "The guide helps users determine optimal conditions for AMBER, GROMACS, NAMD, and OpenMM jobs on Alliance clusters."
+  },
+  {
+    "question": "Is it considered simple to achieve optimal `mdrun` performance with GROMACS?",
+    "answer": "No, getting the best `mdrun` performance with GROMACS is not a straightforward task."
+  },
+  {
+    "question": "Where can users find extensive information on optimizing `mdrun` performance in GROMACS?",
+    "answer": "Users can find extensive information in the GROMACS user guide, which contains a dedicated long section on `mdrun` performance."
+  }
+]

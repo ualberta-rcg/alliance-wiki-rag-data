@@ -1,0 +1,54 @@
+[
+  {
+    "question": "What modules are loaded for Ansys Fluent jobs in the `Multinode (by node + requeue)` script?",
+    "answer": "The script loads `StdEnv/2023` and `ansys/2023R2` (or newer versions). Older versions like `StdEnv/2020`, `ansys/2019R3`, or `ansys/2021R2` are also mentioned as unsupported or for specific clusters."
+  },
+  {
+    "question": "How do you specify the journal file and Ansys Fluent version in the `Multinode (by node + requeue)` script?",
+    "answer": "You specify the journal file name using `MYJOURNALFILE=sample.jou` and the Ansys Fluent version (e.g., 2d, 2ddp, 3d, 3ddp) using `MYVERSION=3d`."
+  },
+  {
+    "question": "How is MPI configured for Narval clusters in the Ansys Fluent requeue scripts?",
+    "answer": "For Narval clusters (`CC_CLUSTER == narval`), the script conditionally loads `intel/2021 intelmpi` (for `EBVERSIONGENTOO == 2020`) or `intel/2023 intelmpi` (for `EBVERSIONGENTOO == 2023`), setting `INTELMPI_ROOT` and `HCOLL_RCACHE`, and unsetting `I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS` and `I_MPI_ROOT`."
+  },
+  {
+    "question": "How does the Ansys Fluent requeue script determine the number of cores to use?",
+    "answer": "The number of cores (`NCORES`) is calculated based on the Slurm allocation: `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK` for `Multinode (by node + requeue)` script, or `SLURM_NTASKS * SLURM_CPUS_PER_TASK` for `Multinode (by core + requeue)` script."
+  },
+  {
+    "question": "What is the purpose of the `--array=1-5%1` SBATCH directive in the requeue scripts?",
+    "answer": "This directive specifies that the job should attempt to requeue up to 5 times. It's used for handling transient failures like license shortages."
+  },
+  {
+    "question": "How does the Ansys Fluent requeue script handle a job's completion or failure?",
+    "answer": "If the Fluent command exits successfully (`$? -eq 0`), it prints 'Job completed successfully!' and cancels the entire job array. If it fails, it prints a failure message and, if there are remaining requeue attempts, indicates that it's 'Resubmitting job now\u2026' or 'All job attempts failed exiting now.' if it's the last attempt."
+  },
+  {
+    "question": "What is the primary purpose of the solution restart scripts for Ansys Fluent?",
+    "answer": "The solution restart scripts are provided to automate restarting very large jobs that might exceed the typical seven-day maximum runtime window available on most clusters, by continuing from the most recently saved time step files."
+  },
+  {
+    "question": "What are the prerequisites for using the solution restart scripts?",
+    "answer": "A working set of `sample.cas`, `sample.dat`, and `sample.jou` files must be present, and the first time step must be able to complete within the requested job array time limit."
+  },
+  {
+    "question": "How should the original `sample.jou` file be modified for solution restarts?",
+    "answer": "The `sample.jou` file should be edited to include `/solve/dual-time-iterate 1` and `/file/auto-save/data-frequency 1`."
+  },
+  {
+    "question": "How do you create and modify the restart journal file (`sample-restart.jou`)?",
+    "answer": "You create it by copying the original `sample.jou` (e.g., `cp sample.jou sample-restart.jou`). Then, edit `sample-restart.jou` to contain `/file/read-cas-data sample-restart` instead of `/file/read-cas-data sample` and comment out the initialization line (e.g., `; /solve/initialize/initialize-flow`). Optionally, set `/solve/dual-time-iterate 2` if subsequent steps are faster."
+  },
+  {
+    "question": "What is the maximum time limit that can be specified for a solution restart job?",
+    "answer": "The Slurm time window for restart jobs can be specified up to a maximum of `#SBATCH --time=07-00:00` days."
+  },
+  {
+    "question": "How do the solution restart scripts differentiate between the initial job run and subsequent restarts?",
+    "answer": "The scripts use the `SLURM_ARRAY_TASK_ID` variable. If `SLURM_ARRAY_TASK_ID` is 1, the original journal file (`MYJOUFILE`) is used. For any subsequent task IDs, the restart journal file (`MYJOUFILERES`) is used."
+  },
+  {
+    "question": "After a successful restart step, what actions do the solution restart scripts perform?",
+    "answer": "After a successful step (if not the last array task), the scripts restart the job and create symbolic links (`ln -sfv`) to the most recent output `.cas` and `.dat` files, naming them `MYCASFILERES` and `MYDATFILERES` respectively, for the next iteration."
+  }
+]

@@ -1,62 +1,50 @@
 [
   {
-    "question": "What is the primary purpose of the `pytorch-ddp-test.sh` script?",
-    "answer": "The `pytorch-ddp-test.sh` script is designed to submit a PyTorch distributed data parallel job, setting up the necessary environment and launching the Python training script."
+    "question": "What PyTorch class is used for multi-GPU data parallelism in the `pytorch-ddp-test.py` script?",
+    "answer": "`torch.nn.parallel.DistributedDataParallel` is used to wrap the model for multi-GPU data parallelism."
   },
   {
-    "question": "How are PyTorch and torchvision installed within the `pytorch-ddp-test.sh` script?",
-    "answer": "They are installed using `pip install torch torchvision --no-index` within a Python virtual environment created in `$SLURM_TMPDIR/env`."
+    "question": "What components are used to prepare training data in the `pytorch-ddp-test.py` script?",
+    "answer": "Training data is prepared using `torchvision.transforms`, `torchvision.datasets.CIFAR10`, `torch.utils.data.distributed.DistributedSampler`, and `torch.utils.data.DataLoader`."
   },
   {
-    "question": "Which environment variable is set in `pytorch-ddp-test.sh` to enable asynchronous handling for NCCL?",
-    "answer": "The `TORCH_NCCL_ASYNC_HANDLING` environment variable is set to `1` using `export TORCH_NCCL_ASYNC_HANDLING=1`."
+    "question": "Which loss function and optimizer are employed in the `pytorch-ddp-test.py` script?",
+    "answer": "`nn.CrossEntropyLoss().cuda()` is used as the loss function, and `optim.SGD` is used as the optimizer."
   },
   {
-    "question": "How is the master node's IP address determined and stored in the `pytorch-ddp-test.sh` script?",
-    "answer": "The master node's IP address is stored in the `MASTER_ADDR` environment variable using `export MASTER_ADDR=$(hostname)`."
+    "question": "What is the main advantage of using PyTorch Lightning for deep learning tasks?",
+    "answer": "PyTorch Lightning provides interfaces to PyTorch to make many common, code-heavy tasks, including training on multiple GPUs, more straightforward."
   },
   {
-    "question": "How is the `world_size` parameter, representing the total number of processes, calculated in the `pytorch-ddp-test.sh` script?",
-    "answer": "The `world_size` is calculated using the expression `$((SLURM_NTASKS_PER_NODE * SLURM_JOB_NUM_NODES))`."
+    "question": "How many GPUs are requested by the `pytorch-ddp-test-pl.sh` SLURM script?",
+    "answer": "The script requests 2 GPUs using `--gres=gpu:2`."
   },
   {
-    "question": "What is the significance of `SLURM_LOCALID` and `SLURM_NODEID` in the `pytorch-ddp-test.py` script for DistributedDataParallel?",
-    "answer": "`SLURM_LOCALID` identifies the current process's ID within a node, while `SLURM_NODEID` identifies the node itself. These are combined to compute a unique global `rank` for each process and determine the `current_device` (GPU) for `local_rank`."
+    "question": "What command is used to install PyTorch Lightning and torchvision within the `pytorch-ddp-test-pl.sh` script?",
+    "answer": "`pip install torchvision pytorch-lightning --no-index` is used after activating the virtual environment."
   },
   {
-    "question": "How does the `pytorch-ddp-test.py` script initialize the distributed process group for communication?",
-    "answer": "It initializes the process group using `dist.init_process_group(backend=args.dist_backend, init_method=args.init_method, world_size=args.world_size, rank=rank)`."
+    "question": "What is the base class for models defined using PyTorch Lightning?",
+    "answer": "Models defined with PyTorch Lightning inherit from `pl.LightningModule`."
   },
   {
-    "question": "Describe the neural network architecture defined by the `Net` class in `pytorch-ddp-test.py`.",
-    "answer": "The `Net` class defines a Convolutional Neural Network (CNN) composed of two `Conv2d` layers with `MaxPool2d` and ReLU activations, followed by three fully connected `Linear` layers."
+    "question": "How is the optimizer configured within a PyTorch Lightning model?",
+    "answer": "The optimizer is configured in the `configure_optimizers` method of the `pl.LightningModule`."
   },
   {
-    "question": "How is a PyTorch model configured for distributed training using `DistributedDataParallel` in `pytorch-ddp-test.py`?",
-    "answer": "After the model (`net`) is moved to the GPU with `net.cuda()`, it is wrapped with `torch.nn.parallel.DistributedDataParallel(net, device_ids=[current_device])`."
+    "question": "What parameters are used to initialize a PyTorch Lightning `Trainer` for distributed data parallel (DDP) GPU training?",
+    "answer": "The `Trainer` is initialized with `accelerator=\"gpu\"`, `devices`, `num_nodes`, and `strategy='ddp'`."
   },
   {
-    "question": "Which PyTorch class is recommended by PyTorch maintainers for Data Parallelism with multiple GPUs?",
-    "answer": "The `DistributedDataParallel` class is recommended by PyTorch maintainers for using multiple GPUs for Data Parallelism."
+    "question": "How are input and target tensors moved to a CUDA device in the `train` function of `pytorch-ddp-test.py`?",
+    "answer": "Inputs and targets are moved to the CUDA device by calling the `.cuda()` method on them (e.g., `inputs = inputs.cuda()`)."
   },
   {
-    "question": "What is a known issue with PyTorch 1.10 regarding `DistributedDataParallel` and specific backends?",
-    "answer": "There is a known issue where multi-GPU code using `DistributedDataParallel` with PyTorch 1.10 may fail unpredictably if the backend is set to `'nccl'` or `'gloo'`."
+    "question": "What command is used to compile the PyTorch model (`net`) for performance in `pytorch-ddp-test.py`?",
+    "answer": "The model is compiled using `net = torch.compile(Net())`."
   },
   {
-    "question": "What is the recommended action if encountering issues with PyTorch 1.10 and `DistributedDataParallel`?",
-    "answer": "It is recommended to use the latest PyTorch build instead of version 1.10 on all GPU clusters."
-  },
-  {
-    "question": "What is the core concept of Data Parallelism when training with multiple GPUs?",
-    "answer": "Data Parallelism involves training multiple replicas of a model in parallel, where each replica processes a different segment of the training data during each iteration. Gradients are then aggregated, and the parameters of all replicas are updated either synchronously or asynchronously."
-  },
-  {
-    "question": "What crucial adjustment must be made when using Data Parallelism to ensure the trained model is equivalent to one trained without it?",
-    "answer": "The user must scale either the learning rate or the desired batch size in proportion to the number of model replicas being used."
-  },
-  {
-    "question": "What is a key constraint for models when using Data Parallelism with multiple GPUs?",
-    "answer": "The model must be sufficiently small to fit entirely within the memory of a single GPU."
+    "question": "What is the default batch size value specified in the `argparse` for `pytorch-ddp-test-pl.py`?",
+    "answer": "The default batch size specified is `768`."
   }
 ]

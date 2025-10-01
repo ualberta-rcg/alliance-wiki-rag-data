@@ -1,0 +1,70 @@
+[
+  {
+    "question": "How do you run earlier versions of GATK (GATK <= 3)?",
+    "answer": "You need to load the appropriate module, such as `module load nixpkgs/16.09 gatk/3.8`, and then execute the jar file using `java -jar \"${EBROOTGATK}\"/GenomeAnalysisTK.jar PROGRAM OPTIONS`."
+  },
+  {
+    "question": "Where can I find specific usage details for GATK versions 3 and earlier?",
+    "answer": "Specific usage for GATK <= 3 can be found in the GATK3 guide."
+  },
+  {
+    "question": "Are GATK tools (versions 4 and newer) multicore by default?",
+    "answer": "No, most GATK (>=4) tools are not multicore by default, so you should request only one core when calling them."
+  },
+  {
+    "question": "How should I handle CPU requests for GATK tools that use threads?",
+    "answer": "For tools that use threads in some computations (e.g., `Mutect2` with `--native-pair-hmm-threads`), you can require more CPUs, typically up to 4 threads for these computations."
+  },
+  {
+    "question": "Do all GATK tools support Spark commands?",
+    "answer": "No, not all GATK tools use Spark. Tools that can use Spark usually have a note to that effect in their respective Tool Doc."
+  },
+  {
+    "question": "How are Spark-capable versions of GATK tools often distinguished?",
+    "answer": "Some Spark-capable GATK tools have the suffix 'Spark' at the end of their names, while others only exist in a Spark-capable version without this suffix."
+  },
+  {
+    "question": "How do you specify the number of CPUs for GATK commands that use Spark?",
+    "answer": "You must provide the exact number of CPUs to the `spark` command; for instance, if you requested 10 CPUs, use `--spark-master local[10]` instead of `--spark-master local[*]`. "
+  },
+  {
+    "question": "What is required to scale a GATK Spark cluster across multiple nodes?",
+    "answer": "To scale a Spark cluster across multiple nodes, you must first deploy a SPARK cluster and then set the appropriate variables in the GATK command."
+  },
+  {
+    "question": "When is it recommended to run GATK via Apptainer?",
+    "answer": "It is recommended to run GATK via Apptainer if you encounter errors like `IllegalArgumentException` while using the installed GATK modules on the clusters."
+  },
+  {
+    "question": "Where can I find GATK Docker images and their different versions?",
+    "answer": "GATK Docker images can be found on `hub.docker.com/r/broadinstitute/gatk`, with other versions available on its tags page."
+  },
+  {
+    "question": "How do I build an Apptainer image for the latest version of GATK from a Docker image?",
+    "answer": "First, load the apptainer module (`module load apptainer`), then run `apptainer build gatk.sif docker://broadinstitute/gatk`."
+  },
+  {
+    "question": "How can I build an Apptainer image for a specific version of GATK?",
+    "answer": "Load the apptainer module (`module load apptainer`) and then use `apptainer build gatk_VERSION.sif docker://broadinstitute/gatk:VERSION`, replacing 'VERSION' with the desired version number."
+  },
+  {
+    "question": "What is the general command structure for running GATK via Apptainer within an SBATCH script?",
+    "answer": "In an SBATCH script, you should load the `apptainer` module and then use `apptainer exec -B /home -B /project -B /scratch -B /localscratch <path to the image>/gatk.sif gatk [--java-options \"-Xmx4G\"] ToolName [GATK args]`."
+  },
+  {
+    "question": "Which GATK/PICARD command is used to add a read group tag to a BAM file?",
+    "answer": "The `AddOrReplaceReadGroups` command from GATK/PICARD is used for adding or replacing read group tags in a BAM file."
+  },
+  {
+    "question": "What is the command to add a read group 'tag' to 'input.bam' and create an indexed output?",
+    "answer": "You would use `gatk AddOrReplaceReadGroups -I input.bam -O output.bam --RGLB tag --RGPL ILLUMINA --RGPU tag --RGSM tag --SORT_ORDER 'coordinate' --CREATE_INDEX true`."
+  },
+  {
+    "question": "How do you typically resolve a `java.lang.OutOfMemoryError: Java heap space` error in GATK?",
+    "answer": "To resolve this error, you should add or increase the maximum heap memory (`-Xmx`) option within the `--java-options` argument, for example, `-Xmx8G`."
+  },
+  {
+    "question": "What if increasing heap memory doesn't fix `java.lang.OutOfMemoryError: Java heap space`?",
+    "answer": "If increasing heap memory doesn't work, it often indicates issues with non-model organisms and too many scaffolds in the reference; it's recommended to remove small scaffolds or create subsets of your reference."
+  }
+]

@@ -1,0 +1,94 @@
+[
+  {
+    "question": "What is the primary difference between `apptainer run` and `apptainer exec` commands?",
+    "answer": "`apptainer run` executes the `%runscript` defined for a container before running the specified command, whereas `apptainer exec` runs only the specified command without invoking the `%runscript`."
+  },
+  {
+    "question": "Which Apptainer command is generally recommended for running software?",
+    "answer": "It is suggested to always use `apptainer run`."
+  },
+  {
+    "question": "How can you compile a C++ program named `myprog.cpp` inside an Apptainer container and then run the resulting executable?",
+    "answer": "You can compile it using `apptainer run your-container-name.sif g++ -O2 -march=broadwell ./myprog.cpp` and then run it with `apptainer run your-container-name.sif ./a.out`."
+  },
+  {
+    "question": "What common additional options are recommended when using `apptainer run` on clusters?",
+    "answer": "On clusters, it is recommended to use options such as `-C`, `-c`, `-e`, `-W`, and various bind mount options (e.g., `-B /project`, `-B /scratch`) to make disk space available to the programs."
+  },
+  {
+    "question": "When running Apptainer jobs with `salloc`, `sbatch`, or JupyterHub, what should be used for the working directory's location?",
+    "answer": "For these scenarios, `${SLURM_TMPDIR}` should be used for the working directory's location, for example, `-W ${SLURM_TMPDIR}`."
+  },
+  {
+    "question": "What is the purpose of the `apptainer shell` command?",
+    "answer": "`apptainer shell` is used to run commands interactively while remaining inside a container."
+  },
+  {
+    "question": "How do you start an interactive session with an Apptainer container?",
+    "answer": "You can start an interactive session by running `apptainer shell your-container-name.sif`."
+  },
+  {
+    "question": "What prompt indicates you are in an interactive Apptainer shell session?",
+    "answer": "An `Apptainer>` (or `Singularity>`) prompt indicates you are inside an interactive session."
+  },
+  {
+    "question": "How do you exit an interactive Apptainer shell session?",
+    "answer": "You can exit by typing `exit` and pressing Enter/Return."
+  },
+  {
+    "question": "What important option must be passed to `apptainer shell` if you want to save changes to a persistent overlay image?",
+    "answer": "You must pass the `-w` or `--writable` option to the container to ensure any changes made to a persistent overlay image are saved."
+  },
+  {
+    "question": "What Apptainer command is used to run daemons within compute jobs on clusters?",
+    "answer": "`apptainer instance` is used to properly run daemons within compute jobs on clusters."
+  },
+  {
+    "question": "Why is it important to use `apptainer instance` for daemons instead of running them manually?",
+    "answer": "Using `apptainer instance` ensures proper interaction with tools like the Slurm scheduler, preventing daemons from hanging or becoming defunct processes if a job is cancelled or crashes. It also allows control over daemons within the container."
+  },
+  {
+    "question": "If the scheduler kills a job, what happens to daemons started with `apptainer instance` within that job?",
+    "answer": "All daemons running in that job will also be killed."
+  },
+  {
+    "question": "Does running MPI programs within an Apptainer container across multiple nodes require special configuration?",
+    "answer": "Yes, running MPI programs within an Apptainer container across nodes likely requires special configuration due to how MPI utilizes cluster interconnection hardware."
+  },
+  {
+    "question": "Are there issues running MPI programs within an Apptainer container if all MPI processes are on a single shared-memory node?",
+    "answer": "No, there will be no issues running MPI programs within an Apptainer container when all MPI processes run on a single shared-memory node, for example, when using `--nodes=1` with an `sbatch` script."
+  },
+  {
+    "question": "What are bind mounts used for in Apptainer?",
+    "answer": "Bind mounts in Apptainer are used to access disk space that originates outside of the container."
+  },
+  {
+    "question": "What is the purpose of persistent overlays in Apptainer?",
+    "answer": "Persistent overlays are used to overlay a writable filesystem on an otherwise immutable (read-only) container image."
+  },
+  {
+    "question": "Why might you not be able to access files from your host system when using Apptainer with `-C` or `-c` options?",
+    "answer": "The `-C` or `-c` options isolate the running container from most or all filesystems, making host files inaccessible unless explicitly bind mounted."
+  },
+  {
+    "question": "How can you make a file from the host's current directory accessible inside an Apptainer container that is using the `-C` isolation option?",
+    "answer": "You can bind mount the current directory using `-B .`, for example: `apptainer run -C -B . -W $SLURM_TMPDIR a-container.sif wc -l ./my_data_file.txt`."
+  },
+  {
+    "question": "What are common top-level directories that users on clusters might want to bind mount?",
+    "answer": "Users on clusters might want to bind mount top-level directories such as `/project` and `/scratch`."
+  },
+  {
+    "question": "How can you bind mount a specific host file or directory to a different path inside the container?",
+    "answer": "You can bind mount to a different path using the format `-B HOST_PATH:CONTAINER_PATH`, for example, `-B ./my_data_file.txt:/special/input.dat`."
+  },
+  {
+    "question": "What is the recommended bind mount option for the `/home` filesystem when running Apptainer on clusters to prevent interference?",
+    "answer": "The recommended option is `-B /home:/cluster_home` to bind mount the `/home` filesystem to an alternate destination directory inside the container."
+  },
+  {
+    "question": "Is it advisable to mount CVMFS paths inside Apptainer containers?",
+    "answer": "No, it is not advisable to mount CVMFS paths inside Apptainer containers as it is considered fraught with perils and defeats many reasons to use a container."
+  }
+]

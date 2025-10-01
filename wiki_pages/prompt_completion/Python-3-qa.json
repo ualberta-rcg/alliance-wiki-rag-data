@@ -1,54 +1,26 @@
 [
   {
-    "question": "What is the purpose of the `submit_venv.sh` script example provided?",
-    "answer": "The `submit_venv.sh` script demonstrates how to create a virtual environment inside a single-node job on a compute node, activate it, upgrade `pip`, install packages from a `requirements.txt` file, and then run a Python script."
+    "question": "What is an example job submission script for creating a virtual environment inside a single-node job?",
+    "answer": "A job submission script named `submit_venv.sh` can be used, which includes commands to load a Python module (e.g., `python/3.11`), create a virtual environment in `$SLURM_TMPDIR/env` using `virtualenv --no-download`, activate it, upgrade pip, and install packages from a `requirements.txt` file."
   },
   {
-    "question": "How do you load a Python version within a SLURM job submission script for a virtual environment?",
-    "answer": "You can load a specific Python version using `module load python/3.10` in your job submission script."
+    "question": "How do you create a `requirements.txt` file for a Python environment, for example, one for TensorFlow?",
+    "answer": "To create a `requirements.txt` file, first load the desired Python module (e.g., `python/3.11`) on a login node. Then, create and activate a temporary virtual environment (e.g., `virtualenv --no-download /tmp/$RANDOM`), upgrade pip, install the desired package (e.g., `pip install --no-index tensorflow`), then use `pip freeze --local > requirements.txt` to save the package list, and finally deactivate and remove the temporary environment."
   },
   {
-    "question": "What command is used to create a virtual environment without downloading packages, typically in a job's temporary directory?",
-    "answer": "The command `virtualenv --no-download $SLURM_TMPDIR/env` is used to create a virtual environment in the temporary directory without downloading packages."
-  },
-  {
-    "question": "How do you activate a virtual environment that has been created in `$SLURM_TMPDIR/env` within a job script?",
-    "answer": "You activate the virtual environment using `source $SLURM_TMPDIR/env/bin/activate`."
-  },
-  {
-    "question": "How do you upgrade `pip` in a virtual environment without accessing external indices?",
-    "answer": "You can upgrade `pip` using the command `pip install --no-index --upgrade pip`."
-  },
-  {
-    "question": "How are Python packages installed from a `requirements.txt` file within a virtual environment, ensuring local packages are prioritized?",
-    "answer": "Packages can be installed using `pip install --no-index -r requirements.txt`."
-  },
-  {
-    "question": "How can a `requirements.txt` file be generated for a specific package like TensorFlow on a login node?",
-    "answer": "To generate a `requirements.txt` file, first load the desired Python module (e.g., `python/3.10`), create and activate a temporary virtual environment, install the package (e.g., `pip install --no-index tensorflow`), then run `pip freeze --local > requirements.txt`, deactivate the environment, and remove the temporary directory."
-  },
-  {
-    "question": "What is the benefit of using a `requirements.txt` file for virtual environments?",
-    "answer": "A `requirements.txt` file ensures that your environment is reproducible between jobs."
+    "question": "What is the benefit of using a `requirements.txt` file for a virtual environment?",
+    "answer": "A `requirements.txt` file ensures that your Python environment is reproducible between jobs."
   },
   {
     "question": "What should be done if a required Python wheel is not available in the provided wheelhouse?",
-    "answer": "If a wheel is not available in the wheelhouse, you can pre-download it or contact technical support to make a request for its inclusion."
+    "answer": "If a wheel is not available in the wheelhouse, you can pre-download it. If you believe it should be included, you should contact Technical support to make a request."
   },
   {
-    "question": "Why is it necessary to create virtual environments inside jobs for multi-node scripts?",
-    "answer": "For multi-node scripts, each node must have its own virtual environment activated to run scripts across multiple nodes."
+    "question": "How are virtual environments managed when running Python scripts across multiple nodes?",
+    "answer": "When running Python scripts across multiple nodes, each node must have its own virtual environment activated. The submission script should create the virtual environment on each allocated node using `srun` and then activate it on the main node before running the script with `srun`."
   },
   {
-    "question": "How is a virtual environment created on each allocated node in a multi-node submission script?",
-    "answer": "Within a multi-node submission script, you use an `srun` command block like `srun --ntasks $SLURM_NNODES --tasks-per-node=1 bash << EOF` to run `virtualenv --no-download $SLURM_TMPDIR/env`, activate it, and install packages on each node."
-  },
-  {
-    "question": "How do you activate the virtual environment on the main node in a multi-node job submission script?",
-    "answer": "You activate the virtual environment on the main node using `source $SLURM_TMPDIR/env/bin/activate;`."
-  },
-  {
-    "question": "How do you execute a Python script across multiple nodes using `srun` after activating the virtual environment?",
-    "answer": "You execute the Python script across multiple nodes using `srun python myscript.py;`."
+    "question": "What is the typical sequence of commands for setting up virtual environments on multiple nodes within a job submission script?",
+    "answer": "In a submission script for multi-node jobs, you would use `srun --ntasks $SLURM_NNODES --tasks-per-node=1 bash << EOF` to create and activate the virtual environment on each allocated node. Inside this EOF block, you would include `virtualenv --no-download $SLURM_TMPDIR/env`, `source $SLURM_TMPDIR/env/bin/activate`, `pip install --no-index --upgrade pip`, and `pip install --no-index -r requirements.txt`. Afterward, activate the environment on the main node using `source $SLURM_TMPDIR/env/bin/activate;` and run your script with `srun python myscript.py;`."
   }
 ]

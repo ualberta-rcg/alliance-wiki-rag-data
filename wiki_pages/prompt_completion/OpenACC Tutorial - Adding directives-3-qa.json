@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What does declaring a pointer as `restrict` formally mean?",
+    "answer": "Declaring a pointer as restricted formally means that for the lifetime of the pointer, only it or a value derived from it (like `ptr + 1`) will be used to access the object to which it points. This is a guarantee the programmer gives to the compiler."
+  },
+  {
+    "question": "What happens if a programmer violates the `restrict` guarantee for a pointer?",
+    "answer": "If the programmer violates the `restrict` guarantee, the behavior of the program is undefined."
+  },
+  {
+    "question": "How is the `restrict` keyword typically declared in C++ for compilers like Portland Group and NVidia?",
+    "answer": "For Portland Group and NVidia compilers, the keyword `__restrict` is used, placed after the pointer, such as `float * __restrict A;`."
+  },
+  {
+    "question": "What is another way to tell the compiler that loop iterations are independent, besides using the `restrict` keyword?",
+    "answer": "Another way is to use the OpenACC `loop` directive with the `independent` clause."
+  },
+  {
+    "question": "Is the `loop independent` directive prescriptive or descriptive?",
+    "answer": "The `loop` directive with the `independent` clause is a prescriptive directive, meaning it explicitly tells the compiler what to do and overrides compiler analysis."
+  },
+  {
+    "question": "How can false aliasing be fixed in the matrix-vector product example discussed in the document?",
+    "answer": "False aliasing can be fixed by declaring the problematic pointers (e.g., `Acoefs`, `xcoefs`, `ycoefs`) as `__restrict`."
+  },
+  {
+    "question": "What was the initial performance observation when running the OpenACC version of the matrix-vector product compared to the original CPU version?",
+    "answer": "The OpenACC version resulted in a slowdown by a factor of almost 4 compared to the original CPU version."
+  },
+  {
+    "question": "What was identified as the primary reason for the performance slowdown in the initially ported OpenACC code?",
+    "answer": "Almost all of the run time was being spent transferring data between the host (CPU) and the device (GPU)."
+  },
+  {
+    "question": "What is the NVIDIA Visual Profiler (NVVP) used for?",
+    "answer": "The NVIDIA Visual Profiler (NVVP) is a cross-platform analyzing tool for codes written with OpenACC and CUDA C/C++ instructions, used to profile their execution."
+  },
+  {
+    "question": "What happens if an executable that doesn't use the GPU is profiled with NVVP?",
+    "answer": "If the executable is not using the GPU, NVVP will yield no results from the profiler."
+  },
+  {
+    "question": "How do you launch the NVIDIA Visual Profiler (NVVP) from a terminal?",
+    "answer": "After loading the necessary modules (e.g., `cuda/11.7 java/1.8`), you can launch NVVP using the command `nvvp &`."
+  },
+  {
+    "question": "What is the nature of the OpenACC `parallel loop` directive?",
+    "answer": "The `parallel loop` directive is a prescriptive directive, meaning it forces the compiler to perform the loop in parallel."
+  },
+  {
+    "question": "What is implicitly included within a `parallel loop` region due to its prescriptive nature?",
+    "answer": "The `independent` clause is implicit within a `parallel loop` region."
+  },
+  {
+    "question": "Why are `private` and `reduction` clauses sometimes needed with the `parallel loop` directive but not always with `kernels`?",
+    "answer": "These clauses are needed with `parallel loop` because it is the programmer's responsibility to manage data scope, whereas the `kernels` directive handles this automatically."
+  },
+  {
+    "question": "What is the purpose of the `private` clause when used with OpenACC directives?",
+    "answer": "With the `private` clause, a copy of the specified variable is made for each loop iteration, ensuring its value is independent of other iterations."
+  },
+  {
+    "question": "What is the purpose of the `reduction` clause when used with OpenACC directives?",
+    "answer": "With the `reduction` clause, the values of a variable from each iteration are combined ('reduced') into a single value, supporting operations like addition, multiplication, maximum, and minimum."
+  },
+  {
+    "question": "How can the matrix-vector product inner loop be parallelized using the `parallel loop` directive with data scope clauses?",
+    "answer": "The inner loop can be parallelized with `#pragma acc loop reduction(+:sum)` to handle the sum accumulation."
+  },
+  {
+    "question": "What are the two main approaches to porting code with OpenACC directives?",
+    "answer": "The two main approaches are the 'descriptive' approach using the `kernels` directive, where the compiler analyzes for parallelism, and the 'prescriptive' approach using the `parallel loop` directive, where the programmer explicitly specifies parallelization."
+  },
+  {
+    "question": "What is a key difference between the `parallel loop` and `kernels` directives regarding programmer responsibility?",
+    "answer": "With `parallel loop`, it is the programmer's responsibility to ensure parallelism is safe, while with `kernels`, the compiler is responsible for analyzing the code and determining safe parallelization."
+  },
+  {
+    "question": "Which OpenACC directive gives the compiler more room to optimize?",
+    "answer": "The `kernels` directive gives the compiler more room to optimize because it allows the compiler to analyze the code and determine the best strategy."
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "question": "How can you correct the issue of requesting a node with four GPUs but only utilizing one?",
+    "answer": "To correct this situation, you can either adapt your code to actually use all four GPUs, or simply request only one GPU when submitting your task."
+  },
+  {
+    "question": "What is the recommended SBATCH script for a GPU task that efficiently requests a single GPU?",
+    "answer": "```#!/bin/bash\n#SBATCH --gpu-per-node=1\n#SBATCH --cpus-per-task=10\n#SBATCH --mem=14G\n#SBATCH --time=3-00:00:00\n#SBATCH --account=def-someuser\n\nmodule load python/3.11\n\npython3 mon_script.py```"
+  },
+  {
+    "question": "What is a general recommendation for managing the number of CPUs for a GPU task on a node with four GPUs?",
+    "answer": "On a node disposing of four GPUs, it is not recommended to request more than a quarter of the CPUs per GPU."
+  },
+  {
+    "question": "Why is it discouraged to request more than a quarter of the CPUs per GPU on a four-GPU node?",
+    "answer": "The additional CPUs risk being allocated on a wrong NUMA node, or even on another socket than that of the GPU, which can lead to a significant slowdown of transfers between the CPU and the GPU."
+  },
+  {
+    "question": "What type of GPU instances support MIG technology?",
+    "answer": "The MIG technology is available for GPU instances of type A100."
+  },
+  {
+    "question": "Under what conditions might a GPU task be suitable for running on a MIG instance?",
+    "answer": "If your GPU utilization is more than 10% but less than 40% and the memory usage is less than 20G, you can most probably run your task on a MIG."
+  },
+  {
+    "question": "Why is it important to carefully choose the type of MIG for a task?",
+    "answer": "It is important to well choose the type of MIG according to your needs to avoid waste."
+  },
+  {
+    "question": "Where can users find more information about Multi-Instance GPU (MIG)?",
+    "answer": "For more information, please consult the wiki page: https://docs.alliancecan.ca/wiki/Multi-Instance_GPU/"
+  },
+  {
+    "question": "What resource waste can occur if a task uses the GPU only temporarily or irregularly?",
+    "answer": "If your task uses the GPU only temporarily or irregularly, this can lead to a waste of resources."
+  },
+  {
+    "question": "What is the recommendation for tasks that only utilize the GPU temporarily or irregularly?",
+    "answer": "It is recommended to evaluate the possibility of interrupting the task after the GPU calculation phase to resume it on a CPU node, or vice versa."
+  },
+  {
+    "question": "How can one optimize resource utilization by understanding task needs?",
+    "answer": "Well knowing the needs of your task allows to efficiently separate the CPU and GPU phases, and to optimize the use of resources."
+  },
+  {
+    "question": "What is MPS (Multi-Process Service) a relevant solution for in the context of GPU utilization?",
+    "answer": "MPS (Multi-Process Service) could be a pertinent solution to reduce the observed waste when your task does not efficiently exploit the GPU\u2019s capabilities."
+  },
+  {
+    "question": "When is MPS (Multi-Process Service) applicable?",
+    "answer": "MPS applies well in cases such as a multiprocessor (MPI) task where each process does not individually fill a GPU, a multithreaded task where each execution thread does not individually fill a GPU, or several similar serial tasks where each individual job does not fill a GPU."
+  },
+  {
+    "question": "Where can users find more information about Hyper-Q / MPS?",
+    "answer": "For more information, please consult the page: https://docs.alliancecan.ca/wiki/Hyper-Q_/_MPS/fr/"
+  }
+]

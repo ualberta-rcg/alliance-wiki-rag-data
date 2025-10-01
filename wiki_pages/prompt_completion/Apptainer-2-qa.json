@@ -1,0 +1,98 @@
+[
+  {
+    "question": "What are the options if I need to use `sudo` for building Apptainer images but don't have it on Alliance clusters?",
+    "answer": "You can install Linux, Apptainer, and `sudo` in a virtual machine on a system you control to build images there and then upload them to Alliance systems. Alternatively, you can submit a ticket to Alliance staff asking for help to build the image, or utilize Apptainer version 1.1.x and newer's improved `--fakeroot` support which may allow building some images without needing `sudo`."
+  },
+  {
+    "question": "Can all Apptainer images be built without `sudo` using the `--fakeroot` feature in version 1.1.x?",
+    "answer": "No, not all images will be able to be built without needing to use `sudo` or superuser/root, even with Apptainer version 1.1.x's improved `--fakeroot` support."
+  },
+  {
+    "question": "What should be avoided when building a sandbox image with `--fakeroot`?",
+    "answer": "Avoid building a sandbox image using `--fakeroot` on networked filesystem(s)."
+  },
+  {
+    "question": "How should `APPTAINER_CACHEDIR` be set before using Apptainer?",
+    "answer": "Explicitly set `APPTAINER_CACHEDIR` to a non-networked filesystem location before using Apptainer."
+  },
+  {
+    "question": "How should `APPTAINER_TMPDIR` be set before using Apptainer?",
+    "answer": "Explicitly set `APPTAINER_TMPDIR` to a non-Lustre/GPFS filesystem location before using Apptainer."
+  },
+  {
+    "question": "Why should Lustre/GPFS filesystems be avoided for building Apptainer containers?",
+    "answer": "Lustre/GPFS filesystems should be avoided as they don't have the feature set required to properly support building Apptainer containers, including `--fakeroot`."
+  },
+  {
+    "question": "How do I load the default version of Apptainer?",
+    "answer": "Run `$ module load apptainer`."
+  },
+  {
+    "question": "How can I see all available versions of Apptainer that can be loaded?",
+    "answer": "Run `$ module spider apptainer`."
+  },
+  {
+    "question": "Why is it important to run programs within containers without environment settings from the host?",
+    "answer": "Software run inside a container uses different libraries and tools than the host system, and Apptainer by default adopts the host's shell environment, which can cause issues. It's important to run programs within containers by not using any environment settings or software defined outside of the container to avoid these issues."
+  },
+  {
+    "question": "Which Apptainer option isolates a running container from all filesystems, parent PID, IPC, and environment?",
+    "answer": "The `-C` option isolates the running container from all filesystems, as well as the parent PID, IPC, and environment."
+  },
+  {
+    "question": "Which Apptainer option isolates a running container from most filesystems?",
+    "answer": "The `-c` option isolates the running container from most filesystems, only using a minimal `/dev`, an empty `/tmp` directory, and an empty `/home` directory."
+  },
+  {
+    "question": "What does the `-e` option do in Apptainer?",
+    "answer": "The `-e` option cleans some shell environment variables before running container commands and applies settings for increased OCI/Docker compatibility. It also implies the use of `--containall`, `--no-init`, `--no-umask`, and `--writable-tmpfs` options."
+  },
+  {
+    "question": "What is the purpose of the `-W` or `--workdir` option in Apptainer?",
+    "answer": "The `-W` or `--workdir` option tells Apptainer to use a real disk location for its working directory, which is a workaround for jobs getting killed due to limited RAM usage of `/tmp` filesystems on clusters."
+  },
+  {
+    "question": "How would you run 'myprogram' in 'myimage.sif' with its working directory set to '/path/to/a/workdir' and full isolation?",
+    "answer": "You would use `apptainer run -C -B /project -W /path/to/a/workdir myimage.sif myprogram`."
+  },
+  {
+    "question": "What should be used for the working directory (`-W`) when using Apptainer in `salloc`, `sbatch` jobs, or JupyterHub on Alliance clusters?",
+    "answer": "When using Apptainer in an `salloc`, `sbatch` job, or with JupyterHub on Alliance clusters, use `${SLURM_TMPDIR}` for the working directory's location, e.g., `-W ${SLURM_TMPDIR}`."
+  },
+  {
+    "question": "Where should programs, including Apptainer, not be run on clusters?",
+    "answer": "Programs (including Apptainer) should not be run on a login node. An interactive `salloc` job should be used instead."
+  },
+  {
+    "question": "What Apptainer options are required when running software that needs NVIDIA GPUs inside a container?",
+    "answer": "You must pass the `--nv` option to Apptainer commands when running software that requires NVIDIA GPUs."
+  },
+  {
+    "question": "What Apptainer options are required when running software that needs AMD GPUs inside a container?",
+    "answer": "You must pass the `--rocm` option to Apptainer commands when running software that requires AMD GPUs."
+  },
+  {
+    "question": "What do the `--nv` and `--rocm` options ensure when using GPUs with Apptainer?",
+    "answer": "These options ensure that appropriate `/dev` entries are bind mounted inside the container, and they locate and bind GPU-related libraries on the host, setting the `LD_LIBRARY_PATH` environment variable for the libraries to work inside the container."
+  },
+  {
+    "question": "What bind mount is necessary when needing to use OpenCL inside an Apptainer container with GPU options?",
+    "answer": "When needing to use OpenCL inside the container, in addition to `--nv` or `--rocm` options, use the bind mount: `-B /etc/OpenCL`."
+  },
+  {
+    "question": "Where can I find more information about running MPI programs inside an Apptainer container?",
+    "answer": "You can find more information in the `Running MPI Programs` section later on this page, or refer to the official Apptainer documentation on MPI programs at `http://apptainer.org/docs/user/main/mpi.html`."
+  },
+  {
+    "question": "How do you view the `%help` section of an Apptainer container built from a Definition file?",
+    "answer": "Run `apptainer run-help your-container-name.sif`, replacing `your-container-name.sif` with the actual container name."
+  },
+  {
+    "question": "How can I get help for a specific 'app' defined within an Apptainer container?",
+    "answer": "Run `apptainer run-help --app appname your-container-name.sif`, replacing `appname` with the app's name and `your-container-name.sif` with the container name."
+  },
+  {
+    "question": "How do you list the 'apps' installed in an Apptainer container?",
+    "answer": "Run `apptainer inspect --list-apps your-container-name.sif`, replacing `your-container-name.sif` with the actual container name."
+  }
+]

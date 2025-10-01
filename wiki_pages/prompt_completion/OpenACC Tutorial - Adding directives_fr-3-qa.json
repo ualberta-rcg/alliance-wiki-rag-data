@@ -1,0 +1,46 @@
+[
+  {
+    "question": "What is the initial C++ code snippet for the matrix-vector product discussed in the document?",
+    "answer": "The initial code is a nested loop structure, where the outer loop iterates `i` from `0` to `num_rows-1` and the inner loop calculates a `sum` based on `Acoefs`, `xcoefs`, `cols`, and `row_offsets`, finally assigning the sum to `ycoefs[i]`."
+  },
+  {
+    "question": "What is the first change suggested to offload the matrix-vector product code to a GPU using OpenACC?",
+    "answer": "The first change is to add the `#pragma acc kernels` directive around the code block to try and execute it on the GPU."
+  },
+  {
+    "question": "What compiler options are used with NVIDIA compilers (`nvc++`) to enable OpenACC compilation for an accelerator?",
+    "answer": "The compiler options used are `-acc` to enable accelerator compilation, `-gpu=managed` for managed memory, `-fast` for optimization, and `-Minfo=accel` for compiler feedback."
+  },
+  {
+    "question": "What is the purpose of the `-gpu=managed` sub-option when compiling OpenACC code with NVIDIA compilers?",
+    "answer": "The `-gpu=managed` sub-option indicates to the compiler that managed memory should be used to simplify data transfer to and from the device."
+  },
+  {
+    "question": "What kind of compiler feedback was received after the first attempt to parallelize the matrix-vector product with `#pragma acc kernels`?",
+    "answer": "The compiler reported 'Loop carried dependence of ycoefs-> prevents parallelization' and 'Complex loop carried dependence of Acoefs->,xcoefs-> prevents parallelization' for the outer loop."
+  },
+  {
+    "question": "What prevents the compiler from parallelizing the outer loop in the matrix-vector product example?",
+    "answer": "The compiler found loop carried dependencies on `ycoefs`, `Acoefs`, and `xcoefs`, which prevented parallelization."
+  },
+  {
+    "question": "What is 'pointer aliasing' in C/C++?",
+    "answer": "Pointer aliasing is a common case in C/C++ where two pointers refer to the same memory location, which can prevent the compiler from detecting parallelizable sections of code."
+  },
+  {
+    "question": "How can a programmer explicitly tell the compiler that pointers are not aliases in C?",
+    "answer": "A programmer can use the `restrict` keyword (introduced in C99) to inform the compiler that pointers are not aliases."
+  },
+  {
+    "question": "Which specific keyword do Portland Group and NVIDIA compilers use for `restrict` in C++?",
+    "answer": "They use `__restrict`."
+  },
+  {
+    "question": "What is the correct placement for the `restrict` keyword in a C/C++ pointer declaration?",
+    "answer": "The `restrict` keyword should be placed after the pointer, for example, `float * __restrict A;`."
+  },
+  {
+    "question": "Why is the `restrict` keyword important for OpenACC and general C/C++ programming?",
+    "answer": "It allows compilers to perform various optimizations if pointers are guaranteed not to be aliases, which is crucial for parallelization."
+  }
+]

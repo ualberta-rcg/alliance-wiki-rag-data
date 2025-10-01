@@ -1,0 +1,94 @@
+[
+  {
+    "question": "Why would an automated workflow need an automation node?",
+    "answer": "An automated workflow involving an outside machine connecting to a cluster without human intervention cannot make use of a second authentication factor, which is now a requirement. Automation nodes are designed for this scenario."
+  },
+  {
+    "question": "What is an automation node?",
+    "answer": "An automation node is a specific type of node that does not require the use of a second authentication factor for automated workflows, but it is more limited than a regular login node in terms of accepted authentication and actions."
+  },
+  {
+    "question": "How do automation nodes differ from regular login nodes?",
+    "answer": "Automation nodes do not require a second authentication factor but are much more limited than regular login nodes in the types of authentication they accept and the actions they can perform."
+  },
+  {
+    "question": "How do I request access to an automation node?",
+    "answer": "You must contact technical support and explain in detail the type of automation you intend to use, including what commands will be executed and what tools or libraries will be used."
+  },
+  {
+    "question": "What is the only accepted method of authentication for automation nodes?",
+    "answer": "The only accepted means of authentication for the automation nodes is through SSH keys uploaded to the CCDB."
+  },
+  {
+    "question": "Are SSH keys from a user's `~/.ssh/authorized_keys` file accepted for automation nodes?",
+    "answer": "No, SSH keys written in your `.ssh/authorized_keys` file are not accepted for automation nodes."
+  },
+  {
+    "question": "What is the recommended practice for using SSH keys with automation workflows?",
+    "answer": "You should follow the rule of 'one SSH key per use' and generate a new SSH key specifically for your automation workflow, without reusing it for interactive login."
+  },
+  {
+    "question": "What are the mandatory constraints for SSH keys used with automation nodes?",
+    "answer": "The SSH keys must obey the `restrict`, `from=\"pattern-list\"`, and `command=\"COMMAND\"` constraints."
+  },
+  {
+    "question": "What functionalities does the `restrict` SSH key constraint disable?",
+    "answer": "The `restrict` constraint disables port forwarding, agent forwarding, X11 forwarding, and the pseudo teletype (PTY), blocking most interactive workloads."
+  },
+  {
+    "question": "Why is the `restrict` constraint necessary for automation nodes?",
+    "answer": "It is required because automation nodes are not intended to be used to start long-running or interactive processes; regular login nodes must be used for those instead."
+  },
+  {
+    "question": "What is the purpose of the `from=\"pattern-list\"` SSH key constraint?",
+    "answer": "This constraint specifies that the key can only be used from IP addresses that match the patterns, ensuring it is not used from computers other than the ones intended."
+  },
+  {
+    "question": "What are the requirements for IP address patterns in the `from=\"pattern-list\"` constraint?",
+    "answer": "The pattern list must include only public IP addresses that fully specify at least the network class, the network, and the subnet (the first three elements of an IP address), for example, `x.y.z.*` is accepted, but `x.y.*.*` is not."
+  },
+  {
+    "question": "Which types of IP addresses are explicitly rejected for the `from=\"pattern-list\"` constraint?",
+    "answer": "Private IP address ranges like `10.0.0.0 \u2013 10.255.255.255`, `172.16.0.0 \u2013 172.31.255.255`, and `192.168.0.0 \u2013 192.168.255.255` are incorrect because they are not public IP addresses."
+  },
+  {
+    "question": "How can one determine their public IP address for the SSH key constraint?",
+    "answer": "You can use a site like `https://whatismyipaddress.com/` or the shell command `curl ifconfig.me` to learn your public IP address."
+  },
+  {
+    "question": "What is the function of the `command=\"COMMAND\"` SSH key constraint?",
+    "answer": "This constraint forces the specified `COMMAND` to be executed when the connection is established, allowing you to restrict which commands can be used with that key."
+  },
+  {
+    "question": "What are convenience wrapper scripts in the context of `command=` constraints?",
+    "answer": "Convenience wrapper scripts are pre-defined scripts that accept or reject commands based on what is being called, making the `command` constraint more useful for common actions."
+  },
+  {
+    "question": "Where are the convenience wrapper scripts for `command=` constraints defined?",
+    "answer": "These scripts are defined in the `https://github.com/ComputeCanada/software-stack-custom/tree/main/bin/computecanada/allowed_commands` git repository."
+  },
+  {
+    "question": "Which wrapper script allows only file transfer commands?",
+    "answer": "The `/cvmfs/soft.computecanada.ca/custom/bin/computecanada/allowed_commands/transfer_commands.sh` script allows only file transfers, such as `scp`, `sftp`, or `rsync`."
+  },
+  {
+    "question": "Which wrapper script allows commands for archiving files?",
+    "answer": "The `/cvmfs/soft.computecanada.ca/custom/bin/computecanada/allowed_commands/archiving_commands.sh` script allows commands to archive files, such as `gzip`, `tar`, or `dar`."
+  },
+  {
+    "question": "Which wrapper script allows commands to manipulate files?",
+    "answer": "The `/cvmfs/soft.computecanada.ca/custom/bin/computecanada/allowed_commands/file_commands.sh` script allows commands to manipulate files, such as `mv`, `cp`, or `rm`."
+  },
+  {
+    "question": "Which wrapper script allows the `git` command?",
+    "answer": "The `/cvmfs/soft.computecanada.ca/custom/bin/computecanada/allowed_commands/git_commands.sh` script allows the `git` command."
+  },
+  {
+    "question": "Which wrapper script allows some Slurm commands?",
+    "answer": "The `/cvmfs/soft.computecanada.ca/custom/bin/computecanada/allowed_commands/slurm_commands.sh` script allows some Slurm commands, such as `squeue` and `sbatch`."
+  },
+  {
+    "question": "Is there a wrapper script that allows all common actions like file transfers, archiving, file manipulation, git, and Slurm commands?",
+    "answer": "Yes, the `/cvmfs/soft.computecanada.ca/custom/bin/computecanada/allowed_commands/allowed_commands.sh` script allows all of the mentioned common actions."
+  }
+]

@@ -1,62 +1,50 @@
 [
   {
-    "question": "What is the first step to starting a VNC server on a compute node?",
-    "answer": "Before starting your VNC server, you need to connect to a cluster (for example, Cedar) and create an allocation on a compute node using the `salloc` command."
+    "question": "How do you identify the port being used by a VNC server on a compute node?",
+    "answer": "The VNC server log file will show a line like 'Listening for VNC connections on all interface(s), port 5901', indicating the port number."
   },
   {
-    "question": "How can you request an interactive job with 4 CPUs and 16GB of memory for one hour using `salloc`?",
-    "answer": "You can use the command `salloc --time=1:00:00 --cpus-per-task=4 --mem=16000 --account=def-username`."
+    "question": "What is the purpose of establishing an SSH tunnel to a VNC server on a compute node?",
+    "answer": "An SSH tunnel creates a bridge for your computer to connect directly to the compute node where the VNC server is running."
   },
   {
-    "question": "Which environment variable should be defined after an interactive task starts to prevent repetitive errors?",
-    "answer": "You should define the environment variable `XDG_RUNTIME_DIR` as `${SLURM_TMPDIR}` using the command `export XDG_RUNTIME_DIR=${SLURM_TMPDIR}`."
+    "question": "What is the general format for an SSH tunnel command?",
+    "answer": "The general format for the SSH tunnel command is `ssh user@host -L port:compute_node:port`."
   },
   {
-    "question": "How do you start a VNC server on a compute node?",
-    "answer": "You can start a VNC server using the `vncserver` command."
+    "question": "How do you establish an SSH tunnel for a VNC server on most clusters, excluding Nibi?",
+    "answer": "For most clusters, use the command `ssh username@clustername -L localforwardedport:computnode:remotelisteningport`. For example, `ssh username@rorqual.alliancecan.ca -L 5905:rc12509:5901`."
   },
   {
-    "question": "What happens the first time you launch `vncserver`?",
-    "answer": "The first time you launch `vncserver`, you will be prompted to create a password for your VNC server, which can be changed later with the `vncpasswd` command."
+    "question": "What is the specific SSH tunnel command to use for the Nibi cluster?",
+    "answer": "For Nibi, the tunnel command is `ssh -J username@clustername -L localforwardedport:localhost:remotelisteningport computenode`. An example is `ssh -J username@nibi.alliancecan.ca -L 5905:localhost:5901 c48`."
   },
   {
-    "question": "How can you determine the port used by the VNC server?",
-    "answer": "You can identify the port used by the VNC server by consulting its log file, for example, by running `grep -iE \"\\sport|kill\" /home/username/.vnc/cdr768.int.cedar.computecanada.ca:1.log`."
+    "question": "Are there any special requirements for using SSH tunnels on the Nibi cluster?",
+    "answer": "Yes, a SSH key pair must be created on your laptop, and the public key contents must be entered into your `~/.ssh/authorized_keys` file on `nibi`."
   },
   {
-    "question": "What is the purpose of creating an SSH tunnel when connecting to a VNC server on a compute node?",
-    "answer": "An SSH tunnel creates a bridge that allows your local computer to connect directly to the compute node where the VNC server is running."
-  },
-  {
-    "question": "What is the general format for an SSH tunnel command to connect to a VNC server?",
-    "answer": "The format for the SSH tunnel command is `ssh user@host -L local_port:compute_node:vnc_port`."
-  },
-  {
-    "question": "Can you provide an example of an SSH tunnel command to connect to a VNC server on `cdr768` using local port 5902 and VNC server port 5901?",
-    "answer": "An example command for establishing an SSH tunnel is `ssh username@cedar.computecanada.ca -L 5902:cdr768:5901`."
-  },
-  {
-    "question": "What happens if you terminate the SSH session used for the VNC tunnel?",
+    "question": "What happens if you terminate the SSH session that is being used for a VNC tunnel?",
     "answer": "If you terminate the SSH session, you will lose your connection to the VNC server."
   },
   {
-    "question": "How do you connect a VNC client to the VNC server after establishing an SSH tunnel on Linux?",
-    "answer": "On Linux, you open a new terminal and connect your VNC client to `localhost:port`, where 'port' matches the local port defined in your SSH tunnel."
+    "question": "How do you connect a VNC client to the server on Linux after setting up an SSH tunnel?",
+    "answer": "On Linux, open a new terminal and connect your VNC client to `localhost:port`, for example, using the command `vncviewer localhost:5902`."
   },
   {
-    "question": "How do you connect a VNC client to the VNC server after establishing an SSH tunnel on macOS or Windows?",
-    "answer": "On macOS or Windows, you click the `TigerVNC Viewer` application icon and enter `localhost:port` in the 'Connection Details'."
+    "question": "How do you connect a VNC client to the server on macOS or Windows after setting up an SSH tunnel?",
+    "answer": "On macOS or Windows, click on the TigerVNC Viewer application icon and enter `localhost:port` into the Connection Details."
   },
   {
-    "question": "What password is required to connect to the VNC server through the client?",
-    "answer": "You will need to enter the password that you previously defined for your VNC server."
+    "question": "What kind of desktop environment will be displayed after successfully connecting with vncviewer?",
+    "answer": "Once vncviewer connects, you will be presented with a Linux MATE desktop."
   },
   {
-    "question": "What is the default VNC port?",
-    "answer": "The default VNC port is 5900."
+    "question": "How can you launch a terminal within the Linux MATE desktop after connecting via VNC?",
+    "answer": "To launch a terminal, click on the top menu on \"Applications -> System Tools -> MATE Terminal\"."
   },
   {
-    "question": "Is it always possible to use local port 5900 for an SSH tunnel on Windows?",
-    "answer": "It may be impossible under Windows to define an SSH tunnel with local port 5900."
+    "question": "How do you launch a program like MATLAB within the VNC MATE desktop?",
+    "answer": "To launch a complicated program like MATLAB, you need to load the module first and then run the `matlab` command within a `bash` session."
   }
 ]

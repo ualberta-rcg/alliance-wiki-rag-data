@@ -1,0 +1,90 @@
+[
+  {
+    "question": "What is FEniCS?",
+    "answer": "FEniCS is a popular open-source computing platform designed for solving partial differential equations (PDEs)."
+  },
+  {
+    "question": "What are the available installation options for FEniCS?",
+    "answer": "FEniCS can be installed either in a virtual environment or by using a Singularity container."
+  },
+  {
+    "question": "What is the first step for installing FEniCS Legacy (2019) on Trillium?",
+    "answer": "The first step is to download the Docker image as an Apptainer SIF using the command `apttainer pull fenics-legacy.sif docker://ghcr.io/scientificcomputing/fenics-gmsh:2024-05-30`."
+  },
+  {
+    "question": "How do you download the FEniCS Legacy Docker image as an Apptainer SIF?",
+    "answer": "You can download it by running `apttainer pull fenics-legacy.sif docker://ghcr.io/scientificcomputing/fenics-gmsh:2024-05-30`."
+  },
+  {
+    "question": "What is the second step for FEniCS Legacy installation on Trillium?",
+    "answer": "The second step is to make a writable sandbox directory from the SIF file."
+  },
+  {
+    "question": "How do you create a writable sandbox directory for FEniCS Legacy using Apptainer?",
+    "answer": "You can create a writable sandbox directory by running `apptainer build --sandbox fenics-legacy.sandbox fenics-legacy.sif`."
+  },
+  {
+    "question": "Can the name of the Apptainer sandbox directory be changed from 'fenics-legacy.sandbox'?",
+    "answer": "Yes, `fenics-legacy.sandbox` is just a directory name the command will create, and you can call it something else (e.g., `fenics-dev/` or `my_rw_image/`)."
+  },
+  {
+    "question": "What is the third step for FEniCS Legacy installation on Trillium?",
+    "answer": "The third step involves fixing the pip certificate bundle path inside the sandbox."
+  },
+  {
+    "question": "How do you fix the pip certificate bundle path inside the Apptainer sandbox for FEniCS Legacy?",
+    "answer": "Inside the sandbox, you create a certs folder and symlink the CA bundle using the command: `apptainer exec --writable fenics-legacy.sandbox sh -c \"mkdir -p /etc/pki/tls/certs && ln -s /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt\"`."
+  },
+  {
+    "question": "What is the fourth step for FEniCS Legacy installation on Trillium?",
+    "answer": "The fourth step is to freeze the modified sandbox into a new SIF image."
+  },
+  {
+    "question": "How do you freeze a modified Apptainer sandbox into a new read-only SIF image?",
+    "answer": "After modifications, you can freeze the sandbox into a new read-only image using `apptainer build fenics-legacy-updated.sif fenics-legacy.sandbox`."
+  },
+  {
+    "question": "What is the fifth step for FEniCS Legacy installation on Trillium?",
+    "answer": "The fifth step is to run quick tests on the newly created Apptainer SIF."
+  },
+  {
+    "question": "How do you run quick tests on a FEniCS Legacy Apptainer SIF image?",
+    "answer": "You can run quick tests with the command: `apptainer exec --bind $PWD:/root/shared --pwd /root/shared fenics-legacy-updated.sif python3 -c \"import ufl_legacy; print('ufl_legacy ok. version:', ufl_legacy.__version__)\"`."
+  },
+  {
+    "question": "What are the purposes of `--bind` and `--pwd` flags when running Apptainer exec?",
+    "answer": "`--bind $PWD:/root/shared` mounts your current host directory in the container, and `--pwd` sets the working directory there."
+  },
+  {
+    "question": "What Python package does FEniCS Legacy (2019.1.x) require?",
+    "answer": "FEniCS Legacy (2019.1.x) requires UFL Legacy."
+  },
+  {
+    "question": "What is the Python package name for UFL in FEniCS Legacy?",
+    "answer": "The Python package is named `ufl_legacy`, not `ufl`."
+  },
+  {
+    "question": "What is the compatible UFL version provided by `ufl_legacy` for FEniCS Legacy?",
+    "answer": "The compatible UFL version is 2022.3.0, provided by `ufl_legacy`."
+  },
+  {
+    "question": "Why might one need to alias `ufl_legacy` as `ufl` for FEniCS Legacy?",
+    "answer": "Some downstream packages, like Oasis, assume `import ufl`, so aliasing `ufl_legacy` as `ufl` avoids patching all of them."
+  },
+  {
+    "question": "How do you test the `ufl_legacy` to `ufl` aliasing inside the container?",
+    "answer": "You prepend the shim path to PYTHONPATH when launching inside the container: `APPTAINERENV_PYTHONPATH=<path_to_shim>:$PYTHONPATH apptainer exec --bind /scratch:/scratch ~/fenics-legacy-updated.sif python3 -c \"from ufl.tensors import ListTensor; print('UFL tensors ok')\"`."
+  },
+  {
+    "question": "What are some of the Python packages installed by the FEniCS Singularity recipe?",
+    "answer": "The Singularity recipe installs various Python packages, including ipython, jinja2, jsonschema, matplotlib, numpy, pandas, paramiko, scipy, and sympy, among many others."
+  },
+  {
+    "question": "What general development tools does the FEniCS Singularity recipe install?",
+    "answer": "The Singularity recipe installs `automake`, `git-core`, `libopenmpi-dev`, `libtool`, `mercurial`, and `openmpi-bin`."
+  },
+  {
+    "question": "How does the FEniCS Singularity recipe clean up after installation?",
+    "answer": "The Singularity recipe runs `sudo apt-get clean` and `sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*` to clean up downloaded and temporary files."
+  }
+]

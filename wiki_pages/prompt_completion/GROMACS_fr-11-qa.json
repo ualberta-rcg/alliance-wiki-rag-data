@@ -1,0 +1,82 @@
+[
+  {
+    "question": "Quelle est la taille minimale pour un domaine dans n'importe quelle direction?",
+    "answer": "Dans chaque direction, un domaine ne peut pas \u00eatre plus petit que le plus long rayon de coupure."
+  },
+  {
+    "question": "\u00c0 quoi sert la sommation d'Ewald (PME) dans GROMACS?",
+    "answer": "La sommation d'Ewald (PME ou 'particle mesh Ewald method') est souvent employ\u00e9e pour le calcul des interactions non liantes \u00e0 distance, soit les interactions qui d\u00e9passent le rayon de coupure."
+  },
+  {
+    "question": "Pourquoi la performance peut-elle se d\u00e9grader avec la m\u00e9thode PME?",
+    "answer": "Puisque cette m\u00e9thode n\u00e9cessite une communication globale, la performance peut se d\u00e9grader rapidement lorsque plusieurs processus MPI sont impliqu\u00e9s \u00e0 la fois dans le calcul des interactions rapproch\u00e9es prot\u00e9ine-prot\u00e9ine (PP) et des interactions \u00e0 distance (PME)."
+  },
+  {
+    "question": "Comment \u00e9viter la d\u00e9gradation de la performance due \u00e0 la PME?",
+    "answer": "Pour \u00e9viter cette baisse de performance, des processus MPI traiteront uniquement des interactions PME."
+  },
+  {
+    "question": "Comment `mdrun` attribue-t-il les processus PME lorsque plus de 12 processus MPI sont utilis\u00e9s?",
+    "answer": "Avec un total de plus de 12 processus MPI, mdrun utilise par d\u00e9faut une m\u00e9thode heuristique pour attribuer ces processus au calcul des interactions PME."
+  },
+  {
+    "question": "Comment peut-on s\u00e9lectionner manuellement le nombre de rangs PME?",
+    "answer": "Le nombre de rangs PME peut \u00eatre s\u00e9lectionn\u00e9 manuellement avec le param\u00e8tre mdrun `-npme`."
+  },
+  {
+    "question": "Que se passe-t-il en cas de d\u00e9balancement de charge important entre les rangs PP et PME?",
+    "answer": "Dans le cas d'un d\u00e9balancement de charge important entre les rangs PP et PME, le travail peut \u00eatre redirig\u00e9 des rangs PP aux rangs PME en augmentant le rayon de coupure."
+  },
+  {
+    "question": "La redirection du travail des rangs PP vers les rangs PME affecte-t-elle le r\u00e9sultat de la simulation?",
+    "answer": "Ceci n'aura aucun effet sur le r\u00e9sultat puisque la somme des forces (ou \u00e9nergies) des interactions rapproch\u00e9es et de celles \u00e0 distance demeure la m\u00eame pour une \u00e9tape particuli\u00e8re."
+  },
+  {
+    "question": "\u00c0 partir de quelle version `mdrun` tente-t-il d'\u00e9quilibrer automatiquement le travail PP et PME?",
+    "answer": "\u00c0 partir de la version 4.6, mdrun tente de faire ceci automatiquement, sauf si le param\u00e8tre `-notunepme` est utilis\u00e9."
+  },
+  {
+    "question": "Est-il possible de rediriger les interactions PME vers un GPU dans GROMACS 2018?",
+    "answer": "\u00c0 partir de la version 2018, les interactions PME peuvent \u00eatre redirig\u00e9es vers un GPU, mais la version 2018.1 pr\u00e9sente toutefois plusieurs contraintes, dont le fait qu'un seul rang GPU peut \u00eatre d\u00e9di\u00e9 aux PME."
+  },
+  {
+    "question": "Quelle est une des contraintes de la version 2018.1 de GROMACS concernant les interactions PME sur GPU?",
+    "answer": "La version 2018.1 pr\u00e9sente toutefois plusieurs contraintes dont le fait qu'un seul rang GPU peut \u00eatre d\u00e9di\u00e9 aux PME."
+  },
+  {
+    "question": "Comment la performance peut-elle \u00eatre am\u00e9lior\u00e9e apr\u00e8s que la d\u00e9composition des domaines ait atteint sa limite de scalabilit\u00e9?",
+    "answer": "Une fois que la d\u00e9composition des domaines atteint la limite de scalabilit\u00e9 (d\u00e9croissance de la scalabilit\u00e9 parall\u00e8le), la performance peut encore \u00eatre am\u00e9lior\u00e9e avec des fils OpenMP par la distribution du travail d'un processus MPI (rang) sur plus d'un c\u0153ur CPU."
+  },
+  {
+    "question": "Comment utiliser les fils OpenMP dans un script Slurm pour GROMACS?",
+    "answer": "Utilisez le param\u00e8tre `--cpus-per-task` dans le script (\u00e0 la fois pour `#SBATCH` et `srun`) et d\u00e9finissez la variable `OMP_NUM_THREADS` avec `export OMP_NUM_THREADS=\"${SLURM_CPUS_PER_TASK:-1}\"` ou le param\u00e8tre mdrun `-ntomp ${SLURM_CPUS_PER_TASK:-1}`."
+  },
+  {
+    "question": "Quel est le nombre optimal de fils OpenMP par processus MPI selon les programmeurs de GROMACS?",
+    "answer": "Selon les programmeurs de GROMACS le nombre optimal de fils OpenMP par processus MPI (CPU par t\u00e2che) se situe habituellement entre 2 et 6."
+  },
+  {
+    "question": "Quand est-il recommand\u00e9 d'augmenter le nombre de CPU par t\u00e2che?",
+    "answer": "Il vaut la peine d'augmenter le nombre de CPU par t\u00e2che dans le cas de t\u00e2ches ex\u00e9cut\u00e9es sur un nombre \u00e9lev\u00e9 de n\u0153uds."
+  },
+  {
+    "question": "Faut-il s'inqui\u00e9ter du d\u00e9s\u00e9quilibre de charge PP-PME si la m\u00e9thode PME n'est pas utilis\u00e9e?",
+    "answer": "Surtout dans les cas o\u00f9 la m\u00e9thode PME n'est pas employ\u00e9e, il n'est pas n\u00e9cessaire de se soucier de PP-PME Load Imbalance."
+  },
+  {
+    "question": "Comment GROMACS calcule-t-il la portion r\u00e9elle des interactions non li\u00e9es \u00e0 courte port\u00e9e?",
+    "answer": "GROMACS utilise des fonctions optimis\u00e9es ('kernel functions') pour calculer la portion r\u00e9elle des interactions non li\u00e9es \u00e0 courte port\u00e9e."
+  },
+  {
+    "question": "Pour quels jeux d'instructions SIMD ces fonctions optimis\u00e9es sont-elles disponibles?",
+    "answer": "Ces fonctions sont disponibles pour une vari\u00e9t\u00e9 de jeux d\u2019instructions SIMD tels qu\u2019AVX, AVX2 ou AVX512."
+  },
+  {
+    "question": "Comment sont choisies les fonctions SIMD lors de la compilation de GROMACS?",
+    "answer": "Ces fonctions sont choisies lors de la compilation de GROMACS, et devraient correspondre aux capacit\u00e9s des CPU qui ex\u00e9cuteront les simulations."
+  },
+  {
+    "question": "Comment GROMACS informe-t-il l'utilisateur si la fonction SIMD choisie est sous-optimale?",
+    "answer": "GROMACS indique quel jeu d\u2019instructions SIMD il supporte dans le fichier du journal (log) et vous avertira si la fonction choisie est sous-optimale."
+  }
+]

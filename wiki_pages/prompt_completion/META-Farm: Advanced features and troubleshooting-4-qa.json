@@ -1,0 +1,78 @@
+[
+  {
+    "question": "Where are the run-times of individual cases recorded by the script?",
+    "answer": "The script measures the run-time of each case and adds the value as one line in a scratch file `times` created in the directory `/home/$USER/tmp/$NODE.$PID/`."
+  },
+  {
+    "question": "How is the `dt_cutoff` value initially estimated by a meta-job?",
+    "answer": "Once the first 8 cases are computed, one of the meta-jobs reads the contents of the `times` file and computes the largest 12.5% quantile for the current distribution of case run-times to serve as `dt_cutoff`."
+  },
+  {
+    "question": "Where is the conservative estimate of the run-time (`dt_cutoff`) stored?",
+    "answer": "The `dt_cutoff` estimate is stored in a file named `dt_cutoff` within the `/home/$USER/tmp/$NODE.$PID/` directory."
+  },
+  {
+    "question": "How do meta-jobs prevent cases from aborting mid-way due to job run-time limits?",
+    "answer": "Each meta-job estimates if it has enough time (`t_finish - t_now > dt_cutoff`) to finish the next case; if not, it exits early to minimize the chance of a case aborting."
+  },
+  {
+    "question": "When is the `dt_cutoff` estimate recomputed?",
+    "answer": "The `dt_cutoff` estimate is recomputed at every subsequent power of two number of computed cases (8, then 16, then 32, and so on)."
+  },
+  {
+    "question": "Why is `dt_cutoff` recomputed at powers of two?",
+    "answer": "Power of two is used to minimize the overheads related to computing `dt_cutoff`, making the algorithm efficient for both very small and very large numbers of cases."
+  },
+  {
+    "question": "By what factor does the run-time estimation algorithm reduce wasted CPU cycles?",
+    "answer": "The algorithm reduces the amount of CPU cycles wasted due to jobs hitting the run-time limit by a factor of 8, on average."
+  },
+  {
+    "question": "What is a useful side effect of running a farm related to case run-times?",
+    "answer": "Every time you run a farm, individual run-times for all of your cases are stored in `/home/$USER/tmp/$NODE.$PID/times`, which can be analyzed for fine-tuning or code profiling."
+  },
+  {
+    "question": "What does the error message \"Non-farm directory, or no farm has been submitted; exiting\" indicate?",
+    "answer": "This error means that either the current directory is not a farm directory, or `submit.run` has not been run for this farm yet."
+  },
+  {
+    "question": "What are the correct arguments for `submit.run`?",
+    "answer": "The correct first argument for `submit.run` is -1 for SIMPLE mode, or a positive integer N (number of requested meta-jobs) for META mode."
+  },
+  {
+    "question": "What is the purpose of the `lockfile` utility in the META package?",
+    "answer": "The `lockfile` utility provides serialized access of meta-jobs to the `table.dat` file, ensuring that two different meta-jobs do not read the same line of `table.dat` at the same time."
+  },
+  {
+    "question": "What should be done if the error \"lockfile is not on path; exiting\" occurs?",
+    "answer": "You should make sure the utility `lockfile` is on your `$PATH`."
+  },
+  {
+    "question": "What does the error \"Non-farm directory (config.h, job_script.sh, single_case.sh, and/or table.dat are missing); exiting\" signify?",
+    "answer": "This error signifies that the current directory is not a farm directory or important files such as `config.h`, `job_script.sh`, `single_case.sh`, and/or `table.dat` are missing."
+  },
+  {
+    "question": "Why might the error \"-auto option requires resubmit_script.sh file in the root farm directory; exiting\" occur?",
+    "answer": "This error occurs if the `-auto` option was used but the `resubmit_script.sh` file is missing from the root farm directory."
+  },
+  {
+    "question": "How is the `resubmit_script.sh` file typically created?",
+    "answer": "A sample `resubmit_script.sh` file is automatically copied into the farm directory when `farm_init.run` is executed."
+  },
+  {
+    "question": "What causes the error \"File table.dat doesn't exist. Exiting\"?",
+    "answer": "This error is caused by forgetting to create the `table.dat` file in the current directory, or by running `submit.run` outside of a farm subdirectory."
+  },
+  {
+    "question": "How do you fix the error \"Job runtime sbatch argument (-t or --time) is missing in job_script.sh. Exiting\"?",
+    "answer": "To fix this error, you must provide a run-time limit for all meta-jobs as an `#SBATCH` argument inside your `job_script.sh` file."
+  },
+  {
+    "question": "Can the job run-time limit be passed as an optional argument to `submit.run`?",
+    "answer": "No, the run-time limit is the only argument that cannot be passed as an optional argument to `submit.run`."
+  },
+  {
+    "question": "What does \"Wrong job runtime in job_script.sh - nnn . Exiting\" mean?",
+    "answer": "This message means that the run-time argument within your `job_script.sh` file is not properly formatted."
+  }
+]

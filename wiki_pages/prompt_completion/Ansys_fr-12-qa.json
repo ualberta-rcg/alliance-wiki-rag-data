@@ -1,0 +1,82 @@
+[
+  {
+    "question": "How do you instruct Fluent to interpret a User-Defined Function (UDF)?",
+    "answer": "Add the command `define/user-defined/interpreted-functions \"sampleudf.c\" \"cpp\" 10000 no` to your journal file before the case/data files are read or initialized, replacing `sampleudf.c` with your source file name."
+  },
+  {
+    "question": "Does the command for an interpreted UDF change for sequential versus parallel simulations?",
+    "answer": "No, the command for an interpreted UDF remains the same whether the simulation is executed sequentially or in parallel."
+  },
+  {
+    "question": "What is a prerequisite to ensure that only the journal file controls UDF execution for an interpreted UDF?",
+    "answer": "Open your case file in the Fluent graphical interface, delete all managed definitions, and re-save it to ensure only the journal file's commands are in control."
+  },
+  {
+    "question": "What is required before a UDF can be used as a compiled UDF?",
+    "answer": "Your UDF must be compiled on one of our clusters at least once, which will create a `libudf` subdirectory containing the required `libudf.so` shared library."
+  },
+  {
+    "question": "Can the `libudf` directory be copied from a remote system, like a laptop, to the Alliance clusters?",
+    "answer": "No, the `libudf` directory cannot be simply copied from a remote system because shared library dependencies will not be met, causing Fluent to crash upon startup."
+  },
+  {
+    "question": "Under what conditions can a compiled `libudf` directory be transferred between Alliance clusters?",
+    "answer": "Once compiled on one of our clusters, the newly created `libudf` can be transferred to any other Alliance cluster, provided your account loads the same version of the StdEnv environment module."
+  },
+  {
+    "question": "How should you configure your journal file to use a compiled UDF without recompiling it for every task?",
+    "answer": "Uncomment only the 'load' line (`define/user-defined/compiled-functions load libudf`) in your journal file when submitting a task, not both 'compile' and 'load'."
+  },
+  {
+    "question": "What are the drawbacks of leaving both the 'compile' and 'load' commands uncommented for a compiled UDF in a journal file?",
+    "answer": "It is inefficient as the UDF will be automatically recompiled for each task, and it can lead to 'racetime' build conflicts if multiple tasks are executed from the same directory."
+  },
+  {
+    "question": "How can you compile a UDF using Fluent's graphical interface?",
+    "answer": "Add the UDF source file in the 'Compiled UDFs' dialog and click 'Build'."
+  },
+  {
+    "question": "What command is used in the journal file to compile a UDF?",
+    "answer": "The command is `define/user-defined/compiled-functions compile libudf yes sampleudf.c \"\" \"\"`."
+  },
+  {
+    "question": "What command is used in the journal file to load a compiled UDF?",
+    "answer": "The command is `define/user-defined/compiled-functions load libudf`."
+  },
+  {
+    "question": "What must be done before a UDF can be used with a parallel Fluent task?",
+    "answer": "It must be parallelized, which involves adding compilation directives, predicates, and reduction macros to your sequential UDF."
+  },
+  {
+    "question": "Why is UDF parallelization necessary for parallel Fluent tasks?",
+    "answer": "Parallelization controls how and which processes (host and/or compute) execute specific parts of the UDF code, ensuring efficient execution; without it, Fluent will run slowly or crash immediately."
+  },
+  {
+    "question": "Where can detailed information on UDF parallelization be found?",
+    "answer": "Detailed information is described in `Fluent Customization Manual, Part I: Chapter 7: Parallel Considerations`, available in the online documentation."
+  },
+  {
+    "question": "Can User-Defined Functions (UDFs) be used to customize Discrete Phase Models (DPM)?",
+    "answer": "Yes, UDFs can be used to customize Discrete Phase Models (DPM)."
+  },
+  {
+    "question": "How do you define particle injection for DPM when using a UDF?",
+    "answer": "Particle injection must be defined by specifying 'Point Properties' with variables such as source position, initial trajectory, mass flow rate, duration, temperature, etc., based on the injection type."
+  },
+  {
+    "question": "What are the initial injection types available in Fluent's 'Set Injection Properties' dialog?",
+    "answer": "The initial injection types available are `single`, `group`, `surface`, and `flat-fan-atomizer`."
+  },
+  {
+    "question": "How can you specify Point Properties by reading an injection text file in Fluent?",
+    "answer": "Select `File` in the 'Injection Type' dropdown menu, specify the injection name, then click the 'File' button next to the 'OK' button in the 'Set Injection Properties' dialog to select an injection file (e.g., .dpm or .inj extension)."
+  },
+  {
+    "question": "What command allows DPM source terms to be updated at each flow iteration in Fluent?",
+    "answer": "The command `define/models/dpm/interaction/coupled-calculations yes` enables updating DPM source terms at each flow iteration."
+  },
+  {
+    "question": "Provide an example of how DPM injection steps can be automated by adding commands to a journal file after solution initialization.",
+    "answer": "Example commands include:\n`/define/models/dpm/interaction/coupled-calculations yes`\n`/define/models/dpm/injections/delete-injection injection-0:1`\n`/define/models/dpm/injections/create injection-0:1 no yes file no zinjection01.inj no no no no`\n`/define/models/dpm/injections/list-particles injection-0:1`\n`/define/models/dpm/injections/list-injection-properties injection-0:1`"
+  }
+]

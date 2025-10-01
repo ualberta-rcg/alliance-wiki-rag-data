@@ -1,0 +1,174 @@
+[
+  {
+    "question": "What analogy is used to introduce the concept of parallel programming?",
+    "answer": "The document uses the analogy: 'To pull a bigger wagon it is easier to add more oxen than to find (or build) a bigger ox,' suggesting that it's more efficient to spread work among many entities than to rely on a single, faster one."
+  },
+  {
+    "question": "What are the primary benefits of dividing computational problems for parallel completion?",
+    "answer": "This approach is important not only in speeding up computations but also in tackling problems requiring large amounts of memory."
+  },
+  {
+    "question": "What is identified as the most significant concept to master in designing parallel applications?",
+    "answer": "The most significant concept to master in designing and building parallel applications is communication."
+  },
+  {
+    "question": "What are the two major models of computational parallelism?",
+    "answer": "There are two major models of computational parallelism: shared memory, and distributed memory."
+  },
+  {
+    "question": "How is shared memory parallelism (SMP) characterized?",
+    "answer": "In shared memory parallelism (SMP), all processors see the same memory image, meaning all memory is globally addressable and all processes can ultimately access it."
+  },
+  {
+    "question": "How do processes communicate in a shared memory parallelism (SMP) environment?",
+    "answer": "Communication between processes on an SMP machine is implicit; any process can ultimately read and write values to memory that can be subsequently accessed and manipulated directly by others."
+  },
+  {
+    "question": "What is the main challenge in writing programs for shared memory parallelism?",
+    "answer": "The challenge in writing shared memory parallelism programs is data consistency: one should take extra care to ensure data is not modified by more than one process at a time."
+  },
+  {
+    "question": "What is distributed memory parallelism equivalent to?",
+    "answer": "Distributed memory parallelism is equivalent to a collection of workstations linked by a dedicated network for communication: a cluster."
+  },
+  {
+    "question": "How do processes communicate in the distributed memory model?",
+    "answer": "When processes need to communicate, they do so by sending messages; a process typically invokes a function to send data and the destination process invokes a function to receive it."
+  },
+  {
+    "question": "What is a major challenge in distributed memory programming?",
+    "answer": "A major challenge in distributed memory programming is how to minimize communication overhead."
+  },
+  {
+    "question": "How do network communication speeds compare to memory access times within a single machine?",
+    "answer": "Networks, even the fastest dedicated hardware interconnects, transmit data orders of magnitude slower than within a single machine. Memory access times are typically measured in ones to hundreds of nanoseconds, while network latency is typically expressed in microseconds."
+  },
+  {
+    "question": "What will the remainder of this tutorial focus on?",
+    "answer": "The remainder of this tutorial will consider distributed memory programming on a cluster using the Message Passing Interface."
+  },
+  {
+    "question": "What does MPI stand for and what is it?",
+    "answer": "MPI stands for Message Passing Interface, and it is a standard describing a set of subroutines, functions, objects, etc., with which one can write parallel programs in a distributed memory environment."
+  },
+  {
+    "question": "Can you list some different implementations of the MPI standard?",
+    "answer": "Many different implementations of the standard have been produced, such as Open MPI, Intel MPI, MPICH, and MVAPICH."
+  },
+  {
+    "question": "Which programming languages does the MPI standard officially support?",
+    "answer": "The standard describes how MPI should be called from Fortran, C, and C++ languages."
+  },
+  {
+    "question": "Are there unofficial bindings for MPI in other languages?",
+    "answer": "Yes, unofficial 'bindings' can be found for several other languages, such as Boost MPI for C++ and MPI for Python (MPI4py) for Python."
+  },
+  {
+    "question": "What is an advantage of MPI being an open, non-proprietary standard?",
+    "answer": "Since MPI is an open, non-proprietary standard, an MPI program can easily be ported to many different computers."
+  },
+  {
+    "question": "How does MPI simplify debugging for parallel applications?",
+    "answer": "Given that memory is local to each process, some aspects of debugging are simplified; it isn't possible for one process to interfere with the memory of another, and a segmentation fault can be processed by standard serial debugging tools."
+  },
+  {
+    "question": "What makes MPI programs potentially more complex than those using implicit communication tools?",
+    "answer": "Due to the need to manage communication and synchronization explicitly, MPI programs may appear more complex than programs written with tools that support implicit communication."
+  },
+  {
+    "question": "What execution model do parallel programs written using MPI typically follow?",
+    "answer": "Parallel programs written using MPI make use of an execution model called Single Program, Multiple Data, or SPMD."
+  },
+  {
+    "question": "In the SPMD model, what is the unique number assigned to each process called?",
+    "answer": "In MPI, each copy or 'process' is assigned a unique number, referred to as the 'rank' of the process."
+  },
+  {
+    "question": "What is the typical method for controlling divergent behavior in SPMD programs?",
+    "answer": "When a process should behave differently, an 'if' statement based on the rank of the process is usually used to execute the appropriate set of instructions."
+  },
+  {
+    "question": "What do MPI programs need to include or use to function correctly?",
+    "answer": "Each MPI program must include the relevant header file or use the relevant module (e.g., `mpi.h` for C/C++, `use mpi` for Fortran)."
+  },
+  {
+    "question": "What are compiler wrappers in the context of MPI, and what do they do?",
+    "answer": "Compiler wrappers are scripts provided by MPI implementations that handle set-up issues regarding `include` and `lib` directories, linking flags, etc., when compiling MPI programs."
+  },
+  {
+    "question": "Name the common compiler wrappers for C, Fortran, and C++ MPI programs.",
+    "answer": "Common compiler wrappers are `mpicc` for C, `mpifort` (or `mpif90`) for Fortran, and `mpiCC` (or `mpicxx`) for C++."
+  },
+  {
+    "question": "What is the purpose of the `MPI_Init` function?",
+    "answer": "The `MPI_Init` function is called to coordinate copies of an MPI program and initialize MPI features before they are used."
+  },
+  {
+    "question": "What is the purpose of the `MPI_Finalize` function?",
+    "answer": "The `MPI_Finalize` function is called to perform any clean-up that might be required before an MPI program exits."
+  },
+  {
+    "question": "What is the general rule of thumb for placing `MPI_Init` and `MPI_Finalize` in an MPI program?",
+    "answer": "As a rule of thumb, it is a good idea to call `MPI_Init` as the first statement of our program, and `MPI_Finalize` as its last statement."
+  },
+  {
+    "question": "What do the MPI functions `MPI_Comm_size` and `MPI_Comm_rank` provide?",
+    "answer": "`MPI_Comm_size` reports the number of processes running as part of the job, and `MPI_Comm_rank` reports the rank of the calling process."
+  },
+  {
+    "question": "What is the starting rank for processes in MPI?",
+    "answer": "Ranks in MPI start from 0."
+  },
+  {
+    "question": "What is an MPI 'communicator'?",
+    "answer": "A communicator is a set of processes capable of sending messages to one another."
+  },
+  {
+    "question": "What does `MPI_COMM_WORLD` represent?",
+    "answer": "`MPI_COMM_WORLD` is a predefined communicator that includes all the MPI processes started with the job."
+  },
+  {
+    "question": "How can processes communicate by sending messages in MPI?",
+    "answer": "Processes communicate using functions like `MPI_Send` for sending and `MPI_Recv` for receiving data."
+  },
+  {
+    "question": "What is the `tag` argument used for in `MPI_Send` and `MPI_Recv`?",
+    "answer": "The `tag` argument is a programmer-specified identifier associated with the message, used to organize communication streams (e.g., to distinguish two distinct streams of interleaved data)."
+  },
+  {
+    "question": "What is the role of the `datatype` argument in `MPI_Send` and `MPI_Recv`?",
+    "answer": "The `datatype` argument specifies the type of data contained in the message buffer, providing compatibility between processes on architectures with different native data formats."
+  },
+  {
+    "question": "What information does the `status` argument in `MPI_Recv` store?",
+    "answer": "The `status` argument in `MPI_Recv` stores information about the received message upon return."
+  },
+  {
+    "question": "What does it mean for `MPI_Send` and `MPI_Recv` to be 'blocking calls'?",
+    "answer": "`MPI_Send` will not return until it is safe for the calling module to modify the contents of the provided message buffer, and `MPI_Recv` will not return until the entire contents of the message are available in the message buffer."
+  },
+  {
+    "question": "What constitutes an 'unsafe' MPI program?",
+    "answer": "An 'unsafe' MPI program is one that relies on a buffered implementation of `MPI_Send` to function correctly, which is not required by the MPI standard and could lead to deadlock if buffering is not provided or if buffers fill up."
+  },
+  {
+    "question": "How can a simple `MPI_Recv` followed by `MPI_Send` on two processes lead to deadlock?",
+    "answer": "If both processes first call `MPI_Recv` and then `MPI_Send`, they will both block on their respective `MPI_Recv` calls, waiting for a message that will never be sent because the sending part of the program is never reached, resulting in deadlock."
+  },
+  {
+    "question": "How can a program performing a ring communication pattern (each process sends to the next rank) be made 'safe' from deadlock?",
+    "answer": "A common solution is to adopt an odd-even pairing: all even-ranked processes execute a send followed by a receive, while all odd-ranked processes execute a receive followed by a send."
+  },
+  {
+    "question": "What is the purpose of the `\u2014showme` option in Open MPI compiler wrappers?",
+    "answer": "With Open MPI, the `\u2014showme` option will print which compiler will be called by the wrapper and which compiler-options will be added."
+  },
+  {
+    "question": "How do MPI compiler wrappers determine which compiler version to use when multiple are available?",
+    "answer": "The MPI compiler-wrappers will always use the compiler and compiler version that you have loaded with the `module load` command."
+  },
+  {
+    "question": "What types of collective communication functions are available in MPI?",
+    "answer": "Collective communication functions include reduction, broadcast, barrier, scatter, and gather."
+  }
+]

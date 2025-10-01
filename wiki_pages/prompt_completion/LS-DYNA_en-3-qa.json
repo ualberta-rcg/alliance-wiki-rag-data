@@ -1,0 +1,74 @@
+[
+  {
+    "question": "What is the purpose of the `script-smp.sh` file?",
+    "answer": "The `script-smp.sh` file is used for running LS-DYNA jobs on a single compute node (SMP - Shared Memory Parallel using OpenMP)."
+  },
+  {
+    "question": "How do you submit a single node LS-DYNA job to the queue?",
+    "answer": "Single node LS-DYNA jobs can be submitted to the queue using the command: `sbatch script-smp.sh`."
+  },
+  {
+    "question": "What are the essential Slurm parameters specified in the `script-smp.sh` example for a single node job?",
+    "answer": "The essential Slurm parameters specified are `--account=def-account`, `--time=0-03:00`, `--cpus-per-task=8`, `--mem=16G`, and `--nodes=1`."
+  },
+  {
+    "question": "Which modules are loaded for a single node LS-DYNA job when using `StdEnv/2023` in the `script-smp.sh` example?",
+    "answer": "When using `StdEnv/2023`, the loaded modules are `StdEnv/2023`, `intel/2023.2.1`, and `ls-dyna/12.2.1`."
+  },
+  {
+    "question": "What command is used to execute a double precision SMP LS-DYNA solver within the `script-smp.sh` example?",
+    "answer": "The command used is `ls-dyna_d ncpu=$SLURM_CPUS_ON_NODE i=airbag.deploy.k memory=1500M`."
+  },
+  {
+    "question": "What is the difference between `ls-dyna_s` and `ls-dyna_d`?",
+    "answer": "`ls-dyna_s` refers to the single precision SMP solver, while `ls-dyna_d` refers to the double precision SMP solver."
+  },
+  {
+    "question": "When is the `LSTC_MEMORY=AUTO` environment variable recommended for LS-DYNA jobs?",
+    "answer": "The `LSTC_MEMORY=AUTO` environment variable is optional and recommended for explicit analyses only, such as metal forming simulations, but not for crash analysis."
+  },
+  {
+    "question": "How much memory does the `1500M` setting represent for a double precision solver in the `script-smp.sh` example, and what percentage of reserved RAM does it typically occupy?",
+    "answer": "For a double precision solver, `1500M` (megawords) equates to 12GB of memory (1500Mw * 8Bytes/w), which represents 75% of the total 16GB memory reserved for the job."
+  },
+  {
+    "question": "What is the recommended maximum percentage of reserved RAM for all expected memory per node in LS-DYNA jobs?",
+    "answer": "For best results, the sum of all expected memory per node should be kept within 75% of the reserved RAM on a node."
+  },
+  {
+    "question": "What is the primary method for running LS-DYNA jobs across multiple compute nodes (MPP)?",
+    "answer": "The primary method for running LS-DYNA jobs across multiple compute nodes (MPP) is based on MPI (Message Passing Parallel)."
+  },
+  {
+    "question": "How can you list the available modules for the MPP version of LS-DYNA?",
+    "answer": "You can list the available modules for the MPP version of LS-DYNA by running the command `module spider ls-dyna-mpi`."
+  },
+  {
+    "question": "What are the two sample Slurm scripts used to submit MPP LS-DYNA jobs?",
+    "answer": "The two sample Slurm scripts are `script-mpp-bynode.sh` for specifying a number of whole nodes, and `script-mpp-bycore.sh` for specifying a total number of cores."
+  },
+  {
+    "question": "What are the critical memory considerations for the first core on the master node in an MPP LS-DYNA job?",
+    "answer": "The MPP version requires a sufficiently large amount of memory (memory1) for the first core (processor 0) on the master node to decompose and simulate the model. This is satisfied by specifying a `mem-per-cpu` slightly larger than the `memory2` (memory per core for simulation) and placing enough cores on the master node such that `(mem-per-cpu - memory2)` is greater than or equal to `memory1`."
+  },
+  {
+    "question": "What Slurm parameters are used in the `script-mpp-bynode.sh` example to submit jobs to a specified number of whole compute nodes?",
+    "answer": "The Slurm parameters used are `--account=def-account`, `--time=0-03:00`, `--ntasks-per-node` (e.g., 40), `--nodes` (e.g., 2), and `--mem=0`."
+  },
+  {
+    "question": "What does `--mem=0` signify in the `script-mpp-bynode.sh` Slurm script?",
+    "answer": "In the `script-mpp-bynode.sh` Slurm script, `--mem=0` signifies that all available memory per compute node should be used."
+  },
+  {
+    "question": "What is the `ntasks-per-node` value for Beluga, Cedar, Graham, and Narval clusters when submitting MPP jobs by node count?",
+    "answer": "The `ntasks-per-node` value is 40 for Beluga, 48 for Cedar, 44 for Graham, and 64 for Narval."
+  },
+  {
+    "question": "Which modules are loaded for an MPP LS-DYNA job when using `StdEnv/2023` in the `script-mpp-bynode.sh` example?",
+    "answer": "When using `StdEnv/2023`, the loaded modules are `StdEnv/2023`, `intel/2023.2.1`, and `ls-dyna-mpi/12.2.1`."
+  },
+  {
+    "question": "How is a double precision MPP LS-DYNA job executed in the `script-mpp-bynode.sh` example if the `EBVERSIONNIXPKGS` environment variable is not `16.09`?",
+    "answer": "If `EBVERSIONNIXPKGS` is not `16.09`, the job is executed using `srun ls-dyna_d i=airbag.deploy.k memory=200M`."
+  }
+]

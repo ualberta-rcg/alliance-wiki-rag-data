@@ -1,0 +1,82 @@
+[
+  {
+    "question": "When is it recommended to run multiple GROMACS simulations on a single GPU using `mdrun -multidir`?",
+    "answer": "It is recommended for similar simulations, such as repeating simulations for more conformational space sampling, simulating multiple protein variants, multiple small ligands in complex with the same protein, multiple temperatures or ionic concentrations, or ensemble-based simulations like replica exchange."
+  },
+  {
+    "question": "Why are similar simulations important when using `mdrun -multidir` on a single GPU?",
+    "answer": "Similar simulations are needed to ensure proper load balancing. If the simulations are dissimilar, some will progress faster and finish earlier than others, leading to idle resources."
+  },
+  {
+    "question": "How should Slurm parameters `--ntasks-per-node` and `--cpus-per-task` be adjusted for `mdrun -multidir`?",
+    "answer": "There should be one task per simulation, and the total number of CPU cores (the product of `--ntasks-per-node` and `--cpus-per-task`) should remain constant."
+  },
+  {
+    "question": "What is an example SLURM command for running three GROMACS simulations in separate directories on one GPU using `mdrun -multidir`?",
+    "answer": "An example command is `srun gmx_mpi mdrun -ntomp ${SLURM_CPUS_PER_TASK:-1} -deffnm md -multidir sim1 sim2 sim3` within a job script requesting `--gpus-per-node=1`, `--ntasks-per-node=3`, and `--cpus-per-task=4`."
+  },
+  {
+    "question": "What is an alternative solution for running GROMACS simulations on recent GPU models like Nvidia A100 or H100 if the molecular system is not very large or simulations are dissimilar?",
+    "answer": "The second solution is to use a Multi-Instance GPU (MIG) instance, which is a fraction of a GPU, rather than a full GPU."
+  },
+  {
+    "question": "When is a Multi-Instance GPU (MIG) instance the preferred solution for GROMACS simulations?",
+    "answer": "MIG instances are preferred if you have a single simulation or if your simulations are dissimilar, for instance, systems with more than a 10% difference in the numbers of atoms, or systems with different shapes or compositions."
+  },
+  {
+    "question": "Should Hyper-Q / MPS be used with GROMACS?",
+    "answer": "No, Hyper-Q / MPS should never be used with GROMACS. The built-in `-multidir` option achieves the same functionality more efficiently."
+  },
+  {
+    "question": "What is a 'tpr' file in GROMACS?",
+    "answer": "A 'tpr' file is a portable binary run input file that contains the starting structure of the simulation, the molecular topology, and all the simulation parameters."
+  },
+  {
+    "question": "How are GROMACS 'tpr' files created?",
+    "answer": "Tpr files are created using the `gmx grompp` command (or simply `grompp` for versions older than 5.0)."
+  },
+  {
+    "question": "What files are needed to create a 'tpr' file using `gmx grompp`?",
+    "answer": "To create a 'tpr' file, you need the coordinate file with the starting structure (e.g., .gro, .pdb, .cpt), the system topology (.top) file (which may include .itp files), and the run parameter (.mdp) file."
+  },
+  {
+    "question": "Is it important to use the same GROMACS version for `grompp` and `mdrun`?",
+    "answer": "Yes, one should always use the same version for both `grompp` and `mdrun`, as using `tpr` files created with an older version for a newer `mdrun` can lead to unexpected simulation results."
+  },
+  {
+    "question": "Why do MD simulations often need to be restarted?",
+    "answer": "MD simulations often take much longer than the maximum walltime for a job to complete and therefore need to be restarted."
+  },
+  {
+    "question": "What is a recommended walltime strategy for GROMACS jobs to balance waiting and running time?",
+    "answer": "Requesting a walltime of 24 hours or 72 hours (three days) is often a good trade-off between waiting time and running time, aiming to maximize the number of nodes you have access to by choosing a shorter running time."
+  },
+  {
+    "question": "What is the purpose of the `mdrun` parameter `-maxh`?",
+    "answer": "The `mdrun` parameter `-maxh` tells the program the requested walltime so that it gracefully finishes the current timestep when reaching 99% of this walltime, creating a new checkpoint file and properly closing all output files."
+  },
+  {
+    "question": "How do you restart a GROMACS simulation?",
+    "answer": "You can restart a simulation by using the same `mdrun` command as the original simulation and adding the `-cpi state.cpt` parameter, where `state.cpt` is the filename of the most recent checkpoint file."
+  },
+  {
+    "question": "How does `mdrun` handle output files when restarting a simulation?",
+    "answer": "By default (since version 4.5), `mdrun` will try to append to existing output files (trajectories, energy- and log-files, etc.) and will check consistency, discarding timesteps newer than the checkpoint file if needed."
+  },
+  {
+    "question": "How does using the `-maxh` parameter benefit restarting GROMACS simulations?",
+    "answer": "The `-maxh` parameter ensures that the checkpoint and output files are written in a consistent state when the simulation reaches its time limit, which is crucial for successful restarts."
+  },
+  {
+    "question": "What are the benefits of splitting a long GROMACS simulation over multiple short jobs using checkpointing?",
+    "answer": "Shorter jobs wait less in the queue, and those requesting 3 hours or less are eligible for backfill scheduling, which can significantly reduce waiting times, especially for groups with default resource allocations."
+  },
+  {
+    "question": "How can checkpointing be automated for GROMACS simulations?",
+    "answer": "Checkpointing can be automated by using a Slurm job array."
+  },
+  {
+    "question": "Describe the process of automating GROMACS checkpointing with a Slurm job array.",
+    "answer": "A single `sbatch` call submits multiple short jobs, but only the first is eligible to start. As soon as the first job completes, the next one becomes eligible to start and resume the simulation. This process repeats until all jobs are complete or the simulation finishes, at which point any remaining pending jobs are automatically cancelled."
+  }
+]

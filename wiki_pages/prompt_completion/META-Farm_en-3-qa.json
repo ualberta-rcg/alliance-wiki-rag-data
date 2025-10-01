@@ -1,0 +1,126 @@
+[
+  {
+    "question": "What does the provided `job_script.sh` modification do before `task.run`?",
+    "answer": "The modification checks for the presence of an NVidia GPU using `nvidia-smi`. If no GPU is found, it forces the metajob to exit before `task.run` starts processing cases, preventing failures on defective nodes."
+  },
+  {
+    "question": "What is `gpu_test` used for?",
+    "answer": "The `gpu_test` utility performs a similar function to `nvidia-smi` in detecting the presence of a GPU."
+  },
+  {
+    "question": "How can a user copy the `gpu_test` utility to their `~/bin` directory on Nibi?",
+    "answer": "On Nibi, you can copy the `gpu_test` utility to your `~/bin` directory by running the command `cp ~syam/bin/gpu_test ~/bin`."
+  },
+  {
+    "question": "What is the purpose of META's built-in protection mechanism?",
+    "answer": "The META package has a built-in mechanism designed to detect and kill metajobs that churn through cases too quickly, which might indicate a problem such as a defective node."
+  },
+  {
+    "question": "Which parameters control the metajob protection mechanism, and where are they set?",
+    "answer": "The two relevant parameters, `N_failed_max` and `dt_failed`, are set in the `config.h` file."
+  },
+  {
+    "question": "When does the metajob protection mechanism get triggered by default?",
+    "answer": "By default, the protection mechanism is triggered when the first `N_failed_max` (default 5) cases are very short, meaning they finish in less than `dt_failed` (default 5) seconds."
+  },
+  {
+    "question": "What should you do if the metajob protection mechanism is falsely triggered by short-running cases?",
+    "answer": "If the protective mechanism is falsely triggered because some of your normal cases have a runtime shorter than `dt_failed`, you should reduce the value of `dt_failed` in `config.h`."
+  },
+  {
+    "question": "What output files are created in the farm directory when metajobs are running?",
+    "answer": "When metajobs are running, `OUTPUT/slurm-$JOBID.out` (containing standard output for each metajob) and `STATUSES/status.$JOBID` (containing the status of each processed case per metajob) are created in the farm directory."
+  },
+  {
+    "question": "What information does `OUTPUT/slurm-$JOBID.out` contain?",
+    "answer": "`OUTPUT/slurm-$JOBID.out` contains the standard output for the corresponding metajob."
+  },
+  {
+    "question": "Where can a user find the status of each case processed by a metajob?",
+    "answer": "The status of each case processed by a metajob can be found in the `STATUSES/status.$JOBID` file within the farm directory."
+  },
+  {
+    "question": "What is the purpose of the `MISC` directory in the farm?",
+    "answer": "The `MISC` directory, created inside the root farm directory, contains auxiliary data."
+  },
+  {
+    "question": "Where are temporary scratch files created by `submit.run`?",
+    "answer": "Every time `submit.run` is executed, it creates a unique subdirectory inside `/home/$USER/tmp` (named `$NODE.$PID`) for small scratch files, such as those used by `lockfile`."
+  },
+  {
+    "question": "Can the temporary subdirectories in `/home/$USER/tmp` be safely deleted?",
+    "answer": "Yes, once the farm execution is done, the unique subdirectories created by `submit.run` inside `/home/$USER/tmp` can be safely erased."
+  },
+  {
+    "question": "What is the effect of running `clean.run` on a farm directory?",
+    "answer": "Running `clean.run` deletes all files and subdirectories in the farm directory (except for `job_script.sh`, `single_case.sh`, `final.sh`, `resubmit_script.sh`, `config.h`, and `table.dat`), and also deletes all associated files in the `/home/$USER/tmp` directory, which effectively deletes all the results produced by the farm."
+  },
+  {
+    "question": "What is the primary function of the `resubmit.run` command?",
+    "answer": "The `resubmit.run` command analyzes `status.*` files, identifies cases that failed or never ran, creates or overwrites a secondary `table.dat_` file listing only those cases, and then launches a new farm to process them."
+  },
+  {
+    "question": "What arguments does `resubmit.run` accept?",
+    "answer": "`resubmit.run` accepts the same arguments as `submit.run`: `N` (number of jobs), an optional `-auto` switch, and any optional `sbatch` arguments."
+  },
+  {
+    "question": "When can `resubmit.run` be executed?",
+    "answer": "`resubmit.run` cannot be executed until all the jobs from the original run are either completed or killed."
+  },
+  {
+    "question": "How can a user easily identify cases with non-zero exit statuses after a farm run?",
+    "answer": "To easily identify cases with non-zero exit statuses, the user can use the `Status.run -f` command, which sorts the output to list cases with non-zero status at the bottom."
+  },
+  {
+    "question": "What does the `-auto` switch do when used with `resubmit.run`?",
+    "answer": "If the `-auto` switch is present, the farm will automatically resubmit itself at the end, more than once if necessary, until all the cases from `table.dat` have been processed."
+  },
+  {
+    "question": "What are the potential issues when using SIMPLE mode for a very large number of cases (e.g., >500)?",
+    "answer": "For a very large number of cases, SIMPLE mode can lead to issues such as exceeding cluster limits on the number of jobs a user can have, and wasting CPU cycles due to scheduling overheads if each case runs for less than 20 minutes."
+  },
+  {
+    "question": "How does META mode address the problems associated with a large number of cases?",
+    "answer": "META mode solves these problems by submitting a smaller number of 'metajobs,' with each metajob processing multiple cases, instead of one job per case."
+  },
+  {
+    "question": "How do you enable META mode when submitting a farm?",
+    "answer": "To enable META mode, the first argument to `submit.run` should be a positive integer `N`, which is the desired number of metajobs (e.g., `submit.run 32`), and it should be significantly smaller than the total number of cases."
+  },
+  {
+    "question": "What is the key mechanism META mode uses to handle varying case runtimes efficiently?",
+    "answer": "META mode uses a dynamic workload-balancing scheme to efficiently handle cases with varying runtimes."
+  },
+  {
+    "question": "Describe the process a metajob follows to process cases in META mode.",
+    "answer": "In META mode, each metajob executes `task.run`. Inside `task.run`, a `while` loop iterates through cases. Each iteration involves a serialized code section where the metajob gets the next case from `table.dat`. Then, `single_case.sh` is executed once for that case, which in turn calls the user's code."
+  },
+  {
+    "question": "What are the advantages of META mode's dynamic workload balancing?",
+    "answer": "Dynamic workload balancing in META mode ensures that all metajobs finish around the same time, regardless of individual case runtimes, CPU speeds on different nodes, or when metajobs start. It also minimizes data loss (at most one case) if a metajob dies, which can be rectified with `resubmit.run`."
+  },
+  {
+    "question": "What is the first step in estimating the optimal runtime and number of metajobs for a farm?",
+    "answer": "The first step is to estimate the average runtime (`dt_case`) for an individual case by allocating a single CPU core, running `single_case.sh` for a few different cases (e.g., with a `for` loop), measuring the total real time, and dividing it by the number of cases run."
+  },
+  {
+    "question": "How do you calculate the total estimated CPU time required for an entire farm?",
+    "answer": "To calculate the total estimated CPU time, multiply the average case runtime (`dt_case`) by the total number of cases (lines in `table.dat`), convert it to CPU-hours (by dividing by 3600), and then multiply by a safety factor (e.g., 1.1 or 1.3)."
+  },
+  {
+    "question": "What factors should be considered when choosing the runtime for metajobs?",
+    "answer": "The metajob runtime should be significantly larger than the average individual case runtime (ideally 100x or more), longer than the longest expected individual case, but not too large (e.g., no more than 3 days). On Alliance clusters, 12h or 24h are generally good choices due to scheduling policies."
+  },
+  {
+    "question": "How is the required number of metajobs determined once the total CPU-hours and desired metajob runtime are known?",
+    "answer": "The required number of metajobs is determined by dividing the total estimated CPU-hours by the chosen metajob runtime (in hours) and then rounding up to the next integer."
+  },
+  {
+    "question": "If a farm requires more metajobs than the cluster's maximum job limit (e.g., 1000 on Nibi/Rorqual), what is the suggested workaround?",
+    "answer": "For farms exceeding job limits, the suggested workaround is to submit jobs in batches (e.g., `submit.run 1000`) and then repeatedly use `resubmit.run 1000` after each preceding farm has finished until all cases are processed."
+  },
+  {
+    "question": "How can the repeated resubmission process for very large farms be automated?",
+    "answer": "The repeated resubmission process for very large farms can be fully automated by using the advanced feature of `resubmit.run` with the `-auto` switch."
+  }
+]

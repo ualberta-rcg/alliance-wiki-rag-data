@@ -1,0 +1,50 @@
+[
+  {
+    "question": "What is the purpose of `MPI_Type_contiguous` in the provided `mpi_view.c` example for writing?",
+    "answer": "`MPI_Type_contiguous(BLOCKSIZE, MPI_CHAR, &type_intercomp)` is used to define a contiguous MPI datatype (`type_intercomp`) of `BLOCKSIZE` characters for inter-process data handling during writing."
+  },
+  {
+    "question": "How is an MPI datatype committed after creation?",
+    "answer": "An MPI datatype is committed using `MPI_Type_commit(&datatype_variable)`, as shown with `MPI_Type_commit(&type_intercomp)`."
+  },
+  {
+    "question": "How is `MPI_File_set_view` used in the `mpi_view.c` example when writing data?",
+    "answer": "`MPI_File_set_view(f, rank*BLOCKSIZE+i*size*BLOCKSIZE, MPI_CHAR, type_intercomp, \"native\", MPI_INFO_NULL)` is used to set the view for each process, defining its section of the file before writing."
+  },
+  {
+    "question": "Which MPI function writes data after a view has been set?",
+    "answer": "`MPI_File_write(f, buffer, BLOCKSIZE, MPI_CHAR, MPI_STATUS_IGNORE)` is used to write data after `MPI_File_set_view` has been called."
+  },
+  {
+    "question": "How is an MPI file opened for read-only access in the `mpi_view.c` example?",
+    "answer": "The file is opened for read-only access using `MPI_File_open(MPI_COMM_WORLD, filename, MPI_MODE_RDONLY, MPI_INFO_NULL, &f)`."
+  },
+  {
+    "question": "How is the `type_contiguous` MPI datatype defined for reading in the `mpi_view.c` example?",
+    "answer": "`MPI_Type_contiguous(NBRBLOCKS*BLOCKSIZE, MPI_CHAR, &type_contiguous)` defines a contiguous MPI datatype `type_contiguous` of `NBRBLOCKS*BLOCKSIZE` characters."
+  },
+  {
+    "question": "How is `MPI_File_set_view` used for reading in the `mpi_view.c` example?",
+    "answer": "`MPI_File_set_view(f, rank*NBRBLOCKS*BLOCKSIZE, MPI_CHAR, type_contiguous, \"native\", MPI_INFO_NULL)` sets the view for reading, giving each process its specific section of the file."
+  },
+  {
+    "question": "Which MPI function reads data after a view has been set for reading?",
+    "answer": "`MPI_File_read(f, buffer, BLOCKSIZE, MPI_CHAR, MPI_STATUS_IGNORE)` is used to read data after `MPI_File_set_view` has defined the reading view."
+  },
+  {
+    "question": "What is the final MPI function called to clean up the MPI environment?",
+    "answer": "`MPI_Finalize()` is called at the end of the program to clean up the MPI environment."
+  },
+  {
+    "question": "What is a potential issue when using views with disjoint file sections on some file systems?",
+    "answer": "Some file systems do not support file locks, which can make certain operations, particularly using views on disjoint file sections, impossible."
+  },
+  {
+    "question": "Where can one find documentation for OpenMPI?",
+    "answer": "OpenMPI documentation is available at http://www.open-mpi.org/doc/current/."
+  },
+  {
+    "question": "Are there resources for learning about parallel I/O?",
+    "answer": "Yes, a course on parallel I/O is referenced at https://scinet.courses/215."
+  }
+]

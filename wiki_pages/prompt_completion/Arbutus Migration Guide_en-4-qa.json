@@ -1,0 +1,106 @@
+[
+  {
+    "question": "What are the recommended methods for migrating ephemeral instances based on storage size?",
+    "answer": "For instances with ephemeral storage less than 150GB, migration using Glance images and volume snapshots is recommended. For larger instances, the manual or orchestrated migration approach is preferred."
+  },
+  {
+    "question": "Is additional data copying required for non-boot ephemeral storage when migrating ephemeral instances?",
+    "answer": "Yes, you will still need to copy data from any non-boot ephemeral storage (i.e., mounted under `/mnt`) separately. Consult the 'Methods to copy data' section for this."
+  },
+  {
+    "question": "What is the initial step for migrating an ephemeral instance using Glance images?",
+    "answer": "Open two SSH sessions to the migration host `cloudmigration.computecanada.ca` with your account credentials."
+  },
+  {
+    "question": "How should the SSH sessions for ephemeral instance migration be configured?",
+    "answer": "In one session, source the OpenStack RC file for West Cloud, and in the other, source the RC file for Arbutus Cloud. It's recommended to use the `screen` command to maintain sessions in case of SSH disconnections."
+  },
+  {
+    "question": "How can you create a snapshot of a desired instance in the West Cloud web UI?",
+    "answer": "Navigate to Compute -> Instances and select 'Create Snapshot' from the drop-down menu."
+  },
+  {
+    "question": "What is the CLI command to create an instance snapshot in West Cloud?",
+    "answer": "First, use `nova list` to find the instance name, then execute `nova image-create --poll <instancename> <snapshotname>`."
+  },
+  {
+    "question": "How do you download an instance snapshot from West Cloud to the migration host?",
+    "answer": "In the West Cloud session on the migration host, use the command `glance image-download --progress --file <filename> <imageid>`, replacing `<filename>` and `<imageid>` with real values."
+  },
+  {
+    "question": "How do you upload a snapshot to Arbutus Cloud from the migration host?",
+    "answer": "In the Arbutus Cloud session on the migration host, use the command `glance image-create --progress --visibility private --container-format bare --disk-format qcow2 --name <imagename> --file <filename>`, replacing `<filename>` and `<imagename>`."
+  },
+  {
+    "question": "What can be done with an image after it has been uploaded to Arbutus Cloud?",
+    "answer": "New instances can now be launched on Arbutus Cloud from this image."
+  },
+  {
+    "question": "What is the final step after migrating and validating ephemeral instances and volumes, and updating DNS records?",
+    "answer": "Delete your old instances on the legacy West Cloud."
+  },
+  {
+    "question": "What is an alternative method for migrating an ephemeral instance?",
+    "answer": "An alternative method is to use the Linux 'dd' utility to create an image directly from the root disk of the instance."
+  },
+  {
+    "question": "What services should be shut down on an ephemeral instance prior to migrating it using the Linux 'dd' method?",
+    "answer": "It is important to shut down as many services as possible on the instance, such as httpd and databases, ideally leaving only SSH running."
+  },
+  {
+    "question": "How do you install the OpenStack CLI on a CentOS instance for the 'dd' migration method?",
+    "answer": "As root, run `yum install epel-release`, then `yum install python-devel python-pip gcc`, and finally `pip install python-openstackclient`."
+  },
+  {
+    "question": "How can you verify that the OpenStack CLI on the West Cloud instance can connect to the Arbutus Cloud API?",
+    "answer": "After copying and sourcing your OpenStack RC file for Arbutus, execute `openstack image list`."
+  },
+  {
+    "question": "How can you typically identify the root disk on an ephemeral instance?",
+    "answer": "The root disk on the instance is typically `/dev/vda1`, which can be verified using the `df` command."
+  },
+  {
+    "question": "How do you create an image from the root disk of an ephemeral instance using the 'dd' utility?",
+    "answer": "Use the command `dd if=/dev/vda | openstack image create --private --container-format bare --disk-format raw \"ephemeralmigrate\"`, assuming `/dev/vda` is the root disk."
+  },
+  {
+    "question": "What are the two recommended approaches for copying data between instances in the two clouds?",
+    "answer": "The two recommended approaches are Globus for very large volumes (greater than 5TB) and `rsync + ssh` for smaller volumes."
+  },
+  {
+    "question": "For what size of data volumes is Globus recommended for data transfer?",
+    "answer": "Globus is recommended for very large volumes, specifically those greater than 5TB."
+  },
+  {
+    "question": "How can a user request a Globus Connect Personal Plus subscription?",
+    "answer": "Send an email with your information to `globus@tech.alliancecan.ca` and ask to be added to the Globus Personal Plus subscription."
+  },
+  {
+    "question": "What configuration is needed on VMs to enable communication with the Globus Service?",
+    "answer": "Ensure each VM has an external IP address, firewall rules permit communication on the necessary ports, and the user running Globus Connect Personal has access to data on the instances\u2019 storage systems."
+  },
+  {
+    "question": "How should Globus Connect Personal be run and configured on instances for data transfer?",
+    "answer": "Run Globus Connect Personal as a background process in user space, and as a Globus Connect Personal Plus subscriber, create a shared endpoint on one or both VMs."
+  },
+  {
+    "question": "How do you transfer data using Globus after endpoints are set up?",
+    "answer": "Using any Globus Interface (globus.org, globus.computecanada.ca), access both endpoints just created and transfer data, consulting the data transfer manual."
+  },
+  {
+    "question": "Who should be contacted for support regarding Globus issues or very large volume moves?",
+    "answer": "Contact `globus@tech.alliancecan.ca` for support, and it's recommended to submit a support ticket in advance if you have very large volumes to move."
+  },
+  {
+    "question": "For what size of data volumes is `rsync + ssh` recommended?",
+    "answer": "`rsync + ssh` is recommended for smaller data volumes."
+  },
+  {
+    "question": "Provide an example command for copying data using `rsync` over SSH.",
+    "answer": "An example is `rsync -avzP -e 'ssh -i ~/.ssh/key.pem' /local/path/ remoteuser@remotehost:/path/to/files/`, assuming password-less login via SSH Keys has already been set up."
+  },
+  {
+    "question": "What is the general email address for cloud support requests?",
+    "answer": "Cloud support requests can be sent to `cloud@tech.alliancecan.ca`."
+  }
+]

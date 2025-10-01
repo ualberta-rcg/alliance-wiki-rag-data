@@ -1,0 +1,58 @@
+[
+  {
+    "question": "How do you bind mount the current directory when running an Apptainer container?",
+    "answer": "You can bind mount the current directory using the `-B .` option in the `apptainer run` command, for example: `apptainer run -C -B . -W $SLURM_TMPDIR a-container.sif wc -l ./my_data_file.txt`."
+  },
+  {
+    "question": "How can you bind mount `/project` and `/scratch` filesystems for an Apptainer container on clusters?",
+    "answer": "You can use `-B /project` to mount the project filesystem and `-B /scratch` to mount the scratch filesystem, as shown in the example: `apptainer run -C -B /project -B /scratch -W $SLURM_TMPDIR a-container.sif wc -l ./my_data_file.txt`."
+  },
+  {
+    "question": "What are the benefits of binding top-level directories like `/project` and `/scratch`?",
+    "answer": "Binding top-level directories is useful for accessing others' files on your research team in different locations and for handling files/directories that are symlinks to different locations, which might otherwise be broken."
+  },
+  {
+    "question": "What script can be run to find necessary bind mount options for `/home`, `/project`, and `/scratch` if standard options don't work?",
+    "answer": "If standard bind mount options do not work on your cluster, you can run the script `/home/preney/public/apptainer-scripts/get-apptainer-options.sh` to obtain the correct options."
+  },
+  {
+    "question": "Can a file or directory be bind mounted to a different location inside an Apptainer container?",
+    "answer": "Yes, you can bind mount any file or directory to a different location inside the container, such as `-B ./my_data_file.txt:/special/input.dat`, which maps `my_data_file.txt` on the host to `/special/input.dat` inside the container."
+  },
+  {
+    "question": "Why would someone bind mount a file to a different path inside an Apptainer container?",
+    "answer": "This feature is useful when programs or scripts inside the container have hard-coded paths to files and directories that must be located in certain specific locations."
+  },
+  {
+    "question": "How should the `/home` filesystem be bind-mounted in an Apptainer container to avoid interference?",
+    "answer": "To bind-mount the `/home` filesystem, use an alternate destination directory like `-B /home:/cluster_home`. This prevents configuration files and programs in your home directory from interfering with software inside the container."
+  },
+  {
+    "question": "Should CVMFS paths be mounted inside Apptainer containers?",
+    "answer": "No, it is strongly advised not to mount CVMFS paths inside your containers, as it is 'fraught with perils' and defeats many reasons to use a container."
+  },
+  {
+    "question": "Where can users find more information about persistent overlays in Apptainer?",
+    "answer": "Users should refer to the official Apptainer documentation page about persistent overlays at `https://apptainer.org/docs/user/main/persistent_overlays.html`."
+  },
+  {
+    "question": "What are the two formats in which Apptainer images can be created?",
+    "answer": "Apptainer images can be created either as an `SIF` file or as a sandbox directory."
+  },
+  {
+    "question": "What are the characteristics of an Apptainer `SIF` file?",
+    "answer": "`SIF` files typically contain multiple parts, each being a `squashfs` filesystem that is read-only and compressed. They result in smaller images, offer faster disk reads, and are the preferred option."
+  },
+  {
+    "question": "What is an Apptainer sandbox directory and what are its characteristics?",
+    "answer": "A sandbox directory is a normal directory in the filesystem that Apptainer populates with files and directories needed in the image. It is uncompressed, can contain thousands of files, and provides read-write access to the image itself."
+  },
+  {
+    "question": "When is it recommended to use an `SIF` file versus a sandbox directory for Apptainer images, especially considering updates?",
+    "answer": "For infrequent updates, it's typically better to use an `SIF` file. When updates are needed, one can build a sandbox image from the `SIF` file, make changes, and then build a new `SIF` file."
+  },
+  {
+    "question": "Which Apptainer image format generally provides better disk performance and uses less quota?",
+    "answer": "Using an `SIF` file is recommended because it offers higher disk access speeds from the container image and consumes a quota file count of 1, compared to a sandbox directory which can consume significant disk space and thousands of file count quotas."
+  }
+]

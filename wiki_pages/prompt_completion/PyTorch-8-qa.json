@@ -1,0 +1,58 @@
+[
+  {
+    "question": "What is the purpose of the `pytorch-gpu-mps.sh` script?",
+    "answer": "The script demonstrates Single GPU Data Parallelism using PyTorch with Nvidia's Multi-Process Service (MPS)."
+  },
+  {
+    "question": "How many GPUs are requested by the `pytorch-gpu-mps.sh` SLURM job script?",
+    "answer": "The script requests 1 GPU (`#SBATCH --gres=gpu:1`)."
+  },
+  {
+    "question": "How many model replicas are configured to run on the GPU in the `pytorch-gpu-mps.sh` script?",
+    "answer": "The script specifies 8 model replicas using `#SBATCH --tasks-per-node=8`."
+  },
+  {
+    "question": "How is Nvidia MPS (Multi-Process Service) activated in the `pytorch-gpu-mps.sh` script?",
+    "answer": "Nvidia MPS is activated by exporting `CUDA_MPS_PIPE_DIRECTORY` and `CUDA_MPS_LOG_DIRECTORY` environment variables, then running `nvidia-cuda-mps-control -d`."
+  },
+  {
+    "question": "Which Python packages are installed in the virtual environment within the `pytorch-gpu-mps.sh` script?",
+    "answer": "The script installs `torch` and `torchvision`."
+  },
+  {
+    "question": "What is the name of the Python script executed by the `pytorch-gpu-mps.sh` job?",
+    "answer": "The Python script executed is `cifar10-gpu-mps.py`."
+  },
+  {
+    "question": "What is the default `batch_size` argument passed to `cifar10-gpu-mps.py` in the job submission script?",
+    "answer": "The default `batch_size` is 512."
+  },
+  {
+    "question": "How is the CUDA device specified for each process within the `cifar10-gpu-mps.py` script?",
+    "answer": "The `current_device` is fixed to 0, and `torch.cuda.set_device(current_device)` is called. The `rank` is obtained from the `SLURM_LOCALID` environment variable."
+  },
+  {
+    "question": "Which backends are supported for `dist.init_process_group` when performing Single GPU Data Parallelism with MPS?",
+    "answer": "The supported backends are \"mpi\" or \"gloo\"."
+  },
+  {
+    "question": "Why is the NCCL backend not used for `dist.init_process_group` in single GPU data parallelism with MPS?",
+    "answer": "NCCL is not used because it does not work on a single GPU due to a hard-coded multi-GPU topology check."
+  },
+  {
+    "question": "How is the PyTorch model configured for distributed data parallelism in `cifar10-gpu-mps.py`?",
+    "answer": "The model is first moved to CUDA (`net.cuda()`) and then wrapped with `torch.nn.parallel.DistributedDataParallel(net, device_ids=[current_device])`."
+  },
+  {
+    "question": "What dataset is used for training in the `cifar10-gpu-mps.py` script?",
+    "answer": "The CIFAR10 dataset is used."
+  },
+  {
+    "question": "Where does `cifar10-gpu-mps.py` expect to find the CIFAR10 dataset?",
+    "answer": "It expects the CIFAR10 dataset to be located in `~/data`."
+  },
+  {
+    "question": "What is the role of `torch.utils.data.distributed.DistributedSampler` in `cifar10-gpu-mps.py`?",
+    "answer": "It is used to create a sampler for the `DataLoader`, which ensures that each model replica receives a different chunk of the training data during distributed data loading."
+  }
+]

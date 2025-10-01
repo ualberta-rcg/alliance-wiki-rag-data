@@ -1,0 +1,70 @@
+[
+  {
+    "question": "What are the learning objectives covered in this document regarding OpenACC?",
+    "answer": "The learning objectives include understanding offloading, OpenACC directives, the difference between `loop` and `kernels` directives, how to build an OpenACC program, what aliasing is in C/C++, and how to use compiler feedback to fix false aliasing."
+  },
+  {
+    "question": "What is 'offloading' in the context of GPU programming?",
+    "answer": "Offloading is the process of transferring data and the code from the main program (host) onto the device (GPU)."
+  },
+  {
+    "question": "Why is managing data transfers crucial when porting code to a GPU?",
+    "answer": "It's crucial because the CPU (host) and GPU do not share the same memory, and data must be transferred between them through the PCI bus, which has a much lower bandwidth than either memory."
+  },
+  {
+    "question": "What are the key memory characteristics of the host (CPU) and GPU?",
+    "answer": "The host memory is generally larger but slower than the GPU memory, and a GPU does not have direct access to the host memory."
+  },
+  {
+    "question": "What is an OpenACC directive?",
+    "answer": "OpenACC directives are statements, similar to OpenMP directives, that take the form of `pragma` statements in C/C++ and comments in Fortran, used to guide the compiler for parallelization."
+  },
+  {
+    "question": "What are the advantages of using OpenACC directives?",
+    "answer": "Advantages include allowing incremental code modifications for debugging, the ability to disable OpenACC support at compile time (using a single source for accelerated and normal versions), and compiler-managed offloading for various accelerator types (GPUs or SIMD on CPUs) and future device generations by simply updating the compiler."
+  },
+  {
+    "question": "How are OpenACC directives expressed in C/C++ and Fortran?",
+    "answer": "They are expressed as `<tt>pragma</tt>` statements in C/C++ and as comments in Fortran."
+  },
+  {
+    "question": "How does the compiler identify kernels in a C/C++ OpenACC block that contains multiple loops?",
+    "answer": "In C/C++, the compiler will identify two kernels corresponding to the inside of each loop within the OpenACC block."
+  },
+  {
+    "question": "How does the compiler identify kernels in a Fortran OpenACC block?",
+    "answer": "In Fortran, the kernels will be the inside of the first loop, as well as the inside of the implicit loop that Fortran performs when doing an array operation."
+  },
+  {
+    "question": "How are OpenACC blocks delimited in C/C++ versus Fortran?",
+    "answer": "In C/C++, the OpenACC block is delimited using curly brackets, while in Fortran, the `!$acc kernels` comment needs to be repeated with the `end` keyword added (`!$acc end kernels`)."
+  },
+  {
+    "question": "What happens when the compiler encounters an OpenACC `kernels` directive?",
+    "answer": "The compiler analyzes the code to identify sections that can be parallelized, often loop bodies with independent iterations. It then wraps the body of the loop into a special function called a 'kernel,' which is compiled to run on an accelerator."
+  },
+  {
+    "question": "What is a 'kernel' in the context of OpenACC, and how does it enable parallel execution?",
+    "answer": "A 'kernel' is a special function that the compiler wraps around the body of a loop with independent iterations. This internal code refactoring ensures each call to the kernel is independent, allowing hundreds of cores on an accelerator to run the function for one specific index in parallel."
+  },
+  {
+    "question": "What type of directive is the `kernels` directive, and what does it imply?",
+    "answer": "The `kernels` directive is a 'descriptive' directive, meaning the programmer suggests to the compiler that the region can be made parallel, and the compiler is free to choose the best strategy, potentially even running it sequentially."
+  },
+  {
+    "question": "What are the typical steps the compiler takes when processing a `kernels` directive?",
+    "answer": "Typically, the compiler will analyze the code for parallelism, identify which data must be transferred and when, create a kernel, and then offload the kernel to the GPU."
+  },
+  {
+    "question": "What is the primary difference between 'prescriptive' (OpenMP) and 'descriptive' (OpenACC) directives?",
+    "answer": "Prescriptive directives (OpenMP) require the compiler to perform the requested parallelization, ensuring reproducible results, while descriptive directives (OpenACC) give the compiler freedom to compile the code in the way it deems best for the target architecture, even if it means not parallelizing at all."
+  },
+  {
+    "question": "What are the consequences of OpenACC's 'descriptive' nature for code compilation and performance?",
+    "answer": "The descriptive nature means the compiler can produce different binary code for GPU or CPU targets, and performance may vary between different compilers or compiler generations, especially with new hardware, as the compiler optimizes for the target architecture."
+  },
+  {
+    "question": "What is the initial change made to a C++ matrix-vector product code to attempt running it on a GPU using OpenACC?",
+    "answer": "The initial change is to add the `#pragma acc kernels` directive around the loop structure of the function, without immediately worrying about data transfer or more detailed compiler information."
+  }
+]

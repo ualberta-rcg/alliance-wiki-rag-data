@@ -1,0 +1,70 @@
+[
+  {
+    "question": "Can I use `apt-get` or `yum` to install software on Alliance systems if the instructions include them?",
+    "answer": "It is unlikely you will be able to install software using `apt-get` or `yum` instructions. You should instead look for instructions that say 'to build from source' or contact support staff for assistance."
+  },
+  {
+    "question": "How can I install Python, R, or Perl packages on Alliance systems?",
+    "answer": "Python, R, and Perl have large libraries of extension packages and package managers that can easily install almost any desired extension in your home directory. You should refer to the dedicated page for each language to find detailed guidance on using its package manager to install packages for yourself."
+  },
+  {
+    "question": "What kind of errors might I encounter when installing pre-compiled binaries in my home directory?",
+    "answer": "You may encounter errors such as `/lib64/libc.so.6: version 'GLIBC_2.18' not found` when installing pre-compiled binaries in your home directory."
+  },
+  {
+    "question": "How can I fix issues with pre-compiled binaries, such as `GLIBC_2.18` not found errors?",
+    "answer": "Such binaries can often be patched using the `setrpaths.sh` script. The syntax is `setrpaths.sh --path path [--add_origin]`, where `path` refers to the directory where you installed the software."
+  },
+  {
+    "question": "What is the purpose of the `setrpaths.sh` script?",
+    "answer": "The `setrpaths.sh` script ensures that binaries use the correct interpreter and search for the libraries they are dynamically linked to in the correct folder."
+  },
+  {
+    "question": "What does the `--add_origin` option do when using `setrpaths.sh`?",
+    "answer": "The `--add_origin` option adds `$ORIGIN` to the RUNPATH, which can be helpful if a library cannot find other libraries in the same folder as itself."
+  },
+  {
+    "question": "Can `setrpaths.sh` patch shared objects inside archive files?",
+    "answer": "Yes, `setrpaths.sh` can extract and patch shared objects found within archive files like Java (`.jar`) or Python wheels (`.whl`) and then updates the archive."
+  },
+  {
+    "question": "Where is most software on the new clusters distributed from?",
+    "answer": "Almost all software used on the new clusters is distributed centrally using the CVMFS file system, located somewhere under `/cvmfs/soft.computecanada.ca`."
+  },
+  {
+    "question": "What is the core software stack provided on Alliance clusters by default?",
+    "answer": "The core of the software stack is provided by the `gentoo//2020` module, which is loaded by default."
+  },
+  {
+    "question": "Where is the `gentoo//2020` software stack located?",
+    "answer": "The `gentoo//2020` stack is located at `/cvmfs/soft.computecanada.ca/gentoo/2020/usr`."
+  },
+  {
+    "question": "Which environment variable should be used to refer to the Gentoo software stack path?",
+    "answer": "The environment variable `$EBROOTGENTOO` should be used to refer to the path `/cvmfs/soft.computecanada.ca/gentoo/2020/usr`."
+  },
+  {
+    "question": "How do compilers and linkers typically find header files and libraries within the Alliance software stack?",
+    "answer": "The compiler and linker automatically look for header files and libraries in the correct location via the environment variables `$CPATH` and `$LIBRARY_PATH`, respectively."
+  },
+  {
+    "question": "What should I do if my software compilation fails because it's hard-coded to look under `/usr`?",
+    "answer": "If software is hard-coded to look under `/usr`, you need to explicitly tell it about `$EBROOTGENTOO`. This might involve adjusting a Makefile, specifying a `--with-` flag for the configure script, or editing a configuration file. You can also ask for help if unsure."
+  },
+  {
+    "question": "How do I specify the location of header files and libraries for a module other than `gentoo`?",
+    "answer": "After loading the module (e.g., `module load hdf5`), you can use its corresponding `EBROOT...` environment variable (e.g., `$EBROOTHDF5`) to find its installation, header files (`$EBROOTHDF5/include`), and library files (`$EBROOTHDF5/lib`)."
+  },
+  {
+    "question": "What should I do if a necessary header file or library is not provided by `gentoo` or another module?",
+    "answer": "You should let Alliance staff know, as it can most likely be easily added to the existing stack."
+  },
+  {
+    "question": "Is it necessary to use `$LD_LIBRARY_PATH` for binaries under `/cvmfs/soft.computecanada.ca`?",
+    "answer": "No, it is generally not necessary to use `$LD_LIBRARY_PATH` because all binaries under `/cvmfs/soft.computecanada.ca` use a RUNPATH, which embeds the directories for their runtime libraries."
+  },
+  {
+    "question": "Why should I avoid setting `$LD_LIBRARY_PATH` to locations like `/usr/lib64` or `$EBROOTGENTOO/lib64`?",
+    "answer": "Setting `$LD_LIBRARY_PATH` overrides the embedded RUNPATH of binaries, and setting it to those locations can cause many binaries to stop working."
+  }
+]

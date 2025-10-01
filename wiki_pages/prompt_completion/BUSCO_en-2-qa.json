@@ -1,0 +1,78 @@
+[
+  {
+    "question": "How do you run BUSCO for analyzing multiple genomes saved in a directory?",
+    "answer": "To run BUSCO on multiple genomes in a directory (e.g., `genome/`), use the command `busco --offline --in genome/ --out TEST --lineage_dataset bacteria_odb10 --mode genome --cpu ${SLURM_CPUS_PER_TASK:-1} --download_path busco_download/`. The `genome/` folder must be in the current directory or a full path must be provided."
+  },
+  {
+    "question": "What should be done if a BUSCO run takes longer than 60 seconds?",
+    "answer": "Production BUSCO runs that exceed 60 seconds should be submitted to the scheduler."
+  },
+  {
+    "question": "What command-line option is used to specify a single input file for BUSCO analysis?",
+    "answer": "Use `--in genome.fna` to specify a single file for analysis."
+  },
+  {
+    "question": "What command-line option is used to specify multiple input files within a directory for BUSCO analysis?",
+    "answer": "Use `--in genome/` to specify a directory containing multiple files for analysis."
+  },
+  {
+    "question": "How can you prevent BUSCO from accessing the internet during its operation?",
+    "answer": "Specify `--offline` in the BUSCO command to avoid using the internet."
+  },
+  {
+    "question": "How do you allocate the number of CPUs for a BUSCO job in a Slurm submission script?",
+    "answer": "Specify `--cpu ${SLURM_CPUS_PER_TASK}` in your job submission script to use the number of CPUs allocated by Slurm."
+  },
+  {
+    "question": "How can a partial BUSCO run be restarted?",
+    "answer": "Use the `--restart` option to restart a BUSCO analysis from a partial run."
+  },
+  {
+    "question": "What is the command to submit a BUSCO job using a Slurm script named `run_busco.sh`?",
+    "answer": "Submit the job by running `sbatch run_busco.sh`."
+  },
+  {
+    "question": "Which environment variables and commands are typically used in a Slurm script to set up a virtual environment and install BUSCO dependencies?",
+    "answer": "The script typically includes `module load ...`, `virtualenv --no-download ${SLURM_TMPDIR}/env`, `source ${SLURM_TMPDIR}/env/bin/activate`, `pip install --no-index --upgrade pip`, and `pip install --no-index --requirement ~/busco-requirements.txt`."
+  },
+  {
+    "question": "How can advanced users pass custom parameters to Augustus when running BUSCO?",
+    "answer": "Advanced users can pass custom Augustus parameters using `--augustus_parameters=\"--yourAugustusParameter\"`."
+  },
+  {
+    "question": "What steps are needed to set up the Augustus configuration for BUSCO if using custom parameters?",
+    "answer": "Copy the Augustus `config` directory to a writable location using `cp -r $EBROOTAUGUSTUS/config $HOME/augustus_config` and then define the `AUGUSTUS_CONFIG_PATH` environment variable with `export AUGUSTUS_CONFIG_PATH=$HOME/augustus_config`."
+  },
+  {
+    "question": "Where should SEPP be installed if its parameters are to be used with BUSCO?",
+    "answer": "SEPP needs to be installed locally within your virtual environment, and this installation should be performed from the login node."
+  },
+  {
+    "question": "What are the steps to install SEPP locally in a BUSCO virtual environment?",
+    "answer": "First, activate your BUSCO virtual environment (`source busco_env/bin/activate`). Then, install DendroPy (`pip install 'dendropy<4.6'`). Finally, clone SEPP (`git clone https://github.com/smirarab/sepp.git`), navigate into the directory (`cd sepp`), and run `python setup.py config` followed by `python setup.py install`."
+  },
+  {
+    "question": "How do you validate a SEPP installation?",
+    "answer": "Navigate to your home directory (`cd`) and run `run_sepp.py -h` to validate the SEPP installation."
+  },
+  {
+    "question": "If SEPP is installed locally, how should the BUSCO virtual environment be activated in a job submission script?",
+    "answer": "To activate your local virtual environment, add the command `source ~/busco_env/bin/activate` immediately after the line that loads the necessary modules in your job submission script."
+  },
+  {
+    "question": "Is the 'Modules' section for BUSCO installation still recommended?",
+    "answer": "No, the 'Modules' section is outdated and deprecated; users should instead use the Python wheels available."
+  },
+  {
+    "question": "What modules were historically loaded for BUSCO when using the deprecated 'Modules' approach?",
+    "answer": "The necessary modules were `StdEnv/2018.3`, `gcc/7.3.0`, `openmpi/3.1.4`, `busco/3.0.2`, and `r/4.0.2`, which also loaded dependencies like Augustus, BLAST+, and HMMER."
+  },
+  {
+    "question": "How did users copy the default BUSCO configuration file when using the deprecated Modules method?",
+    "answer": "Users would copy the configuration file using `cp -v $EBROOTBUSCO/config/config.ini.default $HOME/busco_config.ini` or download it with `wget -O $HOME/busco_config.ini https://gitlab.com/ezlab/busco/raw/master/config/config.ini.default`."
+  },
+  {
+    "question": "What commands were used to check a BUSCO run with the deprecated Modules setup?",
+    "answer": "Users would set environment variables `export BUSCO_CONFIG_FILE=$HOME/busco_config.ini` and `export AUGUSTUS_CONFIG_PATH=$HOME/augustus_config`, then run `run_BUSCO.py --in $EBROOTBUSCO/sample_data/target.fa --out TEST --lineage_path $EBROOTBUSCO/sample_data/example --mode genome`."
+  }
+]

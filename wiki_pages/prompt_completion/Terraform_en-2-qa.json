@@ -1,38 +1,42 @@
 [
   {
-    "question": "What information is typically included in a complete OpenStack provider specification in Terraform?",
-    "answer": "A complete OpenStack provider specification includes `tenant_name`, `tenant_id`, `auth_url`, `user_name`, `password`, and `user_domain_name`."
+    "question": "How do you define the OpenStack provider in Terraform with full connection details?",
+    "answer": "You can define the OpenStack provider by including a `provider \"openstack\"` block in your Terraform configuration, specifying details such as `tenant_name`, `tenant_id`, `auth_url`, `user_name`, `password`, and `user_domain_name`."
   },
   {
-    "question": "How can Terraform handle OpenStack credentials if some values are not specified directly in the provider configuration?",
-    "answer": "Terraform supports partial credentials, allowing some values (e.g., password) to be left out of the configuration file and supplied via environment variables, such as `$OS_PASSWORD`."
+    "question": "Can Terraform configurations use partial OpenStack credentials?",
+    "answer": "Yes, Terraform supports partial credentials, allowing you to omit some values (e.g., password) from the configuration file and supply them via environment variables like `$OS_PASSWORD`."
   },
   {
     "question": "How do you configure the OpenStack provider in Terraform if you prefer to use a `clouds.yaml` file?",
-    "answer": "If you prefer to use `clouds.yaml`, you specify `cloud` in the provider stanza, for example: `cloud = \"my_cloud\"`."
+    "answer": "If you prefer using `clouds.yaml`, you can specify the `cloud` attribute within the `provider \"openstack\"` stanza, like `cloud = \"my_cloud\"`."
   },
   {
-    "question": "What is required in the environment if the OpenStack provider definition in Terraform is left completely empty?",
-    "answer": "If the OpenStack provider definition is completely empty, either `$OS_CLOUD` or the variables set by an appropriate RC file must be in the executing environment for Terraform to proceed."
+    "question": "Is an empty OpenStack provider definition acceptable in Terraform?",
+    "answer": "Yes, an empty `provider \"openstack\" {}` definition is acceptable, but it requires either the `$OS_CLOUD` environment variable or variables set by an appropriate RC file to be present in the executing environment for Terraform to proceed."
   },
   {
     "question": "What is a key security consideration when storing OpenStack credentials in Terraform configurations?",
-    "answer": "It is important to avoid storing credentials, especially passwords, in the Terraform configuration files, even on a personal workstation, to prevent security risks."
+    "answer": "It is important to avoid storing sensitive credentials, especially passwords, directly in Terraform configuration files, as this is considered bad practice and poses security risks."
   },
   {
-    "question": "What command is used to initialize Terraform and set up the OpenStack provider?",
-    "answer": "The command `terraform init` is used to initialize Terraform and download the necessary provider plugins, such as the OpenStack provider."
+    "question": "What command is used to initialize Terraform and set up the provider?",
+    "answer": "The command `terraform init` is used to initialize Terraform, which ensures the provider is set up correctly and downloads the necessary OpenStack provider plugin."
   },
   {
-    "question": "What actions does `terraform init` perform when executed?",
-    "answer": "`terraform init` initializes the backend, checks for and downloads available provider plugins, and suggests version constraints for provider blocks in the configuration."
+    "question": "Does the `terraform init` command test the OpenStack credentials?",
+    "answer": "No, `terraform init` successfully initializes Terraform and downloads the provider plugin, but this operation does not actually try to connect to the defined provider or test the credentials."
   },
   {
-    "question": "Does `terraform init` verify OpenStack credentials?",
-    "answer": "No, `terraform init` does not test the credentials because this operation doesn't actually try to connect to the defined provider."
+    "question": "What is recommended to prevent automatic upgrades of Terraform provider versions?",
+    "answer": "To prevent automatic upgrades to new major versions that may contain breaking changes, it is recommended to add `version = \"...\"` constraints to the corresponding provider blocks in the configuration."
   },
   {
-    "question": "Why is it recommended to specify OpenStack flavors and images using their IDs rather than names in Terraform configurations?",
-    "answer": "It is recommended to always specify flavors and images using their IDs because IDs are stable and will never change, whereas names can change, which could lead to Terraform detecting an updated ID and attempting to rebuild or resize the associated resource destructively."
+    "question": "Why should flavor and image IDs be used instead of names when defining VMs in Terraform?",
+    "answer": "It is good practice to always specify flavors and images using their IDs because the ID defines the state of the resource and will never change, whereas the name can change, potentially leading to Terraform rebuilding or resizing the associated resource destructively."
+  },
+  {
+    "question": "What happens if a flavor or image name changes when defining a VM in Terraform?",
+    "answer": "If a flavor or image name changes (e.g., if it's retired and replaced with another of the same name), Terraform will detect the updated ID on the next run and determine that you want to rebuild or resize the associated resource, which is a destructive operation."
   }
 ]

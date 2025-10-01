@@ -1,0 +1,74 @@
+[
+  {
+    "question": "What is Apache Spark?",
+    "answer": "Apache Spark is an open source framework for distributed computation, initially developed by the AMPLab at Berkeley University and now sponsored by the Apache foundation."
+  },
+  {
+    "question": "How does Apache Spark's performance compare to Hadoop's MapReduce?",
+    "answer": "Spark makes use of primitives stored in memory, achieving up to 100x the performance of Hadoop in certain applications, unlike MapReduce which uses disk storage."
+  },
+  {
+    "question": "Why is Spark particularly suitable for automated learning and interactive data analysis?",
+    "answer": "Loading data in memory allows them to be queried frequently, making Spark especially appropriate for automated learning and interactive data analysis."
+  },
+  {
+    "question": "What modules are typically loaded before running a PySpark application according to the example script?",
+    "answer": "The 'spark/2.3.0' and 'python/3.7' modules are loaded."
+  },
+  {
+    "question": "What environment variable is recommended for Intel MKL routines in multi-threaded Spark applications?",
+    "answer": "The `MKL_NUM_THREADS` environment variable should be set to 1."
+  },
+  {
+    "question": "How is the `SLURM_SPARK_MEM` variable calculated in the PySpark submit script?",
+    "answer": "`SLURM_SPARK_MEM` is calculated as 95% of `SLURM_MEM_PER_NODE` using the formula `$(printf \"%.0f\" $((${SLURM_MEM_PER_NODE} *95/100)))`."
+  },
+  {
+    "question": "What command starts the Spark master process?",
+    "answer": "The `start-master.sh` command starts the Spark master."
+  },
+  {
+    "question": "How is the `MASTER_URL` obtained in the PySpark script?",
+    "answer": "The `MASTER_URL` is obtained by parsing the Spark master's output log using `grep -Po '(?=spark://).*' $SPARK_LOG_DIR/spark-${SPARK_IDENT_STRING}-org.apache.spark.deploy.master*.out`."
+  },
+  {
+    "question": "How are Spark slave workers launched in the provided PySpark example?",
+    "answer": "Spark slave workers are launched using `SPARK_NO_DAEMONIZE=1 srun -n ${NWORKERS} -N ${NWORKERS} --label --output=$SPARK_LOG_DIR/spark-%j-workers.out start-slave.sh -m ${SLURM_SPARK_MEM}M -c ${SLURM_CPUS_PER_TASK} ${MASTER_URL} &`."
+  },
+  {
+    "question": "What is the command to submit a Python Spark application, such as 'pi.py'?",
+    "answer": "A Python Spark application can be submitted using `srun -n 1 -N 1 spark-submit --master ${MASTER_URL} --executor-memory ${SLURM_SPARK_MEM}M $SPARK_HOME/examples/src/main/python/pi.py`."
+  },
+  {
+    "question": "How do you stop Spark slaves and the master process after an application runs?",
+    "answer": "You kill the slaves' process ID (`kill $slaves_pid`) and then run `stop-master.sh`."
+  },
+  {
+    "question": "What modules are loaded for Java Jars Spark applications?",
+    "answer": "Only the 'spark/2.3.0' module is loaded for Java Jars Spark applications, unlike PySpark which also loads Python."
+  },
+  {
+    "question": "How do you submit a Java Spark example like SparkPi or SparkLR?",
+    "answer": "You use `spark-submit --master ${MASTER_URL} --executor-memory ${SLURM_SPARK_MEM}M --class org.apache.spark.examples.SparkPi $SPARK_HOME/examples/jars/spark-examples_2.11-2.3.0.jar 1000` for SparkPi, and similarly for SparkLR."
+  },
+  {
+    "question": "What is the purpose of the event log in Spark?",
+    "answer": "The event log for a Spark application can be saved for later examination using a Web application provided by Spark."
+  },
+  {
+    "question": "How do you create a directory for Spark event logs?",
+    "answer": "You create a directory using the command `mkdir ~/.spark/<spark version>/eventlog`."
+  },
+  {
+    "question": "Where should Spark configuration parameters be stored if the directory doesn't already exist?",
+    "answer": "They should be stored in a directory created with `mkdir ~/.spark/<spark version>/conf`."
+  },
+  {
+    "question": "What file is used to configure Spark's default settings, including event logging?",
+    "answer": "The `spark-defaults.conf` file is used for Spark's default configuration settings."
+  },
+  {
+    "question": "What configuration parameters are needed in `spark-defaults.conf` to enable event logging?",
+    "answer": "You need to set `spark.eventLog.enabled true`, `spark.eventLog.dir /home/<userid>/.spark/<spark version>/eventlog`, and `spark.history.fs.logDirectory /home/<userid>/.spark/<spark version>/eventlog`."
+  }
+]

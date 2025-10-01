@@ -1,0 +1,114 @@
+[
+  {
+    "question": "How can I check a file's last status change time (ctime) immediately?",
+    "answer": "You can use the `ls -lu` command on the file to verify its ctime."
+  },
+  {
+    "question": "How can I check a file's last modification time (mtime) immediately?",
+    "answer": "You can use the `ls -lc` command on the file to verify its mtime."
+  },
+  {
+    "question": "If a file's access or modification time is updated, will it still be deleted on the purging date?",
+    "answer": "If a file's atime/ctime has been updated in the interim, it will no longer be deleted on the purging date on the 15th."
+  },
+  {
+    "question": "What is the recommended method for moving data amounts less than 10GB to and from Niagara?",
+    "answer": "Move amounts less than 10GB through the login nodes using `scp` or `rsync`."
+  },
+  {
+    "question": "What addresses can be used to connect to Niagara from outside SciNet for data transfer?",
+    "answer": "You can use `niagara.scinet.utoronto.ca` or `niagara.computecanada.ca` (they are equivalent)."
+  },
+  {
+    "question": "Why should `scp` or `rsync` not be used through login nodes for data transfers larger than 10GB?",
+    "answer": "Transfers larger than about 10GB using `scp` or `rsync` through login nodes will time out."
+  },
+  {
+    "question": "How should I move data amounts larger than 10GB to and from Niagara?",
+    "answer": "Move amounts larger than 10GB through the datamover nodes (`nia-datamover1` or `nia-datamover2`)."
+  },
+  {
+    "question": "Can I directly connect to the datamover nodes from outside SciNet?",
+    "answer": "Yes, you may login, `scp`, or `rsync` directly to `nia-datamover1.scinet.utoronto.ca` or `nia-datamover2.scinet.utoronto.ca` from the outside."
+  },
+  {
+    "question": "What tool is recommended for frequent large data transfers?",
+    "answer": "If you move data often, consider using Globus, a web-based tool for data transfer."
+  },
+  {
+    "question": "What is the Globus endpoint for Niagara?",
+    "answer": "The Niagara 'endpoint' for Globus is 'computecanada#niagara'."
+  },
+  {
+    "question": "What is the Globus endpoint for HPSS?",
+    "answer": "The HPSS 'endpoint' for Globus is 'computecanada#hpss'."
+  },
+  {
+    "question": "What is HPSS used for?",
+    "answer": "HPSS is for long-term storage of data."
+  },
+  {
+    "question": "What type of storage solution is HPSS?",
+    "answer": "HPSS is a tape-based storage solution and is SciNet's nearline a.k.a. archive facility."
+  },
+  {
+    "question": "How is storage space on HPSS allocated?",
+    "answer": "Storage space on HPSS is allocated through the annual Compute Canada RAC allocation."
+  },
+  {
+    "question": "What are the default file permissions for users within the same group at SciNet?",
+    "answer": "By default, users within the same group have read permission to each other's files (not write)."
+  },
+  {
+    "question": "What is the purpose of Access Control Lists (ACLs)?",
+    "answer": "ACLs can be used to allow a supervisor or another user within your group to manage files (create, move, rename, delete) while retaining original access and permission, or to grant access (read, execute) to users in other groups."
+  },
+  {
+    "question": "Which GPFS native commands are used for managing ACLs?",
+    "answer": "You can use GPFS' native `mmputacl` and `mmgetacl` commands."
+  },
+  {
+    "question": "What are the advantages of using `mmputacl` and `mmgetacl` for ACL management?",
+    "answer": "The advantages are that you can set 'control' permission and that POSIX or NFS v4 style ACLs are supported."
+  },
+  {
+    "question": "How do you apply ACLs to a directory using `mmputacl`?",
+    "answer": "First, create a `/tmp/supervisor.acl` file with the desired ACL contents, then issue `mmputacl -i /tmp/supervisor.acl /project/g/group/[owner]` and `mmputacl -d -i /tmp/supervisor.acl /project/g/group/[owner]`."
+  },
+  {
+    "question": "How do you determine the current ACL attributes of a directory?",
+    "answer": "Use the command `mmgetacl /project/g/group/[owner]`."
+  },
+  {
+    "question": "How can you remove a previously set ACL?",
+    "answer": "You can remove a previously set ACL using `mmdelacl -d /project/g/group/[owner]`."
+  },
+  {
+    "question": "How do you create or change a GPFS access control list interactively?",
+    "answer": "Use the command `mmeditacl /project/g/group/[owner]`, but first set the EDITOR environment variable, for example: `export EDITOR=/usr/bin/vi`."
+  },
+  {
+    "question": "Is there a built-in GPFS command to recursively add or remove ACL attributes to existing files?",
+    "answer": "No, there is no option to recursively add or remove ACL attributes using a GPFS built-in command to existing files; you'll need to use the `-i` option for each file or directory individually, or use a sample bash script."
+  },
+  {
+    "question": "What is the simple way to give read-write-execute (rwx) permissions to everyone in your group?",
+    "answer": "You should simply rely on the plain Unix `chmod g+rwx` command."
+  },
+  {
+    "question": "Can ACLs be used to grant permissions to files or directories that you do not own?",
+    "answer": "No, ACLs won't let you give away permissions to files or directories that do not belong to you."
+  },
+  {
+    "question": "Why is it strongly advised not to grant write permission to other users on the top level of your home directory?",
+    "answer": "Giving write permission to other users on the top level of your home directory (/home/G/GROUP/[owner]) would seriously compromise your privacy and disable SSH key authentication."
+  },
+  {
+    "question": "Which ACL commands should be used on Niagara for GPFS filesystems?",
+    "answer": "On Niagara, you must use the `mm*` commands for GPFS: `mmputacl`, `mmgetacl`, `mmdelacl`, `mmeditacl`."
+  },
+  {
+    "question": "Where can a sample bash script for recursive ACL management be found?",
+    "answer": "A sample bash script for recursively adding or removing ACL attributes using GPFS built-in commands can be found at [https://docs.scinet.utoronto.ca/index.php/Recursive_ACL_script]."
+  }
+]

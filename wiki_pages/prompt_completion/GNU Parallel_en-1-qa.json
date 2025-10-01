@@ -1,0 +1,138 @@
+[
+  {
+    "question": "What is GNU Parallel?",
+    "answer": "GNU Parallel is a tool for running many sequential tasks at the same time on one or more nodes."
+  },
+  {
+    "question": "What are some use cases for GNU Parallel?",
+    "answer": "It is useful for running a large number of sequential tasks, especially if they are short or of variable durations, as well as when doing a parameter sweep."
+  },
+  {
+    "question": "Where can users find more advanced documentation for GNU Parallel?",
+    "answer": "For more advanced usage, users should see the official documentation at http://www.gnu.org/software/parallel/man.html."
+  },
+  {
+    "question": "How many tasks does `parallel` run by default?",
+    "answer": "By default, `parallel` will run as many tasks as the number of cores allocated by the scheduler."
+  },
+  {
+    "question": "How can the number of simultaneous tasks run by GNU Parallel be changed?",
+    "answer": "You can change this behaviour using the option `--jobs` followed by the number of simultaneous tasks that GNU Parallel should run."
+  },
+  {
+    "question": "What happens when a task finishes in GNU Parallel?",
+    "answer": "When one task finishes, a new task will automatically be started by `parallel` in its stead, always keeping the maximum number of tasks running."
+  },
+  {
+    "question": "What syntax does GNU Parallel use for command parameters?",
+    "answer": "Parallel uses curly brackets `{}` as parameters for the command to be run."
+  },
+  {
+    "question": "How can you use `parallel` to `gzip` all text files in a directory?",
+    "answer": "You can execute `ls *.txt | parallel gzip {}`."
+  },
+  {
+    "question": "What is an alternative syntax to curly brackets for specifying parameters in GNU Parallel?",
+    "answer": "An alternative syntax is to use `:::`, such as in the example `parallel echo {} ::: $(seq 1 3)`."
+  },
+  {
+    "question": "What does GNU Parallel refer to its executed commands as?",
+    "answer": "GNU Parallel refers to each of the commands executed as jobs."
+  },
+  {
+    "question": "Why can the term 'jobs' be confusing when discussing GNU Parallel?",
+    "answer": "It can be confusing because on many systems, a job is a batch script run by a scheduler, and GNU Parallel's jobs would be subjobs within that context."
+  },
+  {
+    "question": "How can multiple arguments be used with GNU Parallel?",
+    "answer": "You can use multiple arguments by enumerating them, for example: `parallel echo {1} {2} ::: $(seq 1 3) ::: $(seq 2 3)`."
+  },
+  {
+    "question": "What syntax is used to provide file content as an argument list to GNU Parallel?",
+    "answer": "The syntax `::::` takes the content of a file to generate the list of values for the arguments."
+  },
+  {
+    "question": "How can you use GNU Parallel to display the content of a file named `mylist.txt` as arguments?",
+    "answer": "You may display its content with: `parallel echo {1} :::: mylist.txt`."
+  },
+  {
+    "question": "How can GNU Parallel interpret lines of a file as actual subjobs to be run in parallel?",
+    "answer": "GNU Parallel can interpret the lines of a file as the actual subjobs to be run in parallel by using redirection, for example: `parallel < my_commands.txt`."
+  },
+  {
+    "question": "When is the usage mode of feeding a file as a list of commands particularly useful?",
+    "answer": "This usage mode can be particularly useful if the subjobs contain symbols that are special to GNU Parallel, or the subcommands are to contain a few commands (e.g. `cd dir1 && ./executable`)."
+  },
+  {
+    "question": "Is it recommended to use GNU Parallel across multiple nodes?",
+    "answer": "No, it is not recommended, particularly in the context of a lot of short jobs."
+  },
+  {
+    "question": "What problems can arise when using GNU Parallel across multiple nodes?",
+    "answer": "It can have problems because it needs to start an SSH session on remote nodes, an operation which often requires several seconds and may hang."
+  },
+  {
+    "question": "If GNU Parallel is used across multiple nodes, what option should be added and why?",
+    "answer": "If you choose to use it, make sure you add a delay between jobs of 30 seconds or more, using the option `--sshdelay 30`."
+  },
+  {
+    "question": "How can a list of nodes be provided to GNU Parallel for distributing tasks across a cluster?",
+    "answer": "A file containing the list of nodes can be created (e.g., `scontrol show hostname > ./node_list_${SLURM_JOB_ID}`) and then used with `--sshloginfile ./node_list_${SLURM_JOB_ID}`."
+  },
+  {
+    "question": "What is the purpose of the `--env` option when running GNU Parallel on multiple nodes?",
+    "answer": "The `--env` option allows you to transfer a named environment variable to all the nodes."
+  },
+  {
+    "question": "What does the `--workdir` option ensure when GNU Parallel tasks are run on multiple nodes?",
+    "answer": "The `--workdir` option ensures that the GNU Parallel tasks will start in the same directory as the main node."
+  },
+  {
+    "question": "How can GNU Parallel keep track of completed commands?",
+    "answer": "You can tell GNU Parallel to keep track of which commands have completed by using the `--joblog JOBLOGFILE` argument."
+  },
+  {
+    "question": "What information does the JOBLOGFILE contain?",
+    "answer": "The file JOBLOGFILE will contain the list of completed commands, their start times, durations, hosts, and exit values."
+  },
+  {
+    "question": "How can you resume an interrupted `parallel` command?",
+    "answer": "If the `parallel` command was interrupted, you can make it pick up where it left off using the `--resume` option, for instance `ls *.txt | parallel --resume --joblog gzip.log gzip {}`."
+  },
+  {
+    "question": "What happens to the job log file when `--resume` is used?",
+    "answer": "The new jobs will be appended to the old log file."
+  },
+  {
+    "question": "How can failed subcommands be re-run using GNU Parallel?",
+    "answer": "If some of the subcommands failed, you can re-run the failed ones using `--resume-failed`, e.g., `ls *.txt | parallel --resume-failed --joblog gzip.log gzip {}`."
+  },
+  {
+    "question": "What are the key arguments for handling chunks of large files efficiently with GNU Parallel?",
+    "answer": "You will have to use the GNU Parallel `--pipepart` and `--block` arguments to efficiently handle chunks of the file."
+  },
+  {
+    "question": "What command can be used to count characters in a FASTA file in parallel using 8 cores?",
+    "answer": "The command is `parallel --jobs $SLURM_CPUS_PER_TASK --keep-order --block -1 --recstart '>' --pipepart wc :::: database.fa`."
+  },
+  {
+    "question": "What impact does the `block` size have on GNU Parallel's efficiency for large files?",
+    "answer": "Choosing the right block size has a real impact on the efficiency and the number of cores actually used."
+  },
+  {
+    "question": "What happens if the block size is too small when processing large files with GNU Parallel?",
+    "answer": "A too-small block size results in many jobs dispatched over the available cores."
+  },
+  {
+    "question": "What does a good block size achieve for large file processing with GNU Parallel?",
+    "answer": "A better block size results in a number of jobs close to the number of available cores."
+  },
+  {
+    "question": "What happens if the block size is too big when processing large files with GNU Parallel?",
+    "answer": "A too-big block size means that only one core out of many available is used, leading to inefficient processing."
+  },
+  {
+    "question": "What is often the fastest approach for block size when handling large files with GNU Parallel?",
+    "answer": "In many cases, letting GNU Parallel adapt and decide on the block size (e.g., using `-1`) is often faster."
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "question": "How can I prevent multiple parallel MATLAB tasks from corrupting the local parallel profile?",
+    "answer": "To avoid this problem, each task should create its own parallel profile in a unique location by specifying the `JobStorageLocation` property of the `parallel.Cluster` object."
+  },
+  {
+    "question": "What MATLAB code snippet can be used to configure a unique job storage location for a parallel cluster?",
+    "answer": "You can use this MATLAB code: `local_cluster = parcluster('local'); local_cluster.JobStorageLocation = getenv('SLURM_TMPDIR'); parpool(local_cluster);`"
+  },
+  {
+    "question": "What is the 'simultaneous job problem' when using MATLAB parallel execution?",
+    "answer": "The 'simultaneous job problem' occurs when two or more parallel tasks initialize `parpool` at the same time, attempting to read and write to the same `.dat` file, which can corrupt the local parallel profile used by other tasks."
+  },
+  {
+    "question": "What is an important requirement for including MCR code in high-demand tasks?",
+    "answer": "MCR code must always be included in a task submitted to the scheduler."
+  },
+  {
+    "question": "Which MATLAB Compiler versions are available for use?",
+    "answer": "The `mcc` compiler is currently available for MATLAB versions 2014a, 2018a, and subsequent versions."
+  },
+  {
+    "question": "How do you compile a MATLAB script like `cosplot.m` using the `mcc` compiler?",
+    "answer": "You can compile it using the command `mcc -m -R -nodisplay cosplot.m`."
+  },
+  {
+    "question": "What output files are generated when compiling a MATLAB script with `mcc`?",
+    "answer": "The compilation process produces a binary executable (e.g., `cosplot`) and a wrapper script (e.g., `run_cosplot.sh`)."
+  },
+  {
+    "question": "Why shouldn't the `run_cosplot.sh` script be used directly on the servers to execute compiled MATLAB binaries?",
+    "answer": "The `run_cosplot.sh` script will not work as is on the servers because MATLAB expects certain libraries to be in specific locations."
+  },
+  {
+    "question": "What script should be used to execute a compiled MATLAB binary on the servers instead of `run_cosplot.sh`?",
+    "answer": "The `run_mcr_binary.sh` script should be used, as it defines the correct paths for MATLAB's runtime environment."
+  },
+  {
+    "question": "Which module needs to be loaded before running a compiled MATLAB executable?",
+    "answer": "You need to load the MCR module that corresponds to the version of MATLAB used to create the executable (e.g., `module load mcr/R2024b`)."
+  },
+  {
+    "question": "What command should be run once for each compiled MATLAB binary before its execution?",
+    "answer": "The command `setrpaths.sh --path [binary_name]` should be executed once for each compiled binary."
+  },
+  {
+    "question": "Where should a compiled MATLAB binary be executed?",
+    "answer": "The compiled binary should be executed within the task script, not on the login nodes, using the `run_mcr_binary.sh` script."
+  },
+  {
+    "question": "Under what conditions is MATLAB Parallel Server most useful?",
+    "answer": "MATLAB Parallel Server is useful if your parallel MATLAB task requires more processes (workers) than the CPU cores available on a single compute node."
+  },
+  {
+    "question": "What is the current limitation regarding submitting MATLAB Parallel Server tasks from a local computer?",
+    "answer": "Due to security improvements in May 2023, submitting tasks from a local computer is no longer possible because MATLAB uses an SSH mode that is not authorized."
+  },
+  {
+    "question": "Is the Slurm plugin procedure for MATLAB Parallel Server currently functional?",
+    "answer": "No, the described procedure for the Slurm plugin is not currently functional due to the unavailability of the extension and the SSH connection issue."
+  }
+]

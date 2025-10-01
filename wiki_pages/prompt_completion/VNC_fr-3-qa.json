@@ -1,54 +1,94 @@
 [
   {
-    "question": "How do you connect to Graham via SSH from your local machine?",
-    "answer": "You can connect by running `ssh graham.alliancecan.ca` on your laptop's terminal."
+    "question": "How do you connect to Graham via SSH?",
+    "answer": "You can connect by running the command `ssh graham.alliancecan.ca` on your laptop."
   },
   {
-    "question": "How can you check if there are active vncservers running?",
-    "answer": "You can list active vncservers by running the command `vncserver -list`."
+    "question": "What is the `vncserver` command based on in the StdEnv/2023 environment?",
+    "answer": "The `vncserver` command in the StdEnv/2023 environment is based on TurboVNC."
   },
   {
-    "question": "How do you terminate unneeded active vncservers?",
-    "answer": "You can kill them by executing `pkill Xvnc -u $USER`."
+    "question": "How can you configure a VNC server to automatically terminate after a period of inactivity?",
+    "answer": "When launching a new vncserver, you can add the option `-idletimeout seconds`. For example, `vncserver -idletimeout 86400`."
   },
   {
-    "question": "What option should be added when launching a new vncserver on a login node to ensure it eventually terminates if idle?",
-    "answer": "Add the `-idletimeout seconds` option, for example, `vncserver -idletimeout 86400`."
+    "question": "What happens the first time you launch `vncserver`?",
+    "answer": "The first time you launch `vncserver`, you will be prompted to create a password to access your desktops."
   },
   {
-    "question": "What is the purpose of the `-idletimeout` option for `vncserver`?",
-    "answer": "It ensures the `vncserver` session will terminate if a specified number of seconds pass without a VNC viewer connection, unless the session is explicitly logged out from the VNC desktop."
+    "question": "Why is a password needed for the VNC server?",
+    "answer": "The password is necessary to establish a remote connection between your desktop and a VNC client (such as vncviewer)."
   },
   {
-    "question": "Is a password required the first time you launch `vncserver`?",
-    "answer": "Yes, you will need to create a password the first time you launch `vncserver`, which will be used for remote connections."
+    "question": "How can you allow multiple VNC connections with the same password?",
+    "answer": "Multiple connections can be established with the same password if `vncserver` was launched with the optional `-alwaysshared` flag."
   },
   {
-    "question": "How can you allow multiple connections to a vncserver?",
-    "answer": "Launch the `vncserver` with the `-alwaysshared` option."
+    "question": "How do you determine the listening port of a new VNC server?",
+    "answer": "You can determine the listening port by checking the VNC server's log file, for example, using `grep -iE \"\\sport|kill\" /home/username/.vnc/gra-login2:2.log`."
   },
   {
-    "question": "How do you identify the port number a new vncserver is listening on?",
-    "answer": "Check the vncserver's log file (e.g., `/home/username/.vnc/gra-login2:2.log`) and look for the line indicating 'Listening for VNC connections on TCP port'."
+    "question": "How do you kill all active VNC servers for the current user on a login node?",
+    "answer": "You can kill all active VNC servers for the current user with the command `pkill Xvnc -u $USER`."
   },
   {
-    "question": "How do you establish an SSH tunnel from your laptop to forward an arbitrary local port to the vncserver port?",
-    "answer": "Use the command `ssh graham.computecanada.ca -L local_port:remote_host:remote_port`, for example, `ssh graham.computecanada.ca -L 5901:gra-login2:5903`."
+    "question": "How should a VNC client connect to a VNC server via an SSH tunnel?",
+    "answer": "When connecting through an SSH tunnel, the VNC client must connect to `localhost:port`."
   },
   {
-    "question": "How do you connect to a VNC server through an SSH tunnel using `vncviewer` on your laptop?",
-    "answer": "Connect to `localhost:local_port`, for example, `vncviewer localhost:5901`."
+    "question": "How do you set up an SSH tunnel from your laptop to a VNC server on a login node?",
+    "answer": "You can set up an SSH tunnel using a command like `ssh graham.computecanada.ca -L 5901:gra-login2:5903`, where 5901 is the local forwarded port and 5903 is the remote VNC server's listening port."
   },
   {
-    "question": "How do macOS or Windows users connect to a VNC server through an SSH tunnel using TigerVNC Viewer?",
-    "answer": "Open the TigerVNC Viewer application and enter `localhost:local_port` (e.g., `localhost:5901`) in the 'Connection Details' field."
+    "question": "How do you connect to a VNC server through a local SSH tunnel using `vncviewer` on Linux?",
+    "answer": "After setting up the SSH tunnel, you connect using `vncviewer localhost:5901` (where 5901 is your local forwarded port)."
   },
   {
-    "question": "What are the resource limits for VNC sessions on Graham's login nodes?",
-    "answer": "On Graham, login nodes have limits of 8GB of memory and 1 hour of CPU usage per process."
+    "question": "How do macOS or Windows users connect to a VNC server via an SSH tunnel using TigerVNC Viewer?",
+    "answer": "Users on macOS or Windows should click on the TigerVNC Viewer application icon and enter `localhost:5901` (or the appropriate forwarded local port) in the 'Connection Details' field."
   },
   {
-    "question": "What should you do if you require more resources than what login nodes provide for VNC sessions?",
-    "answer": "You should launch your VNC server on a compute node or a VDI node instead."
+    "question": "What are the memory and CPU time limits for processes on Graham login nodes?",
+    "answer": "On Graham, processes on login nodes are limited to 8GB of memory and 1 hour of CPU usage per process, according to `ulimit -t -v`."
+  },
+  {
+    "question": "Where should you run your VNC server if you need more resources than a login node offers?",
+    "answer": "If you need more resources than available on a login node, you should launch your VNC server on a compute node or a VDI node."
+  },
+  {
+    "question": "When is it appropriate to start a VNC server on a compute node?",
+    "answer": "You can start a VNC server on a compute node if no VDI node is available, allowing you to connect from your computer via port redirection."
+  },
+  {
+    "question": "What is the first step before starting a VNC server on a compute node?",
+    "answer": "Before starting a VNC server on a compute node, you must first connect to a cluster (e.g., Cedar) and create an allocation on a compute node using the `salloc` command."
+  },
+  {
+    "question": "How do you request an interactive job with specific CPU and memory resources on a cluster for a VNC server?",
+    "answer": "You can use the `salloc` command, for example: `salloc --time=1:00:00 --cpus-per-task=4 --mem=16000 --account=def-username`."
+  },
+  {
+    "question": "What environment variable needs to be set after an interactive job starts on a compute node to avoid repetitive errors?",
+    "answer": "After an interactive job starts, you need to define `XDG_RUNTIME_DIR` by running `export XDG_RUNTIME_DIR=${SLURM_TMPDIR}`."
+  },
+  {
+    "question": "How do you start a VNC server on a compute node?",
+    "answer": "After setting the environment variable, you can start a VNC server on a compute node using the `vncserver` command."
+  },
+  {
+    "question": "How can you verify the current hostname of the compute node you are on?",
+    "answer": "If in doubt about which node you are on, you can use the `hostname` command to verify it."
+  },
+  {
+    "question": "Can the VNC server password be changed after initial setup?",
+    "answer": "Yes, the VNC server password can be changed later using the `vncpasswd` command."
+  },
+  {
+    "question": "What does the output 'New 'cdr768.int.cedar.computecanada.ca:1 (username)' desktop is cdr768.int.cedar.computecanada.ca:1' indicate?",
+    "answer": "This output indicates that a new VNC desktop session has been successfully started on the compute node 'cdr768' with display number ':1' for the specified username."
+  },
+  {
+    "question": "What is the example VNC listening port found in the log file for cdr768?",
+    "answer": "The example shows the VNC server listening for connections on TCP port `5901`."
   }
 ]

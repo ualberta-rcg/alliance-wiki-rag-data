@@ -1,34 +1,34 @@
 [
   {
-    "question": "Why might a newly created VM on a private network not be directly accessible?",
-    "answer": "A VM on a private network is not directly accessible from outside the tenant because it has not been assigned a floating IP."
+    "question": "Why is a VM not directly accessible from outside the tenant without a floating IP?",
+    "answer": "A VM on the private network is not directly accessible from outside the tenant until a floating IP is assigned to it."
   },
   {
-    "question": "What is a jump host or bastion host used for in OpenStack?",
-    "answer": "A jump host (or bastion host) can be used to access VMs on a private network that do not have a floating IP, as they are both on the same private network. This strategy helps conserve floating IPs, which are a limited resource."
+    "question": "What is a 'jump host' or 'bastion host' and when is it useful?",
+    "answer": "A jump host (or bastion host) is another host within the same tenant that has a floating IP, which can be used to access other VMs on the same private network. This strategy is useful for nodes that don't need direct internet access or to preserve limited floating IPs."
   },
   {
-    "question": "How are Floating IPs handled in OpenStack?",
-    "answer": "Floating IPs are not created directly on a VM. Instead, they are first allocated to the project from a pool and then associated with the VM's private network interface."
+    "question": "How are floating IPs handled in OpenStack?",
+    "answer": "Floating IPs are not created directly on a VM; instead, they are allocated to the project from a pool and then associated with the VM\u2019s private network interface."
   },
   {
-    "question": "What Terraform resource is used to declare and allocate a floating IP in OpenStack?",
-    "answer": "The `openstack_networking_floatingip_v2` resource is used to declare and allocate a floating IP. You need to specify the `pool` from which to allocate it, such as `ext_net`."
+    "question": "How do you declare a floating IP resource in Terraform for OpenStack?",
+    "answer": "To declare a floating IP resource in Terraform, use `resource \"openstack_networking_floatingip_v2\"` and specify the `pool` attribute, such as `pool = \"ext_net\"`."
   },
   {
-    "question": "How do you allocate a floating IP using Terraform?",
-    "answer": "To allocate a floating IP, you define an `openstack_networking_floatingip_v2` resource in your Terraform configuration, specifying the `pool` (e.g., `pool = \"ext_net\"`), and then run `terraform apply`."
+    "question": "What is the next step after allocating a floating IP in Terraform if you want to use it with a VM?",
+    "answer": "After a floating IP is allocated, it needs to be associated with a VM by declaring an `openstack_compute_floatingip_associate_v2` resource."
   },
   {
-    "question": "What Terraform resource is used to associate an allocated floating IP with a VM?",
-    "answer": "The `openstack_compute_floatingip_associate_v2` resource is used to associate an allocated floating IP with a VM."
-  },
-  {
-    "question": "How do you associate a floating IP with a VM using Terraform?",
-    "answer": "To associate a floating IP with a VM, you define an `openstack_compute_floatingip_associate_v2` resource, setting `floating_ip` to the address attribute of the allocated floating IP resource (e.g., `openstack_networking_floatingip_v2.myvm_fip.address`) and `instance_id` to the ID of the VM instance (e.g., `openstack_compute_instance_v2.myvm.id`), then run `terraform apply`."
+    "question": "How do you associate an allocated floating IP with a VM using Terraform?",
+    "answer": "You associate an allocated floating IP with a VM by creating an `openstack_compute_floatingip_associate_v2` resource, referencing the floating IP's address and the VM's instance ID, for example: `floating_ip = openstack_networking_floatingip_v2.myvm_fip.address` and `instance_id = openstack_compute_instance_v2.myvm.id`."
   },
   {
     "question": "What is the typical syntax for referencing attributes of other resources in Terraform?",
-    "answer": "References to other resources and their attributes typically follow the syntax: `<resource type>.<resource name>.<attribute>`."
+    "answer": "References to other resources and their attributes typically use the syntax `<resource type>.<resource name>.<attribute>`."
+  },
+  {
+    "question": "What should you do if you cannot SSH into your VM even after assigning a floating IP?",
+    "answer": "If SSH access fails after assigning a floating IP, it may be necessary to add your workstation's IP address to the project's default security group."
   }
 ]

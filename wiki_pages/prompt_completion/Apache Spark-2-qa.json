@@ -1,0 +1,78 @@
+[
+  {
+    "question": "Qu'est-ce qu'Apache Spark ?",
+    "answer": "Apache Spark est une framework de calcul distribu\u00e9e open source, initialement d\u00e9velopp\u00e9e par l'AMPLab de l'Universit\u00e9 Berkeley, et maintenant un projet de la fondation Apache."
+  },
+  {
+    "question": "Comment Apache Spark se compare-t-il \u00e0 Hadoop MapReduce en termes de performances ?",
+    "answer": "Contrairement \u00e0 l'algorithme MapReduce impl\u00e9ment\u00e9 par Hadoop qui utilise le stockage sur disque, Spark utilise des primitives conserv\u00e9es en m\u00e9moire, lui permettant d'atteindre des performances jusqu'\u00e0 100 fois plus rapides pour certaines applications."
+  },
+  {
+    "question": "Pourquoi Spark est-il particuli\u00e8rement adapt\u00e9 \u00e0 l'apprentissage automatique et \u00e0 l'analyse de donn\u00e9es interactive ?",
+    "answer": "Le chargement des donn\u00e9es en m\u00e9moire permet de les interroger fr\u00e9quemment, ce qui fait de Spark une framework particuli\u00e8rement appropri\u00e9 pour l'apprentissage automatique et l'analyse de donn\u00e9es interactive."
+  },
+  {
+    "question": "Quels modules sont charg\u00e9s avant d'ex\u00e9cuter un script PySpark ?",
+    "answer": "Les modules 'spark/2.3.0' et 'python/3.7' sont charg\u00e9s."
+  },
+  {
+    "question": "Comment est d\u00e9marr\u00e9 le ma\u00eetre Spark dans le script PySpark d'exemple ?",
+    "answer": "Le ma\u00eetre Spark est d\u00e9marr\u00e9 avec la commande `start-master.sh`."
+  },
+  {
+    "question": "Comment l'URL du ma\u00eetre Spark est-elle r\u00e9cup\u00e9r\u00e9e dans le script PySpark ?",
+    "answer": "L'URL du ma\u00eetre est r\u00e9cup\u00e9r\u00e9e en utilisant `grep -Po '(?=spark://).*' $SPARK_LOG_DIR/spark-${SPARK_IDENT_STRING}-org.apache.spark.deploy.master*.out`."
+  },
+  {
+    "question": "Comment les workers Spark sont-ils lanc\u00e9s dans le script PySpark d'exemple ?",
+    "answer": "Les workers sont lanc\u00e9s avec `srun -n ${NWORKERS} -N ${NWORKERS} --label --output=$SPARK_LOG_DIR/spark-%j-workers.out start-slave.sh -m ${SLURM_SPARK_MEM}M -c ${SLURM_CPUS_PER_TASK} ${MASTER_URL} &`."
+  },
+  {
+    "question": "Quel exemple de programme Python est ex\u00e9cut\u00e9 dans le script PySpark ?",
+    "answer": "Le programme `pi.py` situ\u00e9 dans `$SPARK_HOME/examples/src/main/python/` est ex\u00e9cut\u00e9."
+  },
+  {
+    "question": "Comment sont arr\u00eat\u00e9s les workers et le ma\u00eetre Spark apr\u00e8s l'ex\u00e9cution du programme PySpark ?",
+    "answer": "Les workers sont arr\u00eat\u00e9s avec `kill $slaves_pid` et le ma\u00eetre avec `stop-master.sh`."
+  },
+  {
+    "question": "Quel module est charg\u00e9 pour l'ex\u00e9cution d'un Java Jar avec Spark ?",
+    "answer": "Le module 'spark/2.3.0' est charg\u00e9."
+  },
+  {
+    "question": "Quels sont les noms de classe des exemples Java ex\u00e9cut\u00e9s dans le script `pyspark_java_submit.sh` ?",
+    "answer": "Les exemples ex\u00e9cut\u00e9s sont `org.apache.spark.examples.SparkPi` et `org.apache.spark.examples.SparkLR`."
+  },
+  {
+    "question": "Quel est le but de la section 'Monitoring' ?",
+    "answer": "La section 'Monitoring' explique comment sauvegarder et consulter les journaux d'activit\u00e9s des applications Spark \u00e0 l'aide d'une application web fournie avec Spark."
+  },
+  {
+    "question": "Quelle est la premi\u00e8re \u00e9tape de configuration pour activer le monitoring de Spark ?",
+    "answer": "Cr\u00e9er un r\u00e9pertoire qui contiendra les journaux d'application avec la commande `mkdir ~/.spark/<spark version>/eventlog`."
+  },
+  {
+    "question": "Quel r\u00e9pertoire doit contenir les param\u00e8tres de configuration de Spark pour le monitoring ?",
+    "answer": "Le r\u00e9pertoire `~/.spark/<spark version>/conf` doit contenir les param\u00e8tres de configuration."
+  },
+  {
+    "question": "Quelles sont les configurations \u00e0 ajouter au fichier `spark-defaults.conf` pour activer la journalisation des \u00e9v\u00e9nements ?",
+    "answer": "Les configurations sont:\n`spark.eventLog.enabled true`\n`spark.eventLog.dir /home/<userid>/.spark/<spark version>/eventlog`\n`spark.history.fs.logDirectory  /home/<userid>/.spark/<spark version>/eventlog`"
+  },
+  {
+    "question": "Quelle est la premi\u00e8re \u00e9tape pour visualiser les journaux Spark apr\u00e8s configuration ?",
+    "answer": "Cr\u00e9er un tunnel SSH entre votre ordinateur et la grappe de calcul."
+  },
+  {
+    "question": "Comment lancer l'application web de visualisation des journaux Spark ?",
+    "answer": "Il faut charger le module Spark (`module load spark/2.3.0`) puis lancer l'application avec `SPARK_NO_DAEMONIZE=1 start-history-server.sh`."
+  },
+  {
+    "question": "Sur quel port l'application web du HistoryServer de Spark d\u00e9marre-t-elle habituellement ?",
+    "answer": "L'application web du HistoryServer d\u00e9marre habituellement sur le port 18080."
+  },
+  {
+    "question": "Comment arr\u00eater l'application de visualisation des journaux Spark (HistoryServer) ?",
+    "answer": "Pour stopper l'application de visualisation, il faut entrer la combinaison de touches Ctrl-C dans le terminal ayant servi \u00e0 la lancer."
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "question": "How do you enable the software environment in your session once the CVMFS repository is mounted?",
+    "answer": "You run the bash script `/cvmfs/soft.computecanada.ca/config/profile/bash.sh`."
+  },
+  {
+    "question": "How can you configure the software environment to mimic a specific cluster, such as 'rorqual'?",
+    "answer": "You can define the environment variable `CC_CLUSTER` to `rorqual` (e.g., `export CC_CLUSTER=rorqual`) before sourcing the bash script `/cvmfs/soft.computecanada.ca/config/profile/bash.sh`."
+  },
+  {
+    "question": "Why might the software environment script not run for users with an ID below 1000?",
+    "answer": "It's a safeguard, as the environment is not intended for privileged operations, and the script will not run if your user ID is below 1000."
+  },
+  {
+    "question": "How can a user with an ID below 1000 bypass the safeguard and force the environment to enable?",
+    "answer": "They can define the environment variable `FORCE_CC_CVMFS=1` (e.g., `export FORCE_CC_CVMFS=1`) or create an empty file named `$HOME/.force_cc_cvmfs` in their home directory."
+  },
+  {
+    "question": "What is the method to prevent the software environment from being enabled in a specific account?",
+    "answer": "You can define the environment variable `SKIP_CC_CVMFS=1` or create the file `$HOME/.skip_cc_cvmfs` in your home folder."
+  },
+  {
+    "question": "How can users customize the default behavior of the software environment?",
+    "answer": "Users can control the default behavior by defining specific environment variables prior to enabling the environment."
+  },
+  {
+    "question": "What is the purpose of the `CC_CLUSTER` environment variable?",
+    "answer": "The `CC_CLUSTER` variable identifies a cluster, sends information to system logs, and defines behavior related to licensed software. Its default value is `computecanada`."
+  },
+  {
+    "question": "How is the `RSNT_ARCH` environment variable used?",
+    "answer": "It is used to identify the set of CPU instructions supported by the system, automatically detected from `/proc/cpuinfo` by default. Supported values include `sse3`, `avx`, `avx2`, or `avx512`."
+  },
+  {
+    "question": "What information does the `RSNT_INTERCONNECT` environment variable convey?",
+    "answer": "It identifies the type of interconnect supported by the system (e.g., `omnipath`, `infiniband`, `ethernet`) and triggers different options for OpenMPI's transport protocol."
+  },
+  {
+    "question": "How does `RSNT_CUDA_DRIVER_VERSION` influence CUDA module visibility?",
+    "answer": "This environment variable hides or shows specific CUDA modules based on the required NVIDIA driver version. If undefined, it's detected from `/usr/lib64/nvidia`. Defining it as `0.0` will hide all CUDA versions."
+  },
+  {
+    "question": "What is the function of the `RSNT_LOCAL_MODULEPATHS` environment variable?",
+    "answer": "It allows defining locations for local hierarchical module trees, installed via EasyBuild, so they are automatically meshed into the central module tree."
+  },
+  {
+    "question": "How do you add a local path to a flat module tree with higher priority than the central module tree?",
+    "answer": "You should add the command `module use --priority 1 /path/to/your/flat/module/tree` after sourcing the environment scripts."
+  },
+  {
+    "question": "What does the `LMOD_SYSTEM_DEFAULT_MODULES` environment variable control?",
+    "answer": "It defines which modules are loaded by default. If left undefined, the environment loads the `StdEnv` module, which includes a default Intel compiler and OpenMPI version."
+  },
+  {
+    "question": "How can a user define custom default versions and aliases for modules using Lmod?",
+    "answer": "They can define their own `modulerc` file and add it to the `MODULERCFILE` environment variable, which will take precedence over the environment's defaults."
+  },
+  {
+    "question": "Which system paths are automatically included in the default `MODULEPATH` if they exist?",
+    "answer": "The paths `/opt/software/modulefiles` and `$HOME/modulefiles` are automatically added to the default `MODULEPATH`."
+  },
+  {
+    "question": "What system paths are automatically added to the default `PATH`?",
+    "answer": "The paths `/opt/software/slurm/bin`, `/opt/software/bin`, and `/opt/slurm/bin` are automatically added to the default `PATH`."
+  },
+  {
+    "question": "What is the process for installing additional software modules locally so they are discovered by the central hierarchy?",
+    "answer": "First, identify and create a path (e.g., `/opt/software/easybuild`), then export `RSNT_LOCAL_MODULEPATHS` (e.g., `export RSNT_LOCAL_MODULEPATHS=/opt/software/easybuild/modules`), and finally install software using EasyBuild with `eb --installpath /opt/software/easybuild <some easyconfig recipe>`."
+  },
+  {
+    "question": "Why is it advised that system administrators avoid depending on the software environment during privileged operations?",
+    "answer": "Depending on the environment during operations like CVMFS updates or YUM installations can lead to deadlocks or hangs if CVMFS access is temporarily interrupted or dependencies become unavailable."
+  },
+  {
+    "question": "Are commercial software packages like Intel and Portland Group compilers fully available for compilation through this environment externally?",
+    "answer": "No, only the redistributable parts (shared objects) are available, which are sufficient to run software but not to compile new software."
+  },
+  {
+    "question": "Where does the software environment expect to find NVIDIA driver libraries for CUDA-enabled packages?",
+    "answer": "The software environment relies on having driver libraries installed in the path `/usr/lib64/nvidia`."
+  },
+  {
+    "question": "What should be done if NVIDIA drivers install libraries in `/usr/lib64` instead of the expected `/usr/lib64/nvidia`?",
+    "answer": "It is recommended to create symbolic links in `/usr/lib64/nvidia` pointing to the actual installed NVIDIA libraries in `/usr/lib64`."
+  },
+  {
+    "question": "Is it advisable to define `LD_LIBRARY_PATH` when using this software environment?",
+    "answer": "No, it is not recommended, as the environment is designed to use RUNPATH, and defining `LD_LIBRARY_PATH` can cause the environment to malfunction."
+  },
+  {
+    "question": "Why might binary packages like Anaconda encounter issues finding libraries in this software environment?",
+    "answer": "Because `LD_LIBRARY_PATH` is not defined, and our libraries are not installed in the default Linux locations that binary packages typically expect."
+  },
+  {
+    "question": "What local installation is necessary for some applications to work correctly with this environment?",
+    "answer": "`dbus` needs to be installed locally on the host operating system for some applications."
+  }
+]

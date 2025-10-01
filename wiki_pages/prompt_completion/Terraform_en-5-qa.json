@@ -1,58 +1,46 @@
 [
   {
     "question": "How do you allocate a floating IP in Terraform for OpenStack?",
-    "answer": "You define a `resource \"openstack_networking_floatingip_v2\"` block, specifying the `pool` from which to allocate, like `pool = \"provider-199-2\"`. Then run `terraform apply`."
+    "answer": "You declare an `openstack_networking_floatingip_v2` resource, specifying the `pool` from which to allocate the IP, for example, `pool = \"ext_net\"`."
   },
   {
-    "question": "What is the Terraform definition for allocating a floating IP from the \"provider-199-2\" pool?",
-    "answer": "resource \"openstack_networking_floatingip_v2\" \"myvm_fip\" {\n  pool = \"provider-199-2\"\n}"
+    "question": "What Terraform resource is used to allocate a floating IP from an OpenStack pool?",
+    "answer": "The `openstack_networking_floatingip_v2` resource is used to allocate a floating IP from a specified pool in OpenStack."
   },
   {
-    "question": "How do you associate an allocated floating IP with a VM in Terraform?",
-    "answer": "You define a `resource \"openstack_compute_floatingip_associate_v2\"` block, using `floating_ip = openstack_networking_floatingip_v2.myvm_fip.address` and `instance_id = openstack_compute_instance_v2.myvm.id` to reference the allocated floating IP and the VM instance."
+    "question": "After allocating a floating IP, how do you associate it with an existing OpenStack VM using Terraform?",
+    "answer": "You define an `openstack_compute_floatingip_associate_v2` resource. In this resource, set `floating_ip` to reference the `address` attribute of the allocated floating IP (e.g., `openstack_networking_floatingip_v2.myvm_fip.address`), and `instance_id` to reference the `id` of the VM instance (e.g., `openstack_compute_instance_v2.myvm.id`)."
   },
   {
-    "question": "What is the general syntax for referencing attributes of other resources in Terraform?",
-    "answer": "References are typically formatted as `<resource type>.<resource name>.<attribute>`."
+    "question": "What is the typical syntax for referencing attributes of other resources in Terraform configurations?",
+    "answer": "References are typically structured as `<resource type>.<resource name>.<attribute>`."
   },
   {
-    "question": "What happens immediately after `terraform apply` allocates a floating IP but before it's associated with a VM?",
-    "answer": "The floating IP is allocated to the project but not yet associated with the VM."
+    "question": "What is a critical consideration when adding a root volume to a VM using Terraform?",
+    "answer": "Adding a root volume to a VM is a destructive operation that will replace its boot disk, meaning existing VMs might need to be rebuilt. It is crucial to read Terraform plans carefully before applying changes to avoid surprises."
   },
   {
-    "question": "How can you attempt to connect to a new VM via SSH after adding a floating IP?",
-    "answer": "You can use the command `ssh centos@X.Y.Z.W hostname`, replacing `X.Y.Z.W` with the floating IP address."
+    "question": "How is a root volume defined as part of an OpenStack compute instance in Terraform?",
+    "answer": "A root volume is defined using a `block_device` subblock within the `openstack_compute_instance_v2` resource. Key attributes include `uuid` (of the image), `source_type`, `destination_type` (set to \"volume\"), `volume_size`, `boot_index`, and `delete_on_termination`."
   },
   {
-    "question": "What should be done if you cannot SSH into your new VM even after associating a floating IP?",
-    "answer": "It may be necessary to add your workstation's IP address to the project's default security group."
+    "question": "What specific attribute should be removed from the outer compute instance definition when using a `block_device` subblock to define a root volume?",
+    "answer": "The `image_id` attribute should be removed from the outer compute instance definition."
   },
   {
-    "question": "How do you add a root volume to an OpenStack VM using Terraform configuration?",
-    "answer": "A root volume is added as a `block_device` sub-block within the `openstack_compute_instance_v2` resource definition, alongside other sub-blocks like `network`."
+    "question": "Why is it important to remove the `image_id` attribute from the main compute instance definition when booting from a volume via `block_device`?",
+    "answer": "If the `image_id` attribute remains in the outer definition, Terraform might repeatedly detect a change from 'boot from volume' to 'boot directly from image' on subsequent runs, causing it to attempt to rebuild your instance every time."
   },
   {
-    "question": "What specific attributes are required in a `block_device` sub-block to create a root volume from an image?",
-    "answer": "Required attributes include `uuid` (of the image), `source_type = \"image\"`, `destination_type = \"volume\"`, `volume_size`, `boot_index = 0`, and `delete_on_termination`."
+    "question": "What does setting `destination_type = \"volume\"` in a `block_device` configuration imply?",
+    "answer": "Setting `destination_type = \"volume\"` indicates that the boot disk will be stored with an OpenStack-provided volume rather than directly using disk space on the hypervisor."
   },
   {
-    "question": "Why is adding a root volume to an existing VM considered a destructive operation in Terraform?",
-    "answer": "Because it replaces the VM's boot disk, leading Terraform to destroy and then recreate the associated resources."
+    "question": "What is the recommended setting for `delete_on_termination` when defining a volume for an OpenStack VM, and why?",
+    "answer": "For testing, `delete_on_termination` should probably be `true` to ensure volumes are cleaned up automatically. For real use, it should be considered `false` as a last defense against accidental deletion of resources."
   },
   {
-    "question": "What is the purpose of the `delete_on_termination` attribute in a `block_device` configuration?",
-    "answer": "Setting `delete_on_termination` to `true` (for testing) ensures the volume is cleaned up when the VM is destroyed, while `false` (for real use) acts as a defense against accidental deletion of resources."
-  },
-  {
-    "question": "What problem arises if `image_id` is left in the outer `openstack_compute_instance_v2` block when a `block_device` sub-block is also defined for booting from a volume?",
-    "answer": "Terraform will detect a change from \"boot from volume\" to \"boot directly from image\" on every run, causing it to continuously attempt to rebuild the instance."
-  },
-  {
-    "question": "How does a Terraform plan indicate that a resource will be destroyed and recreated?",
-    "answer": "The plan uses the symbol `-/?` followed by \"destroy and then create replacement\" next to the resource."
-  },
-  {
-    "question": "What does `destination_type = \"volume\"` signify in a `block_device` configuration?",
-    "answer": "It indicates that the boot disk should be stored with an OpenStack-provided volume rather than directly using disk space on the hypervisor."
+    "question": "What post-creation steps are necessary after a VM is rebuilt by Terraform (e.g., due to adding a root volume)?",
+    "answer": "After a rebuild, the VM will have a new SSH key, so you'll need to remove the old SSH key from your workstation's `known_hosts` file. Additionally, it's recommended to log into the VM and apply all available operating system updates (e.g., `sudo yum update -y`)."
   }
 ]

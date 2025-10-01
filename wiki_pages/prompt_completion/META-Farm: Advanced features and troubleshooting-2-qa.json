@@ -1,0 +1,106 @@
+[
+  {
+    "question": "How does the `submit.run` command's positive integer argument change in WHOLE_NODE mode?",
+    "answer": "In WHOLE_NODE mode, a positive integer argument for `submit.run` represents the number of whole nodes to be used in META mode, rather than the number of meta-jobs."
+  },
+  {
+    "question": "What happens if `submit.run 2` is executed when WHOLE_NODE mode is enabled?",
+    "answer": "If `submit.run 2` is executed with WHOLE_NODE mode enabled, it will allocate 2 whole nodes to run up to 384 concurrent serial tasks (192 tasks per node) in META mode, with tasks executed as separate threads."
+  },
+  {
+    "question": "Does the `-1` argument for `submit.run` change its meaning in WHOLE_NODE mode?",
+    "answer": "No, the `-1` argument for `submit.run` retains its original meaning, which is to run the farm using SIMPLE mode."
+  },
+  {
+    "question": "How is the number of actual whole node jobs calculated in WHOLE_NODE mode?",
+    "answer": "The number of actual whole node jobs is calculated by dividing the `Number_of_cases` by `NWHOLE`."
+  },
+  {
+    "question": "What is required for automatic job resubmission and post-processing features to work on Trillium in WHOLE_NODE mode?",
+    "answer": "To enable automatic job resubmission and post-processing features on Trillium, the line `module load StdEnv` must be added to the end of your `~/.bashrc` file."
+  },
+  {
+    "question": "What type of farming is WHOLE_NODE mode limited to?",
+    "answer": "WHOLE_NODE mode can only be used for serial farming; it does not support multi-threaded, MPI, or GPU farming."
+  },
+  {
+    "question": "Can WHOLE_NODE mode be used on clusters other than Trillium?",
+    "answer": "Yes, WHOLE_NODE mode can be used on other clusters, especially when the queue wait time for whole node jobs is shorter than for serial jobs."
+  },
+  {
+    "question": "How do you obtain the META-Farm package if it's not installed as a module on a cluster?",
+    "answer": "You can clone the package from its git repository using the command: `git clone https://git.computecanada.ca/syam/meta-farm.git`."
+  },
+  {
+    "question": "After cloning the META-Farm git repository, how do you set up your environment to use the package?",
+    "answer": "You need to modify your `$PATH` variable to include the `bin` subdirectory of the `meta-farm` directory, for example: `export PATH=~/meta-farm/bin:$PATH`."
+  },
+  {
+    "question": "How can additional `sbatch` arguments be passed to META farm jobs?",
+    "answer": "Additional `sbatch` arguments can be added as separate `#SBATCH` lines within the `job_script.sh` file, or appended to the `submit.run` or `resubmit.run` command."
+  },
+  {
+    "question": "What is an alternative method for passing `sbatch` arguments to META farm jobs?",
+    "answer": "Alternatively, `sbatch` arguments can be appended to the `submit.run` or `resubmit.run` command line, such as `submit.run -1 --mem 4G`."
+  },
+  {
+    "question": "What lines should be added to `job_script.sh` for multi-threaded applications using OpenMP?",
+    "answer": "For multi-threaded applications, add `#SBATCH --cpus-per-task=N`, `#SBATCH --mem=M`, and `export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK` to `job_script.sh`, where N is the number of CPU cores and M is the total memory in megabytes."
+  },
+  {
+    "question": "Can `cpus-per-task` and `mem` be specified as arguments for multi-threaded applications when submitting a job?",
+    "answer": "Yes, `--cpus-per-task=N` and `--mem=M` can be supplied as arguments to `(re)submit.run` for multi-threaded applications."
+  },
+  {
+    "question": "What `SBATCH` directives are needed in `job_script.sh` for MPI applications?",
+    "answer": "For MPI applications, add `#SBATCH --ntasks=N` and `#SBATCH --mem-per-cpu=M` to `job_script.sh`, where N is the number of CPU cores to use, and M is the memory to reserve for each core in megabytes."
+  },
+  {
+    "question": "Can `ntasks` and `mem-per-cpu` be provided as arguments to `submit.run` for MPI jobs?",
+    "answer": "Yes, `--ntasks=N` and `--mem-per-cpu=M` can be supplied as arguments to `(re)submit.run` for MPI applications."
+  },
+  {
+    "question": "How should `single_case.sh` be modified to run MPI applications?",
+    "answer": "Add `srun` before the path to your code in `single_case.sh`, for example: `srun $COMM`."
+  },
+  {
+    "question": "What is an alternative way to run MPI applications by modifying `table.dat`?",
+    "answer": "Alternatively, you can prepend `srun` to each line of your `table.dat` file, like `srun /path/to/mpi_code arg1 arg2`."
+  },
+  {
+    "question": "How do you configure `job_script.sh` for applications using GPUs?",
+    "answer": "For GPU applications, modify `job_script.sh` by adding `#SBATCH --gres=gpu[[:type]:number]` based on the guidance for using GPUs with Slurm."
+  },
+  {
+    "question": "What utility can be used in `job_script.sh` to check GPU availability before running tasks?",
+    "answer": "The `~/bin/gpu_test` utility can be copied and added to `job_script.sh` before the `task.run` line to detect if a GPU is unavailable, preventing job failures."
+  },
+  {
+    "question": "What environment does META package jobs inherit?",
+    "answer": "All jobs generated by the META package inherit the environment, including loaded modules and environment variables, that was present when `submit.run` or `resubmit.run` was executed."
+  },
+  {
+    "question": "How should the `--export` switch be used when passing environment variables to META farm jobs?",
+    "answer": "If using the `--export` switch, ensure that `ALL` is included in its arguments, for example, `--export=ALL,X=1,Y=2`."
+  },
+  {
+    "question": "How can custom environment variables be passed to all META farm jobs without using `--export`?",
+    "answer": "Custom environment variables can be set directly on the command line when invoking `submit.run`, like `VAR1=1 VAR2=5 VAR3=3.1416 submit.run ...`."
+  },
+  {
+    "question": "How should `table.dat` be structured for an application (`fcode`) that reads unique numbered input files (`data.X`) from a specific directory?",
+    "answer": "For such an application, `table.dat` should list each case with its input file, such as `fcode < /home/user/IC/data.1`, `fcode < /home/user/IC/data.2`, and so on."
+  },
+  {
+    "question": "What is a shell command example to generate `table.dat` for 100 cases with numbered input files?",
+    "answer": "A shell loop can generate `table.dat` like this: `for ((i=1; i<=100; i++)); do echo \"fcode < /home/user/IC/data.$i\"; done >table.dat`."
+  },
+  {
+    "question": "How should `table.dat` be formatted for applications that require input from a file with a specific, unchangeable name (e.g., `INPUT`)?",
+    "answer": "For such applications, `table.dat` should repeatedly list only the application name, like `/path/to/code`, assuming each case runs in its own subdirectory with the correctly named input file."
+  },
+  {
+    "question": "What modification is needed in `single_case.sh` when an application expects an input file with a fixed name?",
+    "answer": "In `single_case.sh`, you need to add a line to copy the specific input file for each case into its subdirectory with the prescribed name, for example: `cp /path/to/data.$ID INPUT`."
+  }
+]

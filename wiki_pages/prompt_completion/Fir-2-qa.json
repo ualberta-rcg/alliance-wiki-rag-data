@@ -1,0 +1,182 @@
+[
+  {
+    "question": "What processors are used in the CPU nodes?",
+    "answer": "Each CPU node features 2 \u00d7 AMD EPYC 9655 (Zen 5) @ 2.7 GHz processors."
+  },
+  {
+    "question": "How many physical cores does a CPU node have in total?",
+    "answer": "Each CPU node has a total of 192 physical cores."
+  },
+  {
+    "question": "What kind of architecture are the CPU nodes built on?",
+    "answer": "The CPU nodes are built on a chiplet-based NUMA architecture, where each chiplet (CCD) operates as a separate NUMA node."
+  },
+  {
+    "question": "How many sockets are present in a CPU node?",
+    "answer": "A CPU node has 2 sockets."
+  },
+  {
+    "question": "How many cores are in each socket of a CPU node?",
+    "answer": "Each socket in a CPU node contains 96 cores."
+  },
+  {
+    "question": "How many CCDs (chiplets) are in each socket of a CPU node?",
+    "answer": "Each socket of a CPU node contains 12 CCDs (chiplets)."
+  },
+  {
+    "question": "How many cores are in each CCD of a CPU node?",
+    "answer": "Each CCD in a CPU node contains 8 cores."
+  },
+  {
+    "question": "What is the size of the shared L3 cache per CCD in a CPU node?",
+    "answer": "Each CCD in a CPU node has 32 MiB of shared L3 cache."
+  },
+  {
+    "question": "What are the L1 instruction and data cache sizes per core in a CPU node?",
+    "answer": "Each core in a CPU node has 32+32 KiB L1 instruction/data cache."
+  },
+  {
+    "question": "How many DDR5 memory channels are present in a CPU node?",
+    "answer": "A CPU node has 12 DDR5 memory channels, shared via the I/O die."
+  },
+  {
+    "question": "What is the total number of NUMA nodes per CPU node?",
+    "answer": "There are 24 NUMA nodes per CPU node (12 per socket \u00d7 2)."
+  },
+  {
+    "question": "What is the total L3 cache available in a CPU node?",
+    "answer": "A CPU node has a total of 768 MiB L3 cache."
+  },
+  {
+    "question": "What is the first performance tuning recommendation for CPU nodes?",
+    "answer": "The first recommendation is to align tasks to CCDs (NUMA Domains) to avoid inter-chiplet communication latency."
+  },
+  {
+    "question": "Which Slurm option is recommended to align tasks to CCDs on CPU nodes?",
+    "answer": "Use `#SBATCH --cpus-per-task=8` to ensure that threads of each task stay within a single CCD."
+  },
+  {
+    "question": "What is the second performance tuning recommendation for CPU nodes?",
+    "answer": "The second recommendation is to distribute tasks across NUMA nodes to fully utilize all CCDs without overloading any single NUMA node."
+  },
+  {
+    "question": "Which Slurm option is recommended to distribute tasks across NUMA nodes on CPU nodes?",
+    "answer": "Use `#SBATCH --ntasks-per-node=24` to distribute tasks across NUMA nodes."
+  },
+  {
+    "question": "What Slurm options should be used together to fully utilize a 192-core CPU node?",
+    "answer": "To fully utilize a 192-core node cleanly, use `#SBATCH --ntasks-per-node=24` together with `#SBATCH --cpus-per-task=8`."
+  },
+  {
+    "question": "What processor is used in the GPU nodes?",
+    "answer": "Each GPU node contains 1 \u00d7 AMD EPYC 9454 (Zen 4) @ 2.75 GHz processor."
+  },
+  {
+    "question": "How many physical cores does a GPU node have?",
+    "answer": "A GPU node has 48 physical cores."
+  },
+  {
+    "question": "What NUMA mode do GPU nodes use and why?",
+    "answer": "GPU nodes use the NPS=4 mode (NUMA Per Socket), which divides the socket into four NUMA nodes for better memory locality."
+  },
+  {
+    "question": "How many sockets are configured in a GPU node?",
+    "answer": "A GPU node has 1 socket."
+  },
+  {
+    "question": "How many CCDs (Core Complex Dies) are in a GPU node's socket?",
+    "answer": "A GPU node's socket is configured as 6 CCDs (Core Complex Dies)."
+  },
+  {
+    "question": "What does each CCD in a GPU node contain?",
+    "answer": "Each CCD in a GPU node contains 8 cores and 32 MiB of shared L3 cache."
+  },
+  {
+    "question": "What are the L1 and L2 cache sizes per core in a GPU node?",
+    "answer": "Each core has 1 MiB L2 cache, 32 KiB L1 instruction cache, and 32 KiB L1 data cache."
+  },
+  {
+    "question": "How many memory channels does each NUMA node have when NPS=4 is used on GPU nodes?",
+    "answer": "Each NUMA node has 3 memory channels."
+  },
+  {
+    "question": "How many cores does each NUMA node have when NPS=4 is used on GPU nodes?",
+    "answer": "Each NUMA node has 12 cores (1.5 CCDs per node)."
+  },
+  {
+    "question": "How many NVidia H100 80GB accelerators are on a GPU node?",
+    "answer": "A GPU node contains 2 NVidia H100 80GB accelerators."
+  },
+  {
+    "question": "How are the accelerators on a GPU node interconnected?",
+    "answer": "The 4 node accelerators are interconnected by SXM5."
+  },
+  {
+    "question": "What is the primary goal of binding threads to CCDs for performance tuning on GPU nodes?",
+    "answer": "Binding threads to CCDs helps to keep threads within a CCD, reducing cross-CCD latency and improving cache usage."
+  },
+  {
+    "question": "What Slurm option is used to bind threads to CCDs on GPU nodes?",
+    "answer": "To keep threads within a CCD on GPU nodes, use `#SBATCH --cpus-per-task=8`."
+  },
+  {
+    "question": "What is the recommendation for matching tasks to NUMA nodes on GPU nodes for optimal performance?",
+    "answer": "Launch 4 tasks per node (or a multiple thereof) for best performance, ensuring each task stays within a NUMA domain and has local access to memory and the GPU."
+  },
+  {
+    "question": "What Slurm options are used to match tasks to NUMA nodes on GPU nodes?",
+    "answer": "Use `#SBATCH --ntasks-per-node=4` and `#SBATCH --cpus-per-task=12`."
+  },
+  {
+    "question": "How do you request one full H100-80gb GPU using Slurm?",
+    "answer": "To request one H100-80gb GPU, use the Slurm option `--gpus=h100:1`."
+  },
+  {
+    "question": "What Slurm option requests two H100-80gb GPUs per node?",
+    "answer": "To request two H100-80gb GPUs per node, use `--gpus-per-node=h100:2`."
+  },
+  {
+    "question": "What Slurm option requests three H100-80gb GPUs per node?",
+    "answer": "To request three H100-80gb GPUs per node, use `--gpus-per-node=h100:3`."
+  },
+  {
+    "question": "What Slurm option requests four H100-80gb GPUs per node?",
+    "answer": "To request four H100-80gb GPUs per node, use `--gpus-per-node=h100:4`."
+  },
+  {
+    "question": "How do you request multiple full H100 GPUs spread anywhere?",
+    "answer": "To request multiple full H100 GPUs spread anywhere, use `--gpus=h100:n`, replacing 'n' with the number of GPUs you want."
+  },
+  {
+    "question": "What technology is configured on approximately half of the GPU nodes?",
+    "answer": "Approximately half of the GPU nodes are configured with MIG technology."
+  },
+  {
+    "question": "What are the three available GPU instance sizes?",
+    "answer": "The three available GPU instance sizes are 1g.10gb, 2g.20gb, and 3g.40gb."
+  },
+  {
+    "question": "What are the specifications of a 1g.10gb GPU instance?",
+    "answer": "A 1g.10gb GPU instance provides 1/8th of the computing power with 10GB GPU memory."
+  },
+  {
+    "question": "What are the specifications of a 2g.20gb GPU instance?",
+    "answer": "A 2g.20gb GPU instance provides 2/8th of the computing power with 20GB GPU memory."
+  },
+  {
+    "question": "What are the specifications of a 3g.40gb GPU instance?",
+    "answer": "A 3g.40gb GPU instance provides 3/8th of the computing power with 40GB GPU memory."
+  },
+  {
+    "question": "Which Slurm option is used to request one 1g.10gb GPU instance?",
+    "answer": "To request one 1g.10gb GPU instance, use `--gpus=nvidia_h100_80gb_hbm3_1g.10gb:1`."
+  },
+  {
+    "question": "Which Slurm option is used to request one 2g.20gb GPU instance?",
+    "answer": "To request one 2g.20gb GPU instance, use `--gpus=nvidia_h100_80gb_hbm3_2g.20gb:1`."
+  },
+  {
+    "question": "Which Slurm option is used to request one 3g.40gb GPU instance?",
+    "answer": "To request one 3g.40gb GPU instance, use `--gpus=nvidia_h100_80gb_hbm3_3g.40gb:1`."
+  }
+]

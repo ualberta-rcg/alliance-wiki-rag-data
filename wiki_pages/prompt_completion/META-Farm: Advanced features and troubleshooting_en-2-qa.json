@@ -1,0 +1,70 @@
+[
+  {
+    "question": "What happens when `submit.run 2` is executed with WHOLE_NODE mode enabled?",
+    "answer": "When WHOLE_NODE mode is enabled, `submit.run 2` will allocate 2 whole nodes, which will be used to run up to 384 concurrent serial tasks (192 tasks on each node) using META mode (dynamic workload balancing). These tasks are executed as separate threads within whole-node jobs."
+  },
+  {
+    "question": "What is the purpose of the `-1` argument for `submit.run` in WHOLE_NODE mode?",
+    "answer": "The `-1` argument for `submit.run` preserves its original meaning, which is to run the farm using the SIMPLE mode."
+  },
+  {
+    "question": "How is the number of actual whole node jobs calculated in SIMPLE mode when WHOLE_NODE mode is active?",
+    "answer": "The number of actual (whole node) jobs is computed as `Number_of_cases / NWHOLE`."
+  },
+  {
+    "question": "What is required for automatic job resubmission and post-processing features to work on Trillium with WHOLE_NODE mode?",
+    "answer": "For these advanced features to work on Trillium, the line `module load StdEnv` must be placed at the end of your `~/.bashrc` file."
+  },
+  {
+    "question": "What types of farming are supported by the WHOLE_NODE mode?",
+    "answer": "The WHOLE_NODE mode can only be used for serial farming; it does not support multi-threaded, MPI, or GPU farming."
+  },
+  {
+    "question": "Can the WHOLE_NODE mode be used on clusters other than Trillium?",
+    "answer": "Yes, the WHOLE_NODE mode can also be used on other clusters, not just on Trillium."
+  },
+  {
+    "question": "When might using WHOLE_NODE mode be beneficial on clusters other than Trillium?",
+    "answer": "It may be advantageous in situations when the queue wait time for whole node jobs becomes shorter than the queue wait time for serial jobs."
+  },
+  {
+    "question": "How can I install META-Farm on a cluster where it's not available as a module?",
+    "answer": "You can clone the package from its git repository using `git clone https://git.computecanada.ca/syam/meta-farm.git` and then modify your `$PATH` variable to point to the `bin` subdirectory of the newly created `meta-farm` directory."
+  },
+  {
+    "question": "How do you add additional `sbatch` arguments to META-Farm jobs?",
+    "answer": "You can add them to `job_script.sh` as separate `#SBATCH` lines, or append them to the `submit.run` or `resubmit.run` command, such as `submit.run -1 --mem 4G`."
+  },
+  {
+    "question": "How do you configure `job_script.sh` for multi-threaded applications like OpenMP?",
+    "answer": "You should add the following lines to `job_script.sh`: `#SBATCH --cpus-per-task=N`, `#SBATCH --mem=M`, and `export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK`, where 'N' is the number of CPU cores and 'M' is the total memory."
+  },
+  {
+    "question": "Can `sbatch` arguments for multi-threaded applications be passed via the `(re)submit.run` command?",
+    "answer": "Yes, you may also supply `--cpus-per-task=N` and `--mem=M` as arguments to `(re)submit.run`."
+  },
+  {
+    "question": "What lines should be added to `job_script.sh` for MPI applications?",
+    "answer": "For MPI applications, add `#SBATCH --ntasks=N` and `#SBATCH --mem-per-cpu=M` to `job_script.sh`, where 'N' is the number of CPU cores and 'M' is the memory per core."
+  },
+  {
+    "question": "How do you execute MPI code within `single_case.sh`?",
+    "answer": "You should add `srun` before the path to your code inside `single_case.sh`, for example: `srun $COMM`."
+  },
+  {
+    "question": "Is there an alternative way to run MPI commands other than modifying `single_case.sh`?",
+    "answer": "Alternatively, you can prepend `srun` to each line of your `table.dat` file, like `srun /path/to/mpi_code arg1 arg2`."
+  },
+  {
+    "question": "How should `job_script.sh` be modified for GPU applications?",
+    "answer": "For GPU applications, modify `job_script.sh` by adding `#SBATCH --gres=gpu[[:type]:number]`."
+  },
+  {
+    "question": "What utility is suggested for testing GPU availability in `job_script.sh` on Nibi?",
+    "answer": "The utility `~syam/bin/gpu_test` is suggested, which you can copy to your `~/bin` directory and include its execution in `job_script.sh`."
+  },
+  {
+    "question": "Why is it recommended to include a GPU availability test in `job_script.sh`?",
+    "answer": "It is recommended to catch situations where a node has a problem rendering the GPU unavailable. Without detection, a job might try and fail to run all cases from `table.dat`, wasting resources."
+  }
+]

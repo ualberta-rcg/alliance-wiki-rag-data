@@ -1,0 +1,78 @@
+[
+  {
+    "question": "How do you build a sandbox Apptainer image from a Docker image?",
+    "answer": "You can build a sandbox image from a Docker image by using the `apptainer build --sandbox DIR_NAME docker://image_name` command, for example, `apptainer build --sandbox bb.dir docker://busybox`."
+  },
+  {
+    "question": "What are the key differences between an Apptainer SIF file image and a sandbox directory image?",
+    "answer": "An SIF file image is contained in a single file, compressed, and read-only, while a sandbox directory image is uncompressed, placed in a directory, may contain thousands of files, and is read-write."
+  },
+  {
+    "question": "Why is using an Apptainer SIF file generally recommended over a sandbox directory?",
+    "answer": "An SIF file is recommended because it consumes less disk space and fewer file count quotas, and offers higher disk access speeds compared to a sandbox directory, especially if read-write access is not typically needed."
+  },
+  {
+    "question": "What is the general recommendation for using Conda inside an Apptainer container?",
+    "answer": "Conda should only be used as a last resort inside a container; priority should be given to modules from the software stack or Python wheels, which are optimized for the systems."
+  },
+  {
+    "question": "Which package manager is recommended for use in Apptainer Conda tutorials instead of Conda itself?",
+    "answer": "The `micromamba` package manager is recommended for use in Apptainer Conda tutorials instead of Conda due to Anaconda's Terms of Service and potential commercial license requirements for Conda."
+  },
+  {
+    "question": "What type of Apptainer image is typically created in the Conda tutorial?",
+    "answer": "The Conda tutorial focuses on creating a read-only SIF file containing a Conda environment with all necessary software."
+  },
+  {
+    "question": "What are the three main steps to create an Apptainer image with Conda software installed?",
+    "answer": "The three main steps are: 1) create an `environment.yml` file, 2) create an `image.def` file (Apptainer definition file), and 3) build the Apptainer image using the definition file."
+  },
+  {
+    "question": "What is the purpose of the `environment.yml` file when creating an Apptainer image with Conda?",
+    "answer": "The `environment.yml` file defines the Conda environment's name, specifies the channels for packages, and lists the dependencies (packages) that need to be installed."
+  },
+  {
+    "question": "How do you create an Apptainer definition file (`image.def`) to build a Conda environment using micromamba?",
+    "answer": "The `image.def` file should specify `Bootstrap: docker` and `From: mambaorg/micromamba:latest`, include `environment.yml` in the `%files` section, and use `micromamba install -n base --file environment.yml && micromamba clean --all --yes` in the `%post` section."
+  },
+  {
+    "question": "What command is used to build an Apptainer image from an `image.def` file that sets up a Conda environment?",
+    "answer": "After loading the Apptainer module, the command is `APPTAINER_BIND=' ' apptainer build image.sif image.def`."
+  },
+  {
+    "question": "How can you test if a built Apptainer image successfully provides a program like `multiqc`?",
+    "answer": "You can test it by running `apptainer run image.sif multiqc --help`."
+  },
+  {
+    "question": "What privileges are typically required to create an Apptainer container from a Dockerfile on a personal system?",
+    "answer": "You generally need sufficient access to Docker (e.g., `sudo`, root access, or membership in the `docker` group) and Apptainer (e.g., `sudo`, root access, or `--fakeroot` permissions)."
+  },
+  {
+    "question": "What are the commands to create an Apptainer SIF image from a Dockerfile on a system with Docker and Apptainer installed?",
+    "answer": "The commands are: `docker build -f Dockerfile -t your-tag-name`, `docker save your-tag-name -o your-tarball-name.tar`, `docker image rm your-tag-name`, `apptainer build --fakeroot your-sif-name.sif docker-archive://your-tarball-name.tar`, and `rm your-tarball-name.tar`."
+  },
+  {
+    "question": "What does `--fakeroot` do when building an Apptainer image from a Docker archive?",
+    "answer": "`--fakeroot` provides elevated permissions for building the Apptainer image; it might be optional, or `sudo` could be used instead if necessary."
+  },
+  {
+    "question": "How can you clean up additional Docker image layers after creating an Apptainer SIF from a Dockerfile?",
+    "answer": "First, run `docker images` to list image IDs, then use `docker image rm ID` for each unwanted image ID to free up disk space."
+  },
+  {
+    "question": "How can you list the files in Apptainer's cache directory?",
+    "answer": "To see the files in Apptainer's cache, run the command `apptainer cache list`."
+  },
+  {
+    "question": "How do you clear Apptainer's cache?",
+    "answer": "To remove files from Apptainer's cache, run the command `apptainer cache clean`."
+  },
+  {
+    "question": "Which environment variables can be set to override Apptainer's default temporary and cache directories?",
+    "answer": "You can override them by setting `APPTAINER_CACHEDIR` for the cache directory and `APPTAINER_TMPDIR` for temporary files."
+  },
+  {
+    "question": "Provide an example of how to configure Apptainer to use a user's scratch space for its cache and temporary files.",
+    "answer": "You can use the commands: `mkdir -p /scratch/$USER/apptainer/{cache,tmp}`, `export APPTAINER_CACHEDIR=\"/scratch/$USER/apptainer/cache\"`, and `export APPTAINER_TMPDIR=\"/scratch/$USER/apptainer/tmp\"` before running `apptainer`."
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "question": "Pourquoi devrais-je changer le chemin du d\u00e9p\u00f4t Julia par d\u00e9faut ?",
+    "answer": "Vous devriez changer le chemin du d\u00e9p\u00f4t Julia par d\u00e9faut pour \u00e9viter de d\u00e9passer votre quota de fichiers, car l'installation de plusieurs paquets Julia dans le r\u00e9pertoire `~/.julia` peut cr\u00e9er un grand nombre de fichiers (par exemple, 96 Mo et 37000 fichiers pour un seul paquet comme Gadfly.jl)."
+  },
+  {
+    "question": "Comment puis-je modifier l'emplacement de mon d\u00e9p\u00f4t Julia personnel ?",
+    "answer": "Vous pouvez modifier l'emplacement de votre d\u00e9p\u00f4t Julia personnel en ajoutant une ligne comme `export JULIA_DEPOT_PATH=\"/project/def-bob/alice/julia:$JULIA_DEPOT_PATH\"` \u00e0 votre fichier `~/.bashrc`."
+  },
+  {
+    "question": "Les fichiers dans `~/.julia` sont-ils toujours utilis\u00e9s si je change le `JULIA_DEPOT_PATH` ?",
+    "answer": "Oui, les fichiers dans `~/.julia` seront toujours pris en compte et `~/.julia` sera toujours utilis\u00e9 pour certains fichiers comme votre historique de commandes, m\u00eame si vous modifiez le `JULIA_DEPOT_PATH`."
+  },
+  {
+    "question": "Que dois-je faire de mon d\u00e9p\u00f4t `~/.julia` existant si je d\u00e9place mon d\u00e9p\u00f4t Julia ?",
+    "answer": "Si vous d\u00e9placez votre d\u00e9p\u00f4t Julia vers un autre endroit, il est pr\u00e9f\u00e9rable de supprimer d'abord le d\u00e9p\u00f4t `~/.julia` existant en ex\u00e9cutant `rm -rf $HOME/.julia`."
+  },
+  {
+    "question": "Quelle est une alternative \u00e0 la modification du chemin du d\u00e9p\u00f4t Julia pour g\u00e9rer les paquets et les d\u00e9pendances ?",
+    "answer": "Une alternative est de cr\u00e9er une image Apptainer avec une version sp\u00e9cifique de Julia et un choix de paquets, tout en redirigeant `JULIA_DEPOT_PATH` \u00e0 l'int\u00e9rieur du conteneur."
+  },
+  {
+    "question": "Quels sont les avantages d'utiliser une image Apptainer pour Julia ?",
+    "answer": "Les avantages incluent une performance potentiellement meilleure des entr\u00e9es/sorties, une reproductibilit\u00e9 am\u00e9lior\u00e9e, et la possibilit\u00e9 de tester les versions nightly builds ou d'assembler vos propres d\u00e9pendances avec un contr\u00f4le total sur la cr\u00e9ation du conteneur."
+  },
+  {
+    "question": "Quel est l'inconv\u00e9nient d'utiliser une image Apptainer pour Julia ?",
+    "answer": "L'inconv\u00e9nient est que vous perdez l\u2019avantage offert par les modules Julia optimis\u00e9s."
+  },
+  {
+    "question": "\u00c0 quoi sert le paquet PyCall.jl ?",
+    "answer": "Le paquet PyCall.jl sert d'interface entre Julia et Python, permettant \u00e0 Julia d'appeler du code Python."
+  },
+  {
+    "question": "Comment dois-je configurer PyCall.jl pour qu'il utilise un environnement Python virtuel sur nos grappes ?",
+    "answer": "Vous devez activer votre environnement virtuel Python, puis dans Julia, d\u00e9finir la variable d'environnement `PYTHON` comme \u00e9tant l'ex\u00e9cutable Python de cet environnement virtuel, par exemple `ENV[\"PYTHON\"] = joinpath(ENV[\"VIRTUAL_ENV\"], \"bin\", \"python\")`, et enfin ex\u00e9cuter `Pkg.build(\"PyCall\")`."
+  },
+  {
+    "question": "Quel comportement de PyCall.jl doit \u00eatre \u00e9vit\u00e9 sur les grappes ?",
+    "answer": "Il est fortement conseill\u00e9 d'\u00e9viter le comportement par d\u00e9faut de PyCall.jl qui est d'utiliser une distribution Miniconda \u00e0 l'int\u00e9rieur de votre environnement Julia."
+  },
+  {
+    "question": "Pourquoi les distributions Miniconda ou Anaconda ne conviennent-elles pas pour PyCall.jl sur les grappes ?",
+    "answer": "Elles ne conviennent pas car elles peuvent cr\u00e9er de nombreux fichiers dans `JULIA_DEPOT_PATH`, ce qui peut entra\u00eener des probl\u00e8mes de quota et de performance si le chemin par d\u00e9faut est `~/.julia`, sans compter les incompatibilit\u00e9s possibles avec la pile logicielle."
+  },
+  {
+    "question": "Que se passe-t-il si je n'utilise pas d'environnement virtuel Python avec PyCall.jl ?",
+    "answer": "Si vous ne cr\u00e9ez pas un environnement virtuel, PyCall utilisera par d\u00e9faut l'installation Python du syst\u00e8me d'exploitation, ce qu'il faut \u00e9viter. PyCall pourrait invoquer Conda.jl mais ne reconna\u00eetra pas le chemin correct \u00e0 moins que vous ayez reconstruit avec `ENV[\"PYTHON\"]=\"\"`."
+  },
+  {
+    "question": "Comment ex\u00e9cuter du code parall\u00e8le Julia avec plusieurs processus sur une grappe Slurm ?",
+    "answer": "Vous pouvez utiliser un script Slurm (`.sh`) qui utilise `srun hostname -s > hostfile` pour g\u00e9n\u00e9rer une liste de n\u0153uds allou\u00e9s, puis ex\u00e9cute `julia --machine-file ./hostfile votre_programme.jl` pour d\u00e9marrer un processus Julia principal et des processus de travail sur les n\u0153uds sp\u00e9cifi\u00e9s."
+  },
+  {
+    "question": "Que fait la commande `srun hostname -s > hostfile` dans un script Slurm pour Julia ?",
+    "answer": "Cette commande g\u00e9n\u00e8re une liste des noms courts des n\u0153uds allou\u00e9s par Slurm et ajoute cette liste au fichier texte `hostfile`."
+  },
+  {
+    "question": "Comment configurer l'interface MPI pour Julia versions 0.19 et pr\u00e9c\u00e9dentes afin d'utiliser les biblioth\u00e8ques syst\u00e8me ?",
+    "answer": "Vous devez charger les modules `StdEnv` et `julia`, puis exporter les variables d'environnement suivantes : `JULIA_MPI_BINARY=system`, `JULIA_MPI_PATH=$EBROOTOPENMPI`, `JULIA_MPI_LIBRARY=$EBROOTOPENMPI/lib64/libmpi.so`, `JULIA_MPI_ABI=OpenMPI`, et `JULIA_MPIEXEC=$EBROOTOPENMPI/bin/mpiexec`. Apr\u00e8s cela, vous pouvez ajouter le paquet MPI avec `Pkg.add(\"MPI\")`."
+  },
+  {
+    "question": "Comment configurer l'interface MPI pour Julia versions 0.20 et suivantes afin d'utiliser les biblioth\u00e8ques syst\u00e8me ?",
+    "answer": "Chargez le module `julia`, puis cr\u00e9ez ou modifiez le fichier `.julia/environments/vX.Y/LocalPreferences.toml` pour y ajouter une section `[MPIPreferences]` configurant `abi = \"OpenMPI\"`, `binary = \"system\"`, `libmpi = \"${EBROOTOPENMPI}/lib64/libmpi.so\"`, et `mpiexec = \"${EBROOTOPENMPI}/bin/mpiexec\"`. Ensuite, d\u00e9marrez Julia et ajoutez les paquets `MPIPreferences` et `MPI`."
+  },
+  {
+    "question": "Comment lancer un programme Julia avec MPI apr\u00e8s l'avoir configur\u00e9 ?",
+    "answer": "Pour l'utiliser, chargez les modules `StdEnv` et `julia`, puis ex\u00e9cutez `mpirun -np <nombre_de_processus> julia <votre_programme>.jl`. Par exemple, pour deux processus : `mpirun -np 2 julia hello.jl`."
+  },
+  {
+    "question": "Comment limiter le nombre de fils (threads) utilis\u00e9s par Julia ?",
+    "answer": "Vous pouvez limiter le nombre de fils utilis\u00e9s par Julia en configurant la variable d'environnement `JULIA_NUM_THREADS` \u00e0 une valeur `k`. Par exemple, pour un processus unique avec 12 CPU par t\u00e2che, `k` serait \u00e9gal \u00e0 12."
+  },
+  {
+    "question": "Qu'est-ce que la variable d'environnement `JULIA_EXCLUSIVE` et quand peut-elle \u00eatre utile ?",
+    "answer": "La variable `JULIA_EXCLUSIVE`, configur\u00e9e \u00e0 une valeur autre que z\u00e9ro, attache les fils Julia \u00e0 un c\u0153ur, retirant ainsi au syst\u00e8me d'exploitation l'attribution des fils. Ceci peut am\u00e9liorer la performance si vous avez des informations pr\u00e9cises sur les modes d'acc\u00e8s aux caches ou si le syst\u00e8me d'exploitation attribue les fils de mani\u00e8re non voulue."
+  },
+  {
+    "question": "Sous quelles conditions la configuration de `JULIA_EXCLUSIVE` fonctionne-t-elle ?",
+    "answer": "La configuration de `JULIA_EXCLUSIVE` fonctionne uniquement si votre t\u00e2che a un acc\u00e8s exclusif aux n\u0153uds et que tous les c\u0153urs CPU ont \u00e9t\u00e9 allou\u00e9s \u00e0 votre t\u00e2che."
+  },
+  {
+    "question": "Pourquoi la configuration de `JULIA_EXCLUSIVE` pourrait-elle ne pas am\u00e9liorer la performance avec l'ordonnanceur Slurm ?",
+    "answer": "Puisque l'ordonnanceur Slurm attache d\u00e9j\u00e0 les processus et les fils aux c\u0153urs CPU, demander \u00e0 Julia de 'r\u00e9attacher' les fils n'am\u00e9liorera peut-\u00eatre pas la performance."
+  },
+  {
+    "question": "Que contr\u00f4le la variable `JULIA_THREAD_SLEEP_THRESHOLD` ?",
+    "answer": "La variable `JULIA_THREAD_SLEEP_THRESHOLD` contr\u00f4le le nombre de nanosecondes apr\u00e8s lesquelles un fil qui est en rotation ('spinning') est programm\u00e9 pour dormir."
+  },
+  {
+    "question": "Que signifie une valeur infinie pour `JULIA_THREAD_SLEEP_THRESHOLD` ?",
+    "answer": "Une valeur infinie (exprim\u00e9e par une cha\u00eene de caract\u00e8res) indique que le fil en rotation ne doit jamais dormir."
+  },
+  {
+    "question": "Quand est-il utile de modifier `JULIA_THREAD_SLEEP_THRESHOLD` ?",
+    "answer": "Il peut \u00eatre utile de modifier cette variable quand plusieurs fils se disputent fr\u00e9quemment une ressource partag\u00e9e (il serait alors peut-\u00eatre pr\u00e9f\u00e9rable d'\u00e9liminer plus rapidement des fils en rotation) ou, inversement, quand une ressource est rarement sollicit\u00e9e et qu'une basse latence est souhait\u00e9e (en d\u00e9finissant le seuil comme infini pour \u00e9viter que les fils dorment)."
+  }
+]

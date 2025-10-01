@@ -1,0 +1,42 @@
+[
+  {
+    "question": "How do you restart a GROMACS simulation using a checkpoint file?",
+    "answer": "To restart a GROMACS simulation, use the `mdrun` command with the `-cpi` parameter, specifying the path to the latest checkpoint file (e.g., `md.cpt`). A full command example is `srun gmx_mpi mdrun -deffnm md -maxh 24.0 -cpi md.cpt`."
+  },
+  {
+    "question": "What is the purpose of splitting GROMACS simulations into shorter tasks?",
+    "answer": "Splitting GROMACS simulations into shorter tasks makes them quicker to execute, and tasks requesting three hours or less are eligible for pre-emption scheduling, which is advantageous for all users, especially those with default resource allocations (`def-sponsor`)."
+  },
+  {
+    "question": "How can users automate the checkpointing process for GROMACS simulations?",
+    "answer": "Users can automate checkpointing by utilizing a job array, which allows a single `sbatch` call to submit multiple short tasks. The next task in the array will automatically start and resume the simulation once the previous one completes."
+  },
+  {
+    "question": "What happens to pending tasks in an automated checkpointing job array once the GROMACS simulation is fully completed?",
+    "answer": "Once the GROMACS simulation itself is finished, any pending tasks in the job array are automatically canceled."
+  },
+  {
+    "question": "What Slurm parameters are used for a GROMACS checkpointing job on a whole node, specifically for the Narval cluster example?",
+    "answer": "For a GROMACS checkpointing job on a Narval whole node, the example script specifies `--nodes=1`, `--ntasks-per-node=32`, `--cpus-per-task=2`, `--mem-per-cpu=2000M`, `--time=03:00:00`, and `--array=1-20%1`."
+  },
+  {
+    "question": "How does the provided GROMACS checkpointing script handle an unexpected error during simulation execution?",
+    "answer": "If the simulation exits with a non-zero exit code (an error), the script will print \"Simulation exited with an error, cancelling pending jobs\" and use `scancel -t pending $SLURM_ARRAY_JOB_ID` to cancel all remaining pending jobs in the array."
+  },
+  {
+    "question": "How does the GROMACS checkpointing script determine if a simulation has successfully completed all its steps?",
+    "answer": "The script checks the simulation log file (`sim_name.log`) to see if a line indicating \"Writing checkpoint, step [nsteps] at\" is present, where `[nsteps]` matches the total number of steps (`nsteps`) specified for the simulation."
+  },
+  {
+    "question": "What modules are necessary to load for a CPU-based GROMACS checkpointing job using the StdEnv/2023 environment?",
+    "answer": "The required modules are `StdEnv/2023`, `gcc/12.3`, `openmpi/4.1.5`, and `gromacs/2024.4`."
+  },
+  {
+    "question": "What are the key Slurm parameters and modules for a GPU-accelerated GROMACS checkpointing job in the StdEnv/2023 environment?",
+    "answer": "Key Slurm parameters include `--gpus-per-node=1`, `--cpus-per-task=4`, `--mem-per-cpu=2000M`, `--time=03:00:00`, and `--array=1-20%1`. The necessary modules are `StdEnv/2023`, `gcc/12.3`, `openmpi/4.1.5`, `cuda/12.2`, and `gromacs/2024.4`."
+  },
+  {
+    "question": "What is the significance of the `export OMP_NUM_THREADS=\"${SLURM_CPUS_PER_TASK:-1}\"` command in the GROMACS job scripts?",
+    "answer": "This command sets the `OMP_NUM_THREADS` environment variable, which controls the number of OpenMP threads that GROMACS will utilize per MPI process. It takes its value from `SLURM_CPUS_PER_TASK` or defaults to 1 if `SLURM_CPUS_PER_TASK` is not defined."
+  }
+]

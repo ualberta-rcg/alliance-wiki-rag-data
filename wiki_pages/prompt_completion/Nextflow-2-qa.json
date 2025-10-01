@@ -1,0 +1,62 @@
+[
+  {
+    "question": "How many containers does the `smrnaseq` workflow download and what is their approximate total size?",
+    "answer": "The `smrnaseq` workflow downloads 18 containers for a total of about 4GB."
+  },
+  {
+    "question": "What folder structure is created after downloading the workflow described in the document?",
+    "answer": "A folder named `nf-core-${NFCORE_PL}_${PL_VERSION}` is created, which contains a `config` subfolder for institutional configuration and another subfolder for the workflow itself."
+  },
+  {
+    "question": "Where does Nextflow look for configuration files when a pipeline is launched?",
+    "answer": "Nextflow looks at the `nextflow.config` file in the pipeline's folder and also at the `~/.nextflow/config` file in the user's home directory, if it exists."
+  },
+  {
+    "question": "Is it recommended to run generic Nextflow or nf-core pipelines on Trillium?",
+    "answer": "It is generally discouraged to run nf-core or any other generic Nextflow pipeline on Trillium, unless they were designed with that specific cluster in mind."
+  },
+  {
+    "question": "What is the purpose of `singularity.autoMounts = true` in the Nextflow configuration?",
+    "answer": "The `singularity.autoMounts = true` setting ensures that all cluster File Systems (`/project`, `/scratch`, `/home`, and `/localscratch`) will be properly mounted inside the singularity container."
+  },
+  {
+    "question": "What are the Slurm queue and job submission rate limits set in the provided Nextflow configuration?",
+    "answer": "The configuration ensures that there are no more than 100 jobs in the Slurm queue and that only 60 jobs are submitted per minute."
+  },
+  {
+    "question": "What are the maximum resource allocations (memory, CPU, time) for Rorqual machines according to the example configuration?",
+    "answer": "Rorqual machines are configured with a maximum memory of 750G, 192 CPUs, and a maximum time of 168 hours."
+  },
+  {
+    "question": "How does the Nextflow configuration handle jobs that fail due to out-of-memory errors (return codes 125 or 139)?",
+    "answer": "If jobs fail with return codes 125 (out of memory) or 139 (OOM killed), the `process.errorStrategy` and `process.memory` lines in the configuration ensure they are automatically restarted with an additional 4GB of RAM."
+  },
+  {
+    "question": "How can you run an nf-core pipeline using the `test`, `singularity`, and `narval` profiles?",
+    "answer": "You can run the pipeline using the command: `nextflow run nf-core-${NFCORE_PL}_${PL_VERSION}/2_3_1/ -profile test,singularity,narval --outdir ${NFCORE_PL}_OUTPUT`."
+  },
+  {
+    "question": "How can you check the progression of jobs in the Slurm queue?",
+    "answer": "You can open a new session or detach from a tmux session and use `squeue -u $USER` or `sq` to view the jobs in the Slurm queue."
+  },
+  {
+    "question": "What is a common solution for the 'unable to create native thread' error observed when running Nextflow?",
+    "answer": "Setting the environment variable `export NXF_OPTS='-XX:ActiveProcessorCount=1'` when executing `nextflow` is reported to solve this problem, which is believed to be caused by Java trying to create threads to match physical cores."
+  },
+  {
+    "question": "How can a `SIGBUS` error from the Nextflow main process be resolved?",
+    "answer": "Setting the environment variable `NXF_OPTS=\"-Dleveldb.mmap=false\"` when executing `nextflow` is reported to solve the `SIGBUS` error."
+  },
+  {
+    "question": "What are some typical components found in an nf-core pipeline directory?",
+    "answer": "A typical nf-core pipeline directory includes `assets`, `bin`, `CITATIONS.md`, `conf`, `docs`, `LICENSE`, `main.nf`, `modules`, `nextflow.config`, `nextflow_schema.json`, `README.md`, `subworkflows`, and `workflows`."
+  },
+  {
+    "question": "What is the default CPU setting for processes in the example `~/.nextflow/config`?",
+    "answer": "The default CPU setting for processes in the example configuration is `cpu = 1`."
+  },
+  {
+    "question": "How does a user specify their account for Slurm jobs in the Nextflow configuration?",
+    "answer": "Users should replace `<my-account>` with their actual account, such as `def-pname`, in the `clusterOptions = '--account=<my-account>'` line within the `process` block of the `~/.nextflow/config`."
+  }
+]

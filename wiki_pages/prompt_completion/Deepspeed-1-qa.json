@@ -1,0 +1,138 @@
+[
+  {
+    "question": "What is DeepSpeed?",
+    "answer": "DeepSpeed is a deep learning training optimization library designed to train massive billion-parameter models at scale, fully compatible with PyTorch."
+  },
+  {
+    "question": "What is the core concept behind DeepSpeed's memory-efficient distributed training methods?",
+    "answer": "DeepSpeed's memory-efficient distributed training methods are based on the Zero Redundancy Optimizer (ZeRO) concept."
+  },
+  {
+    "question": "What elements of a training task can DeepSpeed's ZeRO distribute?",
+    "answer": "ZeRO enables distributed storage and computing of optimizer states, model weights, model gradients, and model activations."
+  },
+  {
+    "question": "Across which devices can DeepSpeed distribute training elements?",
+    "answer": "DeepSpeed can distribute training elements across multiple devices, including GPU, CPU, local hard disk, and/or combinations of these devices."
+  },
+  {
+    "question": "What is a key benefit of using DeepSpeed with ZeRO for large models?",
+    "answer": "DeepSpeed allows models with massive amounts of parameters to be trained efficiently across multiple nodes without explicitly handling Model, Pipeline, or Data Parallelism in your code."
+  },
+  {
+    "question": "What is the recommended method for installing DeepSpeed?",
+    "answer": "The recommendation is to install DeepSpeed using its provided Python wheel."
+  },
+  {
+    "question": "What are the steps to install DeepSpeed in a Python environment?",
+    "answer": "1. Load a Python module (e.g., `module load python`). 2. Create and start a virtual environment. 3. Install both PyTorch and DeepSpeed in the virtual environment using `pip install --no-index torch deepspeed`."
+  },
+  {
+    "question": "How do you install PyTorch and DeepSpeed within a virtual environment using pip?",
+    "answer": "Use the command `pip install --no-index torch deepspeed`."
+  },
+  {
+    "question": "What are the notable differences when using DeepSpeed for multi-GPU and multi-node jobs compared to a standard PyTorch tutorial?",
+    "answer": "Common training task elements (optimizer, learning rate scheduler, batch size) and DeepSpeed-specific configurations (like ZeRO modality) are defined in a config file rather than in the main Python script."
+  },
+  {
+    "question": "What is the purpose of the `deepspeed-example.sh` script?",
+    "answer": "It's a bash script used to launch a multi-node, multi-GPU DeepSpeed job, including setting up the environment on all nodes and launching the training script."
+  },
+  {
+    "question": "What does the `config_env.sh` script do?",
+    "answer": "The `config_env.sh` script loads the python module, creates and activates a virtual environment in `$SLURM_TMPDIR/ENV`, and installs pip, torchvision, and deepspeed within it."
+  },
+  {
+    "question": "Which launcher is recommended for DeepSpeed Python scripts and why?",
+    "answer": "The `torchrun` launcher from PyTorch is recommended, as DeepSpeed's own launcher is not recommended at this time."
+  },
+  {
+    "question": "What environment variable is exported in `launch_training_deepspeed.sh` for error handling?",
+    "answer": "The `NCCL_ASYNC_ERROR_HANDLING` environment variable is set to `1`."
+  },
+  {
+    "question": "What is the purpose of the `ds_config.json` file in a DeepSpeed training task?",
+    "answer": "The `ds_config.json` file defines and configures the training task, including common elements like optimizer, scheduler, batch size, and DeepSpeed-specific settings such as ZeRO stage and mixed-precision training."
+  },
+  {
+    "question": "What does ZeRO stage 0 mean in DeepSpeed's `ds_config.json`?",
+    "answer": "ZeRO stage 0 means ZeRO is disabled, resulting in no model parallelism and a purely data parallel job."
+  },
+  {
+    "question": "What is mixed-precision training (fp16) in DeepSpeed?",
+    "answer": "Mixed-precision training involves computing and storing some tensors in half-precision (fp16) to accelerate computations and reduce memory usage."
+  },
+  {
+    "question": "What are some of the key configurable parameters found in `ds_config.json` for DeepSpeed?",
+    "answer": "Key parameters include `train_batch_size`, `steps_per_print`, `optimizer` configuration (type, learning rate, betas, eps, weight_decay), `scheduler` configuration, `gradient_clipping`, `fp16` settings (enabled, loss scale), and `zero_optimization` settings (stage, bucket sizes, offload options)."
+  },
+  {
+    "question": "How is DeepSpeed initialized within the `pytorch-deepspeed.py` script?",
+    "answer": "DeepSpeed is initialized using `deepspeed.init_distributed()` and `deepspeed.initialize(args=args, model=net, model_parameters=parameters, training_data=dataset_train)`."
+  },
+  {
+    "question": "What kind of model is defined in `pytorch-deepspeed.py`?",
+    "answer": "A convolutional neural network (`Net`) with two convolutional layers, max pooling, and three fully connected layers, designed for CIFAR10 classification, is defined."
+  },
+  {
+    "question": "How does PyTorch Lightning integrate with DeepSpeed?",
+    "answer": "PyTorch Lightning can be used as a wrapper around DeepSpeed to simplify its usage, for example, demonstrating ZeRO Stage 3 with offloading capabilities."
+  },
+  {
+    "question": "What does ZeRO Stage 3 entail when used with GPUs?",
+    "answer": "ZeRO Stage 3 means that optimizer states, model parameters, and model gradients are split (sharded) among all GPUs, making it more memory-efficient than pure Data Parallelism."
+  },
+  {
+    "question": "What is the benefit of ZeRO Stage 3 compared to pure Data Parallelism?",
+    "answer": "ZeRO Stage 3 is more memory-efficient because it shards optimizer states, model parameters, and model gradients across GPUs, unlike Data Parallelism where each GPU holds a full replica of the model."
+  },
+  {
+    "question": "Which DeepSpeed optimizer is recommended for ZeRO Stage 3 on GPUs, and what is its performance characteristic?",
+    "answer": "DeepSpeed's `FusedAdam` is recommended, and its performance is comparable to pure Data Parallelism."
+  },
+  {
+    "question": "What is required to be loaded when using DeepSpeed's optimizers like `FusedAdam`?",
+    "answer": "The `cuda/<version>` module must be loaded, where `<version>` matches the CUDA version used to build the PyTorch installation."
+  },
+  {
+    "question": "How does PyTorch Lightning determine if it's running inside a SLURM batch job?",
+    "answer": "PyTorch Lightning queries the environment to figure out if it is running inside a SLURM batch job."
+  },
+  {
+    "question": "In the `deepspeed-stage3.py` example, how is the PyTorch Lightning `Trainer` configured for ZeRO Stage 3 on GPUs?",
+    "answer": "The `Trainer` is initialized with `accelerator=\"gpu\"`, `devices=2`, `num_nodes=1`, and `strategy=\"deepspeed_stage_3\"`."
+  },
+  {
+    "question": "What does enabling offloading model parameters and optimizer states to the CPU achieve?",
+    "answer": "It makes the compute node's CPU memory available to store these tensors when they are not needed by the GPU, effectively extending GPU memory and allowing for larger batch sizes or models."
+  },
+  {
+    "question": "Which DeepSpeed optimizer is used when offloading to the CPU?",
+    "answer": "DeepSpeed's `DeepSpeedCPUAdam` optimizer is used when offloading to the CPU."
+  },
+  {
+    "question": "What is the performance implication of using `DeepSpeedCPUAdam` with CPU offloading?",
+    "answer": "Performance remains at par with pure Data Parallelism when using `DeepSpeedCPUAdam` with CPU offloading."
+  },
+  {
+    "question": "How is ZeRO Stage 3 with CPU offloading configured in PyTorch Lightning?",
+    "answer": "The `Trainer` strategy is set to `DeepSpeedStrategy(stage=3, offload_optimizer=True, offload_parameters=True)`."
+  },
+  {
+    "question": "What does offloading model parameters and optimizer states to the local disk (NVMe) provide?",
+    "answer": "It makes the compute node's local disk storage available to store these tensors, further extending memory, though with a significant performance degradation compared to GPU or CPU offloading."
+  },
+  {
+    "question": "On which type of drives does NVMe offloading perform best?",
+    "answer": "NVMe offloading works best on NVMe-enabled drives due to their higher throughput and faster response times, though it can be used with any storage type."
+  },
+  {
+    "question": "How is ZeRO Stage 3 with NVMe offloading configured in PyTorch Lightning?",
+    "answer": "The `Trainer` strategy is set to `DeepSpeedStrategy(stage=3, offload_optimizer=True, offload_parameters=True, remote_device=\"nvme\", offload_params_device=\"nvme\", offload_optimizer_device=\"nvme\", nvme_path=\"local_scratch\")`."
+  },
+  {
+    "question": "What is the recommended optimizer when offloading to NVMe storage?",
+    "answer": "DeepSpeed's `DeepSpeedCPUAdam` is used when offloading to NVMe, with optimizer steps still computed on the CPU."
+  }
+]

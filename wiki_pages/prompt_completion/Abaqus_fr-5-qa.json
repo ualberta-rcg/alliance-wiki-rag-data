@@ -1,0 +1,74 @@
+[
+  {
+    "question": "Quel est le nom du script Slurm pour l'analyse explicite sur plusieurs n\u0153uds?",
+    "answer": "Le script est nomm\u00e9 `scriptep1-mpi.txt`."
+  },
+  {
+    "question": "Quelles sont les valeurs par d\u00e9faut des param\u00e8tres SBATCH dans le script `scriptep1-mpi.txt` pour l'analyse explicite sur plusieurs n\u0153uds?",
+    "answer": "Les valeurs par d\u00e9faut sont `--account=def-group`, `--time=00-06:00`, `--ntasks=8`, `--mem-per-cpu=16000M` et `--cpus-per-task=1`."
+  },
+  {
+    "question": "Quels modules doivent \u00eatre charg\u00e9s pour ex\u00e9cuter Abaqus 2021 dans le script `scriptep1-mpi.txt`?",
+    "answer": "Les modules `StdEnv/2020` et `abaqus/2021` doivent \u00eatre charg\u00e9s."
+  },
+  {
+    "question": "Quelles variables d'environnement sont export\u00e9es dans le script `scriptep1-mpi.txt` pour la parall\u00e9lisation MPI avec Abaqus/2021?",
+    "answer": "`MPI_IC_ORDER='tcp'` et `I_MPI_HYDRA_TOPOLIB=ipl` sont export\u00e9es, en plus de `LM_LICENSE_FILE` et `ABAQUSLM_LICENSE_FILE`."
+  },
+  {
+    "question": "Comment la liste des h\u00f4tes pour MPI (`mp_host_list`) est-elle g\u00e9n\u00e9r\u00e9e dans le script `scriptep1-mpi.txt`?",
+    "answer": "Elle est g\u00e9n\u00e9r\u00e9e en utilisant la commande `slurm_hl2hl.py --format MPIHOSTLIST`."
+  },
+  {
+    "question": "Comment peut-on estimer la m\u00e9moire totale (`--mem=`) requise par Slurm pour une simulation Abaqus sur un n\u0153ud simple?",
+    "answer": "L'estimation se trouve dans le fichier de sortie Abaqus `test.dat`, dans la section `M E M O R Y E S T I M A T E`."
+  },
+  {
+    "question": "Quelles sont les deux estimations de m\u00e9moire principales fournies dans le fichier de sortie Abaqus `test.dat`?",
+    "answer": "Les estimations sont `MINIMUM MEMORY REQUIRED` (MMR) et `MEMORY TO MINIMIZE I/O` (MRMIO)."
+  },
+  {
+    "question": "Quelle est la m\u00e9moire minimale requise (MMR) et la m\u00e9moire pour minimiser les E/S (MRMIO) dans l'exemple donn\u00e9?",
+    "answer": "La m\u00e9moire minimale requise est de 3612 MB et la m\u00e9moire pour minimiser les E/S est de 96345 MB."
+  },
+  {
+    "question": "Comment peut-on estimer la m\u00e9moire totale pour un processus avec fils sur un n\u0153ud unique de mani\u00e8re interactive?",
+    "answer": "En ex\u00e9cutant la simulation de mani\u00e8re interactive sur un n\u0153ud de calcul et en surveillant la consommation de m\u00e9moire avec les commandes `ps` ou `top`."
+  },
+  {
+    "question": "Quelle est la premi\u00e8re \u00e9tape pour estimer la m\u00e9moire avec `top` sur une grappe?",
+    "answer": "Se connecter \u00e0 une grappe avec SSH et obtenir une allocation sur un n\u0153ud de calcul avec `salloc`."
+  },
+  {
+    "question": "Quelle commande Abaqus est utilis\u00e9e pour d\u00e9marrer une simulation interactive pour l'estimation de la m\u00e9moire?",
+    "answer": "La commande est `abaqus job=test input=Sample.inp scratch=$SLURM_TMPDIR cpus=8 mp_mode=threads interactive`."
+  },
+  {
+    "question": "Comment surveiller l'utilisation de la m\u00e9moire une fois la simulation interactive d\u00e9marr\u00e9e pour l'estimation?",
+    "answer": "Il faut se connecter \u00e0 nouveau au n\u0153ud de calcul via SSH et lancer la commande `top -u $USER`."
+  },
+  {
+    "question": "Quelles colonnes de la commande `top` sont pertinentes pour l'estimation de la m\u00e9moire Abaqus?",
+    "answer": "Les colonnes `VIRT` (m\u00e9moire virtuelle) et `RES` (m\u00e9moire r\u00e9sidente) doivent \u00eatre observ\u00e9es."
+  },
+  {
+    "question": "Pourquoi est-il n\u00e9cessaire de surallouer l\u00e9g\u00e8rement la m\u00e9moire du n\u0153ud demand\u00e9e avec `--mem=`?",
+    "answer": "Ceci est n\u00e9cessaire car la m\u00e9moire physique non \u00e9chang\u00e9e (RES) est g\u00e9n\u00e9ralement inf\u00e9rieure \u00e0 la m\u00e9moire virtuelle (VIRT), et une quantit\u00e9 suffisante de RES doit \u00eatre disponible pour Abaqus afin de satisfaire le MRMIO."
+  },
+  {
+    "question": "Quelle valeur de surallocation de m\u00e9moire a \u00e9t\u00e9 cod\u00e9e en dur dans l'exemple de script Abaqus standard?",
+    "answer": "Une valeur prudente de 3072 Mo a \u00e9t\u00e9 cod\u00e9e en dur."
+  },
+  {
+    "question": "Que se passe-t-il si la m\u00e9moire RES descend en dessous de la `MINIMUM MEMORY REQUIRED` (MMR)?",
+    "answer": "Abaqus fermera en raison d'une m\u00e9moire insuffisante (OOM)."
+  },
+  {
+    "question": "Comment peut-on \u00e9tudier l'impact sur les performances de la simulation en r\u00e9duisant la m\u00e9moire RES en dessous du MRMIO?",
+    "answer": "En ex\u00e9cutant une s\u00e9rie de t\u00e2ches de test courtes avec des valeurs `--mem=` diminu\u00e9es, par exemple `8G, 16G, 32G, 64G`."
+  },
+  {
+    "question": "Quel est l'effet de la r\u00e9duction de la valeur `--mem=` sur l'espace de stockage temporaire (`/scratch`)?",
+    "answer": "Des valeurs `--mem=` plus petites entra\u00eeneront un espace `/scratch` de plus en plus grand pour les fichiers temporaires."
+  }
+]

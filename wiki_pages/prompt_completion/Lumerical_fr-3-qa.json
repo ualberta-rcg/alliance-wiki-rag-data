@@ -1,0 +1,50 @@
+[
+  {
+    "question": "What is the primary function of the `fdtd-process-template.sh` script?",
+    "answer": "The `fdtd-process-template.sh` script is used to replace specific tags in a submission script template with actual values derived from an FDTD Solutions project file."
+  },
+  {
+    "question": "What arguments does `fdtd-process-template.sh` expect?",
+    "answer": "The script expects `[options] <fsp file> <template file> <#processes>` as arguments."
+  },
+  {
+    "question": "What are the valid optional arguments for `fdtd-process-template.sh`?",
+    "answer": "Valid options include `-r <rate>` for simulation rate, `-tm <min_time>` for minimum simulation time, `-ms <memory_safety>` for a memory safety multiplicative factor, and `-mm <memory_min>` for minimum memory per process."
+  },
+  {
+    "question": "What does the `-r` option represent in `fdtd-process-template.sh` and what is its default value?",
+    "answer": "The `-r` option represents the simulation rate in MNodes/s used in time estimates. Its default value is 4MNodes/s/process, which is considered very conservative."
+  },
+  {
+    "question": "What is the purpose of the `-tm` option in `fdtd-process-template.sh` and what is its default value?",
+    "answer": "The `-tm` option specifies the minimum time in seconds that the simulation can take. The default value is 600 seconds."
+  },
+  {
+    "question": "How does the `-ms` option affect memory estimation in `fdtd-process-template.sh`?",
+    "answer": "The `-ms` option applies a multiplicative factor to the memory estimate in percentage. The default value for this factor is 110%."
+  },
+  {
+    "question": "What does the `-mm` option define in `fdtd-process-template.sh` and what is its default setting?",
+    "answer": "The `-mm` option defines the minimum memory that a process can use. Its default value is 20MB."
+  },
+  {
+    "question": "Which tokens does `fdtd-process-template.sh` replace within a template file?",
+    "answer": "It replaces `<total_memory>`, `<processor_memory>`, `<hours>`, `<minutes>`, `<seconds>`, `<n>`, `<dir_fsp>`, and `<filename>`."
+  },
+  {
+    "question": "How does `fdtd-process-template.sh` obtain the estimated memory, gridpoints, and timesteps from an FDTD project file?",
+    "answer": "It runs the `fdtd-engine-mpich2nem -mr <fsp file>` command and parses its output to extract these statistics."
+  },
+  {
+    "question": "How is the total memory (`TOTALMEM`) for the simulation calculated by `fdtd-process-template.sh`?",
+    "answer": "The total memory is calculated as `(estimated memory * memory safety factor) / 100`."
+  },
+  {
+    "question": "How is the memory required per process (`PROCMEM`) determined by `fdtd-process-template.sh`?",
+    "answer": "The memory required per process is calculated by dividing the total memory (`TOTALMEM`) by the number of processes (`PROCS`). If this value is less than the specified minimum memory (`MEMORY_MIN`), `MEMORY_MIN` is used instead."
+  },
+  {
+    "question": "How is the estimated simulation time (`TIME`) calculated by `fdtd-process-template.sh`?",
+    "answer": "The estimated time is calculated as `(gridpoints * timesteps) / processes / rate / 10000000`. If the calculated time is less than the minimum time (`TIME_MIN`), `TIME_MIN` is used."
+  }
+]

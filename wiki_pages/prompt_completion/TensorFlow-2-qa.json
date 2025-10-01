@@ -1,0 +1,66 @@
+[
+  {
+    "question": "How do you launch TensorBoard in the background within a job script?",
+    "answer": "You can launch TensorBoard in the background by calling it before your Python script and appending an ampersand (&) to the call, for example: `tensorboard --logdir=/tmp/your_log_dir --host 0.0.0.0 --load_fast false & python train.py`."
+  },
+  {
+    "question": "What command is used to find the hostname of the compute node running a job?",
+    "answer": "To find the hostname, use the `sq` command to list your jobs and look for the value in the \"NODELIST\" column."
+  },
+  {
+    "question": "How do you create an SSH tunnel to access TensorBoard running on a compute node from your local computer?",
+    "answer": "On your local computer, use the command: `ssh -N -f -L localhost:6006:computenode:6006 userid@cluster.computecanada.ca`. Replace `computenode` with the actual node hostname, `userid` with your Alliance username, and `cluster` with the cluster hostname (e.g., `rorqual`)."
+  },
+  {
+    "question": "What should you do if port 6006 is already in use for TensorBoard?",
+    "answer": "If port 6006 is already in use, TensorBoard will use another port (e.g., 6007, 6008), and you should adjust the `ssh` command and local access URL accordingly."
+  },
+  {
+    "question": "What URL should you navigate to in your web browser to access TensorBoard after creating the SSH connection?",
+    "answer": "Once the connection is created, go to `http://localhost:6006` in your web browser."
+  },
+  {
+    "question": "What API does TensorFlow provide for utilizing multiple GPUs?",
+    "answer": "TensorFlow offers a number of different strategies to make use of multiple GPUs through the high-level API `tf.distribute`."
+  },
+  {
+    "question": "Where can I find more detailed information on TensorFlow's multi-GPU strategies?",
+    "answer": "For more details, please refer to the official TensorFlow documentation on `tf.distribute`."
+  },
+  {
+    "question": "What is the purpose of the `tensorflow-singleworker.sh` script?",
+    "answer": "The `tensorflow-singleworker.sh` script is an example SLURM job submission script for running TensorFlow with a Mirrored strategy on a single node using multiple GPUs."
+  },
+  {
+    "question": "How many nodes and GPUs does the `tensorflow-singleworker.sh` script request?",
+    "answer": "The script requests 1 node (`#SBATCH --nodes 1`) and 4 GPUs (`#SBATCH --gres=gpu:4`)."
+  },
+  {
+    "question": "What are the resource limits set in the `tensorflow-singleworker.sh` script?",
+    "answer": "The script requests 8GB of memory (`#SBATCH --mem=8G`), a time limit of 30 minutes (`#SBATCH --time=0-00:30`), and specifies output to be `%N-%j.out`."
+  },
+  {
+    "question": "How is the Python environment prepared in `tensorflow-singleworker.sh`?",
+    "answer": "The script loads the `python/3` module, creates a virtual environment in `$SLURM_TMPDIR/env`, activates it, and then installs TensorFlow using `pip install --no-index tensorflow`."
+  },
+  {
+    "question": "What environment variable can be set to use the NCCL backend for inter-GPU communication?",
+    "answer": "You can set `export NCCL_BLOCKING_WAIT=1` if you wish to use the NCCL backend for inter-GPU communication."
+  },
+  {
+    "question": "What is the `tensorflow-singleworker.py` script an example of?",
+    "answer": "The `tensorflow-singleworker.py` script is an example of a Python script using `tf.distribute.MirroredStrategy()` for CIFAR10 classification models on a single node."
+  },
+  {
+    "question": "How is the `MirroredStrategy` initialized in `tensorflow-singleworker.py`?",
+    "answer": "The `MirroredStrategy` is initialized with `strategy = tf.distribute.MirroredStrategy()` and its scope is used for model creation: `with strategy.scope():`."
+  },
+  {
+    "question": "How does the `tensorflow-singleworker.py` script obtain the CIFAR10 dataset?",
+    "answer": "The script attempts to download the CIFAR10 dataset from the internet using `tf.keras.datasets.cifar10.load_data()` if it's not already stored in `~/.keras/datasets`."
+  },
+  {
+    "question": "What is the recommendation if the `tensorflow-singleworker.py` script attempts to download the CIFAR10 dataset during a job?",
+    "answer": "It is recommended to run the data download on a login node prior to submitting your job, or manually download the data from `https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz`, rename it to `cifar-10-batches-py.tar.gz`, and place it under `~/.keras/datasets`."
+  }
+]

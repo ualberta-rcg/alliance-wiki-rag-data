@@ -1,0 +1,74 @@
+[
+  {
+    "question": "How should I transfer data amounts larger than 10GB to or from Niagara?",
+    "answer": "For data amounts larger than 10GB, you should use the datamover nodes. You can SSH from a Niagara login node to `nia-datamover1` or `nia-datamover2`, or directly login/scp/rsync to `nia-datamover1.scinet.utoronto.ca` or `nia-datamover2.scinet.utoronto.ca` from outside."
+  },
+  {
+    "question": "What tool is recommended for frequent data transfers to or from Niagara?",
+    "answer": "If you transfer data often, you should consider using Globus, a web-based tool for data transfer."
+  },
+  {
+    "question": "What is the Globus endpoint for Niagara?",
+    "answer": "The Niagara endpoint for Globus is \"computecanada#niagara\"."
+  },
+  {
+    "question": "What is the Globus endpoint for HPSS?",
+    "answer": "The HPSS endpoint for Globus is \"computecanada#hpss\"."
+  },
+  {
+    "question": "What is HPSS used for?",
+    "answer": "HPSS is used for long-term storage of data and serves as SciNet's nearline or archive facility."
+  },
+  {
+    "question": "How is storage space on HPSS allocated?",
+    "answer": "Storage space on HPSS is allocated through the annual Compute Canada RAC allocation."
+  },
+  {
+    "question": "What are the default file permissions for users within the same group at SciNet?",
+    "answer": "By default, users within the same group at SciNet have read permission to each other's files, but not write permission."
+  },
+  {
+    "question": "What is the purpose of using Access Control Lists (ACLs) at SciNet?",
+    "answer": "ACLs allow you to grant your supervisor or other group members management permissions (create, move, rename, delete) over your files, while retaining your original access. They also enable users from other groups to access (read, execute) your files."
+  },
+  {
+    "question": "Which commands should be used to manage ACLs on GPFS at Niagara?",
+    "answer": "On Niagara, you must use GPFS native commands: `mmputacl`, `mmgetacl`, `mmdelacl`, and `mmeditacl`."
+  },
+  {
+    "question": "What are the advantages of using `mmputacl` and `mmgetacl`?",
+    "answer": "The advantages of `mmputacl` and `mmgetacl` are that you can set 'control' permission, and they support POSIX or NFS v4 style ACLs."
+  },
+  {
+    "question": "What is the first step to apply an ACL using `mmputacl`?",
+    "answer": "The first step is to create a `/tmp/supervisor.acl` file with the desired ACL contents."
+  },
+  {
+    "question": "How do you apply ACL attributes recursively to existing files and directories using GPFS commands?",
+    "answer": "There is no built-in GPFS command to recursively add or remove ACL attributes to existing files. You need to use the `-i` option for `mmputacl` on each file or directory individually, or use a sample bash script designed for this purpose."
+  },
+  {
+    "question": "How can you check the current ACL attributes of a directory?",
+    "answer": "You can determine the current ACL attributes using the command `$ mmgetacl /project/g/group/[owner]`."
+  },
+  {
+    "question": "How do you remove a previously set ACL?",
+    "answer": "You can remove a previously set ACL using the command `$ mmdelacl -d /project/g/group/[owner]`."
+  },
+  {
+    "question": "What command allows you to interactively create or change a GPFS access control list?",
+    "answer": "The `mmeditacl` command is used to create or change a GPFS access control list. You must set the EDITOR environment variable (e.g., `export EDITOR=/usr/bin/vi`) for this command to work."
+  },
+  {
+    "question": "Does `mmputacl` overwrite original Linux group permissions?",
+    "answer": "No, `mmputacl` will not overwrite the original Linux group permissions for a directory when copied to another directory already with ACLs. For rwx permissions for everyone in your group, use `chmod g+rwx`."
+  },
+  {
+    "question": "Is it advisable to give write permission to other users on the top level of your home directory?",
+    "answer": "No, it is highly recommended not to give write permission to other users on the top level of your home directory (`/home/G/GROUP/[owner]`), as it compromises your privacy and can disable SSH key authentication. Specific sub-directories should be used for shared access."
+  },
+  {
+    "question": "Why are `setfacl` and `getfacl` not used on Niagara?",
+    "answer": "`setfacl` and `getfacl` only work on systems using Lustre, such as Cedar and Graham. Niagara uses GPFS, requiring the `mm*` commands like `mmputacl`, `mmgetacl`, etc."
+  }
+]

@@ -1,0 +1,146 @@
+[
+  {
+    "question": "What happens if a GROMACS checkpointing job finishes its simulation successfully?",
+    "answer": "If a checkpointing job finishes its simulation successfully, a message 'Simulation finished, cancelling pending jobs' will be echoed, and any remaining pending jobs in the array will be cancelled using `scancel -t pending $SLURM_ARRAY_JOB_ID`."
+  },
+  {
+    "question": "How is the `OMP_NUM_THREADS` environment variable set in a GPU checkpointing job script for GROMACS?",
+    "answer": "The `OMP_NUM_THREADS` environment variable is set using `export OMP_NUM_THREADS=\"${SLURM_CPUS_PER_TASK:-1}\"`."
+  },
+  {
+    "question": "Which modules are loaded for a GROMACS GPU checkpointing job using `StdEnv/2023`?",
+    "answer": "For a GROMACS GPU checkpointing job using `StdEnv/2023`, the following modules are loaded: `StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.2 gromacs/2024.4`."
+  },
+  {
+    "question": "How is the simulation name adjusted in the GROMACS checkpointing job script example?",
+    "answer": "The simulation name is adjusted by setting the `sim_name` variable, for example: `sim_name=md`."
+  },
+  {
+    "question": "How is the `nhours` variable calculated in the GROMACS checkpointing job script?",
+    "answer": "The `nhours` variable is calculated by retrieving the job's time limit from `squeue` using `$(squeue -h -j $SLURM_JOB_ID -O TimeLimit | cut -d: -f1)`."
+  },
+  {
+    "question": "What action is taken if the `gmx mdrun` command exits with an error (non-zero exit code) in a GROMACS checkpointing job?",
+    "answer": "If `gmx mdrun` exits with a non-zero exit code, a message \"Simulation exited with an error, cancelling pending jobs\" is echoed, all pending jobs in the array are cancelled, and the script exits with the error code."
+  },
+  {
+    "question": "What resource can help users determine optimal conditions for AMBER, GROMACS, NAMD, and OpenMM jobs on Alliance clusters?",
+    "answer": "A team at ACENET has created a Molecular Dynamics Performance Guide for Alliance clusters which can help determine optimal conditions."
+  },
+  {
+    "question": "Is achieving the best `mdrun` performance with GROMACS a simple task?",
+    "answer": "No, getting the best `mdrun` performance with GROMACS is not a straightforward task."
+  },
+  {
+    "question": "What factors determine the best parameters for GROMACS `mdrun` performance?",
+    "answer": "The best parameters depend on the size and shape of the system (number of particles, simulation box size) and simulation parameters (cutoffs, use of Particle-Mesh-Ewald method)."
+  },
+  {
+    "question": "Where can users find detailed information on `mdrun` performance options and strategies?",
+    "answer": "The GROMACS developers maintain a long section in their user-guide dedicated to `mdrun`-performance which explains all relevant options/parameters and strategies."
+  },
+  {
+    "question": "Where does GROMACS typically output performance information and statistics?",
+    "answer": "GROMACS prints performance information and statistics at the end of the `md.log` file."
+  },
+  {
+    "question": "How is simulation performance typically measured in GROMACS?",
+    "answer": "Simulation performance is typically quantified by the number of nanoseconds of MD-trajectory that can be simulated within a day (ns/day)."
+  },
+  {
+    "question": "How is parallel scaling defined in the context of GROMACS?",
+    "answer": "Parallel scaling (S) is defined as S = p_N / ( N * p_1 ), where p_N is the performance using N CPU cores."
+  },
+  {
+    "question": "What does a parallel scaling value of 1 (linear scaling) indicate?",
+    "answer": "An ideal parallel scaling (S = 1) indicates that the performance increases linearly with the number of CPU cores."
+  },
+  {
+    "question": "What is the most direct way to increase the number of MPI processes in GROMACS?",
+    "answer": "The most straightforward way to increase the number of MPI processes is by using Slurm's `--ntasks` or `--ntasks-per-node` in the job script."
+  },
+  {
+    "question": "What is Domain Decomposition in GROMACS and how does it work?",
+    "answer": "Domain Decomposition (DD) is used by GROMACS to distribute the work of solving non-bonded Particle-Particle (PP) interactions by effectively cutting the simulation box into domains along the X, Y, and/or Z axes, assigning each domain to one MPI process."
+  },
+  {
+    "question": "Under what conditions does parallel scaling drop significantly when using Domain Decomposition?",
+    "answer": "Parallel scaling drops significantly when the time needed for communication becomes large relative to the size (number of particles or volume) of the domain."
+  },
+  {
+    "question": "How does GROMACS address imbalances in domain workload?",
+    "answer": "GROMACS can use Dynamic Load Balancing to shift the boundaries between domains to some extent, avoiding situations where certain domains take significantly longer to solve."
+  },
+  {
+    "question": "What is the default `mdrun` parameter for dynamic load balancing?",
+    "answer": "The `mdrun` parameter `-dlb auto` is the default for dynamic load balancing."
+  },
+  {
+    "question": "What is the minimum size constraint for domains in GROMACS?",
+    "answer": "Domains cannot be smaller in any direction than the longest cutoff radius."
+  },
+  {
+    "question": "Which method is commonly used to calculate long-range non-bonded interactions beyond the cutoff radius?",
+    "answer": "The Particle-Mesh-Ewald method (PME) is often used to calculate long-range non-bonded interactions."
+  },
+  {
+    "question": "Why can PME performance degrade quickly when many MPI processes are involved?",
+    "answer": "PME requires global communication, so performance can degrade quickly when many MPI processes are calculating both short-range (PP) and long-range (PME) interactions."
+  },
+  {
+    "question": "How does GROMACS prevent PME performance degradation with many MPI processes?",
+    "answer": "GROMACS avoids PME performance degradation by dedicating specific MPI processes (PME-ranks) to only perform PME calculations."
+  },
+  {
+    "question": "When does `gmx mdrun` typically dedicate MPI processes to PME by default?",
+    "answer": "GROMACS `mdrun` by default uses heuristics to dedicate MPI processes to PME when the total number of MPI processes is 12 or greater."
+  },
+  {
+    "question": "How can a user manually choose the number of PME ranks?",
+    "answer": "The `mdrun` parameter `-npme` can be used to select the number of PME ranks manually."
+  },
+  {
+    "question": "How can a 'Load Imbalance' between PP and PME ranks be addressed?",
+    "answer": "One can shift work from the PP ranks to the PME ranks by increasing the cutoff radius."
+  },
+  {
+    "question": "Does increasing the cutoff radius to balance PP/PME load affect simulation results?",
+    "answer": "No, increasing the cutoff radius to balance PP/PME load will not affect the result, as the sum of short-range + long-range forces (or energies) will be the same for a given timestep."
+  },
+  {
+    "question": "Since which GROMACS version can PME be offloaded to the GPU?",
+    "answer": "Since GROMACS version 2018, PME can be offloaded to the GPU."
+  },
+  {
+    "question": "What is a limitation of GPU-accelerated PME in GROMACS 2018.1?",
+    "answer": "One limitation in GROMACS 2018.1 is that only a single GPU rank can be dedicated to PME."
+  },
+  {
+    "question": "How can GROMACS performance be improved once Domain Decomposition reaches its scaling limit?",
+    "answer": "Performance can be further improved by using OpenMP threads to spread the work of an MPI process over more than one CPU core."
+  },
+  {
+    "question": "How are OpenMP threads configured in a Slurm job script for GROMACS?",
+    "answer": "OpenMP threads are configured using Slurm's `--cpus-per-task` parameter in the job script (for both `#SBATCH` and `srun`) and by setting the `OMP_NUM_THREADS` variable or using the `mdrun` parameter `-ntomp`."
+  },
+  {
+    "question": "What is the recommended range for OpenMP threads per MPI process, according to GROMACS developers?",
+    "answer": "According to GROMACS developers, the optimum is usually between 2 and 6 OpenMP threads per MPI process (cpus-per-task)."
+  },
+  {
+    "question": "When might it be beneficial to try a larger number of `cpus-per-task` for GROMACS simulations?",
+    "answer": "For jobs running on a very large number of nodes, it might be worth trying an even larger number of `cpus-per-task`."
+  },
+  {
+    "question": "How does GROMACS optimize kernel functions for short-range non-bonded interactions?",
+    "answer": "GROMACS uses optimized kernel functions for a variety of SIMD instruction sets, such as AVX, AVX2, and AVX512, to compute the real-space portion of short-range, non-bonded interactions."
+  },
+  {
+    "question": "Who selects the appropriate SIMD kernel functions when GROMACS modules are loaded?",
+    "answer": "When a GROMACS module is loaded into the environment, an appropriate AVX/AVX2/AVX512 version is chosen by our team depending on the architecture of the cluster."
+  },
+  {
+    "question": "Where does GROMACS report the SIMD instruction set it supports?",
+    "answer": "GROMACS reports the SIMD instruction set it supports in its log file."
+  }
+]

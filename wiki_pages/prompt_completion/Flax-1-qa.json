@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What is Flax?",
+    "answer": "Flax is a neural network library and ecosystem for JAX, designed for flexibility, with an API for building models similar to PyTorch and Keras, and an API for training models based on functional programming."
+  },
+  {
+    "question": "How does Flax's model building API compare to other libraries?",
+    "answer": "Flax's API for building models is similar to that of PyTorch and Keras, where models are expressed as sequences of modules."
+  },
+  {
+    "question": "What programming paradigm is Flax's training API based on?",
+    "answer": "Flax's API for training models is designed around functional programming, being based on JAX."
+  },
+  {
+    "question": "How can you check the latest available version of Flax that has been built?",
+    "answer": "You can see the latest version by running the command `avail_wheels \"flax*\"`."
+  },
+  {
+    "question": "What is the recommended installation method for Flax on Compute Canada?",
+    "answer": "The preferred option is to install Flax using the Python wheel."
+  },
+  {
+    "question": "What are the steps to install Flax using the Compute Canada wheel?",
+    "answer": "1. Load a Python module (`module load python`). 2. Create and start a virtual environment. 3. Install Flax in the virtual environment using `pip install --no-index flax`."
+  },
+  {
+    "question": "How does Flax achieve high-performance?",
+    "answer": "Flax derives its high-performance from a combination of a functional paradigm, automatic differentiation, and TensorFlow's Accelerated Linear Algebra (XLA) compiler."
+  },
+  {
+    "question": "What is the role of JAX's Just-In-Time (JIT) compiler in Flax's performance?",
+    "answer": "JAX's JIT compiler can leverage XLA on repeatedly called code blocks during a training loop (e.g., loss computation, backpropagation, gradient updates)."
+  },
+  {
+    "question": "What advantage does XLA provide regarding device execution?",
+    "answer": "XLA handles compiling code blocks into CPU or GPU code transparently, so the Python code remains the same regardless of the execution device."
+  },
+  {
+    "question": "What is the recommendation for training small-scale models with Flax concerning CPU vs. GPU usage?",
+    "answer": "When training small-scale models, it is strongly recommended to use multiple CPUs instead of a GPU."
+  },
+  {
+    "question": "Why should GPUs generally be avoided for small-scale Flax models in a shared HPC environment?",
+    "answer": "Using a GPU for small models or datasets may not provide significant speed-up, could lead to underutilization of the GPU's capabilities, unnecessarily block resources for other users, and consume group allocation."
+  },
+  {
+    "question": "What is the general guideline for requesting a GPU for a Flax job?",
+    "answer": "You should not ask for a GPU if your code is not capable of making a reasonable use of its compute capacity."
+  },
+  {
+    "question": "How can you run the `flax-example.sh` script using only CPUs instead of a GPU?",
+    "answer": "To run using only CPUs, remove the lines `#SBATCH --gres=gpu:1` and `module load cuda` from the `flax-example.sh` script."
+  },
+  {
+    "question": "Which Python libraries are installed in the virtual environment within the `flax-example.sh` script?",
+    "answer": "The `flax-example.sh` script installs `flax`, `tensorflow`, and `torchvision`."
+  },
+  {
+    "question": "What does the `Net` class represent in `flax-example.py`?",
+    "answer": "The `Net` class in `flax-example.py` defines a neural network model using `flax.linen.nn.Module`."
+  },
+  {
+    "question": "How are the model's initial parameters generated in `flax-example.py`?",
+    "answer": "Model parameters are initialized using `model.init(seed, jnp.ones([3,32,32]))['params']`, which sets up weights with `jnp.ones()` matching the model's input shape."
+  },
+  {
+    "question": "What tool is used for data loading and pre-processing in the `flax-example.py` script, since Flax and JAX don't provide these functionalities?",
+    "answer": "PyTorch's `torchvision` and `torch.utils.data` are used for data loading and pre-processing."
+  },
+  {
+    "question": "What is the function of the `CastToJnp` helper class in `flax-example.py`?",
+    "answer": "The `CastToJnp` helper class is used to cast NumPy arrays to JAX arrays (specifically `jnp.float32`)."
+  },
+  {
+    "question": "How is the entire training step (forward and backward pass) optimized for performance in `flax-example.py`?",
+    "answer": "The `train_step` function, which encapsulates the loss computation and gradient calculation, is JIT-compiled using the `@jax.jit` decorator."
+  },
+  {
+    "question": "How are weight updates optimized in `flax-example.py`?",
+    "answer": "The `update_state` function, responsible for applying gradients, is JIT-compiled using the `@jax.jit` decorator."
+  }
+]

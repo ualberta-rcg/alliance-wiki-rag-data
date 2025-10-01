@@ -1,0 +1,46 @@
+[
+  {
+    "question": "How should submission parameters for a GROMACS task be configured for optimal execution?",
+    "answer": "The `OMP_NUM_THREADS` variable must represent the requested number of cores, and it is best to ensure it matches the `--cpus-per-task` setting by using the `SLURM_CPUS_PER_TASK` environment variable."
+  },
+  {
+    "question": "Can you provide an example of a GROMACS submission script where `OMP_NUM_THREADS` is incorrectly configured?",
+    "answer": "An example is a script that requests `#SBATCH --cpus-per-task=8` but then explicitly sets `export OMP_NUM_THREADS=4`, leading to requested cores not matching the threads used."
+  },
+  {
+    "question": "What is the consequence of mismatched `OMP_NUM_THREADS` and `--cpus-per-task` values in a GROMACS job?",
+    "answer": "If `OMP_NUM_THREADS` is half of what is requested with `--cpus-per-task` (e.g., 4 vs 8), only half of the allocated CPU cores will be utilized (e.g., 16 out of 32), resulting in wasted resources."
+  },
+  {
+    "question": "How can you correct a GROMACS submission script to ensure `OMP_NUM_THREADS` matches the requested `--cpus-per-task`?",
+    "answer": "To ensure alignment, use `export OMP_NUM_THREADS=\"${SLURM_CPUS_PER_TASK:-1}\"` in the submission script, which automatically sets `OMP_NUM_THREADS` to the value of `--cpus-per-task`."
+  },
+  {
+    "question": "What are the general recommendations to avoid CPU wastage?",
+    "answer": "Key recommendations include identifying the task type, starting with simple 1-2 CPU tests, consulting application documentation for parallelism, performing tests in interactive tasks, utilizing visualization portals, connecting to active nodes, and seeking help when needed."
+  },
+  {
+    "question": "How can one determine the optimal number of cores for an application when its behavior is unknown?",
+    "answer": "Start by running a simple test with 1 CPU, then try with 2 CPUs and observe if both are used efficiently. Additionally, consult the application's documentation for parameters like `--threads` or `--cores`."
+  },
+  {
+    "question": "What is the purpose of using visualization portals for resource management?",
+    "answer": "Visualization portals enable users to monitor the actual usage of resources (CPU, memory, GPU) and identify any inefficiencies or wastage."
+  },
+  {
+    "question": "Why is connecting to an active node during task execution recommended?",
+    "answer": "Connecting to an active node during task execution can provide valuable indications and insights into the program's behavior."
+  },
+  {
+    "question": "What is the first type of GPU resource wastage described?",
+    "answer": "Requesting a GPU but not utilizing it at all during the task execution."
+  },
+  {
+    "question": "What should be done if a GPU is requested but remains unused during a task?",
+    "answer": "It is advisable to question the necessity of using a GPU for that task and perform a comparative test between CPU and GPU execution to determine if GPU use is justified."
+  },
+  {
+    "question": "Why might a task run faster on a GPU node even if the GPU itself is not being used?",
+    "answer": "The faster execution might be due to the more powerful CPUs available on GPU nodes, rather than any acceleration provided by the GPU."
+  }
+]

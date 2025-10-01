@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What is BLAST?",
+    "answer": "BLAST (\"Basic Local Alignment Search Tool\") finds regions of similarity between biological sequences. It compares nucleotide or protein sequences to sequence databases and calculates statistical significance."
+  },
+  {
+    "question": "How can I find more information about BLAST arguments?",
+    "answer": "You can find more information on BLAST arguments in the user manual at https://www.ncbi.nlm.nih.gov/books/NBK279684/ or by using the command `blastn -help`."
+  },
+  {
+    "question": "Where are frequently used sequence databases for BLAST installed on the clusters?",
+    "answer": "Frequently used sequence databases are installed on the clusters in `/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2022_03_23/`."
+  },
+  {
+    "question": "How can I examine the contents of the BLAST database directory on the clusters?",
+    "answer": "You can examine the directory and its subdirectories using the command `ls /cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2022_03_23/`."
+  },
+  {
+    "question": "What files are used as the reference database and queries in the provided examples?",
+    "answer": "The file `ref.fa` is used as the reference database in FASTA format, and `seq.fa` as the queries."
+  },
+  {
+    "question": "What is a necessary preprocessing step before running a BLAST search?",
+    "answer": "Before running a search, the database must be built using `makeblastdb`."
+  },
+  {
+    "question": "What is the purpose of the `makeblastdb` command in a BLAST workflow?",
+    "answer": "The `makeblastdb` command is used to build the reference database before running a BLAST search."
+  },
+  {
+    "question": "How can BLAST search performance be improved through data parallelism?",
+    "answer": "BLAST search can greatly benefit from data parallelism by splitting the query file into multiple smaller queries and running these queries against the database concurrently."
+  },
+  {
+    "question": "What are the recommended chunk sizes for splitting the `seq.fa` file to accelerate a BLAST search?",
+    "answer": "The `seq.fa` file should be split into smaller chunks of at least 1MB or greater, but not smaller, to avoid hurting the parallel filesystem."
+  },
+  {
+    "question": "Which utility is recommended for splitting a sequence file into smaller chunks?",
+    "answer": "The `faSplit` utility is recommended for splitting a sequence file."
+  },
+  {
+    "question": "How would you use `faSplit` to divide a file named `seqs.fa` into 10 parts, naming them `seqN.fa`?",
+    "answer": "First, load the `kentutils/20180716` module, then use the command `faSplit sequence seqs.fa 10 seq` to create 10 files named `seqN.fa` (where N is 0-9)."
+  },
+  {
+    "question": "How does a job array handle split queries for BLAST submission?",
+    "answer": "A job array creates a task for each split query file (e.g., `seq.fa.N`), where the task ID from the array maps to the specific query file to be processed."
+  },
+  {
+    "question": "What command is used to run a BLAST search for a specific query file within a job array task?",
+    "answer": "Within a job array task, the command `blastn -db ref.fa -query seq.fa.${SLURM_ARRAY_TASK_ID} > seq.ref.${SLURM_ARRAY_TASK_ID}` is used to run the search."
+  },
+  {
+    "question": "How do you submit the `blastn_array.sh` script to ensure it runs only after `makeblastdb.sh` has successfully completed?",
+    "answer": "You submit it using `sbatch --dependency=afterok:$(sbatch makeblastdb.sh) blastn_array.sh`."
+  },
+  {
+    "question": "Once all tasks in a BLAST job array are complete, how can the individual results be combined into a single file?",
+    "answer": "The results can be concatenated using the command `cat seq.ref.{0..9} > seq.ref`."
+  }
+]

@@ -1,0 +1,126 @@
+[
+  {
+    "question": "What is an automation node used for?",
+    "answer": "An automation node is used for automated workflows where an outside machine connects to a cluster without human intervention and cannot use a second authentication factor."
+  },
+  {
+    "question": "Why are automation nodes necessary now that MFA is a requirement?",
+    "answer": "Now that Multi-Factor Authentication (MFA) is a requirement, automation nodes are necessary because automated workflows cannot make use of a second authentication factor."
+  },
+  {
+    "question": "What are the limitations of an automation node compared to a regular login node?",
+    "answer": "An automation node is much more limited than a regular login node in terms of the type of authentication it accepts and the types of actions it can be used to perform."
+  },
+  {
+    "question": "How do you request access to an automation node?",
+    "answer": "To request access to an automation node, you must contact technical support and explain in detail the type of automation you intend to use, including the commands to be executed and the tools or libraries you will be using."
+  },
+  {
+    "question": "What is the only accepted authentication method for automation nodes?",
+    "answer": "The only accepted means of authentication for automation nodes is through SSH keys uploaded to the CCDB."
+  },
+  {
+    "question": "Are SSH keys stored in `~/.ssh/authorized_keys` accepted for automation nodes?",
+    "answer": "No, SSH keys written in your `~/.ssh/authorized_keys` file are not accepted for automation nodes."
+  },
+  {
+    "question": "What is the rule regarding reusing SSH keys for automation workflows?",
+    "answer": "You should follow the rule of 'one SSH key per use' and not reuse a key for interactive login. Instead, generate a new SSH key specifically for your automation workflow."
+  },
+  {
+    "question": "What are the three mandatory constraints for SSH keys used with automation nodes?",
+    "answer": "The three mandatory constraints are `restrict`, `from=\"pattern-list\"`, and `command=\"COMMAND\"`."
+  },
+  {
+    "question": "What does the `restrict` constraint disable?",
+    "answer": "The `restrict` constraint disables port forwarding, agent forwarding, X11 forwarding, and the pseudo teletype (PTY), blocking most interactive workloads."
+  },
+  {
+    "question": "Why is the `restrict` constraint required for automation nodes?",
+    "answer": "It is required because automation nodes are not intended for long-running or interactive processes; regular login nodes must be used for those purposes."
+  },
+  {
+    "question": "What does the `from=\"pattern-list\"` constraint specify?",
+    "answer": "This constraint specifies that the SSH key can only be used from IP addresses that match the provided patterns, ensuring it's not used from unintended computers."
+  },
+  {
+    "question": "What is required for the IP address patterns in the `from` constraint?",
+    "answer": "The pattern list must include only public IP addresses that fully specify at least the network class, the network, and the subnet (the first three elements of an IP address), for example, `x.y.z.*` is accepted, but `x.y.*.*` is not."
+  },
+  {
+    "question": "Which types of IP addresses are not accepted in the `from` constraint?",
+    "answer": "Private IP addresses, such as `10.0.0.0 \u2013 10.255.255.255`, `172.16.0.0 \u2013 172.31.255.255`, and `192.168.0.0 \u2013 192.168.255.255`, are not accepted."
+  },
+  {
+    "question": "How can you find your public IP address?",
+    "answer": "You can use a site like [https://whatismyipaddress.com/ What Is My IP Address?] or the shell command `curl ifconfig.me` to learn your public IP address."
+  },
+  {
+    "question": "What is the purpose of the `command=\"COMMAND\"` constraint?",
+    "answer": "The `command=\"COMMAND\"` constraint forces a specific command to be executed when the connection is established, allowing restriction of which commands can be used with that key."
+  },
+  {
+    "question": "When are `command` constraints most useful?",
+    "answer": "They are most useful when using a wrapper script that accepts or rejects commands based on which command is being called."
+  },
+  {
+    "question": "Where can users find provided wrapper scripts for `command` constraints?",
+    "answer": "These scripts are defined in the [https://github.com/ComputeCanada/software-stack-custom/tree/main/bin/computecanada/allowed_commands this git repository]."
+  },
+  {
+    "question": "Which wrapper script allows only file transfer commands?",
+    "answer": "`/cvmfs/soft.computecanada.ca/custom/bin/computecanada/allowed_commands/transfer_commands.sh` allows only file transfers, such as `scp`, `sftp`, or `rsync`."
+  },
+  {
+    "question": "What commands does `/cvmfs/soft.computecanada.ca/custom/bin/computecanada/allowed_commands/archiving_commands.sh` allow?",
+    "answer": "This script allows commands to archive files, such as `gzip`, `tar`, or `dar`."
+  },
+  {
+    "question": "Which wrapper script allows commands like `mv`, `cp`, or `rm`?",
+    "answer": "`/cvmfs/soft.computecanada.ca/custom/bin/computecanada/allowed_commands/file_commands.sh` allows commands to manipulate files, such as `mv`, `cp`, or `rm`."
+  },
+  {
+    "question": "Which script allows the `git` command?",
+    "answer": "`/cvmfs/soft.computecanada.ca/custom/bin/computecanada/allowed_commands/git_commands.sh` allows the `git` command."
+  },
+  {
+    "question": "What commands does `/cvmfs/soft.computecanada.ca/custom/bin/computecanada/allowed_commands/slurm_commands.sh` permit?",
+    "answer": "This script allows some Slurm commands, such as `squeue` and `sbatch`."
+  },
+  {
+    "question": "Which wrapper script allows all common actions mentioned?",
+    "answer": "`/cvmfs/soft.computecanada.ca/custom/bin/computecanada/allowed_commands/allowed_commands.sh` allows all the listed common actions."
+  },
+  {
+    "question": "Where must the SSH key constraints be added before uploading to CCDB?",
+    "answer": "The constraints must be added directly as text in front of your key, before uploading the complete string in [https://ccdb.alliancecan.ca/ssh_authorized_keys your account]."
+  },
+  {
+    "question": "What are the hostnames for automation nodes on the Fir, Narval, and Rorqual clusters?",
+    "answer": "The hostnames are `robot.fir.alliancecan.ca` for Fir, `robot.narval.alliancecan.ca` for Narval, and `robot.rorqual.alliancecan.ca` for Rorqual."
+  },
+  {
+    "question": "How do you specify a specific private key when using `ssh` or `scp` commands?",
+    "answer": "You can specify a private key using the `-i` parameter, for example: `ssh -i .ssh/private_key_to_use ...` or `scp -i .ssh/private_key_to_use ...`."
+  },
+  {
+    "question": "How do you specify a specific private key for `rsync`?",
+    "answer": "For `rsync`, you use the `-e` option to pass SSH parameters, for example: `rsync -e \"ssh -i .ssh/private_key_to_use\" ...`."
+  },
+  {
+    "question": "How can you conveniently manage SSH key parameters for automation nodes?",
+    "answer": "It is often more convenient to put these parameters into your `~/.ssh/config` file, so they get picked up by any ssh client invocation."
+  },
+  {
+    "question": "What is a potential issue when connecting to an automation node related to IP addressing?",
+    "answer": "The SSH client on your computer may choose to use IPv6 addressing over IPv4, which can lead to a problem if the `restrict,from=` field in your SSH key specifies an IPv4 address mask and the connection attempts with IPv6."
+  },
+  {
+    "question": "In which operating system environment is the IPv6 addressing preference more probable?",
+    "answer": "This seems to be more probable in a Windows environment."
+  },
+  {
+    "question": "What happens if your SSH client uses IPv6 but your CCDB SSH key specifies an IPv4 address mask?",
+    "answer": "The source address will not match the mask in the key, and the key will not be accepted by the automation node."
+  }
+]

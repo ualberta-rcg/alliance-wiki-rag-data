@@ -1,0 +1,78 @@
+[
+  {
+    "question": "What type of files often cause performance and backup problems on shared filesystems?",
+    "answer": "Very large collections of small files, typically hundreds of thousands or more, with individual files less than a few hundred kilobytes, are common problems, especially in AI and Machine Learning domains."
+  },
+  {
+    "question": "What are the main issues caused by a large number of small files on shared filesystems?",
+    "answer": "They cause problems due to filesystem quotas limiting the number of objects, degrade the performance of shared filesystems, and complicate the automated backup of home and project spaces."
+  },
+  {
+    "question": "How can I recursively count all files in folders within the current directory?",
+    "answer": "You can use the following code: `for FOLDER in $(find . -maxdepth 1 -type d | tail -n +2); do echo -ne \"$FOLDER:\\t\"; find $FOLDER -type f | wc -l; done`"
+  },
+  {
+    "question": "What command can be used to identify the top 10 directories consuming the most disk space from the current directory?",
+    "answer": "You can use the command: `du -sh * | sort -hr | head -10`"
+  },
+  {
+    "question": "What are the performance characteristics of local disks on compute nodes compared to project or scratch filesystems?",
+    "answer": "Local disks, which are at least SATA SSD or better, generally offer considerably better performance than project or scratch filesystems."
+  },
+  {
+    "question": "Is local disk on a compute node allocated exclusively to a single job?",
+    "answer": "No, a local disk is shared by all running jobs on that node and is not allocated by the scheduler."
+  },
+  {
+    "question": "How much local disk space is typically available on B\u00e9luga's CPU nodes?",
+    "answer": "B\u00e9luga CPU nodes offer approximately 370GB of local disk."
+  },
+  {
+    "question": "What kind of local storage do B\u00e9luga's GPU nodes provide, and for what purpose?",
+    "answer": "B\u00e9luga GPU nodes feature a 1.6TB NVMe disk, primarily to assist with AI image datasets containing millions of small files."
+  },
+  {
+    "question": "Do Niagara's compute nodes have local storage?",
+    "answer": "No, Niagara's compute nodes do not have local storage."
+  },
+  {
+    "question": "What is the minimum assumed local disk size for other clusters not specifically mentioned?",
+    "answer": "For other clusters, you can assume the available local disk size to be at least 190GB."
+  },
+  {
+    "question": "How can a user access the local disk inside a job?",
+    "answer": "The local disk can be accessed inside a job using the environment variable `$SLURM_TMPDIR`."
+  },
+  {
+    "question": "Describe a common workflow for managing datasets using local disk within a job.",
+    "answer": "A common approach is to store the dataset as a single `tar` file in the project space, copy it to the local disk (`$SLURM_TMPDIR`) at the beginning of the job, extract it, use it for computations, and then re-archive any changes and copy them back to the project space at the job's end."
+  },
+  {
+    "question": "How would you extract an archived dataset to the local disk in a Slurm job script?",
+    "answer": "You would `cd $SLURM_TMPDIR`, optionally create a work directory, and then use a command like `tar -xf ~/projects/def-foo/johndoe/my_data.tar` to extract the archive."
+  },
+  {
+    "question": "How can results from computations on the local disk be saved back to the project space at the end of a Slurm job?",
+    "answer": "At the end of the job, you would typically `cd $SLURM_TMPDIR` and then use `tar -cf ~/projects/def-foo/johndoe/results.tar work` to archive and copy the results back to the project space."
+  },
+  {
+    "question": "What file system on compute nodes can be used as a RAM disk?",
+    "answer": "The `/tmp` file system can be used as a RAM disk on the compute nodes."
+  },
+  {
+    "question": "How is the `/tmp` file system implemented when used as a RAM disk?",
+    "answer": "It is implemented using `tmpfs`."
+  },
+  {
+    "question": "When is the `/tmp` RAM disk cleared on compute nodes?",
+    "answer": "The `/tmp` RAM disk is cleared at job end."
+  },
+  {
+    "question": "How does the memory usage of the `/tmp` RAM disk relate to Slurm job requests?",
+    "answer": "Like all other memory use of a job, `/tmp`'s memory usage falls under the cgroup limit corresponding to the `sbatch` request."
+  },
+  {
+    "question": "Why might the `df` command report a misleading size for `/tmp`?",
+    "answer": "The `df` command might report `/tmp`'s size as the node's total physical RAM (`MemTotal`), which does not correspond to the `sbatch` memory request and can potentially confuse some scripts."
+  }
+]

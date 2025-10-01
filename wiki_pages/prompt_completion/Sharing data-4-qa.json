@@ -1,22 +1,62 @@
 [
   {
-    "question": "What commands can be used to grant execute permissions on a project directory for a data sharing group?",
-    "answer": "A PI can grant execute permissions using either `chmod o+X /project/def-<PI>/` or `setfacl -m g:wg_datasharing:X /project/def-<PI>/`."
+    "question": "When sharing a directory in the project filesystem, what path should be provided to collaborators?",
+    "answer": "You must provide collaborators with a path that starts with `/project`, not `/home/<user>/projects`."
   },
   {
-    "question": "How do you add a data sharing group to the Access Control List (ACL) for a shared directory to apply to new data?",
-    "answer": "Use the command `$ setfacl -d -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data`."
+    "question": "Why shouldn't `/home/<user>/projects` be used when sharing directories with collaborators?",
+    "answer": "The `/home/<user>/projects` path contains symbolic links that will not be reachable by your collaborators unless they also have access to your home directory."
   },
   {
-    "question": "What command adds a data sharing group to the ACL for a shared directory, including existing content?",
-    "answer": "The command is `$ setfacl -R -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data`."
+    "question": "How can you determine the physical path a symbolic link points to?",
+    "answer": "You can get the physical path a symlink points to using the `realpath` command."
   },
   {
-    "question": "How can you check if you have read access to all items in a specific directory recursively?",
-    "answer": "You can use the command `find <directory_name> ! -readable -ls` to list all items you cannot read."
+    "question": "Is the physical path to a project directory always consistent across all clusters?",
+    "answer": "No, the physical path to a project directory is not the same on all clusters. If you wish to share a project directory on more than one cluster, you should check its physical path with `realpath` on each cluster."
   },
   {
-    "question": "What command lists all unreadable items within a given directory?",
-    "answer": "The command `find <directory_name> ! -readable -ls` can be used to list all items that are not readable to you in a specified directory."
+    "question": "What command is used to recursively remove all extended Access Control List (ACL) attributes from a directory?",
+    "answer": "To remove all extended ACL attributes from a directory recursively, use `setfacl -bR /home/<user>/projects/def-<PI>/shared_data`."
+  },
+  {
+    "question": "What is a 'data sharing group' primarily used for?",
+    "answer": "A data sharing group is used for more complicated data sharing scenarios, such as those involving multiple people on multiple clusters."
+  },
+  {
+    "question": "When is it necessary to create a data sharing group?",
+    "answer": "You do not need a data sharing group except in specialized sharing circumstances."
+  },
+  {
+    "question": "What is the first step to create a data sharing group?",
+    "answer": "The first step is to send an email to technical support requesting the creation of the data sharing group, indicating its name and that you should be the owner."
+  },
+  {
+    "question": "After technical support creates a data sharing group, where do you go to manage it?",
+    "answer": "Once the group is created, you can access and manage it by going to `https://ccdb.computecanada.ca/services/`."
+  },
+  {
+    "question": "What permissions are required on parent directories for a data sharing group to function correctly?",
+    "answer": "The parent directories of the data you are trying to share must have execute permissions either for everyone or for the data sharing group itself."
+  },
+  {
+    "question": "How can a PI grant execute permissions for everyone on a project directory to facilitate data sharing with a group?",
+    "answer": "A PI can grant execute permissions for everyone on a project directory using the command `chmod o+X /project/def-<PI>/`."
+  },
+  {
+    "question": "How can a PI grant execute permissions to a specific data sharing group (`wg_datasharing`) on a project directory?",
+    "answer": "A PI can grant execute permissions to a specific data sharing group using the command `setfacl -m g:wg_datasharing:X /project/def-<PI>/`."
+  },
+  {
+    "question": "What command adds a data sharing group to the ACL for *new* files and directories within a shared directory?",
+    "answer": "To add a data sharing group to the ACL for new files and directories, use `setfacl -d -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data`."
+  },
+  {
+    "question": "What command adds a data sharing group to the ACL for *existing* files and directories within a shared directory?",
+    "answer": "To add a data sharing group to the ACL for existing files and directories, use `setfacl -R -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data`."
+  },
+  {
+    "question": "How can you check if you have read access to all items within a specific directory for troubleshooting?",
+    "answer": "You can use the command `find <directory_name> ! -readable -ls` to list all items within that directory that are not readable by you."
   }
 ]

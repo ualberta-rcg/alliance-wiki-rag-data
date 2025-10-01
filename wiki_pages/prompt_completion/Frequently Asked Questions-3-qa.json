@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What are common reasons for incorrect file group ownership in the `/project` directory?",
+    "answer": "Incorrect file group ownership can occur if files were moved from `/home` to `/project` using the `mv` command, if files were transferred from another cluster with `rsync` or `scp` using options that preserve original group ownership, or if the `setgid` bit is not set on your Project folders."
+  },
+  {
+    "question": "How can I display files in my `/project` directory that have the wrong group ownership?",
+    "answer": "You can use the command `lfs find ~/projects/*/ -group $USER` to display files with incorrect group ownership."
+  },
+  {
+    "question": "After identifying files with wrong group ownership in `/project`, how do I change their ownership to the correct project group?",
+    "answer": "You can change ownership from your user group to the project group using a command like `chown -h -R $USER:def-professor -- ~/projects/def-professor/$USER/`, replacing `def-professor` with your specific project group name."
+  },
+  {
+    "question": "What command should I use to ensure newly created files in my `/project` directory inherit the correct directory's group membership?",
+    "answer": "To ensure newly created files inherit the directory's group membership, you should set the `setgid` bit on all directories using a command like `lfs find ~/projects/def-professor/$USER -type d -print0 | xargs -0 chmod g+s`."
+  },
+  {
+    "question": "How do I verify that project space directories have correct permissions set after fixing ownership issues?",
+    "answer": "You can verify the correct permissions by running `chmod 2770 ~/projects/def-professor/` and `chmod 2700 ~/projects/def-professor/$USER`."
+  },
+  {
+    "question": "How is file ownership structured in Linux by default?",
+    "answer": "By default, each file in Linux belongs to a person (user) and a group. A file created by 'username' is owned by 'username:username', where 'username' is also the name of their default group."
+  },
+  {
+    "question": "For which directories is the default `username:username` file ownership appropriate?",
+    "answer": "This file ownership is good for your home directory and the scratch space."
+  },
+  {
+    "question": "Why does having files owned by my default `username` group in the project space lead to quota issues?",
+    "answer": "Files owned by the `username` group (your default group) have a very small limit in the project space (e.g., 2MB). If you place large amounts of data with this ownership, you will quickly exceed this small limit, even if your actual project group has a much larger allocation."
+  },
+  {
+    "question": "How does the group ownership of files affect quota limits in the Project space?",
+    "answer": "In the Project space, the group to which files belong determines the quota limit, not necessarily the individual user who owns the files."
+  },
+  {
+    "question": "Why might software insist on retaining original file ownership when moving data, causing project quota problems?",
+    "answer": "Depending on the software used to copy files, it may either respect the ownership of the destination directory and apply the correct group, or it may insist on retaining the original ownership of the source data, which can cause files to have the wrong group in the project space."
+  },
+  {
+    "question": "What does the `sbatch: error: Batch job submission failed: Socket timed out on send/recv operation` message indicate?",
+    "answer": "This message indicates that the load on the Slurm manager or scheduler process is too high, causing a socket timeout during job submission."
+  },
+  {
+    "question": "What should I do if I encounter an `sbatch: error: Socket timed out` message?",
+    "answer": "You should wait a minute or so, then run `squeue -u $USER` to see if the job was accepted despite the error. If the job does not appear, you should submit it again."
+  },
+  {
+    "question": "How can I check why my Slurm jobs are in the pending (`PD`) state?",
+    "answer": "You can check why your jobs are in the `PD` (pending) state by running the `squeue -u <username>` command on the cluster."
+  },
+  {
+    "question": "What does a `(REASON)` of `Resources` mean for a pending Slurm job?",
+    "answer": "A `(REASON)` of `Resources` means the cluster is very busy, and you will need to be patient or consider submitting a job that asks for fewer resources (e.g., CPUs/nodes, GPUs, memory, time)."
+  },
+  {
+    "question": "What does a `(REASON)` of `Priority` mean for a pending Slurm job?",
+    "answer": "A `(REASON)` of `Priority` means your job is waiting to start due to its lower priority, often because you or other members of your research group have been over-consuming your fair share of cluster resources recently."
+  }
+]

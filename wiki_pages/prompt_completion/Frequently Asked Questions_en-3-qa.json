@@ -1,0 +1,62 @@
+[
+  {
+    "question": "How can I find files in my `/project` directory that have the wrong group ownership?",
+    "answer": "You can use the command `lfs find ~/projects/*/ -group $USER` to display files in your project directory that belong to your user group instead of a project group."
+  },
+  {
+    "question": "How do I change the group ownership of files in my `/project` directory from my user group to a project group (e.g., `def-professor`)?",
+    "answer": "To change file ownership, use the command `chown -h -R $USER:def-professor -- ~/projects/def-professor/$USER/`, replacing `def-professor` with your actual project group."
+  },
+  {
+    "question": "How do I ensure that newly created files in my project directory inherit the correct project group membership?",
+    "answer": "You need to set the `setgid` bit on all directories in your project space using `lfs find ~/projects/def-professor/$USER -type d -print0 | xargs -0 chmod g+s`."
+  },
+  {
+    "question": "What are the correct permissions for project space directories to resolve ownership issues?",
+    "answer": "You should set permissions as `chmod 2770 ~/projects/def-professor/` for the main project directory and `chmod 2700 ~/projects/def-professor/$USER` for subdirectories, replacing `def-professor` and `$USER` with appropriate values."
+  },
+  {
+    "question": "What is the default ownership of a file created in Linux?",
+    "answer": "By default, a file you create in Linux belongs to you, the user (e.g., `username`), and your group, which is named the same as your username (e.g., `username:username`)."
+  },
+  {
+    "question": "What determines the quota limit for files in the Project space?",
+    "answer": "In the Project space, the quota limit is determined by the group the files belong to, not by which user owns the files."
+  },
+  {
+    "question": "Why might I encounter a 'Disk quota exceeded' error in my `/project` directory, even if a large project allocation exists?",
+    "answer": "You might get this error if your files are owned by your default user group (e.g., `username:username`), which has a very small quota (e.g., 2MB) in the project space, rather than belonging to a designated project group with a larger allocation."
+  },
+  {
+    "question": "What is a common cause for files in the project space having incorrect group ownership?",
+    "answer": "A common cause is that the software used to copy the files insists on retaining the original group ownership from the source data (e.g., `username:username`) instead of applying the correct project group ownership (e.g., `username:def-professor`) for the destination."
+  },
+  {
+    "question": "What should I do if I receive the error message 'sbatch: error: Batch job submission failed: Socket timed out on send/recv operation'?",
+    "answer": "This error typically indicates high load on the Slurm manager. You should wait about a minute, then run `squeue -u $USER` to see if your job was accepted. If not, submit it again."
+  },
+  {
+    "question": "How can I determine why my jobs are in the pending (PD) state?",
+    "answer": "You can determine why your jobs are pending by running the command `squeue -u <username>` and checking the `(REASON)` column."
+  },
+  {
+    "question": "What does a 'Resources' reason indicate for a pending job?",
+    "answer": "A 'Resources' reason means the cluster is very busy, and you should be patient or consider requesting fewer resources for your job."
+  },
+  {
+    "question": "What does a 'Priority' reason indicate for a pending job?",
+    "answer": "A 'Priority' reason means your job is waiting because its priority is lower due to you or your research group having over-consumed your fair share of cluster resources recently."
+  },
+  {
+    "question": "How can I check my fair share consumption of cluster resources?",
+    "answer": "You can track your fair share consumption using the `sshare` command."
+  },
+  {
+    "question": "What does the `LevelFS` column in the `sshare` output mean?",
+    "answer": "The `LevelFS` column indicates your consumption relative to your fair share. A value greater than one means you are consuming fewer resources, while a value less than one means you are consuming more. Values closer to zero indicate greater overconsumption and lower job priority."
+  },
+  {
+    "question": "Does the Slurm scheduler remember past resource consumption when calculating job priority?",
+    "answer": "Yes, the Slurm scheduler has a memory effect, gradually 'forgetting' about any over- or under-consumption of resources from months past when calculating `LevelFS`."
+  }
+]

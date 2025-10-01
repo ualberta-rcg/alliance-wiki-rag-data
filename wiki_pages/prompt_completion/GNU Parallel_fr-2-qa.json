@@ -1,0 +1,54 @@
+[
+  {
+    "question": "How do you count characters in a large FASTA file using GNU Parallel with 8 cores?",
+    "answer": "You can use the command `parallel --jobs $SLURM_CPUS_PER_TASK --keep-order --block -1 --recstart '>' --pipepart wc :::: database.fa`."
+  },
+  {
+    "question": "Which GNU Parallel options are specifically used for processing large files in parallel?",
+    "answer": "The options `--jobs`, `--keep-order`, `--block`, `--recstart`, and `--pipepart` are used for processing large files."
+  },
+  {
+    "question": "What is the impact of using a block size that is too small when processing large files with GNU Parallel?",
+    "answer": "An overly small block size results in too many tasks being distributed across available cores, potentially reducing efficiency, as seen when a 10MB block size for an 827MB database created 83 tasks."
+  },
+  {
+    "question": "What happens if the block size is too large when using GNU Parallel for large files?",
+    "answer": "An overly large block size can lead to inefficient core utilization, with only a single core being used even if more are available, as demonstrated when an 827MB block size for an 827MB database only utilized 1 out of 8 cores."
+  },
+  {
+    "question": "What is the most efficient block size setting for GNU Parallel when working with large files?",
+    "answer": "Leaving GNU Parallel to adapt and decide the block size itself, by using `--block -1`, is often the fastest approach."
+  },
+  {
+    "question": "What is the purpose of the `--recstart` option in GNU Parallel when processing files like FASTA?",
+    "answer": "The `--recstart '>'` option specifies that new records or blocks should start with the `>` character, which is typical for FASTA format files."
+  },
+  {
+    "question": "How can you estimate the duration for 1000 simulations if each simulation requires 2GB of memory, 1 core, and 5 minutes?",
+    "answer": "With 1 core, 1000 simulations would take 83.3 hours. On a single node with 32 cores, the duration would be 6 hours."
+  },
+  {
+    "question": "How do you run a list of simulations using GNU Parallel where parameters are stored in a file?",
+    "answer": "You can use a file (e.g., `my_parameters.txt`) where parameters are separated by tabs, with each line representing a simulation, and then execute it with `parallel -j $SLURM_CPUS_PER_TASK --colsep '\\t' my_simulator --alpha {1} --beta {2} :::: ./my_parameters.txt`."
+  },
+  {
+    "question": "What is the expected format for a parameter file used with GNU Parallel for multiple simulations?",
+    "answer": "The parameters in the file should be separated by a tab character (`\\t`), and each line should correspond to a distinct simulation."
+  },
+  {
+    "question": "How do you execute simulations in GNU Parallel if the full commands and their parameters are already listed in a file?",
+    "answer": "You can create a file (e.g., `my_commands.txt`) with each full command on a separate line, and then execute it with `parallel -j $SLURM_CPUS_PER_TASK < ./my_commands.txt`."
+  },
+  {
+    "question": "How can GNU Parallel generate parameters for simulations directly without needing an external file?",
+    "answer": "Parameters can be generated dynamically using a range syntax, for example, `parallel -j $SLURM_CPUS_PER_TASK my_simulator --alpha {1} --beta {2} ::: {1..10} ::: {1..100}` will generate combinations for alpha from 1-10 and beta from 1-100."
+  },
+  {
+    "question": "What does `--colsep '\\t'` signify when used with GNU Parallel and a parameter file?",
+    "answer": "`--colsep '\\t'` specifies that the columns (parameters) in the input file are separated by a tab character."
+  },
+  {
+    "question": "What is the function of `:::: ./my_parameters.txt` in a GNU Parallel command?",
+    "answer": "`:::: ./my_parameters.txt` instructs GNU Parallel to read the argument values for the command from the specified file (`my_parameters.txt`)."
+  }
+]

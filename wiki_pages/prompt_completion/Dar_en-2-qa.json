@@ -1,0 +1,58 @@
+[
+  {
+    "question": "How do you list extended attributes for archived files using `dar`?",
+    "answer": "You can list extended attributes using the command `dar -l all -alist-ea`."
+  },
+  {
+    "question": "What kind of extended attribute is typically saved for files from a Lustre filesystem when archived by `dar`?",
+    "answer": "An example of an extended attribute saved for files from a Lustre filesystem is `[lustre.lov]`."
+  },
+  {
+    "question": "What error might occur if you try to extract `dar` archived files with `lustre.lov` extended attributes to node local storage?",
+    "answer": "If you try to extract such files to node local storage (like `$SLURM_TMPDIR`), you might see an error message such as `Error while adding EA lustre.lov : Operation not supported`."
+  },
+  {
+    "question": "How can you prevent `lustre.lov` extended attribute errors during `dar` extraction to a non-Lustre location?",
+    "answer": "You can prevent these errors by using the `-u 'lustre*'` flag during extraction, for example: `dar -R restore/ -O -w -x all -v -g test -u 'lustre*'`. This will exclude the `lustre.lov` attribute."
+  },
+  {
+    "question": "Is it possible to prevent `lustre.lov` extended attribute errors during archive creation instead of extraction?",
+    "answer": "Yes, you can get rid of the `lustre.lov` attribute while creating the archive by using the `-u 'lustre*'` flag, for example: `dar -w -c all -g test -u 'lustre*'`. This is useful if you intend to extract files to a location not formatted in Lustre."
+  },
+  {
+    "question": "When is it necessary to exclude `lustre.lov` attributes with `dar`?",
+    "answer": "It is necessary to exclude `lustre.lov` attributes only if you intend to extract files to a location not formatted in Lustre."
+  },
+  {
+    "question": "How do you create a full backup using `dar`?",
+    "answer": "To create a full backup, you can use a command like `dar -w -c monday -g test`, where `monday` is the base name for the archive and `test` is the directory to back up."
+  },
+  {
+    "question": "How do you create an incremental backup with `dar`, referencing a previous archive?",
+    "answer": "To create an incremental backup, you pass the base name of the reference archive with the `-A` flag, for example: `dar -w -A monday -c tuesday -g test`."
+  },
+  {
+    "question": "What information is contained in an incremental backup archive created by `dar` (e.g., `wednesday.1.dar`)?",
+    "answer": "An incremental backup archive contains only the files that were modified since the reference archive it was based on, not files from earlier full or incremental backups."
+  },
+  {
+    "question": "How do you restore only the files from a specific incremental backup using `dar`?",
+    "answer": "To restore only the files from a specific incremental backup, you would use a command like `dar -R restore -O -x wednesday`."
+  },
+  {
+    "question": "What is the correct procedure to restore all files from a series of `dar` incremental backups?",
+    "answer": "To restore everything from a series of incremental backups, you must restore the full backup first, followed by each incremental backup in chronological order. For example: `dar -R restore -O -w -x monday`, then `dar -R restore -O -w -x tuesday`, and finally `dar -R restore -O -w -x wednesday`."
+  },
+  {
+    "question": "How can you limit the maximum size of each slice when creating a `dar` archive?",
+    "answer": "You can limit the maximum size of each slice using the `-s` flag followed by a number and a unit (k/M/G/T). For example, `dar -s 100M -w -c monday -g test` will create slices of up to 100 MB."
+  },
+  {
+    "question": "If a `dar` archive is split into multiple slices, how do you extract from all of them?",
+    "answer": "To extract from all slices of an archive, you use their base name, for example: `dar -O -x monday`."
+  },
+  {
+    "question": "Where can users find external scripts or bash functions to assist with `dar` usage?",
+    "answer": "Users can find external bash functions that facilitate the use of `dar` on GitHub, specifically at [https://github.com/razoumov/sharedSnippets](https://github.com/razoumov/sharedSnippets)."
+  }
+]

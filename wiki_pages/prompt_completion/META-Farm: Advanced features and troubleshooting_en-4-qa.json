@@ -1,0 +1,58 @@
+[
+  {
+    "question": "How can I access individual columns from the cases table in `single_case.sh`?",
+    "answer": "You can convert the `$COMM` variable into an array using `COMM=( $COMM )`, and then access individual columns as `${COMM[i]}` where `i` is the 0-based column index."
+  },
+  {
+    "question": "What do `$ID` and `$COMM` represent in the customizable part of the `single_case.sh` script?",
+    "answer": "`$ID` contains the case ID from the original table, and `$COMM` is the line corresponding to the case `$ID` in the original table, without the ID field."
+  },
+  {
+    "question": "How do you convert the `$COMM` variable into an array in `single_case.sh`?",
+    "answer": "To convert `$COMM` into an array, use the syntax `COMM=( $COMM )`."
+  },
+  {
+    "question": "How can I determine the number of columns in the `COMM` array within `single_case.sh`?",
+    "answer": "The number of columns in the `COMM` array can be found using the expression `Ncol=${#COMM[@]}`."
+  },
+  {
+    "question": "How can a specific range of columns be accessed from the `COMM` array in `single_case.sh`?",
+    "answer": "A range of columns can be accessed using `${COMM[@]:i:n}`, where `i` is the first column to display and `n` is the number of columns to display. To display all columns starting from the `i`-th column, use `${COMM[@]:i}`."
+  },
+  {
+    "question": "Provide an example of how to modify `single_case.sh` to provide both a standard input file and a variable number of command line arguments to a user code.",
+    "answer": "If your cases table looks like `/path/to/IC.1 0.1` and `/path/to/IC.2 0.2 10`, you can implement this in `single_case.sh` by calling the user code as: `/path/to/code ${COMM[@]:1} < ${COMM[0]}`."
+  },
+  {
+    "question": "What is the 'waste' problem that META-Farm's scripts aim to reduce?",
+    "answer": "The 'waste' problem occurs when meta-jobs hit their run-time limit and die mid-case, leading to interrupted calculations and wasted CPU cycles if `average_case_run_time x N_cases` exceeds the total allowed CPU days."
+  },
+  {
+    "question": "How does `resubmit.run` handle cases that are interrupted or fail due to meta-job run-time limits?",
+    "answer": "`resubmit.run` will automatically find all cases that failed or never ran and restart them."
+  },
+  {
+    "question": "How do META-Farm scripts mitigate wasted CPU cycles due to jobs hitting run-time limits?",
+    "answer": "The `task.run` script measures each case's run-time, computes a `dt_cutoff` (a conservative estimate), and then each meta-job checks if it has enough time (`t_finish - t_now > dt_cutoff`) to finish the next case; if not, it exits early to minimize mid-case aborts."
+  },
+  {
+    "question": "Where are the individual run-times for all cases stored by the `task.run` script?",
+    "answer": "The run-time of each case is stored as a line in a scratch file named `times`, created in the directory `/home/$USER/tmp/$NODE.$PID/`."
+  },
+  {
+    "question": "How is the initial `dt_cutoff` value determined for estimating case run-times?",
+    "answer": "After the first 8 cases are computed, one of the meta-jobs reads the `times` file and calculates the largest 12.5% quantile for the current run-time distribution, which serves as the conservative `dt_cutoff` estimate."
+  },
+  {
+    "question": "How often is the `dt_cutoff` estimate recomputed to improve accuracy?",
+    "answer": "`dt_cutoff` is recomputed at every subsequent power of two number of computed cases (e.g., 8, 16, 32, and so on) to make the estimate more accurate and minimize overheads."
+  },
+  {
+    "question": "What is a useful side effect of the run-time measurement algorithm in `task.run`?",
+    "answer": "Every time a farm is run, individual run-times for all cases are stored in `/home/$USER/tmp/$NODE.$PID/times`, which can be used for fine-tuning farm setup or profiling code."
+  },
+  {
+    "question": "How are subdirectories created for each case when using the explicit column access method in `single_case.sh`?",
+    "answer": "A subdirectory named `RUN$ID` is created for each case using `mkdir RUN$ID`, and the script then changes into that directory using `cd RUN$ID`."
+  }
+]

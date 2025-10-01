@@ -1,74 +1,78 @@
 [
   {
-    "question": "What happens when Slurm starts a job concerning temporary directories?",
-    "answer": "When Slurm starts a job, it creates a temporary directory on each node assigned to the job and sets the full path name of that directory in an environment variable called `SLURM_TMPDIR`."
+    "question": "What is SLURM_TMPDIR?",
+    "answer": "SLURM_TMPDIR is an environment variable containing the full path name of a temporary directory created by Slurm on each node assigned to a job."
   },
   {
-    "question": "Why is I/O to `$SLURM_TMPDIR` generally faster than to network storage?",
-    "answer": "I/O to `$SLURM_TMPDIR` is almost always faster than to network storage because this directory resides on local disk, which is better for frequent small I/O transactions."
+    "question": "When is the SLURM_TMPDIR directory created?",
+    "answer": "Slurm creates a temporary directory and sets the SLURM_TMPDIR environment variable when it starts a job on each assigned node."
   },
   {
-    "question": "What kind of jobs particularly benefit from using `$SLURM_TMPDIR`?",
-    "answer": "Any job doing a lot of input and output, especially with frequent small I/O transactions, may expect to run more quickly if it uses `$SLURM_TMPDIR` instead of network storage."
+    "question": "Why is I/O to SLURM_TMPDIR generally faster than I/O to network storage?",
+    "answer": "SLURM_TMPDIR resides on local disk, making I/O to it almost always faster than I/O to network storage like /project, /scratch, or /home."
   },
   {
-    "question": "What makes `$SLURM_TMPDIR` more challenging to use than network storage?",
-    "answer": "The temporary character of `$SLURM_TMPDIR` makes it more trouble to use because input must be copied from network storage to it before it can be read, and output must be copied from it back to network storage before the job ends to preserve it."
+    "question": "For what type of I/O transactions is SLURM_TMPDIR particularly beneficial?",
+    "answer": "Local disk, and thus SLURM_TMPDIR, is better for frequent small I/O transactions than network storage."
   },
   {
-    "question": "How do you transfer data into `$SLURM_TMPDIR` for reading?",
-    "answer": "To read data from `$SLURM_TMPDIR`, you must first copy the data there. In the simplest case, you can do this with `cp` or `rsync`, for example: `cp /project/def-someone/you/input.files.* $SLURM_TMPDIR/`."
+    "question": "What is a primary benefit of using SLURM_TMPDIR for jobs with heavy I/O?",
+    "answer": "Any job doing a lot of input and output may run more quickly if it uses $SLURM_TMPDIR instead of network storage."
   },
   {
-    "question": "What are some limitations of simply using `cp` or `rsync` to move input data to `$SLURM_TMPDIR`?",
-    "answer": "This method may not work if the input data is too large, or if it must be read by processes on different nodes."
+    "question": "What makes SLURM_TMPDIR more challenging to use compared to network storage?",
+    "answer": "Its temporary nature requires input to be copied from network storage to $SLURM_TMPDIR before use, and output copied back to network storage before the job ends to preserve it."
   },
   {
-    "question": "Why is application code considered a special case of input for `$SLURM_TMPDIR`?",
-    "answer": "Application code is a special case of input because applications often require several files, such as libraries, in addition to the main application file, to run properly."
+    "question": "How do you copy input data from network storage to SLURM_TMPDIR for a job?",
+    "answer": "In the simplest case, you can use `cp` or `rsync`, for example: `cp /project/def-someone/you/input.files.* $SLURM_TMPDIR/`."
   },
   {
-    "question": "Why is it recommended to create Python virtual environments inside jobs using `$SLURM_TMPDIR`?",
-    "answer": "Using an application in a Python virtual environment generates a large number of small I/O transactions, and creating these environments inside jobs using `$SLURM_TMPDIR` can improve performance."
+    "question": "When might a simple `cp` or `rsync` command be insufficient for copying data to SLURM_TMPDIR?",
+    "answer": "A simple `cp` may not work if the input is too large, or if it must be read by processes on different nodes (multinode jobs)."
   },
   {
-    "question": "What is a critical step for preserving output data when using `$SLURM_TMPDIR`?",
-    "answer": "Output data must be copied from `$SLURM_TMPDIR` back to some permanent storage before the job ends."
+    "question": "Why is it recommended to create Python virtual environments inside jobs using SLURM_TMPDIR?",
+    "answer": "Python virtual environments generate a large number of small I/O transactions, and using SLURM_TMPDIR for their creation and use can improve performance."
   },
   {
-    "question": "What are the strategies to ensure output data from `$SLURM_TMPDIR` is saved, especially if a job times out?",
-    "answer": "To ensure output is saved, you can request enough runtime, write checkpoints to network storage, or write a signal trapping function."
+    "question": "What must be done with output data from SLURM_TMPDIR before a job ends?",
+    "answer": "Output data must be copied from SLURM_TMPDIR back to some permanent storage before the job ends."
   },
   {
-    "question": "How can signal trapping help save output data from `$SLURM_TMPDIR`?",
-    "answer": "You can arrange for Slurm to send a signal to your job shortly before runtime expires, prompting your job to copy output from `$SLURM_TMPDIR` back to network storage."
+    "question": "What happens to output data in SLURM_TMPDIR if a job times out without being copied back?",
+    "answer": "If a job times out, the last few lines of the job script (which would typically handle copying output) might not be executed, potentially leading to loss of data."
   },
   {
-    "question": "In what scenarios is signal trapping particularly useful for managing output from `$SLURM_TMPDIR`?",
-    "answer": "This method may be useful if your runtime estimate is uncertain, or if you are chaining together several Slurm jobs to complete a long calculation."
+    "question": "What are three ways to mitigate the risk of losing output from SLURM_TMPDIR if a job times out?",
+    "answer": "You can request enough runtime, write checkpoints directly to network storage, or implement a signal trapping function."
   },
   {
-    "question": "How do you implement a signal trapping function to save output?",
-    "answer": "To implement signal trapping, you need to write a shell function to perform the copying and use the `trap` shell command to associate that function with the signal."
+    "question": "What is the purpose of a signal trapping function in the context of SLURM_TMPDIR output?",
+    "answer": "A signal trapping function arranges for Slurm to send a signal before runtime expires, prompting the job to copy its output from SLURM_TMPDIR back to network storage."
   },
   {
-    "question": "What are the limitations of the signal trapping method for preserving `$SLURM_TMPDIR` contents?",
-    "answer": "This method will not preserve the contents of `$SLURM_TMPDIR` in the case of a node failure or certain malfunctions of the network file system."
+    "question": "When might using a signal trapping function be beneficial?",
+    "answer": "It can be useful if your runtime estimate is uncertain, or if you are chaining together several Slurm jobs for a long calculation."
   },
   {
-    "question": "Why is a simple `cp` or `tar -x` not sufficient for data transfer in multinode jobs using `$SLURM_TMPDIR`?",
-    "answer": "A simple `cp` or `tar -x` will not suffice if a job spans multiple nodes and some data is needed on every node."
+    "question": "How do you implement a signal trapping function?",
+    "answer": "You need to write a shell function to perform the copying and use the `trap` shell command to associate that function with the signal."
   },
   {
-    "question": "How do you copy files to `$SLURM_TMPDIR` on every node assigned to a multinode job?",
-    "answer": "You can copy one or more files to the `SLURM_TMPDIR` directory on every allocated node using the command: `srun --ntasks=$SLURM_NNODES --ntasks-per-node=1 cp file [files...] $SLURM_TMPDIR`."
+    "question": "What are the limitations of using a signal trapping function to preserve SLURM_TMPDIR contents?",
+    "answer": "This method will not preserve the contents of SLURM_TMPDIR in the case of a node failure or certain malfunctions of the network file system."
   },
   {
-    "question": "How do you extract a ZIP archive to `$SLURM_TMPDIR` on every node in a multinode job?",
-    "answer": "You can extract a ZIP archive to the `SLURM_TMPDIR` on every node using the command: `srun --ntasks=$SLURM_NNODES --ntasks-per-node=1 unzip archive.zip -d $SLURM_TMPDIR`."
+    "question": "How do you copy files to SLURM_TMPDIR on every node for a multinode job?",
+    "answer": "You can use the command: `srun --ntasks=$SLURM_NNODES --ntasks-per-node=1 cp file [files...] $SLURM_TMPDIR`."
   },
   {
-    "question": "How do you extract a Tarball archive to `$SLURM_TMPDIR` on every node in a multinode job?",
-    "answer": "You can extract a Tarball archive to the `SLURM_TMPDIR` on every node using the command: `srun --ntasks=$SLURM_NNODES --ntasks-per-node=1 tar -xvf archive.tar.gz -C $SLURM_TMPDIR`."
+    "question": "How do you extract a ZIP archive to SLURM_TMPDIR across all nodes in a multinode job?",
+    "answer": "Use the command: `srun --ntasks=$SLURM_NNODES --ntasks-per-node=1 unzip archive.zip -d $SLURM_TMPDIR`."
+  },
+  {
+    "question": "How do you extract a Tarball archive to SLURM_TMPDIR across all nodes in a multinode job?",
+    "answer": "Use the command: `srun --ntasks=$SLURM_NNODES --ntasks-per-node=1 tar -xvf archive.tar.gz -C $SLURM_TMPDIR`."
   }
 ]

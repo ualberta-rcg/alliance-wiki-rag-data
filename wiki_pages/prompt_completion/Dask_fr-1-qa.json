@@ -1,0 +1,90 @@
+[
+  {
+    "question": "Qu'est-ce que Dask?",
+    "answer": "Dask est une biblioth\u00e8que polyvalente pour Python."
+  },
+  {
+    "question": "Que fournit Dask pour le calcul distribu\u00e9?",
+    "answer": "Dask fournit des tableaux NumPy et des DataFrame Pandas permettant le calcul distribu\u00e9 en Python pur avec acc\u00e8s \u00e0 la pile PyData."
+  },
+  {
+    "question": "Quelle est la meilleure option pour installer Dask?",
+    "answer": "La meilleure option est d'installer Dask avec Python wheels."
+  },
+  {
+    "question": "Quelles sont les \u00e9tapes pour installer Dask en utilisant Python wheels?",
+    "answer": "Les \u00e9tapes sont: 1. Charger un module Python avec 'module load python'. 2. Cr\u00e9er et d\u00e9marrer un environnement virtuel. 3. Dans l'environnement virtuel, utiliser 'pip install' pour installer 'dask' et en option 'dask-distributed'."
+  },
+  {
+    "question": "Quelle commande est utilis\u00e9e pour installer Dask et dask-distributed dans un environnement virtuel, en \u00e9vitant les index de paquets?",
+    "answer": "Utilisez `pip install --no-index dask distributed` dans l'environnement virtuel."
+  },
+  {
+    "question": "Que d\u00e9montre l'exemple de soumission de t\u00e2che sur un n\u0153ud simple?",
+    "answer": "L'exemple d\u00e9montre comment d\u00e9marrer une grappe Dask avec un n\u0153ud simple de 6 CPU et calculer la moyenne d'une colonne pour l'ensemble des donn\u00e9es."
+  },
+  {
+    "question": "Combien de CPU par t\u00e2che sont demand\u00e9s dans le script `dask-example.sh` pour un n\u0153ud simple?",
+    "answer": "6 CPU par t\u00e2che sont demand\u00e9s (`#SBATCH --cpus-per-task=6`)."
+  },
+  {
+    "question": "Quelle quantit\u00e9 de m\u00e9moire est allou\u00e9e pour le script `dask-example.sh` de n\u0153ud simple?",
+    "answer": "8000M de m\u00e9moire sont allou\u00e9s (`#SBATCH --mem=8000M`)."
+  },
+  {
+    "question": "Quels modules sont charg\u00e9s au d\u00e9but du script `dask-example.sh` pour un n\u0153ud simple?",
+    "answer": "Les modules `python`, `gcc`, et `arrow` sont charg\u00e9s."
+  },
+  {
+    "question": "Comment un environnement virtuel est-il cr\u00e9\u00e9 dans le script `dask-example.sh` pour un n\u0153ud simple?",
+    "answer": "Un environnement virtuel est cr\u00e9\u00e9 en utilisant `virtualenv --no-download $SLURM_TMPDIR/env`."
+  },
+  {
+    "question": "Comment les biblioth\u00e8ques Dask, distributed et pandas sont-elles install\u00e9es dans l'environnement virtuel pour le script de n\u0153ud simple?",
+    "answer": "Elles sont install\u00e9es avec la commande `pip install dask distributed pandas --no-index`."
+  },
+  {
+    "question": "Comment l'adresse de l'ordonnanceur Dask est-elle d\u00e9finie dans le script `dask-example.sh` de n\u0153ud simple?",
+    "answer": "L'adresse est d\u00e9finie comme le nom d'h\u00f4te actuel avec `export DASK_SCHEDULER_ADDR=$(hostname)`."
+  },
+  {
+    "question": "Comment le port de l'ordonnanceur Dask est-il d\u00e9termin\u00e9 dans l'exemple de n\u0153ud simple?",
+    "answer": "Le port est g\u00e9n\u00e9r\u00e9 al\u00e9atoirement entre 30000 et 39999 avec `export DASK_SCHEDULER_PORT= $((30000 + $RANDOM % 10000))`."
+  },
+  {
+    "question": "Quelle commande d\u00e9marre l'ordonnanceur Dask dans le script de n\u0153ud simple?",
+    "answer": "L'ordonnanceur Dask est d\u00e9marr\u00e9 avec `dask scheduler --host $DASK_SCHEDULER_ADDR --port $DASK_SCHEDULER_PORT &`."
+  },
+  {
+    "question": "Combien de travailleurs et de fils d'ex\u00e9cution sont configur\u00e9s pour les travailleurs Dask dans l'exemple de n\u0153ud simple?",
+    "answer": "Il y a 6 travailleurs (`--nworkers=6`) et 1 fil d'ex\u00e9cution par travailleur (`--nthreads=1`)."
+  },
+  {
+    "question": "Quel est le but du script `dask-example.py` dans l'exemple de n\u0153ud simple?",
+    "answer": "Le script `dask-example.py` cr\u00e9e un DataFrame Pandas, le divise en un DataFrame Dask, et calcule la moyenne d'une colonne."
+  },
+  {
+    "question": "Comment le nombre de travailleurs (`n_workers`) est-il d\u00e9termin\u00e9 dans le script Python `dask-example.py`?",
+    "answer": "Le nombre de travailleurs est bas\u00e9 sur la variable d'environnement `SLURM_CPUS_PER_TASK` (`n_workers = int(os.environ['SLURM_CPUS_PER_TASK'])`)."
+  },
+  {
+    "question": "Comment le client Dask se connecte-t-il \u00e0 l'ordonnanceur dans `dask-example.py`?",
+    "answer": "Le client se connecte en utilisant `Client(f\"tcp://{os.environ['DASK_SCHEDULER_ADDR']}:{os.environ['DASK_SCHEDULER_PORT']}\")`."
+  },
+  {
+    "question": "Quel calcul est effectu\u00e9 par le script `dask-example.py` pour un n\u0153ud simple?",
+    "answer": "Le script calcule la moyenne de la colonne 'a' du DataFrame Dask (`ddf.a.mean().compute()`)."
+  },
+  {
+    "question": "Quel est l'objectif de l'exemple de grappe Dask sur plusieurs n\u0153uds?",
+    "answer": "L'objectif est de reproduire l'exemple de n\u0153ud simple avec une grappe Dask de deux n\u0153uds comportant 6 CPU chacun, cr\u00e9ant deux processus par n\u0153ud avec trois c\u0153urs chacun."
+  },
+  {
+    "question": "Combien de n\u0153uds et de t\u00e2ches par n\u0153ud sont configur\u00e9s dans le script `dask-example.sh` pour l'exemple multi-n\u0153uds?",
+    "answer": "Deux n\u0153uds (`#SBATCH --nodes 2`) et deux t\u00e2ches par n\u0153ud (`#SBATCH --tasks-per-node=2`) sont configur\u00e9s."
+  },
+  {
+    "question": "Quel est le port fixe d\u00e9fini pour l'ordonnanceur Dask dans l'exemple multi-n\u0153uds?",
+    "answer": "Le port fixe est 34567 (`export DASK_SCHEDULER_PORT=34567`)."
+  }
+]

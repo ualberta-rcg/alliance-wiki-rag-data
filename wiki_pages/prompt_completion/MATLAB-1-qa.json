@@ -1,0 +1,94 @@
+[
+  {
+    "question": "What are the two primary methods for using MATLAB on the clusters?",
+    "answer": "The two primary methods are running MATLAB directly (which requires a license) or compiling your MATLAB code with `mcc` and running the generated executable (which does not require a license)."
+  },
+  {
+    "question": "Which clusters offer MATLAB licenses to students, professors, and academic researchers?",
+    "answer": "Fir, Narval, and Rorqual clusters provide MATLAB licenses for students, professors, and academic researchers."
+  },
+  {
+    "question": "How can users access MATLAB if their institution owns a license?",
+    "answer": "Users can utilize an external license owned by their institution, faculty, department, or lab."
+  },
+  {
+    "question": "What is the command to check if an external MATLAB license is accessible on a cluster?",
+    "answer": "First, load a MATLAB module (e.g., `module load matlab/2023b.2`), then run `matlab -nojvm -nodisplay -batch license`. If a license number is printed, access is confirmed."
+  },
+  {
+    "question": "Why should the MATLAB license availability test be performed on each cluster?",
+    "answer": "The test should be run on each cluster because license availability may vary between them."
+  },
+  {
+    "question": "What action should be taken if a MATLAB license test results in a 'version is newer than license.dat' error message?",
+    "answer": "If this error occurs, try loading an older version of MATLAB in the `module load` command."
+  },
+  {
+    "question": "What should a user do if they don't have access to an external MATLAB license?",
+    "answer": "The user should contact the MATLAB license administrator at their institution or their MathWorks account manager to determine if usage is allowed or arrangements can be made."
+  },
+  {
+    "question": "How do you configure an external MATLAB license after it's approved?",
+    "answer": "Create a `matlab.lic` file with license server specifications (IP address and port) and place it in the `$HOME/.licenses/` directory. Then, contact technical support to ensure the campus license server is reachable by compute nodes."
+  },
+  {
+    "question": "Where can users find online documentation and product information for MATLAB?",
+    "answer": "Online documentation is at http://www.mathworks.com/support and product information at http://www.mathworks.com."
+  },
+  {
+    "question": "Why is it necessary to prepare the `.matlab` folder on compute nodes?",
+    "answer": "The `/home` directory is read-only on some compute nodes, so a symbolic link for `.matlab` is needed to redirect MATLAB profile and job data to `/scratch` space."
+  },
+  {
+    "question": "What command sequence prepares the `.matlab` folder to use `/scratch` space?",
+    "answer": "Run `cd $HOME` followed by `if [ -d \".matlab\" ]; then mv .matlab scratch/; else mkdir -p scratch/.matlab; fi && ln -sn scratch/.matlab .matlab`."
+  },
+  {
+    "question": "How can a user view the list of available MATLAB toolboxes for their license and cluster?",
+    "answer": "Load the MATLAB module (`module load matlab`) and then execute `matlab -nojvm -batch \"ver\"`."
+  },
+  {
+    "question": "When must a MATLAB calculation be submitted to the scheduler?",
+    "answer": "Any significant MATLAB calculation, defined as taking more than 5 minutes or requiring over a gigabyte of memory, must be submitted to the scheduler."
+  },
+  {
+    "question": "What is an example of a Slurm script to run a serial MATLAB program?",
+    "answer": "An example script includes `#SBATCH` directives for job parameters like name, account, time, nodes, tasks, CPUs per task, and memory, followed by `module load matlab/2024b.1` and `matlab -singleCompThread -batch \"cosplot\"`."
+  },
+  {
+    "question": "How do you submit a serial MATLAB job using a Slurm script?",
+    "answer": "You submit the job using the `sbatch` command, for instance, `sbatch matlab_slurm.sl`."
+  },
+  {
+    "question": "What should be done with `java.log` files created by MATLAB?",
+    "answer": "These files should be deleted after MATLAB finishes to conserve storage space. Alternatively, the `-nojvm` option can suppress their creation, though it might affect plotting functions."
+  },
+  {
+    "question": "Where can users find more details on MATLAB command-line options?",
+    "answer": "More information on command-line options like `-nodisplay`, `-nojvm`, `-singleCompThread`, and `-batch` is available on the MathWorks MATLAB (Linux) documentation website."
+  },
+  {
+    "question": "What is a commonly sufficient parallel execution mode for MATLAB on the clusters?",
+    "answer": "Most users find it sufficient to run MATLAB using a `Threads` parallel environment on a single node."
+  },
+  {
+    "question": "What is an example of a MATLAB function designed for parallel execution using `parfor`?",
+    "answer": "The `timeparfor.m` function is an example that uses `getenv('SLURM_CPUS_PER_TASK')` to set `nthreads`, creates a `parpool(\"Threads\",nthreads)`, and then performs parallel computation within a `parfor` loop."
+  },
+  {
+    "question": "How do you submit a parallel MATLAB job using Slurm with 4 CPU cores?",
+    "answer": "Create a job script with `#SBATCH --cpus-per-task=4`, load the MATLAB module (e.g., `module load matlab/2024b.1`), and run `matlab -nojvm -batch \"timeparfor\"`. Then submit it with `sbatch matlab_parallel.sh`."
+  },
+  {
+    "question": "What can cause corruption of local parallel profiles in simultaneous MATLAB jobs using a `Cluster` parallel environment?",
+    "answer": "When two or more parallel MATLAB jobs call `parpool` concurrently, they may attempt to read from and write to the same `.dat` file in the `$HOME/.matlab/local_cluster_jobs/R*` folder, leading to corruption."
+  },
+  {
+    "question": "How can a corrupted local parallel profile from simultaneous MATLAB jobs be resolved?",
+    "answer": "If profile corruption occurs, delete the `local_cluster_jobs` folder when no MATLAB job is running."
+  },
+  {
+    "question": "How can users prevent simultaneous parallel MATLAB jobs from corrupting parallel profiles?",
+    "answer": "Users should ensure each job creates its own unique parallel profile by setting the `JobStorageLocation` property of the `parallel.Cluster` object, for example, to `getenv('SLURM_TMPDIR')`."
+  }
+]

@@ -1,66 +1,110 @@
 [
   {
     "question": "What permissions are required on a directory to access files within it?",
-    "answer": "To access files within a directory, you need both read and execute permission on that directory. This corresponds to '5' or '7' in octal notation."
+    "answer": "To access files within a directory, you need both read and execute permission on that directory, represented as '5' or '7' in octal notation."
   },
   {
-    "question": "Which command is used to change file or directory permissions?",
-    "answer": "The `chmod` command is used to alter file or directory permissions."
+    "question": "How can you change file or directory permissions using octal notation?",
+    "answer": "You can use the `chmod` command with octal notation, for example, `chmod 770 name_of_file` to grant read, write, and execute permissions to everyone in the file's group."
   },
   {
-    "question": "How can you grant read, write, and execute permissions to everyone in your group for a file?",
-    "answer": "You can use the command `chmod 770 name_of_file` to grant read, write, and execute permissions to everyone in your group for that file."
+    "question": "Who is allowed to modify the permissions of a file or directory?",
+    "answer": "Only the owner of the file or directory can modify its permissions."
   },
   {
-    "question": "Can I change permissions on any file or directory?",
-    "answer": "No, you can only modify the permissions of a file or directory that you own."
-  },
-  {
-    "question": "Which command is used to change the group ownership of a file or directory?",
+    "question": "What command is used to alter the group ownership of a file or directory?",
     "answer": "The `chgrp` command is used to alter the group ownership of a file or directory."
   },
   {
-    "question": "What is the purpose of the sticky bit in a Unix filesystem?",
-    "answer": "The sticky bit is used to restrict filesystem permissions for a directory so that a file within it can only be renamed or deleted by its owner or the directory's owner, even if other users have write and execute permissions for that directory."
+    "question": "What is the purpose of the sticky bit in Unix filesystems?",
+    "answer": "The sticky bit restricts filesystem permissions for a directory, ensuring that files within it can only be renamed or deleted by their owner or the directory's owner, even if other users have write and execute permissions."
   },
   {
-    "question": "How do you set the sticky bit on a directory using symbolic notation?",
-    "answer": "You can set the sticky bit using the command `chmod +t <directory name>`."
+    "question": "How do you set the sticky bit on a directory using `chmod`?",
+    "answer": "You can set the sticky bit using `chmod +t <directory name>` or with octal notation, `chmod 1000 <directory name>` (or `chmod 1774 <directory name>` for specific permissions)."
   },
   {
-    "question": "How do you set the sticky bit on a directory using octal notation, along with rwxrwxr-- permissions?",
-    "answer": "You can set the sticky bit and `rwxrwxr--` permissions using the command `chmod 1774 <directory name>`."
-  },
-  {
-    "question": "How is the sticky bit represented in the output of `ls -l`?",
-    "answer": "The sticky bit is represented by the letter 't' or 'T' in the last place of the permissions field in `ls -l` output."
+    "question": "How is the sticky bit indicated in the `ls -l` output?",
+    "answer": "The sticky bit is represented by the letter 't' or 'T' in the last place of the permissions field in `ls -l` output, for example, `drwxrws--T`."
   },
   {
     "question": "How do you unset the sticky bit on a directory?",
-    "answer": "You can unset the sticky bit using the command `chmod -t <directory name>` or `chmod 0774 <directory name>` via octal notation."
+    "answer": "You can unset the sticky bit using `chmod -t <directory name>` or with octal notation, `chmod 0774 <directory name>`."
   },
   {
-    "question": "What is the primary function of the Set Group ID (setGID) bit on a directory?",
-    "answer": "The setGID bit ensures that new files and directories created within a parent directory will automatically inherit the same group ownership as the parent directory."
+    "question": "What happens when the `setGID` bit is enabled for a directory?",
+    "answer": "If the `setGID` bit is enabled for a directory, any new files and directories created within that directory will automatically inherit the same group ownership as the parent directory."
   },
   {
-    "question": "Why is the setGID bit important for project filesystems like Graham and Cedar?",
-    "answer": "It's key for project filesystems because storage quotas in these spaces are enforced by group, ensuring newly created files contribute to the correct group's quota."
+    "question": "How do you enable the `setGID` permission on a directory?",
+    "answer": "You can enable the `setGID` permission on a directory using the command `chmod g+s <directory name>`."
   },
   {
-    "question": "How do you enable the setGID permission on a directory using symbolic notation?",
-    "answer": "You can enable the setGID permission on a directory using the command `chmod g+s <directory name>`."
+    "question": "How is the `setGID` bit indicated in the `ls -l` output for a directory?",
+    "answer": "When the `setGID` bit is enabled, the 'x' permission on the group permissions in `ls -l` output changes to an 's', such as `drwxrws---`."
   },
   {
-    "question": "How does the `ls -l` output change when the setGID bit is enabled on a directory?",
-    "answer": "When the setGID bit is enabled, the 'x' permission for the group in the `ls -l` output changes to an 's'."
+    "question": "What is the difference between an uppercase 'S' and a lowercase 's' when indicating the `setGID` bit?",
+    "answer": "A lowercase 's' indicates that the `setGID` bit is enabled and execute permissions are also present, while an uppercase 'S' means the `setGID` bit is enabled but the execute permissions have been removed from the directory."
   },
   {
-    "question": "What happens when you create a new directory inside a directory with the setGID bit enabled?",
-    "answer": "If you create a new directory inside a directory with the setGID bit enabled, the new directory will inherit the same group as the parent folder and will also have its own setGID bit enabled."
+    "question": "Is the `setUID` bit functional on the clusters mentioned in the document?",
+    "answer": "No, the `setUID` bit is explicitly disabled on the clusters for security reasons."
   },
   {
-    "question": "What does an uppercase 'S' in the group permissions field for a directory indicate when the setGID bit is set?",
-    "answer": "An uppercase 'S' indicates that the execute permissions have been removed from the directory, but the setGID bit is still in place. This can lead to unexpected problems, such as group members not being able to access files within that directory."
+    "question": "How are default filesystem permissions defined in Linux?",
+    "answer": "Default filesystem permissions are defined by something called the `umask`."
+  },
+  {
+    "question": "How can you display the current `umask` value in your session?",
+    "answer": "You can display the current `umask` value in your session by running the command `umask -S`."
+  },
+  {
+    "question": "What is the default `umask -S` value on the clusters?",
+    "answer": "The default `umask -S` value on the clusters is `u=rwx,g=rx,o=`."
+  },
+  {
+    "question": "What does the default `umask` setting of `u=rwx,g=rx,o=` mean for new files?",
+    "answer": "It means that new files you create can be read, written, and executed by yourself; read and executed by members of the file's group; and cannot be accessed by other people."
+  },
+  {
+    "question": "Does changing the `umask` affect existing files?",
+    "answer": "No, the `umask` only applies to new files and does not change the access permissions of existing files."
+  },
+  {
+    "question": "How can you set a custom `umask` value?",
+    "answer": "You can set a custom `umask` value either in a session or in your `.bashrc` file by using the command `umask <value>`, where `<value>` is an octal number."
+  },
+  {
+    "question": "What `umask` value makes files readable, writable, and executable only by the owner?",
+    "answer": "A `umask` value of `077` makes files readable, writable, and executable only by the owner (`u=rwx,g=,o=`)."
+  },
+  {
+    "question": "Which `umask` value allows the owner to read, write, and execute, but only allows the group to read and execute, and others no access?",
+    "answer": "The `umask` value `027` allows files to be readable and executable by the owner and the group, but writable only by the owner (`u=rwx,g=rx,o=`)."
+  },
+  {
+    "question": "What `umask` value grants read, write, and execute permissions to both the owner and the group?",
+    "answer": "The `umask` value `007` grants read, write, and execute permissions to both the owner and the group (`u=rwx,g=rwx,o=`)."
+  },
+  {
+    "question": "Which `umask` value makes files readable and executable by everyone, but writable only by the owner?",
+    "answer": "The `umask` value `022` makes files readable and executable by everyone, but writable only by the owner (`u=rwx,g=rx,o=rx`)."
+  },
+  {
+    "question": "What `umask` value allows files to be readable and executable by everyone, and writable by the owner and the group?",
+    "answer": "The `umask` value `002` allows files to be readable and executable by everyone, and writable only by the owner and the group (`u=rwx,g=rwx,o=rx`)."
+  },
+  {
+    "question": "Besides file permissions, what is a critical requirement for a user to access a file based on its path?",
+    "answer": "A user must have execute permission on all directories in the path leading to the file to be able to access it."
+  },
+  {
+    "question": "Under what condition can a user access a file based on its group permissions?",
+    "answer": "The user must be a member of the file's group to access it based on its group permissions."
+  },
+  {
+    "question": "Is it possible to change the permissions of a file or directory after it has been created?",
+    "answer": "Yes, you can explicitly change the permissions on a file or directory after it is created using the `chmod` command."
   }
 ]

@@ -1,0 +1,66 @@
+[
+  {
+    "question": "What should be done if an Apptainer image build requires `sudo` permissions and you are on an Alliance system?",
+    "answer": "If appropriate, submit a ticket asking if Alliance staff would be able to help build the image(s) required needing `sudo`."
+  },
+  {
+    "question": "How does Apptainer version 1.1.x and newer improve building images?",
+    "answer": "Apptainer version 1.1.x and newer has improved support for users using `--fakeroot` implicitly and explicitly, allowing some images to be built from `.def` definition files and without needing `sudo`."
+  },
+  {
+    "question": "Can all Apptainer images be built without `sudo` using newer versions?",
+    "answer": "No, not all images will be able to be built without needing to use `sudo` or superuser/root, even with Apptainer version 1.1.x and newer."
+  },
+  {
+    "question": "What kind of filesystem should be avoided when building a sandbox image with `--fakeroot`?",
+    "answer": "You should avoid building a sandbox image using `--fakeroot` on networked filesystem(s)."
+  },
+  {
+    "question": "What is the recommended setting for `APPTAINER_CACHEDIR` when building Apptainer images?",
+    "answer": "Explicitly set `APPTAINER_CACHEDIR` to a non-networked filesystem location before using Apptainer."
+  },
+  {
+    "question": "Where should `APPTAINER_TMPDIR` be set when building Apptainer containers?",
+    "answer": "Explicitly set `APPTAINER_TMPDIR` to a non-Lustre/GPFS filesystem location before using Apptainer."
+  },
+  {
+    "question": "Why should Lustre/GPFS filesystems be avoided for building Apptainer containers?",
+    "answer": "Lustre/GPFS filesystems should be avoided as they don't have the feature set required to properly support building Apptainer containers (including `--fakeroot`)."
+  },
+  {
+    "question": "How do you load the default version of Apptainer?",
+    "answer": "To use the default version of Apptainer available, run: `module load apptainer`."
+  },
+  {
+    "question": "How can you view the available versions of Apptainer?",
+    "answer": "To see the available versions of Apptainer that can be loaded, run: `module spider apptainer`."
+  },
+  {
+    "question": "Why is it important to isolate Apptainer containers from the host's environment settings?",
+    "answer": "By default, Apptainer will run adopting the shell environment of the host, which can result in issues when running programs, so isolation is important to avoid these issues."
+  },
+  {
+    "question": "Which Apptainer command line option provides the strongest isolation from host filesystems and environment?",
+    "answer": "The `-C` option isolates the running container from all filesystems as well as the parent PID, IPC, and environment."
+  },
+  {
+    "question": "What is necessary if you use the `-C` or `-c` option and need to access files outside the container?",
+    "answer": "Using the `-C` or `-c` option will require using bind mounts if access to filesystems outside of the container is needed."
+  },
+  {
+    "question": "How does the `-c` option affect filesystem access within an Apptainer container?",
+    "answer": "The `-c` option isolates the running container from most filesystems, only using a minimal `/dev`, an empty `/tmp` directory, and an empty `/home` directory."
+  },
+  {
+    "question": "What is the function of the `-e` command line option in Apptainer?",
+    "answer": "The `-e` option cleans (some) shell environment variables before running container commands, applies settings for increased OCI/Docker compatibility, and implies the use of options `--containall`, `--no-init`, `--no-umask`, and `--writable-tmpfs`."
+  },
+  {
+    "question": "What is the purpose of the `-W` or `--workdir` option in Apptainer, especially on clusters?",
+    "answer": "The `-W` or `--workdir` option allows you to tell Apptainer to use a real disk location for its working directory, which is a workaround to prevent jobs from being killed due to excessive RAM consumption by `/tmp` and similar filesystems on clusters."
+  },
+  {
+    "question": "Provide an example command for running a program `myprogram` from `myimage.sif` with full isolation and a specified working directory `/path/to/a/workdir`.",
+    "answer": "An example command would be: `apptainer run -C -B /project -W /path/to/a/workdir myimage.sif myprogram`."
+  }
+]

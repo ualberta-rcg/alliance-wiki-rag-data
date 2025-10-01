@@ -1,18 +1,50 @@
 [
   {
-    "question": "How do you manually adjust a compiled OpenGL application to preload 'vglfaker.so' for accelerated OpenGL on gra-vdi, if it was not installed via nix?",
-    "answer": "First, load the `nix` module with `module load nix`. Then, use the `patchelf` utility to add the VirtualGL system library by running `patchelf --add-needed /usr/lib64/VirtualGL/libvglfaker.so ~/.local/bin/myglapp`, where `~/.local/bin/myglapp` is the path to your application's binary."
+    "question": "What is the two-step login procedure for gra-vdi.alliancecan.ca?",
+    "answer": "The login procedure involves first entering your username and Alliance ccdb password, and then entering your username and Duo two-factor MFA passcode."
   },
   {
-    "question": "What is an alternative method to preload 'vglfaker.so' besides using `patchelf`?",
-    "answer": "It is also possible to preload 'vglfaker.so' via the `LD_PRELOAD` environment variable."
+    "question": "What happens if I input incorrect credentials during the first step of logging into gra-vdi, and what is the solution?",
+    "answer": "If you enter the wrong username/password in the first step, you will still be prompted for the second step. After sending your username/passcode, you will receive a \"Success, Logging you in...\" message and be returned to the first login screen. The solution is to try again with the correct username/password combination."
   },
   {
-    "question": "Why is using the `LD_PRELOAD` environment variable to preload 'vglfaker.so' generally considered a bad practice?",
-    "answer": "It is generally a bad idea because it applies indiscriminately to all binaries, and those that require a different `vglfaker.so` than the one set in `LD_PRELOAD` will then fail."
+    "question": "How can an Alliance ccdb password be reset if forgotten?",
+    "answer": "To reset your Alliance ccdb password, you can visit [https://ccdb.alliancecan.ca/security/forgot here], provided your account is not pending renewal by your PI."
   },
   {
-    "question": "When can the `LD_PRELOAD` environment variable be safely used for preloading `vglfaker.so`?",
-    "answer": "It can be used safely in some cases within wrapper scripts."
+    "question": "What capabilities do the VDI nodes offer for software applications?",
+    "answer": "The VDI nodes support direct vncviewer connections and GPU-accelerated OpenGL graphics for appropriately-configured software applications. They also provide an extra set of software modules in the SnEnv environment."
+  },
+  {
+    "question": "How does the software environment on VDI nodes differ from regular cluster login nodes?",
+    "answer": "Unlike regular login nodes where a standard software environment and default modules are automatically loaded, VDI nodes do not load them by default. Running `module list` on a VDI node will show \"No modules loaded.\""
+  },
+  {
+    "question": "What must be done before running graphical software on gra-vdi?",
+    "answer": "Before running any graphical software on gra-vdi, you must first manually load one of the available software modules."
+  },
+  {
+    "question": "What command should be used to load the StdEnv module on gra-vdi?",
+    "answer": "To load the StdEnv module on gra-vdi, which provides access to common software modules, you should use the command `module load CcEnv StdEnv/2023`."
+  },
+  {
+    "question": "When is it necessary to load the SnEnv module on gra-vdi, and what is the command?",
+    "answer": "In rare cases where users need to load locally installed modules on gra-vdi, the `SnEnv` module must first be loaded using the command `module load SnEnv`."
+  },
+  {
+    "question": "Is the `nix` module currently available on gra-vdi or graham clusters?",
+    "answer": "No, the `nix` module is no longer available on gra-vdi or graham, and there is no guarantee it will return."
+  },
+  {
+    "question": "For software downloaded and installed outside of nix, what manual adjustment is necessary for accelerated OpenGL to work on gra-vdi?",
+    "answer": "For software installed outside of nix, it is necessary to manually adjust compiled binaries to pre-load \"vglfaker.so\" from VirtualGL. This can be done using the `patchelf` utility."
+  },
+  {
+    "question": "How can the `patchelf` utility be used to add the VirtualGL system library to an OpenGL application?",
+    "answer": "After building your OpenGL application (e.g., `~/.local/bin/myglapp`), you would run `patchelf --add-needed /usr/lib64/VirtualGL/libvglfaker.so ~/.local/bin/myglapp`. The `patchelf` utility itself could be installed into nix with `nix-env --install --attr nixpkgs.patchelf` if nix were available."
+  },
+  {
+    "question": "Why is using `LD_PRELOAD` for `vglfaker.so` generally not recommended for OpenGL applications?",
+    "answer": "Using `LD_PRELOAD` for `vglfaker.so` is generally a bad idea because it applies indiscriminately to all binaries. This can cause those requiring a different `vglfaker.so` than what is set in `LD_PRELOAD` to fail, although it can be used safely in some wrapper scripts."
   }
 ]

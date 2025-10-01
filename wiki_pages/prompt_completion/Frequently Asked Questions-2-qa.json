@@ -1,0 +1,50 @@
+[
+  {
+    "question": "How should you move files from a project space to your scratch or home space?",
+    "answer": "You should not use the `mv` command. Instead, it is recommended to use the regular `cp` or `rsync` command."
+  },
+  {
+    "question": "What `cp` option should be avoided when moving files from a project filesystem to a scratch or home filesystem?",
+    "answer": "When using `cp` to move files from a project space, do not use the archive `-a` option."
+  },
+  {
+    "question": "What `rsync` options are important to use when moving files from a project space to scratch or home to ensure correct group ownership?",
+    "answer": "You must specify the `--no-g --no-p` options with `rsync`, for example: `rsync -axvH --no-g --no-p $HOME/projects/<project>/some_other_directory $HOME/scratch/some_directory`."
+  },
+  {
+    "question": "What is the recommended method for moving files between two different project spaces?",
+    "answer": "You should not use the `mv` command. Instead, it is recommended to use the regular `cp` or `rsync` command, and ensure to delete the old data after copying."
+  },
+  {
+    "question": "What `rsync` command syntax should be used to move files between two project spaces while preserving correct group ownership?",
+    "answer": "Use `rsync -axvH --no-g --no-p $HOME/projects/<project>/some_other_directory $HOME/projects/<project2>/some_directory`."
+  },
+  {
+    "question": "What should you do after successfully copying data between two project spaces?",
+    "answer": "Once the files are copied, you should delete the old data from the source project space."
+  },
+  {
+    "question": "What is a common cause for the \"Disk quota exceeded\" error on `/project` filesystems?",
+    "answer": "Many of the problems reported, including \"Disk quota exceeded\" errors, are due to bad file ownership on the `/project` folders."
+  },
+  {
+    "question": "How can you check your current disk usage and quotas for different filesystems?",
+    "answer": "You can use the `diskusage_report` command to see if you are at or over your quota."
+  },
+  {
+    "question": "What does it mean if `diskusage_report` shows `Project (group ymartin)` exceeding its quota?",
+    "answer": "This indicates that `/project` for user `ymartin` contains too much data in files belonging to group `ymartin`, which has a very small quota (e.g., 2048k). The data should instead be in files belonging to a proper project group like `def-zrichard`."
+  },
+  {
+    "question": "How can a user determine the project groups they are allowed to use?",
+    "answer": "To see the project groups you may use, run the command `stat -c %G $HOME/projects/*/`."
+  },
+  {
+    "question": "What is the intended group ownership for new files and directories created in the `/project` filesystem?",
+    "answer": "By design, new files and directories in `/project` will normally be created belonging to a project group."
+  },
+  {
+    "question": "What are the common reasons files in `/project` might have incorrect group ownership?",
+    "answer": "Files may be associated with the wrong group if they were moved from `/home` to `/project` with the `mv` command, if they were transferred from another cluster using `rsync` or `scp` with an option to preserve original group ownership, or if there is no `setgid` bit set on your Project folders."
+  }
+]

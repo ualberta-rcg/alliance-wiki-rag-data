@@ -1,0 +1,102 @@
+[
+  {
+    "question": "How can large META-Farm jobs that exceed `NJOBS_MAX x job_run_time` be managed?",
+    "answer": "For large farms, you might need to run `resubmit.run` after the original farm finishes, possibly multiple times. This process can also be automated."
+  },
+  {
+    "question": "How do you automate the resubmission of failed cases in META-Farm?",
+    "answer": "To automate resubmission, add the `-auto` switch to your `submit.run` or `resubmit.run` command, for example: `submit.run N -auto`."
+  },
+  {
+    "question": "Can the `-auto` switch be used with both SIMPLE and META modes?",
+    "answer": "Yes, the `-auto` switch can be used in either SIMPLE or META mode."
+  },
+  {
+    "question": "What is the purpose of the additional job submitted when using the `-auto` switch?",
+    "answer": "When `-auto` is used, an additional serial job is submitted whose purpose is to automatically run the `resubmit.run` command right after the current farm finishes running."
+  },
+  {
+    "question": "What is the name of the job script used for automatic resubmission?",
+    "answer": "The job script for automatic resubmission is `resubmit_script.sh`, which should be located in the farm directory."
+  },
+  {
+    "question": "What customization is required for the `resubmit_script.sh` file?",
+    "answer": "The only customization needed for `resubmit_script.sh` is to correct the account name in the `#SBATCH -A` line."
+  },
+  {
+    "question": "How should the `NJOBS_MAX` parameter be adjusted when using the `-auto` feature?",
+    "answer": "When using `-auto`, the `NJOBS_MAX` parameter in `config.h` should be set to at least one less than the largest number of jobs you can submit on the cluster. For instance, if the limit is 999, set `NJOBS_MAX` to 998."
+  },
+  {
+    "question": "Under what condition does auto-resubmission stop?",
+    "answer": "Auto-resubmission will stop if at some point the only cases remaining to be processed are those that failed earlier, to prevent an infinite loop on consistently failing cases."
+  },
+  {
+    "question": "Where can users find messages related to cases failing during auto-resubmission?",
+    "answer": "Relevant messages regarding failing cases can be found in the `farm.log` file, located in the farm directory."
+  },
+  {
+    "question": "What is the automatic post-processing feature in META-Farm?",
+    "answer": "It is an advanced feature that allows for automatically running a post-processing job once all cases from `table.dat` have been successfully processed."
+  },
+  {
+    "question": "When will an automatic post-processing job not run?",
+    "answer": "The post-processing job will not run if any cases failed (i.e., had a non-zero exit status)."
+  },
+  {
+    "question": "How do you enable the automatic post-processing feature?",
+    "answer": "To enable this feature, simply create a script named `final.sh` inside the farm directory."
+  },
+  {
+    "question": "What types of jobs can the `final.sh` script be?",
+    "answer": "The `final.sh` job can be of any kind: serial, parallel, or an array job."
+  },
+  {
+    "question": "Does the automatic post-processing feature use the same script as auto-resubmission?",
+    "answer": "Yes, this feature uses the `resubmit_script.sh` script, similar to the `-auto` feature, and requires the correct account name in its `#SBATCH -A` line."
+  },
+  {
+    "question": "How does automatic post-processing impact the `NJOBS_MAX` parameter?",
+    "answer": "The automatic post-processing feature also causes more serial jobs to be submitted, so `NJOBS_MAX` in `config.h` should be adjusted accordingly (e.g., set to 998 if the cluster limit is 999)."
+  },
+  {
+    "question": "If both auto-resubmit and auto-post-processing features are used, how many additional jobs are submitted?",
+    "answer": "If both features are used, they will together only submit one additional job; you do not need to subtract 2 from `NJOBS_MAX`."
+  },
+  {
+    "question": "What is the WHOLE_NODE mode in meta-farm?",
+    "answer": "The WHOLE_NODE mode allows packaging individual serial farming jobs into whole node jobs, supporting use on clusters like Niagara/Trillium."
+  },
+  {
+    "question": "Which version of meta-farm introduced WHOLE_NODE mode?",
+    "answer": "WHOLE_NODE mode is supported starting from meta-farm version 1.0.3."
+  },
+  {
+    "question": "Is WHOLE_NODE mode enabled by default?",
+    "answer": "No, WHOLE_NODE mode is off by default."
+  },
+  {
+    "question": "How do you enable WHOLE_NODE mode?",
+    "answer": "To enable WHOLE_NODE mode, you need to edit the `config.h` file in your farm directory, setting `WHOLE_NODE=1` and `NWHOLE` to the number of CPU cores per node."
+  },
+  {
+    "question": "What are the values for `NWHOLE` on Niagara and Trillium clusters?",
+    "answer": "`NWHOLE` should be set to 40 for Niagara and 192 for Trillium."
+  },
+  {
+    "question": "How does the `submit.run` command's argument change in WHOLE_NODE mode?",
+    "answer": "In WHOLE_NODE mode, the positive integer argument for `submit.run` changes its meaning from the number of meta-jobs to the number of whole nodes to be used in META mode."
+  },
+  {
+    "question": "What does the command `submit.run 2` do if WHOLE_NODE mode is enabled and `NWHOLE` is 192?",
+    "answer": "If WHOLE_NODE mode is enabled and `NWHOLE` is 192 (e.g., for Trillium), `submit.run 2` will allocate 2 whole nodes, running up to 384 concurrent serial tasks (192 tasks on each node) using META mode."
+  },
+  {
+    "question": "What does the `-1` argument for `submit.run` mean in WHOLE_NODE mode?",
+    "answer": "The `-1` argument for `submit.run` preserves its original meaning in WHOLE_NODE mode, which is to run the farm using the SIMPLE mode."
+  },
+  {
+    "question": "How is the number of actual whole node jobs calculated in SIMPLE mode with `NWHOLE`?",
+    "answer": "In SIMPLE mode, the number of actual (whole node) jobs is computed as `Number_of_cases / NWHOLE`."
+  }
+]

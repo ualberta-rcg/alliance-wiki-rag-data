@@ -1,0 +1,118 @@
+[
+  {
+    "question": "What are the advantages of using Serial I/O with a single CPU?",
+    "answer": "Serial I/O with a single CPU is trivially simple for small I/O, and some I/O libraries are not parallel."
+  },
+  {
+    "question": "What are the limitations of Serial I/O with a single CPU?",
+    "answer": "The bandwidth is limited by the rate one client can sustain, a node may not have enough memory to hold all data, and it won't scale due to a built-in bottleneck."
+  },
+  {
+    "question": "How does Serial I/O with N processors work?",
+    "answer": "Each participating process performs I/O to individual files, meaning all processes do serial I/O."
+  },
+  {
+    "question": "What are the benefits of Serial I/O with N processors?",
+    "answer": "There is no interprocess communication or coordination necessary, and it can offer possibly better scaling than single sequential I/O."
+  },
+  {
+    "question": "What are the drawbacks of Serial I/O with N processors?",
+    "answer": "As process counts increase, it leads to many small files which won't scale, data often must be post-processed into one file, and uncoordinated I/O may swamp the filesystem due to file locks."
+  },
+  {
+    "question": "What is the recommended approach for parallel I/O?",
+    "answer": "The best approach is to do an appropriate parallel I/O, where each participating process writes data simultaneously into a single file in a coordinated fashion."
+  },
+  {
+    "question": "What are the advantages of Parallel I/O where N processes write to a single file?",
+    "answer": "It results in only one file (good for visualization, data management, storage), data can be stored canonically, and avoiding post-processing will scale if done correctly."
+  },
+  {
+    "question": "What are the disadvantages of Parallel I/O where N processes write to a single file?",
+    "answer": "Uncoordinated I/O will swamp the filesystem (due to file locks!) and it requires more design and thought."
+  },
+  {
+    "question": "Why is collective I/O important for parallel middleware?",
+    "answer": "Collective I/O allows the filesystem to know more about access as a whole, which enables more optimization in lower software layers and leads to better performance."
+  },
+  {
+    "question": "Define Independent I/O operations.",
+    "answer": "Independent I/O operations specify only what a single process will do."
+  },
+  {
+    "question": "Define Collective I/O.",
+    "answer": "Collective I/O is coordinated access to storage by a group of processes, where functions are called by all processes participating in I/O."
+  },
+  {
+    "question": "What parallel I/O techniques are discussed as part of the MPI-2 standard or built upon it?",
+    "answer": "MPI-IO is part of the MPI-2 standard, and high-end libraries such as HDF5 (Hierarchical Data Format) and Parallel NetCDF (Network Common Data Format) are built on top of MPI-IO."
+  },
+  {
+    "question": "What implementation of MPI-IO is typically found in OpenMPI on the described systems?",
+    "answer": "ROMIO is the implementation of MPI-IO in OpenMPI, which is the default on these systems."
+  },
+  {
+    "question": "How does MPI-IO exploit analogies with MPI communication?",
+    "answer": "MPI-IO exploits analogies with MPI by making writing similar to sending a message and reading similar to receiving a message."
+  },
+  {
+    "question": "What MPI features are utilized by MPI-IO for file access?",
+    "answer": "MPI-IO utilizes file access grouped via a communicator for collective operations and user-defined MPI datatypes for noncontiguous data layout."
+  },
+  {
+    "question": "What are the basic MPI-IO operations in C?",
+    "answer": "The basic MPI-IO operations in C include `MPI_File_open`, `MPI_File_seek`, `MPI_File_set_view`, `MPI_File_read`, `MPI_File_write`, and `MPI_File_close`."
+  },
+  {
+    "question": "What is the function of `MPI_File_seek`?",
+    "answer": "`MPI_File_seek` updates the individual file pointer."
+  },
+  {
+    "question": "What is the purpose of `MPI_File_set_view`?",
+    "answer": "`MPI_File_set_view` changes a process's view of data in a file and is used to assign regions of the file to separate processes."
+  },
+  {
+    "question": "What three components specify file views for `MPI_File_set_view`?",
+    "answer": "File views are specified using a triplet: displacement, etype, and filetype."
+  },
+  {
+    "question": "In `MPI_File_set_view`, what does 'displacement' mean?",
+    "answer": "`displacement` is the number of bytes to skip from the start of the file."
+  },
+  {
+    "question": "In `MPI_File_set_view`, what does 'etype' refer to?",
+    "answer": "`etype` is the elementary datatype, which is the unit of data access."
+  },
+  {
+    "question": "In `MPI_File_set_view`, what does 'filetype' specify?",
+    "answer": "`filetype` specifies which portion of the file is visible to the process."
+  },
+  {
+    "question": "What are the basic MPI-IO operations in Fortran 90?",
+    "answer": "The basic MPI-IO operations in Fortran 90 include `MPI_FILE_OPEN`, `MPI_FILE_SEEK`, `MPI_FILE_SET_VIEW`, `MPI_FILE_READ`, `MPI_FILE_WRITE`, and `MPI_FILE_CLOSE`."
+  },
+  {
+    "question": "What arguments are required to open a file using `MPI_File_open`?",
+    "answer": "Opening a file requires a communicator, file name, a file handle (for all future reference to the file), and a file access mode (`amode`)."
+  },
+  {
+    "question": "List some common file access modes (`amode`) available in MPI-IO.",
+    "answer": "Common file access modes include `MPI_MODE_RDONLY` (Read only), `MPI_MODE_RDWR` (Read and writing), `MPI_MODE_WRONLY` (Write only), `MPI_MODE_CREATE` (Create file if it does not exist), `MPI_MODE_EXCL` (Error if creating file that exists), `MPI_MODE_DELETE_ON_CLOSE` (Delete file on close), `MPI_MODE_UNIQUE_OPEN` (File not to be opened elsewhere), `MPI_MODE_SEQUENTIAL` (File to be accessed sequentially), and `MPI_MODE_APPEND` (Position all file pointers to end)."
+  },
+  {
+    "question": "How are multiple file access modes combined in C and FORTRAN?",
+    "answer": "In C, they are combined using a bitwise OR (\"|\"), and in FORTRAN, they are combined using addition (\"+\")."
+  },
+  {
+    "question": "What is the typical setting for the `info` argument when opening a file with MPI-IO?",
+    "answer": "The `info` argument is usually set to `MPI_INFO_NULL`."
+  },
+  {
+    "question": "In the MPI-IO C example for writing contiguous data, how is the `displace` offset calculated for each processor?",
+    "answer": "The `displace` offset is calculated by `rank * n * sizeof(char)`, where `rank` is the process ID, `n` is the array size (10 in the example), and `sizeof(char)` is the size of a character."
+  },
+  {
+    "question": "In the MPI-IO C example, what does 'native' signify when passed to `MPI_File_set_view`?",
+    "answer": "In the example, 'native' means that data in this representation is stored in a file exactly as it is in memory."
+  }
+]

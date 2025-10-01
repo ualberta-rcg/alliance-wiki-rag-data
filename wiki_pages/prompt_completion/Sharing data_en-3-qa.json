@@ -1,62 +1,70 @@
 [
   {
-    "question": "What happens to the group ownership of a new file created in a directory with the Set Group ID (setGID) bit enabled?",
-    "answer": "If the setGID bit is enabled for a directory, new files created within that directory will be created with the same group ownership as the parent directory."
+    "question": "What are Access Control Lists (ACLs) used for?",
+    "answer": "Access Control Lists (ACLs) enable permissions to be set on a user-by-user basis, offering a more fine-grained approach than traditional Unix file permissions."
   },
   {
-    "question": "What happens to a new directory created inside a directory where the setGID bit is enabled?",
-    "answer": "If a directory is created inside one with the setGID bit enabled, it will inherit the same group as the parent folder and also have its own setGID bit enabled."
+    "question": "Which commands are used to manage Access Control Lists (ACLs)?",
+    "answer": "The two commands needed to manipulate extended permissions via ACLs are `getfacl` to see permissions and `setfacl` to alter them."
   },
   {
-    "question": "In the `ls -l` output for a directory with setGID enabled, what is the difference between a lowercase 's' and an uppercase 'S' in the group permissions field?",
-    "answer": "A lowercase 's' (e.g., `drwxrwsr-x`) indicates that the setGID is enabled and the group also has execute permission. An uppercase 'S' (e.g., `drwxrS---`) indicates that the setGID is enabled, but the execute permission has been removed for the group, which can lead to access problems."
+    "question": "How do you view the ACL permissions of a filesystem object?",
+    "answer": "You can use the `getfacl` command to see the ACL permissions for a filesystem object."
   },
   {
-    "question": "Is the Set User ID (setUID) bit functional on the clusters?",
-    "answer": "No, the setUID bit is completely disabled on the clusters for security reasons and will not work."
+    "question": "How can you grant a single person read and execute permission on a specific file using ACLs?",
+    "answer": "To allow a single person with username `smithj` to have read and execute permission on the file `my_script.py`, use: `$ setfacl -m u:smithj:rx my_script.py`."
   },
   {
-    "question": "What mechanism defines the default filesystem permissions for new files?",
-    "answer": "Default filesystem permissions are defined by the `umask`."
+    "question": "How do you set default ACL rules for a subdirectory so that newly created files and directories inherit specific permissions for a user?",
+    "answer": "To set default access rules for new data in a subdirectory, you can use: `$ setfacl -d -m u:smithj:rwX /home/<user>/projects/def-<PI>/shared_data`."
   },
   {
-    "question": "How can you check the current `umask` value in your session?",
-    "answer": "You can display the current `umask` value in your session by running the command `umask -S`."
+    "question": "How do you apply ACL rules recursively to an existing subdirectory and its current contents for a specific user?",
+    "answer": "To apply ACL rules to an existing subdirectory and all its current content, you can use: `$ setfacl -R -m u:smithj:rwX /home/<user>/projects/def-<PI>/shared_data`."
   },
   {
-    "question": "If `umask -S` shows `u=rwx,g=rx,o=`, what does this mean for newly created files?",
-    "answer": "This means that, by default, new files you create can be read, written, and executed by yourself (owner), read and executed by members of the file's group, and cannot be accessed by other people."
+    "question": "What does the `X` attribute signify in ACL permissions?",
+    "answer": "The `X` attribute in ACLs sets the execute permission only when the item is already executable (either a directory or a file with the execute permission)."
   },
   {
-    "question": "Does changing the `umask` affect existing files?",
-    "answer": "No, the `umask` only applies to new files; changing it does not alter the access permissions of existing files."
+    "question": "Why is the execute permission important for directories when using ACLs?",
+    "answer": "A directory needs the execute permission to allow it to be browsed."
   },
   {
-    "question": "How can you set a custom `umask` value for your session or permanently?",
-    "answer": "You can set your own `umask` by calling the command `umask <value>` either in a session or by adding it to your `.bashrc` file."
+    "question": "What is a prerequisite for ACL sharing regarding directory ownership?",
+    "answer": "The directory you are trying to share must be owned by you."
   },
   {
-    "question": "Which `umask` value in octal notation makes files readable, writable, and executable only by the owner?",
-    "answer": "The `umask` value `077` makes files readable, writable, and executable by the owner only (`u=rwx,g=,o=`)."
+    "question": "What permissions are required on parent directories for ACL sharing to function correctly?",
+    "answer": "Parent directories (and parents of parents, etc.) of the one you are trying to share must allow execute permission to the user you are trying to share with."
   },
   {
-    "question": "What `umask` value should be used to allow files to be readable and executable by the owner and group, but writable only by the owner?",
-    "answer": "The `umask` value `027` achieves this: `u=rwx,g=rx,o=`."
+    "question": "When sharing a directory in the project filesystem, which path type should collaborators be given?",
+    "answer": "When sharing a directory in the project filesystem, you must provide your collaborators with a path that starts with `/project`, not `/home/<user>/projects`."
   },
   {
-    "question": "What `umask` value provides full read, write, and execute permissions to both the owner and the group, while denying access to others?",
-    "answer": "The `umask` value `007` provides `u=rwx,g=rwx,o=` permissions."
+    "question": "Why should collaborators use the `/project` path instead of `/home/<user>/projects` when accessing shared data?",
+    "answer": "The `/home/<user>/projects` path contains symbolic links (symlinks) to physical directories in `/project`, and these symlinks will not be reachable by collaborators unless they also have access to your home directory."
   },
   {
-    "question": "Which `umask` value allows files to be readable and executable by everyone, but restricts write access to the owner only?",
-    "answer": "The `umask` value `022` allows files to be readable and executable by everyone, but writable only by the owner (`u=rwx,g=rx,o=rx`)."
+    "question": "How can you find the physical path that a symbolic link points to?",
+    "answer": "You can get the physical path a symlink points to using the `realpath` command, for example, `realpath /home/smithj/projects/def-smithj/shared_data`."
   },
   {
-    "question": "What `umask` value allows files to be readable and executable by everyone, but restricts write access to the owner and the group?",
-    "answer": "The `umask` value `002` allows files to be readable and executable by everyone, but writable only by the owner and the group (`u=rwx,g=rwx,o=rx`)."
+    "question": "Why might the physical path of a project directory need to be checked on different clusters?",
+    "answer": "The physical path to a project directory is not the same on all clusters, so if you wish to share a project directory on more than one cluster, you should check its physical path with `realpath` on each cluster."
   },
   {
-    "question": "Besides the `umask`, what other factors determine who can access a file?",
-    "answer": "Other factors include having execute permission on all parent directories in the path to the file, being a member of the file's group for group permissions, explicit changes made with `chmod` after creation, and Access Control Lists (ACLs)."
+    "question": "How can you change the permissions of an existing file to remove group write and other read/execute permissions?",
+    "answer": "You can use the `chmod` command as follows: `chmod g-w,o-rx <file>`."
+  },
+  {
+    "question": "How can you recursively change the permissions of an entire directory to remove group write and other read/execute permissions?",
+    "answer": "If you want to change permissions for a whole directory recursively, you can run: `chmod -R g-w,o-rx <directory>`."
+  },
+  {
+    "question": "Does changing permissions on files or using ACLs imply that files were insecure in the past?",
+    "answer": "No, restrictive access permissions have been set on home, project, and scratch directories since the beginning, and files could not be accessed by others unless execute permission was specifically granted to them on those folders."
   }
 ]

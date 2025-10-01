@@ -1,62 +1,78 @@
 [
   {
-    "question": "When is it recommended to combine model parallelism and data parallelism with multiple GPUs in PyTorch?",
-    "answer": "Combining model and data parallelism is recommended when a model is too large to fit on a single GPU and requires training with a very large dataset."
+    "question": "How do you create model checkpoints with custom training loops in PyTorch?",
+    "answer": "For examples on creating model checkpoints with custom training loops, consult the PyTorch documentation on saving and loading a general checkpoint."
   },
   {
-    "question": "How does combining model and data parallelism work with multiple GPUs?",
-    "answer": "The model is divided into portions, each assigned to a distinct GPU. Pipeline parallelism is then applied to the results, and copies of this process are made, training these model copies in parallel with different subsets of the training data. Gradients are calculated independently, aggregated, and parameters are updated synchronously or asynchronously across all copies."
+    "question": "Is additional code required for checkpoints when using PyTorch Lightning in distributed training?",
+    "answer": "No, with PyTorch Lightning, no additional code is required for checkpoints in distributed training, other than inserting the callbacks parameter."
   },
   {
-    "question": "What is a limitation of Torch RPC when combining model and data parallelism across multiple GPUs?",
-    "answer": "Currently, Torch RPC only supports dividing a model within a single node. For models that exceed the memory capacity of all GPUs in a compute node, DeepSpeed is recommended."
+    "question": "Which process should create checkpoints when using DistributedDataParallel or Horovod in distributed training?",
+    "answer": "When using DistributedDataParallel or Horovod, checkpoints should be created by only one process (rank) of your program, typically rank 0, as all processes will have the same state."
   },
   {
-    "question": "What environment variables are set for Torch RPC and DDP combination in the `pytorch-model-data-par.sh` script?",
-    "answer": "The `MASTER_ADDR` is set to the hostname of the main node, and the `MASTER_PORT` is set to `34567` for the main node, with subsequent replicas using `34567 + local_rank` to ensure unique RPC server ports for each model replica."
+    "question": "How can you save a checkpoint from the first process (rank 0) during distributed training?",
+    "answer": "You can save a checkpoint from the first process (rank 0) using `if global_rank == 0: torch.save(ddp_model.state_dict(), \"./checkpoint_path\")`."
   },
   {
-    "question": "How are model parts distributed across GPUs when combining Torch RPC and DDP?",
-    "answer": "The first part of the model (ConvPart) is loaded onto `cuda(local_rank)`, and the second part (MLPPart) is loaded onto `cuda(local_rank + 1)` for each process."
+    "question": "What potential issues can arise when loading checkpoints in distributed training, and how can they be avoided?",
+    "answer": "Potential issues include processes attempting to load an unsaved checkpoint. To avoid this, add `torch.distributed.barrier()` to ensure the checkpoint is fully written to disk before other processes try to load it."
   },
   {
-    "question": "What is DeepSpeed?",
-    "answer": "DeepSpeed is a library designed to optimize the training of deep learning models, particularly those with billions of parameters, by implementing new distributed training methods that efficiently use memory, notably through the Zero Redundancy Optimizer (ZeRO) concept."
+    "question": "How should `torch.load` be configured to correctly load tensors on specific GPUs during distributed training?",
+    "answer": "To load tensors on the correct GPU for each process, you must pass the `map_location` parameter to `torch.load`, for example, `map_location = f\"cuda:{local_rank}\"`."
   },
   {
-    "question": "How does DeepSpeed's ZeRO (Zero Redundancy Optimizer) work?",
-    "answer": "ZeRO distributes the storage and processing of various training elements, such as optimizer states, model weights, gradients, and activations, across multiple devices like GPUs, CPUs, local hard drives, or combinations thereof. This pooling of resources allows for efficient training of large models on multiple nodes."
+    "question": "What does the CUDA error 'no kernel image is available for execution on the device' indicate?",
+    "answer": "This CUDA error means that the current Torch installation does not support the compute architecture or GPU being used."
   },
   {
-    "question": "What is the primary benefit of using DeepSpeed?",
-    "answer": "DeepSpeed enables the efficient training of models with enormous numbers of parameters across multiple nodes without requiring explicit code for model, pipeline, or data parallelism."
+    "question": "How can you resolve the 'CUDA error: no kernel image is available for execution on the device' error?",
+    "answer": "To resolve this error, you can install a newer version of `torch` or request a GPU that is compatible with your current Torch version."
   },
   {
-    "question": "How is ZeRO Stage 3 used with GPUs for model training?",
-    "answer": "ZeRO Stage 3 distributes the optimizer states, model parameters, and model gradients across all participating GPUs. This approach is more memory-efficient than pure data parallelism, where a complete copy of the model is loaded onto each GPU."
+    "question": "What is LibTorch used for?",
+    "answer": "LibTorch is used to implement C++ extensions to PyTorch and to create pure C++ machine learning applications."
   },
   {
-    "question": "Which DeepSpeed optimizer is recommended for ZeRO Stage 3 with GPUs?",
-    "answer": "The `FusedAdam` optimizer from DeepSpeed is recommended for ZeRO Stage 3 with GPUs, offering performance comparable to pure data parallelism. It requires loading a `cuda/<version>` module that matches the PyTorch package's build version."
+    "question": "What does the LibTorch distribution include?",
+    "answer": "The LibTorch distribution includes the necessary headers, libraries, and CMake configuration files for working with PyTorch, as described in its documentation."
   },
   {
-    "question": "What are the advantages of using ZeRO Stage 3 with CPU offloading?",
-    "answer": "Offloading optimizer states and model parameters to CPU memory makes the compute node's memory available for tensors not currently required by the GPU. This can be seen as adding significant additional memory (e.g., 32GB) to the GPU's capacity, allowing for larger batch sizes or models. Optimizer steps are also computed on the CPU."
+    "question": "What are the initial steps to configure the environment for using LibTorch?",
+    "answer": "To configure the environment for LibTorch, you need to load the required modules and then install PyTorch within a Python virtual environment."
   },
   {
-    "question": "Which DeepSpeed optimizer is used for ZeRO Stage 3 with CPU offloading?",
-    "answer": "The `DeepSpeedCPUAdam` optimizer from DeepSpeed is used for ZeRO Stage 3 with CPU offloading, and it requires loading a `cuda/<version>` module that matches the PyTorch package's build version."
+    "question": "Which modules should be loaded for LibTorch with StdEnv/2023?",
+    "answer": "For LibTorch with StdEnv/2023, you should load `StdEnv/2023`, `gcc`, `cuda/12.2`, `cmake`, `protobuf`, `cudnn`, `python/3.11`, `abseil`, `cusparselt`, and `opencv/4.8.1`."
   },
   {
-    "question": "When is ZeRO Stage 3 with NVMe disk offloading used, and what are its characteristics?",
-    "answer": "ZeRO Stage 3 with NVMe disk offloading is used when optimizer states and model parameters are moved to local storage (NVMe disks) instead of CPU memory. This further expands available storage for tensors, enabling even larger batches or models. However, it results in a significant performance loss compared to CPU/GPU offloading. It's best utilized with faster NVMe disks to minimize this performance impact."
+    "question": "How can you determine the specific versions of modules like abseil, cusparselt, and opencv used to compile a PyTorch wheel for LibTorch?",
+    "answer": "You can determine the specific versions by running `ldd $VIRTUAL_ENV/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so | sed -n 's&^.*/\\(\\(opencv\\|abseil\\|cusparselt\\)/[^/]*\\).*&\\1&p' | sort -u`."
   },
   {
-    "question": "What is the role of `torch.distributed.rpc.init_rpc` when combining Torch RPC and DDP?",
-    "answer": "`torch.distributed.rpc.init_rpc` is used to initialize an RPC server for pipeline parallelism within each model replica, rather than for communication between different replicas, which is handled by DistributedDataParallel."
+    "question": "What modules are required for LibTorch when using StdEnv/2020?",
+    "answer": "For LibTorch with StdEnv/2020, you need to load `gcc`, `cuda/11.4`, `cmake`, `protobuf`, `cudnn`, and `python/3.10`."
   },
   {
-    "question": "How are inputs and targets sent to the GPUs in the model and data parallel example?",
-    "answer": "Inputs are sent to `inputs.cuda(model_rank)` and targets are sent to `targets.cuda(model_rank + 1)`, distributing them across the GPUs assigned to different parts of the model within each replica."
+    "question": "What are the two files needed to compile a minimal LibTorch example?",
+    "answer": "To compile a minimal LibTorch example, you need `example.cpp` and `CMakeLists.txt`."
+  },
+  {
+    "question": "What command is used to configure a LibTorch project for compilation with StdEnv/2023?",
+    "answer": "With StdEnv/2023, activate the virtual environment and use the command `cmake -B build -S . -DCMAKE_PREFIX_PATH=$VIRTUAL_ENV/lib/python3.11/site-packages -DCMAKE_EXE_LINKER_FLAGS=\"-Wl,-rpath=$VIRTUAL_ENV/lib/python3.11/site-packages/torch/lib,-L$EBROOTCUDA/extras/CUPTI/lib64\" -DCMAKE_SKIP_RPATH=ON -DTORCH_CUDA_ARCH_LIST=\"6.0;7.0;7.5;8.0;9.0\"`."
+  },
+  {
+    "question": "How do you build a LibTorch project after configuring it with CMake?",
+    "answer": "After configuring a LibTorch project with CMake, you build it using `cmake --build build`."
+  },
+  {
+    "question": "How do you execute the compiled LibTorch example program?",
+    "answer": "You execute the compiled LibTorch example program using `build/example`."
+  },
+  {
+    "question": "What is required to test a LibTorch application with CUDA?",
+    "answer": "To test a LibTorch application with CUDA, you must request an interactive job with a GPU."
   }
 ]

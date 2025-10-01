@@ -1,0 +1,58 @@
+[
+  {
+    "question": "What is the purpose of the Fluent solution restart scripts?",
+    "answer": "The Fluent solution restart scripts are provided to automate restarting very large jobs that require more than the typical seven-day maximum runtime window available on most clusters."
+  },
+  {
+    "question": "How do Fluent jobs restart when using these scripts?",
+    "answer": "Jobs are restarted from the most recent saved time step files."
+  },
+  {
+    "question": "What is a prerequisite for the first time step when using Fluent solution restart scripts?",
+    "answer": "A fundamental requirement is that the first time step can be completed within the requested job array time limit (specified at the top of your Slurm script) when starting a simulation from an initialized solution field."
+  },
+  {
+    "question": "What files must be present to begin a Fluent solution restart simulation?",
+    "answer": "To begin a Fluent solution restart simulation, a working set of `sample.cas`, `sample.dat`, and `sample.jou` files must be present."
+  },
+  {
+    "question": "How should the initial `sample.jou` file be configured for Fluent solution restart?",
+    "answer": "The initial `sample.jou` file should be edited to contain `/solve/dual-time-iterate 1` and `/file/auto-save/data-frequency 1`."
+  },
+  {
+    "question": "How do you prepare the `sample-restart.jou` file for a Fluent solution restart job?",
+    "answer": "First, create a restart journal file by doing `cp sample.jou sample-restart.jou`. Then, edit `sample-restart.jou` to contain `/file/read-cas-data sample-restart` instead of `/file/read-cas-data sample` and comment out the initialization line (e.g., `;/solve/initialize/initialize-flow`)."
+  },
+  {
+    "question": "Under what condition should `/solve/dual-time-iterate 2` be used in `sample-restart.jou`?",
+    "answer": "If your second and subsequent time steps are known to run twice as fast as the initial time step, you should edit `sample-restart.jou` to specify `/solve/dual-time-iterate 2`."
+  },
+  {
+    "question": "What is the benefit of choosing `2` for `dual-time-iterate` in the restart journal file?",
+    "answer": "Choosing `2` for `dual-time-iterate` means the solution will only be restarted after two time steps are completed following the initial time step, which minimizes computationally expensive solution restarts."
+  },
+  {
+    "question": "Which module versions are specified for the Fluent restart scripts using StdEnv/2023?",
+    "answer": "The scripts specify `module load StdEnv/2023` and `module load ansys/2023R2` (or newer versions) for Beluga, Cedar, Graham, and Narval clusters."
+  },
+  {
+    "question": "How do you specify the number of solution restarts in the Slurm script for Fluent?",
+    "answer": "The number of solution restarts is specified using the `#SBATCH --array=1-5%1` directive, where `1-5%1` means 5 attempts are shown."
+  },
+  {
+    "question": "What variables need to be customized for filenames and version in the Fluent restart scripts?",
+    "answer": "The variables to customize are `MYVERSION` (e.g., `3d`), `MYJOUFILE` (initial journal filename), `MYJOUFILERES` (journal restart filename), `MYCASFILERES` (case restart filename), and `MYDATFILERES` (data restart filename)."
+  },
+  {
+    "question": "How is the total number of cores (`NCORES`) calculated in the Multinode (by node + restart) script?",
+    "answer": "The total number of cores (`NCORES`) is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "What happens in the script if a Fluent job completes successfully?",
+    "answer": "If a Fluent job completes successfully, the script will output 'Job completed successfully! Exiting now.' and then terminate the job array using `scancel $SLURM_ARRAY_JOB_ID`."
+  },
+  {
+    "question": "What happens if a Fluent simulation fails while running with a restart script?",
+    "answer": "If a Fluent simulation fails, the script will output 'Simulation failed. Exiting\u2026' and the job will terminate."
+  }
+]

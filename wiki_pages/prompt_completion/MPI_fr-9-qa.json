@@ -1,0 +1,34 @@
+[
+  {
+    "question": "What is the primary goal of the `phello3` program in the MPI tutorial?",
+    "answer": "The `phello3` program aims to demonstrate a reliable method for circular message passing between processes in an MPI environment, where each process sends a 'Hello, world!' message to its next neighbor and receives one from its previous neighbor, while specifically avoiding potential deadlocks."
+  },
+  {
+    "question": "How are the `sendto` and `recvfrom` target process ranks calculated in the `phello3` example?",
+    "answer": "The `sendto` rank (target for sending) is calculated as `(rank + 1) % size`, and the `recvfrom` rank (source for receiving) is calculated as `((rank + size) - 1) % size`, ensuring a circular communication pattern."
+  },
+  {
+    "question": "What communication strategy is implemented in `phello3` to avoid deadlocks?",
+    "answer": "The `phello3` program employs a pair-odd/even communication strategy to avoid deadlocks: processes with an even rank execute `MPI_Send` followed by `MPI_Recv`, while processes with an odd rank execute `MPI_Recv` followed by `MPI_Send`."
+  },
+  {
+    "question": "Does the odd/even communication strategy prevent deadlocks even with an odd number of processes?",
+    "answer": "Yes, the odd/even communication strategy remains reliable and prevents deadlocks even with an odd number of processes. For instance, process 0 (even) sends to process 1 (odd), which starts by receiving, ensuring a matched transaction and preventing any indefinite wait."
+  },
+  {
+    "question": "How is MPI initialized and finalized in the Fortran 2008 version of `phello3`?",
+    "answer": "In the Fortran 2008 version, MPI is initialized by calling `MPI_Init()` at the start of the program and finalized by calling `MPI_Finalize()` at its conclusion."
+  },
+  {
+    "question": "Which mpi4py functions are used to get the rank and size of processes in the Python `phello3.py` example?",
+    "answer": "In Python (mpi4py), the rank of the current process is obtained using `comm.Get_rank()`, and the total number of processes (`size`) is obtained using `comm.Get_size()`, where `comm` is the `MPI.COMM_WORLD` communicator."
+  },
+  {
+    "question": "Describe the message sending and receiving logic for an even-ranked process in the Python `phello3.py` example.",
+    "answer": "If a process has an even rank, it first sends its `outbuf` message to its calculated `sendto` destination using `comm.send(outbuf, dest=sendto, tag=0)`, and then it receives a message into `inbuf` from its calculated `recvfrom` source using `inbuf = comm.recv(source=recvfrom, tag=0)`."
+  },
+  {
+    "question": "Describe the message sending and receiving logic for an odd-ranked process in the Python `phello3.py` example.",
+    "answer": "If a process has an odd rank, it first receives a message into `inbuf` from its calculated `recvfrom` source using `inbuf = comm.recv(source=recvfrom, tag=0)`, and then it sends its `outbuf` message to its calculated `sendto` destination using `comm.send(outbuf, dest=sendto, tag=0)`."
+  }
+]

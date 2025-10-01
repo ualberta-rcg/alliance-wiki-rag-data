@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What are two key recommendations for optimizing GPU compute performance in PyTorch?",
+    "answer": "To optimize compute performance, increase your `batch_size` to as much as you can fit in the GPU's memory, and use a `DataLoader` with as many `num_workers` as you have `cpus-per-task`."
+  },
+  {
+    "question": "What is the purpose of the `pytorch-single-gpu.sh` script?",
+    "answer": "The `pytorch-single-gpu.sh` script is a bash script for submitting a SLURM job to run a single GPU performance test for CIFAR10 classification models."
+  },
+  {
+    "question": "How does the `pytorch-single-gpu.sh` script request a GPU?",
+    "answer": "It requests a GPU using the SBATCH directive `#SBATCH --gres=gpu:1`."
+  },
+  {
+    "question": "What default arguments are used when `cifar10-gpu.py` is executed by `pytorch-single-gpu.sh`?",
+    "answer": "The `cifar10-gpu.py` script is executed with `--batch_size=512` and `--num_workers=0`."
+  },
+  {
+    "question": "How are the model, loss function, and data moved to the GPU within the `cifar10-gpu.py` script?",
+    "answer": "The model is loaded on the GPU with `net = net.cuda()`, the loss function with `criterion = nn.CrossEntropyLoss().cuda()`, and the input `inputs` and `targets` are moved to the GPU within the training loop using `.cuda()`."
+  },
+  {
+    "question": "What is Data Parallelism in PyTorch?",
+    "answer": "Data Parallelism involves training over multiple replicas of a model in parallel, where each replica receives a different chunk of training data per iteration. Gradients are then aggregated, and parameters are updated synchronously or asynchronously."
+  },
+  {
+    "question": "What is a major advantage of using Data Parallelism?",
+    "answer": "Data Parallelism can provide a significant speed-up by iterating through all examples in a large dataset approximately N times faster, where N is the number of model replicas."
+  },
+  {
+    "question": "What scaling adjustment is necessary when using Data Parallelism?",
+    "answer": "To get a trained model equivalent to one trained without Data Parallelism, the user must scale either the learning rate or the desired batch size in proportion to the number of replicas."
+  },
+  {
+    "question": "What is a constraint on model size when using Data Parallelism with multiple GPUs?",
+    "answer": "When using Data Parallelism with multiple GPUs, the model must be small enough to fit entirely within the memory of a single GPU."
+  },
+  {
+    "question": "What are two primary ways to perform Data Parallelism in PyTorch?",
+    "answer": "Data Parallelism can be performed using the `DistributedDataParallel` class directly or by utilizing the `PyTorch Lightning` package."
+  }
+]

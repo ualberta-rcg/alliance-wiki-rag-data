@@ -1,46 +1,42 @@
 [
   {
-    "question": "What is PyTorch Lightning?",
-    "answer": "PyTorch Lightning is a Python package that provides interfaces to PyTorch to make many common, but otherwise code-heavy tasks, more straightforward, including training on multiple GPUs."
+    "question": "How is the PyTorch Lightning `Trainer` class initialized to use GPUs and the DDP strategy?",
+    "answer": "The `Trainer` is initialized with `pl.Trainer(accelerator=\"gpu\", devices=2, num_nodes=1, strategy='ddp', max_epochs = args.max_epochs, enable_progress_bar=False)`."
   },
   {
-    "question": "How do you set up a PyTorch Lightning job on a SLURM cluster for multiple GPUs?",
-    "answer": "An example SLURM script requests generic GPU resources (`--gres=gpu:2`), sets tasks per node (`--tasks-per-node=2`), loads a Python module, creates a virtual environment, installs `torchvision` and `pytorch-lightning`, exports `TORCH_NCCL_ASYNC_HANDLING=1`, and then runs the Python script using `srun`."
+    "question": "How can the PyTorch Lightning `Trainer` initialization be made more flexible for a generic number of GPUs and nodes?",
+    "answer": "To make it more generic, `torch.cuda.device_count()` can be used to set the number of GPUs, and `int(os.environ.get(\"SLURM_JOB_NUM_NODES\"))` can be used to set the number of nodes."
   },
   {
-    "question": "What is a key requirement for PyTorch Lightning when running in a SLURM batch job with multiple GPUs?",
-    "answer": "PyTorch Lightning expects the user to have requested one task per GPU. If this is not the case or the script is not run with `srun`, the job will fail."
+    "question": "What is the purpose of setting `enable_progress_bar=False` in the PyTorch Lightning `Trainer`?",
+    "answer": "It is set to avoid writing a progress bar to the logs, which can cause issues due to updating logs too frequently."
   },
   {
-    "question": "How is a neural network model typically defined in PyTorch Lightning?",
-    "answer": "A neural network model in PyTorch Lightning is defined by creating a class that inherits from `pl.LightningModule` and implementing methods like `__init__` for layer definition and `forward` for the data flow."
+    "question": "When is it not recommended to use a GPU for model training?",
+    "answer": "It is not advisable to use a GPU when a model is relatively small, does not utilize a large portion of GPU memory, and cannot effectively use its compute capacity."
   },
   {
-    "question": "Which arguments are defined for the `pytorch-ddp-test-pl.py` script?",
-    "answer": "The script defines command-line arguments for learning rate (`--lr`), maximum epochs (`--max_epochs`), batch size (`--batch_size`), and number of workers (`--num_workers`)."
+    "question": "What alternative is suggested for training small models that do not efficiently utilize a GPU?",
+    "answer": "For such models, it is strongly recommended to use one or more CPUs instead of a GPU."
   },
   {
-    "question": "What happens during a `training_step` in a PyTorch Lightning model?",
-    "answer": "In the provided `pytorch-ddp-test-pl.py` example, the `training_step` method receives a `batch` and `batch_idx`, and it immediately unpacks the `batch` into `x` (inputs) and `y` (targets)."
+    "question": "Under what conditions does Data Parallelism on a single GPU become a viable option for small models?",
+    "answer": "It becomes a viable option when you have a small model but a very large dataset, and you wish to perform training with a small batch size while still increasing resource usage and achieving a speed-up."
   },
   {
-    "question": "How is the loss function initialized in the `pytorch-ddp-test.py` script?",
-    "answer": "The loss function is initialized as `nn.CrossEntropyLoss().cuda()`."
+    "question": "What technologies are used to efficiently place multiple model replicas on a single GPU for Data Parallelism?",
+    "answer": "Nvidia's Multi-Process Service (MPS) along with MPI are used to efficiently place multiple model replicas on one GPU."
   },
   {
-    "question": "Which optimizer is used in the `pytorch-ddp-test.py` script and with what parameters?",
-    "answer": "The optimizer used is `optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=1e-4)`."
+    "question": "How do you activate Nvidia Multi-Process Service (MPS) in a bash script?",
+    "answer": "Nvidia MPS is activated by exporting `CUDA_MPS_PIPE_DIRECTORY` and `CUDA_MPS_LOG_DIRECTORY` environment variables, and then running `nvidia-cuda-mps-control -d`."
   },
   {
-    "question": "How are inputs and targets prepared for GPU computation within the `train` function of `pytorch-ddp-test.py`?",
-    "answer": "Inputs and targets are moved to the GPU using `inputs = inputs.cuda()` and `targets = targets.cuda()` respectively."
+    "question": "Which SLURM parameter in the `pytorch-gpu-mps.sh` script specifies the number of model replicas to be placed on a single GPU?",
+    "answer": "The `--tasks-per-node` parameter determines the number of model replicas placed on the GPU."
   },
   {
-    "question": "What are the three main steps performed by the optimizer in each training batch iteration in `pytorch-ddp-test.py`?",
-    "answer": "In each training batch iteration, the optimizer performs `optimizer.zero_grad()` to clear previous gradients, `loss.backward()` to compute new gradients, and `optimizer.step()` to update model parameters."
-  },
-  {
-    "question": "What is the purpose of `train_sampler.set_epoch(epoch)` in the `pytorch-ddp-test.py` training loop?",
-    "answer": "It is used to set the epoch for the `train_sampler`, which is important for distributed data loading to ensure different data subsets are used across epochs when shuffling is enabled."
+    "question": "Describe the architecture of the `Net` class defined in the PyTorch Lightning example for CIFAR10 classification.",
+    "answer": "The `Net` class defines a convolutional neural network with two `Conv2d` layers (3 to 6 channels, 6 to 16 channels, both 5x5 kernel), each followed by a `MaxPool2d` layer. It then flattens the output and passes it through three fully connected layers: `nn.Linear(16 * 5 * 5, 120)`, `nn.Linear(120, 84)`, and `nn.Linear(84, 10)` for the final classification."
   }
 ]

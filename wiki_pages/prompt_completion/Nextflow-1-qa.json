@@ -1,0 +1,90 @@
+[
+  {
+    "question": "What is Nextflow?",
+    "answer": "Nextflow is software for running reproducible scientific workflows. The term Nextflow is used to describe both the domain-specific-language (DSL) the pipelines are written in, and the software used to interpret those workflows."
+  },
+  {
+    "question": "How can Nextflow be loaded on our systems?",
+    "answer": "On our systems, Nextflow is provided as a module you can load with `module load nextflow`."
+  },
+  {
+    "question": "Can I use pre-published pipelines with Nextflow?",
+    "answer": "Yes, you can rely on the published nf-core pipelines, or build your own workflow."
+  },
+  {
+    "question": "Which nf-core pipeline is used as an example in this documentation?",
+    "answer": "The `nf-core/smrnaseq` pipeline is used as an example."
+  },
+  {
+    "question": "Where should the Nextflow installation procedure be run?",
+    "answer": "The installation procedure for Nextflow is to be run on a login node."
+  },
+  {
+    "question": "What are the steps to install nf-core tools?",
+    "answer": "To install nf-core tools, first run `module purge`, then `module load python/3.11`, `module load rust`, `module load postgresql`. After that, create a virtual environment with `python -m venv nf-core-env`, activate it with `source nf-core-env/bin/activate`, and finally install `nf_core==2.13` using `python -m pip install nf_core==2.13`."
+  },
+  {
+    "question": "Why is the `rust` module loaded during nf-core installation?",
+    "answer": "The `rust` module is loaded because new nf-core installations will err out if `rust` hasn't been loaded."
+  },
+  {
+    "question": "Why is the `postgresql` module loaded during nf-core installation if it's not being used?",
+    "answer": "The `postgresql` module is loaded because some Python modules, which list `psycopg2` as a dependency in the installation, would crash without it."
+  },
+  {
+    "question": "What commands are used to set the pipeline name, version, and load Nextflow and Apptainer modules?",
+    "answer": "You need to run `export NFCORE_PL=smrnaseq`, `export PL_VERSION=2.3.1`, `module load nextflow/23`, and `module load apptainer/1`."
+  },
+  {
+    "question": "What is Apptainer?",
+    "answer": "Apptainer is the successor to the Singularity container utility."
+  },
+  {
+    "question": "Why is it important to download Apptainer images at the same time as the workflow?",
+    "answer": "It is important because if not done, Nextflow will try to download images from compute nodes just before steps are executed, which won't work on most clusters as there is no internet connection on compute nodes."
+  },
+  {
+    "question": "Where should workflow images be stored?",
+    "answer": "Workflow images should be stored in `/project` space, not `$HOME` space, because they tend to be big and `$HOME` has a small quota."
+  },
+  {
+    "question": "How do you set the environment variable for the Apptainer image cache directory?",
+    "answer": "You create a folder like `/project/<def-group>/NXF_SINGULARITY_CACHEDIR` and set the environment variable with `export NXF_SINGULARITY_CACHEDIR=/project/<def-group>/NXF_SINGULARITY_CACHEDIR`."
+  },
+  {
+    "question": "Should the Apptainer image cache folder be shared with other group members?",
+    "answer": "Yes, this folder should be shared with other members of your group who are planning to use Nextflow with Apptainer, to reduce duplication."
+  },
+  {
+    "question": "How can the `export NXF_SINGULARITY_CACHEDIR` command be made persistent?",
+    "answer": "You may add the `export` command to your `~/.bashrc` as a convenience."
+  },
+  {
+    "question": "What command downloads the `smrnaseq` pipeline and its images to the cache directory?",
+    "answer": "You navigate to `~/scratch` and run `nf-core download --container-cache-utilisation amend --container-system singularity --compress none -r ${PL_VERSION} -p 6 ${NFCORE_PL}` or run `nf-core download` for interactive mode."
+  },
+  {
+    "question": "Where is the `smrnaseq` pipeline downloaded to?",
+    "answer": "The `smrnaseq` pipeline is downloaded to your `~/scratch` directory."
+  },
+  {
+    "question": "How many containers does the `smrnaseq` workflow download and what is their approximate total size?",
+    "answer": "This workflow downloads 18 containers for a total of about 4GB."
+  },
+  {
+    "question": "What folders are created after downloading the `smrnaseq` pipeline?",
+    "answer": "An `nf-core-${NFCORE_PL}_${PL_VERSION}` folder with the version number and `config` subfolders are created."
+  },
+  {
+    "question": "Which configuration files does Nextflow consider when launching a pipeline?",
+    "answer": "When a pipeline is launched, Nextflow will look at the `nextflow.config` file in that folder and also at the `~/.nextflow/config` file (if it exists) in your home directory."
+  },
+  {
+    "question": "What types of default configurations do nf-core pipelines typically have?",
+    "answer": "Nf-core pipelines all have a default configuration, a test configuration, and container configurations (e.g., singularity, podman)."
+  },
+  {
+    "question": "Is it recommended to run nf-core or generic Nextflow pipelines on Trillium?",
+    "answer": "No, it is generally discouraged to run nf-core or any other generic Nextflow pipeline on Trillium."
+  }
+]

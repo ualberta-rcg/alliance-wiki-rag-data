@@ -1,0 +1,102 @@
+[
+  {
+    "question": "What are the learning objectives related to GPU parallelism?",
+    "answer": "The learning objectives include understanding various levels of parallelism on a GPU, interpreting compiler messages about parallelization, getting optimization advice from the visual profiler, and knowing how to specify parallelization parameters to the compiler."
+  },
+  {
+    "question": "What initial performance gain was achieved compared to CPU performance?",
+    "answer": "A gain of about 3 in performance was obtained in previous steps, compared to the CPU performance."
+  },
+  {
+    "question": "What command line flags are used to obtain detailed compiler feedback on parallelization with OpenACC?",
+    "answer": "The command `pgc++ -fast -ta=tesla,lineinfo -Minfo=all,intensity,ccff -c -o main.o main.cpp` includes flags like `-Minfo=all,intensity,ccff` to get detailed compiler feedback."
+  },
+  {
+    "question": "How did the compiler parallelize loops by default, as shown in the feedback example?",
+    "answer": "Each loop was parallelized using `vector(128)`, meaning the compiler generated instructions for data chunks of length 128."
+  },
+  {
+    "question": "Why was the compiler's default `vector(128)` length inefficient for the example code?",
+    "answer": "Each row of the matrix had 27 elements, so the compiler's `vector(128)` length wasted computation on 101 elements."
+  },
+  {
+    "question": "What are the three levels of parallelism used in OpenACC?",
+    "answer": "The three levels of parallelism in OpenACC are `vector`, `worker`, and `gang`."
+  },
+  {
+    "question": "How do `vector` threads perform operations in OpenACC?",
+    "answer": "`vector` threads perform a single operation on multiple data (SIMD) in a single step. If there are fewer data than the vector's length, the operation is still performed on null values and the result is discarded."
+  },
+  {
+    "question": "What is an OpenACC `worker`?",
+    "answer": "An OpenACC `worker` computes one `vector`."
+  },
+  {
+    "question": "What constitutes an OpenACC `gang`?",
+    "answer": "A `gang` comprises one or multiple `worker`s, and all `worker`s within a `gang` can share resources like cache memory or the processor."
+  },
+  {
+    "question": "How do multiple OpenACC `gang`s interact?",
+    "answer": "Multiple `gang`s run completely independently."
+  },
+  {
+    "question": "What is the specified order of parallelism levels in OpenACC standard 2.0?",
+    "answer": "Version 2.0 of the OpenACC standard states that `gang` must be the outermost level of parallelism, while `vector` must be the innermost level."
+  },
+  {
+    "question": "What are the general correspondences between OpenACC parallelism levels and CUDA concepts?",
+    "answer": "OpenACC `vector` generally corresponds to CUDA threads, `worker` to CUDA warps, and `gang` to CUDA thread blocks."
+  },
+  {
+    "question": "Which clauses can be used with the `loop` directive in OpenACC to control parallelism?",
+    "answer": "The `gang`, `worker`, `vector`, and `seq` clauses can be used to control parallelism for a loop."
+  },
+  {
+    "question": "What is the purpose of the `seq` clause in OpenACC?",
+    "answer": "The `seq` clause will run the loop sequentially, without parallelism."
+  },
+  {
+    "question": "What is the required order for specifying multiple OpenACC parallelism clauses for a loop?",
+    "answer": "Multiple clauses must be specified in a top-down order, with `gang` first and `vector` last."
+  },
+  {
+    "question": "How can you make an OpenACC clause apply only to a specific type of accelerator?",
+    "answer": "The `device_type` clause can be used; for example, `device_type(nvidia) vector` would apply vector parallelism only if the code is compiled for NVidia GPUs."
+  },
+  {
+    "question": "How can the size of `vector`, `worker`, and `gang` parallelism levels be explicitly set?",
+    "answer": "Each of the `vector`, `worker`, and `gang` clauses can take a parameter to explicitly state their size, such as `worker(32) vector(32)`."
+  },
+  {
+    "question": "What are the size limitations for `vector` length on NVidia GPUs?",
+    "answer": "`vector` length must be a multiple of 32, up to 1024."
+  },
+  {
+    "question": "How is `gang` size determined for NVidia GPUs, and what is its maximum value?",
+    "answer": "`gang` size is given by the number of `worker`s times the size of a `vector`, and this number cannot be larger than 1024."
+  },
+  {
+    "question": "How is the `vector` length changed to 32 for an inner loop using a `kernels` directive in OpenACC?",
+    "answer": "It's done by adding `#pragma acc loop device_type(nvidia) vector(32)` before the inner loop."
+  },
+  {
+    "question": "How is the `vector` length changed to 32 using a `parallel loop` directive in OpenACC?",
+    "answer": "The `vector_length(32)` clause is specified on the top `parallel loop` directive, and `#pragma acc loop reduction(+:sum) device_type(nvidia) vector` is used for the inner loop."
+  },
+  {
+    "question": "What was the immediate impact on runtime on a K20 GPU when the `vector` length was reduced from 128 to 32?",
+    "answer": "The run time increased from about 10 seconds to about 15 seconds, indicating that the compiler was performing a clever optimization."
+  },
+  {
+    "question": "What is the first step in using the NVidia Visual Profiler for guided analysis?",
+    "answer": "The first step is to go to the 'Analysis' tab and click on 'Examine GPU Usage'."
+  },
+  {
+    "question": "What information does the NVidia Visual Profiler provide after 'Examine GPU Usage' is run?",
+    "answer": "Once the analysis is run, the profiler provides a series of warnings that indicate what might be possible to improve upon."
+  },
+  {
+    "question": "What is the next step after examining GPU usage in the NVidia Visual Profiler?",
+    "answer": "Click on 'Examine Individual Kernels' to view a list of kernels."
+  }
+]

@@ -1,66 +1,42 @@
 [
   {
-    "question": "When did the default umask change on Cedar, B\u00e9luga, and Niagara clusters?",
-    "answer": "The default `umask` on Cedar, B\u00e9luga, and Niagara clusters was changed on October 16th, 2019."
+    "question": "How do you remove all extended ACL attributes from a directory recursively?",
+    "answer": "To remove all extended ACL attributes from a directory recursively, use the command `setfacl -bR /home/<user>/projects/def-<PI>/shared_data`."
   },
   {
-    "question": "Which clusters had their default umask updated in October 2019?",
-    "answer": "The clusters that had their default `umask` updated were B\u00e9luga, Cedar, and Niagara."
+    "question": "What is a data sharing group used for?",
+    "answer": "A data sharing group is used for more complicated data sharing scenarios, typically involving multiple people on multiple clusters, by giving a special group access permissions through ACLs."
   },
   {
-    "question": "What was the default umask on B\u00e9luga and Cedar before and after the October 2019 change?",
-    "answer": "Before the change, the `umask` on B\u00e9luga and Cedar was `002`. After the change, it became `027`."
+    "question": "When is it necessary to create a data sharing group?",
+    "answer": "You only need a data sharing group in specialized sharing circumstances."
   },
   {
-    "question": "What was the default umask on Niagara before and after the October 2019 change?",
-    "answer": "Before the change, the `umask` on Niagara was `022`. After the change, it became `027`."
+    "question": "What is the first step in creating a data sharing group?",
+    "answer": "The first step is to send an email to technical support requesting the creation of the data sharing group, indicating its name and that you should be the owner."
   },
   {
-    "question": "What is the consequence of the updated default umask on the affected clusters?",
-    "answer": "The updated default `umask` enforces more restrictive permissions on newly created files."
+    "question": "After a data sharing group is created, where can its members be managed?",
+    "answer": "After receiving confirmation from the technical support team, you can manage the group's members by going to `https://ccdb.computecanada.ca/services/`, clicking on the group's name, and accessing the group management screen."
   },
   {
-    "question": "How can a user change their default umask for more permissive permissions?",
-    "answer": "Users can change their default `umask` in their `.bashrc` file if they require more permissive permissions for their workflow."
+    "question": "What permissions are required on parent directories when sharing data using a data sharing group?",
+    "answer": "The parent directories of the data you are trying to share must have execute permissions either for everyone (`o+X`) or specifically for the data sharing group (`g:wg_datasharing:X`)."
   },
   {
-    "question": "Does changing the default umask affect existing files?",
-    "answer": "No, changing the `umask` only applies to new files and does not change the access permissions of existing files."
+    "question": "How can a PI grant execute permissions on a project directory for a data sharing group?",
+    "answer": "A PI can grant execute permissions on a project directory using either `chmod o+X /project/def-<PI>/` or `setfacl -m g:wg_datasharing:X /project/def-<PI>/`."
   },
   {
-    "question": "How do you change the permissions of an existing file to match the new default permissions?",
-    "answer": "To change permissions of an existing file, use the command `chmod g-w,o-rx <file>`."
+    "question": "How do you add a data sharing group to the ACL for new data in a shared directory?",
+    "answer": "To add a data sharing group to the ACL for new data created in a shared directory, use the command `setfacl -d -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data`."
   },
   {
-    "question": "How do you recursively change the permissions of an entire directory to match the new default permissions?",
-    "answer": "To recursively change permissions for a whole directory, use the command `chmod -R g-w,o-rx <directory>`."
+    "question": "How do you add a data sharing group to the ACL for existing data in a shared directory?",
+    "answer": "To add a data sharing group to the ACL for existing data in a shared directory, use the command `setfacl -R -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data`."
   },
   {
-    "question": "What are Access Control Lists (ACLs) used for?",
-    "answer": "Access Control Lists (ACLs) enable permissions to be set on a user-by-user basis, offering more fine-grained control than traditional Unix permissions."
-  },
-  {
-    "question": "What commands are used to manage Access Control Lists (ACLs)?",
-    "answer": "The two commands used to manipulate ACLs are `getfacl` to see permissions and `setfacl` to alter them."
-  },
-  {
-    "question": "How can you grant read and execute permission to a specific user named 'smithj' on a file named 'my_script.py' using ACLs?",
-    "answer": "You can grant read and execute permission using the command: `setfacl -m u:smithj:rx my_script.py`."
-  },
-  {
-    "question": "How do you grant read and write access to a single user for new files created in a subdirectory using ACLs?",
-    "answer": "To set default access rules for new files in a subdirectory, use: `setfacl -d -m u:smithj:rwX /home/<user>/projects/def-<PI>/shared_data`."
-  },
-  {
-    "question": "How do you grant read and write access to a single user for existing files in a subdirectory using ACLs?",
-    "answer": "To set access rules for existing content in a subdirectory, use: `setfacl -R -m u:smithj:rwX /home/<user>/projects/def-<PI>/shared_data`."
-  },
-  {
-    "question": "What does the 'X' attribute mean when used with `setfacl`?",
-    "answer": "The 'X' attribute sets the execute permission only when the item is already executable (like a directory or an executable file), which is useful for browsing directories."
-  },
-  {
-    "question": "What is a prerequisite for sharing a subdirectory with another user using ACLs?",
-    "answer": "The directory you are sharing must be owned by you, and all parent directories in the path must allow execute permission to the user you are sharing with."
+    "question": "What command can be used to recursively test read access within a directory and list unreadable items?",
+    "answer": "To recursively test read access within a directory and list all items not readable to you, use the command `find <directory_name> ! -readable -ls`."
   }
 ]

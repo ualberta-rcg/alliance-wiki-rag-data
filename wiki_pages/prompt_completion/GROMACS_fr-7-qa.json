@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What is one recommended solution for dealing with underutilization of modern GPUs in GROMACS simulations?",
+    "answer": "One recommended solution is to execute multiple simulations on a single GPU using the `mdrun -multidir` command."
+  },
+  {
+    "question": "Under what conditions is the `mdrun -multidir` solution ideal for GROMACS simulations?",
+    "answer": "This solution is ideal when running multiple similar simulations, such as repeating a simulation for more precise conformational space sampling, simulating protein variants, or ensemble-based simulations like replica exchange."
+  },
+  {
+    "question": "Why is it important for simulations to be similar when using `mdrun -multidir` on a single GPU?",
+    "answer": "Similar simulations are necessary to ensure adequate load balancing. If simulations are dissimilar, some will progress and finish faster than others, leading to wasted resources."
+  },
+  {
+    "question": "What Slurm parameters should be adjusted if the number of simulations changes when using `mdrun -multidir`?",
+    "answer": "If the number of simulations changes, the `--ntasks-per-node` and `--cpus-per-task` parameters should be adjusted, ensuring one task per simulation and a constant total number of CPU cores."
+  },
+  {
+    "question": "What GROMACS command and option are used to execute multiple simulations (e.g., sim1, sim2, sim3) from distinct directories on a single GPU?",
+    "answer": "The command `srun gmx_mpi mdrun -ntomp ${SLURM_CPUS_PER_TASK:-1} -deffnm md -multidir sim1 sim2 sim3` is used."
+  },
+  {
+    "question": "Which GROMACS and CUDA module versions are loaded in the example Slurm script for running multiple GPU simulations on Narval?",
+    "answer": "The example script loads `gromacs/2024.4` and `cuda/12.2` modules within the `StdEnv/2023` environment."
+  },
+  {
+    "question": "What is the second recommended solution for situations where GROMACS cannot fully utilize modern GPUs?",
+    "answer": "The second solution is to use a MIG instance (a fraction of a GPU) instead of an entire GPU."
+  },
+  {
+    "question": "When is using a MIG instance for GROMACS simulations ideal?",
+    "answer": "It is ideal if you have only a single simulation or if your simulations are dissimilar, such as systems with different sizes (more than 10% atom count difference), shapes, or compositions (e.g., membrane protein vs. soluble protein)."
+  },
+  {
+    "question": "Is it recommended to use Hyper-Q/MPS with GROMACS?",
+    "answer": "No, Hyper-Q/MPS should never be used with GROMACS, as the integrated `-multidir` option provides the same functionality more efficiently."
+  },
+  {
+    "question": "What is a 'tpr' file in GROMACS, and what kind of information does it contain?",
+    "answer": "A 'tpr' file is a portable binary run input file that contains the starting simulation structure, molecular topology, and all simulation parameters."
+  },
+  {
+    "question": "Which GROMACS command is used to create 'tpr' files?",
+    "answer": "The `gmx grompp` command is used to create 'tpr' files. For versions prior to 5.0, the command was `grompp`."
+  },
+  {
+    "question": "What are the essential input files required to create a 'tpr' file?",
+    "answer": "The essential input files required are a coordinate file ('.gro', '.pdb', or '.cpt'), a topology file ('.top'), and an execution parameters file ('.mdp')."
+  },
+  {
+    "question": "What is the function of the '.top' file in a GROMACS simulation?",
+    "answer": "The '.top' file determines the force field and how its parameters apply to the simulated system, including molecular topologies from individual '.itp' files."
+  },
+  {
+    "question": "Can GROMACS 'tpr' files be transferred between different clusters?",
+    "answer": "Yes, 'tpr' files are portable and can be generated on one cluster, copied to another, and used as input for `mdrun`."
+  },
+  {
+    "question": "Why is it important to use the same GROMACS version for both `grompp` and `mdrun`?",
+    "answer": "It is important to use the same GROMACS version for `grompp` and `mdrun` because using files created with an older `grompp` version by `mdrun` can lead to unexpected simulation results."
+  }
+]

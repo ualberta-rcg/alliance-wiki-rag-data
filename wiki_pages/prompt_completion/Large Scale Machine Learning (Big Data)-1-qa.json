@@ -1,0 +1,82 @@
+[
+  {
+    "question": "How do deep learning training tasks achieve scalability with large quantities of data?",
+    "answer": "Deep learning training tasks are naturally scalable to large quantities of data due to the widespread use of mini-batching strategies and first-order iterative solvers."
+  },
+  {
+    "question": "What are the common challenges when scaling traditional machine learning methods in packages like scikit-learn to very large datasets?",
+    "answer": "Scaling traditional machine learning methods in packages like scikit-learn is often not trivial because many algorithms require the entire training set to be loaded in memory, do not leverage thread or process parallelism, and may use memory-intensive solvers."
+  },
+  {
+    "question": "What is Scikit-learn?",
+    "answer": "Scikit-learn is a Python module for machine learning built on top of SciPy and distributed under the 3-Clause BSD license, featuring an intuitive API for building machine learning pipelines."
+  },
+  {
+    "question": "What are the primary limitations of scikit-learn implementations when dealing with massive datasets?",
+    "answer": "Many scikit-learn implementations of common methods like GLMs and SVMs assume the entire training set can be loaded into memory, and some algorithms use memory-intensive solvers by default."
+  },
+  {
+    "question": "How can Out-Of-Memory (OOM) errors be resolved in scikit-learn if the training set is small enough to fit in memory?",
+    "answer": "OOM errors during training with a sufficiently small dataset are likely caused by a memory-intensive solver; replacing the default solver with an SGD-based one is often a straightforward solution."
+  },
+  {
+    "question": "Which scikit-learn class can be used to reduce memory usage even more than an SGD-based Ridge solver for regression?",
+    "answer": "The `SGDRegressor` class can be used instead of Ridge to further reduce memory usage, as it implements various generalized linear models for regression using vanilla stochastic gradient descent."
+  },
+  {
+    "question": "What is the caveat when using `SGDRegressor` in scikit-learn?",
+    "answer": "A caveat of using `SGDRegressor` is that it only works if the output is unidimensional (a scalar)."
+  },
+  {
+    "question": "What is 'out-of-core learning' in scikit-learn?",
+    "answer": "Out-of-core learning in scikit-learn refers to the strategy of leaving data on disk and loading it in batches during training when the dataset is too large to fit entirely in memory."
+  },
+  {
+    "question": "What method must an estimator have in scikit-learn to enable out-of-core learning?",
+    "answer": "An estimator must have the `partial_fit` method available to be a viable option for out-of-core learning in scikit-learn."
+  },
+  {
+    "question": "How can a linear SVM classifier be fitted using out-of-core learning with memory-mapped NumPy arrays in scikit-learn?",
+    "answer": "A linear SVM classifier can be fitted using `SGDClassifier` with batches of data from memory-mapped NumPy arrays (npy files) by iterating through the batches and calling `model.partial_fit(X,y)` for each batch."
+  },
+  {
+    "question": "How can a LASSO regression model be trained using batch learning from a CSV file with scikit-learn?",
+    "answer": "A LASSO regression model can be trained using `SGDRegressor` by reading data in batches from a CSV file using the `pandas.read_csv` function with `chunksize` and `iterator=True` parameters, then calling `model.partial_fit(X,y)` for each batch."
+  },
+  {
+    "question": "What is Snap ML?",
+    "answer": "Snap ML is a closed-source machine learning library developed by IBM that supports classical machine learning models and scales to very large datasets, featuring an API similar to scikit-learn."
+  },
+  {
+    "question": "What are the key features offered by Snap ML?",
+    "answer": "Snap ML offers distributed training, GPU acceleration, and support for sparse data structures, scaling gracefully to datasets with billions of examples and/or features."
+  },
+  {
+    "question": "How can you check the latest available version of Snap ML that has been built?",
+    "answer": "You can check the latest built version of Snap ML by running the command `avail_wheels \"snapml\"`."
+  },
+  {
+    "question": "What are the steps to install Snap ML using a Python wheel?",
+    "answer": "To install Snap ML, first load a Python module (`module load python`), then create and start a virtual environment, and finally install SnapML in the virtual environment using `pip install --no-index snapml`."
+  },
+  {
+    "question": "How is multithreading controlled in Snap ML estimators?",
+    "answer": "Multithreading in Snap ML estimators is controlled via the `n_jobs` parameter, which can be set to the number of available cores for a typical speedup."
+  },
+  {
+    "question": "How do you enable single GPU training for an estimator in Snap ML?",
+    "answer": "For single GPU training in Snap ML, you simply set the parameter `use_gpu=True` for the estimator."
+  },
+  {
+    "question": "How do you configure Snap ML for training with multiple GPUs?",
+    "answer": "For multiple GPU training in Snap ML, in addition to setting `use_gpu=True`, you must pass a list containing the GPU IDs available to your job to the `device_ids` parameter, for example, `device_ids=[0,1]`."
+  },
+  {
+    "question": "How does Snap ML handle out-of-memory training compared to scikit-learn?",
+    "answer": "Snap ML estimators use first-order iterative solvers (similar to SGD) by default, allowing training in batches to avoid loading entire datasets. Unlike scikit-learn, Snap ML directly accepts memory-mapped NumPy arrays as inputs for this purpose."
+  },
+  {
+    "question": "How can Snap ML's distributed implementations of estimators be run?",
+    "answer": "Snap ML's distributed implementations can be run by calling your Python script using `mpirun` or `srun`."
+  }
+]

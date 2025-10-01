@@ -1,0 +1,142 @@
+[
+  {
+    "question": "What is an example command for running a program in Apptainer with specific options and a custom working directory?",
+    "answer": "An example command is `apptainer run -C -B /project -W /path/to/a/workdir myimage.sif myprogram`."
+  },
+  {
+    "question": "When can an Apptainer `workdir` be removed?",
+    "answer": "A `workdir` can be removed if there are no live containers using it."
+  },
+  {
+    "question": "What working directory should be used for Apptainer in `salloc`, `sbatch`, or JupyterHub jobs on clusters?",
+    "answer": "Use `${SLURM_TMPDIR}` for the working directory's location, e.g., `-W ${SLURM_TMPDIR}`."
+  },
+  {
+    "question": "Where should Apptainer programs not be run?",
+    "answer": "One should not be running programs (including Apptainer) on a login node."
+  },
+  {
+    "question": "What type of job should be used for running Apptainer on clusters?",
+    "answer": "Use an interactive `salloc` job."
+  },
+  {
+    "question": "What Apptainer options are needed for NVIDIA GPUs?",
+    "answer": "Pass the `--nv` option to Apptainer commands for NVIDIA hardware."
+  },
+  {
+    "question": "What Apptainer options are needed for AMD GPUs?",
+    "answer": "Pass the `--rocm` option to Apptainer commands for AMD hardware."
+  },
+  {
+    "question": "What do the `--nv` and `--rocm` options do for GPU usage in Apptainer?",
+    "answer": "These options ensure appropriate `/dev` entries are bind mounted, locate and bind GPU-related libraries on the host, and set the `LD_LIBRARY_PATH` environment variable for GPU libraries to work inside the container."
+  },
+  {
+    "question": "What else is important when running GPU applications inside an Apptainer container?",
+    "answer": "Ensure the application using the GPU inside the container was properly compiled to use the GPU and its libraries."
+  },
+  {
+    "question": "What bind mount is required for using OpenCL inside an Apptainer container?",
+    "answer": "Use the bind mount `-B /etc/OpenCL`."
+  },
+  {
+    "question": "What is necessary to run MPI programs inside an Apptainer container across nodes?",
+    "answer": "Running MPI programs within an Apptainer container across nodes likely will require special configuration in the host environment."
+  },
+  {
+    "question": "Where can more information about running MPI programs in Apptainer be found?",
+    "answer": "More information can be found in the official Apptainer documentation concerning how MPI programs can be run inside a container."
+  },
+  {
+    "question": "How do you view the `help` section of an Apptainer container?",
+    "answer": "Run `apptainer run-help your-container-name.sif`."
+  },
+  {
+    "question": "How do you get help for a specific app within an Apptainer container?",
+    "answer": "Run `apptainer run-help --app appname your-container-name.sif`."
+  },
+  {
+    "question": "How can you list the apps installed in an Apptainer container?",
+    "answer": "Run `apptainer inspect --list-apps your-container-name.sif`."
+  },
+  {
+    "question": "What is the difference between `apptainer run` and `apptainer exec` regarding `runscript`?",
+    "answer": "The `apptainer run` command first runs the `%runscript` (if defined), then the specified command. The `apptainer exec` command will not run the `%runscript`."
+  },
+  {
+    "question": "Which Apptainer command is suggested for running software?",
+    "answer": "It is suggested to always use `apptainer run`."
+  },
+  {
+    "question": "How can you compile a C++ program inside an Apptainer container?",
+    "answer": "Use `apptainer run your-container-name.sif g++ -O2 -march=broadwell ./myprog.cpp`."
+  },
+  {
+    "question": "What additional options are recommended for running Apptainer on clusters?",
+    "answer": "Recommended options include `-C`, `-c`, `-e`, `-W`, and various bind mount options."
+  },
+  {
+    "question": "Which Apptainer commands are suitable for BASH and SLURM job scripts?",
+    "answer": "The `apptainer run`, `apptainer exec`, and `apptainer instance` commands are excellent for use in BASH and SLURM job scripts."
+  },
+  {
+    "question": "Which Apptainer command allows interactive work inside a container?",
+    "answer": "Use the `apptainer shell` command to run commands interactively while remaining inside a container."
+  },
+  {
+    "question": "How do you start an interactive shell session in an Apptainer container?",
+    "answer": "Invoke the `apptainer shell` command, e.g., `apptainer shell your-container-name.sif`."
+  },
+  {
+    "question": "How do you exit an interactive Apptainer shell session?",
+    "answer": "Type `exit` and hit the Enter/Return key at the `Apptainer>` prompt."
+  },
+  {
+    "question": "Provide an example of starting an interactive shell session with recommended cluster options in Apptainer.",
+    "answer": "An example command is `apptainer shell -C -W $SLURM_TMPDIR -B /home:/cluster_home -B /project -B /scratch your-container-name.sif`."
+  },
+  {
+    "question": "What option is crucial for saving changes to a persistent overlay image during an Apptainer shell session?",
+    "answer": "It is extremely important to pass the `-w` or `--writable` option to your container."
+  },
+  {
+    "question": "What happens if the `--writable` option is not used with a persistent overlay image in an Apptainer shell?",
+    "answer": "If the `--writable` option is not passed, any changes made to the image in the `apptainer shell` session will not be saved."
+  },
+  {
+    "question": "Which Apptainer command is used for running daemons within compute jobs?",
+    "answer": "Running daemons is achieved, in part, by using `apptainer instance`."
+  },
+  {
+    "question": "Why should daemons not be run manually without `apptainer instance`?",
+    "answer": "`apptainer instance` works properly with tools like the Slurm scheduler, ensuring daemons don't hang or result in defunct processes if a job is cancelled or crashes."
+  },
+  {
+    "question": "What happens to daemons run with `apptainer instance` if a job is cancelled or crashes?",
+    "answer": "Daemons run using `apptainer instance` will not hang or result in defunct processes when a job is cancelled, killed, crashes, or is otherwise finished."
+  },
+  {
+    "question": "What control does `apptainer instance` provide over daemons and programs in a container?",
+    "answer": "By using the `apptainer instance` command, you will be able to control the daemons and programs running in the same container."
+  },
+  {
+    "question": "When can daemons run in a job using Apptainer?",
+    "answer": "Daemons can only run in your job while your job is running."
+  },
+  {
+    "question": "What happens to daemons if the scheduler kills the job they are running in?",
+    "answer": "Should the scheduler kill your job, all daemons running in that job will also be killed."
+  },
+  {
+    "question": "What is suggested if daemons need to run longer than the associated Apptainer job?",
+    "answer": "If daemons need to run longer than the job they were started in, you may need to also have a virtual machine running in the cloud."
+  },
+  {
+    "question": "Are there issues running MPI programs within an Apptainer container on a single shared-memory node?",
+    "answer": "No, there will be no issues running MPI programs within an Apptainer container when all MPI processes run on a single shared-memory node, especially when `--nodes=1` is used with an `sbatch` script."
+  },
+  {
+    "question": "What can happen if an MPI program in an Apptainer container is run across multiple nodes without proper setup?",
+    "answer": "If an MPI program runs from within an Apptainer container across multiple nodes and has not been set up to properly run, it is possible it will fail to run."
+  }
+]

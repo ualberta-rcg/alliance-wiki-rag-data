@@ -1,0 +1,50 @@
+[
+  {
+    "question": "What are the recommended Slurm parameters for an AlphaFold 2.2 GPU job?",
+    "answer": "For an AlphaFold 2.2 GPU job, the Slurm script suggests a job name of 'alphafold_run', an account 'def-someprof', a walltime of 8 hours (08:00:00), 1 GPU (`--gres=gpu:1`), a maximum of 8 CPUs per task (`--cpus-per-task=8`), and 20G of memory (`--mem=20G`)."
+  },
+  {
+    "question": "Which modules need to be loaded to run AlphaFold 2.2 with GPU?",
+    "answer": "The following modules need to be loaded: `StdEnv/2020 gcc/9.3.0 openmpi/4.0.3 cuda/11.4 cudnn/8.2.0 kalign/2.03 hmmer/3.2.1 openmm-alphafold/7.5.1 hh-suite/3.3.0 python/3.8`."
+  },
+  {
+    "question": "How do you set up and activate a virtual environment for AlphaFold 2.2 within a Slurm job script?",
+    "answer": "You can set up and activate a virtual environment by running `virtualenv --no-download ${SLURM_TMPDIR}/env` to create it in the temporary directory and `source ${SLURM_TMPDIR}/env/bin/activate` to activate it."
+  },
+  {
+    "question": "How are AlphaFold and its dependencies installed in the virtual environment within the Slurm script for version 2.2?",
+    "answer": "AlphaFold and its dependencies are installed by first upgrading pip with `pip install --no-index --upgrade pip` and then installing from a requirements file using `pip install --no-index --requirement ~/alphafold-requirements.txt`."
+  },
+  {
+    "question": "What is the primary command used to execute AlphaFold 2.2 with GPU support for protein folding?",
+    "answer": "The primary command is `run_alphafold.py` with various arguments, including `--fasta_paths`, `--output_dir`, `--data_dir`, `--model_preset=monomer_casp14`, and multiple database paths, ending with `--use_gpu_relax=True`."
+  },
+  {
+    "question": "What is the purpose of the `--use_gpu_relax=True` argument in the AlphaFold 2.2 GPU execution script?",
+    "answer": "The `--use_gpu_relax=True` argument enables GPU acceleration for the inference part of the AlphaFold process, specifically for the relaxation step."
+  },
+  {
+    "question": "What is the default `DOWNLOAD_DIR` specified in the AlphaFold 2.2 GPU example script?",
+    "answer": "The default `DOWNLOAD_DIR` is set to `$SCRATCH/alphafold/data`."
+  },
+  {
+    "question": "How do you submit an AlphaFold job script to the scheduler?",
+    "answer": "You can submit the job to the scheduler using the command `sbatch --job-name alphafold-X alphafold-gpu.sh`, where `alphafold-gpu.sh` is the name of your submission script."
+  },
+  {
+    "question": "What could cause the \"Client_loop: send disconnect: Broken pipe\" error when downloading AlphaFold databases?",
+    "answer": "This error could be caused by a high number of users working on the connection node simultaneously, which reduces the available space for data transfer."
+  },
+  {
+    "question": "What are the suggested solutions for the \"Broken pipe\" error during AlphaFold database download?",
+    "answer": "Suggested solutions include using a terminal multiplexer, utilizing the pre-existing database on the cluster located at `/cvmfs/bio.data.computecanada.ca/content/databases/Core/alphafold2_dbs/2023_07/`, or downloading the database in sections using available `download_` scripts like `download_pdb.sh`."
+  },
+  {
+    "question": "Where can users find pre-existing AlphaFold databases on the cluster?",
+    "answer": "Pre-existing AlphaFold databases are available on the cluster at `/cvmfs/bio.data.computecanada.ca/content/databases/Core/alphafold2_dbs/2023_07/`."
+  },
+  {
+    "question": "How can one download AlphaFold databases in sections to avoid issues like a 'Broken pipe' error?",
+    "answer": "After loading the necessary modules and activating the virtual environment, type `download_` in the terminal and press `tab` twice to see available download scripts, then use a specific script like `download_pdb.sh` to download sections manually."
+  }
+]

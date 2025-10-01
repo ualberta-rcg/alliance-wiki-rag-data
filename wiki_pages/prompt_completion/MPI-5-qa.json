@@ -1,0 +1,58 @@
+[
+  {
+    "question": "What is the C prototype for the `MPI_Recv` function?",
+    "answer": "The C prototype for `MPI_Recv` is: `int MPI_Recv(void *message, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);`"
+  },
+  {
+    "question": "What does the `message` argument in `MPI_Recv` refer to?",
+    "answer": "In `MPI_Recv`, the `message` argument refers to a buffer for received data."
+  },
+  {
+    "question": "What is the purpose of the `count` argument in `MPI_Recv`?",
+    "answer": "The `count` argument in `MPI_Recv` specifies the number of items to be received."
+  },
+  {
+    "question": "What does the `datatype` argument indicate in `MPI_Recv`?",
+    "answer": "The `datatype` argument in `MPI_Recv` indicates the type of item to be received."
+  },
+  {
+    "question": "Which parameter in `MPI_Recv` specifies the rank of the sending process?",
+    "answer": "The `source` parameter in `MPI_Recv` specifies the rank of the process from which to receive."
+  },
+  {
+    "question": "What is the function of the `tag` parameter in an `MPI_Recv` call?",
+    "answer": "The `tag` parameter in `MPI_Recv` is a programmer-specified identifier associated with the message."
+  },
+  {
+    "question": "What is the `comm` argument in `MPI_Recv`?",
+    "answer": "The `comm` argument in `MPI_Recv` is a communicator, which is a set of processes capable of sending messages to one another."
+  },
+  {
+    "question": "What is the purpose of the `status` argument in C's `MPI_Recv`?",
+    "answer": "The `status` argument in C's `MPI_Recv` is a reference to an `MPI_Status` structure that stores information about the received message upon return."
+  },
+  {
+    "question": "How is the destination rank calculated for sending messages in the `phello2` example program?",
+    "answer": "The rank of the process to send to (`sendto`) is calculated using the arithmetic `(rank + 1) % size`."
+  },
+  {
+    "question": "How is the source rank calculated for receiving messages in the `phello2` example program?",
+    "answer": "The rank of the process to receive from (`recvfrom`) is calculated using the arithmetic `(rank + size - 1) % size`."
+  },
+  {
+    "question": "What hidden problem exists in the `phello2` program's use of `MPI_Send` and `MPI_Recv`?",
+    "answer": "The hidden problem is that the MPI standard does not guarantee `MPI_Send` returns before the message has been delivered, which could lead to a deadlock if buffering is not provided by the MPI library."
+  },
+  {
+    "question": "Why would the `phello2` program deadlock if `MPI_Send` did not buffer data?",
+    "answer": "It would deadlock because each process would call `MPI_Send` and then wait for its neighbor process to call `MPI_Recv`, while the neighbor would also be waiting at its `MPI_Send` stage, causing all processes to wait indefinitely."
+  },
+  {
+    "question": "Why did the `phello2` code not deadlock on most systems despite the potential problem?",
+    "answer": "Most MPI implementations buffer the data from `MPI_Send` and return without waiting for it to be delivered, preventing the deadlock in practice."
+  },
+  {
+    "question": "Why is it considered poor design to rely on `MPI_Send` buffering?",
+    "answer": "It is poor design to rely on `MPI_Send` buffering because the MPI standard does not require it, meaning the code could fail on systems where buffering is not provided or if the buffer fills up."
+  }
+]

@@ -1,0 +1,114 @@
+[
+  {
+    "question": "Under what conditions is it reasonable to use the SIMPLE mode for running jobs?",
+    "answer": "It is reasonable to dedicate a separate job to each case using the SIMPLE mode if the total number of cases is fairly small (less than 500) and each case runs for at least 20 minutes."
+  },
+  {
+    "question": "If my job does not meet the conditions for SIMPLE mode, which mode should I consider?",
+    "answer": "If your job does not meet the conditions for SIMPLE mode, you should consider using the META mode to handle many cases per job."
+  },
+  {
+    "question": "What are the three essential scripts used in SIMPLE mode?",
+    "answer": "The three essential scripts are `submit.run`, `single_case.sh`, and `job_script.sh`."
+  },
+  {
+    "question": "How do you specify SIMPLE mode when using the `submit.run` command?",
+    "answer": "To request SIMPLE mode with `submit.run`, you should provide -1 as the obligatory argument, like `$ submit.run -1`. This will submit as many jobs as there are lines in `table.dat`."
+  },
+  {
+    "question": "How do you specify META mode when using the `submit.run` command?",
+    "answer": "To request META mode with `submit.run`, you should provide a positive integer `N` as the obligatory argument, where `N` is the desired number of metajobs, for example, `$ submit.run 32`."
+  },
+  {
+    "question": "What happens if an invalid value is provided for the `N` argument to `submit.run`?",
+    "answer": "Any value for `N` other than -1 (for SIMPLE mode) or a positive integer (for META mode) is not valid."
+  },
+  {
+    "question": "What is the purpose of the `-auto` switch when used with `submit.run`?",
+    "answer": "If the optional switch `-auto` is present, the farm will automatically resubmit itself at the end, more than once if necessary, until all the cases from `table.dat` have been processed."
+  },
+  {
+    "question": "What action does `submit.run` take if a file named `final.sh` is present in the farm directory?",
+    "answer": "If a file named `final.sh` is present in the farm directory, `submit.run` will treat it as a job script for a post-processing job and launch it automatically once all cases from `table.dat` have been successfully processed."
+  },
+  {
+    "question": "What happens to any other arguments provided to `submit.run`?",
+    "answer": "Any other arguments supplied to `submit.run` will be passed on to the Slurm command `sbatch` used to launch all metajobs for this farm."
+  },
+  {
+    "question": "What is the function of the `single_case.sh` script?",
+    "answer": "The function of `single_case.sh` is to read one line from `table.dat`, parse it, and use its contents to launch your code for one case."
+  },
+  {
+    "question": "How does the default `single_case.sh` script (created by `farm_init.run`) execute commands from `table.dat`?",
+    "answer": "The default `single_case.sh` script treats each line in `table.dat` as a literal command and executes it in its own subdirectory named `RUNyyy`, where `yyy` is the case number."
+  },
+  {
+    "question": "What information do the variables `$ID`, `$COMM`, and `$METAJOB_ID` contain within `single_case.sh`?",
+    "answer": "`$ID` contains the case ID from the original table, `$COMM` is the line corresponding to the case `$ID` from `table.dat` without the ID field, and `$METAJOB_ID` is the job ID for the current metajob."
+  },
+  {
+    "question": "What should each line of `table.dat` contain if using an unmodified `single_case.sh`?",
+    "answer": "If using the unmodified `single_case.sh`, each line of `table.dat` should contain a complete command, which can be a compound command with multiple commands separated by semicolons."
+  },
+  {
+    "question": "How can `single_case.sh` be modified to include a common command if I don't want to repeat it in `table.dat`?",
+    "answer": "You can edit `single_case.sh` to include the common command, and then edit `table.dat` to contain only the arguments and/or redirects for each case."
+  },
+  {
+    "question": "If my code doesn't need arguments from `table.dat`, do I still need to generate the `table.dat` file?",
+    "answer": "Yes, if your code doesn't need to read any arguments from `table.dat`, you still have to generate `table.dat` with the number of lines equal to the number of cases you want to compute; only the total number of lines matters."
+  },
+  {
+    "question": "Is it necessary to insert line numbers at the beginning of each line in `table.dat`?",
+    "answer": "No, you do not need to insert line numbers; the script `submit.run` will modify `table.dat` to add line numbers if it doesn't find them there."
+  },
+  {
+    "question": "What is the purpose of the `STATUS` variable in `single_case.sh`?",
+    "answer": "`STATUS` is a variable that should be set to '0' if a case was computed correctly, and some positive value (greater than 0) otherwise. It's used by `resubmit.run` to identify failed cases."
+  },
+  {
+    "question": "How is `STATUS` typically set by default in `single_case.sh`?",
+    "answer": "In the provided version of `single_case.sh`, `STATUS` is set to the exit code of your program."
+  },
+  {
+    "question": "How can `STATUS` be customized to detect errors beyond just the program's exit code, such as a missing output file?",
+    "answer": "You can change how `STATUS` is set by editing `single_case.sh`. For example, you can test if an expected output file (like `out.dat`) exists and is not empty, and set `STATUS` to 1 if it's missing or empty."
+  },
+  {
+    "question": "What is the role of the `job_script.sh` file?",
+    "answer": "The `job_script.sh` file is the job script that will be submitted to SLURM for all metajobs in your farm."
+  },
+  {
+    "question": "What are the essential modifications required in `job_script.sh`?",
+    "answer": "At the very least, you should change the account name (the `-A` switch) and the metajob runtime (the `-t` switch)."
+  },
+  {
+    "question": "How should the runtime be set in `job_script.sh` when using SIMPLE mode?",
+    "answer": "In SIMPLE mode, you should set the runtime in `job_script.sh` to be somewhat longer than the longest expected individual case."
+  },
+  {
+    "question": "Is it mandatory to include the runtime switch in `job_script.sh`?",
+    "answer": "Yes, your `job_script.sh` *must* include the runtime switch (either `-t` or `--time`); it cannot be passed to `sbatch` as an optional argument to `submit.run`."
+  },
+  {
+    "question": "How can `job_script.sh` be modified to prevent issues from defective nodes?",
+    "answer": "You can add tests to `job_script.sh` before the `task.run` line to check for defects (e.g., test for a GPU with `nvidia-smi`), and force the metajob to exit if a problem is detected."
+  },
+  {
+    "question": "What is the META package's built-in mechanism for dealing with metajobs that fail cases too quickly?",
+    "answer": "The META package has a built-in mechanism that tries to detect problems where a metajob churns through cases too quickly. It triggers if the first `N_failed_max` cases are very short (less than `dt_failed` seconds)."
+  },
+  {
+    "question": "Where are the `N_failed_max` and `dt_failed` parameters for the quick-failure protection mechanism set?",
+    "answer": "The parameters `N_failed_max` and `dt_failed` for the quick-failure protection mechanism are set in the `config.h` file."
+  },
+  {
+    "question": "What are the default values for `N_failed_max` and `dt_failed` in the META package?",
+    "answer": "The default values are 5 for `N_failed_max` and 5 for `dt_failed`."
+  },
+  {
+    "question": "How can you adjust the quick-failure protection mechanism if it's falsely triggered by short-running cases?",
+    "answer": "If you get false triggering because some of your normal cases have runtime shorter than `dt_failed`, you should reduce the value of `dt_failed` in `config.h`."
+  }
+]

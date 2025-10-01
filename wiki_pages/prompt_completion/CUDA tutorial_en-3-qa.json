@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What is the value of `N` defined in the provided `dot` kernel example?",
+    "answer": "In the `dot` kernel example, `N` is defined as 512."
+  },
+  {
+    "question": "What is the purpose of `__shared__ int temp[N];` within the `dot` kernel?",
+    "answer": "It declares a shared memory array named `temp` of size `N` (512 integers) that allows threads within the same block to collaborate and share data very quickly."
+  },
+  {
+    "question": "What calculation is performed by `temp[threadIdx.x] = a[threadIdx.x]*b[threadIdx.x];` in the `dot` kernel?",
+    "answer": "It calculates the product of the elements from arrays `a` and `b` at the `threadIdx.x` index and stores the result in the `temp` shared memory array at the same index."
+  },
+  {
+    "question": "What does `__syncthreads();` do in the CUDA `dot` kernel?",
+    "answer": "`__syncthreads()` synchronizes all threads within a block, ensuring that all shared memory writes are visible to all threads in the block before any thread proceeds past this point."
+  },
+  {
+    "question": "How is the final sum for the dot product calculated and stored in the provided kernel?",
+    "answer": "Only `threadIdx.x == 0` sums all the elements from the `temp` shared memory array and stores the total sum in the `c` output variable."
+  },
+  {
+    "question": "How does the speed of PCI-e compare to host and device memories?",
+    "answer": "PCI-e is extremely slow (4-6 GB/s) compared to both host and device memories."
+  },
+  {
+    "question": "What is a key recommendation regarding host-to-device and device-to-host memory copies for performance?",
+    "answer": "Minimize host-to-device and device-to-host memory copies to improve performance."
+  },
+  {
+    "question": "Where should data be kept for as long as possible in GPU programming to optimize performance?",
+    "answer": "Data should be kept on the device (GPU) for as long as possible."
+  },
+  {
+    "question": "In what scenario might executing a non-optimal job on the GPU still be faster than on the CPU?",
+    "answer": "Executing a non-optimal job on the GPU may still be faster than copying to the CPU, executing it there, and then copying the results back."
+  },
+  {
+    "question": "How can one analyze the execution times related to memory transfers?",
+    "answer": "Use `memcpy` times to analyze the execution times of memory transfer operations."
+  },
+  {
+    "question": "What should always be kept in mind regarding bandwidth when modifying CUDA code?",
+    "answer": "Always keep CUDA bandwidth limitations in mind when changing your code."
+  },
+  {
+    "question": "What theoretical values related to bandwidth should a programmer know?",
+    "answer": "A programmer should know the theoretical peak bandwidth of the various data links."
+  },
+  {
+    "question": "How can actual bandwidth performance be compared to the theoretical peak?",
+    "answer": "Count the bytes read/written and compare that to the theoretical peak bandwidth."
+  },
+  {
+    "question": "How should different GPU memory spaces (global, shared, constant) be utilized?",
+    "answer": "Utilize the various memory spaces (global, shared, constant) depending on the specific situation."
+  },
+  {
+    "question": "Where does constant memory reside, and how does its access speed compare to shared memory?",
+    "answer": "Constant memory resides in DRAM. It has much slower access than shared memory, but it is cached."
+  },
+  {
+    "question": "What makes constant memory highly efficient for certain types of access patterns?",
+    "answer": "Constant memory is highly efficient for read-only, broadcast access patterns because it is cached."
+  },
+  {
+    "question": "According to common GPU programming strategies, which memory type is best for read-only data?",
+    "answer": "Constant memory is recommended for read-only data, as it is very fast if in cache."
+  },
+  {
+    "question": "Which memory type is recommended for read/write operations that occur within a block?",
+    "answer": "Shared memory is recommended for read/write operations within a block, as it is very fast."
+  },
+  {
+    "question": "Which memory type is recommended for read/write operations that occur within a single thread?",
+    "answer": "Registers are recommended for read/write operations within a thread, as they are very fast."
+  },
+  {
+    "question": "Which memory type is typically used for input data and final results, despite being slow?",
+    "answer": "Global memory is typically used for input data and final results, although it is considered very slow."
+  }
+]

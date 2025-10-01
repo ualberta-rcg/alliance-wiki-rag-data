@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What is the purpose of the provided Slurm scripts named 'Plusieurs n\u0153uds (par n\u0153ud + red\u00e9marrage)' and 'Plusieurs n\u0153uds (par c\u0153ur + red\u00e9marrage)'?",
+    "answer": "These scripts are designed to automate the restart of long-running Ansys Fluent simulations from recently saved time-step files, especially for tasks that might exceed the maximum allowed execution time on clusters."
+  },
+  {
+    "question": "Which Slurm directive is used in these scripts to enable solution restarts?",
+    "answer": "The `#SBATCH --array=1-5%1` directive is used, allowing for a specified number of restart attempts (e.g., 5 in the example)."
+  },
+  {
+    "question": "What Ansys Fluent files are required for the restart scripts to function?",
+    "answer": "A group of `sample.cas`, `sample.dat`, and `sample.jou` files must be present initially. Additionally, a `sample-restart.jou`, `sample-restart.cas.h5`, and `sample-restart.dat.h5` are used for subsequent restarts."
+  },
+  {
+    "question": "How do these restart scripts handle the latest output files for subsequent restarts?",
+    "answer": "If a job attempt is successful and it's not the last one in the array, the scripts link the most recent `.cas` and `.dat` output files (e.g., `output/*.cas` and `output/*.dat`) to the specified restart filenames (`MYCASFILERES` and `MYDATFILERES`)."
+  },
+  {
+    "question": "What happens if a job attempt in the array completes successfully?",
+    "answer": "If a job completes successfully, the script prints a success message and then uses `scancel $SLURM_ARRAY_JOB_ID` to terminate the entire Slurm array job."
+  },
+  {
+    "question": "What happens if a job attempt fails and it's not the last attempt in the array?",
+    "answer": "If a job attempt fails and there are still remaining attempts in the array, the script indicates that the job will be resubmitted."
+  },
+  {
+    "question": "What Ansys Fluent version is specified by default in the restart scripts?",
+    "answer": "The `MYVERSION` variable is set to `3d` by default, but it can be changed to `2d`, `2ddp`, or `3ddp`."
+  },
+  {
+    "question": "How is the total number of cores calculated in the 'Plusieurs n\u0153uds (par n\u0153ud + red\u00e9marrage)' script?",
+    "answer": "The total number of cores (`NCORES`) is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "How is the total number of cores calculated in the 'Plusieurs n\u0153uds (par c\u0153ur + red\u00e9marrage)' script?",
+    "answer": "The total number of cores (`NCORES`) is calculated as `SLURM_NTASKS * SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "What environment modules are loaded for Ansys Fluent in these restart scripts?",
+    "answer": "The scripts load `StdEnv/2023` and `ansys/2023R2` (or newer versions specific to the cluster)."
+  },
+  {
+    "question": "How do these scripts determine the MPI implementation to use on Narval cluster?",
+    "answer": "On the Narval cluster, the scripts conditionally load `intel/2021 intelmpi` (for `EBVERSIONGENTOO == 2020`) or `intel/2023 intelmpi` (for `EBVERSIONGENTOO == 2023`), and unset some Intel MPI variables, before executing Fluent with `affinity=0 -mpi=intel`."
+  },
+  {
+    "question": "What is the maximum time limit specified for jobs using the 'Plusieurs n\u0153uds (par n\u0153ud + red\u00e9marrage)' script?",
+    "answer": "The script specifies a maximum time limit of `07-00:00` (7 days)."
+  },
+  {
+    "question": "What is the maximum number of nodes that can be specified for Narval in the 'Plusieurs n\u0153uds (par n\u0153ud + red\u00e9marrage)' script?",
+    "answer": "The script notes that for Narval, the maximum number of compute nodes is 1 (`#SBATCH --nodes=1 (narval 1 node max)`)."
+  },
+  {
+    "question": "What is the instruction regarding memory allocation in the 'Plusieurs n\u0153uds (par n\u0153ud + red\u00e9marrage)' script?",
+    "answer": "The instruction is `#SBATCH --mem=0`, which means 'Do not change (allocates all memory per compute node)'."
+  },
+  {
+    "question": "What is the purpose of the `slurm_hl2hl.py` command in these scripts?",
+    "answer": "The `slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID` command is used to generate a machinefile that Fluent uses for parallel execution, specifically for configuring the communication between nodes."
+  }
+]

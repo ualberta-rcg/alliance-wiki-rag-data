@@ -1,0 +1,54 @@
+[
+  {
+    "question": "How do you install the OpenStack CLI on a CentOS 7 instance for migration?",
+    "answer": "To install the OpenStack CLI on a CentOS 7 instance, execute the following commands:\n```bash\nyum install epel-release\nyum install python-devel python-pip gcc\npip install python-openstackclient\n```"
+  },
+  {
+    "question": "How can you verify that the OpenStack CLI has been successfully installed?",
+    "answer": "After installation, you can verify the OpenStack CLI by executing `openstack` on the command line."
+  },
+  {
+    "question": "After installing the OpenStack CLI and sourcing the Arbutus RC file, how do you verify connectivity to the Arbutus OpenStack API?",
+    "answer": "To verify connectivity to the Arbutus OpenStack API, execute the command `openstack image list` after copying and sourcing your OpenStack RC file from Arbutus on the temporary migration host."
+  },
+  {
+    "question": "When migrating a volume-backed instance using the 'dd' utility, what is the initial step regarding the instance and its volume?",
+    "answer": "You should delete the instance to be moved, but **do NOT** delete the volume it is attached to."
+  },
+  {
+    "question": "How do you attach a free volume to a temporary migration host in the West Cloud UI?",
+    "answer": "Go to 'Compute -> Volumes' in the West Cloud web UI, select 'Manage Attachments' from the drop-down menu for the desired volume, and attach it to the temporary migration host."
+  },
+  {
+    "question": "What Linux command is used to create an image from an attached disk of an instance?",
+    "answer": "The `dd` utility is used to create an image. An example command is `dd if=/dev/vdb | openstack image create --private --container-format bare --disk-format raw \"volumemigrate\"`."
+  },
+  {
+    "question": "Where can you see the image created by the `dd` utility after it's uploaded?",
+    "answer": "You should be able to see the image under 'Compute -> Images' in the Arbutus Cloud web UI."
+  },
+  {
+    "question": "When launching a new instance from an image created by `dd`, what should you ensure if you want the data to be persistent?",
+    "answer": "Make sure to create a new volume when launching the instance if you want the data to be persistent."
+  },
+  {
+    "question": "What is the recommendation for migrating large volumes?",
+    "answer": "For large volumes, image-based methods are not recommended. It's suggested to copy data to new volumes on Arbutus using `rsync` or similar file copy tools. If this isn't possible (e.g., for bootable volumes), the `dd` command can be used for an identical copy."
+  },
+  {
+    "question": "What are the required packages to install on the temporary West Cloud instance for migrating large volumes using `dd`?",
+    "answer": "You need to install `epel-release`, `pv`, and `screen` using `yum install epel-release`, `yum install pv`, and `yum install screen`."
+  },
+  {
+    "question": "What permission change is needed on the temporary Arbutus instance for large volume migration using `dd`?",
+    "answer": "You need to execute `chmod u+s /bin/dd` on the temporary Arbutus instance."
+  },
+  {
+    "question": "What is the command to copy a large volume from a temporary West Cloud instance to a temporary Arbutus instance using `dd` and SSH?",
+    "answer": "On the temporary West Cloud instance, within a `screen` session, execute: `sudo dd bs=16M if=/dev/vdb | pv -s 96G | ssh -i key.pem centos@xxx.xx.xx.xx \"dd bs=16M of=/dev/vdb\"`. Remember to substitute `xxx.xx.xx.xx` with the real IP address of the Arbutus instance and ensure `key.pem` is the correct SSH key."
+  },
+  {
+    "question": "After migrating and validating volumes and instances, and updating DNS records, what is the final step on the legacy West Cloud?",
+    "answer": "Once validated, you should delete your old instances and volumes on the legacy West Cloud."
+  }
+]

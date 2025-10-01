@@ -1,0 +1,38 @@
+[
+  {
+    "question": "What is the name of the Slurm script used for running Ansys Fluent on multiple nodes (per node) on Niagara?",
+    "answer": "The script is named `script-flu-bynode-intel-nia.sh`."
+  },
+  {
+    "question": "What modules must be loaded to run Ansys Fluent using the `script-flu-bynode-intel-nia.sh` script on Niagara?",
+    "answer": "You must load `CCEnv StdEnv/2023`, `arch/avx512`, and `ansys/2023R2` (or newer versions)."
+  },
+  {
+    "question": "How are license settings typically configured for Ansys Fluent jobs submitted with `script-flu-bynode-intel-nia.sh` on Niagara?",
+    "answer": "License settings are explicitly defined within the script itself, specifying `LICSERVER`, `FLEXPORT`, `INTEPORT`, and `VENDPORT`. These settings are then used to set up SSH port forwarding to `localhost` and export the `ANSYSLMD_LICENSE_FILE` and `ANSYSLI_SERVERS` variables to point to `localhost`."
+  },
+  {
+    "question": "What are the default values for the license server, flex port, interconnect port, and vendor port specified in the Niagara Fluent script?",
+    "answer": "The script specifies `LICSERVER=license3.sharcnet.ca`, `FLEXPORT=1055`, `INTEPORT=2325`, and `VENDPORT=1793`."
+  },
+  {
+    "question": "What environmental checks does the Fluent Niagara script perform before execution?",
+    "answer": "The script checks if `~/.ansys`, `~/.fluentconf`, and `~/.flrecent` are symbolic links to writable directories/files. If not, it will print an error and instruct the user to create such links to the `$SCRATCH` directory."
+  },
+  {
+    "question": "What command is used to launch Fluent for multi-node tasks within the Niagara Slurm script?",
+    "answer": "For multi-node tasks, the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -ssh -pib -cnf=$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
+  },
+  {
+    "question": "What is the purpose of the `ssh nia-gw -fNL` commands in the Niagara Fluent Slurm script?",
+    "answer": "These commands are used to establish SSH tunnels to forward the Ansys license ports (flex, interconnect, and vendor ports) from the specified license server (`LICSERVER`) to `localhost` on the compute node, allowing Fluent to access the license locally."
+  },
+  {
+    "question": "What is the maximum number of cores per node recommended for Fluent on Niagara with the provided script?",
+    "answer": "The script suggests a maximum of 80 cores per node for Niagara (`#SBATCH --ntasks-per-node=80`)."
+  },
+  {
+    "question": "What memory allocation setting is used in the Niagara Fluent Slurm script?",
+    "answer": "The script sets `#SBATCH --mem=0`, which allocates all available memory per compute node."
+  }
+]

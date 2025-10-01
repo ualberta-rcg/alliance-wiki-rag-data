@@ -1,0 +1,34 @@
+[
+  {
+    "question": "What will happen if PyTorch Lightning is not run with one task per GPU and using 'srun' in a SLURM batch job?",
+    "answer": "Your job will fail if you do not request one task per GPU and run your script with 'srun'."
+  },
+  {
+    "question": "How is the `pl.Trainer` initialized in the `pytorch-ddp-test-pl.py` example script?",
+    "answer": "The `pl.Trainer` is initialized with `accelerator=\"gpu\"`, `devices=2`, `num_nodes=1`, `strategy='ddp'`, `max_epochs`, and `enable_progress_bar=False`."
+  },
+  {
+    "question": "How can you make the `pl.Trainer` initialization more generic for the number of GPUs and nodes?",
+    "answer": "You can use `torch.cuda.device_count()` to set the number of GPUs and `int(os.environ.get(\"SLURM_JOB_NUM_NODES\"))` to set the number of nodes."
+  },
+  {
+    "question": "Why is `enable_progress_bar=False` set in the `pl.Trainer` initialization?",
+    "answer": "It is set to avoid writing a progress bar to the logs, which can cause issues due to updating logs too frequently."
+  },
+  {
+    "question": "When is it not advisable to use a GPU for model training?",
+    "answer": "It is not advisable to use a GPU when a model is fairly small, takes up a small portion of GPU memory, and cannot use a reasonable amount of its compute capacity. In such cases, using one or more CPUs is recommended."
+  },
+  {
+    "question": "Under what conditions can Data Parallelism on a single GPU be a viable option for a small model?",
+    "answer": "It becomes a viable option when you have a small model but a very large dataset and wish to perform training with a small batch size, allowing you to fit several replicas of the model on a single GPU to increase resource usage and achieve a speed-up."
+  },
+  {
+    "question": "What tools are used to efficiently place multiple model replicas on one GPU for Single GPU Data Parallelism?",
+    "answer": "Nvidia's Multi-Process Service (MPS) and MPI are used to efficiently place multiple model replicas on one GPU."
+  },
+  {
+    "question": "What is the typical GPU memory and compute utilization for a small task with a batch size of 512 images?",
+    "answer": "A small task with a batch size of 512 images typically takes up about 1GB of GPU memory space and uses only about 6% of its compute capacity during training."
+  }
+]

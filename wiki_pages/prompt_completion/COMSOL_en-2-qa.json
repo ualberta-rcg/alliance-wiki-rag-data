@@ -1,0 +1,58 @@
+[
+  {
+    "question": "How can I check the full version number of COMSOL installed on a cluster using batch mode?",
+    "answer": "To check the full version number, first allocate a compute node (e.g., `salloc --time=0:01:00 --nodes=1 --cores=1 --mem=1G --account=def-someuser`), then load the COMSOL module (e.g., `module load comsol/6.2`), and finally run `comsol batch -version`."
+  },
+  {
+    "question": "What does the COMSOL version `6.2.0.290` represent?",
+    "answer": "COMSOL Multiphysics `6.2.0.290` corresponds to COMSOL 6.2 Update 1."
+  },
+  {
+    "question": "How are COMSOL release versions and product update versions formatted?",
+    "answer": "A new COMSOL release uses the abbreviated `6.X` version format (e.g., `comsol/6.2`), while additional product updates utilize the full `6.X.Y.Z` version format (e.g., `comsol/6.2.0.415`)."
+  },
+  {
+    "question": "What is the recommended approach for using COMSOL updates?",
+    "answer": "It is recommended to use the most recent update to take advantage of all the latest improvements."
+  },
+  {
+    "question": "How do you check which COMSOL versions are available in the currently loaded standard environment (e.g., `StdEnv/2023`)?",
+    "answer": "Run the `module avail comsol` command."
+  },
+  {
+    "question": "How do you check which COMSOL versions are available across ALL standard environments?",
+    "answer": "Use the `module spider comsol` command."
+  },
+  {
+    "question": "What is the newest COMSOL module version available on all clusters mentioned?",
+    "answer": "A module `comsol/6.3`, corresponding to version `6.3.0.290`, is now available on all clusters."
+  },
+  {
+    "question": "Can you provide a basic Slurm script example for running a COMSOL job on a single compute node?",
+    "answer": "A sample script `mysub1.sh` for a single node could include:\n```bash\n#!/bin/bash\n#SBATCH --time=0-03:00\n#SBATCH --account=def-group\n#SBATCH --mem=32G\n#SBATCH --cpus-per-task=8\n#SBATCH --nodes=1\n#SBATCH --ntasks-per-node=1\nINPUTFILE=\"ModelToSolve.mph\"\nOUTPUTFILE=\"SolvedModel.mph\"\nmodule load StdEnv/2023\nmodule load comsol/6.2\ncomsol batch -inputfile ${INPUTFILE} -outputfile ${OUTPUTFILE} -np $SLURM_CPUS_ON_NODE\n```"
+  },
+  {
+    "question": "What is the command to execute a COMSOL batch job from within a Slurm script for a single node?",
+    "answer": "The command is `comsol batch -inputfile ${INPUTFILE} -outputfile ${OUTPUTFILE} -np $SLURM_CPUS_ON_NODE`."
+  },
+  {
+    "question": "What is recommended when deciding the number of cores for a COMSOL simulation?",
+    "answer": "It is advisable to test the scaling of your simulation by gradually increasing the number of cores, as COMSOL may not be able to efficiently use very many cores depending on the simulation's complexity."
+  },
+  {
+    "question": "When should a COMSOL job be considered for execution across multiple compute nodes?",
+    "answer": "If near-linear speedup is obtained using all cores on a single compute node, it is advisable to consider running the job over multiple full nodes."
+  },
+  {
+    "question": "What features does the sample submission script for multiple compute nodes (`script-dis.sh`) offer?",
+    "answer": "This script is ideal for very large simulations exceeding a single compute node's capabilities, supports restarting interrupted jobs, allocates large temporary files to `/scratch`, and utilizes default `comsolbatch.ini` file settings."
+  },
+  {
+    "question": "Can you provide a basic Slurm script example for running a COMSOL job distributed across two compute nodes?",
+    "answer": "A sample script `script-dis.sh` for two nodes could include:\n```bash\n#!/bin/bash\n#SBATCH --time=0-03:00\n#SBATCH --account=def-account\n#SBATCH --mem=16G\n#SBATCH --cpus-per-task=4\n#SBATCH --nodes=2\n#SBATCH --ntasks-per-node=1\nINPUTFILE=\"ModelToSolve.mph\"\nOUTPUTFILE=\"SolvedModel.mph\"\nmodule load StdEnv/2023\nmodule load comsol/6.2\nRECOVERYDIR=$SCRATCH/comsol/recoverydir\nmkdir -p $RECOVERYDIR\ncp -f ${EBROOTCOMSOL}/bin/glnxa64/comsolbatch.ini comsolbatch.ini\ncp -f ${EBROOTCOMSOL}/mli/startup/java.opts java.opts\ncomsol batch -inputfile $INPUTFILE -outputfile $OUTPUTFILE -np $SLURM_CPUS_ON_NODE -nn $SLURM_NNODES \\\n-recoverydir $RECOVERYDIR -tmpdir $SLURM_TMPDIR -comsolinifile comsolbatch.ini -alivetime 15\n```"
+  },
+  {
+    "question": "What COMSOL batch command is used for distributed jobs across multiple nodes, including recovery and temporary directories?",
+    "answer": "The command is `comsol batch -inputfile $INPUTFILE -outputfile $OUTPUTFILE -np $SLURM_CPUS_ON_NODE -nn $SLURM_NNODES -recoverydir $RECOVERYDIR -tmpdir $SLURM_TMPDIR -comsolinifile comsolbatch.ini -alivetime 15`."
+  }
+]

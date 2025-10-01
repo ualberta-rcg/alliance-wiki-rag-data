@@ -1,0 +1,66 @@
+[
+  {
+    "question": "What is BLAST used for?",
+    "answer": "BLAST (\"Basic Local Alignment Search Tool\") finds regions of similarity between biological sequences by comparing nucleotide or protein sequences to sequence databases and calculating their statistical significance."
+  },
+  {
+    "question": "Where can users find more information on BLAST arguments?",
+    "answer": "Users can find more information on BLAST arguments in the user manual at [https://www.ncbi.nlm.nih.gov/books/NBK279684/] or by using the command `blastn -help`."
+  },
+  {
+    "question": "What is the typical location for frequently used BLAST sequence databases on clusters?",
+    "answer": "Frequently used sequence databases are installed on the clusters in `/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2022_03_23/`."
+  },
+  {
+    "question": "How can one examine the contents of the BLAST database directory?",
+    "answer": "You can examine the BLAST database directory and its subdirectories using a command like `ls /cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2022_03_23/`."
+  },
+  {
+    "question": "What is the purpose of the `makeblastdb` command?",
+    "answer": "Before running a BLAST search, `makeblastdb` must be used to build the database. This can serve as a preprocessing job that other jobs depend on."
+  },
+  {
+    "question": "How do you create a nucleotide database named 'reference' from a `ref.fa` file using `makeblastdb`?",
+    "answer": "To create a nucleotide database, you can use the command `makeblastdb -in ref.fa -title reference -dbtype nucl -out ref.fa`."
+  },
+  {
+    "question": "How can data parallelism accelerate a BLAST search?",
+    "answer": "BLAST search can greatly benefit from data parallelism by splitting the query file into multiple smaller queries and running these queries against the database simultaneously."
+  },
+  {
+    "question": "What are the recommended size requirements for splitting a query file (`seq.fa`) for accelerated BLAST searches?",
+    "answer": "The `seq.fa` file must be split into smaller chunks that are at least 1MB or greater, but not smaller, as chunks smaller than 1MB may hurt the parallel filesystem."
+  },
+  {
+    "question": "Which utility is used to split sequence files into smaller chunks?",
+    "answer": "The `faSplit` utility is used to split sequence files, for example, `faSplit sequence seqs.fa 10 seq` to create 10 files named `seqN.fa`."
+  },
+  {
+    "question": "How do you load the `kentutils` module before using `faSplit`?",
+    "answer": "You load the `kentutils` module using the command `module load kentutils/20180716`."
+  },
+  {
+    "question": "How does a job array handle split queries in a BLAST search?",
+    "answer": "A job array creates a task for each split query file (`seq.fa.N`), mapping the task ID (`$SLURM_ARRAY_TASK_ID`) to the corresponding file name, which allows the scheduler to fit smaller jobs where cluster resources are available."
+  },
+  {
+    "question": "What command is used to submit a BLAST job array script (`blastn_array.sh`) that depends on the successful completion of a database creation script (`makeblastdb.sh`)?",
+    "answer": "You can submit the search using `sbatch --dependency=afterok:$(sbatch makeblastdb.sh) blastn_array.sh`."
+  },
+  {
+    "question": "How can the results from individual tasks of a BLAST job array be combined into a single file?",
+    "answer": "Once all tasks from the array are done, the results can be concatenated using the command `cat seq.ref.{0..9} > seq.ref`, which combines the 10 individual result files into `seq.ref`."
+  },
+  {
+    "question": "What is GNU Parallel and how does it benefit BLAST searches?",
+    "answer": "GNU Parallel is a tool for packing many small jobs into a single job and parallelizing it. It helps alleviate issues with too many small files in a parallel filesystem by querying fixed-size chunks from `seq.fa` on one node with multiple cores."
+  },
+  {
+    "question": "Why is the block size important when using GNU Parallel for BLAST searches?",
+    "answer": "The block size is important because an inappropriate size can lead to wasted cores. For example, if a 3MB file is processed in 1MB blocks, it creates 3 jobs using 3 cores, so requesting 10 cores would waste 7."
+  },
+  {
+    "question": "Must the input file for GNU Parallel be compressed or uncompressed?",
+    "answer": "The input file for GNU Parallel must not be compressed."
+  }
+]

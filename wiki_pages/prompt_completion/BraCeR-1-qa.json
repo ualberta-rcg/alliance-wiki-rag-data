@@ -1,0 +1,74 @@
+[
+  {
+    "question": "What is BraCeR used for?",
+    "answer": "BraCeR is used for the reconstruction of B cell receptor sequences from single-cell RNA-seq data."
+  },
+  {
+    "question": "Where does BraCeR typically install its Git repository content?",
+    "answer": "The content of the BraCeR Git-repository is typically installed in `$HOME/bracer`."
+  },
+  {
+    "question": "What is the default location for the virtual Python environment for BraCeR?",
+    "answer": "The virtual Python environment for BraCeR is typically installed in `$HOME/venv_bracer`."
+  },
+  {
+    "question": "Where are the transcriptome databases for Kallisto installed by default?",
+    "answer": "The transcriptome databases for Kallisto are installed in `/scratch/$USER/GRCh38` (for human) and `/scratch/$USER/GRCm38` (for mouse)."
+  },
+  {
+    "question": "How do you obtain the BraCeR software?",
+    "answer": "You can obtain BraCeR by navigating to `~/` and running `git clone https://github.com/Teichlab/bracer.git`."
+  },
+  {
+    "question": "What are the core modules that need to be loaded for BraCeR installation and execution?",
+    "answer": "The core modules include `StdEnv/2020`, `python/3.8`, `gcc/9.3.0`, `bowtie2/2.4.1`, `bowtie/1.3.0`, `trinity/2.14.0`, `samtools/1.15.1`, `igblast/1.17.0`, `blast+/2.12.0`, `kallisto/0.46.1`, `jellyfish/2.3.0`, `salmon/1.7.0`, and `fastqc/0.11.9`."
+  },
+  {
+    "question": "How do you create and activate the BraCeR virtual Python environment?",
+    "answer": "To create it, run `virtualenv --no-download ~/venv_bracer`. To activate it, run `source ~/venv_bracer/bin/activate`."
+  },
+  {
+    "question": "Which Python packages are installed as dependencies for BraCeR?",
+    "answer": "The dependencies include `biopython==1.77`, packages from `~/bracer/requirements.txt`, and `graphviz`."
+  },
+  {
+    "question": "What is the command to install BraCeR into its virtual environment?",
+    "answer": "Navigate to `~/bracer/` and run `python setup.py install`."
+  },
+  {
+    "question": "What are the main steps to install Trim Galore for BraCeR?",
+    "answer": "The main steps are to download and extract `TrimGalore-0.6.7.tar.gz`, tweak the Perl hashbang in `trim_galore` using `sed`, and then copy the `trim_galore` script into the virtual environment's `bin` directory."
+  },
+  {
+    "question": "How do you download and prepare the human (GRCh38) transcriptome for Kallisto?",
+    "answer": "Navigate to `~/scratch/GRCh38`, then `wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_41/gencode.v41.transcripts.fa.gz`, `gunzip` the file, and finally run `python3 ~/bracer/docker_helper_files/gencode_parse.py gencode.v27.transcripts.fa`."
+  },
+  {
+    "question": "How do you download and prepare the mouse (GRCm38) transcriptome for Kallisto?",
+    "answer": "Navigate to `~/scratch/GRCm38`, then `wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M30/gencode.vM30.transcripts.fa.gz`, `gunzip` the file, and finally run `python3 ~/bracer/docker_helper_files/gencode_parse.py gencode.vM30.transcripts.fa`."
+  },
+  {
+    "question": "What important configuration change must be made in `bracer.conf` before running BraCeR?",
+    "answer": "The placeholder `USERNAME` must be replaced with your actual username in the `bracer.conf` file."
+  },
+  {
+    "question": "In `bracer.conf`, which section is used to configure memory for Trinity Jellyfish?",
+    "answer": "The `[trinity_options]` section is used to configure memory for Trinity Jellyfish, specifically via `max_jellyfish_memory`."
+  },
+  {
+    "question": "What are the default Kallisto transcriptome paths specified in the `bracer.conf` example?",
+    "answer": "The default paths are `Hsap = /scratch/USERNAME/GRCh38` for human and `Mmus = /scratch/USERNAME/GRCm38` for mouse, found in the `[kallisto_transcriptomes]` section."
+  },
+  {
+    "question": "What is the purpose of the `bracer_path` setting in `bracer.conf`?",
+    "answer": "The `bracer_path` setting specifies the path to where BraCeR was originally installed, typically `/home/USERNAME/bracer/`."
+  },
+  {
+    "question": "What are the recommended SLURM resource allocations for a BraCeR job script?",
+    "answer": "The recommended SLURM allocations are `--time=0-00:30` (30 minutes), `--cpus-per-task=4`, and `--mem-per-cpu=4000M`."
+  },
+  {
+    "question": "Provide an example command for running `bracer assemble` within a job script.",
+    "answer": "An example command is `bracer assemble --ncores ${SLURM_CPUS_PER_TASK:-1} --config_file bracer.conf my_cell_name ./my_output_directory/ file_001.fastq file_002.fastq`."
+  }
+]

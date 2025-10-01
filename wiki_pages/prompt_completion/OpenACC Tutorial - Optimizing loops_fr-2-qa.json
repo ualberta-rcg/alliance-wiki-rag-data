@@ -1,0 +1,90 @@
+[
+  {
+    "question": "What is the initial step to perform a guided analysis using NVIDIA Visual Profiler?",
+    "answer": "Open NVIDIA Visual Profiler and start a new session with the latest executable produced."
+  },
+  {
+    "question": "What is the first action to take under the 'Analysis' tab in NVIDIA Visual Profiler?",
+    "answer": "Click on 'Examine GPU Usage'."
+  },
+  {
+    "question": "What is the purpose of clicking 'Examine GPU Usage' in the profiler?",
+    "answer": "At the end of the analysis, the compiler produces a series of warnings that indicate possible improvements."
+  },
+  {
+    "question": "After examining GPU usage, what is the next step to list kernels?",
+    "answer": "Click on 'Examine Individual Kernels' to display the list of kernels."
+  },
+  {
+    "question": "What information does 'Perform Kernel Analysis' provide when a kernel is selected?",
+    "answer": "The profiler presents a detailed analysis of the kernel and indicates probable bottlenecks, such as performance limited by memory latency."
+  },
+  {
+    "question": "What is the final step in the guided analysis procedure if memory latency is an issue?",
+    "answer": "Click on 'Perform Latency Analysis'."
+  },
+  {
+    "question": "According to the NVIDIA Visual Profiler's guided analysis, what typically limits performance?",
+    "answer": "Performance is limited by the size of the blocks, which corresponds to the size of gangs in OpenACC."
+  },
+  {
+    "question": "What was the number of active threads executed by the GPU compared to its potential?",
+    "answer": "The GPU executed 512 threads out of the 2048 possible."
+  },
+  {
+    "question": "What does the 'Occupancy' line indicate in the profiler results?",
+    "answer": "The 'Occupancy' line shows that the GPU is used at 25% of its capacity, representing the ratio of actual usage to possible usage."
+  },
+  {
+    "question": "What does a 25% GPU occupancy suggest about performance?",
+    "answer": "A 25% occupancy is considered rather low, though 100% occupancy does not necessarily guarantee the best performance."
+  },
+  {
+    "question": "How many vector threads per gang (block) was the GPU executing, and what was the maximum possible?",
+    "answer": "The GPU was executing 32 vector threads per block (gang in OpenACC) out of a possible 1024."
+  },
+  {
+    "question": "How many workers per gang (warp per block) was the GPU executing, and what was the maximum possible?",
+    "answer": "The GPU was executing 1 warp per block (worker per gang in OpenACC) out of a possible 32."
+  },
+  {
+    "question": "What is the ideal number of gangs for the accelerator to function at full capacity, and how many can it actually process?",
+    "answer": "For the accelerator to function at full capacity, 64 gangs would be needed, but it can only process 16."
+  },
+  {
+    "question": "What is the recommended action based on the guided analysis to improve performance?",
+    "answer": "The conclusion is that larger gangs are needed, which can be achieved by adding workers while keeping the vector size at 32."
+  },
+  {
+    "question": "What is the maximum allowed size for a gang on an NVIDIA GPU?",
+    "answer": "The size of a gang on an NVIDIA GPU cannot exceed 1024."
+  },
+  {
+    "question": "How is the size of an OpenACC gang determined for an NVIDIA GPU?",
+    "answer": "The size of a gang is the product of the vector length multiplied by the number of workers."
+  },
+  {
+    "question": "How can 32 workers be added per gang using the OpenACC `kernels` directive?",
+    "answer": "By adding `#pragma acc loop device_type(nvidia) gang worker(32)` before the outer loop."
+  },
+  {
+    "question": "How is the `parallel loop` directive modified to include 32 workers per gang?",
+    "answer": "The directive should include `gang worker num_workers(32)`, for example: `#pragma acc parallel loop ... device_type(nvidia) vector_length(32) gang worker num_workers(32)`."
+  },
+  {
+    "question": "What performance improvement was observed on a K20 GPU after adding workers?",
+    "answer": "The execution time decreased from 10 seconds to 6 seconds, resulting in nearly double the performance."
+  },
+  {
+    "question": "What is the function of the OpenACC `collapse(N)` clause?",
+    "answer": "The `collapse(N)` clause is used with a loop directive to flatten the next N loops into a single, flat loop, which is useful for nested or very short loops."
+  },
+  {
+    "question": "When is the OpenACC `tile(N,[M,...])` clause beneficial?",
+    "answer": "The `tile(N,[M,...])` clause is useful for algorithms with strong locality, as it distributes subsequent loops into a tiled structure before parallelization, allowing the accelerator to use data from surrounding tiles."
+  },
+  {
+    "question": "What task is presented in the exercise section?",
+    "answer": "The exercise involves porting code that solves Laplace's equation using the Jacobi method, located in the `bonus` directory, to a GPU and observing the performance gain."
+  }
+]

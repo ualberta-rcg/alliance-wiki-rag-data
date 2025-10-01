@@ -1,0 +1,66 @@
+[
+  {
+    "question": "What are the general syntax forms for launching GLOST?",
+    "answer": "The general syntax of GLOST can take one of the following forms: `srun glost_launch list_glost_tasks.txt`, `mpiexec glost_launch list_glost_tasks.txt`, or `mpirun glost_launch list_glost_tasks.txt`."
+  },
+  {
+    "question": "How does GLOST distribute serial jobs among available cores?",
+    "answer": "GLOST uses a cyclic distribution, assigning one processor to each job from the beginning of the list. When a processor finishes a task, it's assigned the next available line from the list until all jobs are done or the job runs out of time."
+  },
+  {
+    "question": "Does the number of cores need to match the number of requested jobs in GLOST?",
+    "answer": "No, the number of cores may not necessarily match the number of requested jobs in the list."
+  },
+  {
+    "question": "How can one optimize resource usage with GLOST?",
+    "answer": "To optimize resource usage, ensure that the serial jobs have similar runtimes and can be distributed evenly among the requested cores."
+  },
+  {
+    "question": "What kind of jobs can be bundled into GLOST jobs?",
+    "answer": "GLOST can bundle a large number of very short serial jobs (hundreds or thousands, a few minutes runtime), tens to hundreds of relatively short runtime jobs (an hour or so), or many long serial jobs with similar runtimes."
+  },
+  {
+    "question": "How do you estimate the wall time for a GLOST job?",
+    "answer": "First, estimate the runtime for your serial jobs. If you have N jobs, each taking t0 runtime using 1 processor, the total runtime is t0 * Njobs. Then, if you use Ncores for your GLOST job, the estimated wall time (wt) will be wt = t0 * Njobs / Ncores."
+  },
+  {
+    "question": "How does GLOST's use of MPI compare to a typical MPI job in terms of communication overhead?",
+    "answer": "Unlike typical MPI jobs where processes exchange information frequently, GLOST uses MPI primarily to start entirely serial jobs, meaning communication overhead is relatively infrequent and efficiency is nearly the same as writing MPI directly without the effort."
+  },
+  {
+    "question": "How should memory be specified in a Slurm script for a GLOST job?",
+    "answer": "For a GLOST job, use `--mem-per-cpu` instead of `--mem` in your Slurm script, setting the memory per core to be the same as required for a single serial job."
+  },
+  {
+    "question": "What is the first step before submitting a job using GLOST?",
+    "answer": "Before submitting a job using GLOST, you must create a text file, typically named `list_glost_tasks.txt`, which contains all the commands needed to run the serial jobs, with one job per line."
+  },
+  {
+    "question": "What considerations are important when running GLOST jobs in a single directory?",
+    "answer": "When running GLOST jobs in one directory, ensure that the output from different jobs does not overlap or use the same temporary or output files. This can be achieved by redirecting standard output to a file with a variable indicating the job's argument or option."
+  },
+  {
+    "question": "How can multiple commands be executed within a single GLOST job line?",
+    "answer": "One job may contain multiple commands executed one after another by separating them with `&&`."
+  },
+  {
+    "question": "What is the purpose of the `list_glost_example.txt` file in the provided example?",
+    "answer": "The `list_glost_example.txt` file serves as an argument for the `glost_launch` wrapper, demonstrating a simple syntax for a list of 8 jobs."
+  },
+  {
+    "question": "Why might it be useful to run GLOST jobs in separate directories?",
+    "answer": "Running GLOST jobs in separate directories is useful for programs that use files (temporary, input, and/or output) with the same names, preventing crashes or overlap of results from different jobs."
+  },
+  {
+    "question": "What should you do if a GLOST job needs to be restarted because the wall time was underestimated?",
+    "answer": "If a GLOST job needs restarting, identify the jobs that have already completed, remove their corresponding lines from `list_glost_tasks.txt` (or create a new list with only remaining jobs), and then resubmit the script using the updated list."
+  },
+  {
+    "question": "How can users access additional GLOST examples?",
+    "answer": "After loading the GLOST module, users can copy examples to their local directory by running the command `cp -r $EBROOTGLOST/examples Glost_Examples`."
+  },
+  {
+    "question": "Where are the copied GLOST examples saved?",
+    "answer": "The copied GLOST examples are saved under the directory `Glost_Examples` in the user's local directory."
+  }
+]

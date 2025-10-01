@@ -1,0 +1,106 @@
+[
+  {
+    "question": "What Abaqus license file configuration is needed for Abaqus/2020 on SHARCNET?",
+    "answer": "Your `abaqus.lic` file should contain `prepend_path(\"ABAQUSLM_LICENSE_FILE\",\"27050@license3.sharcnet.ca\")` to use Abaqus/2020."
+  },
+  {
+    "question": "What Abaqus license file configuration is needed for Abaqus/6.14.1 on SHARCNET?",
+    "answer": "Your `abaqus.lic` file should contain `prepend_path(\"LM_LICENSE_FILE\",\"27050@license3.sharcnet.ca\")` to use Abaqus/6.14.1."
+  },
+  {
+    "question": "What should you check if an Abaqus/2020 job fails with a 'Segmentation fault' related to the license?",
+    "answer": "Verify that your `abaqus.lic` file contains `ABAQUSLM_LICENSE_FILE`."
+  },
+  {
+    "question": "What should you check if an Abaqus/6.14.1 job fails with 'License server machine is down or not responding'?",
+    "answer": "Verify that your `abaqus.lic` file contains `LM_LICENSE_FILE`."
+  },
+  {
+    "question": "How do you prepare to query the SHARCNET Abaqus license server on Graham?",
+    "answer": "Log into graham (`ssh graham.alliancecan.ca`), then load the necessary modules: `module load StdEnv/2020` and `module load abaqus`."
+  },
+  {
+    "question": "What command checks for started and queued Abaqus jobs on the SHARCNET license server?",
+    "answer": "Run `abaqus licensing lmstat -c $LM_LICENSE_FILE -a | egrep \"Users|start|queued\"`."
+  },
+  {
+    "question": "How can you check for started, queued Abaqus jobs, and also see reservations by purchasing groups on the SHARCNET license server?",
+    "answer": "Use the command `abaqus licensing lmstat -c $LM_LICENSE_FILE -a | egrep \"Users|start|queued|RESERVATION\"`."
+  },
+  {
+    "question": "How do you check the availability of cae, standard, and explicit Abaqus product licenses on the SHARCNET server?",
+    "answer": "Execute `abaqus licensing lmstat -c $LM_LICENSE_FILE -a | grep \"Users of\" | egrep \"cae|standard|explicit\"`."
+  },
+  {
+    "question": "What does it mean if an Abaqus job is 'queued' according to the `lmstat` output?",
+    "answer": "It means the job has entered the 'Running' state in Slurm but is idle on a compute node, waiting for a license to become available."
+  },
+  {
+    "question": "What is the impact of an Abaqus job being 'queued' for a license?",
+    "answer": "The job consumes CPU time from an account priority perspective, similar to a job performing computations, and depreciates the user's fair share level."
+  },
+  {
+    "question": "What strategies can help avoid Abaqus license shortage problems when submitting multiple jobs?",
+    "answer": "You can use job dependencies, job arrays, or set up Slurm email notifications to know when a job completes before submitting another."
+  },
+  {
+    "question": "How can you check memory and CPU utilization for completed Abaqus jobs?",
+    "answer": "For completed jobs, use `seff JobNumber` to see 'Memory Utilized', 'Memory Efficiency', 'CPU (time) Utilized', and 'CPU Efficiency'."
+  },
+  {
+    "question": "What should be done if the 'Memory Efficiency' of a completed Abaqus job is less than 90%?",
+    "answer": "Decrease the value of the `#SBATCH --mem=` setting in your Slurm script."
+  },
+  {
+    "question": "What should be done if the 'CPU Efficiency' of a completed Abaqus job is less than 90%?",
+    "answer": "Perform scaling tests to determine the optimal number of CPUs and then update the `#SBATCH --cpus-per-task=` value in your Slurm script."
+  },
+  {
+    "question": "How can you monitor memory and CPU usage for a *running* Abaqus job on a compute node?",
+    "answer": "Use the command `srun --jobid=29821580 --pty top -d 5 -u $USER` on the compute node to watch the %CPU, %MEM, and RES columns for each Abaqus parent process."
+  },
+  {
+    "question": "What is the formula to calculate Abaqus tokens based on the number of cores?",
+    "answer": "The formula is `TOKENS = floor[5 X CORES^0.422]`."
+  },
+  {
+    "question": "How many additional tokens are required for each GPU used in an Abaqus job?",
+    "answer": "Each GPU used requires 1 additional token."
+  },
+  {
+    "question": "Who can use the Western Abaqus license?",
+    "answer": "Only Western researchers can use the Western Abaqus license, and only on hardware located at Western's campus, such as the Dusky cluster."
+  },
+  {
+    "question": "Which Alliance systems are excluded from using the Western Abaqus license?",
+    "answer": "Graham and gra-vdi are excluded because they are located on Waterloo's campus, not Western's."
+  },
+  {
+    "question": "Whom should Western researchers contact to inquire about using the Western Abaqus license?",
+    "answer": "They should contact the Western Abaqus license server administrator, jmilner@robarts.ca."
+  },
+  {
+    "question": "How should a Western researcher configure their `abaqus.lic` file to use the Western license?",
+    "answer": "The file should contain `prepend_path(\"LM_LICENSE_FILE\",\"27000@license4.sharcnet.ca\")` and `prepend_path(\"ABAQUSLM_LICENSE_FILE\",\"27000@license4.sharcnet.ca\")`."
+  },
+  {
+    "question": "What information should be provided when submitting a problem ticket for issues with the Western Abaqus license on Dusky?",
+    "answer": "Specify that you are using the Abaqus Western license on Dusky, provide the failed job number, and paste any error messages."
+  },
+  {
+    "question": "What is the first step to access Abaqus online documentation on gra-vdi?",
+    "answer": "Connect to `gra-vdi.computecanada.ca` using TigerVNC."
+  },
+  {
+    "question": "What browser configuration is needed on gra-vdi to view Abaqus documentation?",
+    "answer": "Open Firefox, go to `about:config`, accept the risk, search for `unique`, and double click `privacy.file_unique_origin` to change it to `false`."
+  },
+  {
+    "question": "How can you view the Abaqus 2021 online documentation on gra-vdi after setting up Firefox?",
+    "answer": "Open Firefox and paste `file:///opt/sharcnet/abaqus/2021/doc/English/DSSIMULIA_Established.htm` into the address bar."
+  },
+  {
+    "question": "How can you view the Abaqus 2020 online documentation on gra-vdi after setting up Firefox?",
+    "answer": "Open Firefox and paste `file:///opt/sharcnet/abaqus/2020/doc/English/DSSIMULIA_Established.htm` into the address bar."
+  }
+]

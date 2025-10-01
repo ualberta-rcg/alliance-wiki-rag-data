@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What SLURM resources are requested for the LLM training example?",
+    "answer": "The SLURM script requests 1 node, 1 task per node, 4 GPUs, 48 CPUs per task, 0 memory (implying all available), and a time limit of 30 minutes."
+  },
+  {
+    "question": "Which Python modules are loaded at the beginning of the LLM training job?",
+    "answer": "The `python/3.11`, `gcc`, and `arrow` modules are loaded."
+  },
+  {
+    "question": "How is the virtual environment created and activated within the LLM training job script?",
+    "answer": "A virtual environment is created without downloading packages in `$SLURM_TMPDIR/ENV` using `virtualenv --no-download $SLURM_TMPDIR/ENV`, and then activated with `source $SLURM_TMPDIR/ENV/bin/activate`."
+  },
+  {
+    "question": "What Python packages are installed in the virtual environment for the LLM training?",
+    "answer": "The script installs `transformers`, `datasets`, `trl`, and `accelerate` using `pip install --no-index`."
+  },
+  {
+    "question": "How is the `ultrachat_dataset` moved and configured for the LLM training job?",
+    "answer": "The `ultrachat_dataset` is copied to the local storage of the compute node (`$SLURM_TMPDIR`) using `cp -r ultrachat_dataset $SLURM_TMPDIR/`, and the `HF_DATASETS_CACHE` environment variable is set to this location."
+  },
+  {
+    "question": "Which environment variables are set to enable offline mode for Hugging Face datasets and transformers during LLM training?",
+    "answer": "`HF_DATASETS_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1` are set to enable offline mode."
+  },
+  {
+    "question": "What is the purpose of `TORCH_NCCL_ASYNC_ERROR_HANDLING=1` in the LLM training script?",
+    "answer": "This environment variable is set to enable asynchronous error handling for NCCL, which is used for distributed communication."
+  },
+  {
+    "question": "What command is used to launch the LLM training script with Accelerate, and what are its key arguments?",
+    "answer": "The `accelerate launch` command is used, with key arguments including `--config_file='fsdp.yaml'`, `--mixed_precision='fp16'`, `--num_machines=$SLURM_NNODES`, `--machine_rank=$SLURM_NODEID`, and `--num_processes=4`, executing `train_llm.py`."
+  },
+  {
+    "question": "What type of distributed training is configured in the `fsdp.yaml` file?",
+    "answer": "The `fsdp.yaml` file configures `FSDP` (Fully Sharded Data Parallel) as the `distributed_type`."
+  },
+  {
+    "question": "What sharding strategy is specified for FSDP in the `fsdp.yaml` configuration?",
+    "answer": "The `fsdp_sharding_strategy` is set to `FULL_SHARD`."
+  },
+  {
+    "question": "How does `train_llm.py` load the pre-trained model and tokenizer?",
+    "answer": "The `train_llm.py` script loads the model and tokenizer from the local path `./zephyr-7b-beta` using `local_files_only=True`."
+  },
+  {
+    "question": "What is the role of the `preprocess` function in `train_llm.py`?",
+    "answer": "The `preprocess` function formats conversational messages using the tokenizer's chat template and returns them as a 'content' field in a batch."
+  },
+  {
+    "question": "Which training arguments are configured for the `SFTTrainer` in `train_llm.py`?",
+    "answer": "The `TrainingArguments` include `output_dir='./'`, `per_device_train_batch_size=8`, `gradient_accumulation_steps=1`, `gradient_checkpointing=True`, `max_steps=15`, `logging_steps=1`, `learning_rate=2.5e-5`, `optim='adamw_torch'`, `logging_dir='./logs'`, and `remove_unused_columns=False`."
+  },
+  {
+    "question": "What is the `max_seq_length` used when initializing the `SFTTrainer`?",
+    "answer": "The `max_seq_length` is set to 2048."
+  },
+  {
+    "question": "What is the final step in the `main` function of `train_llm.py` using the Accelerator object?",
+    "answer": "The final step is `accelerator.wait_for_everyone()`, which ensures all processes in the distributed setup synchronize before exiting."
+  }
+]

@@ -1,70 +1,66 @@
 [
   {
-    "question": "What are the typical SBATCH directives for a STAR-CCM+ job on the B\u00e9luga cluster?",
-    "answer": "For a STAR-CCM+ job on B\u00e9luga, the SBATCH directives generally include `--account=def-group`, `--time=00-01:00`, `--nodes=1`, `--cpus-per-task=40`, `--mem=0`, and `--ntasks-per-node=1`."
+    "question": "What are the common SBATCH directives used in STAR-CCM+ job scripts for clusters like Fir, Rorqual, Nibi, Narval, and Trillium?",
+    "answer": "Common SBATCH directives include `--account=def-group`, `--time=00-01:00`, `--nodes=1`, `--mem=0`, and `--ntasks-per-node=1`. The `--ntasks-per-node` value should not be changed."
   },
   {
-    "question": "Which environment modules are loaded for STAR-CCM+ on B\u00e9luga according to the example script?",
-    "answer": "The `StdEnv/2023` module is loaded, followed by a STAR-CCM+ module like `starccm-mixed/18.06.006` or `starccm-mixed/18.04.008`."
+    "question": "Which modules should be loaded before running STAR-CCM+ jobs on these clusters?",
+    "answer": "You should load `StdEnv/2023` and `starccm-mixed/20.04.007` (or `starccm/20.04.007-R8`). The Trillium cluster also requires `CCEnv`."
   },
   {
-    "question": "How is a Siemens Power on Demand (PoD) Key specified in a STAR-CCM+ Slurm script for B\u00e9luga?",
-    "answer": "The Siemens PoD Key is specified by setting the `LM_PROJECT` variable, for example, `LM_PROJECT='my22digitpodkey'`."
+    "question": "How do you specify the input simulation file and an optional Java macro file in a STAR-CCM+ SLURM script?",
+    "answer": "The input simulation file is specified by setting `SIM_FILE='mysample.sim'`, and an optional Java macro file can be included by uncommenting `JAVA_FILE='mymacros.java'` and providing the filename."
   },
   {
-    "question": "What is the command to launch STAR-CCM+ with a Siemens PoD license on B\u00e9luga?",
-    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
+    "question": "How many CPUs per task are typically requested for STAR-CCM+ jobs on Fir/Rorqual/Nibi, Narval, and Trillium clusters?",
+    "answer": "Fir/Rorqual/Nibi and Trillium typically request `--cpus-per-task=192`, while Narval requests `--cpus-per-task=64`."
   },
   {
-    "question": "What is the command to launch STAR-CCM+ with an institutional license on B\u00e9luga?",
-    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
+    "question": "How is a Siemens Power on Demand (PoD) license configured and used within a STAR-CCM+ SLURM script?",
+    "answer": "For a Siemens PoD license, the `LM_PROJECT` environment variable must be set to your CD-ADAPCO PROJECT ID (e.g., `LM_PROJECT='my22digitpodkey'`), and the `starccm+` command includes `-power -podkey $LM_PROJECT`."
   },
   {
-    "question": "What is the recommended `cpus-per-task` setting for STAR-CCM+ jobs on the Cedar cluster?",
-    "answer": "For STAR-CCM+ jobs on Cedar, the recommended `cpus-per-task` is 48, requesting all cores per node (options are 32 or 48)."
+    "question": "What is the main difference in the `starccm+` command when using an institutional license server compared to a Siemens PoD license in a job script?",
+    "answer": "When using an institutional license server, the `-power -podkey $LM_PROJECT` options are omitted from the `starccm+` command line."
   },
   {
-    "question": "How do you specify the input simulation file (`.sim`) and an optional Java macro file (`.java`) in a Cedar job script?",
-    "answer": "The input simulation file is specified with `SIM_FILE='mysample.sim'`, and the Java macro file can be specified by uncommenting `JAVA_FILE='mymacros.java'`."
+    "question": "Which MPI implementation is used for STAR-CCM+ jobs on Fir/Rorqual/Nibi and Narval clusters?",
+    "answer": "On Fir/Rorqual/Nibi clusters, the `intel -fabric psm2` MPI implementation is used. On Narval, `openmpi` is used."
   },
   {
-    "question": "Which MPI implementation and fabric are used for STAR-CCM+ on the Cedar and Graham clusters?",
-    "answer": "STAR-CCM+ on Cedar and Graham uses `-mpi intel -fabric psm2`."
+    "question": "What special steps are required for using a Siemens PoD license on the Trillium cluster, including any workarounds for license failures?",
+    "answer": "On Trillium, you need to set `LM_PROJECT`, `FLEXPORT`, `VENDPORT`, and `LICSERVER` variables, export `CDLMD_LICENSE_FILE`, and use an `ssh nia-gw` command for license forwarding. There's also a workaround that retries starting `starccm+` up to 5 times if license failures occur."
   },
   {
-    "question": "What is the recommended `cpus-per-task` setting for STAR-CCM+ jobs on the Graham cluster?",
-    "answer": "For STAR-CCM+ jobs on Graham, the recommended `cpus-per-task` is 32, requesting all cores per node (options are 32 or 44)."
+    "question": "What are the initial steps to configure an account for remote visualization with STAR-CCM+?",
+    "answer": "You must create the license file `~/.licenses/starccm.lic`. If using a POD license, configure `export LM_PROJECT='CD-ADAPCO PROJECT ID'` and add `-power` to the command line options."
   },
   {
-    "question": "What is the recommended `cpus-per-task` setting for STAR-CCM+ jobs on the Narval cluster?",
-    "answer": "For STAR-CCM+ jobs on Narval, the recommended `cpus-per-task` is 64, requesting all cores per node."
+    "question": "How do you launch STAR-CCM+ version 15.04.010 or newer for remote visualization on compute nodes?",
+    "answer": "After connecting with TigerVNC, load `StdEnv/2020`, then `starccm-mixed/17.02.007` (or `starccm/16.04.007-R8`), and finally run `starccm+`."
   },
   {
-    "question": "Which MPI implementation is used for STAR-CCM+ on the Narval cluster?",
-    "answer": "STAR-CCM+ on Narval uses `-mpi openmpi`."
+    "question": "What commands are used to start STAR-CCM+ versions 13.06.012 or older for remote visualization on compute nodes?",
+    "answer": "For STAR-CCM+ versions 13.06.012 or older, load `StdEnv/2016`, then `module load starccm-mixed/13.06.012` (or `starccm/13.06.012-R8`), and run `starccm+ -mesa`."
   },
   {
-    "question": "What specific environment module should be loaded on Niagara before `StdEnv/2023` for STAR-CCM+?",
-    "answer": "The `CCEnv` module should be loaded on Niagara before `StdEnv/2023`."
+    "question": "How do you open a terminal on VDI nodes (gra-vdi) after connecting with TigerVNC to launch STAR-CCM+?",
+    "answer": "Once the remote desktop is displayed, click on `Applications-->Systems Tools-->Mate Terminal` to open a terminal window."
   },
   {
-    "question": "How are license server details configured for PoD licenses on Niagara, including the use of an SSH tunnel?",
-    "answer": "On Niagara, `FLEXPORT`, `VENDPORT`, and `LICSERVER` variables are explicitly set (e.g., `FLEXPORT=1999`, `VENDPORT=2099`, `LICSERVER=flex.cd-adapco.com`), and an SSH tunnel is established via `ssh nia-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f`."
+    "question": "What is the current limitation regarding OpenGL acceleration for STAR-CCM+ on gra-vdi nodes?",
+    "answer": "Only the MESA implementation of OpenGL can currently be used on gra-vdi with STAR-CCM+ due to issues with VirtualGL, which typically provides local GPU acceleration for OpenGL graphics."
   },
   {
-    "question": "What is the workaround for license failures when running STAR-CCM+ on Niagara?",
-    "answer": "A `while` loop attempts to start STAR-CCM+ up to 5 times, with a `sleep 5` between attempts, until the exit status is 0."
+    "question": "What are the commands to launch STAR-CCM+ version 18.04.008 or newer for remote visualization on VDI nodes?",
+    "answer": "Load `CcEnv` and `StdEnv/2023`, then `starccm-mixed/18.04.008` (or `starccm/18.04.008-R8`), and run `starccm+ -rr server`."
   },
   {
-    "question": "What is the purpose of the `slurm_hl2hl.py` script in the STAR-CCM+ job scripts?",
-    "answer": "The `slurm_hl2hl.py` script is used to generate a machinefile for STAR-CCM+, typically by running `slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile`."
+    "question": "How do you start STAR-CCM+ versions from 15.04.010 up to 18.02.008 on VDI nodes for remote visualization?",
+    "answer": "Load `CcEnv` and `StdEnv/2020`, then `starccm-mixed/15.04.010` (or `starccm/15.04.010-R8`), and run `starccm+ -mesa`."
   },
   {
-    "question": "How is the total number of cores (`NCORE`) calculated in the STAR-CCM+ Slurm job scripts?",
-    "answer": "The total number of cores (`NCORE`) is calculated as the product of `SLURM_NNODES`, `SLURM_CPUS_PER_TASK`, and `SLURM_NTASKS_PER_NODE`."
-  },
-  {
-    "question": "What are the common JVM arguments used when launching STAR-CCM+ across the different clusters?",
-    "answer": "The common JVM arguments are `-jvmargs -Xmx4G` for memory allocation and `-jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR` for the temporary directory."
+    "question": "Which commands are used to launch STAR-CCM+ version 13.06.012 or older on VDI nodes for remote visualization?",
+    "answer": "Load `CcEnv` and `StdEnv/2016`, then `starccm-mixed/13.06.012` (or `starccm/13.06.012-R8`), and run `starccm+ -mesa`."
   }
 ]

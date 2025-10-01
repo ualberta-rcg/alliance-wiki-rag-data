@@ -1,50 +1,170 @@
 [
   {
-    "question": "What Python module is recommended for parallel programming on a single compute node?",
-    "answer": "The `multiprocessing` module is recommended for parallel programming."
+    "question": "Which Python module can be used for parallel programming on a single compute node?",
+    "answer": "The `multiprocessing` module is used for parallel programming with Python, specifically the `Pool` class within it."
   },
   {
-    "question": "Which class within Python's `multiprocessing` module helps control the number of parallel processes?",
-    "answer": "The `Pool` class allows one to control the number of processes started in parallel."
+    "question": "How can you control the number of processes started in parallel using the `multiprocessing` module?",
+    "answer": "The `Pool` class of the `multiprocessing` module allows you to control the number of processes started in parallel."
   },
   {
-    "question": "What are two ways to apply a function to a list of data in parallel using the `multiprocessing.Pool` class?",
-    "answer": "You can use `pool.apply_async` in a loop for each item, or `pool.map` to apply the function over the entire data list."
+    "question": "What are the potential issues if you launch more processes than the cores allocated to your job on a cluster?",
+    "answer": "Launching more processes than allocated cores will slow down your calculation and could overload the compute node."
   },
   {
-    "question": "Why should you match the number of processes to the allocated cores on a cluster?",
-    "answer": "Launching more processes than requested cores will slow down calculations and possibly overload the compute node, while launching fewer processes will waste resources and leave cores idle."
+    "question": "What happens if you launch fewer processes than the cores allocated to your job on a cluster?",
+    "answer": "Launching fewer processes than allocated cores will result in wasted resources and idle cores."
   },
   {
-    "question": "How can a Python script dynamically get the number of CPUs allocated to a job on a cluster?",
-    "answer": "The number of CPUs can be retrieved from the `SLURM_CPUS_PER_TASK` environment variable using `os.environ.get('SLURM_CPUS_PER_TASK', default=1)`."
+    "question": "How do you determine the correct number of cores to use in your Python code on a cluster?",
+    "answer": "The correct number of cores is determined by the amount of resources you requested to the scheduler, often accessible via the `SLURM_CPUS_PER_TASK` environment variable."
   },
   {
-    "question": "What is a key limitation of the `multiprocessing` module regarding compute nodes?",
+    "question": "How can a Python script using `multiprocessing.Pool` be modified to dynamically use the number of allocated CPUs from a Slurm job?",
+    "answer": "You can get the number of allocated CPUs using `ncpus = int(os.environ.get('SLURM_CPUS_PER_TASK', default=1))` and then pass `processes=ncpus` to `mp.Pool()`."
+  },
+  {
+    "question": "What is the primary limitation of the Python `multiprocessing` module regarding computation nodes?",
     "answer": "The `multiprocessing` module is restricted to using a single compute node."
   },
   {
-    "question": "What Python libraries or tools should be considered for parallel programming across multiple compute nodes?",
+    "question": "What alternatives are available if you need to perform parallel Python computations across multiple nodes?",
     "answer": "For multiple nodes, consider using `mpi4py` or `PySpark`."
   },
   {
-    "question": "What is an important step to take before parallelizing a Python program for performance improvement?",
-    "answer": "Ensure the Python program is written efficiently first."
+    "question": "What should be done before parallelizing Python code to improve its performance?",
+    "answer": "You should first ensure your Python program is written efficiently to greatly improve its performance."
   },
   {
-    "question": "What Python module can help diagnose a hanging script by dumping a traceback after a timeout?",
-    "answer": "The `faulthandler` module, specifically `faulthandler.dump_traceback_later()`, can be used."
+    "question": "What simple methods can help debug Python code?",
+    "answer": "Simple methods include adding `print` statements or assertions (`assert`)."
   },
   {
-    "question": "What tool allows inspection of a running Python process without prior modification to the script?",
-    "answer": "`py-spy` can be used to inspect a Python process while the job is running."
+    "question": "When is it recommended to use a debugger like `pdb` for Python code?",
+    "answer": "It is recommended to use a debugger like `pdb` when you need to dig deeper into the code and its context beyond simple `print` or `assert` statements."
   },
   {
-    "question": "How can you get live feedback on where a Python script is spending time using `py-spy`?",
-    "answer": "Run `py-spy top --pid PID` after attaching to the job and finding the process ID."
+    "question": "How do you start debugging a Python script using `pdb` in an interactive job?",
+    "answer": "Add `import pdb; pdb.set_trace()` or `breakpoint()` to your file, then run `python ...` in a small interactive job. You will then end up in the debugger."
   },
   {
-    "question": "How can you get a traceback of where a running Python script is currently at using `py-spy`?",
-    "answer": "Run `py-spy dump --pid PID` to get a traceback of the script's current state."
+    "question": "What `pdb` command is used to print a stack trace?",
+    "answer": "The `w` (or `here`) command in `pdb` prints a stack trace."
+  },
+  {
+    "question": "How do you set a breakpoint at a specific line number in `pdb`?",
+    "answer": "Use the `b (reak)` command with a `lineno` argument to set a breakpoint at that line in the current file."
+  },
+  {
+    "question": "Which `pdb` command executes the current line and stops at the next possible occasion?",
+    "answer": "The `s (tep)` command executes the current line and stops either in a called function or on the next line in the current function."
+  },
+  {
+    "question": "What `pdb` command continues execution until the next line in the current function is reached or it returns?",
+    "answer": "The `n (ext)` command continues execution until the next line in the current function is reached or the function returns."
+  },
+  {
+    "question": "How do you continue execution in `pdb` until the current function returns?",
+    "answer": "Use the `r (eturn)` command to continue execution until the current function returns."
+  },
+  {
+    "question": "What `pdb` command evaluates an expression in the current context and prints its value?",
+    "answer": "The `p exp` command evaluates an expression (`exp`) in the current context and prints its value."
+  },
+  {
+    "question": "How can you view the source code for the current file within `pdb`?",
+    "answer": "The `l (list)` command lists the source code for the current file."
+  },
+  {
+    "question": "What `pdb` command is used to quit the debugger and abort the program?",
+    "answer": "The `q (uit)` command quits from the debugger and aborts the program being executed."
+  },
+  {
+    "question": "What are the typically used `pdb` commands for debugging a file?",
+    "answer": "Typically, one would use `w`, `s`, `l`, `p`, `n` to debug a file."
+  },
+  {
+    "question": "How can you configure a Python script to dump a traceback after a timeout if it's hanging?",
+    "answer": "You can use the `faulthandler` module and `faulthandler.dump_traceback_later()` in your script."
+  },
+  {
+    "question": "How can you inspect a running Python process without modifying the script beforehand to diagnose hanging issues?",
+    "answer": "You can use `py-spy` to inspect a running Python process."
+  },
+  {
+    "question": "What are the steps to use `py-spy` to diagnose a hanging Python script on a cluster?",
+    "answer": "1. Install `py-spy` in a virtual environment. 2. Attach to the running job using `srun --pty --jobid JOBID bash`. 3. Find the Python script's process ID with `htop -u $USER`. 4. Activate the `py-spy` virtual environment. 5. Run `py-spy top --pid PID` for live feedback or `py-spy dump --pid PID` for a traceback."
+  },
+  {
+    "question": "What should you do if you encounter an error like 'ERROR: Package 'X' requires a different Python: 3.6.10 not in '>=3.7'' during package installation?",
+    "answer": "You should update to a more recent Python version (e.g., the latest available module) or install an older version of package 'X' that supports your current Python version."
+  },
+  {
+    "question": "How can you resolve an 'ERROR: Package has requirement X, but you'll have Y which is incompatible' message when installing Python packages?",
+    "answer": "Upgrade `pip` to the latest version or higher than `21.3` to use the new dependency resolver, then rerun your install command."
+  },
+  {
+    "question": "What causes the error 'ERROR: No matching distribution found for X' when installing a Python package with `pip`?",
+    "answer": "This error means `pip` did not find a package that satisfies the requirements (name, version, or tags). It can be caused by incorrect name/version, `manylinux_x_y` wheels being discarded, or the package not being available in the wheelhouse."
+  },
+  {
+    "question": "How can you check if a package is available in the wheelhouse when encountering 'No matching distribution found'?",
+    "answer": "You can verify package availability using the `avail_wheels` command on the cluster or by searching the 'Available Python wheels' page."
+  },
+  {
+    "question": "What is the recommended approach when installing multiple Python packages to help `pip` resolve dependencies?",
+    "answer": "When installing multiple packages, it is best to install them in one command, such as `pip install package1 package2 package3`."
+  },
+  {
+    "question": "Why might a virtual environment stop working even if it was functional previously?",
+    "answer": "Packages are often updated, leading to a non-reproducible virtual environment. Also, if the virtual environment was created in `$SCRATCH`, parts of it might have been deleted due to automatic filesystem purging."
+  },
+  {
+    "question": "How can you ensure a virtual environment is reproducible and stable over time?",
+    "answer": "To remedy non-reproducibility, freeze specific packages and their versions (e.g., `pip install --no-index 'package1==X.Y'`) and create a `requirements` file to install them in your job."
+  },
+  {
+    "question": "What does the error 'X is not a supported wheel on this platform' indicate?",
+    "answer": "This error means the package is incompatible or not supported, possibly because it's a `manylinux` package or built for a different Python version than the one currently active."
+  },
+  {
+    "question": "What should you do if you encounter 'AttributeError: module \u2018numpy\u2019 has no attribute \u2018X\u2019'?",
+    "answer": "This usually indicates an incompatibility with your Numpy version, often due to attributes being deprecated in Numpy v1.20 and expired in v1.24. You can solve this by installing a previous version of Numpy, such as `pip install --no-index 'numpy<1.24'`."
+  },
+  {
+    "question": "What are common causes for 'ModuleNotFoundError: No module named 'X''?",
+    "answer": "Common causes include the package not being installed or visible, the module name differing from the package name, or a broken virtual environment."
+  },
+  {
+    "question": "What practices should be avoided to prevent 'ModuleNotFoundError'?",
+    "answer": "Do not modify the `PYTHONPATH` or `PATH` environment variables, and do not load modules while a virtual environment is activated."
+  },
+  {
+    "question": "If you encounter 'ModuleNotFoundError', what steps should you take after checking problematic practices?",
+    "answer": "Make sure the package is installed (`pip list`), double-check the module name (case-sensitivity), ensure the module is imported at the correct level, or start over with a new virtual environment."
+  },
+  {
+    "question": "What typically causes 'ImportError: numpy.core.multiarray failed to import'?",
+    "answer": "This is caused by an incompatible version of Numpy installed or used, especially with the ABI-breaking release of Numpy 2.0. You must install a compatible version, for example, `pip install --no-index 'numpy<2.0'` if a wheel was built with version 1.x but version 2.x is installed."
+  },
+  {
+    "question": "What does the message 'Defaulting to user installation because normal site-packages is not writeable' signify?",
+    "answer": "This message indicates that no virtual environment was found or activated, and `pip` is attempting to install packages in a location where it lacks write permissions. This results in local installations."
+  },
+  {
+    "question": "Why are local installations (`pip install --user`) discouraged?",
+    "answer": "Local installations dump dependencies into one shared space, leading to weird import issues, runtime problems with Python packages, and version conflicts (dependency hell)."
+  },
+  {
+    "question": "What is the recommended method for managing Python packages to ensure isolation, reproducibility, and version control?",
+    "answer": "Using a virtual environment is best for isolation, reproducibility, and managing different versions across projects."
+  },
+  {
+    "question": "How can you effectively remove local Python installations?",
+    "answer": "You can remove local installations by running `rm -vr ~/.local/bin ~/.local/lib/python*`."
+  },
+  {
+    "question": "What should you do after removing local Python installations?",
+    "answer": "After removing local installations, you should start over with a clean, fresh virtual environment."
   }
 ]

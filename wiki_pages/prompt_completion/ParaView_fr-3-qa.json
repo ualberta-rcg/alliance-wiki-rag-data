@@ -1,66 +1,58 @@
 [
   {
-    "question": "How do you create an SSH tunnel from your workstation to a Cedar GPU node for ParaView client-server connection?",
-    "answer": "Open a terminal on your Mac/Linux workstation and use the command: `ssh <username>@cedar.computecanada.ca -L 11111:cdr347:11111`, replacing `cdr347` with the specific compute node."
+    "question": "How do you establish an SSH tunnel for a ParaView client-server connection to Fir or Nibi?",
+    "answer": "In a separate terminal on your Mac/Linux computer, you bind the local port 11111 to the same port on the compute node by executing `ssh <username>@fir.alliancecan.ca -L 11111:fc30107:11111`."
   },
   {
-    "question": "What steps are required to connect the ParaView client on your workstation to a remote server on Cedar/Graham using a GPU node?",
-    "answer": "Start ParaView, go to 'File -> Connect' or click the green 'Connect' button, then 'Add Server'. Configure the server with 'name = cedar', 'server type = Client/Server', 'host = localhost', and 'port = 11111'. Click 'Configure', select 'Manual', and 'Save'. Finally, select the server from the list and click 'Connect'."
+    "question": "What are the steps to connect the ParaView client to a remote server after establishing an SSH tunnel?",
+    "answer": "On your computer, start ParaView, go to 'File -> Connect' (or click the green 'Connect' button), click 'Add Server'. Point ParaView to your local port 11111 with parameters like 'name = fir, server type = Client/Server, host = localhost, port = 11111', click 'Configure', select 'Manual', and click 'Save'. Then, select the server from the list and click 'Connect'."
   },
   {
-    "question": "How can you verify that your ParaView client has successfully connected to the remote server?",
-    "answer": "In the first terminal window where the server was started, the message 'Accepting connection ...' will change to 'Client connected'."
+    "question": "What message indicates a successful ParaView client connection on the server terminal?",
+    "answer": "In the first terminal window, the message 'Accepting connection ...' will change to 'Client connected'."
+  },
+  {
+    "question": "How do you view data after connecting the ParaView client to the remote server?",
+    "answer": "Open a ParaView file, which will direct you to the remote file system for visualization."
   },
   {
     "question": "What is NVIDIA IndeX?",
     "answer": "NVIDIA IndeX is an interactive 3D volumetric rendering engine that can be installed as a plugin with ParaView."
   },
   {
-    "question": "What are the prerequisites for using NVIDIA IndeX with ParaView?",
-    "answer": "To use NVIDIA IndeX, you need to connect in client-server mode to ParaView 5.10 (provided by `paraview-offscreen-gpu/5.10.0`) running in an interactive GPU task."
+    "question": "How is the NVIDIA IndeX plugin activated in ParaView client-server mode?",
+    "answer": "In your client, go to 'Tools -> Manage Plugins' and activate `pvNVIDIAIndeX` first locally and then remotely."
   },
   {
-    "question": "How do you activate the NVIDIA IndeX plugin in ParaView?",
-    "answer": "In your ParaView client, go to 'Tools -> Manage Plugins' and activate `pvNVIDIAIndeX` first locally, then remotely."
+    "question": "Why might activating the NVIDIA IndeX plugin locally first be important?",
+    "answer": "In several configurations, a bug can cause ParaView to close abnormally if the local plugin is not activated first, though it may not be necessary on all platforms."
   },
   {
-    "question": "Why is it recommended to activate the NVIDIA IndeX plugin locally first?",
-    "answer": "While not always necessary, in many configurations, a bug can cause ParaView to close abnormally if the local plugin is not activated first."
+    "question": "How do you use NVIDIA IndeX for rendering once it's activated?",
+    "answer": "After the plugin is activated, load your dataset, then select NVIDIA IndeX from the 'Representation' dropdown menu."
   },
   {
-    "question": "After activating the NVIDIA IndeX plugin, how do you use it for rendering?",
-    "answer": "Once the plugin is activated, load your dataset and then select NVIDIA IndeX from the 'Representation' dropdown menu."
+    "question": "What is recommended when using NVIDIA IndeX with multiple GPUs?",
+    "answer": "It is recommended to test your scalability in parallel and verify that employing multiple GPUs provides better performance; if not, you should use a single GPU."
   },
   {
-    "question": "What is the recommended approach for using NVIDIA IndeX with multiple GPUs?",
-    "answer": "Although NVIDIA IndeX can be used in parallel on multiple GPUs, the acceleration may be suboptimal. It's recommended to test parallel scalability and verify performance gains before production use; if performance isn't better with multiple GPUs, use a single GPU."
+    "question": "Why are visualizations on Trillium limited to software-based rendering?",
+    "answer": "Trillium does not have a GPU, so rendering must be performed by software."
   },
   {
-    "question": "Why must ParaView renders on Niagara be limited to software-based rendering?",
-    "answer": "Niagara does not have GPUs, so ParaView must use software-based rendering."
+    "question": "How do you ensure ParaView uses software rendering on Trillium?",
+    "answer": "You must explicitly use one of the Mesa indicators, such as `paraview --mesa-swr` or `paraview --mesa-swr-avx2`, to prevent ParaView from using hardware OpenGL acceleration."
   },
   {
-    "question": "What explicit indicator must be used for ParaView on Niagara to avoid hardware OpenGL acceleration?",
-    "answer": "You must explicitly use one of the Mesa indicators, such as `paraview --mesa-swr` or `pvserver --mesa-swr-avx2`."
+    "question": "What command is used to launch an interactive task on Trillium to access its resources?",
+    "answer": "You launch an interactive task by executing `debugjob`."
   },
   {
-    "question": "How do you load the ParaView module and start a ParaView server on a Niagara compute node?",
-    "answer": "First, load the ParaView module with `module load paraview`, then start the server using `pvserver --mesa-swr-ax2`."
+    "question": "How do you start the ParaView server on a Trillium compute node after loading the ParaView module?",
+    "answer": "Load the ParaView module with `module load paraview` and then start the server using `pvserver --mesa-swr-ax2`."
   },
   {
-    "question": "When is the `--mesa-swr-avx2` indicator beneficial for ParaView rendering on Niagara?",
-    "answer": "With the OpenSWR library, rendering can sometimes be faster when using the `--mesa-swr-avx2` indicator."
-  },
-  {
-    "question": "How do you establish an SSH tunnel for ParaView client-server connection to a Niagara node?",
-    "answer": "Open a new terminal on your laptop and execute `ssh YOURusername@niagara.scinet.utoronto.ca -L11111:niaXYZW:11111 -N`, replacing `YOURusername` and `niaXYZW` with your specific details."
-  },
-  {
-    "question": "What is the purpose of the SSH tunnel created for ParaView on Niagara?",
-    "answer": "The SSH tunnel associates port 11111 on your local computer (localhost) with port 11111 on the Niagara compute node (`niaXYZW`), where the ParaView server is waiting for connections."
-  },
-  {
-    "question": "What server configuration parameters should be used in the ParaView client to connect to a Niagara server via an SSH tunnel?",
-    "answer": "Set 'name = niagara', 'server type = Client/Server', 'host = localhost', and 'port = 11111'."
+    "question": "How do you create an SSH tunnel to a Trillium compute node?",
+    "answer": "In a new terminal, without closing `debugjob`, connect via SSH using `ssh YOURusername@trillium.alliancecan.ca -L11111:niaXYZW:11111 -N`."
   }
 ]

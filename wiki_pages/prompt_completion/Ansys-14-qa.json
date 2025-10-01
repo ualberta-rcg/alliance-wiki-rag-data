@@ -1,0 +1,38 @@
+[
+  {
+    "question": "What modules are required to run an Ansys CFX multinode job on a cluster?",
+    "answer": "You need to load `StdEnv/2023` and `ansys/2023R2` or newer module versions."
+  },
+  {
+    "question": "How do you run a multinode Ansys CFX job on the Narval cluster?",
+    "answer": "On Narval, use `cfx5solve -def YOURFILE.def -start-method \"Open MPI Distributed Parallel\" -par-dist $NNODES` after loading the necessary modules and setting `NNODES`."
+  },
+  {
+    "question": "How do you run a multinode Ansys CFX job on clusters other than Narval?",
+    "answer": "For clusters other than Narval, use `cfx5solve -def YOURFILE.def -start-method \"Intel MPI Distributed Parallel\" -par-dist $NNODES` after loading the necessary modules and setting environment variables `export I_MPI_HYDRA_BOOTSTRAP=ssh` and `unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS`."
+  },
+  {
+    "question": "What is the procedure to initialize an Ansys Workbench project file before submitting it as a batch job on a cluster?",
+    "answer": "First, connect to the cluster via TigerVNC. Navigate to the project directory, then start Workbench using the same Ansys module as the project. Open the project (`File -> Open`), right-click on 'Setup' in the main window and select 'Clear All Generated Data'. Exit Workbench (`File -> Exit`) and when prompted to save changes, click 'No'. Finally, quit Workbench and submit your job using a Slurm script."
+  },
+  {
+    "question": "How can I prevent Ansys Workbench from overwriting the solution when a job completes, especially for scaling tests?",
+    "answer": "To prevent overwriting the solution, either remove `;Save(Overwrite=True)` from the last line of your Workbench Slurm script, or keep a copy of the original `YOURPROJECT.wbpj` file and `YOURPROJECT_files` subdirectory and restore them after the solution is written."
+  },
+  {
+    "question": "What are the common SBATCH directives used in a single-node Ansys Workbench Slurm script with StdEnv/2023?",
+    "answer": "Common directives include `--account=def-account`, `--time=00-03:00`, `--mem=16G`, `--ntasks=4`, and `--nodes=1`. Multi-node is not supported for Workbench scripts."
+  },
+  {
+    "question": "How is the parallelism type (SMP/DMP) configured in an Ansys Workbench Slurm script?",
+    "answer": "For a single-node job, `MEMPAR` is set to `0` for Shared Memory Parallel (SMP). If it were a multi-node job (though not supported for Workbench Slurm scripts), it would be set to `1` for Distributed Memory Parallel (DMP)."
+  },
+  {
+    "question": "Which environment variables are typically exported in an Ansys Workbench Slurm script for single-node execution?",
+    "answer": "The environment variables `KMP_AFFINITY=disabled` and `I_MPI_HYDRA_BOOTSTRAP=ssh` are typically exported."
+  },
+  {
+    "question": "What command is used to update an Ansys Workbench project in batch mode?",
+    "answer": "The command `runwb2 -B -E \"Update()\" -F YOURPROJECT.wbpj` is used to update a Workbench project in batch mode."
+  }
+]

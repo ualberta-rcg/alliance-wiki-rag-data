@@ -1,0 +1,26 @@
+[
+  {
+    "question": "How do you submit the AlphaFold3 data pipeline and model inference as independent jobs?",
+    "answer": "First, submit the data stage job using `sbatch alphafold3-data.sh`. After it completes, submit the inference stage job using `sbatch alphafold3-inference.sh`."
+  },
+  {
+    "question": "How can AlphaFold3 data pipeline and model inference jobs be submitted as dependent jobs?",
+    "answer": "You can submit the data stage job and capture its ID (e.g., `jid1=$(sbatch alphafold3-data.sh)`), and then submit the inference stage job with a dependency on the first job using `jid2=$(sbatch --dependency=afterok:$jid1 alphafold3-inference.sh)`."
+  },
+  {
+    "question": "What action should be taken if the first stage of a dependent AlphaFold3 job fails?",
+    "answer": "If the first stage fails, you must manually cancel the second stage using the command `scancel -u $USER -n alphafold3-inference`."
+  },
+  {
+    "question": "When should unified memory be enabled for AlphaFold3 to troubleshoot GPU memory issues?",
+    "answer": "Unified memory should be enabled if you encounter 'Out of memory (GPU)' errors, especially when running AlphaFold3 on inputs larger than 5,120 tokens or on GPUs with less memory, like an A100 with 40 GB."
+  },
+  {
+    "question": "Which environment variables are used to enable unified memory for AlphaFold3 inference?",
+    "answer": "To enable unified memory, add these environment variables to your inference stage submission script: `export XLA_PYTHON_CLIENT_PREALLOCATE=false`, `export TF_FORCE_UNIFIED_MEMORY=true`, and `export XLA_CLIENT_MEM_FRACTION=2.0` (adjusting the fraction as needed)."
+  },
+  {
+    "question": "How should job memory be adjusted in SLURM when enabling unified memory for AlphaFold3?",
+    "answer": "The amount of memory allocated to your job should be adjusted accordingly, for instance, by setting `#SBATCH --mem=80G` if `XLA_CLIENT_MEM_FRACTION=2.0` is used with a 40GB GPU."
+  }
+]

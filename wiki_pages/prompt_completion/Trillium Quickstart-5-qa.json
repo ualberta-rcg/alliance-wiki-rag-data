@@ -1,0 +1,114 @@
+[
+  {
+    "question": "What is the purpose of the `--account` option in a SLURM job script on Trillium?",
+    "answer": "The `--account` option specifies the SLURM account to use for a job, though for many users on Trillium, this is automatically handled."
+  },
+  {
+    "question": "How are memory requests handled for jobs on Trillium?",
+    "answer": "Memory requests (e.g., using `--mem`) are ignored on Trillium. CPU jobs automatically receive N \u00d7 768GB of RAM, and GPU jobs get 755GiB for a full node or 188GiB for a single-GPU request."
+  },
+  {
+    "question": "Where should SLURM options like `--nodes` or `--time` be placed in a job script?",
+    "answer": "These options should be placed in separate comment lines at the top of the job script, prefixed with `#SBATCH`, and come after `#!/bin/bash`."
+  },
+  {
+    "question": "What are the two main partitions available for CPU jobs on Trillium?",
+    "answer": "The two main partitions for CPU jobs on Trillium are `compute` and `debug`."
+  },
+  {
+    "question": "What is the default partition for CPU jobs if none is specified?",
+    "answer": "If no partition is specified, CPU jobs will run in the `compute` partition."
+  },
+  {
+    "question": "What is the maximum number of nodes a CPU job can request in the `compute` partition without a special allocation?",
+    "answer": "Without a special allocation, a CPU job in the `compute` partition can request a maximum of 10 nodes (1920 cores)."
+  },
+  {
+    "question": "What is the minimum walltime for a CPU job in the `compute` partition?",
+    "answer": "The minimum walltime for a CPU job in the `compute` partition is 15 minutes."
+  },
+  {
+    "question": "What are the limits for running jobs in the `debug` partition on the CPU subcluster?",
+    "answer": "In the `debug` partition on the CPU subcluster, a user can have 1 running job and 1 submitted job (including running)."
+  },
+  {
+    "question": "How many CPU cores are in one node on the CPU subcluster?",
+    "answer": "One node on the CPU subcluster has 192 cores."
+  },
+  {
+    "question": "What factors influence the waiting time for a job in the queue?",
+    "answer": "Job waiting time depends on factors such as the group's allocation amount, how much allocation has been used in the recent past, the number of requested nodes and walltime, and how many other jobs are waiting in the queue."
+  },
+  {
+    "question": "How do you submit an MPI job script named `mpi_job.sh` on Trillium?",
+    "answer": "An MPI job script named `mpi_job.sh` can be submitted from a CPU login node while in your `$SCRATCH` directory using the command `sbatch mpi_job.sh`."
+  },
+  {
+    "question": "What SLURM options are used in the example MPI job script?",
+    "answer": "The example MPI job script uses `--nodes=2`, `--ntasks-per-node=192`, `--time=01:00:00`, `--job-name=mpi_job`, `--output=mpi_output_%j.txt`, and `--mail-type=FAIL`."
+  },
+  {
+    "question": "What is the purpose of `source /scinet/vast/etc/vastpreload-openmpi.bash` in an MPI job script?",
+    "answer": "This command preloads a library that tunes MPI-IO for the VAST file system, specifically for OpenMPI."
+  },
+  {
+    "question": "How does `mpirun` know how many processes to run in an MPI job submitted via SLURM?",
+    "answer": "SLURM informs `mpirun` (or `srun`) how many processes to run based on the job script's resource requests."
+  },
+  {
+    "question": "How would you set the `OMP_NUM_THREADS` environment variable in an OpenMP job script on Trillium to match the allocated CPUs?",
+    "answer": "You would set `OMP_NUM_THREADS` using `export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "What SLURM options are configured for a single-node OpenMP job example?",
+    "answer": "For a single-node OpenMP job, the example uses `--nodes=1`, `--ntasks=1`, `--cpus-per-task=192`, `--time=01:00:00`, `--job-name=openmp_job`, `--output=openmp_output_%j.txt`, and `--mail-type=FAIL`."
+  },
+  {
+    "question": "How many nodes and CPU cores are requested in the example hybrid MPI/OpenMP job script?",
+    "answer": "The example hybrid MPI/OpenMP job script requests 2 nodes, with 48 tasks per node and 4 CPUs per task, resulting in a total of 384 CPU cores."
+  },
+  {
+    "question": "What environment variables are set to manage OpenMP threads and process binding in the hybrid job example?",
+    "answer": "The environment variables `OMP_NUM_THREADS`, `OMP_PLACES`, and `OMP_PROC_BIND` are set. Specifically: `export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK`, `export OMP_PLACES=cores`, and `export OMP_PROC_BIND=true`."
+  },
+  {
+    "question": "What `mpirun` options are used in the hybrid MPI/OpenMP job example to ensure proper process and thread distribution?",
+    "answer": "The `mpirun` options `--bind-to core --map-by ppr:$RANKS_PER_L3CACHE:l3cache:pe=$OMP_NUM_THREADS` are used to spread processes and threads evenly over the cores."
+  },
+  {
+    "question": "When should `l3cache`, `numa`, or `socket` be used for `mpirun --map-by` options in a hybrid job?",
+    "answer": "`l3cache` is used for up to 8 threads per process, `numa` for more than 8 and at most 24 threads per process, and `socket` for more than 24 threads per process."
+  },
+  {
+    "question": "What are the allowed GPU request options for jobs on Trillium's GPU subcluster?",
+    "answer": "On Trillium's GPU subcluster, you are only allowed to request exactly 1 GPU or a multiple of 4 GPUs using the `--gpus-per-node` option."
+  },
+  {
+    "question": "Does Trillium support NVIDIA's MIG technology for GPU allocation?",
+    "answer": "No, Trillium does not support NVIDIA's MIG technology to allocate a subdivision of a GPU."
+  },
+  {
+    "question": "Can multiple processes share a single GPU on Trillium?",
+    "answer": "Yes, you can use NVIDIA's Multi-Process Service (MPS) within your jobs to share a GPU among processes running on the same job."
+  },
+  {
+    "question": "How would you request a single GPU for a job on the GPU subcluster?",
+    "answer": "You would request a single GPU using the SLURM option `--gpus-per-node=1`."
+  },
+  {
+    "question": "How would you request a whole GPU node for a job on the GPU subcluster?",
+    "answer": "You would request a whole GPU node using the SLURM option `--gpus-per-node=4`."
+  },
+  {
+    "question": "What is the minimum size of a GPU job in the `compute` partition?",
+    "answer": "The minimum size of a GPU job in the `compute` partition is 1/4 node, which corresponds to 24 cores and 1 GPU."
+  },
+  {
+    "question": "What is the maximum walltime for a single-GPU job in the `debug` partition on the GPU subcluster?",
+    "answer": "The maximum walltime for a single-GPU job in the `debug` partition on the GPU subcluster is 2 hours."
+  },
+  {
+    "question": "What is the default maximum number of GPUs a job can request in the `compute` partition on the GPU subcluster without a special allocation?",
+    "answer": "Without a special allocation, the default maximum is 20 GPUs (5 nodes) in the `compute` partition on the GPU subcluster."
+  }
+]

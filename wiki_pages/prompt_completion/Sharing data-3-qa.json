@@ -1,50 +1,54 @@
 [
   {
-    "question": "What does the `X` attribute in `rwX` signify when setting ACL permissions?",
-    "answer": "The `X` attribute in `rwX` sets the execute permission only if the item is already executable (e.g., a directory or an executable file). For directories, execute permission is necessary to allow browsing."
+    "question": "What does a umask value of 007 mean for file permissions?",
+    "answer": "A umask value of 007 means files are readable, writable, and executable by the owner and the group, but not by others."
   },
   {
-    "question": "What is the difference between `setfacl -d` and `setfacl -R` commands when sharing a subdirectory using ACLs?",
-    "answer": "The `setfacl -d` command sets default access rules for the directory, meaning any new file or directory created within it will inherit the specified ACL rule, and is required for new data. The `setfacl -R` command sets ACL rules recursively for the directory and all its existing content, and is applicable only to existing data."
+    "question": "What does a umask value of 022 imply for file permissions?",
+    "answer": "A umask value of 022 means files are readable and executable by everyone, but writable only by the owner."
   },
   {
-    "question": "What are the essential requirements for the `setfacl` method to successfully share a subdirectory?",
-    "answer": "For the `setfacl` method to work, the directory you intend to share must be owned by you. Additionally, all parent directories in the path must grant execute permission to the user you are sharing with. When sharing a project directory, you must use a path starting with `/project`, not `/home/<user>/projects`."
+    "question": "If the umask is 002, what are the resulting default file permissions?",
+    "answer": "With a umask of 002, files are readable, writable, and executable by the owner and the group, and readable and executable by everyone else, but writable only by the owner and the group."
   },
   {
-    "question": "Why should a `/project` path be used instead of a `/home/<user>/projects` path when sharing a directory in the project filesystem?",
-    "answer": "Collaborators should be given a path starting with `/project` because `/home/<user>/projects` contains symbolic links to the physical directories in `/project`. These symlinks will not be accessible by collaborators unless they also have access to your home directory."
+    "question": "What factors, besides umask, determine if a user can access a file?",
+    "answer": "A user trying to access a file must have execute permission on all directories in the path to the file, must be a member of the file's group for group permissions, and Access Control Lists (ACLs) can also determine access. Permissions can also be explicitly changed using `chmod` after creation."
   },
   {
-    "question": "How can you determine the physical path that a symbolic link (symlink) points to?",
-    "answer": "You can determine the physical path a symlink points to using the `realpath` command. For example, `realpath /home/smithj/projects/def-smithj/shared_data` could return `/project/9041430/shared_data`."
+    "question": "How can you change the permissions of existing files to match new default permissions?",
+    "answer": "To change permissions of existing files, use `chmod g-w,o-rx <file>`. For an entire directory, use `chmod -R g-w,o-rx <directory>`."
   },
   {
-    "question": "What command is used to recursively remove all extended ACL attributes from a directory?",
-    "answer": "To remove all extended ACL attributes from a directory recursively, use the command: `setfacl -bR /home/<user>/projects/def-<PI>/shared_data`."
+    "question": "What are Access Control Lists (ACLs) used for?",
+    "answer": "ACLs allow for finer-grained permissions than traditional Unix permissions, enabling permissions to be set on a user-by-user basis rather than just for the owner, group, and everyone else."
   },
   {
-    "question": "What is a data sharing group and when is it typically useful?",
-    "answer": "A data sharing group is a special group designed for more complex data sharing scenarios, particularly those involving multiple people on multiple clusters. It allows all individuals with whom certain data is to be shared to be added to one group, which is then given access permissions via ACLs."
+    "question": "Which commands are used to view and modify Access Control Lists?",
+    "answer": "The `getfacl` command is used to see ACL permissions, and `setfacl` is used to alter them."
   },
   {
-    "question": "When is it necessary to create a data sharing group?",
-    "answer": "A data sharing group is typically only necessary in specialized sharing circumstances, such as when dealing with multiple people across multiple clusters, rather than for simple individual sharing."
+    "question": "How do you grant read and execute permission on a single file for a specific user, like 'smithj' on 'my_script.py', using ACLs?",
+    "answer": "You can use the command: `setfacl -m u:smithj:rx my_script.py`."
   },
   {
-    "question": "What are the steps to create a data sharing group named `wg-datasharing`?",
-    "answer": "1. Send an email to technical support requesting the creation of the data sharing group, indicating the desired name (`wg-datasharing`) and that you should be the owner. 2. After confirmation from technical support, go to [https://ccdb.computecanada.ca/services/ ccdb.computecanada.ca/services/] and access the group. 3. Click on the group's name to enter its management screen. 4. Add members to the group."
+    "question": "How do you share a subdirectory, including future new files, with read and write access for a specific user using ACLs?",
+    "answer": "To share a subdirectory for new files, use `setfacl -d -m u:smithj:rwX /home/<user>/projects/def-<PI>/shared_data`. To apply to existing content, use `setfacl -R -m u:smithj:rwX /home/<user>/projects/def-<PI>/shared_data`."
   },
   {
-    "question": "How do you add a member to an existing data sharing group?",
-    "answer": "After the data sharing group has been created and you have access to manage it, you can add members by navigating to the group management screen on [https://ccdb.computecanada.ca/services/ ccdb.computecanada.ca/services/]."
+    "question": "What is the meaning of the 'X' attribute when setting ACL permissions for directories?",
+    "answer": "The 'X' attribute (uppercase X) sets the execute permission only if the item is already executable (either a directory or a file with existing execute permission). It is essential for directories to allow browsing."
   },
   {
-    "question": "What permissions are required on parent directories when utilizing a data sharing group for sharing data?",
-    "answer": "When using a data sharing group, the parent directories of the data you are sharing must have execute permissions either for everyone (e.g., `chmod o+X /project/def-<PI>/`) or specifically for the data sharing group (e.g., `setfacl -m g:wg_datasharing:X /project/def-<PI>/`). This usually requires consent from the PI for project directories."
+    "question": "What are the requirements for successfully sharing a subdirectory using ACLs?",
+    "answer": "For ACL subdirectory sharing to work, the directory must be owned by you, parent directories must grant execute permission to the shared user (e.g., with `setfacl -m u:smithj:X` or `chmod o+x`), and when sharing in the project filesystem, the path provided to collaborators must start with `/project` (the physical path), not `/home/<user>/projects`."
   },
   {
-    "question": "How do you apply ACL permissions to a directory and its contents for a data sharing group?",
-    "answer": "You apply two commands: `setfacl -d -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data` to set default access rules for newly created data, and `setfacl -R -m g:wg-datasharing:rwx /home/<user>/projects/def-<PI>/shared_data` to apply ACL rules to the directory and its existing contents."
+    "question": "Why should you use the `/project` path instead of `/home/<user>/projects` when sharing a project directory with collaborators?",
+    "answer": "The `/home/<user>/projects` path contains symbolic links to physical directories in `/project`. These symlinks are not reachable by collaborators unless they also have access to your home directory. Using the physical `/project` path ensures collaborators can access the data directly."
+  },
+  {
+    "question": "How can you find the physical path that a symbolic link points to?",
+    "answer": "You can use the `realpath` command to find the physical path a symlink points to. For example, `realpath /home/smithj/projects/def-smithj/shared_data`."
   }
 ]

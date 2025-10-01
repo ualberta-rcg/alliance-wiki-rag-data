@@ -1,0 +1,226 @@
+[
+  {
+    "question": "What is considered a normal termination of a Gaussian job?",
+    "answer": "A Gaussian job normally terminates with lines indicating 'Job cpu time', 'Elapsed time', and 'Normal termination of Gaussian' followed by a timestamp."
+  },
+  {
+    "question": "What are common reasons for a Gaussian job to terminate abnormally without an explicit error message?",
+    "answer": "Abnormal termination without an explicit error message usually means that the disk quota was exceeded, the job exceeded the time requested from the scheduler, the job exceeded the memory requested, or the job produced too much data for the local disk on the compute node."
+  },
+  {
+    "question": "What does an 'Erroneous write' error look like in Gaussian output?",
+    "answer": "An 'Erroneous write' error appears near the end of the output, displaying messages such as 'Erroneous write. write 122880 instead of 4239360.', 'Erroneous write. write -1 instead of 3648000. writwa: No space left on device', or 'Erroneous write during file extend. write -1 instead of 8192 Probably out of disk space.'"
+  },
+  {
+    "question": "What is the cause of an 'Erroneous write' error in Gaussian?",
+    "answer": "This error typically occurs when the job has run out of disk space, which could be due to exceeding your quota, a physically full disk, or (rarely) a network drive being unavailable because of a communication timeout."
+  },
+  {
+    "question": "How can an 'Erroneous write' error be fixed?",
+    "answer": "To fix an 'Erroneous write' error, you should check your disk quota with `quota` and delete unnecessary files. If the job is too large for the current hardware, try using a smaller basis set."
+  },
+  {
+    "question": "What indicates a 'Link 9999' error in Gaussian output?",
+    "answer": "A 'Link 9999' error is indicated by lines such as 'Error termination request processed by link 9999.' and 'Error termination via Lnk1e in /disc30/g98/l9999.exe.' at the end of the output, often preceded by optimization details showing non-convergence (e.g., 'Optimization stopped. -- Number of steps exceeded')."
+  },
+  {
+    "question": "What is the usual explanation for a 'Link 9999' error?",
+    "answer": "This error means the Gaussian job terminated abnormally for some reason internal to Gaussian, most commonly because a geometry optimization has not converged."
+  },
+  {
+    "question": "How can a 'Link 9999' error related to geometry optimization non-convergence be resolved?",
+    "answer": "To fix a 'Link 9999' error from non-converged geometry optimization, you can provide a better initial starting structure, restart the optimization from the last step using `geom=allcheck` (and optionally `opt=CalcFC`), use a better starting force constants matrix (Hessian) with `Opt=ReadFC`, `Opt=CalcFC`, or `Opt=CalcAll`, reformulate the z-matrix or use default redundant internal coordinates if the coordinate system is at fault, or change the optimization method to `opt=ef` or `opt=gdiis`."
+  },
+  {
+    "question": "What does the error message 'angle Alpha is outside the valid range of 0 to 180' signify in Gaussian?",
+    "answer": "This error indicates that an angle in the z-matrix, such as 'angle Alpha', changed to become outside its allowed range of 0 to 180 degrees, leading to termination via Lnk1e in /disc30/g98/l716.exe."
+  },
+  {
+    "question": "How can the 'angle Alpha is outside the valid range of 0 to 180' error be fixed?",
+    "answer": "This error can be fixed by redefining the z-matrix or using a different coordinate system, especially if large geometry changes in the molecule caused the issue."
+  },
+  {
+    "question": "What does 'End of file reading basis center' error mean in Gaussian?",
+    "answer": "This error, usually followed by 'Error termination via Lnk1e in /disc30/g98/l301.exe.', means there was an input error where you attempted to read a general basis set but forgot to include the basis set definition in the input file."
+  },
+  {
+    "question": "How do you resolve an 'End of file reading basis center' error?",
+    "answer": "To resolve this error, you should either add the missing basis set to the input or remove the `gen` keyword from the route line and specify an internal basis set."
+  },
+  {
+    "question": "What does an 'Operation on file out of range' error indicate in Gaussian?",
+    "answer": "This error, often accompanied by 'Error termination in NtrErr: NtrErr Called from FileIO.', typically signifies that Gaussian tried to retrieve information from the checkpoint file (e.g., with `Opt=ReadFC` or `guess=read`) that was not present, possibly due to the information not being calculated or not written because of disk space or time limits in a previous job."
+  },
+  {
+    "question": "How is the 'Operation on file out of range' error corrected?",
+    "answer": "To correct this error, you need to either re-calculate the required information in a previous step or manually type in the necessary information."
+  },
+  {
+    "question": "What is the meaning of the 'End of file in GetChg' error in Gaussian?",
+    "answer": "This input error occurs when the charge/multiplicity line is required but omitted from the input, or when you intended to read it from a checkpoint file but forgot to include `geom=allcheck` in the route section."
+  },
+  {
+    "question": "How can 'End of file in GetChg' error be fixed?",
+    "answer": "To fix this error, you should either add the charge/multiplicity line to the input or include `geom=allcheck` in the route section if you intended to read it from the checkpoint file."
+  },
+  {
+    "question": "What causes the 'Change in point group or standard orientation' error during a Gaussian optimization?",
+    "answer": "This error occurs during optimization when either the molecule's standard orientation or its point group changes. This can manifest as a sudden 180-degree flip in structure when visualized."
+  },
+  {
+    "question": "What are the solutions for a 'Change in point group or standard orientation' error?",
+    "answer": "Fixes include ensuring the z-matrix is correctly specified, desymmetrizing the starting structure if it had too high symmetry, reformulating the z-matrix with more symmetry if the detected point group is incorrect, or turning symmetry completely off if not concerned with it."
+  },
+  {
+    "question": "What does the 'Unrecognized atomic symbol' error mean in Gaussian?",
+    "answer": "This error, often with 'Error termination via Lnk1e in /disc30/g98/l301.exe.', is an input error where an atom specified in a general basis set does not match any standard atomic symbol. It can also occur in a link job if `geom=modify` is used after a step that wipes the z-matrix."
+  },
+  {
+    "question": "How can an 'Unrecognized atomic symbol' error be fixed?",
+    "answer": "To fix this, you must type in the correct atomic symbol."
+  },
+  {
+    "question": "What does 'Convergence failure -- run terminated' indicate in Gaussian?",
+    "answer": "This error means that the Self-Consistent Field (SCF) procedure has failed to converge, as indicated by messages like '>>>>>>>>>> Convergence criterion not met.' after a certain number of cycles."
+  },
+  {
+    "question": "How can a 'Convergence failure -- run terminated' error be resolved?",
+    "answer": "Solutions include using a better initial guess for molecular orbitals (e.g., `guess=read` from a lower-level SCF), employing an alternate SCF converger like `SCF=QC` or `SCF=XQC`, fixing a poor initial geometry, or resubmitting the job with an earlier geometry and a newly evaluated Hessian if the optimizer took a bad step."
+  },
+  {
+    "question": "What is the cause of 'FOPT requested but NVar= XX while NDOF= YY' error?",
+    "answer": "This error occurs when a full optimization (`FOpt`) is requested, but the internal check finds an inconsistency in the number of variables (`NVar`) versus the degrees of freedom (`NDOF`). If `NDOF` is less than `NVar`, it implies lower symmetry is being used than actual; if `NVar` is less than `NDOF`, the z-matrix likely has too many constraints."
+  },
+  {
+    "question": "How is the 'FOPT requested but NVar= XX while NDOF= YY' error addressed?",
+    "answer": "If `NDOF` is less than `NVar`, consider running with higher symmetry. If `NVar` is less than `NDOF`, adjust your z-matrix constraints. While `Opt` can bypass the check, it is not recommended."
+  },
+  {
+    "question": "What does the 'Unable to project read-in occupied orbitals' error signify?",
+    "answer": "This error means that the projection of the molecular-orbital guess from an old basis set to a new one failed. This often happens when certain pseudopotential basis sets, like CEP-121G*, are used with polarization functions that don't actually exist or have zero exponents."
+  },
+  {
+    "question": "How can 'Unable to project read-in occupied orbitals' error be fixed?",
+    "answer": "To fix this, use CEP-121G instead of CEP-121G* for the elements in question, as they are the same for many elements. Alternatively, a workaround is to not use the molecular orbital guess."
+  },
+  {
+    "question": "What does 'KLT.ge.NIJTC in GetRSB' error indicate?",
+    "answer": "This error means an MP2 calculation has failed, and it may be related to issues with pseudopotentials, similar to the 'Unable to project read-in occupied orbitals' error."
+  },
+  {
+    "question": "How can the 'KLT.ge.NIJTC in GetRSB' error be resolved?",
+    "answer": "This error can be resolved by using CEP-121G instead of CEP-121G* for the elements involved, as they are often identical for many elements."
+  },
+  {
+    "question": "What is the cause of the 'Symbol XXX not found in Z-matrix' error?",
+    "answer": "This is an input error where a variable name (e.g., 'H3NNN') typed in the input file is not present or defined in the z-matrix section."
+  },
+  {
+    "question": "How is the 'Symbol XXX not found in Z-matrix' error fixed?",
+    "answer": "To fix this, you should either type the correct symbol or add the missing variable to the z-matrix section as appropriate."
+  },
+  {
+    "question": "What does 'Variable X has invalid number of steps' error mean?",
+    "answer": "This input error occurs when attempting a rigid potential energy scan, most likely because there are two blank lines instead of the required single blank line between the z-matrix and the variables section."
+  },
+  {
+    "question": "How can 'Variable X has invalid number of steps' error be corrected?",
+    "answer": "To correct this error, delete the extra blank line between the z-matrix and the variables section."
+  },
+  {
+    "question": "What causes the 'Problem with the distance matrix' error in Gaussian?",
+    "answer": "This error typically indicates an input problem where at least two atoms are defined too close together. Rarely, it can be a program error if one of the distances is NaN, such as when optimizing diatomics starting with an excessively large distance."
+  },
+  {
+    "question": "How can 'Problem with the distance matrix' error be fixed?",
+    "answer": "You need to check the variables and z-matrix to ensure no atoms are too close, particularly looking for missing minus signs in torsion angles that might cause atoms to become coincident."
+  },
+  {
+    "question": "What does 'End of file in ZSymb' error indicate in Gaussian?",
+    "answer": "This input error occurs because Gaussian cannot find the z-matrix. Common causes are omitting the blank line at the end of the geometry specification or forgetting to type `geom=check` when intending to retrieve the z-matrix and parameters from a checkpoint file."
+  },
+  {
+    "question": "How do you fix 'End of file in ZSymb' error?",
+    "answer": "To fix this, either add a blank line at the end of the geometry specification or add `geom=check` to the route section."
+  },
+  {
+    "question": "What does 'Linear search skipped for unknown reason' error mean?",
+    "answer": "This error signifies that the rational function optimization was unsuccessful during a linear search, most likely because the Hessian matrix is no longer valid."
+  },
+  {
+    "question": "How can 'Linear search skipped for unknown reason' error be resolved?",
+    "answer": "To resolve this error, restart the optimization using the `Opt=CalcFC` keyword."
+  },
+  {
+    "question": "What is the cause of 'Variable index of 3000 on card XXX is out of range, NVar=XX' error?",
+    "answer": "This is an input error indicating that a variable in your Z-matrix, such as one defining atom #15 in the example, was forgotten or not added to your variable list."
+  },
+  {
+    "question": "How do you fix 'Variable index of 3000 on card XXX is out of range, NVar=XX' error?",
+    "answer": "To fix this error, you need to add the missing variable to your input."
+  },
+  {
+    "question": "What does 'Unknown center X' error mean in Gaussian?",
+    "answer": "This input error means you are trying to define an atom in a Z-matrix using another atom name (e.g., 'X') that does not exist or is not recognized."
+  },
+  {
+    "question": "How can 'Unknown center X' error be corrected?",
+    "answer": "To correct this error, you must fix the atom name to a recognized symbol."
+  },
+  {
+    "question": "What does 'Determination of dummy atom variables in z-matrix conversion failed' error imply?",
+    "answer": "This error indicates that the conversion from redundant internal coordinates to Z-matrix coordinates failed due to dummy atoms. This typically happens even if the geometry optimization converged, but Gaussian couldn't convert back to the input z-matrix format."
+  },
+  {
+    "question": "How is 'Determination of dummy atom variables in z-matrix conversion failed' error addressed?",
+    "answer": "If this error occurs, you will have to make do with Cartesian coordinates since Gaussian failed to convert back to the input z-matrix, even if the optimization itself converged."
+  },
+  {
+    "question": "What does 'malloc failed' error mean in Gaussian output?",
+    "answer": "This error, though not strictly a Gaussian error, means the computer has run out of memory, possibly because too much memory was requested in the `%mem` line of the Gaussian input."
+  },
+  {
+    "question": "How can a 'malloc failed' error be resolved?",
+    "answer": "To resolve this, reduce the amount specified with `%mem` in the Gaussian input or increase the memory requested in the job script with `--mem=`, ensuring that `--mem=` is at least 1GB greater than the value in `%mem`."
+  },
+  {
+    "question": "What causes the 'Charge and multiplicity card seems defective' error?",
+    "answer": "This input error occurs when the title line is forgotten when using `geom=modify`. Gaussian then misinterprets the charge/multiplicity line as the title, and subsequently tries to interpret the variable list as the charge/multiplicity line."
+  },
+  {
+    "question": "How do you fix 'Charge and multiplicity card seems defective' error?",
+    "answer": "To fix this error, ensure you include a title line in your input when using `geom=modify`."
+  },
+  {
+    "question": "What does 'Attempt to redefine unrecognized symbol \"XXXXX\"' error indicate?",
+    "answer": "This is an input error that occurs when you are attempting a `geom=modify` operation, but the variable you are trying to replace a value for (e.g., 'O2WXC') is not present in the specified checkpoint file."
+  },
+  {
+    "question": "How can 'Attempt to redefine unrecognized symbol \"XXXXX\"' error be fixed?",
+    "answer": "To fix this error, you must either specify the correct checkpoint file that contains the variable or provide the correct variable name that exists in the checkpoint file."
+  },
+  {
+    "question": "What causes 'Inconsistency #2 in MakNEB' error?",
+    "answer": "This input error occurs when there has been a change in the molecule's point group, and specific `iop` settings (e.g., `iop(2/15=4,2/16=2,2/17=7)`) were used to try and prevent a program crash."
+  },
+  {
+    "question": "How is 'Inconsistency #2 in MakNEB' error fixed?",
+    "answer": "To fix this error, you should be very careful with `iop` settings or consider removing them altogether."
+  },
+  {
+    "question": "What does 'galloc: could not allocate memory' error mean?",
+    "answer": "This is a memory allocation error, specifically indicating a lack of available memory. Gaussian typically uses about 1GB more memory than explicitly requested by the `%mem` directive."
+  },
+  {
+    "question": "How do you fix 'galloc: could not allocate memory' error?",
+    "answer": "To fix this, the value for `%mem` in the Gaussian input file should be at least 1GB less than the value specified for `--mem` in the job submission script. Conversely, `--mem` should be at least 1GB greater than `%mem`."
+  },
+  {
+    "question": "What causes the 'No such file or directory' error in a Gaussian job?",
+    "answer": "This error occurs because a file named in the output (e.g., `/home/johndoe/scratch/Gau-12345.inp`) does not exist, likely because its containing directory does not exist. This often happens if `GAUSS_SCRDIR` is set to a non-existent directory."
+  },
+  {
+    "question": "How can the 'No such file or directory' error be resolved?",
+    "answer": "To resolve this error, you should either create the missing directory using `mkdir` or change the definition of `GAUSS_SCRDIR` to an existing directory."
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "question": "What are the three general migration scenarios discussed in the document?",
+    "answer": "The three general migration scenarios to consider are Manual or orchestrated migration, Migrating volume-backed instances, and Migrating ephemeral instances."
+  },
+  {
+    "question": "What is the general approach for a manual or orchestrated migration?",
+    "answer": "The general approach involves copying any customized Glance images from West Cloud to Arbutus Cloud, installing and configuring services on the new instances, copying data from old instances to new ones, assigning floating IP addresses and updating DNS, and finally decommissioning old instances and deleting old volumes."
+  },
+  {
+    "question": "Which configuration management tools can be used for orchestrated migrations?",
+    "answer": "Orchestrated migrations can be done using configuration management tools such as Ansible, Terraform, or Heat."
+  },
+  {
+    "question": "What is a volume-backed instance?",
+    "answer": "A volume-backed instance has a persistent volume attached to it, which contains the operating system and any required data."
+  },
+  {
+    "question": "What is the best practice for organizing volumes in volume-backed instances?",
+    "answer": "Best practice is to use separate volumes for the operating system and for data."
+  },
+  {
+    "question": "What is the recommended maximum size for volumes when using Glance images for migration?",
+    "answer": "This method is recommended for volumes less than 150GB in size."
+  },
+  {
+    "question": "What is the initial step for migrating volume-backed instances using Glance images?",
+    "answer": "The initial step is to open two SSH sessions to the migration host 'cloudmigration.computecanada.ca' with your account credentials."
+  },
+  {
+    "question": "How do you create an image of a volume using the West Cloud web UI?",
+    "answer": "In the West Cloud web UI, navigate to Compute -> Volumes, select the desired volume, and choose 'Upload to Image' from the drop-down menu. Ensure QCOW2 is selected as the disk format."
+  },
+  {
+    "question": "What is the CLI command to create an image of a volume in West Cloud?",
+    "answer": "You can use `cinder --os-volume-api-version 2 upload-to-image --disk-format qcow2 <volumename> <imagename> --force`."
+  },
+  {
+    "question": "How do you download an image from West Cloud to the migration host?",
+    "answer": "In the West Cloud session on the migration host, use the command `glance image-download --progress --file <filename> <image-id>`."
+  },
+  {
+    "question": "How do you upload an image to Arbutus Cloud from the migration host?",
+    "answer": "In the Arbutus Cloud session on the migration host, use the command `glance image-create --progress --visibility private --container-format bare --disk-format qcow2 --name <imagename> --file <filename>`."
+  },
+  {
+    "question": "How do you create a volume from an uploaded image in Arbutus Cloud?",
+    "answer": "In the Arbutus Cloud web UI, navigate to Compute -> Images, find the uploaded image, and select the 'Create Volume' option from its drop-down menu."
+  },
+  {
+    "question": "What final actions should be taken after migrating and validating instances/volumes with Glance images?",
+    "answer": "Once instances and volumes are migrated and validated, and all associated DNS records are updated, you should delete your old instances and volumes on the legacy West Cloud."
+  },
+  {
+    "question": "What is the first step for migrating a volume-backed instance using the Linux 'dd' alternative method?",
+    "answer": "Launch an instance on West Cloud with the smallest flavor possible, typically 'p1-1.5gb', to act as a temporary migration host, preferably using CentOS 7 as the OS."
+  },
+  {
+    "question": "How do you install the OpenStack CLI on a CentOS 7 temporary migration host?",
+    "answer": "Log in to the instance via SSH and run the following commands in a root shell: `yum install epel-release`, `yum install python-devel python-pip gcc`, and `pip install python-openstackclient`."
+  },
+  {
+    "question": "How do you verify the OpenStack CLI installation?",
+    "answer": "To verify the installation, try executing `openstack` on the command line."
+  },
+  {
+    "question": "What should be done with the instance to be moved when using the 'dd' method for volume migration?",
+    "answer": "Delete the instance to be moved, but do NOT delete the volume it is attached to."
+  },
+  {
+    "question": "How do you attach a volume to the temporary migration host in West Cloud?",
+    "answer": "Go to Compute -> Volumes in the West Cloud web UI, select 'Manage Attachments' from the volume's drop-down menu, and attach the volume to the temporary migration host."
+  },
+  {
+    "question": "What is the typical device name for an attached volume on a Linux instance?",
+    "answer": "The device is typically `/dev/vdb` or `/dev/vdc`."
+  },
+  {
+    "question": "How do you create an image from an attached disk using the 'dd' utility?",
+    "answer": "Use the command `dd if=/dev/vdb | openstack image create --private --container-format bare --disk-format raw \"volumemigrate\"`, replacing `/dev/vdb` with the actual device name and \"volumemigrate\" with your preferred image name."
+  },
+  {
+    "question": "Where can the image created using the 'dd' utility be found after it's made?",
+    "answer": "The image should be visible under Compute -> Images in the Arbutus Cloud web UI."
+  }
+]

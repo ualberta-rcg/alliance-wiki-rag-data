@@ -1,0 +1,62 @@
+[
+  {
+    "question": "How are GATK versions older than GATK 4 executed?",
+    "answer": "Earlier versions of GATK are executed by calling the `java -jar GenomeAnalysisTK.jar PROGRAM OPTIONS` command, as they do not have the `gatk` command."
+  },
+  {
+    "question": "How do you call GATK <= 3 on 'our systems'?",
+    "answer": "On 'our systems', you should load `nixpkgs/16.09` and `gatk/3.8` modules, then execute `java -jar \"${EBROOTGATK}\"/GenomeAnalysisTK.jar PROGRAM OPTIONS`, using the environmental variable `$EBROOTGATK` which contains the path to the jar file."
+  },
+  {
+    "question": "Where can I find specific usage information for GATK versions older than GATK 4?",
+    "answer": "Specific usage for GATK <= 3 can be found in the [https://github.com/broadinstitute/gatk-docs/tree/master/gatk3-tooldocs GATK3 guide]."
+  },
+  {
+    "question": "Are GATK (>=4) tools multicore by default?",
+    "answer": "Most GATK (>=4) tools are not multicore by default, meaning you should request only one core when calling them."
+  },
+  {
+    "question": "How can I use multiple CPUs with GATK tools that support threading?",
+    "answer": "Some GATK tools, such as `Mutect2` with its `--native-pair-hmm-threads` option, utilize threads for certain computations, allowing you to request more CPUs (typically up to 4 threads) for these specific tasks."
+  },
+  {
+    "question": "Do all GATK tools use Spark?",
+    "answer": "No, not all GATK tools use Spark; tools that can use Spark generally have a note to that effect in their respective Tool Doc."
+  },
+  {
+    "question": "How are Spark-capable versions of GATK tools identified?",
+    "answer": "Some Spark-capable GATK tools have the suffix 'Spark' at the end of their names, while others only exist in a Spark-capable version and do not have the 'Spark' suffix."
+  },
+  {
+    "question": "How should the number of CPUs be specified for GATK Spark commands?",
+    "answer": "When using GATK Spark commands, you should provide the exact number of CPUs to the `spark` command; for example, if you requested 10 CPUs, use `--spark-master local[10]` instead of `--spark-master local[*]`. "
+  },
+  {
+    "question": "What is required to scale a Spark cluster across multiple nodes for GATK commands?",
+    "answer": "To use multiple nodes to scale the Spark cluster, you must first deploy an Apache Spark cluster and then set the appropriate variables in the GATK command."
+  },
+  {
+    "question": "What is recommended if `IllegalArgumentException` errors occur with installed GATK modules on our clusters?",
+    "answer": "If `IllegalArgumentException` errors occur while using the installed GATK modules on our clusters, it is recommended to try another workflow by using the program via Apptainer."
+  },
+  {
+    "question": "Where can I find Docker images for GATK?",
+    "answer": "A Docker image of GATK can be found on [https://hub.docker.com/r/broadinstitute/gatk here], with other versions available on its [https://hub.docker.com/r/broadinstitute/gatk/tags tags page]."
+  },
+  {
+    "question": "How do I build an Apptainer image for the latest version of GATK?",
+    "answer": "To build an Apptainer image for the latest version of GATK, you can run `module load apptainer` followed by `apptainer build gatk.sif docker://broadinstitute/gatk` on the cluster."
+  },
+  {
+    "question": "How do I build an Apptainer image for a specific version of GATK?",
+    "answer": "To build an Apptainer image for a particular GATK version, you can run `module load apptainer` followed by `apptainer build gatk_VERSION.sif docker://broadinstitute/gatk:VERSION`, replacing `VERSION` with the desired version number."
+  },
+  {
+    "question": "How is GATK executed using an Apptainer image within an SBATCH script?",
+    "answer": "In your SBATCH script, you should load the Apptainer module and then use `apptainer exec -B /home -B /project -B /scratch -B /localscratch <path to the image>/gatk.sif gatk [--java-options \"-Xmx4G\"] ToolName [GATK args]`."
+  },
+  {
+    "question": "Where can I find more information about Apptainer?",
+    "answer": "For more information about Apptainer, you can watch the recorded [https://www.youtube.com/watch?v=bpmrfVqBowY Apptainer webinar]."
+  }
+]

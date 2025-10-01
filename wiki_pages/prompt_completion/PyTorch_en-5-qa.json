@@ -1,42 +1,42 @@
 [
   {
-    "question": "How is a PyTorch model typically prepared for distributed data parallelism on a GPU, according to the example?",
-    "answer": "The model is first moved to CUDA (`net.cuda()`) and then wrapped with `torch.nn.parallel.DistributedDataParallel(net, device_ids=[current_device])`. The loss function (`criterion`) also needs to be moved to CUDA."
+    "question": "What is a key requirement for models when using multiple GPUs with Data Parallelism?",
+    "answer": "For multiple-GPU data parallelism, the model must be small enough to fit inside the memory of a single GPU."
   },
   {
-    "question": "Are there any known issues with PyTorch 1.10 when using DistributedDataParallel with multiple GPUs?",
-    "answer": "Yes, there is a known issue with the PyTorch 1.10 wheel (`torch-1.10.0+computecanada`) where multi-GPU code using DistributedDataParallel may fail unpredictably if the backend is set to 'nccl' or 'gloo'."
+    "question": "What are the primary ways to perform Data Parallelism in PyTorch, as mentioned in the document?",
+    "answer": "Data Parallelism in PyTorch can be performed using the `DistributedDataParallel` class directly with one or multiple GPUs, or by utilizing the `PyTorch Lightning` package."
   },
   {
-    "question": "What is the recommended solution for the issues encountered with PyTorch 1.10 and DistributedDataParallel?",
-    "answer": "It is recommended to use the latest PyTorch build instead of version 1.10 on all GP clusters."
+    "question": "Which PyTorch class is recommended by PyTorch maintainers for multi-GPU data parallelism?",
+    "answer": "The `DistributedDataParallel` class is recommended by PyTorch maintainers for using multiple GPUs, whether on a single node or distributed across multiple nodes."
   },
   {
-    "question": "What is Data Parallelism in the context of training deep learning models with multiple GPUs?",
-    "answer": "Data Parallelism refers to methods to perform training over multiple replicas of a model in parallel, where each replica receives a different chunk of training data at each iteration. Gradients are then aggregated, and parameters are updated synchronously or asynchronously."
+    "question": "What is the purpose of the `pytorch-ddp-test.sh` script?",
+    "answer": "The `pytorch-ddp-test.sh` script is an example job submission script for running a PyTorch Distributed Data Parallel (DDP) application on a cluster, specifically requesting 2 GPUs."
   },
   {
-    "question": "What is an important consideration for achieving equivalent training results when using Data Parallelism?",
-    "answer": "To get a trained model that is equivalent to one trained without Data Parallelism, the user must scale either the learning rate or the desired batch size in function of the number of replicas."
+    "question": "How many GPUs and tasks per node does the `pytorch-ddp-test.sh` SLURM script request?",
+    "answer": "The `pytorch-ddp-test.sh` SLURM script requests 2 GPUs (`--gres=gpu:2`) and 2 tasks per node (`--tasks-per-node=2`), implying one process per GPU."
   },
   {
-    "question": "What is a prerequisite for a model to be suitable for Data Parallelism with multiple GPUs?",
-    "answer": "The model must be small enough to fit inside the memory of a single GPU."
+    "question": "How is the `MASTER_ADDR` environment variable set within the `pytorch-ddp-test.sh` script?",
+    "answer": "The `MASTER_ADDR` environment variable is set to the hostname (`export MASTER_ADDR=$(hostname)`) to store the master node's IP address."
   },
   {
-    "question": "What are the three main PyTorch methods for performing Data Parallelism mentioned in the document?",
-    "answer": "The three main methods are using the DistributedDataParallel class, the PyTorch Lightning package, and the Horovod package."
+    "question": "What is the role of the `srun` command in the `pytorch-ddp-test.sh` script?",
+    "answer": "The `srun` command in `pytorch-ddp-test.sh` is used to execute the Python script `pytorch-ddp-test.py` multiple times, corresponding to the number of tasks per node times the number of nodes (`$((SLURM_NTASKS_PER_NODE * SLURM_JOB_NUM_NODES))`), distributing the processes across the allocated resources."
   },
   {
-    "question": "Which PyTorch class is recommended by PyTorch maintainers for using multiple GPUs, including those distributed across multiple nodes?",
-    "answer": "The `DistributedDataParallel` class is recommended by PyTorch maintainers for using multiple GPUs, whether they are all on a single node, or distributed across multiple nodes."
+    "question": "What is the primary function of the `pytorch-ddp-test.py` Python script?",
+    "answer": "The `pytorch-ddp-test.py` Python script demonstrates a distributed data parallel test for CIFAR10 classification models, utilizing PyTorch's `DistributedDataParallel` for multi-GPU training."
   },
   {
-    "question": "How many GPUs are requested in the example SLURM script for DistributedDataParallel (`pytorch-ddp-test.sh`)?",
-    "answer": "The example SLURM script (`pytorch-ddp-test.sh`) requests 2 GPUs using `#SBATCH --gres=gpu:2`."
+    "question": "How does `pytorch-ddp-test.py` initialize the distributed process group?",
+    "answer": "The `pytorch-ddp-test.py` script initializes the distributed process group using `dist.init_process_group(backend=args.dist_backend, init_method=args.init_method, world_size=args.world_size, rank=rank)`."
   },
   {
-    "question": "How many tasks per node are requested in the example SLURM script for DistributedDataParallel (`pytorch-ddp-test.sh`)?",
-    "answer": "The example SLURM script (`pytorch-ddp-test.sh`) requests 2 tasks per node using `#SBATCH --tasks-per-node=2`, indicating one process per GPU."
+    "question": "Which specific PyTorch module is used to wrap the neural network for distributed data parallelism in `pytorch-ddp-test.py`?",
+    "answer": "The `torch.nn.parallel.DistributedDataParallel` module is used to wrap the neural network (e.g., `net = torch.nn.parallel.DistributedDataParallel(net, device_ids=[current_device])`) for distributed training."
   }
 ]

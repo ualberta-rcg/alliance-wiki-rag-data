@@ -1,0 +1,46 @@
+[
+  {
+    "question": "What does the error 'Wrong job runtime in job_script.sh - nnn . Exiting' indicate?",
+    "answer": "This error means that the run-time argument within your `job_script.sh` file was not formatted correctly."
+  },
+  {
+    "question": "What is the cause of 'Something wrong with sbatch farm submission; jobid=XXX; aborting' or 'Something wrong with a auto-resubmit job submission; jobid=XXX; aborting' errors?",
+    "answer": "These messages indicate an issue with submitting jobs via `sbatch`, possibly due to a misbehaving or busy cluster scheduler. You should try again later."
+  },
+  {
+    "question": "What should I do if I encounter 'Couldn't create subdirectories inside the farm directory ; exiting', 'Couldn't create the temp directory XXX ; exiting', or 'Couldn't create a file inside XXX ; exiting' errors?",
+    "answer": "These errors suggest a problem with the file system, such as incorrect permissions or an exhausted quota. You need to fix these issues and then try again."
+  },
+  {
+    "question": "Why can't I use `resubmit.run` if I see the message 'Jobs are still running/queued; cannot resubmit'?",
+    "answer": "You cannot use `resubmit.run` until all meta-jobs from that farm have finished running. You can check the farm's status using `list.run` or `queue.run`."
+  },
+  {
+    "question": "What does the message 'No failed/unfinished jobs; nothing to resubmit' imply?",
+    "answer": "This means your farm was 100% processed, and there are no failed or un-ran cases left to compute."
+  },
+  {
+    "question": "How should I address the error 'Too many failed (very short) cases - exiting'?",
+    "answer": "This error occurs if the initial `$N_failed_max` cases are very short (less than `$dt_failed` seconds). You need to identify and fix the cause of the case failures, or adjust the `$N_failed_max` and `$dt_failed` values in `config.h`."
+  },
+  {
+    "question": "What does 'lockfile is not on path on node XXX' signify?",
+    "answer": "This error indicates that the `lockfile` utility is not found in your `$PATH` on a specific compute node. Verify its presence in your `$PATH` on a login node using `which lockfile`; if present, it might point to a file system issue on the compute node."
+  },
+  {
+    "question": "Is 'Exiting after processing one case (-1 option)' an error message?",
+    "answer": "No, this is not an error message. It simply means the farm was submitted with `submit.run -1` (one case per job mode), so each meta-job exits after processing a single case."
+  },
+  {
+    "question": "What does 'Not enough runtime left; exiting.' indicate?",
+    "answer": "This message indicates that, based on the analysis of run-times for cases processed so far, the meta-job estimates it does not have sufficient time left to process the next case, and therefore exits early."
+  },
+  {
+    "question": "Is 'No cases left; exiting.' an error message?",
+    "answer": "No, this is not an error message. It describes the normal completion of a meta-job once all cases have been computed."
+  },
+  {
+    "question": "What action should I take if I receive the message 'Only failed cases left; cannot auto-resubmit; exiting'?",
+    "answer": "This message appears when the farm was submitted with the `-auto` switch and only failed cases remain. You should find the failed cases using `Status.run -f`, fix the underlying issues, and then run `resubmit.run`."
+  }
+]

@@ -1,94 +1,114 @@
 [
   {
-    "question": "What is the purpose of resubmission from a job script?",
-    "answer": "Resubmission from a job script is used for long-running computations that cannot be completed within the system's time limits, allowing the calculation to continue from a saved checkpoint."
+    "question": "How does resubmission from a job script work for long-running computations?",
+    "answer": "A job script for resubmission runs a chunk of the calculation, saves a checkpoint, and if the calculation isn't finished before the allocated run-time ends, the script submits a copy of itself to continue the work."
   },
   {
-    "question": "How does a job script manage to resubmit itself for long-running computations?",
-    "answer": "A job script with resubmission capability runs a chunk of the calculation, saves a checkpoint, checks if the calculation is complete, and if not, submits a copy of itself to continue working before the allocated run-time elapses."
+    "question": "What is a critical consideration when implementing the `work_should_continue` function in a job resubmission script?",
+    "answer": "The `work_should_continue` test should be a positive test, meaning it explicitly checks if work *should* continue. Avoiding a negative test (checking for a stopping condition) prevents indefinite job chains if unforeseen errors occur."
   },
   {
-    "question": "What command is used to resubmit a job script from within itself?",
-    "answer": "The command `sbatch ${BASH_SOURCE[0]}` is used to resubmit a job script from within itself."
+    "question": "What happens if a job script's `work_should_continue` function tests for a stopping condition that is never met due to an error?",
+    "answer": "If the `work_should_continue` function tests for a stopping condition and an unforeseen error prevents that condition from being met, the chain of jobs may continue indefinitely, performing no useful work."
   },
   {
-    "question": "What kind of test should be used to determine if a follow-up job should be submitted in a resubmission script?",
-    "answer": "The test to determine whether to submit a follow-up job (e.g., `work_should_continue`) should be a positive test."
+    "question": "What are some methods to automate job submission for a large number of related calculations?",
+    "answer": "Array jobs and tools like META-Farm, GNU Parallel, and GLOST can be used to automate job submission, a practice sometimes called 'farming' or 'task farming'."
   },
   {
-    "question": "Why should the `work_should_continue` test in a job resubmission script be a positive test?",
-    "answer": "The `work_should_continue` test should be a positive test to prevent the chain of jobs from continuing indefinitely and doing nothing useful if an unforeseen error arises that prevents a stopping condition from being met."
+    "question": "What is the benefit of using tools like META-Farm, GNU Parallel, or GLOST for automating job submission?",
+    "answer": "In addition to automating the workflow, these tools can improve computational efficiency by bundling many short computations into fewer tasks of longer duration."
   },
   {
-    "question": "What are some alternative terms for automating job submission for a large number of related calculations?",
-    "answer": "This practice is sometimes called farming, serial farming, or task farming."
+    "question": "Why is it recommended not to specify a partition when submitting jobs?",
+    "answer": "It is recommended to allow the scheduler to assign a partition to your job based on the resources it requests, rather than specifying one yourself."
   },
   {
-    "question": "What are the benefits of automating job submission through specialized tools?",
-    "answer": "These tools automate the workflow and can improve computational efficiency by bundling many short computations into fewer tasks of longer duration."
+    "question": "What should be done if a software package automatically specifies a partition in Slurm?",
+    "answer": "If using software that automatically specifies a partition, such as Masurca, you can configure it to use `--partition=default`, which is treated the same as not specifying a partition."
   },
   {
-    "question": "Which tools are available on the clusters for automating job submission?",
-    "answer": "The available tools for automating job submission are META-Farm, GNU Parallel, and GLOST."
+    "question": "What are the job duration and job count limits on Beluga, Fir, Narval, Nibi, and Rorqual clusters?",
+    "answer": "On these clusters, jobs are not permitted longer than 168 hours (7 days), and there is a limit of 1000 jobs (queued and running) per user. Production jobs should be at least an hour long."
   },
   {
-    "question": "What is the recommended approach for specifying a Slurm partition for jobs?",
-    "answer": "It is recommended to allow the scheduler to assign a partition to your job based on the resources it requests, rather than specifying one manually."
+    "question": "What is the recommended minimum duration for production jobs on clusters like Beluga, Fir, Narval, Nibi, and Rorqual?",
+    "answer": "Production jobs on these clusters should have a duration of at least an hour."
   },
   {
-    "question": "How should users configure software that automatically submits jobs and expects a partition to be specified?",
-    "answer": "Users should configure such software to use `--partition=default`, which the script treats the same as not specifying a partition."
+    "question": "Where can users find information about Trillium-specific job scheduling restrictions?",
+    "answer": "Users can find information about Trillium-specific restrictions by referring to [[Trillium_Quickstart#Trillium_specific_restrictions|Trillium specific restrictions]]."
   },
   {
-    "question": "What is the maximum job duration allowed on Beluga, Graham, and Narval clusters?",
-    "answer": "On Beluga, Graham, and Narval, no jobs are permitted longer than 168 hours (7 days)."
+    "question": "What is a common cause of trouble with job scripts?",
+    "answer": "Preparing a job script with a word processor instead of a text editor is a common cause of trouble due to hidden characters."
   },
   {
-    "question": "What is the limit on the number of jobs (queued and running) per user on Beluga, Graham, and Narval?",
-    "answer": "There is a limit of 1000 jobs, queued and running, per user on Beluga, Graham, and Narval."
+    "question": "What is the best practice for preparing job scripts on a cluster?",
+    "answer": "The best practice is to prepare your job script on the cluster using a text editor such as nano, vim, or emacs."
   },
   {
-    "question": "What is the recommended minimum duration for production jobs on Beluga, Graham, and Narval?",
-    "answer": "Production jobs on Beluga, Graham, and Narval should have a duration of at least an hour."
+    "question": "How should Windows users prepare and transfer job scripts to a Linux cluster?",
+    "answer": "Windows users should use a text editor like Notepad or Notepad++ and then use `dos2unix` after uploading the script to change Windows end-of-line characters to Linux end-of-line characters."
   },
   {
-    "question": "What is a key restriction regarding job submission directories on the Cedar cluster?",
-    "answer": "Jobs may not be submitted from directories on the /home filesystem on Cedar."
+    "question": "How should Mac users prepare job scripts?",
+    "answer": "Mac users should open a terminal window and use an editor such as nano, vim, or emacs."
   },
   {
-    "question": "What is the maximum job duration allowed on Cedar?",
-    "answer": "The maximum duration for a job on Cedar is 28 days."
+    "question": "What is a 'dependent job' in Slurm?",
+    "answer": "A dependent job is one submitted with `--dependency=afterok:<jobid>`, which waits for the specified parent job to complete successfully."
   },
   {
-    "question": "Why are jobs not permitted to be submitted from the /home filesystem on Cedar?",
-    "answer": "This restriction is in place to reduce the load on the /home filesystem and improve responsiveness for interactive work."
+    "question": "What happens if a parent job fails when a dependent job is set to run 'afterok'?",
+    "answer": "If a parent job fails (ends with a non-zero exit code), the dependent job can never be scheduled and will be automatically cancelled."
   },
   {
-    "question": "How can you check if you are attempting to submit a job from the /home filesystem on Cedar?",
-    "answer": "You can check by running the command `readlink -f $(pwd) | cut -d/ -f2`; if it returns `home`, you are not permitted to submit jobs from that directory."
+    "question": "What error message might indicate a module loading issue due to an unsatisfied prerequisite?",
+    "answer": "An error message like \"Lmod has detected the following error: These module(s) exist but cannot be loaded as requested: \"<module-name>/<version>\"\" suggests a module loading issue, often due to prerequisites."
   },
   {
-    "question": "Where should files be transferred if a job needs to be submitted from a /home directory on Cedar?",
-    "answer": "Files should be transferred from the /home directory to either a /project or /scratch directory, and the job should be submitted from there."
+    "question": "How can `module spider` help diagnose issues with loading a module?",
+    "answer": "`module spider <module-name>/<version>` can show how to load the module, including any prerequisite modules that need to be loaded first."
   },
   {
-    "question": "How is scheduling performed on the Niagara cluster?",
-    "answer": "Scheduling on Niagara is done by node, in multiples of 40-cores."
+    "question": "How can a user resolve the error when `quantumespresso/6.1` fails to load due to missing prerequisites?",
+    "answer": "To resolve this, the user should add `module load nixpkgs/16.09 intel/2016.4 openmpi/2.1.1` to their job script before attempting to load `quantumespresso/6.1`."
   },
   {
-    "question": "What is the maximum walltime for jobs on Niagara?",
-    "answer": "Your job's maximum walltime on Niagara is 24 hours."
+    "question": "Do Slurm jobs inherit environment variables from the submission shell?",
+    "answer": "Yes, by default, a job will inherit the environment variables of the shell where it was submitted."
   },
   {
-    "question": "Which directories must jobs write to on Niagara compute nodes?",
-    "answer": "Jobs must write to your scratch or project directory, as the home directory is read-only on compute nodes."
+    "question": "Why is it recommended to include `module purge` in a job script?",
+    "answer": "It is best practice to include `module purge` in a job script before loading required modules to ensure a consistent state for each job submission and prevent environment changes in the shell from affecting jobs."
   },
   {
-    "question": "Do Niagara compute nodes have internet access?",
-    "answer": "No, Niagara compute nodes do not have internet access."
+    "question": "How can environment variable inheritance from the submitting shell be suppressed for a Slurm job?",
+    "answer": "To suppress environment variable inheritance, use the `--export=none` directive when submitting jobs."
   },
   {
-    "question": "When should data be moved to Niagara for job submission?",
-    "answer": "Data should be moved to Niagara before you submit your job, as compute nodes lack internet access."
+    "question": "What is a common reason for a submitted Slurm job to appear to hang or have incomplete output?",
+    "answer": "Aggressive output buffering performed by the Slurm scheduler is a common reason. Output is aggregated and often only flushed to the log file after the job completes, or with a significant delay."
+  },
+  {
+    "question": "What is recommended if real-time monitoring of job output is necessary?",
+    "answer": "If real-time monitoring of job output is needed, it is recommended to run an interactive job."
+  },
+  {
+    "question": "Where can users find information about how job priority and time limits affect job scheduling?",
+    "answer": "Users can find this information in the [[Job scheduling policies]] document."
+  },
+  {
+    "question": "What should be consulted if jobs within a research group are competing for resources?",
+    "answer": "If jobs within a research group are competing, users should refer to [[Managing_Slurm_accounts|Managing Slurm accounts]]."
+  },
+  {
+    "question": "Where can users find comprehensive documentation and tutorials for Slurm?",
+    "answer": "Comprehensive documentation and tutorials for Slurm are maintained by SchedMD on their website."
+  },
+  {
+    "question": "Is there a resource that maps commands from other schedulers (like PBS/Torque, SGE) to Slurm?",
+    "answer": "Yes, there is a 'Rosetta stone' available that maps commands and directives from PBS/Torque, SGE, LSF, and LoadLeveler to Slurm."
   }
 ]

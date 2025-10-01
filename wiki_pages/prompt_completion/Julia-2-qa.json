@@ -1,0 +1,110 @@
+[
+  {
+    "question": "How can a user change their Julia depot path to a different location?",
+    "answer": "Users can change their Julia depot path by exporting the JULIA_DEPOT_PATH environment variable, for example: `export JULIA_DEPOT_PATH=\"/project/def-bob/alice/julia:$JULIA_DEPOT_PATH\"`."
+  },
+  {
+    "question": "What happens to the `~/.julia` directory if JULIA_DEPOT_PATH is redirected?",
+    "answer": "If JULIA_DEPOT_PATH is redirected, the new path will be used preferentially, but files in `~/.julia` will still be considered, and it will still be used for some files like command history."
+  },
+  {
+    "question": "What is recommended to do with an existing `~/.julia` depot when moving it to a new location?",
+    "answer": "It is better to remove the existing `~/.julia` depot first by running `rm -rf $HOME/.julia`."
+  },
+  {
+    "question": "What is an alternative method to manage Julia packages and avoid home directory quota issues?",
+    "answer": "An alternative is to create an Apptainer image with a chosen Julia version and packages, redirecting JULIA_DEPOT_PATH inside the container."
+  },
+  {
+    "question": "What are the benefits of using an Apptainer image for Julia packages?",
+    "answer": "Apptainer images can potentially improve IO performance by containing many small files in one .sif file, improve reproducibility as the container runs anywhere, allow testing nightly builds, and bundle specific dependencies with complete control at creation."
+  },
+  {
+    "question": "What is a disadvantage of using Apptainer for Julia compared to standard module usage?",
+    "answer": "When using Apptainer, users lose the advantage of optimized Julia modules provided by the cluster."
+  },
+  {
+    "question": "How can Julia interface with Python code?",
+    "answer": "Julia can interface with Python code using the PyCall.jl package."
+  },
+  {
+    "question": "What environment variable should be set when using PyCall.jl to specify the Python executable?",
+    "answer": "The `PYTHON` environment variable should be set to the path of the Python executable in your virtual Python environment."
+  },
+  {
+    "question": "What is the recommended approach for using Python with PyCall.jl on clusters?",
+    "answer": "On clusters, it is recommended to use virtual Python environments and set the `PYTHON` environment variable to the executable within that activated environment."
+  },
+  {
+    "question": "What steps are involved in setting up PyCall.jl with a virtual Python environment?",
+    "answer": "You need to activate your virtual environment, then in Julia, `using Pkg, PyCall`, set `ENV[\"PYTHON\"] = joinpath(ENV[\"VIRTUAL_ENV\"], \"bin\", \"python\")`, and finally `Pkg.build(\"PyCall\")`."
+  },
+  {
+    "question": "What default PyCall.jl behavior is strongly advised against on clusters?",
+    "answer": "The default PyCall.jl behavior of using a Miniconda distribution inside your Julia environment is strongly advised against."
+  },
+  {
+    "question": "Why are Anaconda and similar distributions not suitable for PyCall.jl on clusters?",
+    "answer": "Anaconda and similar distributions are not suitable on clusters due to incompatibilities with the software stack and potential performance/quota issues from creating many files in `JULIA_DEPOT_PATH`."
+  },
+  {
+    "question": "What happens if a virtual environment is not created when using PyCall.jl?",
+    "answer": "PyCall will default to the operating system's Python installation, which is generally not desired. It will invoke Conda.jl but fail to recognize the correct path unless rebuilt with `ENV[\"PYTHON\"]=\"\"`."
+  },
+  {
+    "question": "How can you run a parallel Julia code computing pi using 100 cores across nodes on a cluster?",
+    "answer": "You can use an SLURM script to allocate 100 tasks, generate a hostfile with `srun hostname -s > hostfile`, and then run Julia with `julia --machine-file ./hostfile ./pi_p.jl 1000000000000`."
+  },
+  {
+    "question": "What command is used to generate a list of allocated node names for parallel Julia execution?",
+    "answer": "The command `srun hostname -s > hostfile` generates a list of allocated node names and writes it to a file named `hostfile`."
+  },
+  {
+    "question": "How do you configure Julia's MPI for versions 0.19 or earlier?",
+    "answer": "Load the `StdEnv` and `julia` modules, then export several environment variables (`JULIA_MPI_BINARY`, `JULIA_MPI_PATH`, `JULIA_MPI_LIBRARY`, `JULIA_MPI_ABI`, `JULIA_MPIEXEC`) pointing to the system's OpenMPI libraries, and finally run `Pkg.add(\"MPI\")` inside Julia."
+  },
+  {
+    "question": "How do you configure Julia's MPI for versions 0.20 or later?",
+    "answer": "Load the `julia` module, create the appropriate preferences directory, and then append an `[MPIPreferences]` section with specific settings (format, abi, binary, libmpi, mpiexec) to `~/.julia/environments/vX.Y/LocalPreferences.toml`. Finally, inside Julia, run `Pkg.add(\"MPIPreferences\")` and `Pkg.add(\"MPI\")`."
+  },
+  {
+    "question": "What is the command to run a Julia program with MPI using two processes?",
+    "answer": "First, load `StdEnv` and `julia` modules, then use `mpirun -np 2 julia hello.jl`."
+  },
+  {
+    "question": "How can you restrict the number of threads Julia uses?",
+    "answer": "You can restrict the number of threads Julia uses by setting the `JULIA_NUM_THREADS` environment variable to a specific integer `k`, for example `JULIA_NUM_THREADS=12`."
+  },
+  {
+    "question": "How can threads be 'pinned' to cores in Julia?",
+    "answer": "Threads can be 'pinned' to cores by setting the `JULIA_EXCLUSIVE` environment variable to anything non-zero."
+  },
+  {
+    "question": "When does setting `JULIA_EXCLUSIVE` work effectively?",
+    "answer": "Setting `JULIA_EXCLUSIVE` works only if your job has exclusive access to the compute nodes (all available CPU cores were allocated to your job)."
+  },
+  {
+    "question": "What is `JULIA_THREAD_SLEEP_THRESHOLD` and what does it control?",
+    "answer": "`JULIA_THREAD_SLEEP_THRESHOLD` controls the number of nanoseconds after which a spinning thread is scheduled to sleep. Setting it to `infinite` (as a string) prevents threads from sleeping while spinning."
+  },
+  {
+    "question": "What is Julia's primary programming interface for GPUs?",
+    "answer": "Julia's primary programming interface for GPUs is the CUDA.jl package."
+  },
+  {
+    "question": "How do you install CUDA.jl?",
+    "answer": "Load the appropriate `cuda` and `julia` modules (e.g., `module load cuda/11.4 julia/1.8.1`), then in Julia, run `import Pkg; Pkg.add(\"CUDA\")`."
+  },
+  {
+    "question": "How can you avoid issues if the downloaded CUDA toolkit during installation doesn't work with the installed CUDA driver?",
+    "answer": "You can configure Julia to use the local CUDA toolkit by running `julia> using CUDA; CUDA.set_runtime_version!(v\"version_of_cuda\", local_toolkit=true)` (for newer CUDA) or `julia> CUDA.set_runtime_version!(\"local\")` (for older CUDA)."
+  },
+  {
+    "question": "How can you verify that Julia is using the correct CUDA version after configuration?",
+    "answer": "After restarting Julia, you can verify the CUDA version by running `julia> CUDA.versioninfo()`."
+  },
+  {
+    "question": "Provide an example of Julia code to test a CUDA installation.",
+    "answer": "You can test the installation with `julia> a = CuArray([1,2,3])` and then `julia> a.+=1` to perform an operation on the GPU array."
+  }
+]

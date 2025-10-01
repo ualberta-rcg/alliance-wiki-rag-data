@@ -1,0 +1,138 @@
+[
+  {
+    "question": "What is Dask?",
+    "answer": "Dask is a flexible library for parallel computing in Python that provides distributed NumPy array and Pandas DataFrame objects and enables distributed computing with access to the PyData stack."
+  },
+  {
+    "question": "What objects does Dask provide for parallel computing?",
+    "answer": "Dask provides distributed NumPy array and Pandas DataFrame objects."
+  },
+  {
+    "question": "What is the preferred way to install Dask?",
+    "answer": "The preferred option is to install it using our provided Python wheel."
+  },
+  {
+    "question": "What are the steps to install Dask using the provided Python wheel?",
+    "answer": "The steps are: 1. Load a Python module (e.g., `module load python/3.11`). 2. Create and start a virtual environment. 3. Install `dask` and optionally `dask-distributed` in the virtual environment with `pip install`."
+  },
+  {
+    "question": "Which Python module version is suggested for Dask installation?",
+    "answer": "The suggested Python module version is `python/3.11`."
+  },
+  {
+    "question": "What is the `pip install` command to install Dask and dask-distributed in a virtual environment without an index?",
+    "answer": "The command is `pip install --no-index dask distributed`."
+  },
+  {
+    "question": "What is an example of a single-node Dask job described in the document?",
+    "answer": "An example job spawns a single-node Dask cluster with 6 cpus and computes the mean of a column of a parallelized dataframe."
+  },
+  {
+    "question": "What are the SBATCH parameters for a single-node Dask job in `dask-example.sh`?",
+    "answer": "The parameters are `--account=<your account>`, `--ntasks=1`, `--cpus-per-task=6`, `--mem=8000M`, `--time=0-00:05`, and `--output=%N-%j.out`."
+  },
+  {
+    "question": "How is the Python environment set up in the `dask-example.sh` script for a single-node job?",
+    "answer": "It loads `python`, `gcc`, `arrow` modules, creates a virtual environment `virtualenv --no-download $SLURM_TMPDIR/env`, and activates it with `source $SLURM_TMPDIR/env/bin/activate`."
+  },
+  {
+    "question": "How are Dask and related libraries installed in the `dask-example.sh` script for a single-node job?",
+    "answer": "`pip install dask distributed pandas --no-index`."
+  },
+  {
+    "question": "How is the Dask scheduler's address and port determined in the single-node `dask-example.sh` script?",
+    "answer": "The scheduler address is set to the hostname (`export DASK_SCHEDULER_ADDR=$(hostname)`), and the port is a random number between 30000 and 39999 (`export DASK_SCHEDULER_PORT= $((30000 + $RANDOM % 10000))`)."
+  },
+  {
+    "question": "How is the Dask scheduler started in the single-node `dask-example.sh` script?",
+    "answer": "It's started with `dask scheduler --host $DASK_SCHEDULER_ADDR --port $DASK_SCHEDULER_PORT &`."
+  },
+  {
+    "question": "How are Dask workers launched in the single-node `dask-example.sh` script?",
+    "answer": "Dask workers are launched with `dask worker \"tcp://$DASK_SCHEDULER_ADDR:$DASK_SCHEDULER_PORT\" --no-dashboard --nworkers=6 --nthreads=1 --local-directory=$SLURM_TMPDIR &`."
+  },
+  {
+    "question": "What is the purpose of the `dask-example.py` script?",
+    "answer": "The `dask-example.py` script launches a Dask cluster with worker processes equal to the number of cores in the job, splits a pandas DataFrame into chunks, and computes the mean of a column."
+  },
+  {
+    "question": "How does `dask-example.py` determine the number of worker processes?",
+    "answer": "It uses the `SLURM_CPUS_PER_TASK` environment variable (`n_workers = int(os.environ['SLURM_CPUS_PER_TASK'])`)."
+  },
+  {
+    "question": "How does `dask-example.py` connect to the Dask scheduler?",
+    "answer": "It connects using a `Client` object with the scheduler's address and port from environment variables: `client = Client(f\"tcp://{os.environ['DASK_SCHEDULER_ADDR']}:{os.environ['DASK_SCHEDULER_PORT']}\")`."
+  },
+  {
+    "question": "How many partitions are created when a pandas DataFrame is converted to a Dask DataFrame in `dask-example.py`?",
+    "answer": "It is split into `n_workers` partitions, which is equal to `SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "What computation is performed on the Dask DataFrame in `dask-example.py`?",
+    "answer": "The script computes the mean of column 'a' (`ddf.a.mean().compute()`)."
+  },
+  {
+    "question": "Where can one find detailed information about adjusting the number of Dask worker processes and threads?",
+    "answer": "A complete discussion can be found in the official Dask documentation: [https://distributed.dask.org/en/stable/efficiency.html?highlight=workers%20threads#adjust-between-threads-and-processes official Dask documentation]."
+  },
+  {
+    "question": "What is the goal of the multiple-node Dask example?",
+    "answer": "The goal is to reproduce the single-node example but with a two-node Dask cluster, with 6 CPUs on each node, spawning 2 workers per node, each with 3 cores."
+  },
+  {
+    "question": "What are the SBATCH parameters for a multiple-node Dask job in `dask-example.sh`?",
+    "answer": "The parameters are `--nodes 2`, `--tasks-per-node=2`, `--mem=16000M`, `--cpus-per-task=3`, `--time=0-00:30`, `--output=%N-%j.out`, and `--account=<your account>`."
+  },
+  {
+    "question": "How is the Python environment prepared across multiple nodes in the example?",
+    "answer": "The `config_virtualenv.sh` script is run across nodes using `srun -N 2 -n 2 config_virtualenv.sh`."
+  },
+  {
+    "question": "How is the Dask scheduler port set in the multiple-node `dask-example.sh` script?",
+    "answer": "The Dask scheduler port is fixed to `34567` (`export DASK_SCHEDULER_PORT=34567`)."
+  },
+  {
+    "question": "How are Dask workers launched in the multiple-node `dask-example.sh` script?",
+    "answer": "Dask workers are launched by running the `launch_dask_workers.sh` script across nodes: `srun launch_dask_workers.sh &`."
+  },
+  {
+    "question": "How are Dask workers shut down after the Python process exits in the multiple-node example?",
+    "answer": "The Dask cluster PID is captured (`dask_cluster_pid=$!`), and then `kill $dask_cluster_pid` is used to shut down workers."
+  },
+  {
+    "question": "What does the `config_virtualenv.sh` script do?",
+    "answer": "It loads `python`, `gcc`, and `arrow` modules, creates a virtual environment (`virtualenv --no-download $SLURM_TMPDIR/env`), activates it, installs `dask[distributed,dataframe]` without an index, and then deactivates the environment."
+  },
+  {
+    "question": "What modules are loaded by the `config_virtualenv.sh` script?",
+    "answer": "`python`, `gcc`, and `arrow` modules are loaded."
+  },
+  {
+    "question": "How does `config_virtualenv.sh` install Dask and its dataframe components?",
+    "answer": "It uses `pip install --no-index dask[distributed,dataframe]`."
+  },
+  {
+    "question": "What is the purpose of the `launch_dask_workers.sh` script?",
+    "answer": "It activates the virtual environment, defines the scheduler connection string, and launches Dask workers, adjusting memory and threads based on the SLURM task rank."
+  },
+  {
+    "question": "How are Dask worker memory and threads determined for the SLURM task with Rank 0 in `launch_dask_workers.sh`?",
+    "answer": "On Rank 0, the worker gets 40% of the job's memory (`DASK_WORKER_MEM=0.4`) and one less core than allocated to the task (`DASK_WORKER_THREADS=$(($SLURM_CPUS_PER_TASK-1))`) to reserve a core for the scheduler."
+  },
+  {
+    "question": "How are Dask worker memory and threads determined for SLURM tasks other than Rank 0 in `launch_dask_workers.sh`?",
+    "answer": "On other tasks, each worker gets half of the job's allocated memory (`DASK_WORKER_MEM=0.5`) and all cores allocated to its task (`DASK_WORKER_THREADS=$SLURM_CPUS_PER_TASK`)."
+  },
+  {
+    "question": "What command is used to start a Dask worker in `launch_dask_workers.sh`?",
+    "answer": "`dask worker \"tcp://$DASK_SCHEDULER_ADDR:$DASK_SCHEDULER_PORT\" --no-dashboard --nworkers=1 --nthreads=$DASK_WORKER_THREADS --memory-limit=$DASK_WORKER_MEM --local-directory=$SLURM_TMPDIR`."
+  },
+  {
+    "question": "What does the `test_dask.py` script do?",
+    "answer": "The `test_dask.py` script connects to the Dask cluster, creates a pandas DataFrame, converts it to a Dask DataFrame with 6 partitions, and computes the mean of a column."
+  },
+  {
+    "question": "How many partitions are specified when creating the Dask DataFrame in `test_dask.py`?",
+    "answer": "The Dask DataFrame is created with `npartitions=6`."
+  }
+]

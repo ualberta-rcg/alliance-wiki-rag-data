@@ -1,0 +1,50 @@
+[
+  {
+    "question": "How do you specify the journal file and Fluent version in a Slurm script for Niagara?",
+    "answer": "You specify the journal file name using `MYJOURNALFILE=sample.jou` and the Fluent version (e.g., `2d`, `2ddp`, `3d`, `3ddp`) using `MYVERSION=3d`."
+  },
+  {
+    "question": "Where are the license settings defined in the Fluent multinode (by node, Niagara) Slurm script?",
+    "answer": "The license settings for `LICSERVER`, `FLEXPORT`, `INTEPORT`, and `VENDPORT` are explicitly defined within the script itself, rather than using the `~/.licenses/ansys.lic` file."
+  },
+  {
+    "question": "What is the license server hostname specified in the Niagara Fluent script?",
+    "answer": "The license server hostname is `license3.sharcnet.ca`."
+  },
+  {
+    "question": "What are the specified Flex Port, Interconnect Port, and Vendor Port numbers for the license server in the Niagara Fluent script?",
+    "answer": "The Flex Port is `1055`, the Interconnect Port is `2325`, and the Vendor Port is `1793`."
+  },
+  {
+    "question": "How does the Niagara Fluent script establish a connection to the license server?",
+    "answer": "It uses SSH tunneling via `nia-gw` to forward the Flex, Interconnect, and Vendor ports to `localhost`."
+  },
+  {
+    "question": "What environment variables are set for Ansys licensing after SSH tunneling in the Niagara Fluent script?",
+    "answer": "`ANSYSLMD_LICENSE_FILE` is set to `$FLEXPORT@localhost` and `ANSYSLI_SERVERS` is set to `$INTEPORT@localhost`."
+  },
+  {
+    "question": "How are the total number of cores calculated in the Niagara Fluent script?",
+    "answer": "The total number of cores (`NCORES`) is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "What should be done if an 'ERROR: A link to a writable .ansys directory does not exist' message appears when running a Fluent job on Niagara?",
+    "answer": "You should remove the `~/.ansys` directory if it exists and then run `ln -s $SCRATCH/.ansys ~/.ansys` to create a symbolic link to a writable directory in your scratch space."
+  },
+  {
+    "question": "What are the required symbolic links for Ansys Fluent to run on Niagara?",
+    "answer": "Symbolic links to writable directories/files named `~/.ansys`, `~/.fluentconf`, and `~/.flrecent` are required, typically linking to corresponding locations in `$SCRATCH`."
+  },
+  {
+    "question": "What command is used to run Fluent in a single-node configuration on Niagara?",
+    "answer": "The command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE`."
+  },
+  {
+    "question": "What command is used to run Fluent in a multi-node configuration on Niagara?",
+    "answer": "The command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -ssh -pib -cnf=$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
+  },
+  {
+    "question": "When should license requeue scripts be used for Fluent jobs?",
+    "answer": "License requeue scripts should only be used for Fluent jobs that are known to complete normally without errors but frequently fail to start due to license shortages. They are not recommended for jobs that crash or contain unresolved warnings."
+  }
+]

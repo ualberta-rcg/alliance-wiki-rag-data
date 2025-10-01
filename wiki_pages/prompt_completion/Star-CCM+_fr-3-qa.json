@@ -1,102 +1,30 @@
 [
   {
-    "question": "What is the recommended value for `--ntasks-per-node` in a STAR-CCM+ Slurm script on Niagara?",
-    "answer": "The value for `--ntasks-per-node` should be 1 and should not be changed."
+    "question": "Comment se connecter aux n\u0153uds VDI pour la visualisation \u00e0 distance de STAR-CCM+?",
+    "answer": "Connectez-vous \u00e0 gra-vdi avec TigerVNC."
   },
   {
-    "question": "Which environment modules should be loaded for STAR-CCM+ version 18.06.006 on Niagara?",
-    "answer": "You should load `CCEnv`, `StdEnv/2023`, and then either `starccm/18.06.006-R8` or `starccm-mixed/18.06.006`."
+    "question": "Comment ouvrir une fen\u00eatre de terminal sur les n\u0153uds VDI apr\u00e8s s'\u00eatre connect\u00e9 via TigerVNC?",
+    "answer": "Une fois le bureau distant affich\u00e9, cliquez sur 'Applications-->Systems Tools-->Mate Terminal' pour ouvrir une fen\u00eatre de terminal."
   },
   {
-    "question": "How do you specify the input simulation filename in a Niagara Slurm script for STAR-CCM+?",
-    "answer": "The input simulation filename is specified by setting the `SIM_FILE` variable, for example: `SIM_FILE='mysample.sim'`."
+    "question": "Comment puis-je afficher les versions de Star-CCM+ disponibles sur les n\u0153uds VDI?",
+    "answer": "Si vous avez d\u00e9j\u00e0 charg\u00e9 un StdEnv, vous pouvez faire afficher les versions disponibles avec la commande `module avail starccm-mixed`."
   },
   {
-    "question": "How do you specify an input Java filename for STAR-CCM+ in a Niagara Slurm script?",
-    "answer": "You can uncomment and set the `JAVA_FILE` variable, for example: `#JAVA_FILE='mymacros.java'`."
+    "question": "Pourquoi seule l'impl\u00e9mentation MESA de OpenGL est-elle utilisable avec STAR-CCM+ sur gra-vdi?",
+    "answer": "Pr\u00e9sentement, seulement l'impl\u00e9mentation MESA de OpenGL peut \u00eatre utilis\u00e9e sur gra-vdi avec starccm en raison de probl\u00e8mes avec virtualgl qui offre l'acc\u00e9l\u00e9ration des GPU locaux pour les graphiques OpenGL."
   },
   {
-    "question": "How is a Siemens Power on Demand (PoD) Key specified in a Niagara Slurm script?",
-    "answer": "A Siemens PoD Key is specified by setting the `LM_PROJECT` variable, for example: `LM_PROJECT='my22digitpodkey'`."
+    "question": "Quelles sont les commandes pour charger et ex\u00e9cuter STAR-CCM+ version 18.04.008 ou plus r\u00e9cente sur les n\u0153uds VDI?",
+    "answer": "Chargez l'environnement avec `module load CcEnv StdEnv/2023`, puis `module load starccm-mixed/18.04.008` (ou `starccm/18.04.008-R8`), et enfin `starccm+ -rr server`."
   },
   {
-    "question": "What are the default license server settings used on Niagara when `~/.licenses/starccm.lic` is not utilized?",
-    "answer": "The default settings are `FLEXPORT=1999`, `VENDPORT=2099`, and `LICSERVER=flex.cd-adapco.com`."
+    "question": "Comment charger et ex\u00e9cuter STAR-CCM+ pour les versions de 15.04.010 \u00e0 18.02.008 sur les n\u0153uds VDI?",
+    "answer": "Utilisez `module load CcEnv StdEnv/2020`, suivi de `module load starccm-mixed/15.04.010` (ou `starccm/15.04.010-R8`), et ex\u00e9cutez avec `starccm+ -mesa`."
   },
   {
-    "question": "How is the `CDLMD_LICENSE_FILE` environment variable configured on Niagara for STAR-CCM+?",
-    "answer": "It is configured by exporting `CDLMD_LICENSE_FILE` as `export CDLMD_LICENSE_FILE=\"$FLEXPORT@127.0.0.1\"`."
-  },
-  {
-    "question": "What SSH command is used for license forwarding on Niagara?",
-    "answer": "The SSH command `ssh nia-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f` is used for license forwarding."
-  },
-  {
-    "question": "How is the total number of cores (`NCORE`) calculated in a Niagara Slurm script for STAR-CCM+?",
-    "answer": "The `NCORE` is calculated as `NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))`."
-  },
-  {
-    "question": "What is the workaround for license failures when launching STAR-CCM+ on Niagara?",
-    "answer": "A `while` loop is implemented to retry starting STAR-CCM+ up to 5 times if the exit status is not 0, including a 5-second sleep after the first attempt."
-  },
-  {
-    "question": "What are the command-line options for STAR-CCM+ when using a Siemens PoD license on Niagara?",
-    "answer": "The command-line options are `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
-  },
-  {
-    "question": "What are the command-line options for STAR-CCM+ when using an institutional license on Niagara?",
-    "answer": "The command-line options are `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
-  },
-  {
-    "question": "What is the first step to prepare an account for remote visualization with STAR-CCM+?",
-    "answer": "The first step is to create the license file `~/.licenses/starccm.lic` as described in the documentation."
-  },
-  {
-    "question": "How should a Power-on-demand (PoD) license be configured for remote visualization?",
-    "answer": "For a PoD license, configure `export LM_PROJECT='CD-ADAPCO PROJECT ID'` and add the `-power` option to the other command-line options."
-  },
-  {
-    "question": "How do you connect to a compute node for remote visualization of STAR-CCM+?",
-    "answer": "Connect to a compute node using TigerVNC and open a terminal window."
-  },
-  {
-    "question": "How do you load and run STAR-CCM+ version 15.04.010 or newer on compute nodes for remote visualization?",
-    "answer": "Load `module load StdEnv/2020`, then `module load starccm-mixed/17.02.007` (or `starccm/16.04.007-R8`), and finally run `starccm+`."
-  },
-  {
-    "question": "How do you load and run STAR-CCM+ versions 14.06.010, 14.04.013, or 14.02.012 on compute nodes for remote visualization?",
-    "answer": "Load `module load StdEnv/2016`, then `module load starccm-mixed/14.06.010` (or `starccm/14.06.010-R8`), and finally run `starccm+`."
-  },
-  {
-    "question": "How do you load and run STAR-CCM+ version 13.06.012 or older on compute nodes for remote visualization?",
-    "answer": "Load `module load StdEnv/2016`, then `module load starccm-mixed/13.06.012` (or `starccm/13.06.012-R8`), and finally run `starccm+ -mesa`."
-  },
-  {
-    "question": "How do you connect to a VDI node for remote visualization of STAR-CCM+?",
-    "answer": "Connect to `gra-vdi` using TigerVNC."
-  },
-  {
-    "question": "How do you open a terminal on VDI nodes?",
-    "answer": "Open a terminal window by navigating to `Applications-->Systems Tools-->Mate Terminal`."
-  },
-  {
-    "question": "How can you display the available STAR-CCM+ versions on VDI nodes?",
-    "answer": "After loading an `StdEnv`, you can use the command `module avail starccm-mixed` to display available versions."
-  },
-  {
-    "question": "What OpenGL implementation is recommended for STAR-CCM+ on `gra-vdi` and why?",
-    "answer": "Only the MESA implementation of OpenGL is recommended due to issues with `virtualgl` which typically offers local GPU acceleration for OpenGL graphics."
-  },
-  {
-    "question": "How do you load and run STAR-CCM+ version 18.04.008 or newer on VDI nodes for remote visualization?",
-    "answer": "Load `module load CcEnv StdEnv/2023`, then `module load starccm-mixed/18.04.008` (or `starccm/18.04.008-R8`), and finally run `starccm+ -rr server`."
-  },
-  {
-    "question": "How do you load and run STAR-CCM+ versions 15.04.010 to 18.02.008 on VDI nodes for remote visualization?",
-    "answer": "Load `module load CcEnv StdEnv/2020`, then `module load starccm-mixed/15.04.010` (or `starccm/15.04.010-R8`), and finally run `starccm+ -mesa`."
-  },
-  {
-    "question": "How do you load and run STAR-CCM+ version 13.06.012 or older on VDI nodes for remote visualization?",
-    "answer": "Load `module load CcEnv StdEnv/2016`, then `module load starccm-mixed/13.06.012` (or `starccm/13.06.012-R8`), and finally run `starccm+ -mesa`."
+    "question": "Quelles commandes faut-il utiliser pour les versions de STAR-CCM+ 13.06.012 ou ant\u00e9rieures sur les n\u0153uds VDI?",
+    "answer": "Les commandes sont `module load CcEnv StdEnv/2016`, puis `module load starccm-mixed/13.06.012` (ou `starccm/13.06.012-R8`), et enfin `starccm+ -mesa`."
   }
 ]

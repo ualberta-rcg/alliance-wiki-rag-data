@@ -1,0 +1,106 @@
+[
+  {
+    "question": "What are the two main ways to use MATLAB on the clusters?",
+    "answer": "You can either execute MATLAB directly, which requires a license, or compile your MATLAB code with `mcc` and use the generated executable without needing a license."
+  },
+  {
+    "question": "What types of licenses are accepted for direct MATLAB execution on the clusters?",
+    "answer": "You can use the license provided on Fir, Narval, or Rorqual for students, professors, and researchers, or an external license held by your institution, faculty, department, or laboratory."
+  },
+  {
+    "question": "What is the benefit of compiling MATLAB code with `mcc`?",
+    "answer": "Compiling your MATLAB code with `mcc` allows you to use the generated executable on our clusters without needing to consider a license."
+  },
+  {
+    "question": "How can one test for access to an external MATLAB license on a cluster?",
+    "answer": "Load the MATLAB module (e.g., `module load matlab/2023b.2`) and then run `matlab -nojvm -nodisplay -batch license`. If successful, a license number will be printed."
+  },
+  {
+    "question": "What should you do if the MATLAB license test indicates the version is newer than the license file?",
+    "answer": "Try loading an older version of MATLAB in the `module load` command."
+  },
+  {
+    "question": "Who should be contacted if there are issues using an external MATLAB license?",
+    "answer": "Contact the MATLAB license administrator at your institution or your MATLAB account manager."
+  },
+  {
+    "question": "What is the first step in configuring an external MATLAB license?",
+    "answer": "You must create a `matlab.lic` file containing server specifications (SERVER <ip address> ANY <port> and USE_SERVER)."
+  },
+  {
+    "question": "Where should the `matlab.lic` file for an external license be placed?",
+    "answer": "The `matlab.lic` file should be placed in the `$HOME/.licenses/` directory."
+  },
+  {
+    "question": "What information is required in the `matlab.lic` file?",
+    "answer": "The `matlab.lic` file needs the IP address and port number of your institution's license server, followed by `USE_SERVER`."
+  },
+  {
+    "question": "Who should be contacted to arrange the connection between a license server and compute nodes for an external license?",
+    "answer": "Contact the technical support team."
+  },
+  {
+    "question": "Why is it necessary to prepare the `.matlab` directory?",
+    "answer": "Because the /home directory on some compute nodes is read-only, a symbolic link `.matlab` must be created so that the profile and task data are logged in /scratch instead."
+  },
+  {
+    "question": "How do you prepare the `.matlab` directory for read-only /home directories?",
+    "answer": "Navigate to `$HOME` and run the command: `if [ -d \".matlab\" ]; then mv .matlab scratch/; else mkdir -p scratch/.matlab; fi && ln -sn scratch/.matlab .matlab`."
+  },
+  {
+    "question": "How can you list the MATLAB toolboxes available with a specific license and cluster?",
+    "answer": "Load the MATLAB module (`module load matlab`) and then run `matlab -nojvm -batch \"ver\"`."
+  },
+  {
+    "question": "What is the important rule for large-scale MATLAB computations?",
+    "answer": "For all large-scale calculations (duration over five minutes or memory over 1GB), the task must be submitted to the scheduler."
+  },
+  {
+    "question": "How do you submit a serial MATLAB program (e.g., `cosplot.m`) to the Slurm scheduler?",
+    "answer": "After creating the `cosplot.m` file and a Slurm script (e.g., `matlab_slurm.sl`), submit the task using `sbatch matlab_slurm.sl`."
+  },
+  {
+    "question": "What is the purpose of the `-nojvm` option when launching MATLAB?",
+    "answer": "The `-nojvm` option can prevent the creation of `java.log.12345` files, saving storage space, although it might interfere with certain tracing functions."
+  },
+  {
+    "question": "What MATLAB parallel execution environment is usually sufficient for a single node?",
+    "answer": "Executing MATLAB in a `Threads` parallel environment on a single node is usually sufficient."
+  },
+  {
+    "question": "What Slurm parameter controls the number of CPU cores for parallel MATLAB execution?",
+    "answer": "The `--cpus-per-task` parameter in the Slurm script controls the number of CPU cores."
+  },
+  {
+    "question": "What issue can arise when launching multiple parallel MATLAB tasks simultaneously in a `Cluster` environment?",
+    "answer": "When two or more parallel tasks initialize `parpool` at the same time, they might try to read and write to the same `.dat` file, corrupting the local parallel profile."
+  },
+  {
+    "question": "How can the corruption of the local parallel profile be avoided when launching multiple parallel tasks?",
+    "answer": "It is recommended that each task creates its own parallel profile in a unique location by specifying the `JobStorageLocation` property of the `parallel.Cluster` object, for example, `local_cluster.JobStorageLocation = getenv('SLURM_TMPDIR')`."
+  },
+  {
+    "question": "What is required for MCR code tasks with high requirements?",
+    "answer": "As with all high-requirement tasks, MCR code must always be included in a task submitted to the scheduler."
+  },
+  {
+    "question": "How can MATLAB code be compiled using the MATLAB Compiler?",
+    "answer": "You can compile MATLAB code using the `mcc` command, for example, `mcc -m -R -nodisplay cosplot.m`."
+  },
+  {
+    "question": "What files does the `mcc` command typically produce?",
+    "answer": "The `mcc` command produces the binary executable (e.g., `cosplot`) and a wrapper script (e.g., `run_cosplot.sh`)."
+  },
+  {
+    "question": "Which script should be used to run a compiled MATLAB binary on the servers?",
+    "answer": "You should use the `run_mcr_binary.sh` script, which defines the correct paths, instead of the wrapper script generated by `mcc`."
+  },
+  {
+    "question": "What module needs to be loaded before running a compiled MCR binary?",
+    "answer": "You need to load the MCR module corresponding to the MATLAB version used for compilation, for example, `module load mcr/R2024b`."
+  },
+  {
+    "question": "What command should be run once for each compiled MCR binary?",
+    "answer": "The command `setrpaths.sh --path <binary_name>` should be run once for each compiled binary."
+  }
+]

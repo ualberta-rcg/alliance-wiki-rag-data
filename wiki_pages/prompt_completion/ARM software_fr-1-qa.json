@@ -1,0 +1,146 @@
+[
+  {
+    "question": "What is ARM DDT?",
+    "answer": "ARM DDT (previously 'Allinea DDT') is a powerful commercial tool for debugging parallel code, featuring a graphical user interface."
+  },
+  {
+    "question": "What programming languages and application types does ARM DDT support?",
+    "answer": "It supports debugging C, C++, and Fortran applications, including serial, MPI, multi-threaded, CUDA, or any combination of these types."
+  },
+  {
+    "question": "What other profiling tool does ARM produce for parallel code?",
+    "answer": "ARM also produces the MAP profiler for parallel code."
+  },
+  {
+    "question": "Which ARM DDT modules are available on Graham?",
+    "answer": "On Graham, 'ddt-cpu' is available for debugging and profiling code on CPUs, and 'ddt-gpu' for debugging code on GPUs or CPU/GPU combinations."
+  },
+  {
+    "question": "Which ARM DDT module is available on Niagara?",
+    "answer": "On Niagara, the 'ddt' module is available."
+  },
+  {
+    "question": "How should users connect to use GUI applications like DDT?",
+    "answer": "Users should connect with 'ssh -Y' and use an SSH client like MobaXTerm (Windows) or XQuartz (Mac) to ensure X11 redirection."
+  },
+  {
+    "question": "How are DDT and MAP typically used?",
+    "answer": "DDT and MAP are generally used interactively via the user interface with the 'salloc' command."
+  },
+  {
+    "question": "Can the MAP profiler be used non-interactively?",
+    "answer": "Yes, the MAP profiler can also be used non-interactively by submitting tasks to the scheduler with the 'sbatch' command."
+  },
+  {
+    "question": "What are the current license limitations for DDT/MAP and DDT-GPU?",
+    "answer": "The current license allows DDT/MAP to use up to 512 concurrent cores for all users, while DDT-GPU can only use 8 GPUs."
+  },
+  {
+    "question": "What is the first step for CPU-only debugging or profiling?",
+    "answer": "The first step is to allocate the nodes where you want to debug or profile, which opens a shell session on those nodes."
+  },
+  {
+    "question": "Provide an example 'salloc' command for CPU-only debugging.",
+    "answer": "An example command is: 'salloc --x11 --time=0-1:00 --mem-per-cpu=4G --ntasks=4'."
+  },
+  {
+    "question": "Which module should be loaded for CPU-only debugging or profiling?",
+    "answer": "For CPU-only usage, load the 'ddt-cpu' module with 'module load ddt-cpu'."
+  },
+  {
+    "question": "How do you launch DDT or MAP for CPU-only code?",
+    "answer": "Launch DDT or MAP using 'ddt path/to/code' or 'map path/to/code'."
+  },
+  {
+    "question": "What should be ensured in the DDT/MAP window before clicking 'Run'?",
+    "answer": "Before clicking 'Run', ensure that the MPI implementation is the default OpenMPI and specify the number of CPU cores in the DDT/MAP window."
+  },
+  {
+    "question": "How do you terminate a debugging session started with 'salloc'?",
+    "answer": "Quit the interpreter (shell) to terminate the allocation."
+  },
+  {
+    "question": "Is there a known compatibility issue between DDT and OpenMPI?",
+    "answer": "Yes, current versions of DDT and OpenMPI have a compatibility issue preventing DDT from displaying message queues."
+  },
+  {
+    "question": "How can the DDT/OpenMPI compatibility issue be circumvented?",
+    "answer": "To work around the problem, launch the command 'export OMPI_MCA_pml=ob1'."
+  },
+  {
+    "question": "When should the 'export OMPI_MCA_pml=ob1' command be used?",
+    "answer": "This command should only be used during debugging, as it may slow down MPI code."
+  },
+  {
+    "question": "What is the initial step to debug or profile CUDA code with DDT?",
+    "answer": "The initial step is to allocate the nodes for debugging or profiling using 'salloc', which opens a shell session on those nodes."
+  },
+  {
+    "question": "Provide an example 'salloc' command for CUDA debugging.",
+    "answer": "An example command is: 'salloc --x11 --time=0-1:00 --mem-per-cpu=4G --ntasks=1 --gres=gpu:1'."
+  },
+  {
+    "question": "Which module should be loaded for CUDA debugging?",
+    "answer": "Load the 'ddt-gpu' module using 'module load ddt-gpu'."
+  },
+  {
+    "question": "What should be done if an older OpenMPI version is requested when loading 'ddt-gpu'?",
+    "answer": "If an older OpenMPI version is requested, load it first (e.g., 'module load openmpi/2.0.2') and then reload the 'ddt-gpu' module."
+  },
+  {
+    "question": "Which other module is essential for CUDA debugging with DDT?",
+    "answer": "A CUDA module must be loaded, e.g., 'module load cuda'."
+  },
+  {
+    "question": "How do you launch DDT for CUDA code?",
+    "answer": "Launch DDT using 'ddt path/to/code'."
+  },
+  {
+    "question": "What to do if DDT encounters difficulties due to CUDA driver/toolkit incompatibility?",
+    "answer": "If there's an incompatibility, execute 'export ALLINEA_FORCE_CUDA_VERSION=10.1' (using the same version as in the command) and then relaunch DDT."
+  },
+  {
+    "question": "What causes latency problems with DDT's X-11 redirection?",
+    "answer": "X-11 redirection is very sensitive to packet latency, so if you are not on the same campus as the cluster, the interface may be slow."
+  },
+  {
+    "question": "How can latency issues with DDT's graphical interface be remedied?",
+    "answer": "To remedy latency problems, use DDT under VNC."
+  },
+  {
+    "question": "What is the first step to use DDT under VNC?",
+    "answer": "The first step is to prepare a VNC session."
+  },
+  {
+    "question": "How should a task be launched from DDT's start screen if the VNC session is on a login node or Graham's vdi node?",
+    "answer": "Select 'manually launch backend yourself', enter task details, click 'listen', then click 'help' next to 'waiting for you to start the job...' to get the launch command."
+  },
+  {
+    "question": "What command format is used to launch a task in a VNC session when DDT is waiting?",
+    "answer": "The command typically looks like '/cvmfs/restricted.computecanada.ca/easybuild/software/2020/Core/allinea/20.2/bin/forge-client --ddtsessionfile /home/$USER/.allinea/session/gra-vdi3-1 $PROGRAM ...'."
+  },
+  {
+    "question": "What should be done if there are X11 problems on Graham?",
+    "answer": "If you have X11 problems on Graham, modify your /home directory permissions so that only you can access it."
+  },
+  {
+    "question": "How can you check the current permissions of your home directory?",
+    "answer": "Check current permissions using 'ls -ld /home/$USER'."
+  },
+  {
+    "question": "What should the output of 'ls -ld /home/$USER' typically start with for correct X11 functionality?",
+    "answer": "The result should start with 'drwx------'."
+  },
+  {
+    "question": "How do you remove read and execute permissions for the group and other users from your home directory?",
+    "answer": "Use the command 'chmod go-rx /home/$USER'."
+  },
+  {
+    "question": "Where can users find a video tutorial on debugging with DDT?",
+    "answer": "A 55-minute video titled 'Debugging your code with DDT' is available at 'https://youtu.be/Q8HwLg22BpY'."
+  },
+  {
+    "question": "Where can users find a short tutorial on parallel debugging with DDT?",
+    "answer": "A short tutorial titled 'Parallel debugging with DDT' is available via the link '[[Parallel Debugging with DDT| ''Parallel debugging with DDT'' (court tutoriel)]]'."
+  }
+]

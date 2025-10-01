@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What is the purpose of `--bind $PWD:/root/shared` when running an Apptainer container?",
+    "answer": "It mounts your current host directory (where you execute the command) into the container at the path `/root/shared`."
+  },
+  {
+    "question": "What does the `--pwd /root/shared` option do in an Apptainer command?",
+    "answer": "It sets the working directory inside the container to `/root/shared`."
+  },
+  {
+    "question": "Which UFL package is required by FEniCS Legacy (2019.1.x)?",
+    "answer": "FEniCS Legacy (2019.1.x) requires UFL Legacy."
+  },
+  {
+    "question": "What is the specific Python package name for UFL Legacy?",
+    "answer": "The Python package is named `ufl_legacy`."
+  },
+  {
+    "question": "What is the compatible UFL version provided by `ufl_legacy` for FEniCS Legacy?",
+    "answer": "The compatible UFL version is 2022.3.0, provided by `ufl_legacy`."
+  },
+  {
+    "question": "What happens if you try a `import ufl` statement with FEniCS Legacy?",
+    "answer": "A plain `import ufl` should fail."
+  },
+  {
+    "question": "What happens if you try a `import ufl_legacy` statement with FEniCS Legacy?",
+    "answer": "`import ufl_legacy` should succeed."
+  },
+  {
+    "question": "Why would someone need to alias `ufl_legacy` as `ufl`?",
+    "answer": "Some downstream packages, like Oasis, assume `import ufl`, so aliasing avoids patching all of them."
+  },
+  {
+    "question": "How do you create a shim package to re-export `ufl_legacy` as `ufl`?",
+    "answer": "Create the file `/pyshims/ufl/__init__.py` with specific Python contents that import `ufl_legacy` as `ufl` and re-export its API."
+  },
+  {
+    "question": "How can you test the aliasing of `ufl_legacy` to `ufl` within an Apptainer container?",
+    "answer": "You can prepend the shim path to `PYTHONPATH` when launching inside the container, for example, using `APPTAINERENV_PYTHONPATH=<path_to_shim>:$PYTHONPATH apptainer exec ... python3 -c \"from ufl.tensors import ListTensor; print('UFL tensors ok')\"`."
+  }
+]

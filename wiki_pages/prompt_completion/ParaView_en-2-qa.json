@@ -1,74 +1,122 @@
 [
   {
     "question": "What is the purpose of the 'Remote Render Threshold' setting in ParaView's preferences?",
-    "answer": "The 'Remote Render Threshold' setting in ParaView (found under 'Render View -> Remote/Parallel Rendering Options') determines whether rendering is done on your local computer's GPU or remotely on the cluster. It helps balance interactivity and resource usage for different data sizes."
+    "answer": "The 'Remote Render Threshold' setting determines if small rendering tasks are handled by your computer's GPU or if all rendering is performed remotely on cluster resources."
   },
   {
-    "question": "How does setting the 'Remote Render Threshold' to its default value (e.g., 20MB) affect ParaView visualization?",
-    "answer": "If the 'Remote Render Threshold' is set to default (e.g., 20MB), small rendering tasks (under the threshold) will be handled by your computer's GPU, resulting in fast rotation with the mouse. However, anything modestly intensive (under 20MB) will be shipped to your computer, and visualization might be slow depending on your connection."
+    "question": "How does setting the 'Remote Render Threshold' to a default value (e.g., 20MB) affect ParaView visualization?",
+    "answer": "With a default threshold like 20MB, small renderings occur on your computer's GPU, making rotation with a mouse fast. However, modestly intensive tasks under 20MB are shipped to your computer, which can slow down visualization depending on your connection."
   },
   {
-    "question": "What happens if the 'Remote Render Threshold' is set to 0MB?",
-    "answer": "If the 'Remote Render Threshold' is set to 0MB, all rendering, including rotation, will be performed remotely. This means you will be fully utilizing the cluster resources for everything, which is beneficial for large data processing but may reduce interactivity."
+    "question": "What happens if the 'Remote Render Threshold' is set to 0MB in ParaView?",
+    "answer": "Setting the threshold to 0MB means all rendering, including rotation, is done remotely, utilizing cluster resources for everything. This is good for large data processing but may reduce interactivity."
   },
   {
-    "question": "How do you start a parallel job for ParaView rendering on multiple CPUs?",
-    "answer": "To start a parallel job for CPU-based rendering, you can use the command: `salloc --time=0:30:0 --ntasks=8 --mem-per-cpu=3600 --account=def-someprof`. Remember to specify the correct maximum walltime limit."
+    "question": "How can a user estimate the number of cores needed for CPU-only visualization on Fir, Nibi, Rorqual, and Narval?",
+    "answer": "Estimate the memory needed for rendering, then divide it by approximately 3.5 GB/core. For example, a 40GB dataset would require at least 12 cores."
   },
   {
-    "question": "After allocating a parallel CPU job, how do you start the ParaView server?",
-    "answer": "First, load the ParaView offscreen module: `module load paraview-offscreen/5.13.1`. Then, start the ParaView server using `srun pvserver --force-offscreen-rendering`."
+    "question": "What is the recommended memory allocation per core for software rendering on Fir, Nibi, Rorqual, and Narval?",
+    "answer": "It is not recommended to allocate more than 4GB/core for software rendering because it is CPU-intensive."
   },
   {
-    "question": "How can you verify that parallel rendering is active in ParaView?",
-    "answer": "To check that parallel rendering is active, you can pass your visualization through the 'Process Id Scalars' filter and then color it by 'process id'."
+    "question": "How do you start a serial CPU interactive job on Fir or Nibi for ParaView client-server visualization?",
+    "answer": "Log into Fir or Nibi and run `salloc --time=1:00:0 --ntasks=1 --mem-per-cpu=3600 --account=def-someprof`."
   },
   {
-    "question": "Which cluster nodes support GPU-based ParaView client-server visualization?",
-    "answer": "Cedar and Graham have interactive GPU nodes that can be used for remote client-server visualization."
+    "question": "What commands are used to load the ParaView module and start the server for CPU-based visualization after getting a job allocation?",
+    "answer": "Load the module with `module load paraview/5.13.1` and then start the server with `pvserver --force-offscreen-rendering`."
   },
   {
-    "question": "What is the first step to begin GPU-based ParaView visualization on Cedar or Graham?",
-    "answer": "The first step is to install the same ParaView version on your local computer as the one available on the cluster. Then, log into Cedar or Graham and start a serial GPU interactive job."
+    "question": "How do you establish an SSH tunnel from your local computer to a compute node for ParaView client-server visualization on Fir/Nibi?",
+    "answer": "In a separate terminal on your computer, use `ssh <username>@fir.alliancecan.ca -L 11111:fc30107:11111`, replacing the username and compute node as appropriate."
   },
   {
-    "question": "What command is used to request a serial GPU interactive job on Cedar or Graham?",
-    "answer": "A serial GPU interactive job can be requested using the command: `salloc --time=1:00:0 --ntasks=1 --mem-per-cpu=3600 --gres=gpu:1 --account=def-someprof`."
+    "question": "How do you configure the ParaView client to connect to a remote server?",
+    "answer": "In ParaView, go to 'File -> Connect', click 'Add Server', set name = fir, server type = Client/Server, host = localhost, port = 11111, then click 'Configure', select 'Manual', and 'Save'. Finally, select the server and click 'Connect'."
   },
   {
-    "question": "After starting a GPU interactive job, what steps are needed before starting the ParaView server?",
-    "answer": "At the job prompt, load the ParaView GPU+EGL module (`module load paraview/5.13.1`) and then unset your display variable (`unset DISPLAY`) to prevent ParaView from attempting to use the X11 rendering context."
+    "question": "How do you initiate a parallel job for ParaView CPU rendering on multiple CPUs?",
+    "answer": "Start a parallel job using `salloc --time=0:30:0 --ntasks=8 --mem-per-cpu=3600 --account=def-someprof` and ensure to specify the correct maximum walltime limit."
   },
   {
-    "question": "How do you start the ParaView server for GPU-based visualization on a compute node?",
-    "answer": "After loading the necessary modules and unsetting the DISPLAY variable, start the ParaView server by simply running `pvserver`. You should then wait for it to indicate it's 'Waiting for client...' and note the connection URL."
+    "question": "How do you start the ParaView server for parallel CPU rendering once a parallel job is allocated?",
+    "answer": "Load the ParaView module (`module load paraview/5.13.1`) and then start the server with `srun pvserver --force-offscreen-rendering`."
   },
   {
-    "question": "How do you establish an SSH tunnel from your local computer to the compute node for GPU-based ParaView visualization?",
-    "answer": "In a separate terminal on your computer (Mac/Linux or a terminal emulator on Windows), link the local port 11111 to the compute node's port 11111 using: `ssh <username>@cedar.computecanada.ca -L 11111:cdr347:11111` (replace `cdr347` with your specific node)."
+    "question": "How can a user verify that parallel rendering is occurring in ParaView?",
+    "answer": "You can pass your visualization through the 'Process Id Scalars' filter and then color it by 'process id'."
   },
   {
-    "question": "How do you configure the ParaView client to connect to a remote GPU server?",
-    "answer": "Start ParaView on your computer, go to 'File -> Connect' (or click the green 'Connect' button), and 'Add Server'. Configure it with `name = cedar`, `server type = Client/Server`, `host = localhost`, `port = 11111`. Then click 'Configure', select 'Manual', and click 'Save'. Finally, select the server from the list and click 'Connect'."
+    "question": "What command starts a serial GPU interactive job on Fir or Nibi for ParaView visualization?",
+    "answer": "Run `salloc --time=1:00:0 --ntasks=1 --mem-per-cpu=3600 --gres=gpu:1 --account=def-someprof`."
   },
   {
-    "question": "What is NVIDIA IndeX?",
-    "answer": "NVIDIA IndeX is a 3D volumetric interactive renderer that runs on NVIDIA GPUs, provided as a ParaView server plugin."
+    "question": "What are the steps to load the necessary modules and start the ParaView server for GPU-based visualization on Fir or Nibi?",
+    "answer": "Load the ParaView GPU+EGL module (`module load paraview/5.13.1`), unset the DISPLAY variable (`unset DISPLAY`), and then start the ParaView server with `pvserver`."
   },
   {
-    "question": "How do you enable the NVIDIA IndeX plugin in ParaView?",
-    "answer": "After connecting via client-server to a ParaView 5.10 (paraview-offscreen-gpu/5.10.0) instance running inside an interactive GPU job, go to `Tools | Manage Plugins` in your client and enable the `pvNVIDIAIndeX` plugin first locally and then remotely. Enabling it locally might be necessary to avoid server crashes."
+    "question": "What is NVIDIA IndeX and how does it relate to ParaView?",
+    "answer": "NVIDIA IndeX is a 3D volumetric interactive renderer for NVIDIA GPUs that functions as a ParaView server plugin."
   },
   {
-    "question": "What ParaView server version is required to use the NVIDIA IndeX plugin?",
-    "answer": "To use NVIDIA IndeX, you need to connect via client-server to ParaView 5.10, which is provided by `paraview-offscreen-gpu/5.10.0`."
+    "question": "What is the procedure to enable the NVIDIA IndeX plugin in ParaView?",
+    "answer": "After connecting via client-server to ParaView in an interactive GPU job, go to 'Tools | Manage Plugins' in your client and enable the `pvNVIDIAIndeX` plugin, first locally and then remotely."
   },
   {
-    "question": "Is parallel speedup guaranteed when using NVIDIA IndeX on multiple GPUs?",
-    "answer": "No, the parallel speedup with NVIDIA IndeX on multiple GPUs is described as far from perfect."
+    "question": "What should be considered when using NVIDIA IndeX on multiple GPUs?",
+    "answer": "It is important to test parallel scaling for your dataset, as parallel speedup can be imperfect. If performance doesn't improve with multiple GPUs, it's recommended to use a single GPU."
   },
   {
-    "question": "What should be done before performing production rendering with NVIDIA IndeX on multiple GPUs?",
-    "answer": "Before production rendering with IndeX on multiple GPUs, users should test their parallel scaling to confirm that using more than one GPU actually leads to better performance for their specific dataset; otherwise, it is recommended to use a single GPU."
+    "question": "What is the main limitation for client-server visualization on Trillium?",
+    "answer": "Trillium does not have GPUs, so visualization is limited to software rendering."
+  },
+  {
+    "question": "What commands are used to load ParaView and enable software rendering on Trillium?",
+    "answer": "First, `module load paraview`, then `paraview --mesa-swr` or another mesa flag to disable OpenGL hardware acceleration."
+  },
+  {
+    "question": "How do you initiate an interactive job for ParaView visualization on Trillium?",
+    "answer": "Launch an interactive job by running the command `debugjob`."
+  },
+  {
+    "question": "Which flag is recommended for faster software rendering on Trillium using the OpenSWR library?",
+    "answer": "The `--mesa-swr-avx2` flag is reported to offer faster software rendering using the OpenSWR library."
+  },
+  {
+    "question": "How do you set up an SSH tunnel for ParaView client-server connection to a Trillium compute node?",
+    "answer": "From your local computer, open a new terminal and run `ssh YOURusername@trillium.alliancecan.ca -L11111:niaXYZW:11111 -N`, replacing `YOURusername` and `niaXYZW` with your specific details."
+  },
+  {
+    "question": "How is parallel rendering achieved with multiple CPUs on Trillium?",
+    "answer": "Request a job using `salloc --ntasks=N*40 --nodes=N --time=1:00:00`, then load the ParaView module and run `srun pvserver --mesa`."
+  },
+  {
+    "question": "What are some prerequisites for client-server visualization on a CentOS Cloud VM?",
+    "answer": "You may need to install packages like `xauth`, `wget`, `gcc`, `gcc-c++`, `ncurses-devel`, `python-devel`, `libxcb-devel`, `patch`, `imake`, `libxml2-python`, `mesa-libGL`, `mesa-libGL-devel`, `mesa-libGLU`, `mesa-libGLU-devel`, `bzip2`, `bzip2-libs`, `libXt-devel`, `zlib-devel`, `flex`, and `byacc`."
+  },
+  {
+    "question": "Why is it necessary to compile ParaView with OSMesa support on a Cloud VM without a GPU?",
+    "answer": "OSMesa support enables offscreen (software) rendering without requiring an X server, which is necessary as most Arbutus VMs lack GPU access."
+  },
+  {
+    "question": "What two drivers are typically built with the default OSMesa configuration for ParaView on a Cloud VM?",
+    "answer": "The default configuration builds both `llvmpipe` (older and slower) and `SWR` (newer and faster) drivers."
+  },
+  {
+    "question": "Which driver is recommended for use with ParaView and OSMesa on a Cloud VM?",
+    "answer": "SWR (Intel's software rasterization library) is recommended."
+  },
+  {
+    "question": "How do you start the ParaView server with SWR rendering on a Cloud VM?",
+    "answer": "Run the command `./paraview/bin/pvserver --mesa-swr-avx2`."
+  },
+  {
+    "question": "How do you organize an SSH tunnel from a local machine to a Cloud VM's ParaView server?",
+    "answer": "Use the command `ssh centos@vm.ip.address -L 11111:localhost:11111`."
+  },
+  {
+    "question": "What message indicates that SWR is being used successfully during rendering on a Cloud VM?",
+    "answer": "You should see the message 'SWR detected AVX2' in the console during rendering."
   }
 ]

@@ -1,46 +1,82 @@
 [
   {
-    "question": "What topics does this tutorial cover regarding data handling in HPC?",
-    "answer": "This self-study tutorial will discuss issues in handling large amounts of data in HPC, various parallel I/O strategies for large-scale Input/Output (I/O) with parallel jobs, with a particular focus on MPI-IO, and will introduce parallel I/O libraries like NetCDF, HDF5, and ADIOS."
+    "question": "What is the main focus of this tutorial regarding large amounts of data in HPC?",
+    "answer": "This tutorial will discuss issues in handling large amounts of data in HPC, and a variety of parallel I/O strategies for doing large-scale input/output (I/O) with parallel jobs, particularly using MPI-IO, NetCDF, and HDF5."
   },
   {
-    "question": "What are the three primary I/O activities in computationally expensive HPC jobs?",
-    "answer": "The three primary I/O activities are reading initial datasets or conditions, storing numerical data from calculations for follow-up runs or post-processing, and writing the application state into a file for restarting the application in case of system failure."
+    "question": "What are the three important I/O activities in large parallel calculations?",
+    "answer": "The three important I/O activities are: reading the initial dataset or conditions, writing the application state for restarting (checkpointing), and storing results for follow-up runs or post-processing."
   },
   {
-    "question": "How does Amdahl's law relate to I/O performance in parallel HPC programs?",
-    "answer": "Amdahl's law states that a parallel program's speedup is limited by its sequential fraction. If the I/O part of an HPC application works sequentially, it can create a bottleneck, severely limiting the code's scalability and overall performance."
+    "question": "What is checkpointing in the context of HPC I/O?",
+    "answer": "Checkpointing refers to writing the application state to a file for restarting the application in case of some kind of failure."
   },
   {
-    "question": "Is achieving efficient I/O straightforward in HPC systems?",
-    "answer": "No, efficient I/O without stressing out the HPC system is challenging."
+    "question": "How does Amdahl's law relate to the I/O bottleneck in parallel programs?",
+    "answer": "Amdahl's law states that the speedup of a parallel program is limited by the time needed for the sequential fraction of the program. If the I/O part works sequentially, it creates a bottleneck that limits the desired performance."
   },
   {
-    "question": "Why are load/store operations a critical factor in HPC performance?",
-    "answer": "Load/store operations from memory or hard-disk take much more time than multiply operations in the CPU, making efficient I/O handling a key factor to achieve best overall performance in HPC."
+    "question": "What components contribute to the Total Execution Time in HPC?",
+    "answer": "Total Execution Time is comprised of Computation Time, Communication Time, and I/O time."
   },
   {
-    "question": "What are the components that make up the total execution time in high-performance computing?",
-    "answer": "The total execution time in high-performance computing consists of computation time in the CPU, communication time in the inter-connection or network, and I/O time."
+    "question": "Why is efficient I/O challenging in HPC systems?",
+    "answer": "Efficient I/O is challenging because I/O-related systems are often slow compared to other parts of HPC systems, and supercomputers can produce data much faster than it can be stored."
   },
   {
-    "question": "How does the improvement in supercomputer speed compare to disk access rates over time?",
-    "answer": "From 1960 to 2014, top supercomputer speed increased by 11 orders of magnitude, while single hard disk drive capacity grew by 6 orders, and the average internal drive access rate grew by only 3-4 orders of magnitude. This significant discrepancy means systems produce far more data than can be stored proportionally."
+    "question": "How has the speed of storage and supercomputers changed over time, contributing to I/O challenges?",
+    "answer": "From 1956 to 2014, storage speed increased by a little over 4 orders of magnitude. In less than half that time (1993 to 2014), the speed of top supercomputers increased by over five orders of magnitude, causing data to be produced much faster than it can be stored."
   },
   {
-    "question": "What is IOPs in the context of I/O performance?",
-    "answer": "IOPs stands for I/O operations per second, which includes read/write operations, and is essentially the inverse of latency."
+    "question": "What does IOPs stand for and what does it measure?",
+    "answer": "IOPs stands for I/O operations per second (read/write/open/close/seek) and is essentially an inverse of latency."
   },
   {
     "question": "How is I/O Bandwidth defined?",
-    "answer": "I/O Bandwidth is defined as the quantity of data that you read or write."
+    "answer": "I/O Bandwidth is defined as the quantity of data you read or write."
   },
   {
-    "question": "Are parallel filesystems designed to provide 'supercomputing' performance for I/O?",
-    "answer": "No, parallel (distributed) filesystems are optimized for efficient I/O by multiple users on multiple machines/nodes, but they do not result in 'supercomputing' performance."
+    "question": "Do parallel filesystems provide 'supercomputing' performance for I/O?",
+    "answer": "No, parallel (distributed) filesystems are optimized for efficient I/O by multiple users on multiple machines/nodes but do not result in 'supercomputing' performance due to factors like disk-access time and communication over the network."
   },
   {
-    "question": "Are high-end SSDs suitable for supercomputing systems with hundreds of terabytes of data?",
-    "answer": "While top-of-the-line SSDs on a PCI Express can achieve up to 1GB IOPs, they are still very expensive and not a suitable fit for several hundreds terabyte supercomputing systems."
+    "question": "What is the typical I/O Software + Hardware stack in an HPC environment?",
+    "answer": "The typical I/O stack is: I/O Hardware --> Parallel filesystem --> I/O Middleware --> High-end I/O library --> Application."
+  },
+  {
+    "question": "What open-source parallel filesystem is commonly used on national HPC systems?",
+    "answer": "Lustre is an open-source filesystem commonly run on most national systems."
+  },
+  {
+    "question": "What is the purpose of a parallel filesystem?",
+    "answer": "The purpose of a parallel filesystem is to maintain logical partitions and provide efficient access to data."
+  },
+  {
+    "question": "What role does I/O middleware play in organizing parallel I/O?",
+    "answer": "I/O middleware organizes access from many processes by optimizing two-phase I/O, disk I/O, and data flow over the network, and by providing data sieving (converting many small non-contiguous I/O requests into fewer/bigger requests)."
+  },
+  {
+    "question": "Which high-end I/O libraries are mentioned that map application abstractions to storage abstractions?",
+    "answer": "High-end I/O libraries like HDF5 and NetCDF are mentioned, which map application abstractions to storage abstractions in terms of the data structures of the code."
+  },
+  {
+    "question": "How do parallel filesystems improve performance by handling files across multiple drives?",
+    "answer": "For better performance, files can be striped across multiple drives, meaning a file resides on multiple drives so that reading operations can occur concurrently from different drives."
+  },
+  {
+    "question": "How do parallel file systems manage concurrent file access by different processes?",
+    "answer": "Parallel file systems use locks to manage concurrent file access. Files are pieced into 'lock' units scattered across multiple drives, and client nodes obtain locks on units they access before I/O occurs."
+  },
+  {
+    "question": "What type of files are parallel filesystems optimized for?",
+    "answer": "Parallel filesystems are optimized for storing large shared files that can be accessed by many computing nodes."
+  },
+  {
+    "question": "What kind of file storage performs poorly on parallel filesystems?",
+    "answer": "Storing many small-sized files shows very poor performance on parallel filesystems; users are strongly recommended not to generate millions of small files."
+  },
+  {
+    "question": "How can a user's I/O activities affect others on a shared parallel filesystem?",
+    "answer": "A user's I/O activities, such as how they read/write, file format, number of files, and frequency of 'ls' commands, can hammer the filesystem, slow down the system, and prevent process communications (like MPI communication), affecting all users."
   }
 ]

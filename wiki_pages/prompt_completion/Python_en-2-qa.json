@@ -1,34 +1,38 @@
 [
   {
-    "question": "How can you create a `requirements.txt` file for a TensorFlow environment?",
-    "answer": "First, load Python 3.10 (module load python/3.10). Then, create a temporary virtual environment in `/tmp/$RANDOM`, activate it, upgrade pip, install tensorflow using `pip install --no-index tensorflow`, and finally generate the requirements file with `pip freeze --local > requirements.txt`. After generating, deactivate and remove the temporary environment."
+    "question": "What is the typical sequence of commands to create a `requirements.txt` file for a TensorFlow environment on a login node?",
+    "answer": "The sequence involves loading the Python module, setting an `ENVDIR`, creating the virtual environment with `virtualenv --no-download $ENVDIR`, activating it with `source $ENVDIR/bin/activate`, upgrading pip with `pip install --no-index --upgrade pip`, installing TensorFlow with `pip install --no-index tensorflow`, generating the `requirements.txt` file with `pip freeze --local > requirements.txt`, deactivating the environment, and finally removing the temporary directory with `rm -rf $ENVDIR`."
   },
   {
-    "question": "What is the purpose of a `requirements.txt` file?",
-    "answer": "A `requirements.txt` file ensures that your Python environment is reproducible between jobs by freezing the specific packages and their versions."
+    "question": "What is the purpose of the `requirements.txt` file mentioned in the context?",
+    "answer": "This file will ensure that your environment is reproducible between jobs."
   },
   {
-    "question": "What should you do if a required package's wheel is not available in the wheelhouse?",
-    "answer": "If a wheel is not available in the wheelhouse, you can pre-download it. If you believe the missing wheel should be included, contact technical support to request it."
+    "question": "What should be done if a required package wheel is not available in the provided wheelhouse?",
+    "answer": "If the wheel is not available in our wheelhouse, you can pre-download it or contact Technical support to make a request for its inclusion."
   },
   {
-    "question": "What is the general strategy for running Python scripts across multiple nodes with virtual environments?",
-    "answer": "In order to run scripts across multiple nodes, each node must have its own virtual environment activated. You create the virtual environment on each allocated node within your submission script, then activate it on the main node, and finally use `srun` to run your script."
+    "question": "How are virtual environments created on multiple allocated nodes within a job submission script?",
+    "answer": "In your submission script, create the virtual environment on each allocated node using an `srun` command block: `srun --ntasks $SLURM_NNODES --tasks-per-node=1 bash << EOF ... EOF` which contains commands to create, activate, and install packages into the virtual environment using `--no-download` and `--no-index` options."
   },
   {
-    "question": "How do you create a virtual environment on each allocated node in a multi-node job submission script?",
-    "answer": "You can use an `srun` block within your submission script, running commands like `virtualenv --no-download $SLURM_TMPDIR/env`, `source $SLURM_TMPDIR/env/bin/activate`, `pip install --no-index --upgrade pip`, and `pip install --no-index -r requirements.txt` for each node."
+    "question": "After creating virtual environments on multiple nodes, how is the virtual environment activated on the main node?",
+    "answer": "Activate the virtual environment on the main node using `source $SLURM_TMPDIR/env/bin/activate;`."
   },
   {
-    "question": "After virtual environments are created on all allocated nodes, how do you activate it on the main node?",
-    "answer": "You activate the virtual environment on the main node using the command: `source $SLURM_TMPDIR/env/bin/activate;`."
+    "question": "How is a Python script executed across multiple nodes after setting up node-local virtual environments?",
+    "answer": "Use `srun python myscript.py;` to run your script, as `srun` exports the current environment, which contains `$VIRTUAL_ENV` and `$PATH` variables."
   },
   {
-    "question": "How do you run a Python script across multiple nodes once the virtual environments are set up and activated on the main node?",
-    "answer": "You use the `srun` command to run your script, for example, `srun python myscript.py;`, as `srun` will export the current environment, including the virtual environment variables."
+    "question": "What modules are loaded in the example multi-node submission script?",
+    "answer": "The example submission script loads `StdEnv/2023`, `python/3.11`, and `mpi4py`."
   },
   {
-    "question": "What environment modules are loaded in the example multi-node job submission script?",
-    "answer": "The example multi-node job submission script loads `StdEnv/2023`, `python/3.11`, and `mpi4py`."
+    "question": "What is the command to install TensorFlow without using PyPI?",
+    "answer": "The command is `pip install --no-index tensorflow`."
+  },
+  {
+    "question": "What command is used to upgrade pip without accessing the PyPI index?",
+    "answer": "The command is `pip install --no-index --upgrade pip`."
   }
 ]

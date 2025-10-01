@@ -1,0 +1,46 @@
+[
+  {
+    "question": "Why is memory important for quantum chemistry calculations?",
+    "answer": "Quantum chemistry calculations are often 'memory bound', and larger molecules at higher theoretical levels frequently require more RAM than typically available on a computer."
+  },
+  {
+    "question": "How do GAMESS packages manage memory to free it up during calculations?",
+    "answer": "GAMESS packages utilize 'scratch' storage to save intermediate results, accessing the disk later for calculations to help free up main memory."
+  },
+  {
+    "question": "What is the main disadvantage of using scratch storage compared to RAM?",
+    "answer": "Even the fastest scratch storage is significantly slower than RAM."
+  },
+  {
+    "question": "How should memory be specified for a GAMESS task?",
+    "answer": "Memory should be specified in two places: in the job submission script (e.g., using `--mem-per-cpu=4000M`) and within the `$SYSTEM group` of the GAMESS input file using the `MWORDS` and `MEMDDI` options."
+  },
+  {
+    "question": "What is a recommended value for `--mem-per-cpu` in a GAMESS job submission script?",
+    "answer": "A value of `--mem-per-cpu=4000M` is considered reasonable, as it corresponds to the memory-to-CPU ratio of basic nodes."
+  },
+  {
+    "question": "What might happen if you request too much memory using `--mem-per-cpu` in the job script?",
+    "answer": "Requesting too much memory might cause the task to remain pending, waiting to be executed on a 'large' type node."
+  },
+  {
+    "question": "What do `MWORDS` and `MEMDDI` options represent in the GAMESS input file?",
+    "answer": "`MWORDS` specifies the maximum memory a task can use on each core (in units of 1,000,000 words, where a word is 8 bytes), and `MEMDDI` specifies the total memory needed for the Distributed Data Interface (DDI) (also in units of 1,000,000 words)."
+  },
+  {
+    "question": "How is the total memory required per CPU core calculated in GAMESS when using `MWORDS` and `MEMDDI`?",
+    "answer": "The memory required per CPU core when using `p` CPU cores is calculated as `MEMDDI/p + MWORDS`."
+  },
+  {
+    "question": "Why is it important to keep a safety margin between the memory requested to the scheduler and the memory GAMESS uses?",
+    "answer": "It is important to maintain a safety margin of a few hundred MB to prevent the scheduler from terminating the job if GAMESS exceeds the memory requested to the scheduler."
+  },
+  {
+    "question": "How can you tell if a GAMESS job was terminated due to exceeding its memory limit?",
+    "answer": "If the job results are incomplete and the `slurm-{JOBID}.out` file contains a message like 'slurmstepd: error: Exceeded step/job memory limit at some point', it indicates that Slurm stopped the task because it used more memory than requested."
+  },
+  {
+    "question": "What actions can be taken if a GAMESS job fails because it exceeded its memory limit?",
+    "answer": "If a GAMESS job fails due to exceeding its memory limit, you can either reduce the `MWORDS` or `MEMDDI` values in the input file or increase the `--mem-per-cpu` value in the submission script."
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What are the recommended characteristics for choosing a metajob's runtime?",
+    "answer": "The metajob runtime should be significantly larger than the average runtime of an individual case (ideally 100 times or more), definitely longer than the longest expected individual case, and typically no more than 3 days. For Alliance general-purpose clusters, 12h or 24h are good choices due to scheduling policies."
+  },
+  {
+    "question": "How does a metajob's runtime choice impact its scheduling?",
+    "answer": "The longer a job's runtime is, the longer it will usually wait to be scheduled."
+  },
+  {
+    "question": "Once a metajob runtime is decided, how do you calculate the number of metajobs needed?",
+    "answer": "Divide the total number of CPU-hours by the chosen runtime (in hours) and round the result up to the next integer to get the required number of metajobs."
+  },
+  {
+    "question": "What are the benefits of selecting an optimal metajob runtime and count?",
+    "answer": "Choosing optimal metajob runtime and count should lead to a fairly small queue wait time and high throughput and efficiency for the farm."
+  },
+  {
+    "question": "Can you provide a calculation example for determining metajob runtime and quantity?",
+    "answer": "If the average case runtime is 95 seconds, with 1000 total cases and a 1.2 safety factor, the total CPU-hours needed are 31.7. By choosing a 3-hour metajob runtime (set as `#SBATCH -t 3:00:00` in `job_script.sh`), approximately 11 metajobs would be required (calculated as 31.7 / 3 rounded up, then launched with `submit.run 11`)."
+  },
+  {
+    "question": "What is the job submission limit on Nibi and Rorqual clusters for a single command?",
+    "answer": "The maximum number of jobs that can be submitted on Nibi and Rorqual clusters with a single command is 1000."
+  },
+  {
+    "question": "How can one manage a particularly large farm (more than 1000 cases) on Nibi or Rorqual?",
+    "answer": "For farms larger than 1000 jobs, you can repeatedly use `submit.run 1000`, followed by `resubmit.run 1000` after each previous farm completes, or leverage the advanced feature for automatic resubmission to automate these steps."
+  },
+  {
+    "question": "What is the recommended initial step before running a large production farm?",
+    "answer": "Always start with a small test run to ensure everything works correctly before submitting a large production run."
+  },
+  {
+    "question": "How can individual cases be tested before launching a full farm?",
+    "answer": "You can test individual cases by reserving an interactive node with `salloc`, navigating to the farm directory, and executing commands like `./single_case.sh table.dat 1` or `./single_case.sh table.dat 2`."
+  },
+  {
+    "question": "What are the key optimization strategies for very large farms (over 10,000 cases)?",
+    "answer": "For very large farms, minimize the number of files and directories created. Instruct your code to append to existing files (one per metajob, without mixing results from different metajobs) instead of creating a separate file or subdirectory for each case."
+  },
+  {
+    "question": "Why is it recommended to avoid creating a separate subdirectory for each case in very large farms?",
+    "answer": "While creating separate subdirectories for each case is the default for safety, it can be inefficient for very large farms and should be avoided for better performance if possible."
+  },
+  {
+    "question": "What is an example of an optimized `single_case.sh` configuration for efficiency in large farms?",
+    "answer": "An optimized `single_case.sh` configuration might involve the code accepting an output file name via a command line switch (e.g., `-o`), opening output files in append mode, using `$COMM` for arguments from `table.dat`, allowing concurrent runs in the same directory, and outputting to a metajob-specific file like `/path/to/your/code $COMM -o output.$METAJOB_ID`."
+  },
+  {
+    "question": "What is the primary benefit of using an optimized `single_case.sh` setup for very large farms?",
+    "answer": "With an optimized setup, even very large farms (hundreds of thousands or millions of cases) can run efficiently with a minimal number of files created."
+  },
+  {
+    "question": "Where can users find more advanced features and troubleshooting for META-Farm?",
+    "answer": "More detailed discussion of advanced features and troubleshooting suggestions can be found in the 'META-Farm: Advanced features and troubleshooting' document."
+  },
+  {
+    "question": "Who should be contacted for further assistance with the META package?",
+    "answer": "For more help, contact technical support, specifically mentioning the package name (META) and the staff member who wrote the software (Sergey Mashchenko)."
+  }
+]

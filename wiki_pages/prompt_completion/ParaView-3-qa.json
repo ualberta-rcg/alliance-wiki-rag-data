@@ -1,58 +1,86 @@
 [
   {
-    "question": "What is recommended when running NVIDIA IndeX in parallel on multiple GPUs?",
-    "answer": "It is recommended to test parallel scaling before doing any production rendering with IndeX on multiple GPUs to verify that using more than one GPU leads to better performance for your dataset; otherwise, use a single GPU."
+    "question": "What should users consider regarding parallel speedup when running NVIDIA IndeX on multiple GPUs?",
+    "answer": "Users should test their parallel scaling to verify if using more than one GPU leads to better performance for their dataset, as parallel speedup can be imperfect; otherwise, a single GPU should be used."
   },
   {
-    "question": "Does Niagara support GPU-based visualization for ParaView?",
-    "answer": "No, Niagara does not have GPUs, so visualization on this system is limited to software rendering."
+    "question": "Does Trillium support GPU-based client-server visualization?",
+    "answer": "No, Trillium does not have GPUs, so visualization on Trillium is limited to software rendering."
   },
   {
-    "question": "How do you configure ParaView for software rendering on Niagara?",
-    "answer": "You need to explicitly specify one of the mesa flags, such as `--mesa-swr`, to tell ParaView not to use OpenGL hardware acceleration after loading the ParaView module."
+    "question": "According to the outdated documentation, what module must be loaded before the `paraview` module on Trillium?",
+    "answer": "The `StdEnv/2023` module is required before loading the `paraview` module on Trillium."
   },
   {
-    "question": "What command is used to launch an interactive job on Niagara to access resources for ParaView visualization?",
-    "answer": "You need to start a `debugjob` by running the `debugjob` command."
+    "question": "How do you explicitly tell ParaView not to use OpenGL hardware acceleration for software rendering on Trillium?",
+    "answer": "You need to explicitly specify one of the Mesa flags, such as `paraview --mesa-swr`."
   },
   {
-    "question": "After launching a debugjob on Niagara, how do you load the ParaView module and start the server?",
-    "answer": "Load the ParaView module using `module load paraview` and then start the server with `pvserver --mesa-swr-ax2`."
+    "question": "How can you launch an interactive job to access resources on Trillium for client-server visualization?",
+    "answer": "You can launch an interactive job by running the `debugjob` command."
   },
   {
-    "question": "Which ParaView server flag is reported to offer faster software rendering on Niagara?",
-    "answer": "The `--mesa-swr-avx2` flag is reported to offer faster software rendering using the OpenSWR library."
+    "question": "What commands are used to load ParaView and start the server for software rendering after obtaining a compute node on Trillium?",
+    "answer": "You would use `module load paraview` followed by `pvserver --mesa-swr-ax2`."
   },
   {
-    "question": "What information should be noted once the ParaView server is ready on a Niagara compute node?",
-    "answer": "You should note the connection URL, specifically the compute node name (e.g., `niaXYZW`) and the port (usually `11111`)."
+    "question": "What is the reported benefit of using the `--mesa-swr-avx2` flag when starting the ParaView server on Trillium?",
+    "answer": "The `--mesa-swr-avx2` flag has been reported to offer faster software rendering using the OpenSWR library."
   },
   {
-    "question": "How do you establish an SSH tunnel from your local computer to a Niagara compute node for ParaView client-server connection?",
-    "answer": "Open a new terminal and use the command `ssh YOURusername@niagara.scinet.utoronto.ca -L11111:niaXYZW:11111 -N`, replacing `YOURusername` and `niaXYZW` with your specific details."
+    "question": "How do you establish an SSH tunnel from your local computer to a Trillium compute node for a ParaView client-server connection?",
+    "answer": "You can establish a tunnel by running `ssh YOURusername@trillium.alliancecan.ca -L11111:niaXYZW:11111 -N` in a new terminal, replacing `YOURusername` and `niaXYZW` with the correct values."
   },
   {
-    "question": "What is the purpose of the `ssh` command with the `-L` option for ParaView connection on Niagara?",
-    "answer": "It establishes a tunnel mapping port 11111 on your local computer (`localhost`) to port 11111 on the Niagara compute node (e.g., `niaXYZW`) where the ParaView server is waiting for connections."
+    "question": "What steps are needed to configure the ParaView client on your local computer to connect to a Trillium server?",
+    "answer": "Start ParaView, go to 'File -> Connect', click 'Add Server', set name = trillium, server type = Client/Server, host = localhost, port = 11111, then 'Configure', select 'Manual', and 'Save'. Finally, select the server from the list and click 'Connect'."
   },
   {
-    "question": "How do you configure the ParaView client on your local computer to connect to the server on Niagara?",
-    "answer": "In your local ParaView client, go to 'File -> Connect', click 'Add Server', and set 'name = niagara', 'server type = Client/Server', 'host = localhost', 'port = 11111'. Then click 'Configure', select 'Manual', and click 'Save'."
+    "question": "How is parallel rendering on multiple CPUs initiated on Trillium?",
+    "answer": "Parallel rendering is initiated by requesting a job with `salloc --ntasks=N*40 --nodes=N --time=1:00:00`, loading `module load paraview`, and then running `srun pvserver --mesa`."
   },
   {
-    "question": "How can you perform parallel rendering using multiple CPUs on Niagara?",
-    "answer": "You should run `pvserver` using `srun` within an allocated job. For example, request a job with `salloc --ntasks=N*40 --nodes=N --time=1:00:00`, then load the ParaView module and run `srun pvserver --mesa`."
+    "question": "Why is it necessary to compile ParaView with OSMesa support on a Cloud VM?",
+    "answer": "Since most Arbutus VMs do not have access to a GPU, OSMesa support is needed to enable offscreen (software) rendering."
   },
   {
-    "question": "What are the prerequisites for client-server visualization on a cloud VM?",
-    "answer": "You need to launch a new virtual machine (VM) using the Cloud Quick Start Guide and then install additional packages to be able to compile ParaView or VisIt."
+    "question": "Which software driver is recommended for offscreen CPU-based rendering when ParaView is compiled with OSMesa on a VM?",
+    "answer": "The `SWR` (newer and faster) driver is recommended over `llvmpipe`."
   },
   {
-    "question": "Which packages are typically installed on a CentOS VM for compiling ParaView or VisIt?",
-    "answer": "Common packages include `xauth`, `wget`, `gcc`, `gcc-c++`, `ncurses-devel`, `python-devel`, `libxcb-devel`, `patch`, `imake`, `libxml2-python`, `mesa-libGL`, `mesa-libGL-devel`, `mesa-libGLU`, `mesa-libGLU-devel`, `bzip2`, `bzip2-libs`, `libXt-devel`, `zlib-devel`, `flex`, and `byacc`. A symbolic link for `glx.h` is also typically created."
+    "question": "What command is used to start the ParaView server on a Cloud VM with SWR rendering after it has been compiled?",
+    "answer": "The command to start the ParaView server is `./paraview/bin/pvserver --mesa-swr-avx2`."
   },
   {
-    "question": "How can a user simplify SSH logins to a cloud VM if they have their own private-public SSH key pair?",
-    "answer": "The user can copy their public key to the VM's `authorized_keys` file by running `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'` on their computer."
+    "question": "How do you organize an SSH tunnel from your local computer to a Cloud VM's ParaView server port 11111?",
+    "answer": "You can organize an SSH tunnel using the command `ssh centos@vm.ip.address -L 11111:localhost:11111`."
+  },
+  {
+    "question": "What message indicates successful SWR rendering when the ParaView client connects to a VM server?",
+    "answer": "During rendering in the console, the message 'SWR detected AVX2' should appear."
+  },
+  {
+    "question": "What are some prerequisite packages to install on a CentOS VM for compiling ParaView or VisIt?",
+    "answer": "You need to install packages such as `xauth`, `wget`, `gcc`, `gcc-c++`, `ncurses-devel`, `python-devel`, `libxcb-devel`, `patch`, `imake`, `libxml2-python`, `mesa-libGL`, `mesa-libGL-devel`, `mesa-libGLU`, `mesa-libGLU-devel`, `bzip2`, `bzip2-libs`, `libXt-devel`, `zlib-devel`, `flex`, and `byacc`."
+  },
+  {
+    "question": "How do you copy a public SSH key to a Cloud VM to simplify logins?",
+    "answer": "On your computer, issue the command `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'`."
+  },
+  {
+    "question": "What are the general steps to compile `cmake` on a Cloud VM as a prerequisite?",
+    "answer": "The steps are to `wget` the tarball, unpack it and `cd` into the directory, then run `./bootstrap`, `make`, and `sudo make install`."
+  },
+  {
+    "question": "What are some of the key `cmake` flags used when compiling `llvm` for ParaView on a Cloud VM?",
+    "answer": "Key `cmake` flags include `-DCMAKE_BUILD_TYPE=Release`, `-DLLVM_BUILD_LLVM_DYLIB=ON`, `-DLLVM_ENABLE_RTTI=ON`, `-DLLVM_INSTALL_UTILS=ON`, and `-DLLVM_TARGETS_TO_BUILD:STRING=X86`."
+  },
+  {
+    "question": "What are essential configure flags for compiling Mesa with OSMesa support on a Cloud VM?",
+    "answer": "Essential flags include `--enable-opengl --disable-gles1 --disable-gles2 --enable-shared-glapi --enable-gallium-llvm --enable-llvm-shared-libs --with-gallium-drivers=swrast,swr --enable-gallium-osmesa`."
+  },
+  {
+    "question": "What are some of the important `cmake` flags for compiling the ParaView server for offscreen rendering on a Cloud VM?",
+    "answer": "Important `cmake` flags include `-DCMAKE_BUILD_TYPE=Release`, `-DCMAKE_INSTALL_PREFIX=/home/centos/paraview`, `-DPARAVIEW_USE_MPI=OFF`, `-DPARAVIEW_ENABLE_PYTHON=ON`, `-DPARAVIEW_BUILD_QT_GUI=OFF`, `-DVTK_OPENGL_HAS_OSMESA=ON`, `-DVTK_USE_OFFSCREEN=ON`, and `-DVTK_USE_X=OFF`."
   }
 ]

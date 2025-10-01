@@ -1,0 +1,98 @@
+[
+  {
+    "question": "What are the different types of GPU memories available for CUDA operations?",
+    "answer": "The several types of memories available for CUDA operations are Global memory, Shared memory, Registers and Local Memory, and Constant memory."
+  },
+  {
+    "question": "Describe Global memory in CUDA.",
+    "answer": "Global memory is off-chip, good for I/O, but relatively slow."
+  },
+  {
+    "question": "Describe Shared memory in CUDA.",
+    "answer": "Shared memory is on-chip, good for thread collaboration, and very fast."
+  },
+  {
+    "question": "Describe Registers and Local Memory in CUDA.",
+    "answer": "Registers and Local Memory serve as thread work space and are very fast."
+  },
+  {
+    "question": "How do you allocate an object in device memory using CUDA?",
+    "answer": "You use the `cudaMalloc((void**)&array, size)` function. It requires the address of a pointer of the allocated array and its size."
+  },
+  {
+    "question": "How do you deallocate an object from device memory using CUDA?",
+    "answer": "You use the `cudaFree(array)` function, which requires just a pointer to the array."
+  },
+  {
+    "question": "How do you copy data between host and device memory in CUDA synchronously?",
+    "answer": "You use the `cudaMemcpy(array_dest, array_orig, size, direction)` function. It requires pointers to the destination and original arrays, the size, and the direction type (e.g., `cudaMemcpyHostToDevice`, `cudaMemcpyDeviceToHost`)."
+  },
+  {
+    "question": "What is `cudaMemcpyAsync` and what is its advantage?",
+    "answer": "`cudaMemcpyAsync` is similar to `cudaMemcpy` but transfers data asynchronously, meaning it doesn't block the execution of other processes."
+  },
+  {
+    "question": "What is the purpose of the initial simple CUDA C program example provided?",
+    "answer": "The initial simple CUDA C program example shows how to add two numbers on the GPU using CUDA, serving as a basic exercise."
+  },
+  {
+    "question": "In the simple CUDA C program, how is memory allocated for `dev_a`, `dev_b`, and `dev_c` on the device?",
+    "answer": "Memory is allocated using `cudaMalloc((void**)&dev_a, size)`, `cudaMalloc((void**)&dev_b, size)`, and `cudaMalloc((void**)&dev_c, size)` respectively."
+  },
+  {
+    "question": "How are initial values transferred from host to device in the simple CUDA C program?",
+    "answer": "Values are transferred using `cudaMemcpy(dev_a, &a, size, cudaMemcpyHostToDevice)` and `cudaMemcpy(dev_b, &b, size, cudaMemcpyHostToDevice)`."
+  },
+  {
+    "question": "How is the `add` kernel launched on the GPU in the initial simple CUDA C program?",
+    "answer": "The `add` kernel is launched using `add <<< 1, 1 >>> (dev_a, dev_b, dev_c)`."
+  },
+  {
+    "question": "How is the result transferred back from device to host in the simple CUDA C program?",
+    "answer": "The result is transferred using `cudaMemcpy(&c, dev_c, size, cudaMemcpyDeviceToHost)`."
+  },
+  {
+    "question": "How are device memories `dev_a`, `dev_b`, and `dev_c` deallocated in the simple CUDA C program?",
+    "answer": "They are deallocated using `cudaFree(dev_a)`, `cudaFree(dev_b)`, and `cudaFree(dev_c)`."
+  },
+  {
+    "question": "How can parallelism be achieved in the simple CUDA C program by executing multiple CUDA blocks?",
+    "answer": "By changing the kernel launch syntax from `add <<< 1, 1 >>>` to `add <<< N, 1 >>>`, where N different CUDA blocks will be executed at the same time."
+  },
+  {
+    "question": "What modification is needed in the `add` kernel to support parallelism across CUDA blocks?",
+    "answer": "The kernel needs to use `blockIdx.x` to access different elements of the input arrays, for example: `c[blockIdx.x] = a[blockIdx.x] + b[blockIdx.x];`"
+  },
+  {
+    "question": "How can parallelism be achieved in the simple CUDA C program by distributing the job across parallel threads within a single block?",
+    "answer": "By changing the kernel launch syntax from `add <<< 1, 1 >>>` to `add <<< 1, N >>>`, where N represents the number of threads within a block."
+  },
+  {
+    "question": "What is the advantage of having parallel threads within a block compared to parallel blocks?",
+    "answer": "Unlike blocks, threads within a block can communicate with each other, which is advantageous for parallelizing tasks that involve heavy communication."
+  },
+  {
+    "question": "When should you distribute independent code chunks across parallel blocks versus parallel threads?",
+    "answer": "Chunks of code that can run independently (with little or no communication) are distributed across parallel blocks. When heavy communication is involved, you parallelize across multiple threads in the block."
+  },
+  {
+    "question": "Why is shared memory advantageous in CUDA operations?",
+    "answer": "Shared memory is very fast and can significantly speed up memory operations between threads, especially when there are many communications."
+  },
+  {
+    "question": "What is a key limitation of shared memory regarding thread communication?",
+    "answer": "Only the threads within a block can communicate using shared memory."
+  },
+  {
+    "question": "How is shared memory declared within a CUDA kernel, as shown in the dot product example?",
+    "answer": "Shared memory is declared using the `__shared__` keyword, for example: `__shared__ int temp[N];`"
+  },
+  {
+    "question": "In the dot product example, how is the issue of each thread's `temp` variable being private resolved?",
+    "answer": "The issue is resolved by using shared memory, allowing threads within the block to share data."
+  },
+  {
+    "question": "What is the purpose of `__syncthreads()` in the shared memory dot product kernel example?",
+    "answer": "`__syncthreads()` ensures that all threads within a block have completed their operations up to that point before proceeding, which is crucial for correct shared memory access and sum calculation."
+  }
+]

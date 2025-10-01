@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What is the purpose of persistent overlays in Apptainer?",
+    "answer": "Persistent overlays allow you to superimpose a read/write filesystem onto an immutable (read-only) container."
+  },
+  {
+    "question": "Why is it necessary to use bind mounts with Apptainer options like `-C` or `-c`?",
+    "answer": "Using options like `-C` or `-c` with a container prevents access to your disk space, so bind mounts are needed to explicitly grant access to that space."
+  },
+  {
+    "question": "How can I bind mount the current directory into an Apptainer container?",
+    "answer": "You can bind mount the current directory using the `-B .` option in your `apptainer run` command, for example: `apptainer run -C -B . -W $SLURM_TMPDIR a-container.sif wc -l ./my_data_file.txt`."
+  },
+  {
+    "question": "How do you bind mount multiple top-level directories, such as `/project` and `/scratch`, on clusters?",
+    "answer": "You can use multiple `-B` options in the `apptainer run` command, for example: `apptainer run -C -B /project -B /scratch -W $SLURM_TMPDIR a-container.sif wc -l ./my_data_file.txt`."
+  },
+  {
+    "question": "What are the benefits of bind mounting higher-level directories?",
+    "answer": "Bind mounting higher-level directories is useful for accessing files from other team members and for accessing files and directories that are symlinks to different locations, which might otherwise be inaccessible."
+  },
+  {
+    "question": "What script should I run if bind mounts are not working on the cluster?",
+    "answer": "If bind mounts are not working on your cluster, you should launch the script `/home/preney/public/apptainer-scripts/get-apptainer-options.sh` to obtain the necessary Apptainer options."
+  },
+  {
+    "question": "How can I bind mount a host file to a different path inside an Apptainer container?",
+    "answer": "You can bind mount a host file to a different path inside the container by specifying the source and destination paths separated by a colon, like `-B ./my_data_file.txt:/special/input.dat`."
+  },
+  {
+    "question": "When is it useful to bind mount a file or directory to a different location within the container?",
+    "answer": "This is useful when programs or scripts in a container contain hard-coded paths to files or directories that are located elsewhere on the host system."
+  },
+  {
+    "question": "What is the recommended way to bind mount the `/home` filesystem into an Apptainer container to prevent interference?",
+    "answer": "It is recommended to use an alternative destination directory, such as `-B /home:/cluster_home`, when bind mounting the `/home` filesystem into your container."
+  },
+  {
+    "question": "Why should I avoid bind mounting CVMFS into Apptainer containers?",
+    "answer": "You should avoid bind mounting CVMFS into your containers because CVMFS programs can be incompatible with your containers, and the goal of a container is to provide a complete, self-contained environment independent of external software."
+  }
+]

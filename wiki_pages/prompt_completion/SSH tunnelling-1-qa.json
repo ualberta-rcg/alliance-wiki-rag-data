@@ -4,79 +4,107 @@
     "answer": "SSH tunnelling is a method to use a gateway computer to connect two computers that cannot connect directly."
   },
   {
-    "question": "Why is SSH tunnelling necessary for compute nodes on Alliance clusters like Niagara, B\u00e9luga, and Graham?",
-    "answer": "SSH tunnelling is necessary because compute nodes on these clusters do not have direct access to the Internet, nor can they be contacted directly from the Internet."
+    "question": "Why is SSH tunnelling necessary in the context of the Alliance?",
+    "answer": "In the context of the Alliance, SSH tunnelling is necessary because compute nodes on some clusters do not have direct access to the Internet, nor can they be contacted directly from the Internet."
   },
   {
-    "question": "What are the main use cases that require SSH tunnels in the Alliance context?",
-    "answer": "SSH tunnels are required for: running commercial software needing a license server over the Internet; running visualization software needing client contact on a user's local computer; running a Jupyter Notebook needing Web browser contact; and connecting to the Cedar database server from a desktop."
+    "question": "What are some common use cases that require SSH tunnels?",
+    "answer": "Use cases requiring SSH tunnels include running commercial software needing to contact a license server over the Internet, running visualization software needing client contact from a user's local computer, and connecting to a database hosted on a cluster from a desktop."
   },
   {
-    "question": "What is a 'port' in the context of computer communication?",
-    "answer": "A port is a number used to distinguish streams of communication from one another, analogous to a radio frequency or a channel. Many port numbers are reserved for specific types of traffic."
+    "question": "What is a port?",
+    "answer": "A port is a number used to distinguish streams of communication from one another, analogous to a radio frequency or a channel, with many port numbers reserved for specific types of traffic."
   },
   {
-    "question": "Why is SSH tunnelling, also called port forwarding, used when commercial software on a compute node needs to contact an Internet-based license server?",
-    "answer": "It's used because compute nodes typically lack direct Internet access. A gateway server with Internet access must be used to forward communications from the compute node to the license server via a predetermined port."
+    "question": "Why is SSH tunnelling (port forwarding) required for commercially licensed programs on compute nodes?",
+    "answer": "If a commercially licensed program running on a compute node needs to connect to a license server on the Internet via a predetermined port, but the compute node has no direct Internet access, then a gateway server must be used to forward communications on that port by setting up an SSH tunnel."
   },
   {
-    "question": "What essential information is required to set up an SSH tunnel in a batch job for contacting a license server?",
-    "answer": "You will need the IP address or name of the license server (LICSERVER) and the port number of the license service (LICPORT)."
+    "question": "What information is required to set up an SSH tunnel for a license server in a batch job?",
+    "answer": "You will need the IP address or the name of the license server (LICSERVER) and the port number of the license service (LICPORT)."
   },
   {
-    "question": "Who should provide the IP address and port number for the license server?",
+    "question": "Where should you obtain the license server information from?",
     "answer": "You should obtain this information from whoever maintains the license server."
   },
   {
-    "question": "What are the outgoing IP addresses for Niagara login nodes when connecting to a license server?",
+    "question": "What are the outgoing IP addresses for Niagara when connecting to a license server?",
     "answer": "For Niagara, the outgoing IP address will either be 142.1.174.227 or 142.1.174.228."
   },
   {
-    "question": "Is there an alternative solution for Graham users to connect to a license server without setting up an SSH tunnel?",
-    "answer": "Yes, for Graham, an alternative is to request a firewall exception for the specific license server (LICSERVER) and its port (LICPORT)."
+    "question": "What is the gateway server for Niagara when setting up an SSH tunnel?",
+    "answer": "The gateway server (GATEWAY) on Niagara is nia-gw."
   },
   {
-    "question": "What are the designated gateway servers for setting up an SSH tunnel on Niagara and Graham?",
-    "answer": "On Niagara, the gateway server is 'nia-gw'. On Graham, you need to pick one of the login nodes (e.g., 'gra-login1, 2, ...')."
+    "question": "What is an alternative solution for Nibi when connecting to a license server?",
+    "answer": "For nibi, an alternative solution is to request a firewall exception for the license server LICSERVER and its specific port LICPORT."
   },
   {
-    "question": "What is the purpose of the `-N` and `-f` parameters in the SSH tunnel command `ssh GATEWAY -L COMPUTEPORT:LICSERVER:LICPORT -N -f`?",
-    "answer": "The `-N` parameter tells SSH not to open a shell on the GATEWAY, and combining `-f` with `-N` tells SSH to run in the background, allowing the job script to continue executing past this SSH command."
+    "question": "What is the SSH command used in a job script to set up a tunnel for contacting a license server?",
+    "answer": "The SSH command to issue in the job script is `ssh GATEWAY -L COMPUTEPORT:LICSERVER:LICPORT -N -f`."
   },
   {
-    "question": "How should software be configured in a job script to utilize a license server through an SSH tunnel?",
-    "answer": "The software should be informed that the license server is on port COMPUTEPORT on the server 'localhost'. This is often achieved by setting an environment variable in the job script, such as `export MLM_LICENSE_FILE=COMPUTEPORT@localhost`."
+    "question": "What do the `-N` and `-f` parameters signify in the SSH tunnel command?",
+    "answer": "The `-N` parameter tells SSH not to open a shell on the GATEWAY, and `-f` and `-N` together tell SSH not to open a shell and to run in the background, allowing the job script to continue."
   },
   {
-    "question": "What does the term 'localhost' signify when configuring software to use an SSH tunnel for a license server?",
-    "answer": "The term 'localhost' is the standard name a computer uses to refer to itself. It should be taken literally and not replaced with the computer's actual name."
+    "question": "How can you inform the software in a job script that the license server is on a specific port on `localhost`?",
+    "answer": "Often, it is simply a matter of setting an environment variable in the job script like `export MLM_LICENSE_FILE=COMPUTEPORT@localhost`."
   },
   {
-    "question": "What is the primary benefit of using SSH tunnelling to connect to a program running on a compute node?",
-    "answer": "It allows a user's computer to connect to a compute node through an encrypted tunnel via the login node, enabling graphical output of applications like Jupyter Notebooks or visualization software to be displayed transparently on the user's local workstation."
+    "question": "What is the meaning of `localhost`?",
+    "answer": "The term `localhost` is the standard name by which a computer refers to itself and should be taken literally, not replaced with your computer's name."
   },
   {
-    "question": "What tool is recommended for creating an SSH tunnel from Linux or MacOS X systems when connecting to a program on a compute node?",
-    "answer": "On Linux or MacOS X systems, the `sshuttle` Python package is recommended."
+    "question": "What is the purpose of SSH tunnelling when connecting to a program running on a compute node?",
+    "answer": "SSH tunnelling allows a user's computer to connect to a compute node on a cluster through an encrypted tunnel via the login node, enabling graphical output of applications (like Jupyter Notebook or visualization software) to be displayed on the user's local workstation, or binding an external port to a database server."
   },
   {
-    "question": "What command is used to create an SSH tunnel with `sshuttle` on Linux or MacOS X?",
-    "answer": "The command to create the tunnel using `sshuttle` is `sshuttle --dns -Nr userid@machine_name`."
+    "question": "What tool is recommended for creating SSH tunnels on Linux or MacOS X systems?",
+    "answer": "On a Linux or MacOS X system, the `sshuttle` Python package is recommended."
   },
   {
-    "question": "Which software is used to create an SSH tunnel from Windows for connecting to a program on a compute node?",
+    "question": "How do you create an SSH tunnel using `sshuttle` on Linux or MacOS X?",
+    "answer": "You open a new terminal window and run the command `sshuttle --dns -Nr userid@machine_name`."
+  },
+  {
+    "question": "How can an SSH tunnel be created from Windows?",
     "answer": "An SSH tunnel can be created from Windows using MobaXTerm."
   },
   {
-    "question": "When using MobaXTerm on Windows to connect to a program on a compute node, how is the SSH tunnel typically set up?",
-    "answer": "You open two MobaXTerm sessions: one for the cluster job to get the application URL, and a second local terminal session. In the local terminal, you run an `ssh -L` command to forward a local port to the remote host and port. Finally, you modify the application's URL to use `localhost` instead of the remote hostname."
+    "question": "What are the general steps to set up an SSH tunnel using MobaXTerm on Windows?",
+    "answer": "You open two sessions in MobaXTerm: Session 1 for connecting to a cluster and starting your job to get a URL, and Session 2 as a local terminal to set up the SSH tunnel using a specific `ssh -L` command."
   },
   {
-    "question": "In the MobaXTerm example command `ssh -L 8888:cdr544.int.cedar.computecanada.ca:8888 someuser@cedar.computecanada.ca`, what do the two '8888' port numbers represent?",
-    "answer": "The first '8888' is the local port number on your computer, to which connections will be forwarded. The second '8888' is the remote port number on `cdr544.int.cedar.computecanada.ca` (the compute node) where the application is listening."
+    "question": "How do you modify an application's URL to use an SSH tunnel set up on Windows with MobaXTerm?",
+    "answer": "Modify the URL by replacing the host name with `localhost`, for example, changing `http://fc3281.int.fir.alliancecan.ca:8888/?token=...` to `http://localhost:8888/?token=...`."
   },
   {
-    "question": "In the example job script for contacting a license server, how is the `LOCALPORT` determined?",
-    "answer": "The `LOCALPORT` is determined by randomly selecting a number between 1024 and 65535 using the `shuf -i 1024-65535 -n 1` command."
+    "question": "How can you create an SSH tunnel from your desktop to a PostgreSQL database server on Fir?",
+    "answer": "You can use the command `ssh -L PORT:cedar-pgsql-vm.int.cedar.computecanada.ca:5432 someuser@fir.alliancecan.ca`."
+  },
+  {
+    "question": "How can you create an SSH tunnel from your desktop to a MySQL database server on Fir?",
+    "answer": "You can use the command `ssh -L PORT:cedar-mysql-vm.int.cedar.computecanada.ca:3306 someuser@fir.alliancecan.ca`."
+  },
+  {
+    "question": "What is the recommended maximum value for the local port number (PORT) when connecting to a database server via SSH tunnel?",
+    "answer": "The port number you choose (PORT) should not be bigger than 32768."
+  },
+  {
+    "question": "How do you connect to a PostgreSQL database server from your desktop after setting up an SSH tunnel?",
+    "answer": "On your desktop, run the command `psql -h 127.0.0.1 -p PORT -U <your username> -d <your database>`."
+  },
+  {
+    "question": "How do you connect to a MySQL database server from your desktop after setting up an SSH tunnel?",
+    "answer": "On your desktop, run the command `mysql -h 127.0.0.1 -P PORT -u <your username> --protocol=TCP -p`."
+  },
+  {
+    "question": "Where is the MySQL password stored for connecting to a database server on Fir?",
+    "answer": "The MySQL password is stored in your `.my.cnf` located in your home directory on Fir."
+  },
+  {
+    "question": "How long will a database connection remain open when using an SSH tunnel?",
+    "answer": "The database connection will remain open as long as the SSH connection remains open."
   }
 ]

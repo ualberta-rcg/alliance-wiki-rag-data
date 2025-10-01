@@ -1,0 +1,114 @@
+[
+  {
+    "question": "What are the learning objectives for data management in OpenACC?",
+    "answer": "The learning objectives include understanding data locality and data movement, structured and unstructured data clauses, how to move data explicitly, and how to compile and run OpenACC code with data movement directives."
+  },
+  {
+    "question": "What was used to simplify initial code acceleration steps, and what were its drawbacks?",
+    "answer": "CUDA Unified Memory was used to simplify initial steps, but it made the code not portable, being PGI-only (with \u2013ta=tesla:managed flag) and NVIDIA-only."
+  },
+  {
+    "question": "What is the benefit of explicitly managing data in OpenACC?",
+    "answer": "Explicitly managing data will make the code portable and may improve performance."
+  },
+  {
+    "question": "What is the purpose of the `data` directive in OpenACC?",
+    "answer": "The `data` directive defines a region of code in which GPU arrays remain on the GPU and are shared among all kernels in that region."
+  },
+  {
+    "question": "How do you define a structured data region in C++ using OpenACC directives?",
+    "answer": "An example is `#pragma acc data { #pragma acc parallel loop ... }`."
+  },
+  {
+    "question": "How do you define a structured data region in Fortran using OpenACC directives?",
+    "answer": "An example is `!$acc data ... !$acc end data`."
+  },
+  {
+    "question": "What does 'data locality' mean in the context of OpenACC data regions?",
+    "answer": "Data locality means that arrays used within the data region will remain on the GPU until the end of that data region."
+  },
+  {
+    "question": "When are unstructured data directives used instead of normal data regions?",
+    "answer": "Unstructured data directives are used when scoping does not allow the use of normal data regions, such as when using constructors or destructors."
+  },
+  {
+    "question": "What are the unstructured data directives and their clauses?",
+    "answer": "The `enter data` directive defines the start of an unstructured data lifetime with `copyin(list)` and `create(list)` clauses, and the `exit data` directive defines the end with `copyout(list)` and `delete(list)` clauses."
+  },
+  {
+    "question": "What is an advantage of using unstructured data clauses?",
+    "answer": "Unstructured data clauses enable OpenACC to be used in C++ classes and whenever data is allocated and initialized in a different piece of code than where it is freed (e.g., Fortran modules)."
+  },
+  {
+    "question": "What does the `copyin(list)` data clause do?",
+    "answer": "The `copyin(list)` clause allocates memory on the GPU and copies data from the host to the GPU when entering the region."
+  },
+  {
+    "question": "What does the `copyout(list)` data clause do?",
+    "answer": "The `copyout(list)` clause allocates memory on the GPU and copies data to the host when exiting the region."
+  },
+  {
+    "question": "What does the `copy(list)` data clause do?",
+    "answer": "The `copy(list)` clause allocates memory on the GPU, copies data from the host to the GPU when entering the region, and copies data to the host when exiting the region. (This clause is for Structured Data Regions Only)."
+  },
+  {
+    "question": "What does the `create(list)` data clause do?",
+    "answer": "The `create(list)` clause allocates memory on the GPU but does not copy data."
+  },
+  {
+    "question": "What does the `delete(list)` data clause do?",
+    "answer": "The `delete(list)` clause deallocates memory on the GPU without copying. (This clause is for Unstructured Data Regions Only)."
+  },
+  {
+    "question": "What does the `present(list)` data clause indicate?",
+    "answer": "The `present(list)` clause indicates that data is already present on the GPU from another containing data region."
+  },
+  {
+    "question": "Why is it sometimes necessary to explicitly specify array sizes with data clauses?",
+    "answer": "Sometimes the compiler cannot determine the size of arrays, so one must explicitly specify the size using data clauses and array 'shape'."
+  },
+  {
+    "question": "How do you specify array shape in C with an OpenACC data clause?",
+    "answer": "An example is `#pragma acc data copyin(a[0:nelem]) copyout(b[s/4:3*s/4])`."
+  },
+  {
+    "question": "How do you specify array shape in Fortran with an OpenACC data clause?",
+    "answer": "An example is `!$acc data copyin(a(1:end)) copyout(b(s/4:3*s/4))`."
+  },
+  {
+    "question": "How is a matrix copied to the device in OpenACC according to the 'Copy In Matrix' example?",
+    "answer": "The copy procedure is done in two steps: first, copy the structure of the matrix, and then copy its members using `#pragma acc enter data copyin` directives."
+  },
+  {
+    "question": "How is device memory freed for a matrix in OpenACC according to the 'Delete Matrix' example?",
+    "answer": "To free device memory, the matrix is removed from the device in two steps: first delete the members, then delete the structure, using `#pragma acc exit data delete` directives."
+  },
+  {
+    "question": "When should the `present` clause be used?",
+    "answer": "The `present` clause should be used when managing memory at a higher level to inform the compiler that data is already present on the device."
+  },
+  {
+    "question": "Why is using the `present` clause often critical for performance?",
+    "answer": "High-level data management and the `present` clause are often critical to good performance."
+  },
+  {
+    "question": "How do you rebuild OpenACC code without managed memory?",
+    "answer": "To rebuild the code without managed memory, change `-ta=tesla:managed` to `-ta-tesla` in the Makefile."
+  },
+  {
+    "question": "What is the purpose of the `update` directive in OpenACC?",
+    "answer": "The `update` directive specifies an array (or part of an array) that should be refreshed within a data region."
+  },
+  {
+    "question": "How do you copy data from the GPU to the CPU using the `update` directive?",
+    "answer": "You use `!$acc update self(a)` to copy 'a' from the GPU to the CPU."
+  },
+  {
+    "question": "How do you copy data from the CPU to the GPU using the `update` directive?",
+    "answer": "You use `!$acc update device(a)` to copy 'a' from the CPU to the GPU."
+  },
+  {
+    "question": "How is a vector updated on the GPU after modification on the CPU using the `update` directive?",
+    "answer": "First, the vector is updated on the CPU (e.g., `v.coefs[i]=val;`), then `#pragma acc update device(v.coefs[:v.n])` is used to update the vector on the GPU."
+  }
+]

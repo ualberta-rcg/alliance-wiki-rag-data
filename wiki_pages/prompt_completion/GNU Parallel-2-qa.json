@@ -1,0 +1,70 @@
+[
+  {
+    "question": "How can GNU Parallel be used to distribute a workload across multiple nodes in a cluster?",
+    "answer": "First, create a file containing the list of nodes using `scontrol show hostname > ./node_list_${SLURM_JOB_ID}`, then use `parallel` with `--sshloginfile` to specify this file for task distribution."
+  },
+  {
+    "question": "What GNU Parallel options are used to transfer environment variables and set the working directory when distributing tasks across nodes?",
+    "answer": "The `--env` option allows transferring a named environment variable, and the `--workdir` option ensures GNU Parallel tasks start in the same directory as the main node."
+  },
+  {
+    "question": "What is the recommended delay to add between jobs when using GNU Parallel across multiple nodes?",
+    "answer": "It is recommended to add a delay of 30 seconds or more between jobs using the option `--sshdelay 30`."
+  },
+  {
+    "question": "How many OpenMP processes can run simultaneously in an example using `N` nodes, 5 tasks per node, and 8 CPUs per task?",
+    "answer": "Up to `5*N` OpenMP processes can run simultaneously with a CPU usage of up to 800% each."
+  },
+  {
+    "question": "How do you tell GNU Parallel to keep track of completed commands?",
+    "answer": "You can tell GNU Parallel to keep track of completed commands by using the `--joblog JOBLOGFILE` argument."
+  },
+  {
+    "question": "What information does the JOBLOGFILE contain?",
+    "answer": "The JOBLOGFILE will contain the list of completed commands, their start times, durations, hosts, and exit values."
+  },
+  {
+    "question": "How do you resume an interrupted GNU Parallel command?",
+    "answer": "If a `parallel` command was interrupted, you can make it pick up where it left off using the `--resume` option along with the `--joblog` argument."
+  },
+  {
+    "question": "How can you re-run only the failed subcommands in GNU Parallel?",
+    "answer": "You can re-run failed subcommands by using the `--resume-failed` option with the `--joblog` argument."
+  },
+  {
+    "question": "What is the behavior of `--resume-failed` regarding subjobs that were not considered before?",
+    "answer": "The `--resume-failed` option will also start subjobs that were not considered before."
+  },
+  {
+    "question": "What arguments are used in GNU Parallel to efficiently handle chunks of a large file?",
+    "answer": "The GNU Parallel `--pipepart` and `--block` arguments are used to efficiently handle chunks of a large file."
+  },
+  {
+    "question": "What block size is often faster when GNU Parallel processes large files?",
+    "answer": "Letting GNU Parallel adapt and decide on the block size, typically by using `--block -1`, is often faster."
+  },
+  {
+    "question": "What are the initial steps for running hundreds or thousands of simulations with GNU Parallel?",
+    "answer": "First, you must determine how many resources are required by one simulation, then you can estimate the total resources required in your job."
+  },
+  {
+    "question": "How long would 1000 serial simulations, each requiring 5 minutes and 1 core, take to run on a single core?",
+    "answer": "It would take 83.3 hours or 3.472 days to run 1000 such simulations with 1 core."
+  },
+  {
+    "question": "How can a list of parameters for simulations be provided to GNU Parallel from a file?",
+    "answer": "Parameters can be provided from a file where they are delimited by a tab character (`\\t`) and each line corresponds to one simulation, using the `::::` syntax (e.g., `parallel ... :::: ./my_parameters.txt`)."
+  },
+  {
+    "question": "How can a list of commands for simulations be provided to GNU Parallel from a file?",
+    "answer": "A file containing a list of subjobs (one per line) can be redirected to `parallel` (e.g., `parallel -j $SLURM_CPUS_PER_TASK < ./my_commands.txt`)."
+  },
+  {
+    "question": "How can GNU Parallel generate parameters for simulations directly from ranges?",
+    "answer": "GNU Parallel can generate parameters using range notation with `:::`, such as `parallel ... my_simulator --alpha {1} --beta {2} ::: {1..10} ::: {1..100}`."
+  },
+  {
+    "question": "What are some related topics to GNU Parallel mentioned in the document?",
+    "answer": "Related topics include META, GLOST, and Job arrays."
+  }
+]

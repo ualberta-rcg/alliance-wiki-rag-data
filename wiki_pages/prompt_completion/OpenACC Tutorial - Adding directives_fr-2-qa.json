@@ -1,0 +1,42 @@
+[
+  {
+    "question": "How does an OpenACC kernel function execute on an accelerator?",
+    "answer": "Each call to the kernel function is independent, allowing hundreds of cores on the accelerator to execute the function in parallel for a specific index."
+  },
+  {
+    "question": "What is the difference between a traditional loop and an OpenACC kernel in terms of calculation execution?",
+    "answer": "A traditional loop calculates sequentially from `i=0` to `i=N-1`, while an OpenACC kernel allows each computation unit to execute the function for a single value of `i` in parallel."
+  },
+  {
+    "question": "What is the nature of the OpenACC `kernels` directive?",
+    "answer": "The `kernels` directive is 'descriptive', meaning the programmer uses it to suggest to the compiler which code portions can be parallelized, but the compiler adopts the strategy it deems best, including sequential execution."
+  },
+  {
+    "question": "What are the general steps a compiler follows when using the `kernels` directive?",
+    "answer": "Generally, the compiler (1) analyzes the code for parallelism, (2) identifies data to transfer and decides when to transfer it, (3) creates a kernel, and (4) transfers the kernel to the GPU."
+  },
+  {
+    "question": "Provide an example of how the `kernels` directive is used in C/C++.",
+    "answer": "An example is: `#pragma acc kernels { for (int i=0; i<N; i++) { C[i] = A[i] + B[i]; } }`"
+  },
+  {
+    "question": "Why is it important to rely on compiler feedback when using the `kernels` directive?",
+    "answer": "It is important because code is rarely simple enough for the compiler to parallelize everything automatically, and feedback helps find portions that the compiler might have neglected to parallelize."
+  },
+  {
+    "question": "What is the main difference in how OpenMP and OpenACC directives instruct the compiler?",
+    "answer": "OpenMP directives are 'prescriptive', forcing the compiler to parallelize regardless of performance, while many OpenACC directives are 'descriptive', giving the compiler freedom to optimize based on the target architecture, potentially leading to no parallelization at all."
+  },
+  {
+    "question": "What are the consequences of OpenMP's prescriptive directives on performance across different architectures?",
+    "answer": "The prescriptive nature of OpenMP means the result is predictable across compilers and the parallelization method is the same regardless of hardware. However, the same code might perform worse on different architectures, potentially requiring different sets of directives for optimal performance."
+  },
+  {
+    "question": "How do OpenACC's descriptive directives impact code execution and compiler evolution?",
+    "answer": "Descriptive OpenACC directives allow the compiler to compile code in the way it judges best for the targeted architecture, potentially leading to different binary code for GPU and CPU execution. This implies performance can vary by compiler, and newer generation compilers will be more effective, especially with new hardware."
+  },
+  {
+    "question": "What is the initial action to port a matrix-vector product code to a GPU using OpenACC directives?",
+    "answer": "The initial action is to add the `#pragma acc kernels` directive around the code section for the matrix-vector product to attempt execution on the GPU, without immediately concerning oneself with data transfer or providing additional compiler information."
+  }
+]

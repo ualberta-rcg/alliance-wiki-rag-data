@@ -1,0 +1,110 @@
+[
+  {
+    "question": "How do you attach the CephFS network to a VM on SD4H/Juno using the OpenStack client?",
+    "answer": "First, list the servers with `openstack server list` to get the VM's ID. Then, use the command `openstack server add network <server_id> CephFS-Network`."
+  },
+  {
+    "question": "What is the latest stable Ceph release for Red Hat family distributions as of July 2024?",
+    "answer": "As of July 2024, 'quincy' is the latest stable release for Red Hat family distributions."
+  },
+  {
+    "question": "Where can you find available Ceph releases for rpm-based distributions?",
+    "answer": "You can check the available releases at `https://download.ceph.com/` and look for recent `rpm-*` directories."
+  },
+  {
+    "question": "What configuration file is used to install relevant Ceph repositories for Enterprise Linux 8?",
+    "answer": "The configuration file is `/etc/yum.repos.d/ceph.repo`."
+  },
+  {
+    "question": "What is the base URL for Ceph packages for Enterprise Linux 8 (EL8) using the 'quincy' release?",
+    "answer": "The base URL for Ceph packages for EL8 is `http://download.ceph.com/rpm-quincy/el8/$basearch`."
+  },
+  {
+    "question": "What key is used to verify Ceph packages for Enterprise Linux 8?",
+    "answer": "The GPG key `https://download.ceph.com/keys/release.asc` is used to verify Ceph packages for Enterprise Linux 8."
+  },
+  {
+    "question": "What additional repository is required before installing Ceph client packages on Red Hat family systems?",
+    "answer": "The epel repo needs to be in place, installed with `sudo dnf install epel-release`."
+  },
+  {
+    "question": "Which packages are required to install the Ceph client on Red Hat family distributions?",
+    "answer": "You need to install `libcephfs2 python3-cephfs ceph-common python3-ceph-argparse` using `sudo dnf install -y`."
+  },
+  {
+    "question": "How do you add the Ceph repository for Debian family distributions?",
+    "answer": "You can add the repository using `sudo apt-add-repository 'deb https://download.ceph.com/debian-quincy/ {codename} main'`, where `{codename}` is your distro's codename found with `lsb_release -sc`."
+  },
+  {
+    "question": "What packages are needed for the Ceph client on Debian family distributions?",
+    "answer": "You need to install `libcephfs2 python3-cephfs ceph-common python3-ceph-argparse` using `sudo apt-get install -y`."
+  },
+  {
+    "question": "What is the path to the main Ceph configuration file?",
+    "answer": "The main Ceph configuration file is located at `/etc/ceph/ceph.conf`."
+  },
+  {
+    "question": "What are the monitor hosts for CephFS on Arbutus?",
+    "answer": "The monitor hosts for CephFS on Arbutus are `10.30.201.3:6789,10.30.202.3:6789,10.30.203.3:6789`."
+  },
+  {
+    "question": "What are the monitor hosts for CephFS on SD4H/Juno?",
+    "answer": "The monitor hosts for CephFS on SD4H/Juno are `10.65.0.10:6789,10.65.0.12:6789,10.65.0.11:6789`."
+  },
+  {
+    "question": "Where can you find the monitor information if the wiki page is outdated?",
+    "answer": "The monitor information can be found in the share details 'Path' field, which is used to mount the volume."
+  },
+  {
+    "question": "What is the purpose of the `ceph.keyring` file?",
+    "answer": "The `ceph.keyring` file is used to store the client name and secret (access key) for connecting to CephFS."
+  },
+  {
+    "question": "Where do you find the access key and client name for the `ceph.keyring` file?",
+    "answer": "The access key and client name are found under the access rules on your project web page by navigating to `Project --> Share --> Shares` and clicking on the name of the share."
+  },
+  {
+    "question": "What is the command to create a mount point directory for CephFS?",
+    "answer": "You can create a mount point directory using `mkdir /cephfs` (or your preferred path)."
+  },
+  {
+    "question": "What is the fstab entry format for permanently mounting a CephFS share on Arbutus?",
+    "answer": "A typical fstab entry for Arbutus is `:/volumes/_nogroup/f6cb8f06-f0a4-4b88-b261-f8bd6b03582c /cephfs/ ceph name=MyCephFS-RW 0 2`."
+  },
+  {
+    "question": "What is important to notice about the device path in the fstab entry for CephFS?",
+    "answer": "Notice the non-standard colon (`:`) before the device path; it is not a typo."
+  },
+  {
+    "question": "What specific option is required when mounting CephFS on SD4H/Juno via fstab?",
+    "answer": "The `mds_namespace=cephfs_4_2` option is required for mounting CephFS on SD4H/Juno."
+  },
+  {
+    "question": "How do you mount a CephFS share from the command line on Arbutus?",
+    "answer": "You can use `sudo mount -t ceph :/volumes/_nogroup/f6cb8f06-f0a4-4b88-b261-f8bd6b03582c /cephfs/ -o name=MyCephFS-RW`."
+  },
+  {
+    "question": "What command is used to install the `ceph-fuse` library?",
+    "answer": "The `ceph-fuse` library can be installed using `sudo dnf install ceph-fuse`."
+  },
+  {
+    "question": "How do you make FUSE mounts accessible in user space?",
+    "answer": "To make FUSE mounts accessible in user space, uncomment `user_allow_other` in the `/etc/fuse.conf` file."
+  },
+  {
+    "question": "How do you mount CephFS in a user's home directory using `ceph-fuse`?",
+    "answer": "First, create a directory like `mkdir ~/my_cephfs`, then use `ceph-fuse my_cephfs/ --id=MyCephFS-RW --conf=~/ceph.conf --keyring=~/ceph.keyring --client-mountpoint=/volumes/_nogroup/f6cb8f06-f0a4-4b88-b261-f8bd6b03582c`."
+  },
+  {
+    "question": "What does the `--id` option represent in the `ceph-fuse` command?",
+    "answer": "The `--id` option in the `ceph-fuse` command represents the client name."
+  },
+  {
+    "question": "Can a CephFS share have multiple user keys?",
+    "answer": "Yes, a particular share can have more than one user key provisioned for it, allowing for more granular access."
+  },
+  {
+    "question": "Is the CephFS service available to hosts outside the OpenStack cluster?",
+    "answer": "No, this service is not available to hosts outside of the OpenStack cluster."
+  }
+]

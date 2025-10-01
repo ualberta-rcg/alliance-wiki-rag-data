@@ -1,38 +1,46 @@
 [
   {
-    "question": "Comment initialiser Terraform pour configurer un fournisseur ?",
-    "answer": "Pour initialiser Terraform apr\u00e8s avoir d\u00e9fini le fournisseur dans un fichier (par exemple, `nodes.tf`), ex\u00e9cutez la commande `terraform init`."
+    "question": "Comment initialiser Terraform apr\u00e8s avoir d\u00e9fini le fournisseur ?",
+    "answer": "Pour initialiser Terraform et v\u00e9rifier la configuration jusqu'\u00e0 pr\u00e9sent, ex\u00e9cutez la commande `terraform init` dans le r\u00e9pertoire contenant votre fichier de d\u00e9finition du fournisseur (par exemple, `nodes.tf`)."
   },
   {
     "question": "Que fait la commande `terraform init` ?",
-    "answer": "La commande `terraform init` initialise le backend, v\u00e9rifie et t\u00e9l\u00e9charge les plugiciels de fournisseur n\u00e9cessaires, et pr\u00e9pare le r\u00e9pertoire de travail pour Terraform."
+    "answer": "La commande `terraform init` initialise le backend, t\u00e9l\u00e9charge les plugiciels du fournisseur (tel que le plugiciel OpenStack) et v\u00e9rifie la configuration."
   },
   {
-    "question": "Est-ce que `terraform init` v\u00e9rifie les identifiants OpenStack ?",
-    "answer": "Non, la commande `terraform init` ne teste pas les informations d'identification car elle n'essaie pas de se connecter au fournisseur d\u00e9fini."
+    "question": "Quelle version du plugiciel du fournisseur OpenStack est mentionn\u00e9e comme exemple ?",
+    "answer": "Le plugiciel du fournisseur OpenStack mentionn\u00e9 est la version 1.19.0."
   },
   {
-    "question": "Quelle est la recommandation pour \u00e9viter les mises \u00e0 jour automatiques des plugiciels de fournisseur dans Terraform ?",
-    "answer": "Il est recommand\u00e9 d'ajouter des contraintes de version (par exemple, `version = \"~> 1.19\"`) aux blocs de fournisseur correspondants dans la configuration pour \u00e9viter les mises \u00e0 jour automatiques vers de nouvelles versions majeures."
+    "question": "Quelle est la recommandation pour \u00e9viter les mises \u00e0 niveau automatiques des plugiciels des fournisseurs dans Terraform ?",
+    "answer": "Il est recommand\u00e9 d'ajouter des contraintes de version, comme `version = \"~> 1.19\"`, aux blocs de fournisseur correspondants dans la configuration pour \u00e9viter les mises \u00e0 niveau automatiques vers de nouvelles versions majeures qui pourraient contenir des changements incompatibles."
   },
   {
-    "question": "Comment d\u00e9finir une machine virtuelle (VM) OpenStack minimale avec Terraform ?",
-    "answer": "Une VM OpenStack minimale peut \u00eatre d\u00e9finie dans Terraform en utilisant un bloc `resource \"openstack_compute_instance_v2\" \"myvm\"` avec des attributs tels que `name`, `image_id`, `flavor_id`, `key_pair` et `security_groups`."
+    "question": "Que ne teste pas l'op\u00e9ration `terraform init` ?",
+    "answer": "L'op\u00e9ration `terraform init` ne teste pas les informations d'identification, car elle n'essaie pas r\u00e9ellement de se connecter au fournisseur d\u00e9fini."
   },
   {
-    "question": "Pourquoi est-il important d'utiliser les identifiants (UUID) plut\u00f4t que les noms pour les images et gabarits dans Terraform ?",
-    "answer": "Il est recommand\u00e9 d'utiliser les identifiants (UUID) car ils d\u00e9finissent r\u00e9ellement l'\u00e9tat de la ressource et ne changeront jamais. Les noms peuvent changer, ce qui pourrait amener Terraform \u00e0 d\u00e9tecter un changement et \u00e0 tenter de reconstruire ou redimensionner la ressource associ\u00e9e, ce qui est une op\u00e9ration destructrice."
+    "question": "Quand faut-il r\u00e9ex\u00e9cuter `terraform init` ?",
+    "answer": "Vous devez r\u00e9ex\u00e9cuter `terraform init` si vous d\u00e9finissez ou modifiez des modules ou la configuration du backend pour Terraform."
   },
   {
-    "question": "O\u00f9 peut-on trouver les valeurs d' `image_id` et de `flavor_id` pour OpenStack ?",
-    "answer": "Les valeurs pour `image_id` et `flavor_id` peuvent \u00eatre trouv\u00e9es en utilisant la CLI OpenStack avec des commandes comme `flavor list` ou `image list`, ou en partie via l'interface web Horizon."
+    "question": "Quel est le type de ressource Terraform pour d\u00e9finir une machine virtuelle OpenStack ?",
+    "answer": "La machine virtuelle OpenStack est d\u00e9finie en utilisant le type de ressource `openstack_compute_instance_v2`."
   },
   {
-    "question": "Que se passe-t-il si aucun volume n'est explicitement fourni pour une VM d\u00e9finie dans Terraform sur OpenStack ?",
-    "answer": "Une instance de calcul aura d\u00e9j\u00e0 un volume qui lui est associ\u00e9, mais une instance persistante \u00e9chouera probablement \u00e0 moins qu'il n'y ait assez d'espace vide dans l'image elle-m\u00eame. Il est recommand\u00e9 de cr\u00e9er un volume de d\u00e9marrage pour les machines virtuelles persistantes."
+    "question": "Pourquoi est-il recommand\u00e9 d'utiliser les identifiants (UUID) des gabarits et des images plut\u00f4t que leurs noms lors de la d\u00e9finition d'une VM dans Terraform ?",
+    "answer": "Il est fortement recommand\u00e9 d'utiliser les identifiants (UUID) des gabarits et des images, car l'identifiant ne changera jamais et d\u00e9finit l'\u00e9tat de la ressource. Les noms peuvent changer, ce qui pourrait amener Terraform \u00e0 d\u00e9tecter un identifiant mis \u00e0 jour et \u00e0 tenter de reconstruire ou redimensionner la ressource associ\u00e9e."
   },
   {
-    "question": "Quels sont les attributs typiques n\u00e9cessaires pour la d\u00e9finition d'une instance OpenStack de base dans Terraform ?",
-    "answer": "Les attributs typiques incluent `name`, `image_id`, `flavor_id`, `key_pair` (paire de cl\u00e9s SSH) et `security_groups` (groupes de s\u00e9curit\u00e9)."
+    "question": "Quels sont les attributs minimaux n\u00e9cessaires pour d\u00e9finir une machine virtuelle OpenStack dans Terraform ?",
+    "answer": "Une machine virtuelle OpenStack minimale peut \u00eatre d\u00e9finie avec les attributs `name`, `image_id`, `flavor_id`, `key_pair`, et `security_groups`."
+  },
+  {
+    "question": "O\u00f9 peut-on trouver les valeurs pour `image_id` et `flavor_id` ?",
+    "answer": "Les valeurs pour `image_id` et `flavor_id` peuvent \u00eatre obtenues en utilisant les commandes de l'interface de ligne de commande OpenStack comme `flavor list` ou `image list` dans un terminal, ou via l'interface web Horizon (avec des limitations pour les gabarits)."
+  },
+  {
+    "question": "Quel est l'impact si aucun volume n'est explicitement fourni lors de la d\u00e9finition d'une VM persistante ?",
+    "answer": "Pour une instance persistante, l'absence de volume explicitement fourni \u00e9chouera probablement \u00e0 moins qu'il n'y ait assez d'espace vide dans l'image elle-m\u00eame. Il est recommand\u00e9 de cr\u00e9er un volume de d\u00e9marrage pour les machines virtuelles qui utilisent des versions persistantes."
   }
 ]

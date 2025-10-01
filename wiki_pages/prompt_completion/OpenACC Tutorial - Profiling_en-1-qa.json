@@ -1,0 +1,114 @@
+[
+  {
+    "question": "What are the learning objectives of this tutorial?",
+    "answer": "The learning objectives are to understand what a profiler is, how to use the NVPROF profiler, how the code is performing, and where to focus time and rewrite most time-consuming routines."
+  },
+  {
+    "question": "Why is code profiling necessary?",
+    "answer": "Code profiling is necessary to understand where time is being spent (hotspots), how the code is performing, and where to focus development time."
+  },
+  {
+    "question": "What is a 'hotspot' in code?",
+    "answer": "Hotspots are the most time-consuming routines in the code."
+  },
+  {
+    "question": "According to Amdahl's law, what will have the most impact on performance?",
+    "answer": "Amdahl's law states that parallelizing the most time-consuming routines (hotspots) will have the most impact."
+  },
+  {
+    "question": "Where can the sample code for this example be obtained?",
+    "answer": "The sample code can be obtained from the Git repository at https://github.com/calculquebec/cq-formation-openacc. It can be downloaded and extracted from https://github.com/calculquebec/cq-formation-openacc/archive/refs/heads/main.zip."
+  },
+  {
+    "question": "What is the purpose of the build process for the sample code?",
+    "answer": "The object is to compile and link the code, obtain an executable, and then profile its source code with a profiler."
+  },
+  {
+    "question": "Which compilers offer the most advanced OpenACC support?",
+    "answer": "Compilers from Cray and NVIDIA (through its HPC SDK, previously Portland Group) offer the most advanced OpenACC support."
+  },
+  {
+    "question": "What OpenACC version do GCC compilers 10, 11, and 12 support as of July 2022?",
+    "answer": "As of July 2022, GCC versions 10, 11 and 12 support OpenACC version 2.6."
+  },
+  {
+    "question": "Which NVIDIA HPC SDK version is used for this tutorial?",
+    "answer": "The NVIDIA HPC SDK, version 22.7, is used for this tutorial."
+  },
+  {
+    "question": "Are NVIDIA compilers free for academic usage?",
+    "answer": "Yes, NVIDIA compilers are free for academic usage."
+  },
+  {
+    "question": "What command is used to load the `nvhpc/22.7` module?",
+    "answer": "The command `module load nvhpc/22.7` is used."
+  },
+  {
+    "question": "How is the sample code compiled using the NVIDIA HPC SDK?",
+    "answer": "The `make` command is used, which executes `nvc++ -c -o main.o main.cpp` and `nvc++ main.o -o cg.x`."
+  },
+  {
+    "question": "What is the name of the executable created from the sample code?",
+    "answer": "The executable created is named `cg.x`."
+  },
+  {
+    "question": "What are the memory and CPU requirements for profiling the `cg.x` executable?",
+    "answer": "The `cg.x` executable uses about 3GB of memory and one CPU core at near 100%, so a proper test environment should have at least 4GB of available memory and at least two (2) CPU cores."
+  },
+  {
+    "question": "What two profilers are used in this tutorial?",
+    "answer": "The two profilers used are NVIDIA `nvprof` and NVIDIA Visual Profiler `nvvp`."
+  },
+  {
+    "question": "What is NVIDIA `nvprof`?",
+    "answer": "NVIDIA `nvprof` is a command line text-based profiler that can analyze non-GPU codes."
+  },
+  {
+    "question": "Why is `nvprof` chosen for the initial analysis of the `cg.x` executable?",
+    "answer": "It is chosen for the initial analysis because the `cg.x` executable is not yet using the GPU."
+  },
+  {
+    "question": "What module needs to be loaded to use `nvprof` on clusters?",
+    "answer": "The `cuda/11.7` module needs to be loaded."
+  },
+  {
+    "question": "How do you profile a pure CPU executable using `nvprof`?",
+    "answer": "You need to add the arguments `--cpu-profiling on` to the command line, for example: `nvprof --cpu-profiling on ./cg.x`."
+  },
+  {
+    "question": "Based on the `nvprof` output, which function is most responsible for execution time?",
+    "answer": "The `matvec()` function is responsible for 83.5% of the execution time."
+  },
+  {
+    "question": "What questions should be considered before working on a routine based on compiler feedback?",
+    "answer": "Questions to consider are: What optimizations were applied automatically by the compiler? What prevented further optimizations? Can very minor modifications of the code affect performance?"
+  },
+  {
+    "question": "What flag does the NVIDIA compiler offer for feedback?",
+    "answer": "The NVIDIA compiler offers a `-Minfo` flag for feedback."
+  },
+  {
+    "question": "What information is provided by the `all` option for the `-Minfo` flag?",
+    "answer": "The `all` option prints almost all types of compilation information, including accelerator operations (`accel`), inlined functions (`inline`), and various loop optimization details (`loop,mp,par,stdpar,vect`)."
+  },
+  {
+    "question": "What information does the `intensity` option for the `-Minfo` flag provide?",
+    "answer": "The `intensity` option prints compute intensity information about loops."
+  },
+  {
+    "question": "How can compiler feedback be enabled in the `Makefile`?",
+    "answer": "Compiler feedback can be enabled by editing the `Makefile` to set `CXXFLAGS=-fast -Minfo=all,intensity` and `LDFLAGS=${CXXFLAGS}`."
+  },
+  {
+    "question": "What commands are used to rebuild the code after modifying the `Makefile` for compiler feedback?",
+    "answer": "The commands `make clean; make` are used to rebuild the code."
+  },
+  {
+    "question": "What is Computational Intensity?",
+    "answer": "Computational Intensity is a measure of how much work is being done compared to memory operations, defined as (Compute Operations) / (Memory Operations)."
+  },
+  {
+    "question": "What does a Computational Intensity value of >= 1.0 suggest?",
+    "answer": "An `Intensity` value of >= 1.0 suggests that the loop might run well on a GPU."
+  }
+]

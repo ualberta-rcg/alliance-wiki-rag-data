@@ -1,0 +1,70 @@
+[
+  {
+    "question": "How is the TensorFlow model compiled in the provided Python script?",
+    "answer": "The model is compiled using `model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer=tf.keras.optimizers.SGD(learning_rate=args.lr), metrics=['accuracy'])`."
+  },
+  {
+    "question": "What loss function and optimizer are used for compiling the Keras model in the example?",
+    "answer": "The model uses `tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)` as the loss function and `tf.keras.optimizers.SGD(learning_rate=args.lr)` as the optimizer, with 'accuracy' as a metric."
+  },
+  {
+    "question": "How is the CIFAR10 dataset loaded in the TensorFlow example script?",
+    "answer": "The CIFAR10 dataset is loaded using `(x_train, y_train),_ = tf.keras.datasets.cifar10.load_data()`."
+  },
+  {
+    "question": "What should I do if the CIFAR10 dataset is not already stored in `~/.keras/datasets`?",
+    "answer": "You should run the data loading line on a login node prior to submitting your job, or manually download the data from `https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz`, rename it to `cifar-10-batches-py.tar.gz`, and place it under `~/.keras/datasets`."
+  },
+  {
+    "question": "How many epochs is the model trained for in the single-worker example?",
+    "answer": "The model is trained for 2 epochs using `model.fit(dataset, epochs=2)`."
+  },
+  {
+    "question": "What is the key difference when using TensorFlow with multiple GPUs across multiple nodes compared to a single node?",
+    "answer": "The most notable difference is the use of `MultiWorkerMirroredStrategy()` instead of `MirroredStrategy()` (which is used for single-node multi-GPU)."
+  },
+  {
+    "question": "How does TensorFlow acquire job information from SLURM in a multi-node setup?",
+    "answer": "TensorFlow uses `SlurmClusterResolver()` to acquire all the necessary job information from SLURM."
+  },
+  {
+    "question": "What communication backend is specified for inter-GPU communication in multi-node TensorFlow setups?",
+    "answer": "`CommunicationImplementation.NCCL` is added to the distribution strategy to specify Nvidia's NCCL backend for inter-GPU communications."
+  },
+  {
+    "question": "Is it always necessary to specify `CommunicationImplementation.NCCL` for multi-GPU setups?",
+    "answer": "No, it's not always necessary. It was not required in the single-node case as NCCL is the default backend with `MirroredStrategy()`."
+  },
+  {
+    "question": "How many nodes and GPUs are requested in the `tensorflow-multiworker.sh` SLURM script?",
+    "answer": "The script requests 2 nodes (`#SBATCH --nodes 2`) and 2 GPUs per node (`#SBATCH --gres=gpu:2`), totaling 4 GPUs across the two nodes."
+  },
+  {
+    "question": "How many tasks per node are requested in the `tensorflow-multiworker.sh` SLURM script?",
+    "answer": "The script requests 2 tasks per node (`#SBATCH --ntasks-per-node=2`), which corresponds to 1 process per GPU."
+  },
+  {
+    "question": "What modules are loaded in the `tensorflow-multiworker.sh` SLURM script?",
+    "answer": "The `gcc/9.3.0` and `cuda/11.8` modules are loaded."
+  },
+  {
+    "question": "What environment variable is set in `tensorflow-multiworker.sh` to use the NCCL backend?",
+    "answer": "The `NCCL_BLOCKING_WAIT` environment variable is set to `1` (`export NCCL_BLOCKING_WAIT=1`)."
+  },
+  {
+    "question": "What is the purpose of the `config_env.sh` script in the multi-node example?",
+    "answer": "The `config_env.sh` script is responsible for loading the python module, creating and activating a Python virtual environment, upgrading pip, and installing TensorFlow within that environment."
+  },
+  {
+    "question": "How is TensorFlow installed within the virtual environment in `config_env.sh`?",
+    "answer": "TensorFlow is installed using `pip install --no-index tensorflow` after activating the virtual environment."
+  },
+  {
+    "question": "What does the `launch_training.sh` script do?",
+    "answer": "The `launch_training.sh` script activates the previously created virtual environment and then executes the `tensorflow-multiworker.py` Python script."
+  },
+  {
+    "question": "How is the `MultiWorkerMirroredStrategy` initialized in the `tensorflow-multiworker.py` script?",
+    "answer": "The `MultiWorkerMirroredStrategy` is initialized with a `SlurmClusterResolver` for cluster configuration and `tf.distribute.experimental.CommunicationOptions` with `CommunicationImplementation.NCCL` for communication options: `strategy = tf.distribute.MultiWorkerMirroredStrategy(cluster_resolver=cluster_config, communication_options=comm_options)`."
+  }
+]

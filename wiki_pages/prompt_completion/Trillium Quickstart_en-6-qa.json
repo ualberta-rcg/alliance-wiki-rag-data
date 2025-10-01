@@ -1,0 +1,134 @@
+[
+  {
+    "question": "How do you submit a hybrid MPI/OpenMP job script on the CPU subcluster?",
+    "answer": "You submit the script from a CPU login node while in your $SCRATCH directory using the command: `sbatch hybrid_job.sh`."
+  },
+  {
+    "question": "What resources does the example hybrid MPI/OpenMP job request?",
+    "answer": "The example hybrid job requests 2 nodes, with 48 tasks per node, and 4 CPUs per task, for a duration of 1 hour."
+  },
+  {
+    "question": "What happens when the example hybrid MPI/OpenMP job script runs on Trillium?",
+    "answer": "Once nodes are found, the script changes to the submission directory, loads modules (StdEnv/2023, gcc/12.3, openmpi/4.1.5), preloads a library for MPI-IO for the VAST file system, and runs the `hybrid_example` application, with `mpirun` distributing processes and threads evenly over the cores using `bind-to core` and `map-by` options."
+  },
+  {
+    "question": "What are the allowed GPU request configurations on Trillium?",
+    "answer": "On Trillium, you are allowed to request exactly 1 GPU or a multiple of 4 GPUs. This means either `--gpus-per-node=1` for single-GPU jobs or `--gpus-per-node=4` for whole-node GPU jobs."
+  },
+  {
+    "question": "Can NVIDIA's MIG technology be used on Trillium's GPU subcluster?",
+    "answer": "No, NVIDIA's MIG technology (which allows allocating a subdivision of a GPU) is not supported on Trillium's GPU subcluster."
+  },
+  {
+    "question": "What is the purpose of NVIDIA's Multi-Process Service (MPS) on Trillium?",
+    "answer": "NVIDIA's Multi-Process Service (MPS) can be used inside a job to share a single GPU among multiple processes running on the same job."
+  },
+  {
+    "question": "What are the limits for GPU compute jobs in the 'compute' partition?",
+    "answer": "For GPU compute jobs in the 'compute' partition, the limit on running jobs is 150, submitted jobs (including running) is 500. The minimum job size is 1/4 node (24 cores / 1 GPU), while the maximum is 5 nodes (480 cores / 20 GPUs) by default, or 25 nodes (2400 cores / 100 GPUs) with an allocation. The walltime ranges from 15 minutes to 24 hours."
+  },
+  {
+    "question": "What are the limits for GPU testing jobs in the 'debug' partition?",
+    "answer": "For GPU testing jobs in the 'debug' partition, the limit on running jobs is 1, and on submitted jobs is 1. The minimum job size is 1/4 node (24 cores / 1 GPU), and the maximum is 2 nodes (192 cores / 8 GPUs). There is no minimum walltime, but the maximum walltime is 2 hours for a single GPU job or 30 minutes for an 8 GPU job."
+  },
+  {
+    "question": "What factors determine the waiting time for GPU jobs in the queue?",
+    "answer": "The waiting time for GPU jobs depends on several factors, including your group's allocation amount, recent past allocation usage, the number of requested nodes and walltime, and the number of other jobs waiting in the queue."
+  },
+  {
+    "question": "How do you request a single GPU job on Trillium?",
+    "answer": "To request a single GPU job, you include `#SBATCH --gpus-per-node=1` in your job script, typically along with `#SBATCH --nodes=1` and a specified runtime like `#SBATCH --time=00:30:00`."
+  },
+  {
+    "question": "What modules are typically loaded for a single-GPU Python job?",
+    "answer": "For a single-GPU Python job, the typical modules loaded are `StdEnv/2023`, `cuda/12.6`, and `python/3.11.5`, followed by activating a Python environment if applicable."
+  },
+  {
+    "question": "How do you request a whole-node (4 GPUs) job?",
+    "answer": "You request a whole-node GPU job by including `#SBATCH --gpus-per-node=4` in your job script, usually with `#SBATCH --nodes=1` and a desired runtime."
+  },
+  {
+    "question": "What is the example runtime requested for a whole-node GPU job?",
+    "answer": "The example whole-node GPU job requests a maximum runtime of 2 hours (`#SBATCH --time=02:00:00`)."
+  },
+  {
+    "question": "How do you request a multi-node GPU job?",
+    "answer": "To request a multi-node GPU job, you specify the number of nodes (e.g., `#SBATCH --nodes=2`) and ensure you request 4 GPUs per node (`#SBATCH --gpus-per-node=4`)."
+  },
+  {
+    "question": "What modules are typically loaded for the example multi-node GPU job?",
+    "answer": "For the example multi-node GPU job, the modules `StdEnv/2023`, `cuda/12.6`, and `openmpi/4.1.5` are loaded."
+  },
+  {
+    "question": "Should the `--mem` option be used for GPU jobs on Trillium?",
+    "answer": "No, you should not use the `--mem` option for GPU jobs on Trillium as memory is fixed per GPU (192 GB) or per node (768 GB)."
+  },
+  {
+    "question": "What are the recommended practices for specifying node and GPU counts for GPU jobs?",
+    "answer": "You should always specify the node count and use `--gpus-per-node=4` for whole-node or multi-node GPU jobs."
+  },
+  {
+    "question": "Why is it important to be explicit with software versions for GPU jobs?",
+    "answer": "Being explicit with software versions (e.g., `cuda/12.6` instead of just `cuda`) is important for reproducibility of your GPU jobs."
+  },
+  {
+    "question": "What is a good strategy for testing GPU code before scaling?",
+    "answer": "It is recommended to test your GPU code on a single GPU before attempting to scale it to multiple GPUs or nodes."
+  },
+  {
+    "question": "How can GPU utilization be monitored during a job?",
+    "answer": "GPU utilization can be monitored using `nvidia-smi` to ensure that the GPUs are fully utilized."
+  },
+  {
+    "question": "What command shows all jobs in the queue?",
+    "answer": "The `squeue` command shows all jobs currently in the queue."
+  },
+  {
+    "question": "How can a user view only their own jobs in the queue?",
+    "answer": "To view only your own jobs, use the command `squeue -u $USER`."
+  },
+  {
+    "question": "How can you get detailed information about a specific job?",
+    "answer": "You can get detailed information about a specific job by using `scontrol show job JOBID`."
+  },
+  {
+    "question": "What command provides a rough estimate of when a pending job is expected to start?",
+    "answer": "The command `squeue --start -j JOBID` provides a rough estimate of when a pending job is expected to start, though this estimate can be inaccurate."
+  },
+  {
+    "question": "How do you cancel a job you submitted?",
+    "answer": "You can cancel a submitted job using the command `scancel JOBID`."
+  },
+  {
+    "question": "What command allows you to monitor the CPU and memory usage of a running job?",
+    "answer": "The command `jobperf JOBID` gives a live snapshot of the CPU and memory usage of your job while it is running."
+  },
+  {
+    "question": "How can you view information about your past jobs, including their status and resource usage?",
+    "answer": "The `sacct` command shows information about your past jobs, including start time, run time, node usage, and exit status."
+  },
+  {
+    "question": "Where can users inspect information about their past jobs and their resource usage after a job has finished?",
+    "answer": "Your past jobs and their resource usage can be inspected through the [https://my.scinet.utoronto.ca my.SciNet] portal."
+  },
+  {
+    "question": "How often does the my.SciNet portal collect performance data for running jobs?",
+    "answer": "The my.SciNet portal saves performance data collected every two minutes while the job was running."
+  },
+  {
+    "question": "What is the command to submit a batch job script?",
+    "answer": "The command to submit a batch job script is `sbatch <script>`."
+  },
+  {
+    "question": "What command is used to list all available software modules?",
+    "answer": "The command `module avail` lists all available software modules."
+  },
+  {
+    "question": "What command can be used to check the status of GPUs on GPU nodes?",
+    "answer": "The command `nvidia-smi` can be used to check the GPU status on GPU nodes."
+  },
+  {
+    "question": "How can you check your storage quotas on Trillium?",
+    "answer": "You can check your storage quotas using the command `diskusage_report`."
+  }
+]

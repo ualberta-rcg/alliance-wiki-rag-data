@@ -1,42 +1,54 @@
 [
   {
-    "question": "What is model parallelism used for in PyTorch?",
-    "answer": "Model parallelism is used when a deep learning model is too large to fit entirely within the memory of a single GPU, requiring it to be split into multiple parts and loaded onto separate GPUs."
+    "question": "What is Tensor Parallelism (TP) in PyTorch?",
+    "answer": "Tensor Parallelism (TP) is a model sharding approach where the computation of a forward or backward pass through a model layer, along with the layer's weights, is split across multiple devices."
   },
   {
-    "question": "How can you implement model parallelism in PyTorch to reduce GPU idle time?",
-    "answer": "To minimize the idle time of subsequent GPUs, one can implement pipeline parallelism by creating separate `nn.Module` objects for each part of the model, wrapping them with `nn.Sequential`, and then using `torch.distributed.pipeline.sync.Pipe` to break input batches into chunks and feed them in parallel."
+    "question": "How does Tensor Parallelism differ from Fully Sharded Data Parallelism (FSDP)?",
+    "answer": "While FSDP shards model weights across devices but may collect them on a single device during certain computation steps, Tensor Parallelism performs computation steps locally on the device where a model shard is placed."
   },
   {
-    "question": "What PyTorch components are used to split a Convolutional Neural Network into parts for model parallelism?",
-    "answer": "A Convolutional Neural Network can be split into parts like `ConvPart` (convolutional/pooling layers) and `MLPPart` (densely connected feedforward layers), each defined as a separate `nn.Module`."
+    "question": "What is an advantage of using Tensor Parallelism?",
+    "answer": "With Tensor Parallelism, computation steps are done locally on the device where a model shard is placed, avoiding overhead from moving model shards across devices and allowing layers that do not fit entirely in the memory of a single device to be processed."
   },
   {
-    "question": "How are different parts of a model loaded onto separate GPUs in a model parallelism setup?",
-    "answer": "Each part of the model is explicitly moved to a specific GPU, for example, `part1 = ConvPart().to('cuda:0')` and `part2 = MLPPart().to('cuda:1')`."
+    "question": "What is Pipeline Parallelism (PP)?",
+    "answer": "Pipeline Parallelism (PP) is a model sharding approach where groups of consecutive layers of a model are placed on different devices."
   },
   {
-    "question": "Which PyTorch utility is used to enable pipeline parallelism?",
-    "answer": "`torch.distributed.pipeline.sync.Pipe` is used to enable pipeline parallelism, requiring all modules to be wrapped with `nn.Sequential()`."
+    "question": "How does Pipeline Parallelism mitigate device idleness during sequential computations?",
+    "answer": "To mitigate device idleness, Pipeline Parallelism breaks every input batch into 'micro-batches,' which are then fed to the model in sequence, ensuring all devices stay busy as the first micro-batch reaches the last model block."
   },
   {
-    "question": "What is the purpose of `torch.distributed.rpc.init_rpc` when using `Pipe` for pipeline parallelism?",
-    "answer": "`torch.distributed.rpc.init_rpc` is required to initialize PyTorch's RPC (Remote Procedure Call) module, which is necessary for the `Pipe` class to function correctly."
+    "question": "What is a model checkpoint in the context of training?",
+    "answer": "A model checkpoint is a snapshot of your model at a given point during the training process (e.g., after a certain number of iterations or epochs) that is saved to disk."
   },
   {
-    "question": "How do you configure a SLURM job script to request GPUs for a model parallelism task?",
-    "answer": "In a SLURM job script, you request GPUs using `#SBATCH --gres=gpu:<number_of_gpus>`, for example, `#SBATCH --gres=gpu:2` to request two GPUs."
+    "question": "Why is it recommended to create model checkpoints during training?",
+    "answer": "Creating model checkpoints is a good habit because it allows you to break up long jobs into shorter ones for faster cluster allocation, and it helps avoid losing progress in case of unexpected code errors or node failures."
   },
   {
-    "question": "What environment variables are needed to initialize PyTorch's RPC module in a job script?",
-    "answer": "The `MASTER_ADDR` and `MASTER_PORT` environment variables are needed, typically set as `export MASTER_ADDR=$(hostname)` and `export MASTER_PORT=34567`."
+    "question": "How can you create a model checkpoint using PyTorch Lightning?",
+    "answer": "To create a checkpoint with PyTorch Lightning, you can use the `pl.callbacks.ModelCheckpoint` class in the `Trainer()`'s callbacks parameter, for example: `callbacks = [pl.callbacks.ModelCheckpoint(dirpath=\"./ckpt\",every_n_epochs=1)] trainer = pl.Trainer(callbacks=callbacks) trainer.fit(model)`."
   },
   {
-    "question": "On which GPU should the loss function be loaded when using model parallelism across two GPUs?",
-    "answer": "The loss function should be loaded on the GPU that handles the final part of the model, which is typically the last GPU in the pipeline, e.g., `criterion = nn.CrossEntropyLoss().to('cuda:1')` if `cuda:1` is the last GPU."
+    "question": "How do you load a checkpoint and continue training with PyTorch Lightning?",
+    "answer": "The same code snippet used for creating a checkpoint with `pl.callbacks.ModelCheckpoint` (`trainer.fit(model)`) will automatically load an existing checkpoint from the specified `dirpath` (e.g., `./ckpt`) and continue training from that point."
   },
   {
-    "question": "How are input tensors and target tensors distributed to GPUs in a pipelined model parallelism setup?",
-    "answer": "Input tensors are sent to the first GPU of the pipeline (e.g., `inputs = inputs.to('cuda:0')`), and target tensors are sent to the GPU where the loss function will be calculated (e.g., `targets = targets.to('cuda:1')`)."
+    "question": "Where can you find information on creating and loading checkpoints in custom PyTorch training loops?",
+    "answer": "For custom training loops, you should refer to the official PyTorch documentation on saving and loading a general checkpoint."
+  },
+  {
+    "question": "When performing distributed training with PyTorch Lightning, what extra code is required for checkpointing?",
+    "answer": "No extra code is required for checkpointing with PyTorch Lightning during distributed training, beyond using the standard checkpoint callback."
+  },
+  {
+    "question": "When using DistributedDataParallel or Horovod for distributed training, which process should handle checkpointing?",
+    "answer": "Only one process (one of the ranks), typically rank 0, should perform checkpointing during distributed training, as all ranks will have the same state at the end of each iteration."
+  },
+  {
+    "question": "What precautions should be taken when loading a checkpoint during distributed training, especially if multiple processes are involved?",
+    "answer": "To avoid errors or wrong results, add a `torch.distributed.barrier()` to ensure the checkpointing process finishes writing to disk before other processes attempt to load it, and pass `map_location` to `torch.load` to ensure tensors are loaded onto the correct GPU for each rank (e.g., `map_location = f\"cuda:{local_rank}\"`)."
   }
 ]

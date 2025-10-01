@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What is AnsysEDT?",
+    "answer": "AnsysEDT bundles electromagnetics simulation solutions such as Ansys HFSS, Ansys Maxwell, Ansys Q3D Extractor, Ansys SIwave, and Ansys Icepak using electrical CAD (ECAD) and mechanical CAD (MCAD) workflows."
+  },
+  {
+    "question": "What types of analyses can AnsysEDT integrate with?",
+    "answer": "AnsysEDT integrates with the complete Ansys portfolio of thermal, fluid, and mechanical solvers for comprehensive multiphysics analysis."
+  },
+  {
+    "question": "Does the Alliance provide a generic license for AnsysEDT?",
+    "answer": "No, the Alliance is a hosting provider and installs the software on its clusters, but does not provide a generic license accessible to everyone."
+  },
+  {
+    "question": "How can users access AnsysEDT licenses on Alliance clusters if the Alliance doesn't provide them?",
+    "answer": "Many institutions, faculties, and departments already have license servers that can be used if legal aspects are worked out and network changes are made to enable access from cluster compute nodes."
+  },
+  {
+    "question": "What is required to enable an external license server for AnsysEDT on Alliance clusters?",
+    "answer": "Network changes would need to be made to enable the license server to be reached from the cluster compute nodes, after which the Ansys software could check out licenses after loading the `ansysedt` module."
+  },
+  {
+    "question": "How do you specify your AnsysEDT license server?",
+    "answer": "You specify your AnsysEDT license server by creating a file named `$HOME/.licenses/ansys.lic` consisting of two lines."
+  },
+  {
+    "question": "Where can more details about configuring an Ansys license file be found?",
+    "answer": "Further details can be found on the `Ansys#Configuring_your_license_file` section of the Ansys wiki page."
+  },
+  {
+    "question": "How can AnsysEDT be run interactively in non-GUI batch mode?",
+    "answer": "It can be run by first starting an `salloc` session with options like `--time=3:00:00 --tasks=8 --mem=16G --account=def-account`, and then copy-pasting the full `ansysedt` command from the last line of `script-local-cmd.sh`, ensuring `$YOUR_AEDT_FILE` is manually specified."
+  },
+  {
+    "question": "What command is used to submit AnsysEDT jobs to a cluster queue using Slurm scripts?",
+    "answer": "Jobs may be submitted with the `sbatch script-name.sh` command."
+  },
+  {
+    "question": "On which cluster were the single node Slurm scripts for AnsysEDT tested as of January 2023?",
+    "answer": "As of January 2023, the scripts had only been tested on Graham."
+  },
+  {
+    "question": "What information must be specified in the Slurm scripts before using them for AnsysEDT?",
+    "answer": "Before using the scripts, users must specify the simulation time, memory, number of cores, and replace `YOUR_AEDT_FILE` with their input file name."
+  },
+  {
+    "question": "How can a user obtain a full listing of command line options for AnsysEDT?",
+    "answer": "A full listing of command line options can be obtained by starting AnsysEDT in graphical mode with `ansysedt -help` or `ansysedt -Batchoptionhelp` to get scrollable graphical popups."
+  },
+  {
+    "question": "What module environment and AnsysEDT version are loaded in the provided Slurm script examples for 2023?",
+    "answer": "The scripts load `StdEnv/2023` and `ansysedt/2023R2`."
+  },
+  {
+    "question": "How is a test example file copied into the current directory in the batch scripts?",
+    "answer": "A test example can be copied using `cp -f $EBROOTANSYSEDT/AnsysEM21.2/Linux64/Examples/HFSS/Antennas/TransientGeoRadar.aedt .`."
+  },
+  {
+    "question": "What is the purpose of `YOUR_AEDT_FILE` in the AnsysEDT batch scripts?",
+    "answer": "It is used to specify the input Ansys Electronics Desktop (AEDT) file for the simulation."
+  },
+  {
+    "question": "How are previous output files removed before running an AnsysEDT simulation in the batch script?",
+    "answer": "Previous output files are removed using `rm -rf $YOUR_AEDT_FILE.* ${YOUR_AEDT_FILE}results`."
+  },
+  {
+    "question": "What AnsysEDT command is used for batch solving in the `script-local-cmd.sh` example?",
+    "answer": "The command is `ansysedt -monitor -UseElectronicsPPE -ng -distributed -machinelist list=localhost:1:$SLURM_NTASKS -batchoptions \"TempDirectory=$SLURM_TMPDIR HPCLicenseType=pool HFSS/EnableGPU=0\" -batchsolve \"$YOUR_AEDT_FILE\"`."
+  },
+  {
+    "question": "How does `script-local-opt.sh` handle batch options differently from `script-local-cmd.sh`?",
+    "answer": "`script-local-opt.sh` writes batch options to a separate file named `Options.txt` and passes this file using `-batchoptions $OPTIONS_TXT`, while `script-local-cmd.sh` specifies options as a single string argument."
+  },
+  {
+    "question": "What is the purpose of `export KMP_AFFINITY=disabled` in the AnsysEDT batch scripts?",
+    "answer": "It is used to disable KMP affinity."
+  },
+  {
+    "question": "Which Slurm directive in the batch script specifies the number of cores for the job?",
+    "answer": "The `--ntasks` directive specifies the number of cores."
+  }
+]

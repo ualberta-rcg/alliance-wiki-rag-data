@@ -1,0 +1,78 @@
+[
+  {
+    "question": "What is the difference between starting a VNC server with and without the `-AlwaysShared` option?",
+    "answer": "If a vncserver is started with the `-AlwaysShared` option, multiple connections can be made to it from different locations. Without this option, only one vncviewer connection is possible, requiring applications to be closed and the server shut down before reconnecting from elsewhere."
+  },
+  {
+    "question": "How can I troubleshoot repeated failures to connect to a VNC server?",
+    "answer": "Repeated connection failures might be due to an old SSH tunnel still running on your desktop. You can identify and kill such tunnels by running `ps ux | grep ssh` followed by `kill PID` in a terminal window on your desktop."
+  },
+  {
+    "question": "What password should I use if my VNC screensaver times out?",
+    "answer": "If your VNC screensaver times out and requests a password, you should enter your cluster account password, not your vncserver password."
+  },
+  {
+    "question": "How can I unlock a VNC screensaver if it's unresponsive in a MATE desktop environment?",
+    "answer": "If you are running the MATE desktop and the screensaver will not unlock, try running `killall -9 .mate-screensaver`."
+  },
+  {
+    "question": "What is the two-step login process for gra-vdi.alliancecan.ca?",
+    "answer": "The login process involves two steps: first, entering your username and ccdb password, and second, entering your username and Duo two-factor MFA passcode."
+  },
+  {
+    "question": "What should I do if I cannot log in to gra-vdi after entering my Duo passcode?",
+    "answer": "If you are returned to the login screen after entering your Duo passcode, it indicates that you entered the wrong username/password in the first step. You should try again, ensuring your correct username/password combination."
+  },
+  {
+    "question": "How can I reset my Alliance ccdb password if I forget it?",
+    "answer": "If you cannot recall your Alliance ccdb password, you can visit https://ccdb.alliancecan.ca/security/forgot to reset it, provided your account is not pending renewal by your PI."
+  },
+  {
+    "question": "Do VDI nodes automatically load software environments like regular login nodes?",
+    "answer": "No, unlike regular login nodes where a standard software environment and default modules are automatically loaded, on VDI nodes, you must manually load a software environment such as StdEnv or SnEnv."
+  },
+  {
+    "question": "Which module is recommended for most users on gra-vdi to access standard software?",
+    "answer": "Most users will find it sufficient to load the `StdEnv` module on gra-vdi, which provides access to the same software modules loaded by default on the clusters."
+  },
+  {
+    "question": "How do I load the StdEnv module on a VDI node?",
+    "answer": "You can load the StdEnv module on a VDI node by running `module load CcEnv StdEnv/2023`."
+  },
+  {
+    "question": "When would a user need to load the SnEnv module on gra-vdi?",
+    "answer": "In some rare cases, users will need to load a locally installed module(s) on gra-vdi, and to do this, the `SnEnv` module must first be loaded."
+  },
+  {
+    "question": "How do I load the SnEnv module on a VDI node?",
+    "answer": "You can load the SnEnv module on a VDI node by running `module load SnEnv`."
+  },
+  {
+    "question": "Is the `nix` module currently available on gra-vdi?",
+    "answer": "No, the `nix` module is no longer available on gra-vdi (or graham), and there is no guarantee it will return."
+  },
+  {
+    "question": "If the `nix` module were available, how would one load it?",
+    "answer": "If the `nix` module were available, one would load it by running `module load nix`."
+  },
+  {
+    "question": "How would one install a Nix package, for example QGIS, into their environment?",
+    "answer": "After loading the `nix` module, you would search for the package using `nix search qgis` and then install it with `nix-env --install --attr nixpkgs.qgis`."
+  },
+  {
+    "question": "Does a Nix environment persist across logins?",
+    "answer": "Yes, a Nix environment persists from one login to the next, so you only need to run an install command once for software to be available after loading the `nix` module."
+  },
+  {
+    "question": "How are OpenGL applications optimized when installed with Nix on gra-vdi?",
+    "answer": "When installing OpenGL-based software packages with Nix on gra-vdi, the compiled binaries are automatically adjusted to pre-load `vglfaker.so` from VirtualGL, which is necessary for accelerated OpenGL to work."
+  },
+  {
+    "question": "How can one manually adjust compiled binaries to pre-load `vglfaker.so` for OpenGL applications not installed via Nix?",
+    "answer": "You can use the `patchelf` utility to adjust the final binary. First, load the nix module, then run `patchelf --add-needed /usr/lib64/VirtualGL/libvglfaker.so ~/.local/bin/myglapp` where `myglapp` is your application."
+  },
+  {
+    "question": "What is generally discouraged for preloading `vglfaker.so` and why?",
+    "answer": "Preloading `vglfaker.so` via the `LD_PRELOAD` environment variable is generally discouraged because it applies indiscriminately to all binaries, potentially causing issues for applications that require a different `vglfaker.so`."
+  }
+]

@@ -1,58 +1,50 @@
 [
   {
-    "question": "What is the recommended approach for installing multiple Python packages?",
-    "answer": "It is preferable to install multiple packages with a single `pip install` command, for example, `pip install package1 package2 package3 package4`, to help `pip` resolve dependencies more easily."
+    "question": "How can I inspect a running Python process without modifying its script?",
+    "answer": "You can use `py-spy`. First, install `py-spy` in a virtual environment in your /home directory. Then, connect to a running job using `srun --pty --jobid JOBID bash`, find the Python script's process ID (PID) with `htop -u $USER`, activate the virtual environment where `py-spy` is installed, and finally, use `py-spy top --pid PID` for live monitoring or `py-spy dump --pid PID` for a trace of your code's state."
   },
   {
-    "question": "Why might a virtual environment stop working between two different days?",
-    "answer": "Frequent package updates can make virtual environments unreproducible. Additionally, a virtual environment created in $SCRATCH might be partially destroyed during the automatic purging of that file system."
+    "question": "What should I do if I get an 'ERROR: Package 'X' requires a different Python: X.Y.Z not in '>=X.Y'' message during package installation?",
+    "answer": "This error means the loaded Python version (e.g., 3.6.10) is not supported by the package. You should use a more recent Python version (like the latest available module) or install an older version of the package X."
   },
   {
-    "question": "How can I make my virtual environment more stable and reproducible?",
-    "answer": "To counter instability, freeze the packages and their versions during installation (e.g., `pip install --no-index 'package1==X.Y' 'package2==X.Y.Z' 'package3<X.Y' 'package4>X.Y'`) and then create a requirements file to use for your tasks."
+    "question": "How can I resolve the error 'ERROR: Package has requirement X, but you'll have Y which is incompatible' during package installation?",
+    "answer": "To use the new dependency resolver, install the latest version of `pip` (or a version superior to 21.3) by running `pip install --no-index --upgrade pip` within your virtual environment, and then retry the installation command."
   },
   {
-    "question": "What does the error message 'ERROR: package-3.8.1-cp311-cp311-manylinux_2_28_x86_64.whl is not a supported wheel on this platform.' mean?",
-    "answer": "This error means that the Python package (wheel) you are trying to install is incompatible or not supported by the platform."
+    "question": "What does 'ERROR: No matching distribution found for X' mean when installing a package?",
+    "answer": "This error indicates that `pip` could not find any package matching the specified requirements (name, version, or tags). You should ensure the package name and version are correct. Note that `manylinux_x_y` wheels are ignored. You can also check if the package is available using `avail_wheels` or the 'Available Python wheels' page."
   },
   {
-    "question": "What are the common causes for an unsupported wheel error during package installation?",
-    "answer": "Two frequent causes are installing a `manylinux` package or installing a Python package built for a different Python version than the one currently active (e.g., installing a Python 3.11 package when using Python 3.9)."
+    "question": "What is the recommended way to install multiple Python packages to avoid dependency issues?",
+    "answer": "When possible, it is preferable to install multiple packages with a single `pip install package1 package2 package3 package4` command (after upgrading pip with `pip install --upgrade pip`). This allows `pip` to resolve cross-dependencies more easily."
   },
   {
-    "question": "How can I handle `manylinux` wheels if they are causing unsupported wheel errors?",
-    "answer": "Some `manylinux` packages might be available among the pre-built Python wheels provided on the system."
+    "question": "Why might my virtual environment stop working, and how can I fix it?",
+    "answer": "Virtual environments can become unreproducible due to frequent package updates or might be partially destroyed if created in `$SCRATCH` due to automatic purges. To counter this, you should freeze your package versions by explicitly specifying them during installation (e.g., `pip install --no-index 'package1==X.Y'`) and create a `requirements.txt` file to reproduce the environment in your tasks. Avoid creating virtual environments in `$SCRATCH`."
   },
   {
-    "question": "What can cause an `AttributeError: module \u2018numpy\u2019 has no attribute \u2018X\u2019` message?",
-    "answer": "This error can occur because several attributes were declared obsolete in Numpy v1.20 and are no longer offered in v1.24. If no specific version is requested, the latest version of Numpy is installed by default, which might not include older attributes."
+    "question": "What causes the error 'ERROR: X is not a supported wheel on this platform' during package installation?",
+    "answer": "This error occurs when a package is incompatible or not supported by the system. Common reasons include installing a `manylinux` package not provided by our systems or a Python package built for a different Python version than the one you are currently using. You can check if `manylinux` packages are available in the provided Python wheels."
   },
   {
-    "question": "How can I fix an `AttributeError` related to missing Numpy attributes, such as `module \u2018numpy\u2019 has no attribute \u2018bool\u2019`?",
-    "answer": "This issue is resolved by installing an earlier version of Numpy, for example, using `pip install --no-index 'numpy<1.24'`."
+    "question": "How can I resolve 'AttributeError: module \u2018numpy\u2019 has no attribute \u2018X\u2019'?",
+    "answer": "This error often occurs because attributes in NumPy were deprecated in v1.20 and are no longer available in v1.24. You can resolve it by installing a previous version of NumPy, for example, using `pip install --no-index 'numpy<1.24'`."
   },
   {
-    "question": "What are the primary reasons for a `ModuleNotFoundError: No module named 'X'`?",
-    "answer": "The most frequent explanations are that the package is not installed or not visible to the Python interpreter, the module name does not match the actual name, or the virtual environment is defective."
+    "question": "What are common reasons for 'ModuleNotFoundError: No module named 'X'', and how can I troubleshoot it?",
+    "answer": "Common reasons include the package not being installed or visible, an incorrect module name, or a defective virtual environment. To troubleshoot, avoid modifying `PYTHONPATH` or `PATH`, and load all necessary modules before activating a virtual environment. You can check if the package is installed with `pip list`, verify the exact module name (case, underscores), and confirm if the module is imported at the correct level from its source directory. If issues persist, it's recommended to start with a new virtual environment."
   },
   {
-    "question": "What should I avoid doing to prevent `ModuleNotFoundError`?",
-    "answer": "To prevent this, avoid modifying the `PYTHONPATH` or `PATH` environment variables. Also, ensure you load all necessary modules before activating a virtual environment, rather than while it's active."
+    "question": "Why do I get 'ImportError: numpy.core.multiarray failed to import' when importing a module that depends on NumPy?",
+    "answer": "This error indicates an incompatible version of NumPy is installed or used. This typically happens with NumPy 2.0 due to an ABI break. You need to install a compatible version, such as an earlier version with `pip install --no-index 'numpy<2.0'` if a wheel was built with version 1.x but installed with version 2.x."
   },
   {
-    "question": "What steps should I take if I encounter a `ModuleNotFoundError`?",
-    "answer": "You should check if the package is installed with `pip list`, verify if the name you entered exactly matches the module's actual name (case, underscores, etc.), and confirm if the module is imported at the correct level from its source directory. If in doubt, recreate the environment."
+    "question": "What does 'Defaulting to user installation because normal site-packages is not writeable' mean?",
+    "answer": "This message is `pip`'s default behavior outside a virtual environment, indicating that no virtual environment is active and `pip` lacks the necessary permissions to install packages globally. This will lead to problematic 'local installations'."
   },
   {
-    "question": "When does `ImportError: numpy.core.multiarray failed to import` typically occur?",
-    "answer": "This message can occur when you try to import a Python module that depends on Numpy, specifically when an incompatible version of Numpy is installed or used."
-  },
-  {
-    "question": "What specific Numpy version issue can lead to `ImportError: numpy.core.multiarray failed to import`?",
-    "answer": "A typical case is Numpy version 2.0, which breaks the ABI. If a wheel built with a 1.x version of Numpy is installed with a 2.x version, this error can occur."
-  },
-  {
-    "question": "How can I resolve `ImportError: numpy.core.multiarray failed to import`?",
-    "answer": "To resolve this, you must install a compatible version of Numpy. For instance, if the issue is due to Numpy 2.0's ABI breakage, you should install an earlier version with `pip install --no-index 'numpy<2.0'`."
+    "question": "Why are local Python installations (pip install --user) undesirable, and how can I remove them?",
+    "answer": "Local installations, whether accidental or explicit (`pip install --user`), effectively transfer package dependencies to a shared space, which is highly undesirable. This can cause strange import or execution issues, version conflicts, and lead to 'dependency hell'. It is strongly recommended to use a virtual environment for isolating, reproducing, and managing different versions in your projects. To remove a local installation, run `rm -vr ~/.local/bin ~/.local/lib/python*` and then start with a new, unused virtual environment."
   }
 ]

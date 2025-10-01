@@ -1,0 +1,54 @@
+[
+  {
+    "question": "How do you set up ACLs (Access Control Lists) for a supervisor on a GPFS system like Niagara?",
+    "answer": "First, create a temporary file, for example, `/tmp/supervisor.acl`, with the desired ACL rules. Then, run `mmputacl -i /tmp/supervisor.acl /project/g/group/[owner]` to apply the ACL."
+  },
+  {
+    "question": "What content should be included in the `/tmp/supervisor.acl` file to grant supervisor access?",
+    "answer": "The file should contain:\n`user::rwxc\ngroup::----\nother::----\nmask::rwxc\nuser:[owner]:rwxc\nuser:[supervisor]:rwxc\ngroup:[othegroup]:r-xc`"
+  },
+  {
+    "question": "How do you ensure that new files and directories created within an owner's space inherit supervisor ownership by default?",
+    "answer": "After applying the initial ACL, run `mmputacl -d -i /tmp/supervisor.acl /project/g/group/[owner]`."
+  },
+  {
+    "question": "What command is used to determine the current ACL attributes of a directory?",
+    "answer": "You can use `mmgetacl /project/g/group/[owner]` to determine the current ACL attributes."
+  },
+  {
+    "question": "How can you remove any previously set ACLs for a directory?",
+    "answer": "To remove previously set ACLs, use the command `mmdelacl -d /project/g/group/[owner]`."
+  },
+  {
+    "question": "What is required to create or change a GPFS access control list using `mmeditacl`?",
+    "answer": "To use `mmeditacl /project/g/group/[owner]`, you must first set the `EDITOR` environment variable, for example, `export EDITOR=/usr/bin/vi`."
+  },
+  {
+    "question": "Can GPFS built-in commands recursively add or remove ACL attributes to existing files?",
+    "answer": "No, there is no option to recursively add or remove ACL attributes using a GPFS built-in command to existing files. You need to use the `-i` option for each file or directory individually, or use a sample bash script."
+  },
+  {
+    "question": "What happens if `mmputacl` is used on a directory that already has Linux group permissions?",
+    "answer": "`mmputacl` will not overwrite the original Linux group permissions for a directory when copied to another directory already with ACLs. To give full `rwx` permissions to everyone in your group, you should rely on the plain Unix `chmod g+rwx` command."
+  },
+  {
+    "question": "Who is responsible for defining ACLs at the `/project/G/GROUP` level to allow cross-group access?",
+    "answer": "In the case of PROJECT, the person responsible for your group must define the appropriate ACL at the `/project/G/GROUP` level to allow users from other groups to access files."
+  },
+  {
+    "question": "Can ACLs be used to grant permissions for files or directories that you do not own?",
+    "answer": "No, ACLs do not allow you to grant permissions for files or directories that you do not own."
+  },
+  {
+    "question": "What is a strong recommendation regarding granting write authorization at the top level of your personal directory?",
+    "answer": "It is strongly recommended never to grant write authorization to others at the top level of your personal directory (`/home/G/GROUP/[owner]`) as it would severely compromise your confidentiality. Instead, create specific subdirectories for others to access and manipulate files."
+  },
+  {
+    "question": "Which ACL commands should be used on GPFS systems like Niagara versus Lustre systems like Cedar/Graham?",
+    "answer": "On GPFS systems like Niagara, you must use `mmputacl`, `mmgetacl`, `mmdelacl`, and `mmeditacl`. Commands like `setfacl` and `getfacl` are only for Lustre systems like Cedar and Graham."
+  },
+  {
+    "question": "Where can users find a sample bash script to recursively add or remove ACL attributes using GPFS commands?",
+    "answer": "Users can find and adapt a sample bash script for recursive ACL changes at `https://docs.scinet.utoronto.ca/index.php/Recursive_ACL_script`."
+  }
+]

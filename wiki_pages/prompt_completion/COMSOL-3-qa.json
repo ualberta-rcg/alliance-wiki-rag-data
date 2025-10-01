@@ -1,0 +1,74 @@
+[
+  {
+    "question": "What standard environment and COMSOL module should be loaded for versions 6.2 and newer in a multiple-node job script?",
+    "answer": "You should load `StdEnv/2023` and `comsol/6.2` (or newer versions like `comsol/6.3`)."
+  },
+  {
+    "question": "How do you specify the input and output filenames in a COMSOL multiple-node job script?",
+    "answer": "Set the `INPUTFILE` variable (e.g., `INPUTFILE=\"ModelToSolve.mph\"`) and `OUTPUTFILE` variable (e.g., `OUTPUTFILE=\"SolvedModel.mph\"`)."
+  },
+  {
+    "question": "How do you set up a recovery directory for COMSOL multiple-node jobs?",
+    "answer": "Define `RECOVERYDIR=$SCRATCH/comsol/recoverydir` and then create the directory using `mkdir -p $RECOVERYDIR`."
+  },
+  {
+    "question": "What files need to be copied from the COMSOL installation directory for a multiple-node job?",
+    "answer": "You need to copy `comsolbatch.ini` from `${EBROOTCOMSOL}/bin/glnxa64/` and `java.opts` from `${EBROOTCOMSOL}/mli/startup/java.opts`."
+  },
+  {
+    "question": "How can an interrupted COMSOL multiple-node job be restarted from its latest recovery files?",
+    "answer": "Uncomment the line `# -recover -continue` in the COMSOL batch command."
+  },
+  {
+    "question": "What is the command to run a COMSOL batch job with multiple nodes, including recovery and temporary directory settings?",
+    "answer": "The command is `comsol batch -inputfile $INPUTFILE -outputfile $OUTPUTFILE -np $SLURM_CPUS_ON_NODE -nn $SLURM_NNODES -recoverydir $RECOVERYDIR -tmpdir $SLURM_TMPDIR -comsolinifile comsolbatch.ini -alivetime 15`."
+  },
+  {
+    "question": "What action should be taken if a COMSOL multiple-node job crashes on startup with a Java segmentation fault?",
+    "answer": "Try increasing the Java heap by adding `sed -i 's/-Xmx2g/-Xmx4g/g' comsolbatch.ini` and `sed -i 's/-Xmx768m/-Xmx4g/g' java.opts` after the `cp -f` lines in the script. If needed, further increase both '4g' values to '8g'."
+  },
+  {
+    "question": "Where can more information about COMSOL 'Out of Memory' issues be found?",
+    "answer": "More information can be found in the COMSOL Knowledge Base article [https://www.comsol.ch/support/knowledgebase/1243 Out of Memory]."
+  },
+  {
+    "question": "What should be done if COMSOL jobs run slow on Narval with `comsol/6.0.0.405` in multiple-node submissions?",
+    "answer": "Use `comsol/6.0` instead and report the problem by opening a ticket."
+  },
+  {
+    "question": "How can COMSOL be run interactively in full graphical mode on cluster nodes?",
+    "answer": "Connect to a compute node with TigerVNC, open a terminal, run `export XDG_RUNTIME_DIR=${SLURM_TMPDIR}`, then load the appropriate modules (e.g., `module load StdEnv/2023` and `module load comsol/6.3`), and finally execute `comsol`."
+  },
+  {
+    "question": "What is the time limit for interactive COMSOL sessions on cluster compute nodes via VNC?",
+    "answer": "The time limit is 3 hours."
+  },
+  {
+    "question": "Which modules are required to start COMSOL Multiphysics 6.2 (or newer) on cluster nodes for graphical use?",
+    "answer": "You need to load `module load StdEnv/2023` and `module load comsol/6.3` (or the specific newer version)."
+  },
+  {
+    "question": "What interactive uses are suitable for COMSOL on gra-vdi nodes?",
+    "answer": "Gra-vdi nodes are suitable for running compute calculations with up to 12 cores and 128GB memory, creating or modifying simulation input files, and performing post-processing or data visualization tasks."
+  },
+  {
+    "question": "What are the maximum core and memory limits for compute calculations on gra-vdi nodes?",
+    "answer": "On gra-vdi nodes, you can use a maximum of 12 cores and 128GB memory for compute calculations."
+  },
+  {
+    "question": "How do you start COMSOL Multiphysics 6.2 (or newer) on VDI nodes for graphical use?",
+    "answer": "Load `module load CcEnv StdEnv/2023` and `module load comsol/6.3`, then run `comsol -np 12 -Dosgi.locking=none`."
+  },
+  {
+    "question": "Is there a time limit for interactive COMSOL use on VDI nodes?",
+    "answer": "No, there is no time limit for interactive use on gra-vdi nodes."
+  },
+  {
+    "question": "What should be done if the upper menu items in COMSOL's GUI are greyed out immediately after starting?",
+    "answer": "Your `~/.comsol` directory might be corrupted. Rename or remove it by running `rm -rf ~/.comsol` and then try starting COMSOL again."
+  },
+  {
+    "question": "What might cause the `~/.comsol` directory to become corrupted?",
+    "answer": "This may occur if you previously loaded a COMSOL module from the SnEnv on `gra-vdi`."
+  }
+]

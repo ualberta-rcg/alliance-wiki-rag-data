@@ -1,0 +1,54 @@
+[
+  {
+    "question": "Quel est le but du script `config_virtualenv.sh`?",
+    "answer": "Le script `config_virtualenv.sh` est utilis\u00e9 pour installer un environnement virtuel et Dask."
+  },
+  {
+    "question": "Quels modules sont charg\u00e9s par le script `config_virtualenv.sh` avant de cr\u00e9er l'environnement virtuel?",
+    "answer": "Le script `config_virtualenv.sh` charge les modules `python`, `gcc`, et `arrow`."
+  },
+  {
+    "question": "Comment Dask est-il install\u00e9 dans l'environnement virtuel cr\u00e9\u00e9 par `config_virtualenv.sh`?",
+    "answer": "Dask est install\u00e9 en utilisant `pip install --no-index dask[distributed,dataframe]`."
+  },
+  {
+    "question": "Quel est le r\u00f4le du script `launch_dask_workers.sh`?",
+    "answer": "Le script `launch_dask_workers.sh` est responsable du d\u00e9marrage des workers Dask."
+  },
+  {
+    "question": "Comment la cha\u00eene de connexion du scheduler est-elle d\u00e9finie dans `launch_dask_workers.sh`?",
+    "answer": "La cha\u00eene de connexion du scheduler est d\u00e9finie comme `SCHEDULER_CONNECTION_STRING=\"tcp://$DASK_SCHEDULER_ADDR:$DASK_SCHEDULER_PORT\"`."
+  },
+  {
+    "question": "Comment la m\u00e9moire est-elle allou\u00e9e pour le Dask worker sur la t\u00e2che SLURM avec le rang 0 dans `launch_dask_workers.sh`?",
+    "answer": "Sur la t\u00e2che SLURM avec le rang 0, le Dask worker se voit allouer 40% de la m\u00e9moire du job (`DASK_WORKER_MEM=0.4`)."
+  },
+  {
+    "question": "Combien de threads sont allou\u00e9s au Dask worker sur la t\u00e2che SLURM avec le rang 0, et pourquoi?",
+    "answer": "Le Dask worker sur la t\u00e2che SLURM avec le rang 0 re\u00e7oit `SLURM_CPUS_PER_TASK - 1` threads, afin de laisser un c\u0153ur pour le scheduler."
+  },
+  {
+    "question": "Quelle est l'allocation de m\u00e9moire pour les Dask workers sur les t\u00e2ches SLURM autres que le rang 0?",
+    "answer": "Sur toutes les autres t\u00e2ches SLURM (non-rang 0), chaque worker re\u00e7oit la moiti\u00e9 de la m\u00e9moire allou\u00e9e au job (`DASK_WORKER_MEM=0.5`)."
+  },
+  {
+    "question": "Combien de threads sont allou\u00e9s aux Dask workers sur les t\u00e2ches SLURM autres que le rang 0?",
+    "answer": "Sur toutes les autres t\u00e2ches SLURM (non-rang 0), chaque worker re\u00e7oit tous les c\u0153urs allou\u00e9s \u00e0 sa t\u00e2che (`DASK_WORKER_THREADS=$SLURM_CPUS_PER_TASK`)."
+  },
+  {
+    "question": "Quel est le but du script Python `test_dask.py`?",
+    "answer": "Le script `test_dask.py` se connecte \u00e0 un client Dask, cr\u00e9e un DataFrame Pandas, le convertit en DataFrame Dask et calcule la moyenne d'une colonne."
+  },
+  {
+    "question": "Comment le script `test_dask.py` se connecte-t-il au client Dask?",
+    "answer": "Le script `test_dask.py` se connecte au client Dask en utilisant `client = Client(f\"tcp://{os.environ['DASK_SCHEDULER_ADDR']}:{os.environ['DASK_SCHEDULER_PORT']}\")`."
+  },
+  {
+    "question": "Comment un DataFrame Dask est-il cr\u00e9\u00e9 \u00e0 partir d'un DataFrame Pandas dans `test_dask.py`?",
+    "answer": "Un DataFrame Dask est cr\u00e9\u00e9 \u00e0 partir d'un DataFrame Pandas en utilisant `dd.from_pandas(df, npartitions=6)`."
+  },
+  {
+    "question": "Quelle op\u00e9ration est effectu\u00e9e sur le DataFrame Dask dans le script `test_dask.py`?",
+    "answer": "Le script `test_dask.py` calcule la moyenne de la colonne 'a' du DataFrame Dask en utilisant `ddf.a.mean().compute()`."
+  }
+]

@@ -1,66 +1,118 @@
 [
   {
-    "question": "How can I determine the maximum memory a completed job used?",
-    "answer": "You can determine the maximum memory a job needed by using the `MaxRSS` accounting field with the `sacct` command."
+    "question": "How can I view all jobs managed by the Slurm scheduler?",
+    "answer": "By default, the `squeue` command will show all jobs the scheduler is currently managing."
   },
   {
-    "question": "How do I find out which task and node recorded the largest resident set size for a completed job?",
-    "answer": "To know which task and node recorded the largest resident set size, you should print the `MaxRSSTask` and `MaxRSSNode` fields along with `MaxRSS`."
+    "question": "How do I list only my own jobs in Slurm?",
+    "answer": "You can use the command `squeue -u $USER` or the utility `sq` to list only your own jobs."
   },
   {
-    "question": "Which command is used to monitor a running job in a similar way that `sacct` works for completed jobs?",
+    "question": "How do I display only running jobs in Slurm?",
+    "answer": "To show only running jobs, use the command `squeue -u <username> -t RUNNING`."
+  },
+  {
+    "question": "How do I display only pending jobs in Slurm?",
+    "answer": "To show only pending jobs, use the command `squeue -u <username> -t PENDING`."
+  },
+  {
+    "question": "How can I get detailed information for a specific Slurm job?",
+    "answer": "You can show detailed information for a specific job using `scontrol show job <jobid>`."
+  },
+  {
+    "question": "Is it recommended to run `squeue` frequently from a script?",
+    "answer": "No, it is not recommended to run `squeue` from a script or program at high frequency (e.g., every few seconds) as it adds load to Slurm and may interfere with its performance."
+  },
+  {
+    "question": "How can I receive email notifications for Slurm job conditions?",
+    "answer": "You can ask to be notified by email by supplying options to sbatch, specifically `#SBATCH --mail-user=your.email@example.com` and `#SBATCH --mail-type=ALL`."
+  },
+  {
+    "question": "What is output buffering in non-interactive Slurm jobs?",
+    "answer": "Output from a non-interactive Slurm job is normally buffered, meaning there's a delay between when data is written by the job and when you can see the output on a login node, ranging from seconds to minutes or until the job completes."
+  },
+  {
+    "question": "Why is output buffering vital in Slurm?",
+    "answer": "Buffering is vital to preserving the overall performance of the filesystem."
+  },
+  {
+    "question": "How can I monitor the output from a Slurm job in real time?",
+    "answer": "To monitor the output from a job in real time, it is recommended to run an interactive job."
+  },
+  {
+    "question": "What command provides a summary of CPU and memory efficiency for a completed Slurm job?",
+    "answer": "The `seff <jobid>` command provides a short summary of the CPU and memory efficiency of a completed job."
+  },
+  {
+    "question": "How can I get more detailed information about a completed Slurm job?",
+    "answer": "You can find more detailed information about a completed job using `sacct -j <jobid>`."
+  },
+  {
+    "question": "How can I customize the output format of the `sacct` command?",
+    "answer": "You can control what `sacct` prints by using the `--format` option, for example: `sacct -j <jobid> --format=JobID,JobName,MaxRSS,Elapsed`."
+  },
+  {
+    "question": "What do the `.bat+`, `.ext+`, and `.0` records mean in `sacct` output?",
+    "answer": "The `.bat+` record represents the batch step (your submission script), where the main work and resource consumption often occur; `.ext+` is the extern step (prologue and epilogue) which normally doesn't consume significant resources; and `.0, .1, .2, ...` steps are created if `srun` is used in your submission script."
+  },
+  {
+    "question": "How do I view all records for a job if it has been restarted multiple times due to node failures?",
+    "answer": "If a node fails and a job is restarted, `sacct` normally shows only the last successful run. To see all related records, add the `--duplicates` option to your `sacct` command."
+  },
+  {
+    "question": "How can I determine the maximum memory a Slurm job needed?",
+    "answer": "Use the `MaxRSS` accounting field in `sacct` to determine the maximum memory a job needed, which represents the largest resident set size for any of the tasks."
+  },
+  {
+    "question": "What command provides information about a running job similar to `sacct` for completed jobs?",
     "answer": "The `sstat` command works on a running job much the same way that `sacct` works on a completed job."
   },
   {
-    "question": "What are the primary reasons for connecting to a node where a job is running?",
-    "answer": "Connecting to a node running a job can be useful for troubleshooting or to monitor the progress of a job."
+    "question": "How can I monitor GPU usage on a node where my Slurm job is running?",
+    "answer": "You can attach to the node and run `nvidia-smi` using `srun --jobid 123456 --pty watch -n 30 nvidia-smi`."
   },
   {
-    "question": "How can I monitor GPU usage on a node assigned to my running job?",
-    "answer": "You can monitor GPU usage by running `srun --jobid <jobid> --pty watch -n 30 nvidia-smi`, which will execute `nvidia-smi` every 30 seconds on the assigned node."
+    "question": "How can I monitor multiple processes (e.g., htop and nvidia-smi) simultaneously on a node assigned to my Slurm job?",
+    "answer": "You can launch multiple monitoring commands using `tmux` with `srun --jobid 123456 --pty tmux new-session -d 'htop -u $USER' \\; split-window -h 'watch nvidia-smi' \\; attach`."
   },
   {
-    "question": "How do I launch multiple monitoring commands in separate panes on a node assigned to a running job?",
-    "answer": "You can launch multiple monitoring commands, like `htop` and `nvidia-smi`, in separate panes using `srun --jobid <jobid> --pty tmux new-session -d 'htop -u $USER' \\; split-window -h 'watch nvidia-smi' \\; attach`."
+    "question": "What should I be careful about when launching processes with `srun` on a node where a job is running?",
+    "answer": "You should be careful not to launch processes that would use a significant portion of the resources allocated for the job, as using too much memory could kill the job or too many CPU cycles could slow it down."
   },
   {
-    "question": "What precautions should be taken when launching new processes with `srun` on a node where a job is already running?",
-    "answer": "You should be careful not to launch processes that would use a significant portion of the resources allocated for the job, as excessive memory or CPU usage could cause the job to be killed or slowed down."
+    "question": "Can `srun` commands used for monitoring be applied to interactive jobs?",
+    "answer": "No, the `srun` commands shown for monitoring only work to monitor a job submitted with `sbatch`. To monitor an interactive job, you should create multiple panes with `tmux` and start each process in its own pane."
   },
   {
-    "question": "Can `srun` commands be used to monitor interactive jobs?",
-    "answer": "No, the `srun` commands described for monitoring only work for jobs submitted with `sbatch`. To monitor an interactive job, you would create multiple panes with `tmux` and start each process in its own pane."
+    "question": "How do I cancel a specific Slurm job?",
+    "answer": "Use `scancel` with the job ID, like `scancel <jobid>`."
   },
   {
-    "question": "What is the command to cancel a specific job?",
-    "answer": "To cancel a specific job, use `scancel <jobid>`."
+    "question": "How can I cancel all my Slurm jobs?",
+    "answer": "You can cancel all your jobs using `scancel -u $USER`."
   },
   {
-    "question": "How do I cancel all my jobs?",
-    "answer": "You can cancel all your jobs by using the command `scancel -u $USER`."
+    "question": "How can I cancel only my pending Slurm jobs?",
+    "answer": "You can cancel all your pending jobs using `scancel -t PENDING -u $USER`."
   },
   {
-    "question": "What command is used to cancel only my pending jobs?",
-    "answer": "To cancel only your pending jobs, use `scancel -t PENDING -u $USER`."
+    "question": "What is checkpointing in the context of long-running computations?",
+    "answer": "Checkpointing is when an application saves its state to a file, called a checkpoint file, allowing it to restart and continue the computation from that saved state, which is necessary for computations exceeding system time limits."
   },
   {
-    "question": "What is a prerequisite for applications that need to run longer than the system's time limits?",
-    "answer": "The application must support checkpointing, meaning it can save its state to a file and restart from that saved state."
-  },
-  {
-    "question": "What are the two recommended methods for automatically restarting long-running computations?",
+    "question": "What are the two recommended methods for automating job restarts for long-running computations?",
     "answer": "The two recommended methods for automatic restarting are using SLURM job arrays and resubmitting from the end of the job script."
   },
   {
-    "question": "How can a job array be configured to ensure only one job runs at a time?",
-    "answer": "A job array can be configured to run only one job at a time by using the `--array=1-100%10` syntax (where 10 is the number of concurrent jobs allowed, and for one at a time, it would be `--array=1-X%1`)."
+    "question": "How can job arrays be used to restart a multi-step simulation?",
+    "answer": "Job arrays can be used by specifying `--array=1-10%1` (e.g., for 10 jobs running one at a time) and writing the script to use the last checkpoint file (e.g., `state.cpt`) to restart the simulation."
   },
   {
-    "question": "How is a job array script designed to restart a simulation from the last checkpoint?",
-    "answer": "A job array script should check for the existence of a checkpoint file (e.g., `state.cpt`); if found, it restarts the simulation from that file (`mdrun --restart state.cpt`), otherwise, it starts a new simulation (`mdrun`)."
+    "question": "What is the principle behind resubmitting a job from the job script itself?",
+    "answer": "A job is submitted that runs a chunk of the calculation, saves a checkpoint, and before its allocated run-time elapses, the script checks if the calculation is finished. If not, it submits a copy of itself to continue working."
   },
   {
-    "question": "How can a molecular dynamics simulation requiring 1,000,000 steps, which exceeds time limits, be managed using job arrays?",
-    "answer": "The simulation can be split into 10 smaller jobs of 100,000 steps each, with each job in the array running one after another and using checkpoints to continue the overall simulation."
+    "question": "What is an important consideration when defining the `work_should_continue` function for job resubmission?",
+    "answer": "The test to determine whether to submit a follow-up job (e.g., `work_should_continue`) should be a positive test, meaning it should explicitly confirm that work *should* continue, rather than testing for a stopping condition, to prevent indefinite job chains due to unforeseen errors."
   }
 ]

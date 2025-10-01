@@ -1,0 +1,46 @@
+[
+  {
+    "question": "Quand est-il recommand\u00e9 d'utiliser le mode META de META-Farm?",
+    "answer": "Le mode META est recommand\u00e9 lorsque le nombre de cas est largement sup\u00e9rieur \u00e0 500."
+  },
+  {
+    "question": "Quels probl\u00e8mes peuvent survenir en mode SIMPLE si le nombre de cas est tr\u00e8s \u00e9lev\u00e9?",
+    "answer": "Pour un tr\u00e8s grand nombre de cas (>500), le mode SIMPLE peut entra\u00eener une limite du nombre de t\u00e2ches par grappe et un gaspillage de cycles CPU si chaque cas prend moins de 20 minutes."
+  },
+  {
+    "question": "Comment le mode META r\u00e9sout-il les probl\u00e8mes li\u00e9s \u00e0 un grand nombre de cas?",
+    "answer": "Au lieu de soumettre une t\u00e2che distincte pour chaque cas, le mode META soumet un plus petit nombre de m\u00e9tat\u00e2ches, chacune traitant plusieurs cas."
+  },
+  {
+    "question": "Comment active-t-on le mode META lors de la soumission de t\u00e2ches?",
+    "answer": "Pour activer le mode META, le premier argument de `submit.run` doit \u00eatre le nombre souhait\u00e9 de m\u00e9tat\u00e2ches, par exemple `submit.run 32`."
+  },
+  {
+    "question": "D\u00e9crivez le m\u00e9canisme d'\u00e9quilibrage dynamique de la charge de travail en mode META.",
+    "answer": "Chaque t\u00e2che ex\u00e9cute le m\u00eame script `task.run`, qui contient une boucle `while` pour les cas. Chaque it\u00e9ration de la boucle passe par une zone critique pour obtenir le cas suivant \u00e0 traiter dans `table.dat`, puis ex\u00e9cute le script `single_case.sh` pour ce nouveau cas."
+  },
+  {
+    "question": "Quels sont les avantages de l'\u00e9quilibrage dynamique de la charge de travail en mode META?",
+    "answer": "L'\u00e9quilibrage dynamique a pour r\u00e9sultat que toutes les m\u00e9tat\u00e2ches se terminent \u00e0 peu pr\u00e8s au m\u00eame moment, quelle que soit la diff\u00e9rence des dur\u00e9es d'ex\u00e9cution pour les cas individuels, la vitesse des processeurs des n\u0153uds et le moment de d\u00e9marrage des m\u00e9tat\u00e2ches."
+  },
+  {
+    "question": "Que se passe-t-il si une m\u00e9tat\u00e2che est interrompue en mode META?",
+    "answer": "Si une m\u00e9tat\u00e2che est interrompue en plein calcul, au plus un cas sera perdu, ce qui peut facilement \u00eatre repris avec `resubmit.run`."
+  },
+  {
+    "question": "Est-il n\u00e9cessaire que toutes les m\u00e9tat\u00e2ches demand\u00e9es s'ex\u00e9cutent pour que tous les cas soient trait\u00e9s en mode META?",
+    "answer": "Non, toutes les m\u00e9tat\u00e2ches demand\u00e9es ne s'ex\u00e9cuteront pas n\u00e9cessairement; cela d\u00e9pend de la disponibilit\u00e9 de la grappe, mais tous les r\u00e9sultats seront obtenus."
+  },
+  {
+    "question": "Quelle est la premi\u00e8re \u00e9tape pour d\u00e9terminer le nombre optimal de m\u00e9tat\u00e2ches et le temps d'ex\u00e9cution \u00e0 utiliser dans `job_script.sh`?",
+    "answer": "La premi\u00e8re \u00e9tape est de d\u00e9terminer le temps d'ex\u00e9cution moyen pour un cas individuel (une seule ligne dans `table.dat`), appel\u00e9 `dt_case`."
+  },
+  {
+    "question": "Comment peut-on estimer la dur\u00e9e d'ex\u00e9cution moyenne d'un cas individuel (`dt_case`)?",
+    "answer": "Pour estimer `dt_case`, allouez un seul c\u0153ur CPU avec `salloc`, puis ex\u00e9cutez `single_case.sh` pour quelques cas diff\u00e9rents en utilisant une boucle `for`, mesurez la dur\u00e9e d'ex\u00e9cution totale et divisez-la par le nombre de cas ex\u00e9cut\u00e9s."
+  },
+  {
+    "question": "Donnez un exemple de commande pour mesurer le temps moyen d'ex\u00e9cution d'un cas individuel.",
+    "answer": "Un exemple de commande est : `N=10; time for ((i=1; i<=$N; i++)); do ./single_case.sh table.dat $i ; done`."
+  }
+]

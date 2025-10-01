@@ -1,0 +1,38 @@
+[
+  {
+    "question": "How do you restart a GROMACS simulation?",
+    "answer": "You can restart a GROMACS simulation by using the `mdrun` command and adding the `-cpi state.cpt` parameter, where `state.cpt` is the filename of the most recent checkpoint file."
+  },
+  {
+    "question": "What is the default behavior of GROMACS mdrun when restarting a simulation that uses an existing checkpoint file?",
+    "answer": "Since version 4.5, `mdrun` will by default try to append to existing output files (trajectories, energy- and log-files, etc.) when restarting from a checkpoint file."
+  },
+  {
+    "question": "How does GROMACS ensure output file consistency when restarting a simulation?",
+    "answer": "GROMACS will check the consistency of the output files and, if needed, discard timesteps that are newer than that of the checkpoint file being used for the restart."
+  },
+  {
+    "question": "What is the purpose of the `-maxh` parameter in GROMACS `mdrun` when managing long simulations?",
+    "answer": "The `-maxh` parameter tells the program the requested walltime so that it gracefully finishes the current timestep when reaching 99% of this walltime, ensuring checkpoint and output files are written in a consistent state."
+  },
+  {
+    "question": "Why should long GROMACS simulations be split into multiple shorter jobs?",
+    "answer": "Splitting long simulations into shorter jobs can minimize the time a job needs to wait in the queue, as shorter jobs (e.g., 3 hours or less) are eligible for backfill scheduling."
+  },
+  {
+    "question": "How can checkpointing be automated for GROMACS simulations?",
+    "answer": "Checkpointing can be automated using a job array, where a single `sbatch` call submits multiple short jobs that automatically resume the simulation sequentially."
+  },
+  {
+    "question": "In a GROMACS checkpointing job array script, what happens if a simulation job exits with an error?",
+    "answer": "If a simulation job exits with an error (non-zero exit code), the script will cancel all pending jobs in the array using `scancel -t pending $SLURM_ARRAY_JOB_ID`."
+  },
+  {
+    "question": "How does a GROMACS checkpointing job array script detect when a simulation has finished?",
+    "answer": "The script checks the simulation's log file for a line indicating 'Writing checkpoint, step [total_steps] at ' to determine if the simulation has reached its final step, then cancels pending jobs."
+  },
+  {
+    "question": "What are the required modules for running a GROMACS 2024.4 checkpointing job on Narval using StdEnv/2023?",
+    "answer": "The required modules are `StdEnv/2023 gcc/12.3 openmpi/4.1.5 gromacs/2024.4`."
+  }
+]

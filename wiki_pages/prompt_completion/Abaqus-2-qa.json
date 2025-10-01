@@ -1,0 +1,110 @@
+[
+  {
+    "question": "How do you specify a T4 GPU for a Standard Analysis job on a single node?",
+    "answer": "Uncomment `#SBATCH --constraint=cascade` and `#SBATCH --gres=gpu:t4:1` in the Slurm script."
+  },
+  {
+    "question": "How do you specify an A100 GPU for a Standard Analysis job on a single node?",
+    "answer": "Uncomment `#SBATCH --constraint=rome` and `#SBATCH --gres=gpu:a100:1` in the Slurm script."
+  },
+  {
+    "question": "Which `StdEnv` and `abaqus` modules are loaded by default for the latest installed version in the Standard Analysis script?",
+    "answer": "`module load StdEnv/2020` and `module load abaqus/2021` are loaded."
+  },
+  {
+    "question": "How can older versions of the `StdEnv` and `abaqus` modules be used?",
+    "answer": "Uncomment `#module load StdEnv/2016` and `#module load abaqus/2020` in the script."
+  },
+  {
+    "question": "Which environment variable related to MPI order is exported in the Abaqus scripts?",
+    "answer": "`MPI_IC_ORDER` is exported as `'tcp'`."
+  },
+  {
+    "question": "What is the command to run a standard Abaqus job with an input file `mystd-sim.inp` and thread-based parallelization?",
+    "answer": "The command is `abaqus job=testsp1 input=mystd-sim.inp scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive mp_mode=threads memory=\"$((${SLURM_MEM_PER_NODE}-3072))MB\"`."
+  },
+  {
+    "question": "How is the memory allocated for the Abaqus job in the provided Standard Analysis script?",
+    "answer": "The memory is calculated as the node's memory minus 3072MB: `memory=\"$((${SLURM_MEM_PER_NODE}-3072))MB\"`."
+  },
+  {
+    "question": "How can GPU usage be enabled in the Abaqus command line within the script?",
+    "answer": "Uncomment the line `# gpus=$SLURM_GPUS_ON_NODE`."
+  },
+  {
+    "question": "How do you specify writing restart data every 12 time increments in an Abaqus input file?",
+    "answer": "Add `*RESTART, WRITE, OVERLAY, FREQUENCY=12` to the input file."
+  },
+  {
+    "question": "How do you check for completed restart information for a standard analysis job?",
+    "answer": "Run `egrep -i \"step|start\" testsp*.com testsp*.msg testsp*.sta`."
+  },
+  {
+    "question": "What Abaqus command argument might improve performance for some simulations?",
+    "answer": "Adding `order_parallel=OFF` to the Abaqus command may benefit some simulations."
+  },
+  {
+    "question": "What is the name of the project directory restart script?",
+    "answer": "`scriptsp2.txt`."
+  },
+  {
+    "question": "What Slurm command is used to restart an Abaqus job from an old job?",
+    "answer": "The Abaqus command includes `oldjob=testsp1` and specifies an input file like `mystd-sim-restart.inp`."
+  },
+  {
+    "question": "What must the input file for a restart analysis contain?",
+    "answer": "The restart input file should contain `*HEADING` and `*RESTART, READ`."
+  },
+  {
+    "question": "What is the name of the temporary directory script for standard analysis?",
+    "answer": "`scriptst1.txt`."
+  },
+  {
+    "question": "How does the temporary directory script handle saving data periodically during a long job?",
+    "answer": "It runs a background process: `while sleep 6h; do echo \"Saving data due to time limit ...\"; cp -fv * $SLURM_SUBMIT_DIR 2>/dev/null; done &`."
+  },
+  {
+    "question": "Where is the scratch directory created and used in the temporary directory script?",
+    "answer": "A `scratch` directory is created within `$SLURM_TMPDIR`, and the Abaqus command uses `scratch=$SLURM_TMPDIR/scratch`."
+  },
+  {
+    "question": "What happens to the job's output files at the end of a temporary directory script run?",
+    "answer": "All files are copied from `$SLURM_TMPDIR` back to `$SLURM_SUBMIT_DIR` using `cp -fv * $SLURM_SUBMIT_DIR`."
+  },
+  {
+    "question": "What is the name of the temporary directory restart script?",
+    "answer": "`scriptst2.txt`."
+  },
+  {
+    "question": "How are initial files copied for a temporary directory restart job?",
+    "answer": "`cp testst1* $SLURM_TMPDIR` copies files from the previous run to the temporary directory."
+  },
+  {
+    "question": "Who should use multiple node computing scripts for Abaqus?",
+    "answer": "Users with large memory or compute needs and correspondingly large licenses should use them."
+  },
+  {
+    "question": "What type of parallelization is employed in multiple node computing for Abaqus?",
+    "answer": "MPI-based computing."
+  },
+  {
+    "question": "Are restart scripts available for multi-node Abaqus jobs?",
+    "answer": "No, a companion template script for multinode job restarts is not provided due to additional limitations."
+  },
+  {
+    "question": "What is the filename for the MPI-based multiple node script for standard analysis?",
+    "answer": "`scriptsp1-mpi.txt`."
+  },
+  {
+    "question": "What are the default Slurm resource requests for the MPI-based multiple node script?",
+    "answer": "`--account=def-group`, `--time=00-06:00`, `--ntasks=8`, `--mem-per-cpu=4G`, `--cpus-per-task=1`."
+  },
+  {
+    "question": "What value is recommended for `--cpus-per-task` in the MPI-based multiple node script?",
+    "answer": "`--cpus-per-task=1` should not be changed."
+  },
+  {
+    "question": "How can the number of nodes be specified (optionally) in the MPI script?",
+    "answer": "Uncomment `#SBATCH --nodes=2` to specify the number of nodes."
+  }
+]

@@ -1,74 +1,82 @@
 [
   {
-    "question": "How do you specify the input simulation filename in a STAR-CCM+ Slurm script?",
-    "answer": "You specify it using the `SIM_FILE` variable, for example: `SIM_FILE='mysample.sim'`."
+    "question": "How do you specify the input simulation filename in a Trillium Slurm script for STAR-CCM+?",
+    "answer": "Set the `SIM_FILE` variable, for example: `SIM_FILE='mysample.sim'`."
   },
   {
-    "question": "How can you include an input Java filename in a STAR-CCM+ Slurm job?",
-    "answer": "Uncomment the line `#JAVA_FILE='mymacros.java'` and specify your Java filename, for example: `JAVA_FILE='mymacros.java'`."
+    "question": "How do you specify an input Java macro filename in a Trillium Slurm script for STAR-CCM+?",
+    "answer": "Uncomment and set the `JAVA_FILE` variable, for example: `#JAVA_FILE='mymacros.java'`."
   },
   {
-    "question": "Which environment module should be loaded for STAR-CCM+ versions running on StdEnv/2023?",
-    "answer": "You should load `StdEnv/2023` followed by either `starccm-mixed/18.06.006` or `starccm/18.06.006-R8`."
+    "question": "How is the Siemens Power on Demand (PoD) Key specified in a Trillium Slurm script?",
+    "answer": "Set the `LM_PROJECT` environment variable, e.g., `LM_PROJECT='my22digitpodkey'`. This line should be commented out if using an institutional license server."
   },
   {
-    "question": "How is the Siemens Power on Demand (PoD) Key specified in a Slurm script?",
-    "answer": "The PoD Key is specified using the `LM_PROJECT` variable, for example: `LM_PROJECT='my22digitpodkey'`."
+    "question": "What are the default license server settings for STAR-CCM+ on the Trillium cluster, used instead of the `~/.licenses/starccm.lic` file?",
+    "answer": "The settings are `FLEXPORT=1999`, `VENDPORT=2099`, and `LICSERVER=flex.cd-adapco.com`."
   },
   {
-    "question": "What is the command to generate the machinefile for STAR-CCM+ jobs?",
-    "answer": "The command `slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile` generates the machinefile."
+    "question": "How is the `CDLMD_LICENSE_FILE` environment variable set for licensing on Trillium?",
+    "answer": "It is exported as `export CDLMD_LICENSE_FILE=\"$FLEXPORT@127.0.0.1\"`."
   },
   {
-    "question": "How are the total number of cores calculated within the Slurm script?",
-    "answer": "The total number of cores (`NCORE`) is calculated as `NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))`."
+    "question": "How is an SSH tunnel established for license access on Trillium?",
+    "answer": "An SSH command `ssh nia-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f` is used."
   },
   {
-    "question": "What command is used to launch STAR-CCM+ when using a Siemens PoD license server?",
-    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
+    "question": "How is the total number of cores (NCORE) calculated in the Trillium Slurm script for STAR-CCM+?",
+    "answer": "`NCORE` is calculated as the product of `SLURM_NNODES`, `SLURM_CPUS_PER_TASK`, and `SLURM_NTASKS_PER_NODE`."
   },
   {
-    "question": "What command is used to launch STAR-CCM+ when using an institutional license server?",
-    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
+    "question": "What workaround is implemented in the Trillium Slurm script for STAR-CCM+ license failures?",
+    "answer": "The script attempts to start STAR-CCM+ up to 5 times in a loop, pausing for 5 seconds after the first attempt if it fails."
   },
   {
-    "question": "What is the recommended `--cpus-per-task` for Beluga cluster jobs?",
-    "answer": "The recommended `--cpus-per-task` for Beluga is `40`."
+    "question": "What command line options are used for a Siemens PoD license server when running STAR-CCM+ on Trillium?",
+    "answer": "The `starccm+` command includes `-power -podkey $LM_PROJECT` for Siemens PoD license server usage."
   },
   {
-    "question": "What MPI settings are used for STAR-CCM+ jobs on Cedar and Graham clusters?",
-    "answer": "STAR-CCM+ jobs on Cedar and Graham use `-mpi intel -fabric psm2`."
+    "question": "What command line options are used for an institutional license server when running STAR-CCM+ on Trillium?",
+    "answer": "The `starccm+` command does not include `-power -podkey $LM_PROJECT` for institutional license server usage."
   },
   {
-    "question": "What is the recommended `--cpus-per-task` for Cedar cluster jobs?",
-    "answer": "The recommended `--cpus-per-task` for Cedar is `48` (can be 32 or 48)."
+    "question": "What is the initial step to set up an account for remote visualization of STAR-CCM+?",
+    "answer": "Create the `~/.licenses/starccm.lic` file as described in the documentation."
   },
   {
-    "question": "What MPI settings are used for STAR-CCM+ jobs on the Narval cluster?",
-    "answer": "STAR-CCM+ jobs on Narval use `-mpi openmpi`."
+    "question": "What additional steps are required for users with a POD license when setting up for remote visualization?",
+    "answer": "Users must set `export LM_PROJECT='CD-ADAPCO PROJECT ID'` and add `-power` to the STAR-CCM+ command line options."
   },
   {
-    "question": "What is the recommended `--cpus-per-task` for Narval cluster jobs?",
-    "answer": "The recommended `--cpus-per-task` for Narval is `64`."
+    "question": "How do you connect to compute nodes for remote visualization of STAR-CCM+?",
+    "answer": "Connect using TigerVNC and open a terminal window."
   },
   {
-    "question": "What environment module is loaded specifically for Niagara cluster STAR-CCM+ jobs, in addition to StdEnv?",
-    "answer": "For Niagara cluster jobs, `CCEnv` is loaded in addition to `StdEnv/2023`."
+    "question": "What modules should be loaded to run STAR-CCM+ version 15.04.010 (or newer) on compute nodes for remote visualization?",
+    "answer": "Load `module load StdEnv/2020` and then `module load starccm-mixed/17.02.007` (or `starccm/17.02.007-R8`)."
   },
   {
-    "question": "How are license server settings configured directly in the Slurm script for Niagara?",
-    "answer": "License server settings are configured using `FLEXPORT`, `VENDPORT`, and `LICSERVER` variables, for example: `FLEXPORT=1999`, `VENDPORT=2099`, `LICSERVER=flex.cd-adapco.com`."
+    "question": "How do you launch STAR-CCM+ version 13.06.012 (or older) on compute nodes for remote visualization?",
+    "answer": "After loading `StdEnv/2016` and `starccm-mixed/13.06.012` (or `starccm/13.06.012-R8`), run `starccm+ -mesa`."
   },
   {
-    "question": "What command is used to set the `CDLMD_LICENSE_FILE` environment variable on Niagara?",
-    "answer": "The command `export CDLMD_LICENSE_FILE=\"$FLEXPORT@127.0.0.1\"` is used."
+    "question": "How do you connect to VDI nodes for remote visualization of STAR-CCM+?",
+    "answer": "Connect to `gra-vdi.alliancecan.ca` with TigerVNC, log in, and open a Mate Terminal from 'Applications -> Systems Tools'."
   },
   {
-    "question": "What SSH command is run on Niagara for licensing purposes?",
-    "answer": "The SSH command `ssh nia-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f` is run."
+    "question": "How can you check which STAR-CCM+ versions are available on VDI nodes?",
+    "answer": "After loading a `StdEnv` module, use the `module avail starccm-mixed` command."
   },
   {
-    "question": "Is there a workaround implemented in the Niagara Slurm script for license failures?",
-    "answer": "Yes, there is a `while` loop that attempts to start STAR-CCM+ up to 5 times (`while [ $i -le 5 ] && [ $RET -ne 0 ]; do ... done`) in case of initial license failures."
+    "question": "What OpenGL implementation is currently usable with STAR-CCM+ on gra-vdi?",
+    "answer": "Only the MESA implementation of OpenGL is usable due to virtualgl issues."
+  },
+  {
+    "question": "What modules are needed to run STAR-CCM+ version 18.04.008 (or newer) on VDI nodes for remote visualization, and how is it launched?",
+    "answer": "Load `module load CcEnv StdEnv/2023` and `module load starccm-mixed/18.04.008` (or `starccm/18.04.008-R8`), then run `starccm+ -rr server`."
+  },
+  {
+    "question": "How do you launch STAR-CCM+ version 15.04.010 to 18.02.008 on VDI nodes for remote visualization?",
+    "answer": "After loading `module load CcEnv StdEnv/2020` and `module load starccm-mixed/15.04.010` (or `starccm/15.04.010-R8`), run `starccm+ -mesa`."
   }
 ]

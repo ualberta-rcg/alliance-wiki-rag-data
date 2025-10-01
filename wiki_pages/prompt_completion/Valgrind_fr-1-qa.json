@@ -1,46 +1,82 @@
 [
   {
     "question": "What is Valgrind?",
-    "answer": "Valgrind is a powerful debugging tool that detects memory problems, including memory leaks, access to unallocated or deallocated memory, multiple deallocations, and other related issues."
+    "answer": "Valgrind is a powerful debugging tool used to detect memory problems."
   },
   {
-    "question": "What kind of memory-related issues can Valgrind help detect?",
-    "answer": "Valgrind can detect memory leaks, access to unallocated or deallocated memory, multiple deallocations, and can help diagnose issues causing segmentation faults, broken pipes, or bus errors."
+    "question": "What types of memory problems can Valgrind detect?",
+    "answer": "Valgrind can find memory leaks, accesses to unallocated or deallocated memory, multiple deallocations, and other memory issues."
   },
   {
-    "question": "Is Valgrind available on Calcul Canada clusters without special setup?",
-    "answer": "Yes, Valgrind is part of the basic software installed on Calcul Canada clusters and can be used without having to load a module."
+    "question": "What kind of program errors might indicate a memory problem that Valgrind can help diagnose?",
+    "answer": "If you encounter a 'segmentation fault', 'broken pipe', or 'bus error' when running your program, you likely have a memory usage problem."
+  },
+  {
+    "question": "Is Valgrind pre-installed on Calcul Canada clusters?",
+    "answer": "Yes, Valgrind is part of the basic software installed on Calcul Canada clusters."
+  },
+  {
+    "question": "Do I need to load a module to use Valgrind on Calcul Canada clusters?",
+    "answer": "No, Valgrind can be used without having to load a module on Calcul Canada clusters."
   },
   {
     "question": "What is the issue with Valgrind and AVX-512 instructions as of December 2020?",
-    "answer": "As of December 2020, current Valgrind versions cannot use AVX-512 instructions found on the latest Intel processors, which results in an 'Unrecognised instruction' error message."
+    "answer": "As of December 2020, current versions of Valgrind cannot use AVX-512 instructions found on recent Intel and AMD processors, leading to an 'Unrecognised instruction' message."
   },
   {
-    "question": "How can one resolve the AVX-512 instruction issue on B\u00e9luga when using Valgrind?",
-    "answer": "To resolve this issue on B\u00e9luga, where the default environment uses AVX-2, you should first load the AVX-2 environment using `module load arch/avx2` and then recompile your application from scratch."
+    "question": "What is the default environment for Calcul Canada clusters, excluding Narval?",
+    "answer": "The default environment on all Calcul Canada clusters (except Narval) uses AVX-2 instructions."
   },
   {
-    "question": "How should a program be prepared for debugging with Valgrind?",
-    "answer": "To extract useful information, you must first compile your code with debugging information by adding the `-g` option to the compilation command."
+    "question": "How can the Valgrind AVX-512 instruction problem be circumvented?",
+    "answer": "To circumvent the AVX-512 problem, you should load the AVX-2 environment and then recompile your application from scratch to ensure the binary does not contain AVX-512 instructions."
   },
   {
-    "question": "Why might highly optimized mathematical libraries cause errors when run with Valgrind?",
-    "answer": "Some highly specialized optimizations, especially with certain mathematical libraries, can generate operations that Valgrind does not recognize, leading to errors when executing Valgrind."
+    "question": "What command should be used to load the AVX-2 environment?",
+    "answer": "The command `module load arch/avx2` should be used to load the AVX-2 environment."
   },
   {
-    "question": "What is the recommended approach for compiling code with mathematical libraries when debugging with Valgrind?",
-    "answer": "It is recommended to compile your code by linking against an unoptimized version of libraries (e.g., Netlib BLAS and LAPACK) that do not use problematic operations, especially for diagnosing issues in your own code."
+    "question": "What is required to extract useful information from Valgrind?",
+    "answer": "To extract useful information, your code must first be compiled with debugging information."
   },
   {
-    "question": "What is the basic command to run a program with Valgrind for memory checking?",
-    "answer": "The command is `valgrind --tool=memcheck --leak-check=yes --show-reachable=yes ./your_program`."
+    "question": "Which compiler option is typically used to add debugging information?",
+    "answer": "With most compilers, you need to add the `-g` option to the compilation."
   },
   {
-    "question": "What is a known side effect of running code with Valgrind?",
-    "answer": "When using Valgrind, your code runs in an instance that validates all memory accesses, causing it to execute much more slowly."
+    "question": "Can highly optimized mathematical libraries cause errors when running Valgrind?",
+    "answer": "Yes, some very specific optimizations that generate unrecognized operations can generate errors when Valgrind is executed, especially with certain mathematical libraries."
   },
   {
-    "question": "What advice is given for choosing a test problem size when using Valgrind?",
-    "answer": "Due to Valgrind's slower execution speed, it is advised to choose a smaller problem for testing than what you would normally run."
+    "question": "What is recommended when compiling code for Valgrind if mathematical libraries are involved?",
+    "answer": "It is recommended to compile your code by linking against a non-optimized version of the libraries that does not use these specific operations, such as the Netlib implementation of BLAS and LAPACK."
+  },
+  {
+    "question": "When should optimized libraries be used instead of non-optimized ones?",
+    "answer": "Optimized libraries should be linked when it's time to run simulations, after diagnosing problems with non-optimized versions."
+  },
+  {
+    "question": "How do you execute a compiled program with Valgrind for memory checking?",
+    "answer": "You execute it as follows: `valgrind --tool=memcheck --leak-check=yes --show-reachable=yes ./your_program`."
+  },
+  {
+    "question": "Where can users find more information about Valgrind?",
+    "answer": "More information can be found on this page: http://www.cprogramming.com/debugging/valgrind.html."
+  },
+  {
+    "question": "How does using Valgrind affect program execution speed?",
+    "answer": "When using Valgrind, your code executes much more slowly because it runs in an instance that validates all memory accesses."
+  },
+  {
+    "question": "What is a good strategy for testing with Valgrind due to its performance impact?",
+    "answer": "For testing, choose a problem smaller than what you would normally execute."
+  },
+  {
+    "question": "Does a program need to terminate with an error like a segmentation fault for Valgrind to detect problems?",
+    "answer": "No, it is not necessary for your program to terminate with a segmentation fault or other error for Valgrind to detect errors."
+  },
+  {
+    "question": "Can minor memory access issues go unnoticed without Valgrind?",
+    "answer": "Yes, very frequently, minor memory access problems, such as reading a single element beyond the bounds of an array, go unnoticed while more serious problems cause a segmentation fault."
   }
 ]

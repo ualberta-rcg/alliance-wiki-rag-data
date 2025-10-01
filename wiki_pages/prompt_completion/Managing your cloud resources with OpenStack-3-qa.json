@@ -1,0 +1,42 @@
+[
+  {
+    "question": "How can you add users to a VM during its creation?",
+    "answer": "You can add users during the creation of a VM using a cloudInit script."
+  },
+  {
+    "question": "What is an example of a cloudInit script for adding users with and without sudo permissions?",
+    "answer": "A cloudInit script like this example adds 'gretzky' with sudo and 'lemieux' without: `#cloud-config users: - name: gretzky shell: /bin/bash sudo: ALL=(ALL) NOPASSWD:ALL ssh_authorized_keys: - <Gretzky's public key goes here> - name: lemieux shell: /bin/bash ssh_authorized_keys: - <Lemieux's public key goes here>`"
+  },
+  {
+    "question": "What is a common pitfall regarding whitespace in cloudInit YAML for SSH keys?",
+    "answer": "YAML is very picky about white space formatting; there must be a space after the \"-\" before your public key string."
+  },
+  {
+    "question": "What is the impact of a cloudInit script on default users if not explicitly handled?",
+    "answer": "This configuration overwrites the default user that is added when no cloudInit script is specified, meaning the users listed in the script will be the only users on the newly created VM."
+  },
+  {
+    "question": "What is a crucial security consideration when adding users via cloudInit?",
+    "answer": "It is vital to have at least one user with sudo permission among the users added through the cloudInit script."
+  },
+  {
+    "question": "How can you add more users to a cloudInit script?",
+    "answer": "More users can be added by simply including more `- name: username` sections in the cloudInit script."
+  },
+  {
+    "question": "How can you preserve the default user (e.g., debian, centos, ubuntu) while adding new users with cloudInit?",
+    "answer": "To preserve the default user, include `- default` in the `users:` section of the cloudInit script, for example: `#cloud-config users: - default - name: gretzky ... - name: lemieux ...`"
+  },
+  {
+    "question": "How do you verify if public keys have been correctly added for users after a VM has launched?",
+    "answer": "After the VM has finished spawning, look at the log to ensure that the public keys have been added correctly for those users."
+  },
+  {
+    "question": "Where can you find the log for a VM to check cloudInit output?",
+    "answer": "The log can be found by clicking on the name of the instance on the \"Compute->Instances\" panel and then selecting the \"log\" tab."
+  },
+  {
+    "question": "After configuring users and SSH keys with cloudInit, how do users typically log into the VM?",
+    "answer": "Once this is done, users can log into the VM with their private keys as usual."
+  }
+]

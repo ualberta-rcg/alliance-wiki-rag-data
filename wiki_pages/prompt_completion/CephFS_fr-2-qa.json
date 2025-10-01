@@ -1,0 +1,126 @@
+[
+  {
+    "question": "How can I list OpenStack servers using the command line?",
+    "answer": "You can list OpenStack servers by running the command: `$ openstack server list`."
+  },
+  {
+    "question": "How do I attach the CephFS-Network to an OpenStack instance using the command line?",
+    "answer": "First, obtain the instance ID using `$ openstack server list`. Then, use the command `$ openstack server add network <instance_ID> CephFS-Network`. For example: `$ openstack server add network 1b2a3c21-c1b4-42b8-9016-d96fc8406e04 CephFS-Network`."
+  },
+  {
+    "question": "How can I verify that the CephFS-Network has been successfully attached to an OpenStack instance via the command line?",
+    "answer": "After running the `openstack server add network` command, execute `$ openstack server list` again. The `Networks` column for the relevant instance should then display `CephFS-Network`."
+  },
+  {
+    "question": "What is the initial step for installing a Ceph client on a Red Hat family distribution?",
+    "answer": "You need to verify which Ceph versions are available on `https://download.ceph.com/` and locate the most recent `rpm-*` directories."
+  },
+  {
+    "question": "As of July 2024, which Ceph version is indicated as the most recent stable release?",
+    "answer": "`quincy` is noted as the most recent stable Ceph version as of July 2024."
+  },
+  {
+    "question": "How do I configure the Ceph package repository for Enterprise Linux 8?",
+    "answer": "Create or modify the `/etc/yum.repos.d/ceph.repo` file with the following content:\n```ini\n[Ceph]\nname=Ceph packages for $basearch\nbaseurl=http://download.ceph.com/rpm-quincy/el8/$basearch\nenabled=1\ngpgcheck=1\ntype=rpm-md\ngpgkey=https://download.ceph.com/keys/release.asc\n\n[Ceph-noarch]\nname=Ceph noarch packages\nbaseurl=http://download.ceph.com/rpm-quincy/el8/noarch\nenabled=1\ngpgcheck=1\ntype=rpm-md\ngpgkey=https://download.ceph.com/keys/release.asc\n\n[ceph-source]\nname=Ceph source packages\nbaseurl=http://download.ceph.com/rpm-quincy/el8/SRPMS\nenabled=1\ngpgcheck=1\ntype=rpm-md\ngpgkey=https://download.ceph.com/keys/release.asc\n```"
+  },
+  {
+    "question": "What is the configuration for the Ceph package repository on Enterprise Linux 9?",
+    "answer": "For Enterprise Linux 9, create or modify the `/etc/yum.repos.d/ceph.repo` file as follows:\n```ini\n[Ceph]\nname=Ceph packages for $basearch\nbaseurl=http://download.ceph.com/rpm-quincy/el9/$basearch\nenabled=1\ngpgcheck=1\ntype=rpm-md\ngpgkey=https://download.ceph.com/keys/release.asc\n\n[Ceph-noarch]\nname=Ceph noarch packages\nbaseurl=http://download.ceph.com/rpm-quincy/el9/noarch\nenabled=1\ngpgcheck=1\ntype=rpm-md\ngpgkey=https://download.ceph.com/keys/release.asc\n\n[ceph-source]\nname=Ceph source packages\nbaseurl=http://download.ceph.com/rpm-quincy/el9/SRPMS\nenabled=1\ngpgcheck=1\ntype=rpm-md\ngpgkey=https://download.ceph.com/keys/release.asc\n```"
+  },
+  {
+    "question": "Is the EPEL repository a prerequisite for installing Ceph client packages on Red Hat family distributions?",
+    "answer": "Yes, the EPEL repository must be present. You can install it using `sudo dnf install epel-release`."
+  },
+  {
+    "question": "Which command installs the required Ceph client and dependency packages on Red Hat family systems after repository setup?",
+    "answer": "After configuring the repositories, execute the command: `sudo dnf install -y libcephfs2 python3-cephfs ceph-common python3-ceph-argparse`."
+  },
+  {
+    "question": "How do you add the Ceph package repository for Debian family distributions?",
+    "answer": "First, find your distribution's codename using `lsb_release -sc`, then run `sudo apt-add-repository 'deb https://download.ceph.com/debian-quincy/ {codename} main'`."
+  },
+  {
+    "question": "What command is used to install Ceph client packages and their dependencies on Debian family systems?",
+    "answer": "After adding the Ceph package repository, run the command: `sudo apt-get install -y libcephfs2 python3-cephfs ceph-common python3-ceph-argparse`."
+  },
+  {
+    "question": "What is the name of the primary configuration file for a Ceph client?",
+    "answer": "The main configuration file for the Ceph client is named `ceph.conf`."
+  },
+  {
+    "question": "What are the `mon host` values for the `/etc/ceph/ceph.conf` file on the Arbutus cloud?",
+    "answer": "For Arbutus, the `mon host` values are `10.30.201.3:6789,10.30.202.3:6789,10.30.203.3:6789`."
+  },
+  {
+    "question": "What are the `mon host` values for the `/etc/ceph/ceph.conf` file on the SD4H/Juno cloud?",
+    "answer": "For SD4H/Juno, the `mon host` values are `10.65.0.10:6789,10.65.0.12:6789,10.65.0.11:6789`."
+  },
+  {
+    "question": "What is the purpose of the `ceph.keyring` file in a Ceph client setup?",
+    "answer": "The `ceph.keyring` file is used to store the client name and its secret (access key) for authentication."
+  },
+  {
+    "question": "What content should be included in the `ceph.keyring` file?",
+    "answer": "The `ceph.keyring` file should contain the client name and the access key, formatted as shown in this example:\n```ini\n[client.MyCephFS-RW]\n    key = <access Key>\n```"
+  },
+  {
+    "question": "Where can the access key and client name (like `MyCephFS-RW`) required for `ceph.keyring` be located?",
+    "answer": "These details can be found under the 'Access Rules' section on the OpenStack project's web page. Navigate to `Project --> Share --> Shares` and then click on the specific share's name."
+  },
+  {
+    "question": "How do you retrieve the full access path needed to mount the CephFS file system?",
+    "answer": "In `Project --> Share --> Shares`, click on the name of the share. The full access path will be listed under the 'Path' field in the 'Share Overview' section."
+  },
+  {
+    "question": "What is the initial step for mounting a CephFS file system on your host?",
+    "answer": "The first step is to create a directory for the mount point on your host, for example: `mkdir /cephfs`."
+  },
+  {
+    "question": "How do you configure a permanent CephFS mount on an Arbutus instance using `/etc/fstab`?",
+    "answer": "Add the following line to the `/etc/fstab` file: `:/volumes/_nogroup/f6cb8f06-f0a4-4b88-b261-f8bd6b03582c /cephfs/ ceph name=MyCephFS-RW 0 2`."
+  },
+  {
+    "question": "How do you configure a permanent CephFS mount on an SD4H/Juno instance using `/etc/fstab`?",
+    "answer": "Add the following line to the `/etc/fstab` file: `:/volumes/_nogroup/f6cb8f06-f0a4-4b88-b261-f8bd6b03582c /cephfs/ ceph name=MyCephFS-RW,mds_namespace=cephfs_4_2,x-systemd.device-timeout=30,x-systemd.mount-timeout=30,noatime,_netdev,rw 0 2`."
+  },
+  {
+    "question": "Is the colon (`:`) character at the beginning of the device path in the `fstab` entry for CephFS a typographical error?",
+    "answer": "No, the colon (`:`) character at the beginning of the device path in the `fstab` entry for CephFS is non-standard but is not a typographical error."
+  },
+  {
+    "question": "What specific mount option is mandatory for SD4H/Juno instances when mounting CephFS, and what do other common options do?",
+    "answer": "The `mds_namespace` option is required for SD4H/Juno. Other options like `x-systemd.device-timeout`, `x-systemd.mount-timeout`, `noatime`, `_netdev`, and `rw` are typically performance adjustments."
+  },
+  {
+    "question": "What is the command to directly mount CephFS on an Arbutus instance from the command line?",
+    "answer": "The command to directly mount CephFS on Arbutus is: `sudo mount -t ceph :/volumes/_nogroup/f6cb8f06-f0a4-4b88-b261-f8bd6b03582c /cephfs/ -o name=MyCephFS-RW`."
+  },
+  {
+    "question": "How do you directly mount CephFS on an SD4H/Juno instance from the command line?",
+    "answer": "The command to directly mount CephFS on SD4H/Juno is: `sudo mount -t ceph :/volumes/_nogroup/f6cb8f06-f0a4-4b88-b261-f8bd6b03582c /cephfs/ -o name=MyCephFS-RW,mds_namespace=cephfs_4_2,x-systemd.device-timeout=30,x-systemd.mount-timeout=30,noatime,_netdev,rw`."
+  },
+  {
+    "question": "Can CephFS be mounted directly within a user's workspace, and if so, how?",
+    "answer": "Yes, CephFS can be mounted directly in a user's workspace using `ceph-fuse`."
+  },
+  {
+    "question": "How is the `ceph-fuse` library installed?",
+    "answer": "The `ceph-fuse` library can be installed using `sudo dnf install ceph-fuse` (for Red Hat family distributions)."
+  },
+  {
+    "question": "What configuration change is necessary in `/etc/fuse.conf` to allow `ceph-fuse` to mount in a user's space?",
+    "answer": "To enable user mounting with `ceph-fuse`, uncomment the `user_allow_other` line in the `/etc/fuse.conf` file."
+  },
+  {
+    "question": "What is an example command for mounting CephFS into a user's home directory using `ceph-fuse`?",
+    "answer": "First, create a mount point like `mkdir ~/my_cephfs`. Then, use the command: `ceph-fuse my_cephfs/ --id=MyCephFS-RW --conf=~/ceph.conf --keyring=~/ceph.keyring --client-mountpoint=/volumes/_nogroup/f6cb8f06-f0a4-4b88-b261-f8bd6b03582c`."
+  },
+  {
+    "question": "Which parameter in the `ceph-fuse` command specifies the client name?",
+    "answer": "In the `ceph-fuse` command, the `--id` parameter is used to specify the client name."
+  },
+  {
+    "question": "Which configuration files are utilized by the `ceph-fuse` command for user-space mounting?",
+    "answer": "The `ceph-fuse` command uses `ceph.conf` (specified with `--conf`) and `ceph.keyring` (specified with `--keyring`), which contain the same information as for kernel Ceph mounts."
+  }
+]

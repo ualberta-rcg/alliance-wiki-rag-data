@@ -1,0 +1,26 @@
+[
+  {
+    "question": "How do you add a read group (RG) tag to a BAM file using GATK/PICARD?",
+    "answer": "You can use the GATK/PICARD command `AddOrReplaceReadGroups`. An example command is: `gatk AddOrReplaceReadGroups -I input.bam -O output.bam --RGLB tag --RGPL ILLUMINA --RGPU tag --RGSM tag --SORT_ORDER 'coordinate' --CREATE_INDEX true`. This assumes your input file is coordinate-sorted and an index will be generated."
+  },
+  {
+    "question": "What should be done if a `java.lang.OutOfMemoryError: Java heap space` message occurs while running GATK?",
+    "answer": "If you weren't using the `-Xmx` command, add it to `--java-options` to increase the maximum heap memory. For example: `gatk MarkDuplicates --java-options \"-Xmx8G DGATK_STACKTRACE_ON_USER_EXCEPTION=true\" -I input.bam -O marked_duplicates.bam -M marked_dup_metrics.txt`. You might need to increase the memory further until it meets your dataset's requirements, and always remember to request sufficient memory on the system."
+  },
+  {
+    "question": "How can I obtain more debugging information if a GATK program fails?",
+    "answer": "You should always use `-DGATK_STACKTRACE_ON_USER_EXCEPTION=true` with `--java-options`, for example: `\"-Xmx8G DGATK_STACKTRACE_ON_USER_EXCEPTION=true\"`, to get more debugging information in case of program failure."
+  },
+  {
+    "question": "What if increasing the Java heap memory still does not resolve the `java.lang.OutOfMemoryError: Java heap space` in GATK?",
+    "answer": "This can occur with non-model organisms or when references are too scaffolded. It is recommended to remove less important levels and create subsets for your references, then perform multiple MAPS and run pipelines in each subset. However, this approach does not work for all pipelines, and results should be carefully reviewed as GATK is primarily designed for the human genome."
+  },
+  {
+    "question": "How can I prevent GATK/JAVA applications from using more resources (memory or CPU/threads) than what was requested?",
+    "answer": "This often happens due to Java's Garbage Collection process. To circumvent this, you can add `-XX:ConcGCThreads=1` to the `--java-options` argument."
+  },
+  {
+    "question": "Where can I find additional troubleshooting information for GATK4 issues?",
+    "answer": "You can refer to the 'Troubleshooting GATK4 Issues' section on the GATK website."
+  }
+]

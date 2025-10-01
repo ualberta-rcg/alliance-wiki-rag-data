@@ -1,0 +1,70 @@
+[
+  {
+    "question": "What does HDF5 stand for?",
+    "answer": "HDF5 stands for Hierarchical Data Format."
+  },
+  {
+    "question": "What does NetCDF stand for?",
+    "answer": "NetCDF stands for Network Common Data Format."
+  },
+  {
+    "question": "What are some key features of HDF5 and NetCDF libraries?",
+    "answer": "HDF5 and NetCDF are open standards and open-source libraries that provide data portability across platforms and languages, store data in binary with optional compression, include data description, and optionally provide parallel I/O."
+  },
+  {
+    "question": "Why is organizing parallel I/O necessary in large parallel calculations?",
+    "answer": "In large parallel calculations where the dataset is distributed across many processors/nodes, using a parallel filesystem alone isn't sufficient; you must organize parallel I/O yourself because each node will compute its allocated domain and store data to disk."
+  },
+  {
+    "question": "What file format options are available for data in large parallel calculations?",
+    "answer": "Data in large parallel calculations can be written as raw binary without metadata information or by using high-end libraries like HDF5 and NetCDF."
+  },
+  {
+    "question": "How does the Serial I/O (Single CPU) approach work when writing data from multiple computing nodes?",
+    "answer": "The simplest approach for Serial I/O (Single CPU) is to designate a 'spokesperson' node to collect all data from other members via communication, and then this spokesperson writes the collected data into a single file using regular serial I/O."
+  },
+  {
+    "question": "What are the advantages of using the Serial I/O (Single CPU) approach?",
+    "answer": "The Serial I/O (Single CPU) approach is trivially simple for small I/O, and some I/O libraries are not parallel, making it an easy option."
+  },
+  {
+    "question": "What are the disadvantages of the Serial I/O (Single CPU) approach?",
+    "answer": "The disadvantages of Serial I/O (Single CPU) include bandwidth being limited by the rate of one client, potential memory limitations on a single node to hold all data, and the inability to scale due to a built-in bottleneck."
+  },
+  {
+    "question": "Describe the Serial I/O approach where N processors are involved.",
+    "answer": "In the Serial I/O (N processors) approach, each participating process performs I/O to individual files, meaning all processes write their data to separate files."
+  },
+  {
+    "question": "What are the benefits of the Serial I/O (N processors) method?",
+    "answer": "The Serial I/O (N processors) method requires no interprocess communication or coordination, and it can offer possibly better scaling than single sequential I/O up to a certain limit."
+  },
+  {
+    "question": "What are the drawbacks of using the Serial I/O (N processors) method?",
+    "answer": "Drawbacks include creating many small files as process counts increase (which parallel filesystems handle poorly and is often prohibited), the necessity for post-processing data into one file, and the risk of uncoordinated I/O swamping the filesystem due to file locks."
+  },
+  {
+    "question": "What is considered the best approach for parallel I/O when multiple processes write to a single file?",
+    "answer": "The best approach is to have each participating process write data simultaneously into a single file using appropriate parallel I/O, specifically in a coordinated fashion."
+  },
+  {
+    "question": "What is an important consideration when multiple processes write data simultaneously to a single file in parallel I/O?",
+    "answer": "It is crucial to perform this parallel I/O in a coordinated fashion; otherwise, uncoordinated I/O will swamp the filesystem."
+  },
+  {
+    "question": "What are the advantages of the Parallel I/O approach (N processes to/from 1 file)?",
+    "answer": "The advantages are having only one file (beneficial for visualization, data management, and storage), data being stored canonically, and avoiding post-processing which can scale if implemented correctly."
+  },
+  {
+    "question": "What are the disadvantages of the Parallel I/O approach (N processes to/from 1 file)?",
+    "answer": "The disadvantages are that uncoordinated I/O will swamp the filesystem due to file locks, and this approach requires more design and thought."
+  },
+  {
+    "question": "What is the difference between Independent I/O and Collective I/O operations?",
+    "answer": "Independent I/O operations specify only what a single process will do, whereas Collective I/O is a coordinated access to storage by a group of processes, with functions called by all processes participating in the I/O."
+  },
+  {
+    "question": "Why is Collective I/O preferred for better efficiency?",
+    "answer": "Collective I/O allows the filesystem to gain more information about the overall access pattern, enabling more optimization in lower software layers and resulting in better performance."
+  }
+]

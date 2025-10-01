@@ -1,102 +1,66 @@
 [
   {
-    "question": "What information needs to be replaced in the SSH command to access TensorBoard remotely?",
-    "answer": "You need to replace `computenode` with the actual node hostname, `userid` with your Alliance username, and `cluster` with the cluster hostname (e.g., `beluga`, `cedar`, `graham`)."
+    "question": "What high-level API does TensorFlow offer for using multiple GPUs?",
+    "answer": "TensorFlow offers the high-level API `tf.distribute` to make use of multiple GPUs."
   },
   {
-    "question": "What happens if port 6006 is already in use when setting up TensorBoard?",
-    "answer": "If port 6006 is already in use, TensorBoard will use another port, such as 6007 or 6008."
+    "question": "Where can users find more detailed information about TensorFlow's multi-GPU strategies?",
+    "answer": "For more details, users should refer to the official TensorFlow documentation on `tf.distribute`."
   },
   {
-    "question": "How do you access TensorBoard in a web browser after establishing the SSH connection?",
-    "answer": "Once the connection is created, navigate to `http://localhost:6006` in your web browser."
+    "question": "How is the Mirrored strategy implemented for multi-GPU training on a single node in TensorFlow?",
+    "answer": "The Mirrored strategy for a single node is implemented using `tf.distribute.MirroredStrategy()` within a `strategy.scope()` in the Python script."
   },
   {
-    "question": "What are the two most common methods for managing variables when training TensorFlow 1.x models on multiple GPUs?",
-    "answer": "The two most common methods are \"Parameter Server\" and \"Replicated\"."
+    "question": "What is the purpose of the `NCCL_BLOCKING_WAIT` environment variable in a single-node Mirrored strategy SLURM script?",
+    "answer": "Setting `export NCCL_BLOCKING_WAIT=1` is done if you wish to use the NCCL backend for inter-GPU communication."
   },
   {
-    "question": "Where can users find example code for implementing multi-GPU variable management methods in TensorFlow 1.x?",
-    "answer": "Users can reference the TensorFlow Benchmarks code on GitHub at `https://github.com/tensorflow/benchmarks`."
+    "question": "What SLURM resource requests are included in the `tensorflow-singleworker.sh` script for a single-node Mirrored strategy?",
+    "answer": "The `tensorflow-singleworker.sh` script requests 1 node (`#SBATCH --nodes 1`), 4 GPUs (`#SBATCH --gres=gpu:4`), 8GB of memory (`#SBATCH --mem=8G`), and a time limit of 30 minutes (`#SBATCH --time=0-00:30`)."
   },
   {
-    "question": "How does the Parameter Server method manage variables in distributed TensorFlow 1.x training?",
-    "answer": "Variables are stored on a parameter server that holds the master copy. In distributed training, parameter servers are separate processes on different devices. Each step, each tower gets a copy of variables from the parameter server and sends its gradients back."
+    "question": "How is TensorFlow installed within the `tensorflow-singleworker.sh` SLURM script?",
+    "answer": "TensorFlow is installed in a virtual environment created in `$SLURM_TMPDIR/env` using `pip install --no-index tensorflow` after loading the `python/3` module and activating the virtual environment."
   },
   {
-    "question": "How can you configure the Parameter Server method to store parameters on a CPU?",
-    "answer": "Use the command `python tf_cnn_benchmarks.py --variable_update=parameter_server --local_parameter_device=cpu`."
+    "question": "What type of Keras model is defined in the `tensorflow-singleworker.py` script?",
+    "answer": "The `tensorflow-singleworker.py` script defines a `tf.keras.Sequential()` model for CIFAR10 classification, consisting of convolutional, activation, MaxPooling, Dropout, Flatten, and Dense layers."
   },
   {
-    "question": "How can you configure the Parameter Server method to store parameters on a GPU?",
-    "answer": "Use the command `python tf_cnn_benchmarks.py --variable_update=parameter_server --local_parameter_device=gpu`."
+    "question": "How does the `tensorflow-singleworker.py` script handle the CIFAR10 dataset?",
+    "answer": "The script attempts to download the CIFAR10 dataset from the internet if it's not already stored in `~/.keras/datasets`, or it can be manually downloaded and placed there. It then uses `tf.data.Dataset.from_tensor_slices` to create a batched dataset."
   },
   {
-    "question": "How does the Replicated method manage variables in distributed TensorFlow 1.x training?",
-    "answer": "With the Replicated method, each GPU has its own copy of the variables. An `all_reduce` algorithm or regular cross-device aggregation is used to replicate combined gradients to all towers."
+    "question": "What is the main difference in syntax when using the Mirrored strategy across multiple nodes compared to a single node?",
+    "answer": "The most notable difference is the use of `MultiWorkerMirroredStrategy()` for multiple nodes instead of `MirroredStrategy()`."
   },
   {
-    "question": "How do you use the default all_reduce method for variable replication in TensorFlow 1.x?",
-    "answer": "Use the command `python tf_cnn_benchmarks.py --variable_update=replicated`."
+    "question": "How does TensorFlow obtain necessary job information from SLURM for a multi-node Mirrored strategy?",
+    "answer": "TensorFlow uses `SlurmClusterResolver()` to acquire all the necessary job information from SLURM, avoiding manual assignment of master and worker nodes."
   },
   {
-    "question": "How do you specify the `xring` all_reduce method for variable replication in TensorFlow 1.x?",
-    "answer": "Use the command `python tf_cnn_benchmarks.py --variable_update=replicated --all_reduce_spec=xring`."
+    "question": "How is Nvidia's NCCL backend explicitly specified for inter-GPU communications in a multi-node Mirrored strategy?",
+    "answer": "`CommunicationImplementation.NCCL` must be explicitly added to the distribution strategy using `tf.distribute.experimental.CommunicationOptions(implementation=tf.distribute.experimental.CommunicationImplementation.NCCL)`."
   },
   {
-    "question": "How do you specify the `pscpu` all_reduce method for variable replication in TensorFlow 1.x?",
-    "answer": "Use the command `python tf_cnn_benchmarks.py --variable_update=replicated --all_reduce_spec=pscpu`."
+    "question": "Why is explicit specification of `CommunicationImplementation.NCCL` necessary for multi-node but not single-node Mirrored strategy?",
+    "answer": "NCCL is the default backend with `MirroredStrategy()` (single-node), but it needs to be explicitly specified for `MultiWorkerMirroredStrategy()` (multi-node)."
   },
   {
-    "question": "How do you specify the `NCCL` all_reduce method for variable replication in TensorFlow 1.x?",
-    "answer": "Use the command `python tf_cnn_benchmarks.py --variable_update=replicated --all_reduce_spec=nccl`."
+    "question": "What SLURM resource requests are made in the `tensorflow-multiworker.sh` script for a multi-node Mirrored strategy?",
+    "answer": "The script requests 2 nodes (`#SBATCH --nodes 2`), 2 GPUs per node (`#SBATCH --gres=gpu:2`), 2 tasks per node (`#SBATCH --ntasks-per-node=2`), 8GB of memory (`#SBATCH --mem=8G`), and a time limit of 30 minutes (`#SBATCH --time=0-00:30`)."
   },
   {
-    "question": "What is recommended for users to optimize performance with different variable managing methods in TensorFlow 1.x?",
-    "answer": "Users are highly recommended to test their own models with all methods on different types of GPU nodes, as performance varies."
+    "question": "What environment variables are set in the `tensorflow-multiworker.sh` script for multi-node GPU training?",
+    "answer": "The `tensorflow-multiworker.sh` script sets `export NCCL_BLOCKING_WAIT=1` for the NCCL backend and `export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CUDA_HOME`."
   },
   {
-    "question": "Which TensorFlow version and supporting libraries were used for the multi-GPU benchmarks?",
-    "answer": "TensorFlow v1.5 (built with CUDA 9 and cuDNN 7) was used."
+    "question": "What is the role of the `config_env.sh` script in the multi-node TensorFlow setup?",
+    "answer": "The `config_env.sh` script is responsible for loading the python module, creating a virtual environment in `$SLURM_TMPDIR/ENV`, upgrading pip, and installing tensorflow using `pip install --no-index tensorflow`."
   },
   {
-    "question": "What is the batch size per GPU used for the ResNet-50 and VGG-16 benchmarks?",
-    "answer": "The batch size is 32 per GPU for both ResNet-50 and VGG-16 benchmarks."
-  },
-  {
-    "question": "What metric is used to report the results of the ResNet-50 and VGG-16 benchmarks?",
-    "answer": "The results are reported in \"images per second\"."
-  },
-  {
-    "question": "What was the performance of ResNet-50 on a Graham GPU node with 1 GPU?",
-    "answer": "171.23 images per second."
-  },
-  {
-    "question": "What was the best ResNet-50 benchmark result on a Graham GPU node with 2 GPUs, and which method achieved it?",
-    "answer": "The best result was 324.04 images per second, achieved with the 'ps, gpu' method."
-  },
-  {
-    "question": "What was the best ResNet-50 benchmark result on a Cedar GPU Base node with 4 GPUs, and which method achieved it?",
-    "answer": "The best result was 662.65 images per second, achieved with the 'ps,cpu' method."
-  },
-  {
-    "question": "What was the best ResNet-50 benchmark result on a Cedar GPU Large node with 4 GPUs, and which method achieved it?",
-    "answer": "The best result was 754.35 images per second, achieved with the 'replicated' method."
-  },
-  {
-    "question": "What was the performance of VGG-16 on a Graham GPU node with 1 GPU?",
-    "answer": "115.89 images per second."
-  },
-  {
-    "question": "What was the best VGG-16 benchmark result on a Graham GPU node with 2 GPUs, and which method achieved it?",
-    "answer": "The best result was 219.72 images per second, achieved with the 'replicated, nccl' method."
-  },
-  {
-    "question": "What was the best VGG-16 benchmark result on a Cedar GPU Base node with 4 GPUs, and which method achieved it?",
-    "answer": "The best result was 388.53 images per second, achieved with the 'replicated, nccl' method."
-  },
-  {
-    "question": "What was the best VGG-16 benchmark result on a Cedar GPU Large node with 4 GPUs, and which method achieved it?",
-    "answer": "The best result was 490.52 images per second, achieved with the 'replicated, nccl' method."
+    "question": "What does the `launch_training.sh` script do in the multi-node TensorFlow setup?",
+    "answer": "The `launch_training.sh` script activates the virtual environment located in `$SLURM_TMPDIR/ENV` and then executes the main Python training script, `tensorflow-multiworker.py`."
   }
 ]
