@@ -1,50 +1,58 @@
 [
   {
-    "question": "What types of parallelization do Abaqus solvers support for explicit analysis?",
+    "question": "What type of parallelization do Abaqus solvers support for Explicit analysis?",
     "answer": "Abaqus solvers support thread-based and MPI-based parallelization for explicit analysis."
   },
   {
-    "question": "Are scripts available for running explicit analysis type jobs on single or multiple nodes?",
-    "answer": "Yes, scripts for running explicit analysis type jobs are provided for both single and multiple nodes."
+    "question": "Are template scripts currently provided for multinode job restarts in Abaqus Explicit analysis?",
+    "answer": "No, template scripts to perform multinode job restarts are not currently provided for Explicit analysis, pending further testing."
   },
   {
-    "question": "Are template scripts currently provided for multinode job restarts in explicit analysis?",
-    "answer": "No, template scripts for multinode job restarts in explicit analysis are not currently provided, pending further testing."
+    "question": "What are the required Slurm directives for a single-node Abaqus Explicit analysis job using the 'project directory script'?",
+    "answer": "The Slurm directives are: `--account=def-group`, `--time=00-06:00`, `--mem=8000M`, `--cpus-per-task=4`, and `--nodes=1`."
   },
   {
-    "question": "How do you specify a job's account, time, memory, and CPU cores in a single node explicit analysis project directory script?",
-    "answer": "These are specified using SLURM parameters like `#SBATCH --account=def-group`, `#SBATCH --time=00-06:00`, `#SBATCH --mem=8000M`, and `#SBATCH --cpus-per-task=4`."
+    "question": "How do you load the necessary Abaqus modules for a single-node Explicit analysis job?",
+    "answer": "You load them by running 'module load StdEnv/2020' and 'module load abaqus/2021'."
   },
   {
-    "question": "Which Abaqus module is loaded in the `scriptep1.txt` for single node explicit analysis?",
-    "answer": "The `abaqus/2021` module is loaded in the `scriptep1.txt` script."
+    "question": "What Abaqus command is used to start an Explicit analysis job named 'testep1' with input 'myexp-sim.inp' using the 'project directory script'?",
+    "answer": "The command is 'abaqus job=testep1 input=myexp-sim.inp scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive mp_mode=threads memory=\"$((${SLURM_MEM_PER_NODE}-3072))MB\"'."
   },
   {
-    "question": "How do you write restart data for a total of 12 time increments in an explicit analysis input file?",
-    "answer": "Specify `*RESTART, WRITE, OVERLAY, NUMBER INTERVAL=12, TIME MARKS=NO` in the input file."
+    "question": "How do you specify writing restart data for a total of 12 time increments in an Explicit analysis input file?",
+    "answer": "You add the line '*RESTART, WRITE, OVERLAY, NUMBER INTERVAL=12, TIME MARKS=NO' to the input file."
   },
   {
-    "question": "How can you check for completed restart information for explicit analysis jobs?",
-    "answer": "You can check using the command `egrep -i \"step|restart\" testep*.com testep*.msg testep*.sta` in relevant output files."
+    "question": "How can you check for completed restart information after an Abaqus Explicit analysis job?",
+    "answer": "You can check by running 'egrep -i \"step|restart\" testep*.com testep*.msg testep*.sta'."
   },
   {
-    "question": "What is the Abaqus command used to restart an explicit analysis job from a project directory?",
-    "answer": "The command is `abaqus job=testep2 input=myexp-sim.inp recover ...`."
+    "question": "What Abaqus command is used to restart an Explicit analysis job named 'testep2' from 'testep1' using the 'project directory restart script'?",
+    "answer": "After copying existing 'testep1*' files to 'testep2*', the command is 'abaqus job=testep2 input=myexp-sim.inp recover scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive mp_mode=threads memory=\"$((${SLURM_MEM_PER_NODE}-3072))MB\"'."
   },
   {
-    "question": "Are input file modifications required to restart an explicit analysis using the `scriptep2.txt` script?",
-    "answer": "No input file modifications are required to restart the analysis using the `scriptep2.txt` script."
+    "question": "Are input file modifications required when restarting an Explicit analysis using the 'project directory restart script'?",
+    "answer": "No input file modifications are required to restart the analysis when using the 'project directory restart script'."
   },
   {
-    "question": "What is the primary purpose of the 'temporary directory script' (`scriptet1.txt`) for explicit analysis?",
-    "answer": "The 'temporary directory script' is designed to write large restart data to the local disk using the `SLURM_TMPDIR` environment variable to benefit job performance."
+    "question": "What is the primary benefit of using the 'temporary directory script' for Abaqus Explicit analysis?",
+    "answer": "The 'temporary directory script' benefits jobs that create large restart files by writing them to the local disk through the use of the SLURM_TMPDIR environment variable."
   },
   {
-    "question": "How does the `scriptet1.txt` ensure data from the temporary directory is saved back to the submission directory?",
-    "answer": "It includes a loop `while sleep 6h; do cp -f * $SLURM_SUBMIT_DIR 2>/dev/null; done &` to periodically copy files and a final `cp -f * $SLURM_SUBMIT_DIR` command upon job completion."
+    "question": "How does the 'temporary directory script' ensure data persistence during a long Abaqus Explicit analysis job?",
+    "answer": "A background process is initiated that periodically (every 6 hours) copies all files from the temporary directory ($SLURM_TMPDIR) to the submit directory ($SLURM_SUBMIT_DIR) to prevent data loss."
   },
   {
-    "question": "How often does the `scriptet2.txt` (temporary directory restart script) save data from the temporary directory to the submit directory?",
-    "answer": "The `scriptet2.txt` saves data from the temporary directory to the submit directory every 3 hours."
+    "question": "What Abaqus command is used to start an Explicit analysis job named 'testet1' with input 'myexp-sim.inp' using the 'temporary directory script'?",
+    "answer": "After changing to the temporary directory, the command is 'abaqus job=testet1 input=$SLURM_SUBMIT_DIR/myexp-sim.inp scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive mp_mode=threads memory=\"$((${SLURM_MEM_PER_NODE}-3072))MB\"'."
+  },
+  {
+    "question": "How is the `mp_host_list` variable generated and exported for multi-node Abaqus Standard analysis jobs?",
+    "answer": "The `mp_host_list` is generated by processing the output of `slurm_hl2hl.py`, constructing a string `mp_host_list=[...]`, exporting it as an environment variable, and writing it to `abaqus_v6.env`."
+  },
+  {
+    "question": "What Abaqus command is used to run a multi-node MPI job named `testsp1-mpi` with input `mystd-sim.inp`?",
+    "answer": "The command is `abaqus job=testsp1-mpi input=mystd-sim.inp scratch=$SLURM_TMPDIR cpus=$SLURM_NTASKS interactive mp_mode=mpi`."
   }
 ]

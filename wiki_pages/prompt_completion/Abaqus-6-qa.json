@@ -1,102 +1,90 @@
 [
   {
-    "question": "What is the SHARCNET Academic License User Agreement for Abaqus?",
-    "answer": "It is an agreement where the user confirms they will only use 'SIMULIA Academic Software' with tokens from the SHARCNET license server for specific purposes, on SHARCNET hardware, and in affiliation with a Canadian degree-granting academic institution."
+    "question": "What is the purpose of the Abaqus SHARCNET Academic License User Agreement?",
+    "answer": "The agreement confirms that a user will only use 'SIMULIA Academic Software' with tokens from the SHARCNET license server for specific academic and research purposes on SHARCNET hardware."
   },
   {
-    "question": "For what purposes can SIMULIA Academic Software tokens from the SHARCNET license server be used?",
-    "answer": "They can be used on SHARCNET hardware where the software is installed, in affiliation with a Canadian degree-granting academic institution, for education, institutional or instruction purposes (not commercial/contract-related where results are not publishable), and for experimental, theoretical, and/or digital research work up to the point of proof-of-concept in a laboratory."
+    "question": "What are the four main conditions for using the SHARCNET academic license?",
+    "answer": "The conditions are: 1) use on SHARCNET hardware where the software is installed, 2) affiliation with a Canadian degree-granting academic institution, 3) for education, institutional, or instruction purposes (not commercial/contractual with unpublishable results), and 4) for experimental, theoretical, or digital research work up to proof-of-concept in a laboratory."
   },
   {
-    "question": "What details must be included when requesting access to the SHARCNET Abaqus license?",
-    "answer": "You must mention that it is for use on SHARCNET systems and include a copy/paste of the `License Agreement` statement with your full name and username entered in the indicated locations."
+    "question": "How should the Abaqus license file be configured for SHARCNET systems?",
+    "answer": "The `~/.licenses/abaqus.lic` file should contain `prepend_path(\"LM_LICENSE_FILE\",\"27050@license3.sharcnet.ca\")` and `prepend_path(\"ABAQUSLM_LICENSE_FILE\",\"27050@license3.sharcnet.ca\")`."
   },
   {
-    "question": "How do you configure the Abaqus license file for SHARCNET systems?",
-    "answer": "You need to create or edit `~/.licenses/abaqus.lic` to include the lines: `prepend_path(\"LM_LICENSE_FILE\",\"27050@license3.sharcnet.ca\")` and `prepend_path(\"ABAQUSLM_LICENSE_FILE\",\"27050@license3.sharcnet.ca\")`."
+    "question": "Which SHARCNET systems are compatible with the provided license file configuration?",
+    "answer": "The license file configuration is usable on Graham, gra-vdi, and Dusky systems."
   },
   {
-    "question": "On which systems is the SHARCNET Abaqus license usable?",
-    "answer": "The SHARCNET Abaqus license is only usable on SHARCNET systems, specifically Graham, gra-vdi, and Dusky."
+    "question": "What should be checked if an Abaqus job fails with a 'Segmentation fault' error in the Slurm output?",
+    "answer": "Verify that your `abaqus.lic` file contains `ABAQUSLM_LICENSE_FILE` to support abaqus/2020."
   },
   {
-    "question": "What should be checked if an Abaqus job fails with a 'Segmentation fault' error related to `ABAQUS/eliT_CheckLicense`?",
-    "answer": "Verify if your `abaqus.lic` file contains `ABAQUSLM_LICENSE_FILE` to use Abaqus/2020."
+    "question": "What should be checked if an Abaqus job fails with a 'License server machine is down or not responding' error?",
+    "answer": "Verify that your `abaqus.lic` file contains `LM_LICENSE_FILE` to support abaqus/6.14.1."
   },
   {
-    "question": "What should be verified if an Abaqus job fails with an error message starting 'License server machine is down or not responding'?",
-    "answer": "Verify if your `abaqus.lic` file contains `LM_LICENSE_FILE` to use Abaqus/6.14.1."
-  },
-  {
-    "question": "How do you log into Graham and load Abaqus modules to query the license server?",
-    "answer": "First, `ssh graham.alliancecan.ca`, then `module load StdEnv/2020`, and finally `module load abaqus`."
+    "question": "How do you prepare to query the SHARCNET Abaqus license server?",
+    "answer": "Log into graham using `ssh graham.alliancecan.ca`, then load the necessary modules with `module load StdEnv/2020` and `module load abaqus`."
   },
   {
     "question": "What command checks the SHARCNET license server for started and queued jobs?",
     "answer": "Run `abaqus licensing lmstat -c $LM_LICENSE_FILE -a | egrep \"Users|start|queued\"`."
   },
   {
-    "question": "How can you check the SHARCNET license server for started and queued jobs, including reservations by purchasing groups?",
-    "answer": "Run `abaqus licensing lmstat -c $LM_LICENSE_FILE -a | egrep \"Users|start|queued|RESERVATION\"`."
+    "question": "How can you check for started, queued, and reserved jobs on the SHARCNET license server?",
+    "answer": "Use the command `abaqus licensing lmstat -c $LM_LICENSE_FILE -a | egrep \"Users|start|queued|RESERVATION\"`."
   },
   {
-    "question": "What command checks the SHARCNET license server for the availability of only cae, standard, and explicit Abaqus products?",
-    "answer": "Run `abaqus licensing lmstat -c $LM_LICENSE_FILE -a | grep \"Users of\" | egrep \"cae|standard|explicit\"`."
+    "question": "What command checks the SHARCNET license server for availability of only CAE, Standard, and Explicit products?",
+    "answer": "Execute `abaqus licensing lmstat -c $LM_LICENSE_FILE -a | grep \"Users of\" | egrep \"cae|standard|explicit\"`."
   },
   {
-    "question": "What does it mean if the SHARCNET license server indicates that an Abaqus job is 'queued'?",
-    "answer": "It means the job has entered the 'Running' state from Slurm's perspective but is idle on a compute node, waiting for a license."
+    "question": "What does it signify when an Abaqus job is reported as 'queued' by `lmstat`?",
+    "answer": "A 'queued' job means it has entered the 'Running' state from Slurm's perspective, is idle on a compute node, and is waiting for a license. This consumes CPU time and impacts account priority."
   },
   {
-    "question": "How does an Abaqus job waiting for a license (in a 'queued' state) impact a user's account priority?",
-    "answer": "It has the same impact on your account priority as if the job were performing computations and consuming CPU time, depreciating the user's fair share level."
+    "question": "How can users prevent license shortage issues when submitting multiple Abaqus jobs?",
+    "answer": "Users can employ job dependencies, job arrays, or set up Slurm email notifications to know when a job completes before manually submitting another."
   },
   {
-    "question": "What strategies can be used to avoid license shortage problems when submitting multiple Abaqus jobs?",
-    "answer": "You can use a job dependency, a job array, or set up Slurm email notifications to know when a job completes before manually submitting another one."
+    "question": "How can memory usage (`#SBATCH --mem=`) be optimized for completed Abaqus jobs?",
+    "answer": "For completed jobs, use `seff JobNumber` to check 'Memory Efficiency'. If it's below ~90%, decrease the `#SBATCH --mem=` value in the Slurm script."
   },
   {
-    "question": "How can you determine the optimal `--mem` value for a Slurm script after an Abaqus job has completed?",
-    "answer": "For completed jobs, use `seff JobNumber`. If the 'Memory Efficiency' is less than ~90%, decrease the `#SBATCH --mem=` setting in your Slurm script."
+    "question": "How can CPU usage (`#SBATCH --cpus-per-task=`) be optimized for completed Abaqus jobs?",
+    "answer": "For completed jobs, use `seff JobNumber` to check 'CPU Efficiency'. If it's below ~90%, perform scaling tests to find the optimal number of CPUs and update the `#SBATCH --cpus-per-task=` value."
   },
   {
-    "question": "How can you determine the optimal `--cpus-per-task` value for a Slurm script after an Abaqus job has completed?",
-    "answer": "For completed jobs, use `seff JobNumber`. If the 'CPU Efficiency' is less than ~90%, perform scaling tests to determine the optimal number of CPUs and then update the `#SBATCH --cpus-per-task=` value."
+    "question": "How can memory and CPU usage be monitored for running Abaqus jobs?",
+    "answer": "Use `srun --jobid=29821580 --pty top -d 5 -u $USER` to monitor `%CPU`, `%MEM`, and `RES` for each Abaqus parent process on the compute node."
   },
   {
-    "question": "How can you monitor memory and CPU utilization for a running Abaqus job on a compute node?",
-    "answer": "Use the command `srun --jobid=JOBID --pty top -d 5 -u $USER` to watch the %CPU, %MEM, and RES columns for each Abaqus parent process."
-  },
-  {
-    "question": "What is the formula for calculating Abaqus tokens based on the number of cores?",
+    "question": "What is the formula used to calculate Abaqus tokens based on the number of cores?",
     "answer": "The formula is `TOKENS = floor[5 X CORES^0.422]`."
   },
   {
-    "question": "How many additional Abaqus tokens are required for each GPU used in a job?",
+    "question": "How many additional tokens are required for each GPU used?",
     "answer": "Each GPU used requires 1 additional token."
   },
   {
     "question": "Who is eligible to use the Western Abaqus site license?",
-    "answer": "Only Western researchers are permitted to use it, and only on hardware located at Western's campus."
+    "answer": "Only Western researchers are permitted to use the Western site license."
   },
   {
-    "question": "Which cluster currently supports the Western Abaqus license?",
-    "answer": "The Dusky cluster is currently the only system that satisfies the conditions for using the Western Abaqus license."
+    "question": "On which hardware systems can the Western Abaqus license be used?",
+    "answer": "The Western license can only be used on hardware located at Western's campus, with the Dusky cluster being the currently eligible system. Graham and gra-vdi are excluded."
   },
   {
-    "question": "Which systems are excluded from using the Western Abaqus license?",
-    "answer": "Graham and gra-vdi are excluded because they are located on Waterloo's campus, not Western's."
+    "question": "How should Western researchers inquire about using the Western Abaqus license?",
+    "answer": "Contact the Western Abaqus license server administrator at `jmilner@robarts.ca`, providing your username and potentially making arrangements to purchase tokens."
   },
   {
-    "question": "Who should Western researchers contact to inquire about using the Western Abaqus license?",
-    "answer": "They should contact the Western Abaqus license server administrator at `jmilner@robarts.ca`."
+    "question": "How do you configure the Abaqus license file for the Western license?",
+    "answer": "The `~/.licenses/abaqus.lic` file should contain `prepend_path(\"LM_LICENSE_FILE\",\"27000@license4.sharcnet.ca\")` and `prepend_path(\"ABAQUSLM_LICENSE_FILE\",\"27000@license4.sharcnet.ca\")`."
   },
   {
-    "question": "How should a Western researcher configure their `abaqus.lic` file for the Western license?",
-    "answer": "They should configure it to contain the lines: `prepend_path(\"LM_LICENSE_FILE\",\"27000@license4.sharcnet.ca\")` and `prepend_path(\"ABAQUSLM_LICENSE_FILE\",\"27000@license4.sharcnet.ca\")`."
-  },
-  {
-    "question": "What information should be included when submitting a problem ticket for issues with the Abaqus Western license on Dusky?",
-    "answer": "You should specify that you are using the Abaqus Western license on Dusky, provide the failed job number, and paste any applicable error messages."
+    "question": "What should be done if problems arise with the Western Abaqus license after configuration?",
+    "answer": "Submit a problem ticket to technical support, specifying that you are using the Abaqus Western license on Dusky, and include the failed job number and any error messages."
   }
 ]

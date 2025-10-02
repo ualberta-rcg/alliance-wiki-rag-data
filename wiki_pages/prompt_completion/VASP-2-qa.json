@@ -1,102 +1,58 @@
 [
   {
-    "question": "What are the four input files required for a VASP job?",
-    "answer": "VASP uses four input files named INCAR, KPOINTS, POSCAR, and POTCAR."
+    "question": "What executable files are available for VASP-4.6 and what are their purposes?",
+    "answer": "For VASP-4.6, the executable files are:\n- `vasp` for standard NVT calculations with non-gamma k points.\n- `vasp-gamma` for standard NVT calculations with only gamma points.\n- `makeparam` to estimate how much memory is required to run VASP for a particular cluster."
   },
   {
-    "question": "How should VASP input files be prepared for a job?",
-    "answer": "It is best to prepare VASP input files in a separate directory for each job."
+    "question": "Which executable files are available for VASP versions 5.4.1, 5.4.4, and 6.1.0 without CUDA support?",
+    "answer": "For VASP versions 5.4.1, 5.4.4, and 6.1.0 without CUDA support, the executable files are:\n- `vasp_std` for standard NVT calculations with non-gamma k points.\n- `vasp_gam` for standard NVT calculations with only gamma points.\n- `vasp_ncl` for NPT calculations with non-gamma k points."
   },
   {
-    "question": "How do you submit a VASP job script?",
-    "answer": "To submit a VASP job from its directory, use `sbatch vasp_job.sh`."
+    "question": "What executable files are used for VASP-5.4.4 and 6.1.0 when CUDA support is enabled?",
+    "answer": "For VASP-5.4.4 and 6.1.0 with CUDA support, the executable files are:\n- `vasp_gpu` for standard NVT calculations with both gamma and non-gamma k points.\n- `vasp_gpu_ncl` for NPT calculations with both gamma and non-gamma k points."
   },
   {
-    "question": "How much CPU and memory are requested by the example VASP GPU job script?",
-    "answer": "The example VASP GPU job script requests one CPU core and 1024MB memory."
+    "question": "What extensions have been incorporated into VASP?",
+    "answer": "Two extensions have been incorporated: Transition State Tools (http://theory.cm.utexas.edu/vtsttools/) and VASPsol (https://github.com/henniggroup/VASPsol)."
   },
   {
-    "question": "What type of GPU is specified in the example VASP GPU job script, and on which cluster is it available?",
-    "answer": "The example VASP GPU job script requests one `p100` type GPU, which is only available on Cedar."
+    "question": "What should I do if a specific VASP version I need is not available as a pre-built option?",
+    "answer": "If you need a version of VASP that is not listed, you can either build it yourself or contact Technical support and ask that it be built and installed."
   },
   {
-    "question": "What command does the example GPU job script use to run VASP?",
-    "answer": "The example GPU job script uses `srun` to run VASP."
+    "question": "What is the main recommendation for using Vasp-GPU executables?",
+    "answer": "Vasp-GPU executables run on both GPUs and CPUs. Since GPU calculations are much more expensive, it is highly recommended to perform a benchmark using one or two GPUs for your specific system to ensure maximum performance and avoid wasting computer resources."
   },
   {
-    "question": "Which modules are loaded in the example VASP GPU job script?",
-    "answer": "The example VASP GPU job script loads `intel/2020.1.217`, `cuda/11.0`, `openmpi/4.0.3`, and `vasp/<VERSION>`."
+    "question": "What were the findings of the Vasp-GPU benchmark conducted on a Si crystal?",
+    "answer": "A benchmark of a Si crystal with 256 Si-atoms showed that the performance for GPU=1,2 with CPU=1 is more than 5 times better compared to GPU=0 with CPU=1. However, using GPU=2 instead of GPU=1 showed little additional performance gain, with GPU=2 utilization observed to be around 50%."
   },
   {
-    "question": "How can a user estimate the memory needed for a VASP job if the requirement is unknown?",
-    "answer": "To estimate memory, prepare input files and then run `makeparam` in an interactive job submission, using the result for the next run."
+    "question": "Provide an example of a Slurm job script for running a standard VASP job.",
+    "answer": "An example Slurm job script for running VASP in parallel is:\n```sh\n#!/bin/bash\n#SBATCH --account=<ACCOUNT>\n#SBATCH --ntasks=4             # number of MPI processes\n#SBATCH --mem-per-cpu=1024M    # memory\n#SBATCH --time=0-00:05         # time (DD-HH:MM)\nmodule load intel/2020.1.217  intelmpi/2019.7.217 vasp/<VERSION>\nmpirun <VASP>\n```\nThis script requests four CPU cores and a total of 4096MB memory (4x1024MB)."
   },
   {
-    "question": "For more accurate memory estimates for future VASP jobs, what should be checked?",
-    "answer": "For a more accurate estimate, check the maximum stack size used by completed jobs and use this as the memory requirement per processor for the next job."
+    "question": "How should the placeholders `<ACCOUNT>`, `<VERSION>`, and `<VASP>` be filled in a VASP job script?",
+    "answer": "`<ACCOUNT>` should be replaced with your Slurm account name. `<VERSION>` is the VASP version you intend to use (e.g., 4.6, 5.4.1, 5.4.4, or 6.1.0). `<VASP>` is the name of the executable program for your chosen VASP version and calculation type, as listed in the \"Executable programs\" section."
   },
   {
-    "question": "When should users read about whole-node scheduling for VASP jobs?",
-    "answer": "Users should read about whole-node scheduling if they want to use 32 or more cores."
+    "question": "How can I submit a VASP job script?",
+    "answer": "To submit a VASP job from the directory where your input files and job script (e.g., `vasp_job.sh`) are located, use the command: `sbatch vasp_job.sh`."
   },
   {
-    "question": "What are the prerequisites for building VASP yourself?",
-    "answer": "You must be licensed to use VASP and have access to the VASP source code."
+    "question": "What are the requirements for a VASP job script utilizing GPUs?",
+    "answer": "A VASP job script utilizing GPUs would look like this:\n```sh\n#!/bin/bash\n#SBATCH --account=<ACCOUNT>\n#SBATCH --cpus-per-task=1      # number of CPU processes\n#SBATCH --gres=gpu:p100:1      # Number of GPU type:p100 (valid type only for cedar)\n#SBATCH --mem=3GB              # memory\n#SBATCH --time=0-00:05         # time (DD-HH:MM)\nmodule load intel/2020.1.217  cuda/11.0  openmpi/4.0.3 vasp/<VERSION>\nmpirun <VASP>\n```\nThis script requests one CPU core, 3GB of memory, and one GPU of type p100, which is specifically valid for Cedar."
   },
   {
-    "question": "On which clusters can VASP be installed by users in their home directory?",
-    "answer": "VASP can be installed in a user's `/home` directory on all clusters except Niagara."
+    "question": "What input files does VASP require, and what is the recommended way to organize them?",
+    "answer": "VASP requires four input files: INCAR, KPOINTS, POSCAR, and POTCAR. It is recommended to prepare these input files in a separate directory for each job."
   },
   {
-    "question": "What is the EasyBuild command used to install VASP from source?",
-    "answer": "The EasyBuild command is `eb -f [RECIPE NAME] --sourcepath=[SOURCEPATH]`."
+    "question": "How can I estimate the memory needed for my VASP job before running it?",
+    "answer": "To estimate memory, prepare all your input files, then run the `makeparam` executable in an interactive job submission. Use the result from `makeparam` as the required memory for your next run. For more accurate estimates for future jobs, you can check the maximum stack size used by completed jobs and use that as the memory requirement per processor."
   },
   {
-    "question": "What do `[SOURCEPATH]` and `[RECIPE NAME]` represent when using EasyBuild to install VASP?",
-    "answer": "`[SOURCEPATH]` is the directory containing the VASP source code, and `[RECIPE NAME]` is the name of the recipe."
-  },
-  {
-    "question": "Where can the VASP source code be downloaded for building?",
-    "answer": "The VASP source code can be downloaded from the official VASP website."
-  },
-  {
-    "question": "How long does it typically take to run the EasyBuild command for VASP?",
-    "answer": "Running the EasyBuild command for VASP can take perhaps more than an hour."
-  },
-  {
-    "question": "How can built VASP versions be used after installation with EasyBuild?",
-    "answer": "After installation, built VASP versions can be loaded and run using `module` commands."
-  },
-  {
-    "question": "What alternative resources are available for building a custom version of VASP?",
-    "answer": "Alternative resources include [[Installing software in your home directory]], [https://www.vasp.at/wiki/index.php/Installing_VASP.5.X.X Installing VASP 5], or [https://www.vasp.at/wiki/index.php/Installing_VASP.6.X.X Installing VASP 6]."
-  },
-  {
-    "question": "Which VASP version is associated with the `VASP-6.4.2-iimpi-2023a.eb` EasyBuild recipe?",
-    "answer": "The `VASP-6.4.2-iimpi-2023a.eb` EasyBuild recipe is for VASP version 6.4.2."
-  },
-  {
-    "question": "Does the `VASP-6.5.0-iimpi-2023a.eb` EasyBuild recipe include VTSTtools and VASPsol?",
-    "answer": "No, the `VASP-6.5.0-iimpi-2023a.eb` recipe does not include VTSTtools or VASPsol extensions."
-  },
-  {
-    "question": "What is the required source file for the `VASP-6.3.1-iimpi-2020a.eb` EasyBuild recipe?",
-    "answer": "The required source file for the `VASP-6.3.1-iimpi-2020a.eb` recipe is `vasp.6.3.1.tgz`."
-  },
-  {
-    "question": "Which EasyBuild recipes for VASP version 6 include Wannier Function, Beef, HDF5, and LibXC?",
-    "answer": "Recipes `VASP-6.3.0-iimpi-2020a.eb`, `VASP-6.3.1-iimpi-2020a.eb`, `VASP-6.4.2-iimpi-2023a.eb`, `VASP-6.4.3-iimpi-2023a.eb`, `VASP-6.5.0-iimpi-2023a.eb`, and `VASP-6.5.1-iimpi-2023a.eb` include these libraries."
-  },
-  {
-    "question": "Which EasyBuild recipes for VASP include ELPA and Libmbd?",
-    "answer": "The `VASP-6.5.0-iimpi-2023a.eb` and `VASP-6.5.1-iimpi-2023a.eb` recipes include ELPA and Libmbd."
-  },
-  {
-    "question": "Where can I find a 'Getting Started' guide for VASP from its developers?",
-    "answer": "A 'Getting Started' guide is available on the developers' website at [https://www.vasp.at/tutorials/latest/part1/]."
-  },
-  {
-    "question": "Is there a Python interface for extracting data from VASP calculations?",
-    "answer": "Yes, `py4vasp` is a Python interface to extract data from VASP calculations, available at [https://www.vasp.at/py4vasp/latest/]."
+    "question": "What consideration should be made when using 32 or more CPU cores for a VASP job?",
+    "answer": "If you intend to use 32 or more CPU cores for your VASP job, you should read about whole-node scheduling policies."
   }
 ]

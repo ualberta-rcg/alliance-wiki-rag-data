@@ -1,50 +1,54 @@
 [
   {
-    "question": "What modules are required for the Fluent multinode (by core + restart) Slurm script?",
-    "answer": "You need to load `StdEnv/2023` and `ansys/2023R2` (or newer versions) for clusters such as Beluga, Cedar, Graham, or Narval."
+    "question": "What modules are required for the Fluent 'Multinode (by core + restart)' Slurm script?",
+    "answer": "The script requires loading `StdEnv/2023` and `ansys/2023R2` or newer versions, applicable to beluga, cedar, graham, and narval clusters."
   },
   {
-    "question": "Which specific variables must be defined by the user in the Fluent restart script?",
-    "answer": "The user must specify `MYVERSION` (e.g., 2d, 2ddp, 3d, or 3ddp), `MYJOUFILE` (your journal filename), `MYJOUFILERES` (journal restart filename), `MYCASFILERES` (cas restart filename), and `MYDATFILERES` (dat restart filename)."
+    "question": "Which Ansys and StdEnv module versions are no longer supported for Fluent in the 'Multinode (by core + restart)' script?",
+    "answer": "The `StdEnv/2020` module is no longer supported, and older Ansys versions like `ansys/2019R3` (narval only) and `ansys/2021R2` (beluga, cedar, graham) are also not supported by this script."
   },
   {
-    "question": "How is the total number of cores (NCORES) calculated in the Fluent restart script?",
-    "answer": "The `NCORES` value is calculated by multiplying `SLURM_NTASKS` by `SLURM_CPUS_PER_TASK`."
+    "question": "What user-defined variables must be specified in the Fluent 'Multinode (by core + restart)' Slurm script?",
+    "answer": "Users must specify `MYVERSION` (e.g., '3d'), `MYJOUFILE` (journal filename), `MYJOUFILERES` (journal restart filename), `MYCASFILERES` (case restart filename), and `MYDATFILERES` (data restart filename)."
   },
   {
-    "question": "What is the command to execute Fluent on a single node within the restart script?",
-    "answer": "For the first array task (`SLURM_ARRAY_TASK_ID == 1`), the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -I $MYFILEJOU`. For subsequent tasks, it's `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -I $MYFILEJOURES`."
+    "question": "How is the total number of cores (NCORES) calculated in the 'Multinode (by core + restart)' Fluent script?",
+    "answer": "NCORES is calculated as the product of `SLURM_NTASKS` (total number of tasks/cores requested) and `SLURM_CPUS_PER_TASK`."
   },
   {
-    "question": "How does the Fluent restart script handle a successful job completion?",
-    "answer": "If the Fluent command returns a success code (`$? -eq 0`), the script prints 'Job completed successfully! Exiting now.' and cancels the job array using `scancel $SLURM_ARRAY_JOB_ID`."
+    "question": "What command is used to run Fluent in single-node mode for a restart step in the 'Multinode (by core + restart)' script?",
+    "answer": "For a single-node restart step, the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -I $MYFILEJOURES`."
   },
   {
-    "question": "What occurs if a Fluent simulation fails when using the restart script?",
-    "answer": "If the simulation fails, the script prints 'Simulation failed. Exiting now.'"
+    "question": "What command is used to run Fluent in multi-node mode for a restart step in the 'Multinode (by core + restart)' script?",
+    "answer": "For a multi-node restart step, the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILERES`."
+  },
+  {
+    "question": "What happens if a Fluent job completes successfully within the 'Multinode (by core + restart)' Slurm script?",
+    "answer": "If a job completes successfully, the script prints 'Job completed successfully! Exiting now.' and then calls `scancel $SLURM_ARRAY_JOB_ID` to terminate any remaining array tasks."
+  },
+  {
+    "question": "How does the 'Multinode (by core + restart)' script prepare for a subsequent restart if the current job array task is not the last one?",
+    "answer": "If the current array task is not the last one, the script creates symbolic links (`ln -sfv`) for the most recent `.cas` and `.dat` output files to `MYCASFILERES` and `MYDATFILERES` respectively, and then attempts to restart the job."
   },
   {
     "question": "What is the primary function of Fluent journal files?",
-    "answer": "Fluent journal files can include any command from Fluent's Text-User-Interface (TUI) to change simulation parameters, allowing users to run a series of simulations under different conditions with a single case file."
+    "answer": "Fluent journal files are used to include any command from Fluent's Text-User-Interface (TUI) to change simulation parameters like temperature, pressure, and flow speed, or to automate simulation workflows."
   },
   {
-    "question": "Where can users find comprehensive information about Fluent Text-User-Interface (TUI) commands?",
-    "answer": "Users can refer to the Fluent User's Guide for more information and a complete list of all commands."
+    "question": "How can Fluent journal files be used to run a series of simulations under different conditions?",
+    "answer": "By only changing the parameters within the journal file, users can run a series of simulations under different conditions with a single case file."
   },
   {
-    "question": "How are Fluent journal files configured to use the legacy .cas/.dat file format?",
-    "answer": "To use the legacy `.cas/.dat` file format (default in module versions 2019R3 or older), set `/file/cff-files no` in the journal file."
+    "question": "What commands control the file format for Fluent journal files, and what are the implications?",
+    "answer": "The command `/file/cff-files no` is used for the legacy `.cas/.dat` file format, while `/file/cff-files yes` is used for the more efficient `.cas.h5/.dat.h5` file format. This choice affects the default behavior based on the Ansys module version."
   },
   {
-    "question": "How can journal files be configured to use the more efficient .cas.h5/.dat.h5 file format in Fluent?",
-    "answer": "To use the more efficient `.cas.h5/.dat.h5` file format (default in module versions 2020R1 or newer), set `/file/cff-files yes` in the journal file."
+    "question": "What is the default file format for Fluent journal files in module versions 2019R3 or older?",
+    "answer": "For Fluent module versions 2019R3 or older, the default file format for journal files is the legacy `.cas/.dat` format, controlled by `/file/cff-files no`."
   },
   {
-    "question": "What happens if a job is restarting and not yet complete in the multinode (by core + restart) script?",
-    "answer": "If the current array task is not the last one, the script will print 'Restarting job with the most recent output dat file' and symbolically link the latest `.cas` and `.dat` files for the restart."
-  },
-  {
-    "question": "What MPI settings are applied for Fluent jobs on the Narval cluster based on the EBVERSIONGENTOO environment variable?",
-    "answer": "If `EBVERSIONGENTOO` is 2020, `intel/2021 intelmpi` is loaded, and `INTELMPI_ROOT` is set to `$I_MPI_ROOT/mpi/latest`. If `EBVERSIONGENTOO` is 2023, `intel/2023 intelmpi` is loaded, and `INTELMPI_ROOT` is set to `$I_MPI_ROOT`."
+    "question": "What is the default file format for Fluent journal files in module versions 2020R1 or newer?",
+    "answer": "For Fluent module versions 2020R1 or newer, the default file format for journal files is the more efficient `.cas.h5/.dat.h5` format, controlled by `/file/cff-files yes`."
   }
 ]

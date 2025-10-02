@@ -1,38 +1,62 @@
 [
   {
-    "question": "\u00c0 quoi sert le fichier 'requirements.txt' pour un environnement Python ?",
-    "answer": "Le fichier 'requirements.txt' permet de s'assurer que votre environnement Python puisse \u00eatre reproduit pour d'autres t\u00e2ches."
+    "question": "How do you create and activate a virtual environment for each node in a multi-node job?",
+    "answer": "To create and activate a virtual environment for each node, include the following in your job submission script: `srun --ntasks $SLURM_NNODES --tasks-per-node=1 bash << EOF\\nvirtualenv --no-download $SLURM_TMPDIR/env\\nsource $SLURM_TMPDIR/env/bin/activate\\npip install --no-index --upgrade pip\\npip install --no-index -r requirements.txt\\nEOF`"
   },
   {
-    "question": "Que faire si les paquets Python requis ne sont pas disponibles dans les wheels fournis ?",
-    "answer": "Si les paquets Python ne sont pas disponibles dans les wheels fournis, vous pouvez les pr\u00e9t\u00e9l\u00e9charger. Si vous estimez que les wheels devraient \u00eatre disponibles, vous pouvez en faire la demande au soutien technique."
+    "question": "How do you activate the virtual environment on the master node in a multi-node job?",
+    "answer": "After creating the virtual environments on all nodes, activate the one on the master node using: `source $SLURM_TMPDIR/env/bin/activate;`"
   },
   {
-    "question": "Comment cr\u00e9er et utiliser un environnement virtuel pour des scripts Python ex\u00e9cut\u00e9s sur plusieurs n\u0153uds ?",
-    "answer": "Pour utiliser plusieurs n\u0153uds, chaque n\u0153ud doit avoir son propre environnement activ\u00e9. Il faut d'abord cr\u00e9er l'environnement virtuel pour chacun des n\u0153uds allou\u00e9s dans le script de soumission de la t\u00e2che, puis activer l'environnement virtuel du n\u0153ud principal, et enfin ex\u00e9cuter le script avec la commande srun python myscript.py."
+    "question": "How do you execute a Python script with the activated virtual environment across multiple nodes?",
+    "answer": "Execute the script using `srun python myscript.py;` after activating the virtual environment on the master node."
   },
   {
-    "question": "Quelle est la commande pour cr\u00e9er un environnement virtuel pour chaque n\u0153ud dans un script de soumission de t\u00e2che multi-n\u0153uds ?",
-    "answer": "Dans le script de soumission de la t\u00e2che, utilisez un bloc srun comme ceci : `srun --ntasks $SLURM_NNODES --tasks-per-node=1 bash << EOF virtualenv --no-download $SLURM_TMPDIR/env source $SLURM_TMPDIR/env/bin/activate pip install --no-index --upgrade pip pip install --no-index -r requirements.txt EOF`."
+    "question": "Where can I find a list of currently available Python wheels?",
+    "answer": "The currently available wheels are listed on the 'Available Python wheels/fr' page or by using the `avail_wheels` command on the cluster."
   },
   {
-    "question": "Comment activer l'environnement virtuel sur le n\u0153ud principal dans une configuration multi-n\u0153uds ?",
-    "answer": "Activez l'environnement virtuel du n\u0153ud principal avec la commande `source $SLURM_TMPDIR/env/bin/activate;`."
+    "question": "What information does the `avail_wheels` command display by default?",
+    "answer": "By default, `avail_wheels` shows the most recent version of a package (unless a specific version is requested), versions compatible with the loaded Python module or active virtual environment, and versions compatible with your current CPU architecture and software environment (StdEnv)."
   },
   {
-    "question": "O\u00f9 peut-on trouver la liste des wheels Python disponibles ?",
-    "answer": "Les wheels Python disponibles sont list\u00e9s sur la page [[Available Python wheels/fr|Wheels Python]] ou peuvent \u00eatre trouv\u00e9s en utilisant la commande `avail_wheels` sur la grappe."
+    "question": "How can I list Python wheels that contain 'cdf' in their name (case-insensitive)?",
+    "answer": "You can list wheels containing 'cdf' by running the command: `avail_wheels \"*cdf*\"`."
   },
   {
-    "question": "Quel est le comportement par d\u00e9faut de la commande 'avail_wheels' ?",
-    "answer": "Par d\u00e9faut, la commande `avail_wheels` montre uniquement la plus r\u00e9cente version d'un paquet (sauf si une version particuli\u00e8re est sp\u00e9cifi\u00e9e), les versions compatibles avec le module Python charg\u00e9 ou l'environnement virtuel activ\u00e9, et les versions compatibles avec l'architecture CPU et l'environnement logiciel utilis\u00e9."
+    "question": "How do I list available wheels for a specific package, such as 'numpy'?",
+    "answer": "You can list available wheels for a specific package by running: `avail_wheels numpy`."
   },
   {
-    "question": "Comment lister les wheels qui contiennent 'cdf' dans leur nom avec la commande 'avail_wheels' ?",
-    "answer": "Pour lister les wheels contenant 'cdf' (insensible \u00e0 la casse) dans leur nom, lancez la commande `avail_wheels \"*cdf*\"`."
+    "question": "How can I list wheels for a particular version of a package, like NumPy version 1.23?",
+    "answer": "You can list wheels for a specific version by using `avail_wheels numpy==1.23` or `avail_wheels numpy --version 1.23`."
   },
   {
-    "question": "Comment obtenir la liste des wheels disponibles pour un paquet sp\u00e9cifique comme NumPy ?",
-    "answer": "Vous pouvez utiliser la commande `avail_wheels numpy`."
+    "question": "How do I list all available versions of a package using `avail_wheels`?",
+    "answer": "To list all available versions of a package, use the `--all-version` option, for example: `avail_wheels \"*cdf*\" --all-version`."
+  },
+  {
+    "question": "How can I filter the list of available wheels by a specific Python version, for example, Python 3.9?",
+    "answer": "You can filter by Python version using the `--python` option, like so: `avail_wheels 'numpy<1.23' --python 3.9`."
+  },
+  {
+    "question": "What does 'cp39' mean in the 'python' column of the `avail_wheels` output?",
+    "answer": "`cp39` signifies that the wheel is available for CPython 3.9."
+  },
+  {
+    "question": "How can I check if the packages specified in a `requirements.txt` file are available as wheels?",
+    "answer": "To check if the wheels are available from a `requirements.txt` file, use the command: `avail_wheels -r requirements.txt`."
+  },
+  {
+    "question": "How can I list the packages from a `requirements.txt` file that are *not* available as wheels?",
+    "answer": "To list the packages from a `requirements.txt` file that are not available, use the `--not-available` option: `avail_wheels -r requirements.txt --not-available`."
+  },
+  {
+    "question": "What is the purpose of the `requirements.txt` file in the context of virtual environments?",
+    "answer": "The `requirements.txt` file ensures that your virtual environment can be reproduced for other tasks by listing the exact packages and versions needed."
+  },
+  {
+    "question": "What should I do if a required package is not available in the provided Python wheels?",
+    "answer": "If a required package is not available in the provided Python wheels, you can pre-download it, or request it from technical support if you believe a wheel should be provided."
   }
 ]

@@ -1,50 +1,62 @@
 [
   {
-    "question": "What is the primary purpose of the 'Multinode (by node + restart)' Slurm script for Ansys Fluent?",
-    "answer": "This script is designed to automate restarting very large Ansys Fluent jobs that might exceed the typical seven-day maximum runtime window available on most clusters."
+    "question": "What is the purpose of the 'Multinode (by node + restart)' Slurm script for Ansys Fluent?",
+    "answer": "This script is provided to automate restarting very large jobs that require more than the typical seven-day maximum runtime window available on most clusters, restarting from the most recent saved time step files."
   },
   {
-    "question": "What are the fundamental file requirements to use the Fluent solution restart script?",
-    "answer": "A working set of `sample.cas`, `sample.dat`, and `sample.jou` files must be present."
+    "question": "What is the maximum time limit specified in the 'Multinode (by node + restart)' Slurm script?",
+    "answer": "The maximum time limit specified is 7 days and 0 hours (`07-00:00`)."
   },
   {
-    "question": "How should the initial `sample.jou` file be configured for a restart job?",
-    "answer": "The `sample.jou` file must include the commands `/solve/dual-time-iterate 1` and `/file/auto-save/data-frequency 1`."
+    "question": "How many compute nodes are requested by default in the 'Multinode (by node + restart)' Slurm script?",
+    "answer": "The script specifies `nodes=1` by default, though it has logic for single or multiple nodes."
   },
   {
-    "question": "How do you prepare the `sample-restart.jou` file for a Fluent restart job?",
-    "answer": "Create `sample-restart.jou` by copying `sample.jou`. Then, edit `sample-restart.jou` to contain `/file/read-cas-data sample-restart` instead of `sample`, and comment out any initialization line (e.g., `;/solve/initialize/initialize-flow`)."
+    "question": "How is the number of cores per node specified in the 'Multinode (by node + restart)' script?",
+    "answer": "The number of cores per node is specified by `#SBATCH --ntasks-per-node=32`, with examples like 'graham 32 or 44, cedar 48, beluga 40, narval 64, or less'."
   },
   {
-    "question": "What is the maximum time limit that can be specified in the Slurm script for a restart job?",
-    "answer": "The `--time` limit can be set up to `07-00:00` (seven days)."
+    "question": "How does the 'Multinode (by node + restart)' script handle memory allocation?",
+    "answer": "The script allocates all memory per compute node by setting `#SBATCH --mem=0`."
   },
   {
-    "question": "What does the `#SBATCH --array=1-5%1` directive mean in the restart script?",
-    "answer": "It specifies the number of solution restarts, with a minimum of 2 attempts and 5 attempts shown as an example."
+    "question": "What is the purpose of the `--array` Slurm parameter in the restart script?",
+    "answer": "The `--array=1-5%1` parameter specifies the number of solution restarts, with 5 shown as an example (must be 2 or more)."
   },
   {
-    "question": "Which Ansys Fluent module versions are typically loaded for this restart script?",
-    "answer": "The script typically loads `StdEnv/2023` and `ansys/2023R2` or newer versions."
+    "question": "Which standard environment and Ansys module versions are loaded in the 'Multinode (by node + restart)' script?",
+    "answer": "The script loads `StdEnv/2023` and `ansys/2023R2` (or newer versions for beluga, cedar, graham, narval)."
   },
   {
-    "question": "How does the script calculate the total number of cores (`NCORES`)?",
-    "answer": "The total number of cores is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
+    "question": "What are the key user-defined filenames required for the Fluent restart script?",
+    "answer": "The key user-defined filenames are `MYJOUFILE` (initial journal), `MYJOUFILERES` (journal restart), `MYCASFILERES` (case restart), and `MYDATFILERES` (data restart)."
   },
   {
-    "question": "What happens if a job attempt completes successfully but more restarts are scheduled?",
-    "answer": "If `SLURM_ARRAY_TASK_ID` is less than `SLURM_ARRAY_TASK_COUNT`, the script creates symbolic links to the most recent output `.cas` and `.dat` files for the next restart."
+    "question": "How does the script determine the total number of cores to use for the Fluent simulation?",
+    "answer": "The script calculates `NCORES` as `((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))`."
   },
   {
-    "question": "How does the script handle the final successful completion of an array job?",
-    "answer": "If `SLURM_ARRAY_TASK_ID` equals `SLURM_ARRAY_TASK_COUNT` and the job completes successfully, it prints 'Job completed successfully! Exiting now.' and cancels the entire SLURM array job ID."
+    "question": "How does the 'Multinode (by node + restart)' script differentiate between the initial run and subsequent restarts?",
+    "answer": "If `SLURM_ARRAY_TASK_ID == 1`, it executes Fluent with `MYJOUFILE`; otherwise, it executes Fluent with `MYJOUFILERES`."
   },
   {
-    "question": "What is the consequence if the simulation fails during an attempt?",
-    "answer": "The script will output 'Simulation failed. Exiting \u2026' and the job will terminate."
+    "question": "What happens if a Fluent job completes successfully but is not the last restart attempt?",
+    "answer": "The script outputs a message, then symbolically links the most recent `.cas` and `.dat` output files to `MYCASFILERES` and `MYDATFILERES` respectively, and restarts the job."
   },
   {
-    "question": "How can the `sample-restart.jou` be adjusted to minimize solution restarts if subsequent steps run faster?",
-    "answer": "If the second and subsequent time steps are known to run twice as fast, edit `sample-restart.jou` to specify `/solve/dual-time-iterate 2`."
+    "question": "What action does the script take if the simulation fails?",
+    "answer": "If the simulation fails, the script outputs 'Simulation failed. Exiting \u2026' and terminates."
+  },
+  {
+    "question": "What is the command to run Fluent in the single node configuration for the restart script?",
+    "answer": "The command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -i $MYJOUFILE` for the first run or `fluent -g $MYVERSION -t $NCORES -affinity=0 -i $MYJOUFILERES` for restarts."
+  },
+  {
+    "question": "What is the command to run Fluent in a multinode configuration using the restart script?",
+    "answer": "The command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -cnf=/tmp/machinefile-$SLURM_JOB_ID -mpi=intel -ssh -i $MYJOUFILE` for the first run or `fluent -g $MYVERSION -t $NCORES -affinity=0 -cnf=/tmp/machinefile-$SLURM_JOB_ID -mpi=intel -ssh -i $MYJOUFILERES` for restarts."
+  },
+  {
+    "question": "How does the 'Multinode (by node + restart)' script handle Narval-specific Intel MPI configurations?",
+    "answer": "For Narval, it conditionally loads `intel/2021 intelmpi` or `intel/2023 intelmpi` based on `EBVERSIONGENTOO`, and sets `INTELMPI_ROOT` and `HCOLL_RCACHE` accordingly, while unsetting `I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS` and `I_MPI_ROOT`."
   }
 ]

@@ -1,66 +1,94 @@
 [
   {
-    "question": "What must be created from your laptop to the compute node after starting a VNC server?",
-    "answer": "A secure \"bridge\" or \"tunnel\" from your laptop to the compute node where your vncserver is running."
+    "question": "How can I instantly terminate all vncserver processes running under my username on a node?",
+    "answer": "You can kill all vncserver processes instantly by running the command `pkill Xvnc -u $USER`."
   },
   {
-    "question": "How many types of SSH tunnel commands are available for connecting to a VNC server?",
-    "answer": "There are two types of tunnel commands that may be used, depending on the cluster."
+    "question": "How can I view all active vncserver sessions running under my username on a node?",
+    "answer": "You can display all vncserver sessions by running the command `vncserver -list`."
   },
   {
-    "question": "What is the recommended SSH tunnel command format for clusters other than nibi?",
-    "answer": "The command format is `ssh username@clustername -L localforwardedport:computnode:remotelisteningport`."
+    "question": "What option should I use when starting a vncserver to allow multiple connections?",
+    "answer": "You should start the vncserver with the `-alwaysshared` option, for example: `vncserver -idletimeout 86400 -alwaysshared`."
   },
   {
-    "question": "Provide an example SSH tunnel command for the `rorqual` cluster, assuming a local port of 5905 and a remote port of 5901 on compute node `rc12509`.",
-    "answer": "`ssh username@rorqual.alliancecan.ca -L 5905:rc12509:5901`"
+    "question": "What is the benefit of starting a vncserver with the `-AlwaysShared` option?",
+    "answer": "If a vncserver is started with the `-AlwaysShared` option, multiple connections can be made to it from any remote location, allowing you to seamlessly continue working from different places (e.g., office then home)."
   },
   {
-    "question": "What is the specific SSH tunnel command format for the `nibi` cluster?",
-    "answer": "The `nibi` cluster requires the command `ssh -J username@clustername -L localforwardedport:localhost:remotelisteningport computenode`."
+    "question": "What happens if a vncserver is *not* started with the `-AlwaysShared` option?",
+    "answer": "If a vncserver is not started with `-AlwaysShared`, only one vncviewer connection is possible. To reconnect from a different location, you would need to close all applications, shut down the vncserver, and then restart a new desktop and applications from scratch."
   },
   {
-    "question": "What additional setup is required on your laptop to use the `nibi` cluster's SSH tunnel approach?",
-    "answer": "An SSH key pair must be created on your laptop, with the contents of the public key entered into your `~/.ssh/authorized_keys` file on `nibi`."
+    "question": "What could be a reason for repeated failures to establish a new vncserver/vncviewer connection?",
+    "answer": "Repeated failing attempts to connect may be due to an old SSH tunnel still running on your desktop and tying up ports."
   },
   {
-    "question": "Can the SSH tunnel command approach used for `nibi` also be applied to other clusters?",
-    "answer": "Yes, this approach will also work on any other cluster."
+    "question": "How do I identify and terminate old SSH tunnels on my desktop?",
+    "answer": "To identify old SSH tunnels, open a terminal and run `ps ux | grep ssh`. Then, use `kill PID` to terminate them, replacing PID with the process ID of the old tunnel."
   },
   {
-    "question": "Give an example SSH tunnel command for the `nibi` cluster if the compute node is `c48`, the local port is 5905, and the remote port is 5901.",
-    "answer": "`ssh -J username@nibi.alliancecan.ca -L 5905:localhost:5901 c48`"
+    "question": "What password should I use if my VNC screensaver times out and asks for one?",
+    "answer": "You should enter your cluster account password to unlock the VNC screensaver, not your vncserver password."
   },
   {
-    "question": "What happens if you exit the node your SSH tunnel is connected to?",
-    "answer": "If you exit the node that your tunnel is connected to, you will no longer be able to connect to the VNC server with `vncviewer`."
+    "question": "If the MATE desktop screensaver will not unlock, what command can I use?",
+    "answer": "You can try running `killall -9 .mate-screensaver` if the MATE desktop screensaver will not unlock."
   },
   {
-    "question": "How can you regain access to a running VNC server if you've exited the node and lost the tunnel connection?",
-    "answer": "You may regain access by simply starting a new tunnel."
+    "question": "Is the VNC screensaver still an issue on the clusters?",
+    "answer": "No, the VNC screensaver has been disabled on the clusters."
   },
   {
-    "question": "How do users with a Linux desktop connect to the VNC server after setting up an SSH tunnel?",
-    "answer": "Open a new local terminal window and tell your VNC client to connect to `localhost:port` using the `vncviewer` command, for example, `vncviewer localhost:5905`."
+    "question": "Describe the two-step login process for gra-vdi.alliancecan.ca.",
+    "answer": "The login process for gra-vdi.alliancecan.ca involves two steps: 1) entering your username and CCDB password, and 2) entering your username and Duo two-factor MFA passcode."
   },
   {
-    "question": "What is required to connect to the VNC server using `vncviewer`?",
-    "answer": "You will be prompted for the VNC password that you set up earlier."
+    "question": "What happens if I enter the wrong username or password in the first step of logging into gra-vdi.alliancecan.ca?",
+    "answer": "If you enter the wrong username/password in step 1, you will still be prompted for step 2. However, after entering your username/passcode for step 2, you will receive a message 'Success, Logging you in...' and then be returned to the login screen of step 1."
   },
   {
-    "question": "How do Mac or Windows desktop users connect to the VNC server via an SSH tunnel?",
-    "answer": "They may click the `TigerVNC Viewer` application icon and enter their `localhost:port` information."
+    "question": "How can I resolve the issue of being returned to the login screen after successfully completing the second step of login on gra-vdi.alliancecan.ca?",
+    "answer": "To resolve this, you need to try again, ensuring you enter the correct username/password combination for the first step of the login process."
   },
   {
-    "question": "What is the default VNC port assumed by TigerVNC Viewer?",
-    "answer": "The default VNC port assumed by TigerVNC Viewer is 5900."
+    "question": "Where can I reset my Alliance CCDB password if I've forgotten it?",
+    "answer": "You can reset your Alliance CCDB password by visiting https://ccdb.alliancecan.ca/security/forgot, assuming your account is not pending renewal by your PI."
   },
   {
-    "question": "When can you simply specify 'localhost' in TigerVNC Viewer instead of 'localhost:port'?",
-    "answer": "If you specified 5900 as the local port to be forwarded when you started your SSH tunnel, then you could simply specify 'localhost'."
+    "question": "What capabilities do VDI nodes offer for software applications?",
+    "answer": "VDI nodes support direct vncviewer connections and provide GPU-accelerated OpenGL graphics for appropriately-configured software applications."
   },
   {
-    "question": "Are there any limitations for Windows users when setting up SSH tunnels on local port 5900?",
-    "answer": "Windows users may find they cannot set up an SSH tunnel on local port 5900 in the first place."
+    "question": "What additional software environment is available on VDI nodes?",
+    "answer": "VDI nodes provide an extra set of software modules in the SnEnv environment, which is analogous to the StdEnv environments found on all clusters."
+  },
+  {
+    "question": "How do VDI nodes differ from regular login nodes in terms of software environment loading?",
+    "answer": "On regular login nodes, a standard software environment and some default modules are automatically loaded. However, on VDI nodes, no modules are loaded by default, and users must manually load them before running any graphical software."
+  },
+  {
+    "question": "What is the expected output when running 'module list' on a VDI node before loading any modules?",
+    "answer": "The expected output is 'No modules loaded'."
+  },
+  {
+    "question": "How do most users load standard software modules on gra-vdi?",
+    "answer": "Most users can load standard software modules on gra-vdi by running `module load CcEnv StdEnv/2023`."
+  },
+  {
+    "question": "What does loading the StdEnv module on gra-vdi provide?",
+    "answer": "Loading the StdEnv module on gra-vdi provides access to the same software modules that are loaded by default on the clusters."
+  },
+  {
+    "question": "When is it necessary to load the SnEnv module on gra-vdi?",
+    "answer": "It is necessary to load the SnEnv module on gra-vdi in rare cases when users need to load locally installed module(s)."
+  },
+  {
+    "question": "What command is used to load the SnEnv module on gra-vdi?",
+    "answer": "The command to load the SnEnv module on gra-vdi is `module load SnEnv`."
+  },
+  {
+    "question": "Is the 'nix' module still available on gra-vdi or graham?",
+    "answer": "No, the `nix` module is no longer available on gra-vdi (or graham), and there is no guarantee it will return."
   }
 ]

@@ -1,74 +1,50 @@
 [
   {
-    "question": "How can DPM coupled calculations be enabled in Ansys Fluent via a journal file?",
-    "answer": "You can enable DPM coupled calculations by adding the command `/define/models/dpm/interaction/coupled-calculations yes` to your journal file."
+    "question": "How can you automate DPM injection and interaction settings in an Ansys Fluent journal file?",
+    "answer": "You can include commands like '/define/models/dpm/interaction/coupled-calculations yes', '/define/models/dpm/injections/delete-injection injection-0:1', and '/define/models/dpm/injections/create injection-0:1 no yes file no zinjection01.inj no no no no' in your journal file after solution initialization."
   },
   {
-    "question": "How do you delete an existing DPM injection named 'injection-0:1' using a journal command?",
-    "answer": "To delete an injection, use the command `/define/models/dpm/injections/delete-injection injection-0:1` in your journal file."
+    "question": "What does a basic manually created steady injection file for DPM simulations look like?",
+    "answer": "A basic manually created steady injection file, such as 'zinjection01.inj', would include lines defining the number of injections (e.g., '(z=4 12)') and then the particle properties (e.g., '( x y z u v w diameter t mass-flow mass frequency time name ) (( 2.90e-02 5.00e-03 0.0 -1.00e-03 0.0 0.0 1.00e-04 2.93e+02 1.00e-06 0.0 0.0 0.0 ) injection-0:1 )')."
   },
   {
-    "question": "How do you create a DPM injection named 'injection-0:1' from a file named 'zinjection01.inj' using a journal command?",
-    "answer": "The command `/define/models/dpm/injections/create injection-0:1 no yes file no zinjection01.inj no no no no` can be used to create the injection from the specified file."
+    "question": "Where can you find detailed information on the steady file format for DPM injection files?",
+    "answer": "Detailed information can be found in subsection 'Part III: Solution Mode | Chapter 24: Modeling Discrete Phase | 24.3. Setting Initial Conditions for the Discrete Phase | 24.3.13 Point Properties for File Injections | 24.3.13.1 Steady File Format' of the '2024R2 Fluent Customization Manual'."
   },
   {
-    "question": "How can you list the particles for a DPM injection 'injection-0:1' in Ansys Fluent?",
-    "answer": "Use the journal command `/define/models/dpm/injections/list-particles injection-0:1`."
+    "question": "How do you display a summary of command-line options for Ansys CFX?",
+    "answer": "You can print a summary of command-line options by running 'cfx5solve -help' after manually loading the appropriate Ansys module version."
   },
   {
-    "question": "How do you list the properties for a DPM injection 'injection-0:1' in Ansys Fluent?",
-    "answer": "The command `/define/models/dpm/injections/list-injection-properties injection-0:1` can be added to your journal file."
+    "question": "What is the default precision for cfx5solve and how can it be changed?",
+    "answer": "By default, cfx5solve runs in single precision. To run it in double precision, you should add the '-double' option, which will also double the memory requirements."
   },
   {
-    "question": "What is the typical format for a basic manually created steady DPM injection file?",
-    "answer": "A basic steady injection file `zinjection01.inj` includes coordinate ranges (e.g., `(z=4 12)`) followed by a header and then particle properties in a specific format, for example: `( x y z u v w diameter t mass-flow mass frequency time name ) (( 2.90e-02 5.00e-03 0.0 -1.00e-03 0.0 0.0 1.00e-04 2.93e+02 1.00e-06 0.0 0.0 0.0 ) injection-0:1 )`."
+    "question": "What are the default mesh size limits for cfx5solve and how can larger meshes be handled?",
+    "answer": "By default, cfx5solve supports meshes with up to 80 million structured elements or 200 million unstructured elements. For larger meshes, up to 2 billion elements, you should add the '-large' option."
   },
   {
-    "question": "Where can one find detailed information on the steady file format for DPM injections?",
-    "answer": "Detailed information is described in `Part III: Solution Mode | Chapter 24: Modeling Discrete Phase | 24.3. Setting Initial Conditions for the Discrete Phase | 24.3.13 Point Properties for File Injections | 24.3.13.1 Steady File Format` of the `2024R2 Fluent Customization Manual`."
+    "question": "Where can users find more detailed information about cfx5solve command-line options?",
+    "answer": "Users should consult the ANSYS CFX-Solver Manager User's Guide for further details on cfx5solve command-line options."
   },
   {
-    "question": "How can you view a summary of command-line options for Ansys CFX-Solver?",
-    "answer": "You can print a summary of command-line options by running `cfx5solve -help` after loading the appropriate Ansys CFX module."
+    "question": "What are the SBATCH parameters for a single-node Ansys CFX job script?",
+    "answer": "For a single-node Ansys CFX job script, the SBATCH parameters are typically: '--account=def-group', '--time=00-03:00', '--nodes=1' (do not change), '--ntasks-per-node=4' (up to cluster max), '--mem=16G' (or 0 for all node memory), and '--cpus-per-task=1'."
   },
   {
-    "question": "What is the default precision for cfx5solve and how can it be changed to double precision?",
-    "answer": "By default, `cfx5solve` runs in single precision. To run in double precision, you need to add the `-double` option to the command line."
+    "question": "How do you specify the start method for a single-node Ansys CFX job on Narval versus other clusters?",
+    "answer": "On Narval, use '-start-method \"Open MPI Local Parallel\"', while on other clusters, use '-start-method \"Intel MPI Local Parallel\"', both with '-part $SLURM_CPUS_ON_NODE'."
   },
   {
-    "question": "What are the default mesh element limits for cfx5solve and how can they be extended for larger meshes?",
-    "answer": "By default, `cfx5solve` supports meshes up to 80 million structured elements or 200 million unstructured elements. For larger meshes, up to 2 billion elements, you can add the `-large` option."
+    "question": "What are the SBATCH parameters for a multinode Ansys CFX job script?",
+    "answer": "For a multinode Ansys CFX job script, the SBATCH parameters include: '--account=def-group', '--time=00-03:00', '--nodes=2' (or more), '--ntasks-per-node=64' (up to cluster max), '--mem=0' (to use all memory), and '--cpus-per-task=1'."
   },
   {
-    "question": "What are the typical maximum core limits per node for Ansys CFX single node jobs on Graham, Cedar, Beluga, and Narval clusters?",
-    "answer": "The maximum cores per node are typically Graham 44, Cedar 32 or 48, Beluga 40, and Narval 64."
+    "question": "How do you specify the start method for a multinode Ansys CFX job on Narval versus other clusters?",
+    "answer": "On Narval, use '-start-method \"Open MPI Distributed Parallel\" -par-dist $NNODES'. For other clusters, set 'export I_MPI_HYDRA_BOOTSTRAP=ssh' and 'unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS', then use '-start-method \"Intel MPI Distributed Parallel\" -par-dist $NNODES'."
   },
   {
-    "question": "Which MPI implementation is typically used for Ansys CFX single-node parallel jobs on Narval?",
-    "answer": "On Narval, the `Open MPI Local Parallel` method is used for single-node jobs."
-  },
-  {
-    "question": "Which MPI implementation is typically used for Ansys CFX single-node parallel jobs on clusters other than Narval?",
-    "answer": "On clusters other than Narval, the `Intel MPI Local Parallel` method is typically used for single-node jobs."
-  },
-  {
-    "question": "How does a multinode Ansys CFX job specify the number of compute nodes for parallel execution?",
-    "answer": "In the Slurm script, the `#SBATCH --nodes` directive is used to specify the number of compute nodes (e.g., `#SBATCH --nodes=2` for two or more nodes)."
-  },
-  {
-    "question": "Which MPI implementation is typically used for Ansys CFX multinode parallel jobs on Narval?",
-    "answer": "On Narval, the `Open MPI Distributed Parallel` method is used for multinode jobs."
-  },
-  {
-    "question": "Which MPI implementation is typically used for Ansys CFX multinode parallel jobs on clusters other than Narval?",
-    "answer": "On clusters other than Narval, the `Intel MPI Distributed Parallel` method is used for multinode jobs, and `export I_MPI_HYDRA_BOOTSTRAP=ssh` is also set."
-  },
-  {
-    "question": "What Slurm setting allocates all memory per compute node for an Ansys CFX multinode job?",
-    "answer": "The setting `#SBATCH --mem=0` allocates all memory per compute node."
-  },
-  {
-    "question": "What is the recommended module load for Ansys CFX version 2023R2 on StdEnv/2023?",
-    "answer": "The recommended module load is `module load StdEnv/2023 ansys/2023R2`."
+    "question": "Which Ansys CFX module versions are recommended for use with Slurm scripts?",
+    "answer": "The recommended module versions for Ansys CFX Slurm scripts are 'StdEnv/2023' and 'ansys/2023R2' or newer module versions."
   }
 ]

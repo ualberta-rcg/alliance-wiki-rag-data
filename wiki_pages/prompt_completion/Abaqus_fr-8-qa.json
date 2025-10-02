@@ -1,86 +1,90 @@
 [
   {
-    "question": "Comment configurer le fichier de licence Abaqus pour les syst\u00e8mes SHARCNET ?",
-    "answer": "Pour configurer votre fichier de licence pour les syst\u00e8mes SHARCNET (Graham, gra-vdi et Dusky), ajoutez les lignes suivantes \u00e0 votre fichier `~/.licenses/abaqus.lic`:\n`prepend_path(\"LM_LICENSE_FILE\",\"27050@license3.sharcnet.ca\")`\n`prepend_path(\"ABAQUSLM_LICENSE_FILE\",\"27050@license3.sharcnet.ca\")`"
+    "question": "What does the `abaqus licensing lmstat -c $LM_LICENSE_FILE -a | egrep \"Users|start|queued\"` command show in the provided example?",
+    "answer": "The command shows the total Abaqus licenses issued (78), total licenses in use (53), and specific user job statuses, including licenses in use and licenses queued."
   },
   {
-    "question": "Que faire si ma t\u00e2che Abaqus/2020 se termine anormalement avec un message '*** ABAQUS/eliT_CheckLicense rank 0 terminated by signal 11 (Segmentation fault)' ?",
-    "answer": "Si vous rencontrez ce message d'erreur avec Abaqus/2020, v\u00e9rifiez si votre fichier `abaqus.lic` contient la ligne `ABAQUSLM_LICENSE_FILE`."
+    "question": "In the example, how many Abaqus licenses were issued in total?",
+    "answer": "A total of 78 Abaqus licenses were issued."
   },
   {
-    "question": "Que faire si ma t\u00e2che Abaqus/6.14.1 affiche 'License server machine is down or not responding etc.' dans le fichier de sortie de l'ordonnanceur ?",
-    "answer": "Si vous rencontrez ce message d'erreur avec Abaqus/6.14.1, v\u00e9rifiez si votre fichier `abaqus.lic` contient la ligne `LM_LICENSE_FILE`."
+    "question": "How many Abaqus licenses were actively in use in the example output?",
+    "answer": "53 Abaqus licenses were in use."
   },
   {
-    "question": "Comment v\u00e9rifier l'\u00e9tat des t\u00e2ches Abaqus lanc\u00e9es et en attente sur le serveur de licences SHARCNET ?",
-    "answer": "Apr\u00e8s vous \u00eatre connect\u00e9 \u00e0 Graham et avoir charg\u00e9 les modules StdEnv/2020 et Abaqus, ex\u00e9cutez la commande `abaqus licensing lmstat -c $LM_LICENSE_FILE -a | egrep \"Users|start|queued\"`."
+    "question": "According to the example, how many licenses did `roberpj`'s first job on `gra107` acquire?",
+    "answer": "`roberpj`'s first job on `gra107` acquired 10 licenses."
   },
   {
-    "question": "Comment v\u00e9rifier l'\u00e9tat des t\u00e2ches Abaqus lanc\u00e9es et en attente, ainsi que les r\u00e9servations de produits par groupe d'acquisition, sur le serveur de licences SHARCNET ?",
-    "answer": "Apr\u00e8s vous \u00eatre connect\u00e9 \u00e0 Graham et avoir charg\u00e9 les modules StdEnv/2020 et Abaqus, ex\u00e9cutez la commande `abaqus licensing lmstat -c $LM_LICENSE_FILE -a | egrep \"Users|start|queued|RESERVATION\"`."
+    "question": "Why was `roberpj`'s second job on `gra292` queued for licenses in the example?",
+    "answer": "`roberpj`'s second job was queued because the user had only 10 Abaqus compute tokens, which were used by the first job, leaving no licenses available for the second job."
   },
   {
-    "question": "Comment v\u00e9rifier la disponibilit\u00e9 des licences pour les produits Abaqus CAE, standard et explicite sur le serveur de licences SHARCNET ?",
-    "answer": "Apr\u00e8s vous \u00eatre connect\u00e9 \u00e0 Graham et avoir charg\u00e9 les modules StdEnv/2020 et Abaqus, ex\u00e9cutez la commande `abaqus licensing lmstat -c $LM_LICENSE_FILE -a | grep \"Users of\" | egrep \"cae|standard|explicit\"`."
+    "question": "What are the suggested methods to avoid Abaqus license shortage problems when submitting multiple jobs?",
+    "answer": "To avoid license shortage, users can use a job dependency, a job array, or set up Slurm email notifications to know when a job completes before submitting another one."
   },
   {
-    "question": "Que signifie le statut 'queued' pour une t\u00e2che Abaqus dans la sortie `lmstat` ?",
-    "answer": "Le statut 'queued' signifie que la t\u00e2che est pass\u00e9e \u00e0 l'\u00e9tat 'Running' du point de vue de `squeue` ou `sacct`, mais qu'elle est en attente sur un n\u0153ud de calcul, attendant une licence Abaqus disponible."
+    "question": "Why is it important to accurately specify memory and CPU resources in a Slurm script for Abaqus tasks?",
+    "answer": "It is important to accurately specify memory and CPU resources to ensure optimal utilization of Abaqus tokens and system resources."
   },
   {
-    "question": "Quel est l'impact d'une t\u00e2che Abaqus 'queued' (en attente de licence) sur la priorit\u00e9 de mon compte ?",
-    "answer": "Une t\u00e2che 'queued' a le m\u00eame impact sur la priorit\u00e9 de votre compte que si elle effectuait des calculs et consommait du temps CPU, d\u00e9pr\u00e9ciant ainsi votre niveau de juste part."
+    "question": "How can you check the memory usage for completed Abaqus jobs?",
+    "answer": "For completed jobs, use the command `seff JobNumber` to display the total 'm\u00e9moire utilis\u00e9e' (memory used) and 'efficacit\u00e9 de la m\u00e9moire' (memory efficiency)."
   },
   {
-    "question": "Comment \u00e9viter les probl\u00e8mes de p\u00e9nurie de licences lors de la soumission de plusieurs t\u00e2ches Abaqus ?",
-    "answer": "Pour \u00e9viter les probl\u00e8mes de p\u00e9nurie de licences, utilisez une d\u00e9pendance de t\u00e2che, un tableau de t\u00e2ches (job array) ou configurez une notification par e-mail Slurm pour savoir quand votre t\u00e2che est termin\u00e9e avant d'en soumettre une autre manuellement."
+    "question": "What action should be taken if the memory efficiency for a completed job is below approximately 90%?",
+    "answer": "If memory efficiency is below approximately 90%, the value of the `#SBATCH --mem=` parameter in your Slurm script should be decreased."
   },
   {
-    "question": "Pourquoi est-il important de bien sp\u00e9cifier la m\u00e9moire et les cpus dans un script Slurm pour les t\u00e2ches Abaqus ?",
-    "answer": "Il est important de bien sp\u00e9cifier la m\u00e9moire et les cpus requis dans votre script Slurm pour garantir une utilisation optimale de vos jetons Abaqus et des ressources du syst\u00e8me."
+    "question": "How do you determine the optimal number of processors for an Abaqus job if CPU efficiency is low?",
+    "answer": "If CPU efficiency is below approximately 90%, you should perform scaling tests to determine the optimal number of processors for optimal performance, then update the `#SBATCH --cpus-per-task=` value in your Slurm script."
   },
   {
-    "question": "Comment \u00e9valuer l'utilisation de la m\u00e9moire et l'efficacit\u00e9 pour les t\u00e2ches Abaqus termin\u00e9es ?",
-    "answer": "Pour les t\u00e2ches termin\u00e9es, utilisez la commande `seff JobNumber` pour afficher la 'm\u00e9moire utilis\u00e9e' totale et l''efficacit\u00e9 de la m\u00e9moire'. Si l'efficacit\u00e9 est inf\u00e9rieure \u00e0 environ 90%, diminuez la valeur du param\u00e8tre `--mem=`."
+    "question": "How can you monitor the %CPU, %MEM, and RES of a running Abaqus job on a compute node?",
+    "answer": "For running jobs, use the command `srun --jobid=29821580 --pty top -d 5 -u $USER` to monitor %CPU, %MEM, and RES for each Abaqus parent process."
   },
   {
-    "question": "Comment \u00e9valuer l'efficacit\u00e9 du processeur pour les t\u00e2ches Abaqus termin\u00e9es ?",
-    "answer": "Pour les t\u00e2ches termin\u00e9es, la commande `seff JobNumber` affiche le total du 'CPU (temps) utilis\u00e9' et l''efficacit\u00e9 du processeur'. Si l'efficacit\u00e9 est inf\u00e9rieure \u00e0 environ 90%, effectuez des tests de mise \u00e0 l'\u00e9chelle pour d\u00e9terminer le nombre optimal de processeurs et mettez \u00e0 jour la valeur de `--cpus-per-task=`."
+    "question": "What do the %CPU and %MEM columns in the `top` command indicate for Abaqus processes?",
+    "answer": "The %CPU and %MEM columns display the percentage of usage relative to the total available on the node."
   },
   {
-    "question": "Comment surveiller l'utilisation du CPU et de la m\u00e9moire pour une t\u00e2che Abaqus en cours d'ex\u00e9cution ?",
-    "answer": "Pour les t\u00e2ches en cours d'ex\u00e9cution, utilisez la commande `srun --jobid=29821580 --pty top -d 5 -u $USER` pour surveiller le %CPU, le %MEM et la taille de la m\u00e9moire r\u00e9sidente (RES) pour chaque processus parent Abaqus sur le n\u0153ud de calcul."
+    "question": "What does the RES column in the `top` command represent for Abaqus processes?",
+    "answer": "The RES column displays the size of the resident memory per process, in an easily readable format for values greater than 1 GB."
   },
   {
-    "question": "Quelle est la correspondance entre les c\u0153urs CPU et les jetons Abaqus ?",
-    "answer": "La correspondance est la suivante : TOKENS (5, 6, 7, 8, 10, 12, 14, 16, 19, 21, 25, 28, 34, 38) correspondent respectivement \u00e0 CORES (1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128)."
+    "question": "What is the formula for calculating Abaqus tokens based on the number of cores?",
+    "answer": "The formula is `TOKENS = floor[5 X CORES^0.422]`."
   },
   {
-    "question": "Quelle est la formule pour calculer les jetons Abaqus en fonction du nombre de c\u0153urs ?",
-    "answer": "La formule est `TOKENS = floor[5 X CORES^0.422]`."
+    "question": "Does using a GPU with Abaqus require additional tokens?",
+    "answer": "Yes, each GPU requires an additional token."
   },
   {
-    "question": "Combien de jetons Abaqus sont requis pour chaque GPU ?",
-    "answer": "Chaque GPU n\u00e9cessite un jeton Abaqus additionnel."
+    "question": "Who is eligible to use the Western Abaqus site license?",
+    "answer": "The Western site license can only be used by Western researchers on hardware located on the Western campus."
   },
   {
-    "question": "Qui peut utiliser la licence de site Western pour Abaqus ?",
-    "answer": "La licence de site Western ne peut \u00eatre utilis\u00e9e que par les chercheurs de Western sur le mat\u00e9riel situ\u00e9 sur le campus de Western."
+    "question": "Which cluster currently meets the requirements for using the Western Abaqus license?",
+    "answer": "Presently, only the Dusky cluster satisfies these conditions."
   },
   {
-    "question": "Quelle grappe est compatible avec la licence Abaqus de Western ?",
-    "answer": "Actuellement, la grappe Dusky est la seule qui satisfait les conditions pour l'utilisation de la licence Abaqus de Western."
+    "question": "Why are Graham and gra-vdi excluded from using the Western Abaqus license?",
+    "answer": "Graham and gra-vdi are excluded because they are located on the Waterloo campus, not the Western campus."
   },
   {
-    "question": "Quelles grappes sont exclues de l'utilisation de la licence Abaqus de Western et pourquoi ?",
-    "answer": "Graham et gra-vdi sont exclus car ils sont situ\u00e9s sur le campus de Waterloo, et la licence Western est limit\u00e9e au mat\u00e9riel situ\u00e9 sur le campus de Western."
+    "question": "Who should be contacted for inquiries regarding the Western Abaqus license?",
+    "answer": "The administrator of the Western Abaqus license server, jmilner@robarts.ca, should be contacted."
   },
   {
-    "question": "Comment configurer le fichier de licence Abaqus pour la licence Western sur Dusky ?",
-    "answer": "Pour utiliser la licence Western sur Dusky, configurez votre fichier `~/.licenses/abaqus.lic` comme suit:\n`prepend_path(\"LM_LICENSE_FILE\",\"27000@license4.sharcnet.ca\")`\n`prepend_path(\"ABAQUSLM_LICENSE_FILE\",\"27000@license4.sharcnet.ca\")`"
+    "question": "What information should be provided when inquiring about the Western Abaqus license?",
+    "answer": "You will need to provide your username and potentially make arrangements to purchase tokens."
   },
   {
-    "question": "Que faire en cas de probl\u00e8me lors de l'utilisation de la licence Western Abaqus sur Dusky ?",
-    "answer": "En cas de probl\u00e8me, \u00e9crivez au soutien technique en indiquant que vous utilisez la licence du site Western sur Dusky, ajoutez le num\u00e9ro de la t\u00e2che probl\u00e9matique et copiez les messages d'erreur si pr\u00e9sents."
+    "question": "How should the `abaqus.lic` file be configured to use the Western site license on Dusky?",
+    "answer": "The `abaqus.lic` file should contain `prepend_path(\"LM_LICENSE_FILE\",\"27000@license4.sharcnet.ca\")` and `prepend_path(\"ABAQUSLM_LICENSE_FILE\",\"27000@license4.sharcnet.ca\")`."
+  },
+  {
+    "question": "What should you do if you encounter a problem while using the Western license on Dusky?",
+    "answer": "You should write to technical support, indicating that you are using the Western site license on Dusky, and include the problem job number and any error messages."
   }
 ]

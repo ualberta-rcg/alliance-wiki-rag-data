@@ -1,54 +1,110 @@
 [
   {
-    "question": "What is the wall time per step for a NAMD simulation using 4 cores and 1 GPU on a single node?",
-    "answer": "The wall time per step for this configuration is 0.0165 seconds."
+    "question": "What options should be adjusted in a multi-node GPU job script when using it on different clusters?",
+    "answer": "You should adjust the `--cpus-per-task` and `--gpus-per-node` options according to the specifications of the available nodes on those clusters."
   },
   {
-    "question": "Which configuration offers the greatest efficiency for NAMD simulations on a single node for the described system?",
-    "answer": "Using 1 GPU and 16 cores on a single node offers the greatest efficiency."
+    "question": "Is NAMD 2.14 recommended for use on clusters with H100 GPUs for multi-node GPU jobs?",
+    "answer": "No, NAMD 2.14 should not be used on clusters with H100 GPUs."
   },
   {
-    "question": "What NAMD configuration is recommended for quick results on a single node, even if not the most efficient?",
-    "answer": "Using 2 GPUs and 32 cores on a single node is acceptable for getting results quickly."
+    "question": "Is the UCX version of NAMD 3.0.1 compatible with H100 GPUs currently installed on Alliance clusters?",
+    "answer": "The UCX version of NAMD 3.0.1 able to run on H100 is not yet installed on Alliance clusters."
   },
   {
-    "question": "Does NAMD performance improve when using more than one node for the system detailed in the benchmark table?",
-    "answer": "No, for this particular system, performance actually becomes worse when using 2 or more nodes."
+    "question": "Which modules are loaded in the example multi-node UCX GPU job script?",
+    "answer": "The modules loaded are `StdEnv/2020`, `intel/2020.1.217`, `cuda/11.0`, and `namd-ucx-smp/2.14`."
   },
   {
-    "question": "How does the speed of a NAMD job on a full Graham GPU node compare to non-GPU nodes?",
-    "answer": "A NAMD job using a full GPU node of Graham (32 cores, 2 GPUs) runs faster than it would on 4 non-GPU nodes of Graham."
+    "question": "Where can users find a Molecular Dynamics Performance Guide for Alliance clusters?",
+    "answer": "A team at ACENET has created a Molecular Dynamics Performance Guide for Alliance clusters, available at [https://mdbench.ace-net.ca/mdbench/ Molecular Dynamics Performance Guide]."
   },
   {
-    "question": "Is it more cost-effective to run NAMD with or without GPUs on Graham, given the cost difference?",
-    "answer": "It is more cost-effective to run with GPUs, as a GPU node on Graham costs about twice what a non-GPU node costs but offers better performance for this system."
+    "question": "What is the purpose of the Molecular Dynamics Performance Guide?",
+    "answer": "It can help you determine optimal conditions for AMBER, GROMACS, NAMD, and OpenMM jobs."
   },
   {
-    "question": "Why might a user choose to submit a non-GPU NAMD job even if GPU jobs are more cost-effective?",
-    "answer": "Users may need to consider submitting non-GPU jobs if the waiting time for GPU jobs is too long, as there are fewer GPU nodes available."
+    "question": "Why is it useful to benchmark NAMD for a particular system?",
+    "answer": "Performance of NAMD will differ depending on the number of atoms in the simulation, so benchmarking is very useful if you plan to spend a significant amount of time simulating a particular system."
   },
   {
-    "question": "What is the latest version of NAMD that is installed as a module?",
-    "answer": "NAMD 3.0.1 is currently installed as a module."
+    "question": "Is benchmarking data helpful when applying for a RAC award?",
+    "answer": "Yes, collecting and providing this kind of data is very useful if you are applying for a RAC award."
   },
   {
-    "question": "How can a user manually install and prepare a newer NAMD binary downloaded from the NAMD website to run on Alliance systems?",
-    "answer": "After downloading and extracting the binary (e.g., `tar xvfz NAMD_3.0alpha11_Linux-x86_64-multicore-CUDA-SingleNode.tar.gz`), change to the extracted directory and run `setrpaths.sh --path .` to link it to the correct libraries."
+    "question": "What are the guidelines for conducting a good NAMD benchmark regarding simulation duration?",
+    "answer": "For a good benchmark, vary the number of steps so that your system runs for a few minutes, and that timing information is collected in reasonable time intervals of at least a few seconds to avoid fluctuations."
   },
   {
-    "question": "What keyword should be added to the NAMD configuration file for best performance of NAMD 3 on GPUs?",
-    "answer": "Add the keyword `GPUresident on;` to the NAMD configuration file for best performance on GPUs, if the input configuration supports it."
+    "question": "On which cluster were the NAMD benchmarking numbers for the apoa1 benchmark obtained?",
+    "answer": "The benchmarking was conducted on the Graham cluster."
   },
   {
-    "question": "Where can users find the NAMD User's guide for version 3.0.1?",
-    "answer": "The NAMD User's guide for version 3.0.1 is available at `https://www.ks.uiuc.edu/Research/namd/3.0.1/ug/`."
+    "question": "What NAMD version and module were used for the initial CPU benchmarking results?",
+    "answer": "NAMD 2.12 from the verbs module was used."
   },
   {
-    "question": "Is registration required to download NAMD software from the official website?",
-    "answer": "Yes, registration is required to download the NAMD software."
+    "question": "How is efficiency calculated in NAMD benchmarking?",
+    "answer": "Efficiency is computed from (time with 1 core) / (N * (time with N cores) )."
   },
   {
-    "question": "What is the charging policy on Graham GPU nodes for NAMD jobs using up to 16 cores and 1 GPU?",
-    "answer": "On Graham GPU nodes, the priority is charged the same for any NAMD job using up to 16 cores and 1 GPU."
+    "question": "What is the acceptable maximum number of cores for the NAMD apoa1 benchmark system, according to the CPU benchmarking results?",
+    "answer": "For this system, it is acceptable to use up to 256 cores."
+  },
+  {
+    "question": "What impact does requesting too many cores have on job throughput?",
+    "answer": "If you ask for more cores, your jobs will wait in the queue for a longer time, affecting your overall throughput."
+  },
+  {
+    "question": "Which NAMD module is used for GPU simulations that fit within a single node?",
+    "answer": "The NAMD multicore module is used for simulations that fit within 1 node."
+  },
+  {
+    "question": "Which NAMD module is used for GPU simulations that span multiple nodes?",
+    "answer": "The NAMD verbs-smp module is used for runs spanning nodes."
+  },
+  {
+    "question": "For the apoa1 GPU benchmark, is it beneficial to use more than one node?",
+    "answer": "No, there is no point at all in using more than 1 node for this system, since performance actually becomes worse if we use 2 or more nodes."
+  },
+  {
+    "question": "What is considered the most efficient configuration for the apoa1 GPU benchmark when using only one node?",
+    "answer": "Using only 1 node, it is best to use 1GPU/16 core as that has the greatest efficiency."
+  },
+  {
+    "question": "When comparing GPU and non-GPU options for the apoa1 benchmark on Graham, which is more cost-effective?",
+    "answer": "It is more cost effective to run with GPUs, as a full GPU node runs faster than 4 non-GPU nodes, and a GPU node costs about twice what a non-GPU node costs."
+  },
+  {
+    "question": "When might users consider submitting non-GPU jobs despite GPUs being more cost-effective?",
+    "answer": "Users may need to consider submitting non-GPU jobs if their waiting time for GPU jobs is too long, given that there are fewer GPU than CPU nodes."
+  },
+  {
+    "question": "Is NAMD 3.0.1 available as a module?",
+    "answer": "Yes, NAMD 3.0.1 is now installed as a module."
+  },
+  {
+    "question": "How does NAMD 3.0.1 performance compare to NAMD 2.14?",
+    "answer": "NAMD 3.0.1 might offer better performance than NAMD 2.14 for certain system configurations."
+  },
+  {
+    "question": "How can a user run a newer NAMD version that is not yet installed as a module on Alliance systems?",
+    "answer": "Users can download the binary from the NAMD website, extract it, navigate to the directory, and run `setrpaths.sh --path .` to link it to the correct libraries."
+  },
+  {
+    "question": "What keyword is highly recommended for best NAMD 3 performance on GPUs?",
+    "answer": "For best performance of NAMD 3 on GPUs, adding the keyword `GPUresident on;` to the configuration file is highly recommended if the input configuration supports it."
+  },
+  {
+    "question": "Where can I find more details about the `GPUresident on;` parameter and NAMD 3 changes?",
+    "answer": "More details can be found on the NAMD 3.0 Alpha web page."
+  },
+  {
+    "question": "Is registration required to download NAMD software?",
+    "answer": "Yes, registration is required to download the software from the NAMD website."
+  },
+  {
+    "question": "Where can I find the NAMD User's guide for version 3.0.1?",
+    "answer": "The NAMD User's guide for version 3.0.1 is available at [https://www.ks.uiuc.edu/Research/namd/3.0.1/ug/]."
   }
 ]

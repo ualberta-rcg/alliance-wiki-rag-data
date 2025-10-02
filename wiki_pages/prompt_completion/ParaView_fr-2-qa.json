@@ -1,42 +1,86 @@
 [
   {
-    "question": "How do you establish an SSH tunnel to connect a local ParaView client to a remote server on Fir or Nibi?",
-    "answer": "Note the node and port (e.g., fc30107:11111) from the remote server. Then, in a separate terminal on your Mac/Linux computer (or a terminal emulator on Windows), bind your local port 11111 to the compute node's port using `ssh <username>@fir.alliancecan.ca -L 11111:fc30107:11111`."
+    "question": "What is the purpose of the \"Large-scale interactive\" tab in the documentation?",
+    "answer": "This tab describes the interactive client-server setup for ParaView on all HPC clusters, where a ParaView client runs on your computer and the server runs on the remote cluster."
   },
   {
-    "question": "After setting up an SSH tunnel, how do you configure ParaView on your local computer to connect to the remote server?",
-    "answer": "On your computer, start ParaView, go to 'File -> Connect' (or click the green 'Connect' button), and then click 'Add Server'. Set the parameters to `name = fir`, `server type = Client/Server`, `host = localhost`, `port = 11111`. Click 'Configure', select 'Manual', and click 'Save'. Finally, select the server from the list and click 'Connect'."
+    "question": "Which HPC clusters support the large-scale interactive client-server ParaView setup?",
+    "answer": "The large-scale interactive client-server ParaView setup is supported on Rorqual, Nibi, Fir, Trillium, and Narval."
   },
   {
-    "question": "What is the final step to visualize data once the ParaView client is connected to the remote server?",
-    "answer": "Open a ParaView file; this action will direct you to the remote file system for data visualization."
+    "question": "What is an important compatibility requirement for the ParaView client and server in a client-server setup?",
+    "answer": "ParaView requires the same major version on the local client and the remote host. For example, to use ParaView server version 6.0.0 on the cluster, you need client version 6.0.x on your computer."
   },
   {
-    "question": "What is the function of the 'Remote Render Threshold' option in ParaView's preferences?",
-    "answer": "The 'Remote Render Threshold' defines a data size limit. Small rendering tasks (e.g., below the default 20Mo) are handled by your local computer's GPU for quick interactive rotation. Any somewhat intensive task that is still below the threshold will also be handled by your local computer, and its visualization speed may depend on your connection."
+    "question": "Where can you find the \"Remote Render Threshold\" setting in ParaView and what does it control?",
+    "answer": "The \"Remote Render Threshold\" setting is located in ParaView's preferences under `Render View -> Remote/Parallel Rendering Options`. It controls whether small rendering tasks (below the threshold) are done on your computer's GPU or shipped to the remote cluster for processing."
   },
   {
-    "question": "How does setting the 'Remote Render Threshold' to 0Mo affect ParaView rendering?",
-    "answer": "Setting the 'Remote Render Threshold' to 0Mo forces all rendering tasks to be performed remotely by the cluster's resources, which is beneficial for intensive processing but can make interactive tasks less responsive."
+    "question": "How does setting the \"Remote Render Threshold\" to 0MB affect ParaView rendering?",
+    "answer": "If set to 0MB, all rendering, including rotation, will be done remotely on the cluster resources. This is good for large data processing but might reduce interactivity."
   },
   {
-    "question": "How do you launch a parallel task for multi-CPU rendering in ParaView?",
-    "answer": "Launch a parallel task using a command such as `salloc --time=0:30:0 --ntasks=8 --mem-per-cpu=3600 --account=def-someprof`, remembering to specify the maximum real-time execution limit."
+    "question": "What rendering capabilities are available when using cluster CPUs for ParaView visualization?",
+    "answer": "You can do both rasterization and ray tracing on cluster CPUs. Modern CPU-based libraries like OSPRay and OpenSWR offer performance similar to GPU-based rendering."
   },
   {
-    "question": "How do you start the ParaView server for parallel rendering with multiple CPUs?",
-    "answer": "First, load the ParaView module (`module load paraview/5.13.1`), then start the server using `srun pvserver --force-offscreen-rendering`."
+    "question": "How does the ParaView server handle very large datasets using distributed-memory processing?",
+    "answer": "The ParaView server uses MPI for distributed-memory processing, enabling parallel rendering on a large number of CPU cores, either on a single node or scattered across multiple nodes."
   },
   {
-    "question": "How can you verify that rendering is being performed in parallel when using ParaView?",
-    "answer": "To verify parallel rendering, use the 'Process Id Scalars' filter and apply color based on 'process id'."
+    "question": "What is the easiest way to estimate the number of CPU cores needed for ParaView rendering based on dataset size?",
+    "answer": "The easiest way is to estimate the memory required for your rendering and divide it by approximately 3.5 GB/core."
   },
   {
-    "question": "How do you launch an interactive serial task with a GPU on Fir or Nibi for ParaView visualization?",
-    "answer": "After installing the same ParaView version on your computer as on the cluster, connect to Fir or Nibi and launch an interactive serial task with a GPU using `salloc --time=1:00:0 --ntasks=1 --mem-per-cpu=3600 --gres=gpu:1 --account=def-someprof`."
+    "question": "What is the recommended maximum memory allocation per CPU core for software rendering in ParaView?",
+    "answer": "It is not recommended to allocate more than 4GB/core, as software rendering is CPU-intensive."
   },
   {
-    "question": "What steps are required to start the ParaView server for GPU-based visualization on a remote cluster node?",
-    "answer": "At the prompt within your task, load the GPU+EGL module (`module load paraview/5.13.1`), then unset the `DISPLAY` variable to prevent ParaView from using the X11 rendering context (`unset DISPLAY`), and finally start the ParaView server by running `pvserver`."
+    "question": "Why is it important to allocate additional memory for filters and data processing in ParaView?",
+    "answer": "It's important because filters and data processing can significantly increase your memory footprint; for example, a structured to unstructured dataset conversion can increase memory usage by about 3X."
+  },
+  {
+    "question": "What action should be taken if the ParaView server is killed during data processing?",
+    "answer": "If the ParaView server is killed while processing data, you will need to increase the number of cores allocated."
+  },
+  {
+    "question": "What is a specific core allocation requirement for ParaView visualization on the Trillium cluster?",
+    "answer": "On Trillium, you must schedule on whole nodes, meaning in multiples of 192 cores. Therefore, the minimum visualization example on Trillium will require 192 cores."
+  },
+  {
+    "question": "What is the initial step for setting up large-scale interactive ParaView visualization on an HPC cluster?",
+    "answer": "First, install the same ParaView version on your computer as available on the cluster, then log into the cluster and start a parallel CPU interactive job."
+  },
+  {
+    "question": "Provide an example `salloc` command for starting a parallel CPU interactive job for ParaView.",
+    "answer": "A general `salloc` command would be: `salloc --time=1:00:0 --ntasks=... --mem-per-cpu=3600 --account=def-someprof`."
+  },
+  {
+    "question": "How would you specifically start an `salloc` job for ParaView visualization on the Trillium cluster, assuming one node is used?",
+    "answer": "The command would be: `salloc --time=1:00:0 --ntasks=192 --account=def-someprof`."
+  },
+  {
+    "question": "What module must be loaded on Trillium before loading the `paraview/6.0.0` module?",
+    "answer": "On Trillium, you must load `StdEnv/2023` before attempting to load `paraview/6.0.0`."
+  },
+  {
+    "question": "What command sequence is used to load the ParaView module and start the server within a Slurm job?",
+    "answer": "First, `module load paraview/6.0.0`, and then `srun pvserver --force-offscreen-rendering --opengl-window-backend OSMesa`."
+  },
+  {
+    "question": "How do you set up an SSH tunnel from your local computer to the compute node for ParaView connectivity?",
+    "answer": "In a terminal on your computer (Mac/Linux), use the command: `ssh <username>@fir.alliancecan.ca -L 11111:fc30669:11111`. Replace `fir.alliancecan.ca` with the actual cluster name and `fc30669` with the compute node name."
+  },
+  {
+    "question": "What steps are required to configure the ParaView client on your computer to connect to the remote parallel server?",
+    "answer": "Start ParaView on your computer, navigate to `File -> Connect` (or click the green `Connect` button). Click `Add Server`, set `name` (e.g., 'fir'), `server type = Client/Server`, `host = localhost`, `port = 11111`. Then click `Configure`, select `Manual`, and click `Save`. Finally, select the added server from the list and click `Connect`."
+  },
+  {
+    "question": "How can you verify that your ParaView client has successfully connected to the remote server?",
+    "answer": "The terminal window where the `pvserver` was started, which initially showed \"Accepting connection\", will change to display \"Client connected.\""
+  },
+  {
+    "question": "What happens after successfully connecting the ParaView client to the remote server regarding file access?",
+    "answer": "Once connected, you can open a file in ParaView, and it will point to the remote filesystem for visualization."
   }
 ]
