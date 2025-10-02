@@ -1,58 +1,74 @@
 [
   {
-    "question": "Comment installer un paquet Python pr\u00e9t\u00e9l\u00e9charg\u00e9, comme un fichier .whl ?",
-    "answer": "Pour installer un paquet pr\u00e9t\u00e9l\u00e9charg\u00e9, utilisez la commande `pip install` avec le chemin complet du fichier, par exemple : `pip install tensorboardX-1.9-py2.py3-none-any.whl`."
+    "question": "Quel est le but du module `multiprocessing` en Python ?",
+    "answer": "Le module `multiprocessing` en Python est un moyen facile d'obtenir des r\u00e9sultats plus rapidement par la programmation parall\u00e8le."
   },
   {
-    "question": "Quel est le but principal du module `multiprocessing` en Python ?",
-    "answer": "Le module `multiprocessing` en Python est un moyen facile d'obtenir des r\u00e9sultats plus rapidement gr\u00e2ce \u00e0 la programmation parall\u00e8le."
+    "question": "Quelle classe du module `multiprocessing` est particuli\u00e8rement int\u00e9ressante et pourquoi ?",
+    "answer": "La classe `Pool` est particuli\u00e8rement int\u00e9ressante car elle permet de contr\u00f4ler le nombre de processus lanc\u00e9s en parall\u00e8le pour ex\u00e9cuter le m\u00eame calcul avec des donn\u00e9es multiples."
   },
   {
-    "question": "Que permet la classe `Pool` du module `multiprocessing` ?",
-    "answer": "La classe `Pool` permet de contr\u00f4ler le nombre de processus lanc\u00e9s en parall\u00e8le pour ex\u00e9cuter le m\u00eame calcul avec des donn\u00e9es multiples."
+    "question": "Comment le module `multiprocessing` peut-il \u00eatre utilis\u00e9 pour calculer le cube d'une liste de nombres en parall\u00e8le en utilisant la classe `Pool` et la m\u00e9thode `apply_async` ?",
+    "answer": "Le code parall\u00e8le peut utiliser `pool = mp.Pool(processes=ncpus)` et ensuite `results = [pool.apply_async(cube, args=(x,)) for x in data]` suivi de `cubes = [p.get() for p in results]` pour obtenir les r\u00e9sultats."
   },
   {
-    "question": "Quelle est l'importance d'adapter le nombre de processus \u00e0 la quantit\u00e9 de c\u0153urs allou\u00e9s sur une grappe ?",
-    "answer": "Il est crucial d'utiliser les c\u0153urs allou\u00e9s \u00e0 la t\u00e2che. Si le nombre de processus d\u00e9passe les c\u0153urs demand\u00e9s, les calculs seront plus lents et le n\u0153ud pourrait \u00eatre surcharg\u00e9. Si le nombre de processus est inf\u00e9rieur, des c\u0153urs resteront inactifs, menant \u00e0 une sous-utilisation des ressources."
+    "question": "Comment le module `multiprocessing` peut-il \u00eatre utilis\u00e9 pour calculer le cube d'une liste de nombres en parall\u00e8le en utilisant la classe `Pool` et la m\u00e9thode `map` ?",
+    "answer": "Le code parall\u00e8le peut utiliser `pool = mp.Pool(processes=ncpus)` et ensuite `cubes = pool.map(cube, data)` pour appliquer la fonction `cube` \u00e0 chaque \u00e9l\u00e9ment des `data`."
   },
   {
-    "question": "Comment un script Python peut-il obtenir le nombre de c\u0153urs CPU allou\u00e9s par l'ordonnanceur (SLURM) ?",
-    "answer": "Dans un script Python, le nombre de c\u0153urs peut \u00eatre obtenu via la variable d'environnement `SLURM_CPUS_PER_TASK` en utilisant `int(os.environ.get('SLURM_CPUS_PER_TASK',default=1))`."
+    "question": "Comment optimiser l'utilisation des c\u0153urs CPU allou\u00e9s \u00e0 une t\u00e2che sur une grappe lorsque l'on utilise le module `multiprocessing` ?",
+    "answer": "Pour optimiser l'utilisation des c\u0153urs CPU, le code Python devrait faire appel \u00e0 autant de c\u0153urs que la quantit\u00e9 de ressources demand\u00e9es \u00e0 l'ordonnanceur. Il est recommand\u00e9 de r\u00e9cup\u00e9rer le nombre de c\u0153urs allou\u00e9s via la variable d'environnement `SLURM_CPUS_PER_TASK`."
   },
   {
-    "question": "Le module `multiprocessing` peut-il utiliser plusieurs n\u0153uds de calcul ?",
-    "answer": "Non, le module `multiprocessing` ne peut utiliser qu'un seul n\u0153ud de calcul. Le gain de performance est donc limit\u00e9 au nombre de c\u0153urs CPU de ce n\u0153ud."
+    "question": "Quelles sont les cons\u00e9quences si le nombre de processus ex\u00e9cut\u00e9s d\u00e9passe ou est inf\u00e9rieur au nombre de c\u0153urs demand\u00e9s pour une t\u00e2che sur une grappe ?",
+    "answer": "Si le nombre de processus d\u00e9passe les c\u0153urs demand\u00e9s, les calculs s'effectueront plus lentement et le n\u0153ud de calcul sera possiblement surcharg\u00e9. Si le nombre est inf\u00e9rieur, certains c\u0153urs resteront inactifs et les ressources ne seront pas utilis\u00e9es de fa\u00e7on optimale."
   },
   {
-    "question": "Quelles sont les alternatives pour la programmation parall\u00e8le en Python sur plusieurs n\u0153uds ?",
-    "answer": "Pour d\u00e9passer la limite d'un seul n\u0153ud et utiliser plusieurs n\u0153uds, on peut consid\u00e9rer `mpi4py` ou `PySpark`."
+    "question": "Comment un script SLURM devrait-il \u00eatre configur\u00e9 pour utiliser tous les c\u0153urs d'un n\u0153ud avec un script Python parall\u00e8le ?",
+    "answer": "Le script de soumission de la t\u00e2che (`submit.sh`) devrait inclure `#SBATCH --ntasks-per-node=1` et `#SBATCH --cpus-per-task=32` (par exemple pour 32 c\u0153urs), puis appeler `python cubes_parallel.py`."
   },
   {
-    "question": "Quelle est la premi\u00e8re \u00e9tape \u00e0 consid\u00e9rer avant de parall\u00e9liser un code Python ?",
-    "answer": "Avant de parall\u00e9liser, assurez-vous que votre code est optimal, car un code de qualit\u00e9 fournira toujours la meilleure performance."
+    "question": "Comment un script Python peut-il dynamiquement obtenir le nombre de c\u0153urs CPU allou\u00e9s par l'ordonnanceur (SLURM) pour ajuster le nombre de processus de `Pool` ?",
+    "answer": "Le script peut utiliser `ncpus = int(os.environ.get('SLURM_CPUS_PER_TASK',default=1))` pour obtenir le nombre de c\u0153urs et l'utiliser lors de la cr\u00e9ation de la `Pool` (`pool = mp.Pool(processes=ncpus)`)."
   },
   {
-    "question": "Quelles sont les m\u00e9thodes simples pour d\u00e9boguer du code Python ?",
-    "answer": "Les m\u00e9thodes simples pour d\u00e9boguer le code Python incluent l'ajout d'instructions `print` ou l'utilisation d'assertions (`assert`)."
+    "question": "Qu'est-ce qu'il faut v\u00e9rifier si une fonction appel\u00e9e d'une biblioth\u00e8que externe (comme `numpy`) est d\u00e9j\u00e0 parall\u00e8le, et que l'on utilise le module `multiprocessing` ?",
+    "answer": "Il faut v\u00e9rifier si les fonctions appel\u00e9es sont en elles-m\u00eames parall\u00e8les. Si c'est le cas, il faudra contr\u00f4ler le nombre de fils qu'elles utiliseront pour \u00e9viter de surcharger le n\u0153ud si le module `multiprocessing` lance aussi un grand nombre de processus."
   },
   {
-    "question": "Comment utiliser le d\u00e9bogueur `pdb` en Python pour une t\u00e2che interactive ?",
-    "answer": "Pour utiliser `pdb`, ajoutez `import pdb; pdb.set_trace()` (ou `breakpoint()`) au d\u00e9but de votre fichier ou \u00e0 l'endroit d\u00e9sir\u00e9, puis ex\u00e9cutez votre code. Vous entrerez alors dans le d\u00e9bogueur."
+    "question": "Quelle est la principale limitation du module `multiprocessing` de Python en termes de n\u0153uds de calcul ?",
+    "answer": "Le module `multiprocessing` ne peut utiliser qu'un seul n\u0153ud de calcul, limitant le gain en performance au nombre de c\u0153urs CPU de ce n\u0153ud."
   },
   {
-    "question": "Quels sont quelques exemples de commandes utiles dans le d\u00e9bogueur `pdb` ?",
-    "answer": "Des commandes utiles de `pdb` incluent `w` (afficher la trace de pile), `b` (d\u00e9finir un point d'arr\u00eat), `s` (ex\u00e9cuter la ligne actuelle et arr\u00eater), `n` (continuer jusqu'\u00e0 la ligne suivante dans la fonction actuelle), `p exp` (\u00e9valuer et afficher une expression), et `q` (quitter le d\u00e9bogueur)."
+    "question": "Quelles sont les alternatives recommand\u00e9es pour la programmation parall\u00e8le sur plusieurs n\u0153uds ?",
+    "answer": "Pour d\u00e9passer la limite d'un seul n\u0153ud et utiliser plusieurs n\u0153uds, il faut consid\u00e9rer `mpi4py` ou PySpark (voir la page Apache Spark)."
   },
   {
-    "question": "Comment obtenir une trace de l'origine d'un probl\u00e8me pour un script Python qui se suspend ?",
-    "answer": "Avec le module `faulthandler`, vous pouvez modifier votre script pour qu'une trace de l'origine du probl\u00e8me soit fournie apr\u00e8s une certaine dur\u00e9e en utilisant la commande `faulthandler.dump_traceback_later(timeout, repeat=False, file=sys.stderr, exit=False)`."
+    "question": "Quel est le conseil principal avant de parall\u00e9liser un code Python ?",
+    "answer": "Avant de parall\u00e9liser, il faut s'assurer que le code est optimal, car un code de qualit\u00e9 fournira toujours la meilleure performance."
   },
   {
-    "question": "Quel outil peut \u00eatre utilis\u00e9 pour inspecter un processus Python en cours d'ex\u00e9cution sans modifier le script ?",
-    "answer": "L'outil `py-spy` peut \u00eatre utilis\u00e9 pour inspecter un processus Python pendant l'ex\u00e9cution d'une t\u00e2che sans avoir \u00e0 le modifier au pr\u00e9alable."
+    "question": "Quand faut-il contacter le soutien technique concernant l'efficacit\u00e9 du code Python ?",
+    "answer": "Il faut contacter le soutien technique si vous doutez de l'efficacit\u00e9 de votre code."
   },
   {
-    "question": "Quelles sont les \u00e9tapes pour utiliser `py-spy` afin de diagnostiquer un script Python suspendu ?",
-    "answer": "Les \u00e9tapes incluent : 1. Installer `py-spy` dans un environnement virtuel. 2. Se connecter \u00e0 la t\u00e2che avec `srun --pty --jobid JOBID bash`. 3. Trouver l'ID du processus Python avec `htop -u $USER`. 4. Activer l'environnement virtuel de `py-spy`. 5. Lancer `py-spy top --pid PID` pour une vue en direct ou `py-spy dump --pid PID` pour une trace de l'\u00e9tat du code."
+    "question": "Comment peut-on d\u00e9boguer du code Python ?",
+    "answer": "Le d\u00e9bogage peut \u00eatre r\u00e9alis\u00e9 par des m\u00e9thodes simples comme l'ajout de `print` ou d'`assert`, ou par l'utilisation d'un d\u00e9bogueur comme `pdb`, souvent via une petite t\u00e2che interactive."
+  },
+  {
+    "question": "Comment activer le d\u00e9bogueur `pdb` dans un script Python ?",
+    "answer": "On peut activer `pdb` en ajoutant `import pdb; pdb.set_trace()` au d\u00e9but du fichier ou `breakpoint()` \u00e0 l'endroit appropri\u00e9, puis en ex\u00e9cutant le code."
+  },
+  {
+    "question": "Quelles sont les commandes utiles du d\u00e9bogueur `pdb` ?",
+    "answer": "Les commandes utiles sont:\n- `w` (where): Affiche la trace de la pile d'ex\u00e9cution.\n- `b` (break) `lineno`: Ins\u00e8re un saut (point d'arr\u00eat) au num\u00e9ro de ligne.\n- `s` (step): Ex\u00e9cute la ligne actuelle et s'arr\u00eate \u00e0 la premi\u00e8re occasion.\n- `n` (next): Continue l'ex\u00e9cution jusqu'\u00e0 la ligne suivante de la fonction actuelle.\n- `r` (return): Continue l'ex\u00e9cution jusqu'\u00e0 la fin de la fonction actuelle.\n- `c` (continue): Continue l'ex\u00e9cution et s'arr\u00eate uniquement aux points d'arr\u00eat.\n- `p exp`: \u00c9value et affiche la valeur de l'expression.\n- `l` (list): Affiche le code source du fichier actuel.\n- `q` (quit): Quitte le d\u00e9bogueur et arr\u00eate le programme."
+  },
+  {
+    "question": "Quelles sont les commandes `pdb` g\u00e9n\u00e9ralement utilis\u00e9es pour d\u00e9boguer un fichier ?",
+    "answer": "En g\u00e9n\u00e9ral, on utilise `w`, `s`, `l`, `p`, `n` pour d\u00e9boguer un fichier."
+  },
+  {
+    "question": "O\u00f9 peut-on trouver plus d'informations sur le d\u00e9bogueur Python `pdb` ?",
+    "answer": "Plus d'informations sont disponibles sur la page 'The Python Debugger' (docs.python.org/3/library/pdb.html)."
   }
 ]

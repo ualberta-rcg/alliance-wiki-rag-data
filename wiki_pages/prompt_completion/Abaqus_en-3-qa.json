@@ -1,58 +1,62 @@
 [
   {
-    "question": "How do you specify in an Abaqus input file to write restart data every 12 time increments for a standard analysis temporary directory script?",
-    "answer": "To write restart data every N=12 time increments, specify `*RESTART, WRITE, OVERLAY, FREQUENCY=12` in the input file."
+    "question": "How do you specify writing restart data every N time increments in an Abaqus input file?",
+    "answer": "In the input file, specify `*RESTART, WRITE, OVERLAY, FREQUENCY=12` (replacing 12 with N)."
   },
   {
-    "question": "What input file command is used to write restart data for a total of 12 time increments in a standard analysis temporary directory script?",
-    "answer": "To write restart data for a total of 12 time increments, specify `*RESTART, WRITE, OVERLAY, NUMBER INTERVAL=12, TIME MARKS=NO` in the input file."
+    "question": "How do you specify writing restart data for a total number of time increments?",
+    "answer": "In the input file, specify `*RESTART, WRITE, OVERLAY, NUMBER INTERVAL=12, TIME MARKS=NO` (replacing 12 with the desired total number)."
   },
   {
-    "question": "How can you check for completed restart information in a standard analysis temporary directory job?",
-    "answer": "You can check for completed restart information by running the command `egrep -i \"step|start\" testst*.com testst*.msg testst*.sta`."
+    "question": "How can you check for completed restart information for Abaqus jobs using temporary directory scripts?",
+    "answer": "Run the command `egrep -i \"step|start\" testst*.com testst*.msg testst*.sta`."
   },
   {
-    "question": "What is the Abaqus command line used in the 'temporary directory script' for single node standard analysis?",
-    "answer": "The Abaqus command line is `abaqus job=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim.inp scratch=$SLURM_TMPDIR/scratch cpus=$SLURM_CPUS_ON_NODE interactive mp_mode=threads memory=\"$((${SLURM_MEM_PER_NODE}-3072))MB\"`."
+    "question": "What is the purpose of the `while sleep 6h; do ... done &` block in the temporary directory script?",
+    "answer": "This block is used to periodically save data (copy files) from the temporary directory (`$SLURM_TMPDIR`) to the submission directory (`$SLURM_SUBMIT_DIR`) due to time limits."
   },
   {
-    "question": "How does the temporary directory script handle saving data to prevent loss due to time limits?",
-    "answer": "The script includes a loop (`while sleep 6h; do ... done &`) that periodically copies data (`cp -fv * $SLURM_SUBMIT_DIR`) from the temporary directory to the submission directory."
+    "question": "How is the Abaqus job's memory configured in the provided temporary directory script?",
+    "answer": "The memory is set using `memory=\"$((${SLURM_MEM_PER_NODE}-3072))MB\"`, which subtracts 3072MB from the total node memory."
   },
   {
-    "question": "What is the name of the 'temporary directory restart script' for standard analysis?",
-    "answer": "The name of the temporary directory restart script is `scriptst2.txt`."
+    "question": "How can GPU usage be enabled for an Abaqus job in the temporary directory script?",
+    "answer": "Uncomment the line `# gpus=$SLURM_GPUS_ON_NODE` in the script."
   },
   {
-    "question": "What should the restart input file contain for a standard analysis temporary directory restart job?",
+    "question": "What command line arguments are used to restart an Abaqus job with the temporary directory restart script?",
+    "answer": "The `abaqus` command uses `job=testst2 oldjob=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim-restart.inp`."
+  },
+  {
+    "question": "What must the restart input file contain for a standard analysis job being restarted using a temporary directory restart script?",
     "answer": "The restart input file should contain `*HEADING` and `*RESTART, READ`."
   },
   {
-    "question": "How are files from a previous job made available for a temporary directory restart job?",
-    "answer": "Files from the previous job (`testst1*`) are copied to the `$SLURM_TMPDIR` using `cp testst1* $SLURM_TMPDIR`."
+    "question": "Who should use the multiple node computing scripts for Abaqus Standard Analysis?",
+    "answer": "Users with large memory or compute needs and correspondingly large licenses should use these scripts."
   },
   {
-    "question": "Who is intended to use the multiple node computing scripts for standard analysis?",
-    "answer": "Users with large memory or compute needs and correspondingly large licenses can use the multiple node computing scripts."
+    "question": "What type of parallelization do multiple node computing scripts use for Abaqus Standard Analysis?",
+    "answer": "They use MPI-based computing."
   },
   {
-    "question": "What type of parallelization do the multiple node computing scripts for standard analysis support?",
-    "answer": "These scripts support MPI-based computing over an arbitrary range of nodes."
+    "question": "Are restart scripts available for multi-node Abaqus Standard Analysis jobs?",
+    "answer": "No, a companion template script to perform restart of multi-node jobs is not provided due to additional limitations."
   },
   {
-    "question": "Are restart scripts available for multi-node standard analysis jobs?",
-    "answer": "No, a companion template script to perform restart of multinode jobs is not provided due to additional limitations."
+    "question": "How is the number of cores specified for a multi-node Abaqus job in the Slurm script?",
+    "answer": "The number of cores is specified using `#SBATCH --ntasks=8`."
   },
   {
-    "question": "What is the Abaqus command used for a multi-node MPI-based standard analysis job?",
-    "answer": "The Abaqus command is `abaqus job=testsp1-mpi input=mystd-sim.inp scratch=$SLURM_TMPDIR cpus=$SLURM_NTASKS interactive mp_mode=mpi`."
+    "question": "How is memory per CPU specified for a multi-node Abaqus job in the Slurm script?",
+    "answer": "Memory per CPU is specified using `#SBATCH --mem-per-cpu=4G`."
   },
   {
-    "question": "What is the required value for `#SBATCH --cpus-per-task` in the multi-node standard analysis script?",
-    "answer": "The value for `#SBATCH --cpus-per-task` must be 1 and should not be changed."
+    "question": "Which environment variables are echoed in the multi-node Abaqus script to check license file paths?",
+    "answer": "`LM_LICENSE_FILE` and `ABAQUSLM_LICENSE_FILE` are echoed."
   },
   {
-    "question": "How is the `mp_host_list` generated and exported for multi-node Abaqus jobs?",
-    "answer": "The `slurm_hl2hl.py` script is used to format the Slurm host list, which is then processed into a `mp_host_list` variable and exported, also written to `abaqus_v6.env`."
+    "question": "How does the multi-node Abaqus script for Standard Analysis determine the host list for MPI?",
+    "answer": "It uses `slurm_hl2hl.py --format MPIHOSTLIST` to get the nodes and then constructs `mp_host_list` in `abaqus_v6.env`."
   }
 ]

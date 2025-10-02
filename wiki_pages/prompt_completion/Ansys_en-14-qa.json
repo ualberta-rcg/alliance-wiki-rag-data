@@ -1,38 +1,70 @@
 [
   {
-    "question": "How do you generate an APDL input file from an interactive Workbench Mechanical session?",
-    "answer": "From within your interactive Workbench Mechanical session, click Solution -> Tools -> Write Input Files, then specify File name: YOURAPDLFILE.inp and Save as type: APDL Input Files (*.inp)."
+    "question": "How do you generate an input file for Ansys Mechanical APDL jobs?",
+    "answer": "From within your interactive Workbench Mechanical session, click 'Solution -> Tools -> Write Input Files', then specify a file name like `YOURAPDLFILE.inp` and set 'Save as type' to 'APDL Input Files (*.inp)'."
   },
   {
-    "question": "How are APDL jobs submitted to the queue?",
-    "answer": "APDL jobs can be submitted to the queue by running the `sbatch script-name.sh` command."
+    "question": "How are Ansys Mechanical APDL jobs submitted to the queue?",
+    "answer": "APDL jobs can be submitted to the queue by running the `sbatch script-name.sh` command with a configured Slurm script."
   },
   {
-    "question": "How is Shared Memory Parallel (SMP) or Distributed Memory Parallel (DMP) configured for an Ansys Workbench job in a Slurm script?",
-    "answer": "The `MEMPAR` variable is set to `0` for SMP if `$SLURM_NNODES` is 1, otherwise it is set to `1` for DMP. This value is then used to modify the `SolveHandlers.xml` file."
+    "question": "What is a typical command to run an Ansys Mechanical Shared Memory Parallel (SMP) CPU job within a Slurm script?",
+    "answer": "The command `mapdl -smp -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp` is used within a Slurm script for an SMP CPU job."
   },
   {
-    "question": "What command is used to run an update on an Ansys Workbench project file in a batch script?",
-    "answer": "The command `runwb2 -B -E \"Update()\" -F YOURPROJECT.wbpj` is used to run an update on an Ansys Workbench project file in batch mode."
+    "question": "How do you run an Ansys Mechanical Distributed Memory Parallel (DMP) CPU job on a Beluga cluster?",
+    "answer": "On Beluga, you should include `export KMP_AFFINITY=none` and use the command `mapdl -dis -mpi intelmpi -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp` in your Slurm script."
   },
   {
-    "question": "What are the typical SBATCH parameters for a Shared Memory Parallel (SMP) CPU job in Ansys Mechanical?",
-    "answer": "Typical SBATCH parameters include `--account=def-account`, `--time=00-03:00`, `--mem=32G`, `--nodes=1`, `--tasks=8`, and `--cpus-per-task=1`."
+    "question": "Which MPI implementation is typically used for Ansys Mechanical Distributed Memory Parallel (DMP) CPU jobs on clusters other than Beluga?",
+    "answer": "On clusters other than Beluga, `openmpi` is typically used, with the command `mapdl -dis -mpi openmpi -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp`."
   },
   {
-    "question": "Which MPI implementation does Ansys Mechanical Distributed Memory Parallel (DMP) CPU jobs use on the Beluga cluster?",
-    "answer": "On the Beluga cluster, Ansys Mechanical DMP CPU jobs use Intel MPI (`-mpi intelmpi`). On other clusters, Open MPI is used."
+    "question": "How do you enable GPU acceleration for an Ansys Mechanical Shared Memory Parallel (SMP) job?",
+    "answer": "To enable GPU acceleration for an SMP job, include `#SBATCH --gpus-per-node=1` (or specify type/quantity), set `export ANSGPU_PRINTDEVICES=1`, and use `mapdl -smp -acc nvidia -na $SLURM_GPUS_ON_NODE -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp`."
   },
   {
-    "question": "What `mapdl` command is used for a Shared Memory Parallel (SMP) GPU job in Ansys Mechanical?",
-    "answer": "The `mapdl` command for an SMP GPU job is `mapdl -smp -acc nvidia -na $SLURM_GPUS_ON_NODE -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp`."
+    "question": "What are the default memory allocations for Ansys Mechanical APDL jobs?",
+    "answer": "Ansys allocates 1024 MB total memory and 1024 MB database memory by default for APDL jobs."
   },
   {
-    "question": "What environment variable is exported to print GPU device information for Ansys Mechanical GPU jobs?",
-    "answer": "The environment variable `ANSGPU_PRINTDEVICES=1` is exported to print GPU device information."
+    "question": "How can you manually specify total and database memory for an APDL job?",
+    "answer": "You can manually specify memory by adding arguments `-m <total_memory_MB>` and/or `-db <database_memory_MB>` to the `mapdl` command line in your Slurm script."
   },
   {
-    "question": "How is an output directory created for Ansys Mechanical jobs in the provided Slurm scripts?",
-    "answer": "An output directory is created using `mkdir outdir-$SLURM_JOBID`."
+    "question": "What license-related arguments might be necessary for APDL jobs using a remote institutional license server with multiple Ansys licenses?",
+    "answer": "Depending on the Ansys module, it might be necessary to add `-p aa_r` or `-ppf anshpc` to the `mapdl` command line."
+  },
+  {
+    "question": "How can you determine the Workbench version used to generate an APDL input file?",
+    "answer": "You can find the Workbench version by examining the input file using `cat YOURAPDLFILE.inp | grep version`. The output will show a line indicating the version, for example, `! ANSYS input file written by Workbench version 2019 R3`."
+  },
+  {
+    "question": "Which type of parallel script is generally recommended for Ansys Mechanical APDL jobs?",
+    "answer": "The single node (SMP Shared Memory Parallel) scripts will typically perform better than the multinode (Distributed Memory Parallel) scripts and should be used whenever possible."
+  },
+  {
+    "question": "What is the initial setup required for submitting a Workbench project file to a cluster queue for the first time?",
+    "answer": "First, connect to the cluster via VNC, then navigate to the project directory. Start Workbench with the same Ansys module, open the project, right-click on 'Setup', and select 'Clear All Generated Data'. Finally, exit Workbench and do not save when prompted."
+  },
+  {
+    "question": "How do you prevent a running Workbench job in batch mode from overwriting its solution upon successful completion?",
+    "answer": "To prevent overwriting, remove `;Save(Overwrite=True)` from within the last line of your Slurm script."
+  },
+  {
+    "question": "What is the purpose of the `MEMPAR` variable in a Workbench Slurm script?",
+    "answer": "`MEMPAR` is set to `0` for Shared Memory Parallel (SMP) execution on a single node, and `1` for Distributed Memory Parallel (DMP) execution across multiple nodes."
+  },
+  {
+    "question": "Which configuration file is modified by Workbench Slurm scripts to set parallel processing parameters?",
+    "answer": "The `SolveHandlers.xml` file, found at `~/.mw/Application Data/Ansys/<version>/SolveHandlers.xml`, is modified to configure `Distribute` and `MaxNumberProcessors` settings."
+  },
+  {
+    "question": "What is the command `rm -fv *_files/.lock` used for in Workbench Slurm scripts?",
+    "answer": "This command is used to remove any existing lock files (`.lock`) in the project's data directory, which helps prevent conflicts or startup issues for Workbench."
+  },
+  {
+    "question": "What command launches Ansys Workbench in batch mode to update a project?",
+    "answer": "The command `runwb2 -B -E \"Update()\" -F YOURPROJECT.wbpj` launches Workbench in batch mode to update the specified project file."
   }
 ]

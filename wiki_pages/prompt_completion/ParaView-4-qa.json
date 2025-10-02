@@ -1,46 +1,78 @@
 [
   {
-    "question": "How do you set up an SSH tunnel from your local computer to a Cloud VM for ParaView client-server mode?",
-    "answer": "You can organize an SSH tunnel from the local port 11111 to the VM's port 11111 using the command `ssh centos@vm.ip.address -L 11111:localhost:11111`."
+    "question": "What command is used to start the ParaView server with off-screen rendering on a cluster for large-scale interactive visualization?",
+    "answer": "You would use `srun pvserver --force-offscreen-rendering --opengl-window-backend OSMesa` after loading the ParaView module."
   },
   {
-    "question": "Once the SSH tunnel to a Cloud VM is established, how do you connect the ParaView client?",
-    "answer": "Start the ParaView client on your computer and connect to `localhost:11111`."
+    "question": "What information should be noted from the `pvserver` output when setting up a large-scale interactive visualization?",
+    "answer": "You should note the node name (e.g., `fc30669`) and the port (usually `11111`) from the `Connection URL`."
   },
   {
-    "question": "What message indicates successful SWR rendering when connected to a ParaView server on a Cloud VM?",
-    "answer": "During rendering in the console, you should see the message 'SWR detected AVX2'."
+    "question": "How do you establish an SSH tunnel from your local computer to the compute node for a ParaView client-server connection?",
+    "answer": "In a terminal on your computer, use the command `ssh <username>@fir.alliancecan.ca -L 11111:fc30669:11111`, replacing `fir.alliancecan.ca` with the actual cluster name and `fc30669` with the compute node's name."
   },
   {
-    "question": "What kind of remote desktop is used for interactive visualization with ParaView in JupyterLab?",
-    "answer": "Remote VNC desktop is used for ParaView visualization through JupyterLab, unlike client-server visualizations."
+    "question": "What are the steps to connect the ParaView client on your computer to a remote server running on an HPC cluster?",
+    "answer": "Start ParaView on your computer, go to `File -> Connect` (or click the green `Connect` button). Click `Add Server`, set `name` (e.g., `fir`), `server type` to `Client/Server`, `host` to `localhost`, and `port` to `11111`. Click `Configure`, select `Manual`, and then `Save`. Finally, select the added server from the list and click `Connect`."
   },
   {
-    "question": "What are the steps to start ParaView for visualization within JupyterLab?",
-    "answer": "To start ParaView in JupyterLab, launch a JupyterLab instance through one of the supported options, then load a `paraview` module. A launcher icon for ParaView will then appear, allowing you to start your visualization."
+    "question": "How can you verify that parallel rendering is active when visualizing a dataset with ParaView?",
+    "answer": "You can color your dataset by the `Process Id` variable, which is only available during parallel rendering."
   },
   {
-    "question": "What are the typical resource limits for small interactive visualizations on Nibi's Open OnDemand?",
-    "answer": "Small interactive visualizations on Nibi's Open OnDemand can require up to 256GB memory and 16 cores."
+    "question": "When is it recommended to use off-screen batch visualization instead of interactive client-server mode?",
+    "answer": "For large-scale and automated visualization, such as generating 1,000 frames for a movie, off-screen batch visualization is strongly recommended."
   },
   {
-    "question": "How do you prepare the environment and load ParaView modules on Nibi's Open OnDemand for a VNC remote desktop session?",
-    "answer": "First, connect to `gra-vdi` (as described in TigerVNC) and open a terminal, then run `module load CcEnv`. You can then use `module spider paraview` to see available versions, and `module load StdEnv/2020 gcc/9.3.0 openmpi/4.0.3 paraview/5.11.0` to load the specific modules."
+    "question": "How can ParaView batch production visualization be scripted?",
+    "answer": "ParaView supports Python scripting, allowing you to script your workflow and submit it as a regular, possibly parallel production job on a cluster."
   },
   {
-    "question": "What special command is needed to start recent versions of ParaView on Nibi's Open OnDemand to avoid issues with VirtualGL dynamic linker faker?",
-    "answer": "For recent ParaView versions, you need to disable the VirtualGL dynamic linker faker `LD_PRELOAD` by running `LD_PRELOAD=${LD_PRELOAD/libdlfaker.so/} paraview`."
+    "question": "What is the command to submit a serial ParaView batch job?",
+    "answer": "After loading the ParaView module, use `sbatch serial.sh`, where `serial.sh` is your Slurm job submission script."
   },
   {
-    "question": "What is the recommended approach for large-scale and automated visualization with ParaView?",
-    "answer": "For large-scale and automated visualization, it is strongly recommended to switch from interactive client-server to off-screen batch visualization."
+    "question": "Provide an example of a Slurm script for serial ParaView batch rendering.",
+    "answer": "A `serial.sh` script might look like:\n```sh\n#!/bin/bash\n#SBATCH --time=3:0:0\n#SBATCH --mem-per-cpu=3600\n#SBATCH --account=def-someuser\npvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py\n```"
   },
   {
-    "question": "How can you automate visualization workflows using ParaView?",
-    "answer": "ParaView supports Python scripting, which allows you to script your workflow and submit it as a regular, potentially parallel production job on a cluster."
+    "question": "What is the command to submit a parallel ParaView batch job?",
+    "answer": "After loading the ParaView module, use `sbatch distributed.sh`, where `distributed.sh` is your Slurm job submission script."
   },
   {
-    "question": "Who should be contacted for assistance with batch rendering in ParaView?",
-    "answer": "If you need any help with batch rendering, you should contact Technical support."
+    "question": "Provide an example of a Slurm script for parallel ParaView batch rendering.",
+    "answer": "A `distributed.sh` script might look like:\n```sh\n#!/bin/bash\n#SBATCH --time=3:0:0\n#SBATCH --mem-per-cpu=3600\n#SBATCH --ntasks=4\n#SBATCH --account=def-someuser\nsrun pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py\n```"
+  },
+  {
+    "question": "Why would someone choose to run a ParaView server on a cloud VM instead of a cluster?",
+    "answer": "This less common approach should be used only if you require a custom setup that is not supported by the cluster-installed ParaView."
+  },
+  {
+    "question": "What packages need to be installed on a CentOS VM as prerequisites for compiling ParaView or VisIt?",
+    "answer": "You need to install `xauth wget gcc gcc-c++ ncurses-devel python-devel libxcb-devel`, `patch imake libxml2-python mesa-libGL mesa-libGL-devel`, `mesa-libGLU mesa-libGLU-devel bzip2 bzip2-libs libXt-devel zlib-devel flex byacc`, and create a symbolic link for `glx.h`."
+  },
+  {
+    "question": "Why is OSMesa support required when compiling ParaView for a cloud VM?",
+    "answer": "Since most Arbutus VMs do not have access to a GPU, OSMesa support is needed to enable offscreen (software) rendering."
+  },
+  {
+    "question": "What drivers does the default OSMesa configuration enable for offscreen CPU-based rendering?",
+    "answer": "It enables both `llvmpipe` (older and slower) and `SWR` (newer and faster) drivers."
+  },
+  {
+    "question": "Which driver is recommended for offscreen CPU-based rendering with OSMesa?",
+    "answer": "SWR (Intel's software rasterization library) is recommended."
+  },
+  {
+    "question": "What command starts the ParaView server on a VM with SWR rendering?",
+    "answer": "The command is `./paraview/bin/pvserver --force-offscreen-rendering --opengl-window-backend OSMesa`."
+  },
+  {
+    "question": "How do you set up an SSH tunnel from your local computer to a VM for ParaView client-server visualization?",
+    "answer": "On your computer, use `ssh centos@vm.ip.address -L 11111:localhost:11111` to organize an SSH tunnel from local port 11111 to the VM's port 11111."
+  },
+  {
+    "question": "What message should you expect to see in the console on the VM during rendering if SWR is detected?",
+    "answer": "You should see the message `SWR detected AVX2`."
   }
 ]

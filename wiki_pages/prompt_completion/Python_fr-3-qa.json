@@ -1,30 +1,46 @@
 [
   {
-    "question": "Quelle est la recommandation pour la cr\u00e9ation d'environnements virtuels sur Trillium ?",
-    "answer": "Sur Trillium, il est recommand\u00e9 de cr\u00e9er un environnement virtuel sur un n\u0153ud de connexion dans /home et de l'activer (avec source) dans le script de la t\u00e2che."
+    "question": "What is the recommended approach for creating a virtual environment on Trillium?",
+    "answer": "On Trillium, it is recommended to create a virtual environment on a login node in /home and activate this environment (with `source`) in the job script."
   },
   {
-    "question": "Pourquoi le lancement de Python et le chargement d'un environnement virtuel peuvent-ils \u00eatre lents sur les syst\u00e8mes de fichiers parall\u00e8les ?",
-    "answer": "Les syst\u00e8mes de fichiers parall\u00e8les sont tr\u00e8s efficaces pour lire ou \u00e9crire de grandes portions de donn\u00e9es, mais pas pour une utilisation intensive de petits fichiers, ce qui peut ralentir le lancement de Python et le chargement d'un environnement virtuel."
+    "question": "Why can launching Python software and loading libraries be slow on parallel file systems?",
+    "answer": "Parallel file systems are very efficient for reading or writing large data portions, but not for intensive use of small files, which causes slowdowns when launching Python and loading a virtual environment."
   },
   {
-    "question": "Comment peut-on contrer le ralentissement du chargement d'un environnement virtuel Python pour les t\u00e2ches sur un seul n\u0153ud ?",
-    "answer": "Pour les t\u00e2ches Python sur un n\u0153ud unique, vous pouvez cr\u00e9er votre environnement virtuel \u00e0 l'int\u00e9rieur de votre t\u00e2che en utilisant le disque local du n\u0153ud de calcul."
+    "question": "How can slowdowns for Python tasks on a single compute node be mitigated?",
+    "answer": "To counter slowdowns, especially for Python tasks on a single compute node, you can create your virtual environment inside your task using the local disk of the compute node."
   },
   {
-    "question": "Est-il plus efficace de recr\u00e9er un environnement virtuel localement pour chaque t\u00e2che ?",
-    "answer": "Il peut sembler d\u00e9raisonnable de recr\u00e9er votre environnement pour chacune de vos t\u00e2ches, mais c'est souvent plus rapide et plus efficace que d'utiliser le syst\u00e8me de fichiers parall\u00e8les, car l'acc\u00e8s \u00e0 virtualenv se fait par n\u0153ud."
+    "question": "Is it efficient to recreate a virtual environment for each task on a compute node?",
+    "answer": "It can be more efficient and often faster to recreate your virtual environment for each task on the local disk of the compute node than to use the parallel file system, even if it seems unreasonable."
   },
   {
-    "question": "Quel est le but du fichier `requirements.txt` dans l'exemple de script ?",
-    "answer": "Le fichier `requirements.txt` est cr\u00e9\u00e9 dans un environnement de test et contient la liste des paquets et de leurs versions, permettant ainsi de reproduire l'environnement pour les autres t\u00e2ches."
+    "question": "Where should a virtualenv be created when a task utilizes multiple nodes?",
+    "answer": "A virtualenv must be created locally on each of the nodes used by the task, as access to virtualenv is per node."
   },
   {
-    "question": "Comment cr\u00e9er un fichier `requirements.txt` pour un environnement TensorFlow ?",
-    "answer": "Chargez `python/3.11`, cr\u00e9ez un environnement virtuel temporaire, activez-le, mettez \u00e0 jour pip, installez tensorflow, puis utilisez `pip freeze --local > requirements.txt`, d\u00e9sactivez l'environnement et supprimez le r\u00e9pertoire temporaire."
+    "question": "Can you provide an example of a job script for creating a virtual environment within a task?",
+    "answer": "An example script named `submit_venv.sh` would include commands like `module load python/3.11`, `virtualenv --no-download $SLURM_TMPDIR/env`, `source $SLURM_TMPDIR/env/bin/activate`, `pip install --no-index --upgrade pip`, and `pip install --no-index -r requirements.txt`, followed by the Python execution."
   },
   {
-    "question": "Que faire si les paquets Python requis ne sont pas disponibles via les wheels Python fournis ?",
-    "answer": "Si les paquets ne sont pas disponibles via les wheels Python fournis, vous pouvez les pr\u00e9t\u00e9l\u00e9charger ou faire une demande au soutien technique."
+    "question": "What is the purpose of the `requirements.txt` file when creating a virtual environment inside a job?",
+    "answer": "The `requirements.txt` file ensures that your environment can be reproduced for other tasks by listing all required packages and their specific versions."
+  },
+  {
+    "question": "How do you create a `requirements.txt` file for a package like TensorFlow from a login node?",
+    "answer": "To create a `requirements.txt` for TensorFlow, you would load `python/3.11`, create a temporary virtual environment (`virtualenv --no-download $ENVDIR`), activate it, upgrade pip, install tensorflow (`pip install --no-index tensorflow`), then use `pip freeze --local > requirements.txt` before deactivating and removing the temporary environment."
+  },
+  {
+    "question": "What kind of content would typically be found in a `requirements.txt` file generated for TensorFlow?",
+    "answer": "A `requirements.txt` file generated for TensorFlow would list various packages and their specific versions, such as `absl_py==1.2.0+computecanada`, `tensorflow==2.9.0+computecanada`, `numpy==1.23.0+computecanada`, etc."
+  },
+  {
+    "question": "What condition must be met for the virtual environment creation directives to work for all required packages?",
+    "answer": "The directives for creating virtual environments in tasks require that all packages you need are available in the Python wheels provided by the system."
+  },
+  {
+    "question": "What should be done if a required package is not available as a pre-built wheel?",
+    "answer": "If a required package is not available in the provided wheels, you can pre-download it following the 'Pr\u00e9t\u00e9l\u00e9charger des paquets' procedure, or make a request to technical support if you believe the wheel should be provided."
   }
 ]

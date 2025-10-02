@@ -1,46 +1,70 @@
 [
   {
-    "question": "How do you determine the TCP port your VNC server is listening on after starting it on a login node?",
-    "answer": "You can determine the port by running `grep -iE \"\\sport|kill\" /home/yourusername/.vnc/l4.nibi.sharcnet:1.log` on the login node, which will show output like 'Listening for VNC connections on TCP port 5901'."
+    "question": "When should you start a VNC server on a compute node?",
+    "answer": "You can start a VNC server on a compute node when VDI login nodes are unavailable."
   },
   {
-    "question": "Will a VNC server continue to run on a login node if you exit the node?",
-    "answer": "Yes, you may exit the login node, and your vncserver will continue running until the time limit you assigned with the `-idletimeout` option is reached."
+    "question": "What are the limitations of using a VNC server on a compute node?",
+    "answer": "Using a VNC server on a compute node does not provide a full graphical desktop or hardware-accelerated OpenGL."
   },
   {
-    "question": "How do you start an SSH tunnel from your desktop to a VNC server on a login node, forwarding a local port?",
-    "answer": "On your desktop, you can start an SSH tunnel using a command like `ssh nibi.computecanada.ca -L 5905:l4:5901`, where 5905 is the arbitrary local port and 5901 is the VNC server's listening port on the login node (l4 in this example)."
+    "question": "What is the first step to starting a VNC server on a compute node?",
+    "answer": "Before starting your VNC server, you must log into a cluster (such as nibi) and create a compute node allocation using the `salloc` command."
   },
   {
-    "question": "After setting up an SSH tunnel, how do you connect to the VNC server from a Linux desktop's command line?",
-    "answer": "You connect by running `vncviewer localhost:5905` on your desktop, using the local forwarded port (5905 in this example)."
+    "question": "What is the time limit for a compute node allocation created with `salloc`?",
+    "answer": "A 24-hour time limit applies to compute node allocations created with `salloc`."
   },
   {
-    "question": "How do Mac or Windows users connect to a VNC server via a forwarded port using TigerVNC Viewer?",
-    "answer": "Mac or Windows users can click the TigerVNC Viewer application icon on their desktop and enter `localhost:5905` (or the respective forwarded port) in the 'Connection Details' dialogue box that appears."
+    "question": "How do you request an interactive job with specific resources using `salloc`?",
+    "answer": "To request an interactive job, you can use a command like `salloc --time=1:00:00 --cpus-per-task=4 --mem=16000 --account=def-piusername`."
   },
   {
-    "question": "What are the typical memory and CPU limits on Graham's cluster login nodes?",
-    "answer": "On Graham, cluster login nodes have strict memory and cputime limits, typically 8GB of memory and 1 cpu-hour per process, though other clusters may vary."
+    "question": "What environment variable needs to be set after an interactive job starts on a compute node to avoid desktop errors?",
+    "answer": "You should set the `XDG_RUNTIME_DIR` environment variable to `${SLURM_TMPDIR}` to avoid repetitive desktop errors."
   },
   {
-    "question": "When should you consider running a VNC server on a cluster compute node instead of a login node?",
-    "answer": "You should run a VNC server on a cluster compute node if VDI login nodes are unavailable, or if you require more resources (memory, cputime) than the strict limits imposed on cluster login nodes."
+    "question": "What command is used to start the VNC server itself on a compute node?",
+    "answer": "You use the `vncserver` command to start the VNC server on a compute node."
   },
   {
-    "question": "What is the first step to start a VNC server on a compute node?",
-    "answer": "The first step is to log into a cluster (e.g., nibi) and create a compute node allocation using the `salloc` command. For example: `salloc --time=1:00:00 --cpus-per-task=4 --mem=16000 --account=def-piusername`."
+    "question": "What happens the first time you start a VNC server, and what is an important security consideration?",
+    "answer": "The first time you start a VNC server, you will be prompted to set a password. It is crucial NOT to leave this blank, as doing so would allow anyone to connect and access your account files."
   },
   {
-    "question": "What environment variable should be set after an interactive job starts on a compute node to avoid desktop errors for VNC?",
-    "answer": "You should set `export XDG_RUNTIME_DIR=${SLURM_TMPDIR}` once your interactive job has started on the compute node."
+    "question": "How can you change the VNC server password after it has been set?",
+    "answer": "You may change the password later using the `vncpasswd` command."
   },
   {
-    "question": "How do you start a VNC server on a compute node?",
-    "answer": "After logging into a compute node and setting the `XDG_RUNTIME_DIR` environment variable, you can start a VNC server by simply running the `vncserver` command. The first time, you will be prompted to set a password."
+    "question": "How do you determine which port your VNC server is listening on?",
+    "answer": "You can determine the port your VNC server is listening on by running the `grep` command on the log file, for example: `grep -iE \"\\sport|kill\" /home/yourusername/.vnc/c48.nibi.sharcnet:1.log`."
   },
   {
-    "question": "What is important to remember when setting a password for a new VNC server?",
-    "answer": "It is crucial NOT to leave the VNC server password blank, as doing so would allow anyone to connect to it and gain access to the files in your account. The password can be changed later using the `vncpasswd` command."
+    "question": "What is the purpose of setting up an SSH tunnel to the VNC server?",
+    "answer": "Setting up an SSH tunnel creates a secure \"bridge\" from your laptop to the compute node where your vncserver is running."
+  },
+  {
+    "question": "What is the recommended SSH tunnel command for clusters other than `nibi`?",
+    "answer": "For all clusters except `nibi`, the recommended SSH tunnel command is `ssh username@clustername -L localforwardedport:computnode:remotelisteningport`."
+  },
+  {
+    "question": "Provide an example of an SSH tunnel command for a `rorqual` compute node.",
+    "answer": "An example SSH tunnel command for a `rorqual` compute node is `ssh username@rorqual.alliancecan.ca -L 5905:rc12509:5901`."
+  },
+  {
+    "question": "What is the new form of the SSH tunnel command required for the `nibi` cluster?",
+    "answer": "For `nibi`, the new form of the tunnel command is `ssh -J username@clustername -L localforwardedport:localhost:remotelisteningport computenode`."
+  },
+  {
+    "question": "What additional setup is required on your laptop for the `nibi` specific SSH tunnel command?",
+    "answer": "An SSH key pair must be created on your laptop, and the contents of the public key must be entered into your `~/.ssh/authorized_keys` file on `nibi`."
+  },
+  {
+    "question": "Can the `nibi`-specific SSH tunnel command (`ssh -J`) be used on other clusters?",
+    "answer": "Yes, the `nibi`-specific SSH tunnel approach (`ssh -J`) will also work on any other cluster."
+  },
+  {
+    "question": "Provide an example of an SSH tunnel command for the `nibi` cluster, assuming `c48` is the compute node and `5905` is the local port.",
+    "answer": "The tunnel command for `nibi` would be `ssh -J username@nibi.alliancecan.ca -L 5905:localhost:5901 c48`."
   }
 ]

@@ -1,82 +1,130 @@
 [
   {
-    "question": "What is the purpose of the 'Remote Render Threshold' setting in ParaView?",
-    "answer": "The 'Remote Render Threshold' setting determines where rendering will be performed. If set to a default (e.g., 20MB), small renderings happen on your local GPU, while anything modestly intensive is shipped to the remote cluster. If set to 0MB, all rendering, including rotations, is done remotely using cluster resources."
+    "question": "What is the primary purpose of this page?",
+    "answer": "This page describes remote visualization of datasets residing on Alliance's HPC clusters using ParaView."
   },
   {
-    "question": "How does setting the 'Remote Render Threshold' to a default value (e.g., 20MB) affect ParaView's rendering behavior?",
-    "answer": "If the 'Remote Render Threshold' is set to default (e.g., 20MB), small rendering tasks will be handled by your computer's GPU, making mouse rotations fast. However, anything under the threshold (modestly intensive) will be sent to the remote computer, which might result in slow visualization depending on your connection."
+    "question": "What are the three main workflow scenarios for remote visualization with ParaView on the clusters?",
+    "answer": "The three main workflow scenarios are: small-scale interactive visualization, large-scale interactive visualization (client-server setup), and batch production visualization."
   },
   {
-    "question": "What is the impact of setting the 'Remote Render Threshold' to 0MB in ParaView?",
-    "answer": "Setting the 'Remote Render Threshold' to 0MB ensures that all rendering, including rotations, is performed remotely on the cluster. This is beneficial for large data processing as it fully utilizes cluster resources, but it may reduce interactivity."
+    "question": "When should the 'Small-scale interactive visualization' workflow be used?",
+    "answer": "This workflow should be used if your dataset is only a few GBs (either the entire dataset or each timestep in a time-dependent simulation), allowing for interactive visualization using a small number of CPU cores."
   },
   {
-    "question": "What is a key compatibility requirement for ParaView client-server connections?",
-    "answer": "ParaView requires the same major version on the local client and the remote host to prevent incompatibility, which typically manifests as a failed handshake during connection establishment."
+    "question": "How is small-scale interactive visualization typically performed?",
+    "answer": "It's performed by starting a remote desktop session through JupyterHub or Open OnDemand and running ParaView interactively inside it."
   },
   {
-    "question": "What happens if the ParaView client and server major versions do not match?",
-    "answer": "If the ParaView client and server major versions do not match, it can lead to incompatibility, typically showing as a failed handshake when trying to establish the client-server connection."
+    "question": "What is the recommended setup for interactively visualizing a larger dataset?",
+    "answer": "A client-server setup is recommended, where the ParaView client runs on your computer, and the server runs in parallel inside a Slurm job on the HPC cluster."
   },
   {
-    "question": "Which types of rendering are supported on Fir, Nibi, Rorqual, and Narval clusters for client-server visualization?",
-    "answer": "On Fir, Nibi, Rorqual, and Narval, client-server rendering can be done on both CPUs (in software) and GPUs (with hardware acceleration)."
+    "question": "What defines a 'large' dataset on the Trillium cluster for client-server visualization?",
+    "answer": "On Trillium, 'large' means a dataset of 50\u2013100 GB to efficiently utilize whole-node jobs in multiples of 192 cores."
   },
   {
-    "question": "What is the recommended starting approach for visualization on Fir, Nibi, Rorqual, and Narval due to GPU complexities?",
-    "answer": "Due to additional complications with GPU rendering, it is strongly recommended to start with CPU-only visualization on these clusters."
+    "question": "How do other clusters (Rorqual, Nibi, Fir, Narval) differ from Trillium regarding large dataset visualization?",
+    "answer": "On other clusters like Rorqual, Nibi, Fir, and Narval, you can schedule by core, making it possible to visualize much smaller datasets, even on a single core, with more cores speeding up rendering."
   },
   {
-    "question": "How can you estimate the number of cores needed for CPU-only visualization on these clusters?",
-    "answer": "You can estimate the number of necessary cores by dividing the amount of memory required for your rendering by approximately 3.5 GB/core. For example, a 40GB dataset would need at least 12 cores."
+    "question": "When is JupyterHub or Open OnDemand generally recommended over a client-server configuration for interactive visualization?",
+    "answer": "JupyterHub or Open OnDemand is generally recommended for smaller datasets before attempting a more complex client-server configuration."
   },
   {
-    "question": "What is the recommended maximum memory allocation per core for software rendering?",
-    "answer": "For software rendering, it is not recommended to allocate more than 4GB/core."
+    "question": "What is the recommended approach for production visualizations, such as generating movies?",
+    "answer": "All production visualizations should ideally be scripted and run as batch, off-screen jobs on the clusters, rendering directly to files without interactive windows."
   },
   {
-    "question": "Why is it important to allocate additional memory for filters and data processing in ParaView?",
-    "answer": "It's important to allocate additional memory for filters and data processing because operations like a structured to unstructured dataset conversion can significantly increase your memory footprint (e.g., by ~3X)."
+    "question": "How can interactive GUI workflows be used for batch production visualization?",
+    "answer": "Interactive GUI workflows can be used as steps to set up the visualization and save it as a ParaView Python script, which can then be executed as a batch job."
   },
   {
-    "question": "What should you do if your ParaView server terminates during data processing?",
-    "answer": "If your ParaView server gets killed when processing data, you will need to increase the number of allocated cores."
+    "question": "Are H100 GPUs recommended for visualization on the clusters, and why or why not?",
+    "answer": "No, H100 GPUs are not recommended because they are not optimized for graphics rendering, utilizing only a small fraction of their thread controllers, leading to poor cluster utilization and slow rendering speeds."
   },
   {
-    "question": "What CPU-based libraries are mentioned as offering performance similar to GPU-based rendering for some ParaView tasks?",
-    "answer": "Modern CPU-based libraries such as OSPRay and OpenSWR are mentioned as offering performance quite similar to GPU-based rendering for some types of rendering."
+    "question": "What is the GPU utilization of H100 cards when running OpenGL and Vulkan applications for visualization?",
+    "answer": "H100 cards utilize roughly 3% GPU utilization for such applications, as they use only 2 of the 66 on-board thread controllers."
   },
   {
-    "question": "How does the ParaView server utilize MPI for large datasets with CPU-based visualization?",
-    "answer": "The ParaView server uses MPI for distributed-memory processing, allowing parallel rendering of very large datasets on a large number of CPU cores, either on a single node or across multiple nodes."
+    "question": "Can MIGs (static GPU partitions) run graphics APIs like OpenGL or Vulkan?",
+    "answer": "No, MIGs (static GPU partitions) cannot run graphics APIs such as OpenGL or Vulkan."
   },
   {
-    "question": "What is the first step to set up CPU-based client-server visualization on Fir or Nibi?",
-    "answer": "First, you need to install the same ParaView version on your local computer as available on the cluster, then log into Fir or Nibi and start a serial CPU interactive job."
+    "question": "If GPU rendering is absolutely necessary, which GPUs are recommended?",
+    "answer": "If GPU rendering is absolutely necessary, Nibi's AMD MI300A nodes or older NVIDIA GPUs (e.g., T4) should be used where available."
   },
   {
-    "question": "How do you start a serial CPU interactive job on Fir or Nibi?",
-    "answer": "You can start a serial CPU interactive job using the command: `salloc --time=1:00:0 --ntasks=1 --mem-per-cpu=3600 --account=def-someprof`."
+    "question": "What is described in the 'Small-scale interactive' tab?",
+    "answer": "The 'Small-scale interactive' tab describes interactive visualization through remote desktop via JupyterHub and Open OnDemand."
   },
   {
-    "question": "After starting an interactive job, how do you load the ParaView module and start the server for CPU-based visualization?",
-    "answer": "Inside your job, you load the ParaView module with `module load paraview/5.13.1` and then start the server using `pvserver --force-offscreen-rendering`."
+    "question": "Which clusters use JupyterLab for small-scale interactive visualization?",
+    "answer": "Fir, Rorqual, and Narval use JupyterLab for small-scale interactive visualization."
   },
   {
-    "question": "What information should you note from the `pvserver` output to establish a client connection?",
-    "answer": "You should note the node name (e.g., fc30107) and the port number (usually 11111) displayed in the `pvserver` output under 'Connection URL'."
+    "question": "Which clusters use Open OnDemand for small-scale interactive visualization?",
+    "answer": "Nibi and Trillium use Open OnDemand for small-scale interactive visualization."
   },
   {
-    "question": "How do you set up an SSH tunnel from your local computer to the compute node for ParaView client-server connection?",
-    "answer": "You open another terminal on your computer (Mac/Linux or terminal emulator on Windows) and use the command: `ssh <username>@fir.alliancecan.ca -L 11111:fc30107:11111`, replacing `<username>` and `fc30107` with your actual username and compute node."
+    "question": "What is the first step to launch a single-core ParaView visualization via JupyterLab on Fir?",
+    "answer": "The first step is to sign in to https://jupyterhub.fir.alliancecan.ca with your Alliance account."
   },
   {
-    "question": "How do you configure the ParaView client on your computer to connect to the remote server?",
-    "answer": "Start ParaView, go to 'File -> Connect' (or click the green 'Connect' button), then 'Add Server'. Set name = fir, server type = Client/Server, host = localhost, port = 11111. Click 'Configure', select 'Manual', and 'Save'."
+    "question": "What selections should be made in the JupyterHub job submission form for single-core visualization?",
+    "answer": "You should select one of the CPU accounts, 'None' for GPU configuration, '1' for Number of Cores, set your required Time and Memory, and select 'JupyterLab' under User interface."
   },
   {
-    "question": "How can you confirm that your ParaView client has successfully connected to the remote server?",
-    "answer": "After selecting the server from the list and clicking 'Connect' in your ParaView client, the first terminal window where `pvserver` was running (which initially read 'Accepting connection') will change to 'Client connected'."
+    "question": "How do you load ParaView modules within a JupyterLab session for single-core visualization?",
+    "answer": "On the left-hand side, under Software Modules, load 'boost/1.85.0' module and then 'paraview/6.0.0' module."
+  },
+  {
+    "question": "What are two ways to start ParaView after loading modules in a JupyterLab remote desktop?",
+    "answer": "You can either click on the ParaView VNC button that appears, or open a terminal inside the desktop and type `module load boost/1.85.0 paraview/6.0.0` followed by `paraview`."
+  },
+  {
+    "question": "Can the ParaView GUI application directly use multiple cores?",
+    "answer": "No, the ParaView GUI application itself is single-threaded and cannot directly use multiple cores."
+  },
+  {
+    "question": "How is true parallel rendering achieved with ParaView?",
+    "answer": "True parallel rendering requires connecting the single-core ParaView client to a parallel ParaView server."
+  },
+  {
+    "question": "How do you request resources for multi-core visualization in JupyterHub settings?",
+    "answer": "In JupyterHub settings, you select your desired number of cores (e.g., 4) under 'Number of Cores' and scale your memory request accordingly (e.g., 14400 MB for 4 cores)."
+  },
+  {
+    "question": "What command is used to start a parallel ParaView server with 4 cores within a JupyterHub remote desktop session?",
+    "answer": "After loading modules, the command is `mpirun --oversubscribe -np 4 pvserver`."
+  },
+  {
+    "question": "What is the 'Connection URL' output by the ParaView server when started in parallel?",
+    "answer": "The connection URL will be similar to `cs://fc30669:11111`, indicating the host and port for the client connection."
+  },
+  {
+    "question": "How do you connect the ParaView GUI client to the remote parallel server from within the same JupyterHub session?",
+    "answer": "In ParaView GUI, click 'Connect', then 'Add Server', select 'Server Type = Client/Server', set 'Host = localhost', 'Port = 11111', 'Startup Type = Manual', and then click 'Connect' again."
+  },
+  {
+    "question": "How can you verify that you are performing parallel rendering?",
+    "answer": "You can verify parallel rendering by coloring your dataset by the 'Process Id' variable, which is unavailable when running in serial."
+  },
+  {
+    "question": "What are the portals for Open OnDemand on Nibi and Trillium?",
+    "answer": "The portal for Nibi is https://ondemand.sharcnet.ca and for Trillium is https://ondemand.scinet.utoronto.ca/pun/sys/dashboard."
+  },
+  {
+    "question": "How do you access the Desktop on Nibi's Open OnDemand portal?",
+    "answer": "After logging in, find 'Desktop' in the menu, specifically under 'Compute Nodes | Nibi Desktop'."
+  },
+  {
+    "question": "What command is used to launch ParaView for single-core visualization within an Open OnDemand desktop session?",
+    "answer": "Inside the desktop, open a terminal and type `module load paraview/6.0.0` followed by `paraview`."
+  },
+  {
+    "question": "What are the resource limits for multi-core visualization on Nibi's Open OnDemand?",
+    "answer": "On Nibi's Open OnDemand, you can ask for up to 128GB memory and up to 8 cores."
   }
 ]

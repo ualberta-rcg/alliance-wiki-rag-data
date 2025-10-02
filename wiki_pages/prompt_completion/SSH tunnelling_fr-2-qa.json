@@ -1,54 +1,82 @@
 [
   {
-    "question": "What is the function of the SSH command `ssh -L 8888:cdr544.int.cedar.computecanada.ca:8888 someuser@cedar.computecanada.ca`?",
-    "answer": "This command redirects connections from local port 8888 to port 8888 on `cdr544.int.cedar.computecanada.ca`, which is designated as the remote port."
+    "question": "How is the `MLM_LICENSE_FILE` environment variable typically set when using an SSH tunnel for a license server?",
+    "answer": "It is often set as `export MLM_LICENSE_FILE=COMPUTEPORT@localhost`, where `COMPUTEPORT` is the local port used for the tunnel."
   },
   {
-    "question": "Are the local and remote port numbers required to be identical when setting up an SSH tunnel?",
-    "answer": "No, it is not necessary for the numbers to be identical, but it is a convention that allows for easy identification of the local and remote ports."
+    "question": "What is the purpose of the provided example job script for license servers?",
+    "answer": "The script sets up an SSH tunnel to connect to `licenseserver.institution.ca` on port 9999."
   },
   {
-    "question": "How should an application's URL be modified after an SSH tunnel is established, for example, after launching Jupyter Notebook in Session 1?",
-    "answer": "Modify the URL by replacing the node name with `localhost`."
+    "question": "How does the example job script determine the local port for the SSH tunnel?",
+    "answer": "It randomly selects a port between 1024 and 65535, attempting up to 10 times to establish the tunnel."
   },
   {
-    "question": "Provide an example of a modified URL for Jupyter Notebook after an SSH tunnel is set up.",
-    "answer": "An example URL would be `http://localhost:8888/?token=7ed7059fad64446f837567e32af8d20efa72e72476eb72ca`."
+    "question": "What commands are used in the example script to establish the SSH tunnel and configure the license file environment variable?",
+    "answer": "`ssh tri-gw -L $LOCALPORT:$REMOTEHOST:$REMOTEPORT -N -f` for the tunnel and `export MLM_LICENSE_FILE=$LOCALPORT@$LOCALHOST` for the license file."
   },
   {
-    "question": "How do you create an SSH tunnel from your computer to a PostgreSQL server on Cedar?",
-    "answer": "Use the command `ssh -L PORT:cedar-pgsql-vm.int.cedar.computecanada.ca:5432 someuser@cedar.computecanada.ca`."
+    "question": "What is the primary purpose of setting up an SSH tunnel to an application running on a compute node?",
+    "answer": "To connect a user's computer to a compute node in a cluster, allowing transparent display of visualizations, Jupyter Notebook graphics, or access to database servers."
   },
   {
-    "question": "How do you create an SSH tunnel from your computer to a MySQL server on Cedar?",
-    "answer": "Use the command `ssh -L PORT:cedar-mysql-vm.int.cedar.computecanada.ca:3306 someuser@cedar.computecanada.ca`."
+    "question": "Which clusters are mentioned as performing Network Address Translation (NAT) for compute nodes to access the Internet?",
+    "answer": "Nibi and Fir perform NAT (network address translation) for users to access the Internet from compute nodes."
   },
   {
-    "question": "What does `PORT` signify in the SSH commands for connecting to database servers?",
-    "answer": "`PORT` refers to the port number on your local computer."
+    "question": "What Python package is recommended for setting up an SSH tunnel from Linux or MacOS X?",
+    "answer": "The Python package `sshuttle` is recommended."
   },
   {
-    "question": "What is the maximum allowed value for the `PORT` number used in SSH tunnels for database connections?",
-    "answer": "The `PORT` number must be less than 32768 (2^15)."
+    "question": "What command should be executed in a new terminal window on Linux or MacOS X to use `sshuttle`?",
+    "answer": "You should launch the command `sshuttle --dns -Nr userid@machine_name`."
   },
   {
-    "question": "What does `someuser` refer to in the SSH commands for creating database tunnels?",
-    "answer": "`someuser` is the username associated with your account."
+    "question": "What should a user do after launching the `sshuttle` command for an application like Jupyter Notebook?",
+    "answer": "Copy and paste the application's URL, which includes a token, into their browser."
   },
   {
-    "question": "After establishing an SSH tunnel, how do you connect to a PostgreSQL server from your personal computer?",
-    "answer": "Execute the command `psql -h 127.0.0.1 -p PORT -U <your username> -d <your database>` on your personal computer."
+    "question": "What tool can be used to create an SSH tunnel from Windows?",
+    "answer": "An SSH tunnel can be created with MobaXTerm."
   },
   {
-    "question": "After establishing an SSH tunnel, how do you connect to a MySQL server from your personal computer?",
-    "answer": "Execute the command `mysql -h 127.0.0.1 -P PORT -u <your username> --protocol=TCP -p` on your personal computer."
+    "question": "How many MobaXterm sessions are typically launched to set up a tunnel from Windows, and what is the role of each?",
+    "answer": "Two sessions are launched: Session 1 for connecting to the cluster and launching the task (to get the application URL), and Session 2 for setting up the SSH tunnel locally."
   },
   {
-    "question": "Is a password required for MySQL connections through an SSH tunnel, and if so, where is it found?",
-    "answer": "Yes, a password is required for MySQL. It is located in the `.my.cnf` file in your Cedar home directory."
+    "question": "What information is typically obtained from Session 1 when using MobaXterm for tunneling an application like Jupyter Notebook?",
+    "answer": "An URL containing the name and port of the host node, such as `fc3281.int.fir.alliancecan.ca:8888`."
   },
   {
-    "question": "How long is the database connection maintained when using an SSH tunnel?",
-    "answer": "The database connection is maintained as long as the SSH connection is active."
+    "question": "What command is used in MobaXterm's Session 2 to set up an SSH tunnel for an application?",
+    "answer": "You would use a command like `ssh -L 8888:fc3281.int.fir.alliancecan.ca:8888 someuser@fir.alliancecan.ca`, replacing the node name with the URL obtained from Session 1."
+  },
+  {
+    "question": "What modification is required for the application URL obtained in MobaXterm's Session 1 before it can be used in a browser?",
+    "answer": "The node name in the URL must be replaced with `localhost`."
+  },
+  {
+    "question": "What commands are used to create an SSH tunnel from a local computer to PostgreSQL and MySQL servers on Fir?",
+    "answer": "For PostgreSQL: `ssh -L PORT:cedar-pgsql-vm.int.cedar.computecanada.ca:5432 someuser@fir.alliancecan.ca`. For MySQL: `ssh -L PORT:cedar-mysql-vm.int.cedar.computecanada.ca:3306 someuser@fir.alliancecan.ca`."
+  },
+  {
+    "question": "What is the requirement for the `PORT` number when creating an SSH tunnel to a database server on Fir?",
+    "answer": "The value of the `PORT` number must be less than 32768 (2^15)."
+  },
+  {
+    "question": "How do you connect to a PostgreSQL server locally after setting up an SSH tunnel?",
+    "answer": "Use the command `psql -h 127.0.0.1 -p PORT -U <your username> -d <your database>`."
+  },
+  {
+    "question": "How do you connect to a MySQL server locally after setting up an SSH tunnel?",
+    "answer": "Use the command `mysql -h 127.0.0.1 -P PORT -u <your username> --protocol=TCP -p`."
+  },
+  {
+    "question": "Where can the MySQL password be found when connecting to a MySQL server on Fir?",
+    "answer": "The MySQL password is in the `.my.cnf` file located in your `/home` directory on Fir."
+  },
+  {
+    "question": "How long is the connection to the database maintained after setting up an SSH tunnel?",
+    "answer": "The connection to the database is maintained as long as the SSH connection is active."
   }
 ]

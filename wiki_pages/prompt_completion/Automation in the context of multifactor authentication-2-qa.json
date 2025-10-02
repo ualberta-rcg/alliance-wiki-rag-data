@@ -1,46 +1,62 @@
 [
   {
-    "question": "What is the test command to troubleshoot SSH connection difficulties to an automation node and get verbose output?",
-    "answer": "To troubleshoot, use the command: `ssh -i ~/.ssh/automation_key -vvv username@robot.rorqual.alliancecan.ca \"ls -l\"`."
+    "question": "How can I troubleshoot SSH connection difficulties to an automation node?",
+    "answer": "You can use the test command `ssh -i ~/.ssh/automation_key -vvv username@robot.rorqual.alliancecan.ca \"ls -l\"` to connect to the Rorqual automation node and execute `ls -l`."
   },
   {
-    "question": "What is the purpose of the `-vvv` option in the SSH test command for automation nodes?",
-    "answer": "The `-vvv` option enables \"Very Very Verbose\" debug output, which is useful for identifying connection problems."
+    "question": "What is the purpose of the `-vvv` option in the SSH test command?",
+    "answer": "The `-vvv` option stands for \"Very Very Verbose\" and produces a lot of debug output, which is useful for identifying connection problems."
   },
   {
-    "question": "How can you identify if your SSH client is using IPv4 or IPv6 from the debug output of the test command?",
-    "answer": "Look for the \"Connecting to...\" message. If it shows an IP like `[199.241.166.5]`, IPv4 is being used. If it shows an IP like `[2620:123:7002:4::5]`, then IPv6 is being used."
+    "question": "How can I determine if my SSH client is using IPv4 or IPv6 when connecting to an automation node?",
+    "answer": "After running the `ssh -vvv` command, look for the 'Connecting to...' message in the debug output. If it shows an address like `[199.241.166.5]`, IPv4 is being used. If it shows an address like `[2620:123:7002:4::5]`, IPv6 is being used."
   },
   {
-    "question": "What are two ways to explicitly make an SSH client use either IPv4 or IPv6?",
-    "answer": "You can use the `-4` option to explicitly use IPv4 or the `-6` option to explicitly use IPv6 with the SSH client."
+    "question": "What does an SSH debug message like `debug1: Connecting to robot.rorqual.alliancecan.ca [199.241.166.5] port 22.` indicate?",
+    "answer": "This message indicates that your SSH client is using IPv4 for the connection."
   },
   {
-    "question": "How can you force SSH to use IPv4 addresses when connecting to an automation node, using an IP address instead of the hostname?",
-    "answer": "For Rorqual, you can try `ssh -i ~/.ssh/automation_key -vvv username@132.219.138.79 \"ls -l\"` to force SSH to use IPv4 addresses."
+    "question": "What does an SSH debug message like `debug1: Connecting to robot.rorqual.alliancecan.ca [2620:123:7002:4::5] port 22.` indicate?",
+    "answer": "This message indicates that your SSH client is using IPv6 for the connection."
   },
   {
-    "question": "What is considered a last-resort method to ensure only IPv4 is used for connections to automation nodes?",
-    "answer": "Disabling IPv6 addressing for your computer is a last-resort method, but Microsoft does not recommend it."
+    "question": "What are the possible solutions if the IP address type (IPv4/IPv6) used by my SSH client does not match the `from=\"pattern-list\"` constraint in my SSH key?",
+    "answer": "Possible solutions include explicitly making the SSH client use either IPv4 or IPv6 with the `-4` or `-6` options, using an IP address instead of the hostname for the connection, or as a last resort, disabling IPv6 addressing on your computer."
   },
   {
-    "question": "Which Python module is recommended for automating workflows with automation nodes?",
-    "answer": "The Paramiko Python module is recommended for automating workflows with automation nodes."
+    "question": "How can I force my SSH client to use a specific IP version (IPv4 or IPv6)?",
+    "answer": "You can use the `-4` option to explicitly force IPv4 or the `-6` option to explicitly force IPv6 with your SSH command."
   },
   {
-    "question": "How do you load an Ed25519 SSH private key from a file using Paramiko?",
+    "question": "Can I use an IP address directly instead of the hostname to connect to an automation node?",
+    "answer": "Yes, you can use an IP address, for example, `ssh -i ~/.ssh/automation_key -vvv username@132.219.138.79 \"ls -l\"` for Rorqual, to force SSH to use IPv4 addresses."
+  },
+  {
+    "question": "Is disabling IPv6 on my computer a recommended solution for SSH connection issues?",
+    "answer": "Disabling IPv6 should be a last resort method if other solutions don't work, as Microsoft does not recommend it, and the process varies by operating system."
+  },
+  {
+    "question": "What Python module is suggested for automating workflows with automation nodes?",
+    "answer": "The Paramiko Python module is suggested for automating workflows with automation nodes."
+  },
+  {
+    "question": "How do you load an Ed25519 SSH private key file using Paramiko in Python?",
     "answer": "You can load an Ed25519 key using `key = paramiko.Ed25519Key.from_private_key_file(\"/home/username/.ssh/cc_allowed\")`."
   },
   {
-    "question": "What Paramiko policy can be set to allow connecting to a host even if it's not known?",
-    "answer": "The `paramiko.AutoAddPolicy()` can be set using `ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())`."
+    "question": "How does Paramiko handle SSH connections to hosts that are not in the known_hosts file?",
+    "answer": "Paramiko can be configured to automatically add unknown host keys using `ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())`."
   },
   {
-    "question": "How do you execute a command on a remote host via SSH using Paramiko?",
-    "answer": "After connecting, use `stdin, stdout, stderr = ssh.exec_command(cmd)` to execute a command."
+    "question": "What is the Paramiko method for connecting to an SSH host with a username and private key?",
+    "answer": "You use `ssh.connect(hostname=host, username=user, pkey=key)`."
   },
   {
-    "question": "What is the recommended way to install Paramiko to ensure support for Ed25519 key types?",
-    "answer": "Install Paramiko using the command `pip install paramiko[all]` to ensure Ed25519 key type support."
+    "question": "How do you execute a command on a remote server through an SSH connection established with Paramiko?",
+    "answer": "You use `stdin, stdout, stderr = ssh.exec_command(cmd)` to execute a command, where `cmd` is the command string."
+  },
+  {
+    "question": "What is important to ensure Paramiko supports Ed25519 key types?",
+    "answer": "It is important to install Paramiko with `pip install paramiko[all]` to ensure that support for the Ed25519 key type is also installed."
   }
 ]

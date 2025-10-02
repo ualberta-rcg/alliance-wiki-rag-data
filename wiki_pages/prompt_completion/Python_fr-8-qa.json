@@ -1,14 +1,46 @@
 [
   {
-    "question": "How do you thoroughly remove a local Python installation?",
-    "answer": "You can remove a local Python installation by running the command `rm -vr ~/.local/bin ~/.local/lib/python*`."
+    "question": "Why might a virtual environment stop working, even if it was functional previously?",
+    "answer": "A virtual environment might stop working due to frequent package updates or if it was created in the $SCRATCH directory and partially destroyed by an automatic purge."
   },
   {
-    "question": "What should be done after deleting local Python installations?",
-    "answer": "After deleting local installations, you should start over with a new, unused virtual environment."
+    "question": "How can I prevent a virtual environment from becoming unstable due to package updates or purges?",
+    "answer": "To prevent instability, freeze the packages and their versions using `pip install --no-index 'package1==X.Y' 'package2==X.Y.Z' 'package3<X.Y' 'package4>X.Y'` and then create a requirements file to install these packages reliably in your tasks."
   },
   {
-    "question": "What if `~/.local/bin` is also used for non-Python binaries when removing a local Python installation?",
-    "answer": "If `~/.local/bin` is used for local binaries other than Python packages, you might need to specify those binaries directly when deleting the local installation."
+    "question": "What does the error message 'X is not a supported wheel on this platform' indicate?",
+    "answer": "This error message indicates that a package is incompatible or not supported by the system, often because it's a `manylinux` package or was built for a different Python version than the one currently in use (e.g., installing a Python 3.11 package with Python 3.9)."
+  },
+  {
+    "question": "What causes the 'AttributeError: module \u2018numpy\u2019 has no attribute \u2018X\u2019' error?",
+    "answer": "This error occurs when the latest version of Numpy is installed by default, but the code tries to use attributes that were deprecated in Numpy v1.20 and subsequently removed in v1.24."
+  },
+  {
+    "question": "How can I resolve an 'AttributeError: module \u2018numpy\u2019 has no attribute \u2018X\u2019' error?",
+    "answer": "You can resolve this error by installing a previous version of Numpy using the command: `pip install --no-index 'numpy<1.24'`."
+  },
+  {
+    "question": "What are the common reasons for a 'ModuleNotFoundError: No module named 'X''?",
+    "answer": "Common reasons include the package not being installed or visible to the Python interpreter, a mismatch between the module name used and its actual name, or a defective virtual environment."
+  },
+  {
+    "question": "What should I avoid doing to prevent 'ModuleNotFoundError' issues?",
+    "answer": "To prevent 'ModuleNotFoundError', avoid modifying the `PYTHONPATH` or `PATH` environment variables, and always load all necessary modules before activating a virtual environment."
+  },
+  {
+    "question": "What steps can I take to debug a 'ModuleNotFoundError'?",
+    "answer": "To debug a 'ModuleNotFoundError', check if the package is installed with `pip list`, verify that the module name exactly matches the actual name (case, underscores, etc.), and ensure the module is imported at the correct level from its source directory. If issues persist, recreate the environment."
+  },
+  {
+    "question": "When does the 'ImportError: numpy.core.multiarray failed to import' message typically appear?",
+    "answer": "This message typically appears when you try to import a Python module that depends on Numpy, and an incompatible version of Numpy is installed or being used, such as Numpy 2.0 which breaks ABI compatibility with wheels built for 1.x."
+  },
+  {
+    "question": "How can I fix the 'ImportError: numpy.core.multiarray failed to import' error?",
+    "answer": "You can fix this error by installing a compatible, older version of Numpy, for example, `pip install --no-index 'numpy<2.0'` if the issue is related to Numpy 2.0 incompatibility."
+  },
+  {
+    "question": "What does the message 'Defaulting to user installation because normal site-packages is not writeable' signify?",
+    "answer": "This message signifies `pip`'s default behavior outside of a virtual environment, meaning no virtual environment was found or activated, and `pip` attempted to install packages in a location without the necessary write permissions."
   }
 ]

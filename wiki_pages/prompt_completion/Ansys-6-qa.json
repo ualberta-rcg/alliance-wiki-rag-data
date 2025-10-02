@@ -1,46 +1,42 @@
 [
   {
-    "question": "Which `StdEnv` module should be loaded for Ansys Fluent `Multinode (by node, narval)` jobs?",
-    "answer": "The `StdEnv/2023` module should be loaded."
+    "question": "What is the purpose of the `script-flu-bynode-openmpi.sh` script for Ansys Fluent?",
+    "answer": "This Slurm script is designed for running Ansys Fluent in multinode mode on Narval clusters using Open MPI, configured to allocate all memory per compute node."
   },
   {
-    "question": "Which Ansys module version is specified for Fluent `Multinode (by node, narval)` jobs?",
-    "answer": "The `ansys/2023R2` module or newer versions are specified, exclusively for Narval."
+    "question": "Which modules are required to run Ansys Fluent with the `script-flu-bynode-openmpi.sh` on Narval?",
+    "answer": "You need to load `StdEnv/2023` and `ansys/2023R2` (or newer versions specific to Narval)."
   },
   {
-    "question": "What user-defined variables are required for the `Multinode (by node, narval)` Fluent script?",
-    "answer": "The user needs to specify `MYJOURNALFILE` for the journal file name and `MYVERSION` for the Fluent version (e.g., `3d`, `2d`, `2ddp`, `3ddp`)."
+    "question": "How is the total number of cores calculated within the `script-flu-bynode-openmpi.sh` script?",
+    "answer": "The total number of cores (`NCORES`) is calculated by multiplying `SLURM_NNODES` (number of nodes), `SLURM_NTASKS_PER_NODE` (tasks per node), and `SLURM_CPUS_PER_TASK` (CPUs per task)."
   },
   {
-    "question": "What MPI implementation is used by default for `Multinode (by node, narval)` Ansys Fluent jobs?",
-    "answer": "Open MPI is used by default."
+    "question": "What is the maximum number of cores per node specified for Narval in the `script-flu-bynode-openmpi.sh` script?",
+    "answer": "The script specifies 64 cores per node or less for Narval."
   },
   {
-    "question": "How is the total number of cores (`NCORES`) calculated in the `Multinode (by node, narval)` Fluent script?",
-    "answer": "The total number of cores is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
+    "question": "How does the `script-flu-bynode-openmpi.sh` script differentiate Fluent execution for single versus multiple nodes?",
+    "answer": "For a single node (`$SLURM_NNODES == 1`), Fluent runs with `-pshmem`. For multiple nodes, it uses `-pib` and specifies a machinefile (`-cnf=/tmp/machinefile-$SLURM_JOB_ID`)."
   },
   {
-    "question": "How is the total number of cores (`NCORES`) calculated in the `Multinode (by core, narval)` Fluent script?",
-    "answer": "The total number of cores is calculated as `SLURM_NTASKS * SLURM_CPUS_PER_TASK`."
+    "question": "What is the key difference in Slurm memory allocation between the 'by node' and 'by core' OpenMPI scripts for Fluent on Narval?",
+    "answer": "The 'by node' script (`script-flu-bynode-openmpi.sh`) uses `--mem=0` to allocate all memory per compute node, while the 'by core' script (`script-flu-bycore-openmpi.sh`) uses `--mem-per-cpu` to specify memory per core."
   },
   {
-    "question": "Which `StdEnv` modules and additional libraries are loaded for Ansys Fluent `Multinode (by node, niagara)` jobs?",
-    "answer": "`CCEnv StdEnv/2023`, `arch/avx512`, and `ansys/2023R2` (or newer versions, specific to Niagara) are loaded."
+    "question": "What user-defined variables must be specified in the Ansys Fluent Slurm scripts for Narval?",
+    "answer": "Users must specify `MYJOURNALFILE` (your journal file name) and `MYVERSION` (e.g., '3d' for 3D double precision)."
   },
   {
-    "question": "What license server settings are explicitly defined in the `Multinode (by node, niagara)` Fluent script?",
-    "answer": "The script defines `LICSERVER=license3.sharcnet.ca`, `FLEXPORT=1055`, `INTEPORT=2325`, and `VENDPORT=1793`."
+    "question": "Which modules are necessary for running Ansys Fluent on Niagara using the `script-flu-bynode-intel-nia.sh` script?",
+    "answer": "The required modules are `CCEnv`, `StdEnv/2023`, `arch/avx512`, and `ansys/2023R2` (or newer versions available on Niagara)."
   },
   {
-    "question": "How does the `Multinode (by node, niagara)` Fluent script ensure license server connectivity?",
-    "answer": "It uses SSH forwarding via `nia-gw` for the `FLEXPORT`, `INTEPORT`, and `VENDPORT`, and then sets `ANSYSLMD_LICENSE_FILE` and `ANSYSLI_SERVERS` to `localhost`."
+    "question": "What is the recommended maximum number of cores per node for Niagara in the `script-flu-bynode-intel-nia.sh` script?",
+    "answer": "The script recommends 80 cores per node or less for Niagara."
   },
   {
-    "question": "What MPI implementation is specified for Ansys Fluent jobs on Niagara with the `Multinode (by node)` script?",
-    "answer": "Intel MPI is specified using the `-mpi=intel` flag in the `fluent` command."
-  },
-  {
-    "question": "What is the purpose of the `slurm_hl2hl.py` script in the Niagara Fluent job submission?",
-    "answer": "The `slurm_hl2hl.py` script formats the SLURM host list for ANSYS-FLUENT and outputs it to a machine file (`$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID`)."
+    "question": "How is memory configured in the `script-flu-bynode-intel-nia.sh` Slurm script for Niagara?",
+    "answer": "The script sets `#SBATCH --mem=0`, which allocates all available memory per compute node."
   }
 ]

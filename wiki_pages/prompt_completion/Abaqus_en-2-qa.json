@@ -1,58 +1,78 @@
 [
   {
-    "question": "What are the common Slurm SBATCH directives specified in a project directory script for a single-node Abaqus Standard Analysis job?",
-    "answer": "The common Slurm SBATCH directives include `--account=def-group`, `--time=00-06:00`, `--cpus-per-task=4`, `--mem=8G`, and `--nodes=1`."
+    "question": "What Abaqus software version is typically loaded in the provided Slurm scripts for Standard Analysis?",
+    "answer": "The scripts typically load `abaqus/2021` after loading `StdEnv/2020`."
   },
   {
-    "question": "Which Abaqus and environment modules should be loaded for a Standard Analysis job?",
-    "answer": "The latest installed versions `StdEnv/2020` and `abaqus/2021` should be loaded. Older versions like `StdEnv/2016` and `abaqus/2020` can also be used."
+    "question": "How do you specify the number of CPU cores for a single-node Abaqus job in a Slurm script?",
+    "answer": "You specify the number of cores using `#SBATCH --cpus-per-task=4` in the Slurm script."
   },
   {
-    "question": "What is the Abaqus command line structure for a Standard Analysis job running in threads mode?",
-    "answer": "The command typically looks like `abaqus job=testsp1 input=mystd-sim.inp scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive mp_mode=threads memory=\"$((${SLURM_MEM_PER_NODE}-3072))MB\"`."
+    "question": "What is the typical memory requested for a single-node Abaqus job in the provided Standard Analysis Slurm scripts?",
+    "answer": "The scripts specify `#SBATCH --mem=8G` as the total memory for the node, noting it should be greater than 5G."
   },
   {
-    "question": "How do you enable GPU usage for a single-node Abaqus job within the Slurm script and Abaqus command?",
-    "answer": "To enable GPU usage, uncomment the relevant `--gres` SBATCH directive (e.g., `##SBATCH --gres=gpu:t4:1` or `##SBATCH --gres=gpu:a100:1`) and uncomment `gpus=$SLURM_GPUS_ON_NODE` in the Abaqus command line."
+    "question": "Which environment module is loaded before the Abaqus module in the example Slurm scripts for Standard Analysis?",
+    "answer": "The `StdEnv/2020` module is loaded before the Abaqus module."
   },
   {
-    "question": "How do you configure an Abaqus input file to write restart data every N time increments?",
-    "answer": "You should specify `*RESTART, WRITE, OVERLAY, FREQUENCY=N` in the input file, replacing N with the desired number of increments (e.g., 12)."
+    "question": "How is the `memory` argument for the Abaqus command calculated in the single-node Standard Analysis scripts?",
+    "answer": "The `memory` argument is calculated as `\"$((${SLURM_MEM_PER_NODE}-3072))MB\"`, which subtracts 3072MB from the total node memory (`$SLURM_MEM_PER_NODE`)."
   },
   {
-    "question": "How do you configure an Abaqus input file to write restart data for a total of N time increments?",
-    "answer": "You should specify `*RESTART, WRITE, OVERLAY, NUMBER INTERVAL=N, TIME MARKS=NO` in the input file, replacing N with the desired total number of increments (e.g., 12)."
+    "question": "How can GPU usage be enabled for an Abaqus job using the project directory script for Standard Analysis?",
+    "answer": "To use a GPU, you need to uncomment the line `# gpus=$SLURM_GPUS_ON_NODE` within the Abaqus command and potentially `#SBATCH --gres` and `#SBATCH --constraint` lines in the Slurm header."
   },
   {
-    "question": "What command can be used to check for completed restart information in Abaqus Standard Analysis jobs?",
-    "answer": "The command `egrep -i \"step|start\" testsp*.com testsp*.msg testsp*.sta` can be used to check for completed restart information."
+    "question": "How do you configure an Abaqus input file to write restart data every N=12 time increments?",
+    "answer": "You specify `*RESTART, WRITE, OVERLAY, FREQUENCY=12` in the input file."
   },
   {
-    "question": "What optional argument can be added to the Abaqus command for some simulations to potentially improve performance?",
-    "answer": "`order_parallel=OFF` can be added to the Abaqus command at the bottom of the script for potential simulation benefits."
+    "question": "How do you configure an Abaqus input file to write restart data for a total of 12 time increments?",
+    "answer": "You specify `*RESTART, WRITE, OVERLAY, NUMBER INTERVAL=12, TIME MARKS=NO` in the input file."
   },
   {
-    "question": "What is the Abaqus command line to restart a Standard Analysis job using a project directory restart script?",
-    "answer": "The command uses the `oldjob` argument: `abaqus job=testsp2 oldjob=testsp1 input=mystd-sim-restart.inp ...`, where `testsp1` is the name of the previous job."
+    "question": "What command checks for completed restart information in Standard Analysis Abaqus output files?",
+    "answer": "You can use `egrep -i \"step|start\" testsp*.com testsp*.msg testsp*.sta` to check for completed restart information."
   },
   {
-    "question": "What are the required lines in the input file for a Standard Analysis restart job?",
+    "question": "What optional argument can be added to the Abaqus command in a Standard Analysis script to potentially benefit some simulations?",
+    "answer": "Adding `order_parallel=OFF` to the Abaqus command can benefit some simulations."
+  },
+  {
+    "question": "How do you run a restart job for a Standard Analysis using the 'project directory restart script'?",
+    "answer": "The script uses the command `abaqus job=testsp2 oldjob=testsp1 input=mystd-sim-restart.inp`, where `testsp1` is the name of the previous job."
+  },
+  {
+    "question": "What content should the restart input file for a Standard Analysis `project directory restart script` contain?",
     "answer": "The restart input file should contain `*HEADING` and `*RESTART, READ`."
   },
   {
-    "question": "When would you use a 'temporary directory script' for Abaqus Standard Analysis, and which environment variable is crucial for it?",
-    "answer": "Temporary directory scripts are used for single-node jobs that create large restart files to benefit from writing to local disk, utilizing the `SLURM_TMPDIR` environment variable."
+    "question": "When should a 'temporary directory script' be used for single-node Abaqus Standard Analysis jobs?",
+    "answer": "A temporary directory script should be used for single-node jobs that create large restart files, benefiting from writing to local disk via `SLURM_TMPDIR`."
   },
   {
-    "question": "How is the scratch directory created and used within a temporary directory script for Abaqus?",
-    "answer": "The script creates a scratch directory using `mkdir $SLURM_TMPDIR/scratch` and specifies it in the Abaqus command with `scratch=$SLURM_TMPDIR/scratch`."
+    "question": "How does the 'temporary directory script' save data to the submit directory periodically?",
+    "answer": "It uses a `while sleep 6h; do cp -fv * $SLURM_SUBMIT_DIR 2>/dev/null done &` loop to periodically copy data from `$SLURM_TMPDIR` to `$SLURM_SUBMIT_DIR`."
   },
   {
-    "question": "How does a temporary directory script ensure data is saved back to the submission directory?",
-    "answer": "It uses a background process (`while sleep 6h; do cp -fv * $SLURM_SUBMIT_DIR 2>/dev/null; done &`) to periodically copy data back to `$SLURM_SUBMIT_DIR` and then kills this process once the Abaqus job completes."
+    "question": "What is the scratch directory specified for Abaqus in the 'temporary directory script' for Standard Analysis?",
+    "answer": "The scratch directory for Abaqus is specified as `scratch=$SLURM_TMPDIR/scratch`."
   },
   {
-    "question": "What specific steps are taken in a temporary directory restart script to prepare for a restart job?",
-    "answer": "Before running the Abaqus job, the script copies the previous job's files to the temporary directory, e.g., `cp testst1* $SLURM_TMPDIR`, and then changes into that directory (`cd $SLURM_TMPDIR`)."
+    "question": "What environment variables related to licenses are echoed in the provided Slurm scripts?",
+    "answer": "The scripts echo `LM_LICENSE_FILE` and `ABAQUSLM_LICENSE_FILE`."
+  },
+  {
+    "question": "What Slurm constraint can be uncommented to specify a node with 128 cores for a single-node Abaqus job?",
+    "answer": "The `#SBATCH --constraint=rome` line can be uncommented to specify a node (128cores)."
+  },
+  {
+    "question": "What Slurm constraint can be uncommented to specify a node with 44 cores for a single-node Abaqus job?",
+    "answer": "The `#SBATCH --constraint=cascade` line can be uncommented to specify a node (44cores)."
+  },
+  {
+    "question": "What files are typically removed at the start of a Standard Analysis job using the 'project directory script'?",
+    "answer": "The command `rm -f testsp1* testsp2*` removes files starting with `testsp1` or `testsp2`."
   }
 ]

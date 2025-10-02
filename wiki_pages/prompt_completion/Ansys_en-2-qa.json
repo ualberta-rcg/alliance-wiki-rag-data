@@ -1,70 +1,66 @@
 [
   {
-    "question": "How do I use an existing ANSYS License server on the cluster?",
-    "answer": "Contact your local Ansys license server administrator to get the fully qualified hostname (LICSERVER), the Ansys flex port (FLEXPORT, commonly 1055), and the Ansys licensing interconnect port (INTEPORT, commonly 2325). Then, configure your `~/.licenses/ansys.lic` file with these values."
+    "question": "What three pieces of information are required to configure an existing ANSYS license server for use on a cluster?",
+    "answer": "You need the fully qualified hostname (LICSERVER) of the server, the Ansys flex port (FLEXPORT) number (commonly 1055), and the Ansys licensing interconnect port (INTEPORT) number (commonly 2325)."
   },
   {
-    "question": "What information is needed for a local Ansys license server that has never been set up on the Alliance cluster?",
-    "answer": "In addition to the hostname, flex port, and interconnect port, you will need the static vendor port (VENDPORT) number and confirmation that the `<servername>` in your license file resolves to the same IP as LICSERVER on Alliance clusters."
+    "question": "How do I configure my `~/.licenses/ansys.lic` file with license server information once I have the necessary details?",
+    "answer": "Once the LICSERVER, FLEXPORT, and INTEPORT values are collected, you configure your `~/.licenses/ansys.lic` file by plugging these values into the `FILE: ansys.lic` template."
   },
   {
-    "question": "Why is it important for the <servername> to resolve to the same IP as LICSERVER?",
-    "answer": "If `<servername>` does not resolve to the same IP, Ansys license checkouts will not work on any remote cluster at the Alliance."
+    "question": "What are the common port numbers for Ansys Flex and Interconnect ports?",
+    "answer": "The Ansys flex port (FLEXPORT) is commonly 1055, and the Ansys licensing interconnect port (INTEPORT) is commonly 2325."
   },
   {
-    "question": "What should I do if my local Ansys license server's <servername> doesn't resolve correctly?",
-    "answer": "Request your license administrator to change `<servername>` to either the same fully qualified hostname as LICSERVER or at least to a hostname that will resolve to the same IP address as LICSERVER remotely."
+    "question": "What additional information is needed if a local Ansys license server has never been set up for use on an Alliance cluster?",
+    "answer": "You will also need the static vendor port (VENDPORT) number from your local Ansys server administrator and confirmation that the `<servername>` (found in the first line of the license file) resolves to the same IP as LICSERVER on Alliance clusters."
   },
   {
-    "question": "After collecting license server details for a new setup, who should I contact?",
-    "answer": "Send the hostname, flex port, interconnect port, and static vendor port by email to technical support, specifying which Alliance cluster(s) you want to run Ansys jobs on."
+    "question": "What should be done if the `<servername>` in the license file does not resolve to the same IP address as LICSERVER on Alliance clusters?",
+    "answer": "If `<servername>` does not meet this requirement, you should request your license administrator to change it to either the same fully qualified hostname as LICSERVER or at least to a hostname that will resolve to the same IP address as LICSERVER remotely."
   },
   {
-    "question": "What happens after I contact technical support to set up a new Ansys license server?",
-    "answer": "Alliance system administrators will open the firewall, and you will receive a range of IP addresses to provide to your server administrator, who will then open the local firewall for inbound Ansys license connections on the FLEXPORT, INTEPORT, and VENDPORT."
+    "question": "After collecting all necessary information for a new Ansys license server setup, whom should I contact and what information should I send?",
+    "answer": "You should send the LICSERVER, FLEXPORT, INTEPORT, and VENDPORT values by email to technical support, mentioning which Alliance cluster(s) you want to run Ansys jobs on."
   },
   {
-    "question": "How can I test if my `ansys.lic` file is correctly configured and working?",
-    "answer": "Copy and paste a specific sequence of commands on the cluster you're using, which involves loading the Ansys module and running `lmutil lmstat -c $ANSYSLMD_LICENSE_FILE`."
+    "question": "What happens after Alliance system administrators receive the license server setup request?",
+    "answer": "Alliance system administrators will open the firewall to allow license checkout requests to reach your license server from the specified cluster compute nodes, and in return, you will receive a range of IP addresses to forward to your server administrator for opening the local firewall."
   },
   {
-    "question": "What command sequence is used to check the Ansys license configuration?",
-    "answer": "The sequence is `cd /tmp`, `salloc --time=1:0:0 --mem=1000M --account=def-YOURUSERID`, `module load StdEnv/2023; module load ansys/2023R2`, and then `$EBROOTANSYS/v$(echo ${EBVERSIONANSYS:2:2}${EBVERSIONANSYS:5:1})/licensingclient/linx64/lmutil lmstat -c $ANSYSLMD_LICENSE_FILE 1> /dev/null && echo Success || echo Fail`."
+    "question": "How can I test if my `ansys.lic` file is configured and working properly on a cluster?",
+    "answer": "You can test it by running a sequence of commands on the cluster, starting with `cd /tmp`, `salloc` for resource allocation, `module load StdEnv/2023; module load ansys/2023R2`, and then using `lmutil lmstat -c $ANSYSLMD_LICENSE_FILE` to check for 'Success' or 'Fail'."
   },
   {
-    "question": "What indicates a successful Ansys license checkout during testing?",
-    "answer": "`Success` will be output if the license checkouts are working properly."
+    "question": "What indicates a successful Ansys license checkout when testing the `ansys.lic` configuration?",
+    "answer": "If `Success` is output, license checkouts should work when jobs are submitted to the queue."
   },
   {
-    "question": "What should I do if the Ansys license checkout test outputs `Fail`?",
-    "answer": "If `Fail` is output, jobs will likely fail, and you should submit a problem ticket to resolve the issue."
+    "question": "What should I do if the Ansys license check outputs 'Fail'?",
+    "answer": "If `Fail` is output, jobs will likely fail, requiring a problem ticket to be submitted to resolve the issue."
   },
   {
-    "question": "Are Ansys simulations typically backwards compatible?",
-    "answer": "No, Ansys simulations are NOT backwards compatible; they are typically forward compatible."
+    "question": "Why is it important to test the Ansys license with the same module version used in Slurm scripts?",
+    "answer": "It is important to use the same Ansys module version to ensure that license checkouts will work when jobs are run in the queue, as using a newer module version for testing with an outdated remote license server could cause a failure."
   },
   {
-    "question": "What does forward compatibility mean for Ansys simulations?",
-    "answer": "Simulations created using an older version of Ansys can be expected to load and run fine with any newer version, for example, ansys/2022R2 on ansys/2023R2."
+    "question": "Are Ansys simulations typically forward compatible or backwards compatible?",
+    "answer": "Ansys simulations are typically forward compatible but NOT backwards compatible."
   },
   {
-    "question": "What might happen if a simulation created with a newer Ansys version is run with an older version?",
-    "answer": "While it might be possible to start, random error messages or crashing will likely occur."
+    "question": "Can an Ansys simulation created with an older version be run with a newer version?",
+    "answer": "Yes, simulations created using an older version of Ansys can be expected to load and run fine with any newer version."
   },
   {
-    "question": "How can I identify the Fluent version used to create a `.cas` or `.cas.h5` file?",
-    "answer": "You can try grepping the file, for example: `$ grep -ia fluent combustor.cas` or `$ grep -ia fluent cavity.cas.h5`."
+    "question": "How can I determine which version of Ansys Fluent was used to create a `.cas` file?",
+    "answer": "You can check by grepping the `.cas` file using a command like `grep -ia fluent combustor.cas` to look for clues."
   },
   {
-    "question": "Where can I find detailed Ansys platform support information?",
-    "answer": "Detailed platform support information, including software/hardware compatibility, is available on the Ansys website for the Current Release and Previous Releases."
+    "question": "Where can I find detailed platform support information for Ansys software?",
+    "answer": "Ansys provides detailed platform support information describing software/hardware compatibility for the Current Release and Previous Releases on their website."
   },
   {
-    "question": "Which platform support document is particularly relevant for Alliance users?",
-    "answer": "The 'Platform Support by Application / Product' PDF is of special interest."
-  },
-  {
-    "question": "Why is the 'Platform Support by Application / Product' PDF important for Alliance users?",
-    "answer": "It shows which packages, such as Spaceclaim, are supported under Windows but not under Linux, and therefore not available on the Alliance systems."
+    "question": "Are there any Ansys packages supported under Windows but not under Linux (and thus not on Alliance systems)?",
+    "answer": "Yes, the 'Platform Support by Application / Product' PDF indicates which packages, such as Spaceclaim, are supported under Windows but not under Linux."
   }
 ]

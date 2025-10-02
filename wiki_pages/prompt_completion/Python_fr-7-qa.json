@@ -1,50 +1,58 @@
 [
   {
-    "question": "How can I inspect a running Python process without modifying its script?",
-    "answer": "You can use `py-spy`. First, install `py-spy` in a virtual environment in your /home directory. Then, connect to a running job using `srun --pty --jobid JOBID bash`, find the Python script's process ID (PID) with `htop -u $USER`, activate the virtual environment where `py-spy` is installed, and finally, use `py-spy top --pid PID` for live monitoring or `py-spy dump --pid PID` for a trace of your code's state."
+    "question": "Quelles sont les commandes `pdb` g\u00e9n\u00e9ralement utilis\u00e9es pour d\u00e9boguer un fichier Python ?",
+    "answer": "En g\u00e9n\u00e9ral, on utilise `w`, `s`, `l`, `p`, `n` pour d\u00e9boguer un fichier."
   },
   {
-    "question": "What should I do if I get an 'ERROR: Package 'X' requires a different Python: X.Y.Z not in '>=X.Y'' message during package installation?",
-    "answer": "This error means the loaded Python version (e.g., 3.6.10) is not supported by the package. You should use a more recent Python version (like the latest available module) or install an older version of the package X."
+    "question": "O\u00f9 puis-je trouver plus d'informations sur le d\u00e9bogueur Python (`pdb`) ?",
+    "answer": "Pour plus d'information, voir la page ''The Python Debugger'' sur [https://docs.python.org/3/library/pdb.html]."
   },
   {
-    "question": "How can I resolve the error 'ERROR: Package has requirement X, but you'll have Y which is incompatible' during package installation?",
-    "answer": "To use the new dependency resolver, install the latest version of `pip` (or a version superior to 21.3) by running `pip install --no-index --upgrade pip` within your virtual environment, and then retry the installation command."
+    "question": "Comment puis-je modifier mon script pour obtenir une trace de l'origine du probl\u00e8me si un script Python se suspend ?",
+    "answer": "Avec le module `faulthandler`, vous pouvez modifier votre script pour qu'une trace de l'origine du probl\u00e8me soit fournie apr\u00e8s une certaine dur\u00e9e; voir l'information sur la commande `faulthandler.dump_traceback_later(timeout, repeat=False, file=sys.stderr, exit=False)`."
   },
   {
-    "question": "What does 'ERROR: No matching distribution found for X' mean when installing a package?",
-    "answer": "This error indicates that `pip` could not find any package matching the specified requirements (name, version, or tags). You should ensure the package name and version are correct. Note that `manylinux_x_y` wheels are ignored. You can also check if the package is available using `avail_wheels` or the 'Available Python wheels' page."
+    "question": "Quel outil permet d'inspecter un processus Python pendant l'ex\u00e9cution d'une t\u00e2che sans modification pr\u00e9alable du script ?",
+    "answer": "Vous pouvez inspecter un processus Python pendant l'ex\u00e9cution d'une t\u00e2che sans avoir \u00e0 le modifier au pr\u00e9alable avec `py-spy`."
   },
   {
-    "question": "What is the recommended way to install multiple Python packages to avoid dependency issues?",
-    "answer": "When possible, it is preferable to install multiple packages with a single `pip install package1 package2 package3 package4` command (after upgrading pip with `pip install --upgrade pip`). This allows `pip` to resolve cross-dependencies more easily."
+    "question": "O\u00f9 faut-il installer `py-spy` pour l'utiliser ?",
+    "answer": "`py-spy` doit \u00eatre install\u00e9 dans un environnement virtuel de votre r\u00e9pertoire `/home`."
   },
   {
-    "question": "Why might my virtual environment stop working, and how can I fix it?",
-    "answer": "Virtual environments can become unreproducible due to frequent package updates or might be partially destroyed if created in `$SCRATCH` due to automatic purges. To counter this, you should freeze your package versions by explicitly specifying them during installation (e.g., `pip install --no-index 'package1==X.Y'`) and create a `requirements.txt` file to reproduce the environment in your tasks. Avoid creating virtual environments in `$SCRATCH`."
+    "question": "Quelles sont les \u00e9tapes pour inspecter un processus Python en cours d'ex\u00e9cution \u00e0 l'aide de `py-spy` ?",
+    "answer": "Les \u00e9tapes sont : # Installez `py-spy` dans un environnement virtuel de votre r\u00e9pertoire `/home`. # Connectez-vous \u00e0 une t\u00e2che en cours avec `srun --pty --jobid JOBID bash`. # Trouvez l'ID du processus du script Python avec `htop -u $USER`. # Activez l'environnement virtuel o\u00f9 `py-spy` est install\u00e9. # Lancez `py-spy top --pid PID` pour visionner en direct les endroits o\u00f9 le code utilise beaucoup de temps. # Lancez `py-spy dump --pid PID` pour obtenir une trace de l'\u00e9tat de votre code."
   },
   {
-    "question": "What causes the error 'ERROR: X is not a supported wheel on this platform' during package installation?",
-    "answer": "This error occurs when a package is incompatible or not supported by the system. Common reasons include installing a `manylinux` package not provided by our systems or a Python package built for a different Python version than the one you are currently using. You can check if `manylinux` packages are available in the provided Python wheels."
+    "question": "Que signifie l'erreur \"Package 'X' requires a different Python: X.Y.Z not in '>=X.Y'\" lors de l'installation d'un paquet ?",
+    "answer": "Cette erreur signifie que le module Python X.Y.Z qui est charg\u00e9 n'est pas support\u00e9 par le paquet."
   },
   {
-    "question": "How can I resolve 'AttributeError: module \u2018numpy\u2019 has no attribute \u2018X\u2019'?",
-    "answer": "This error often occurs because attributes in NumPy were deprecated in v1.20 and are no longer available in v1.24. You can resolve it by installing a previous version of NumPy, for example, using `pip install --no-index 'numpy<1.24'`."
+    "question": "Comment r\u00e9soudre l'erreur \"Package 'X' requires a different Python: X.Y.Z not in '>=X.Y'\" ?",
+    "answer": "Pour r\u00e9soudre cette erreur, vous pouvez utiliser une version de Python plus r\u00e9cente, comme le dernier module disponible, ou installer une version moins r\u00e9cente du paquet X."
   },
   {
-    "question": "What are common reasons for 'ModuleNotFoundError: No module named 'X'', and how can I troubleshoot it?",
-    "answer": "Common reasons include the package not being installed or visible, an incorrect module name, or a defective virtual environment. To troubleshoot, avoid modifying `PYTHONPATH` or `PATH`, and load all necessary modules before activating a virtual environment. You can check if the package is installed with `pip list`, verify the exact module name (case, underscores), and confirm if the module is imported at the correct level from its source directory. If issues persist, it's recommended to start with a new virtual environment."
+    "question": "Que faire en cas d'erreur \"Package has requirement X, but you'll have Y which is incompatible\" lors de l'installation d'un paquet ?",
+    "answer": "Pour utiliser le nouveau r\u00e9solveur de d\u00e9pendances, installez la plus r\u00e9cente version de `pip` ou une version sup\u00e9rieure \u00e0 21.3 en ex\u00e9cutant `pip install --no-index --upgrade pip`, puis relancez la commande d'installation."
   },
   {
-    "question": "Why do I get 'ImportError: numpy.core.multiarray failed to import' when importing a module that depends on NumPy?",
-    "answer": "This error indicates an incompatible version of NumPy is installed or used. This typically happens with NumPy 2.0 due to an ABI break. You need to install a compatible version, such as an earlier version with `pip install --no-index 'numpy<2.0'` if a wheel was built with version 1.x but installed with version 2.x."
+    "question": "Que signifie le message d'erreur \"No matching distribution found for X\" lors de l'installation d'un paquet Python ?",
+    "answer": "Cela signifie que `pip` n'a trouv\u00e9 aucun paquet \u00e0 installer qui rencontre les exigences (nom, version ou tags), et il faut savoir que les wheels `manylinux_x_y` sont ignor\u00e9s."
   },
   {
-    "question": "What does 'Defaulting to user installation because normal site-packages is not writeable' mean?",
-    "answer": "This message is `pip`'s default behavior outside a virtual environment, indicating that no virtual environment is active and `pip` lacks the necessary permissions to install packages globally. This will lead to problematic 'local installations'."
+    "question": "Comment v\u00e9rifier la disponibilit\u00e9 d'un paquet lorsque l'erreur \"No matching distribution found for X\" survient ?",
+    "answer": "Assurez-vous que le nom et la version sont corrects. Vous pouvez aussi v\u00e9rifier si le paquet est disponible avec la commande `avail_wheels` ou en consultant la page \"Wheels disponibles\"."
   },
   {
-    "question": "Why are local Python installations (pip install --user) undesirable, and how can I remove them?",
-    "answer": "Local installations, whether accidental or explicit (`pip install --user`), effectively transfer package dependencies to a shared space, which is highly undesirable. This can cause strange import or execution issues, version conflicts, and lead to 'dependency hell'. It is strongly recommended to use a virtual environment for isolating, reproducing, and managing different versions in your projects. To remove a local installation, run `rm -vr ~/.local/bin ~/.local/lib/python*` and then start with a new, unused virtual environment."
+    "question": "Est-il pr\u00e9f\u00e9rable d'installer plusieurs paquets Python individuellement ou en une seule fois ?",
+    "answer": "Lorsque possible, il est pr\u00e9f\u00e9rable d'installer plusieurs paquets avec une seule commande, car `pip` peut alors r\u00e9soudre plus facilement les probl\u00e8mes de d\u00e9pendance."
+  },
+  {
+    "question": "Pourquoi un environnement virtuel qui fonctionnait pr\u00e9c\u00e9demment pourrait-il ne plus fonctionner ?",
+    "answer": "Les fr\u00e9quentes mises \u00e0 jour des paquets font en sorte qu'un environnement virtuel ne peut souvent pas \u00eatre reproduit. Il est possible aussi qu'un environnement virtuel cr\u00e9\u00e9 dans `$SCRATCH` soit partiellement d\u00e9truit lors de la purge automatique de ce syst\u00e8me de fichiers."
+  },
+  {
+    "question": "Comment \u00e9viter qu'un environnement virtuel ne cesse de fonctionner en raison de mises \u00e0 jour ou de purges de `$SCRATCH` ?",
+    "answer": "Pour contrer ceci, gelez les paquets et leurs versions avec des sp\u00e9cifications comme `package1==X.Y` et cr\u00e9ez ensuite un fichier de requis (`requirements.txt`) qui sera utilis\u00e9 pour installer ces paquets dans votre t\u00e2che."
   }
 ]
