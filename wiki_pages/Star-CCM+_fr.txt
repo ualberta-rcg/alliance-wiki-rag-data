@@ -54,7 +54,10 @@ mkdir -p "$STARCCM_TMP"
 
 slurm_hl2hl.py --format STAR-CCM+ > machinefile-$SLURM_JOB_ID
 
-slurm_hl2hl.py --format STAR-CCM+ > $STARCCM_TMP/machinefile-$SLURM_JOB_ID
+echo "Checking $CDLMD_LICENSE_FILE ..."
+server=$(head -n1 $CDLMD_LICENSE_FILE {{!}} awk '{print $2}')
+port=$(cat $CDLMD_LICENSE_FILE {{!}} grep -Eo '[0-9]+$')
+nmap $server -Pn -p $port {{!}} grep -v '^$'; echo
 
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
 NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
@@ -143,7 +146,7 @@ LICSERVER=flex.cd-adapco.com     # Specify license server hostname
 # ------- no changes required below this line --------
 
 export CDLMD_LICENSE_FILE="$FLEXPORT@127.0.0.1"
-ssh nia-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f
+ssh tri-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f
 
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
 NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))

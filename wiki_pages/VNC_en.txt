@@ -1,13 +1,12 @@
-<languages />
-{{Outdated}}
+<languages/>
 
 [[File:Matlab-vnc.png|400px|thumb|MATLAB running via VNC.]]
 
-It is often necessary to remotely start the graphical user interface for complex software packages such as [[MATLAB]]. The most common way to do this is with [[SSH]] and X11 forwarding. However the performance of SSH+X11 is often too slow similar to [https://docs.computecanada.ca/wiki/Connecting_with_MobaXTerm MobaXTerm] or [https://docs.computecanada.ca/wiki/Connecting_with_PuTTY Putty]. A much better alternative is to use [https://en.wikipedia.org/wiki/Virtual_Network_Computing VNC] to connect to a remote desktop.
+To remotely start the graphical user interface (gui) of a program, X11 forwarding over [[SSH]] is commonly used. However the  performance of this approach is often too slow to perform smooth complex graphics rotations.  A much better alternative is to use [https://en.wikipedia.org/wiki/Virtual_Network_Computing VNC] to connect to a remote desktop.
 
 = Setup =
 
-First you will need to install a VNC client on your machine to connect to the VNC server.  We recommend using [http://tigervnc.org/ TigerVNC].  A TigerVNC package is available for Windows, MacOS and most Linux distributions.  The following shows how to download, install and configure TigerVNC securely for each operating system.  The certificate configuration steps are only required for connecting to VDI nodes so the signing authority of the certificate presented by the vncserver is known. If a popup about a certificate issue occurs, either you have not configured it properly or you are not connected to our server and should not enter your password.
+To begin a VNC client will need to be installed on your desktop.  A TigerVNC package is available for Windows, MacOS and most Linux distributions.  The following shows how to download, install and configure TigerVNC securely for each of these systems.
 
 == Windows ==
 
@@ -35,22 +34,7 @@ First install TigerVNC viewer with the package manager for your Linux version:
 | <code>emerge -av net-misc/tigervnc</code>
 |}
 
-Next, start TigerVNC by either finding it in the applications menu or running <code>vncviewer</code> on the command line.  In the "VNC Viewer: Connection Details" window that appears click "Options -> Security" then tick all boxes except "Encryption None" and enter one of the following paths in the "Path to X509 CA Certificate" field.  
-
-{| class="wikitable"
-! Linux Version
-! Path to X509 CA Certificate
-|-
-| Debian, Ubuntu
-| /etc/ssl/certs/ca-certificates.crt
-|-
-| Fedora, CentOS, or RHEL
-| /etc/pki/tls/certs/ca-bundle.crt
-|-
-| Gentoo
-| /etc/ssl/certs/ca-certificates.crt
-|}
-To save the settings click OK and then click Connect.  If Connect is not clicked, the settings will not be saved.
+Next, start TigerVNC by either finding it in the applications menu or running <code>vncviewer</code> on the command line of your laptop.  
 
 = Connect =
 
@@ -58,7 +42,7 @@ Now you need a VNC server to connect to, such as a temporary vncserver started o
 
 == Login nodes ==
 
-You may run lightweight applications (that do not require a gpu) within a remote VNC desktop on a cluster login node (memory and cputime limits apply).  To do this, you must first connect to a cluster login node.  Using nibi cluster for example :
+You may run lightweight applications (that do not require a gpu) within a remote VNC desktop on a cluster login node (memory and cputime limits apply).  To do this, you must first connect to a cluster login node.  Using nibi cluster to demonstrate :
 
  [<b>laptop</b>:~] ssh nibi.alliancecan.ca
 
@@ -71,33 +55,33 @@ Next run <code>vncserver -list</code> to check if you have an old unused vncserv
  [<b>l4</b>(login node):~] vncserver -idletimeout 86400<br>
  Desktop 'TurboVNC: l4.nibi.sharcnet:1 (yourusername)' started on display <b>l4</b>.nibi.sharcnet:1<br>
  Starting applications specified in /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/xstartup.turbovnc
- Log file is /home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log
+ Log file is <span style="Color:green">/home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log</span>
 
 Note that the vncserver command provided by StdEnv/2023 is based on [https://turbovnc.org turbovnc].  When starting a new vncserver on a login node <code>-idletimeout seconds</code> should be added as shown above.  Doing so will ensure your <code>vncserver</code> eventually terminates (once S seconds has elapsed with no VNC viewer connections) should you forget to terminate your vncviewer session by clicking <code>System -> Log out</code> in the vnc desktop.  The first time you start vncserver you will be required to set a password which can be [https://docs.alliancecan.ca/wiki/VNC#Vncserver_password changed] later.  The password will be required to remotely connect to your desktop with a vncclient (such as vncviewer). The same password will be required when making [https://docs.alliancecan.ca/wiki/VNC#Multiple_connections multiple connections] assuming you started your vncserver by appending the additional <code>-alwaysshared</code> option.
 
 2) Now determine which port your vncserver is listening on (5901 for this example) by running grep on the log file:
 
- [<b>l4</b>(login node):~] grep -iE "\sport|kill"  /home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log
+ [<b>l4</b>(login node):~] grep -iE "\sport|kill" <span style="Color:green">/home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log</span>
  25/08/2025 15:16:20 Listening for VNC connections on TCP port <span style="Color:blue">5901</span>
 
 Now you may exit the login node and your vncserver will continue running until the time limit you assigned (by specifying the -idletimeout option) is reached
 
- [<b>l4</b>(login node):~]  exit
+ [<b><span style="Color:green">l4</span></b>(login node):~]  exit
  [<b>laptop</b>:~]
 
 3) On your desktop start a SSH tunnel to forward an arbitrary port (5905 in this example) to the port your VNC server is listening (5901 according to the above) as follows :
 
- [<b>laptop</b>:~] ssh nibi.computecanada.ca -L <span style="Color:red">5905</span>:<b>l4</b>:<span style="Color:blue">5901</span>
+ [<b>laptop</b>:~] ssh nibi.computecanada.ca -L <span style="Color:red">5905</span>:<b><span style="Color:green">l4</span></b>:<span style="Color:blue">5901</span>
 
 4) On your desktop command line, enter the following to connect with vncviewer via your forwarded port:
 
  [<b>laptop</b>:~] vncviewer localhost:<span style="Color:red">5905</span>
 
-Mac or Windows users may optionally click the <i>TigerVNC Viewer</i> application icon on their desktop and enter '''localhost:<span style="Color:red">5905</span>''' in the "Connection Details" dialogue box that appears.  Keep in mind that strict memory and cputime limits apply on cluster login nodes.  If you require more resources, then start your VNC server on a cluster compute node instead as described in the next section.
+Mac or Windows users may optionally click the <i>TigerVNC Viewer</i> application icon on their desktop and enter '''localhost:<span style="Color:red">5905</span>''' in the "Connection Details" dialogue box that appears.  Keep in mind that memory and cputime limits apply on cluster login nodes.  If you require more resources, then instead start your VNC server on a cluster compute node as described in the next section.
 
 == Compute nodes ==
 
-Where VDI login nodes are unavailable you can start a VNC server on a compute node, and with suitable port forwarding, connect to it from your desktop.  This gives you dedicated access to the server, but does not provide a full graphical desktop or hardware-accelerated OpenGL.
+If your program requires memory and/or cputime limits greater than those provided on a cluster login node(s), then connect to a cluster compute node using the <code>salloc</code> command, start a VNC server, and then start a secure tunnel to it (with suitable port forwarding) and connect to it from your desktop with a vncviewer.  This approach will give you dedicated access to your vnc server on a compute node with full graphical desktop however by default it will not have hardware-accelerated OpenGL capabilities.
 
 <b>1) Start a VNC server</b>
 
@@ -121,27 +105,27 @@ Then, start a VNC server with <code>vncserver</code> noting which compute node y
  [<b>c48</b>(compute node):~] vncserver<br>
  Desktop 'TurboVNC: c48.nibi.sharcnet:1 (yourusername)' started on display <b>c48</b>.nibi.sharcnet:1<br>
  Starting applications specified in /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/xstartup.turbovnc
- Log file is /home/yourusername/.vnc/<b>c48</b>.nibi.sharcnet:1.log
+ Log file is <span style="Color:green">/home/yourusername/.vnc/<b>c48</b>.nibi.sharcnet:1.log</span>
 
 Run the grep command on the log file to determine which port your VNC server is listening on:
 
- [<b>c48</b>(compute node):~] grep -iE "\sport|kill" /home/yourusername/.vnc/<b>c48</b>.nibi.sharcnet:1.log
+ [<b>c48</b>(compute node):~] grep -iE "\sport|kill" <span style="Color:green">/home/yourusername/.vnc/<b>c48</b>.nibi.sharcnet:1.log</span>
  26/08/2025 10:43:36 Listening for VNC connections on TCP port <span style="Color:blue">5901</span>
 
 <b>2) Set up a SSH tunnel to the VNC server</b>
 
 Once your VNC server has been started, you must create a secure "bridge" or "tunnel" from your laptop to the compute node where your vncserver is running (as determined in the previous step above).  There are two types of tunnel commands that maybe used depending on which cluster you are using.
 
-For all clusters (<b>except</b> nibi) the previously recommended form of the tunnel command <code>ssh username@clustername -L localforwardedport:computnode:remotelisteningport</code> may continue to be used.  As an  example, if a vncserver is started on <code>rorqual</code> compute node <b>rc12509</b> the the local port on your laptop to be forwarded is once again <span style="Color:green">5905</span> then the appropriate tunnel command would be:
+For all clusters (<b>except</b> nibi) the previously recommended form of the tunnel command <code>ssh username@clustername -L localforwardedport:<span style="Color:orange">computenode</span>:remotelisteningport</code> may continue to be used.  As an  example, if a vncserver is started on <code>rorqual</code> compute node <b><span style="Color:orange">rc12509</span></b> and the local port on your laptop to be forwarded is again <span style="Color:red">5905</span> the appropriate tunnel command becomes:
 
- [<b>laptop</b>:~] ssh username@rorqual.alliancecan.ca -L <span style="Color:green">5905</span>:<b>rc12509</b>:<span style="Color:blue">5901</span>
+ [<b>laptop</b>:~] ssh username@rorqual.alliancecan.ca -L <span style="Color:red">5905</span>:<b><span style="Color:orange">rc12509</span></b>:<span style="Color:blue">5901</span>
  Duo two-factor login for username
  Enter a passcode or select one of the following options:
  [rc12509(compute node):~] 
 
-For nibi, a new form of the tunnel command <code>ssh -J username@clustername -L localforwardedport:localhost:remotelisteningport computenode</code> must be used.  In addition a SSH key pair must created on your laptop with the contents of the pub key entered into your <code>~/.ssh/authorized_keys</code> file on <code>nibi</code>.  This approach will also work on any other cluster and so may eventually be preferred.  Continuing with the above example, where <b>c48</b> is the compute node that you started your vncserver on, and <span style="Color:green">5905</span> is the local port on your laptop being forwarded, then the tunnel command to nibi would be:
+For nibi, a new form of the tunnel command <code>ssh -J username@clustername -L localforwardedport:<span style="Color:orange">localhost</span>:remotelisteningport computenode</code> must be used.  In addition a SSH key pair must created on your laptop with the contents of the pub key entered into your <code>~/.ssh/authorized_keys</code> file on <code>nibi</code>.  This approach will also work on any other cluster and so may eventually be preferred.  Continuing with the above example, where <b><span style="Color:green">c48</span></b> is the compute node that you started your vncserver on, and <span style="Color:red">5905</span> is the local port on your laptop being forwarded, the tunnel command would be:
 
- [<b>laptop</b>:~] ssh -J username@nibi.alliancecan.ca -L <span style="Color:green">5905</span>:localhost:<span style="Color:blue">5901</span> <b>c48</b>
+ [<b>laptop</b>:~] ssh -J username@nibi.alliancecan.ca -L <span style="Color:red">5905</span>:<span style="Color:orange">localhost</span>:<span style="Color:blue">5901</span> <b><span style="Color:green">c48<span></b>
  Duo two-factor login for username
  Enter a passcode or select one of the following options:
  [c48(compute node):~]
@@ -152,7 +136,7 @@ If you exit the node that your tunnel is connected to, you will no longer be abl
 
 If you have a Linux desktop, open a new local terminal window and tell your VNC client to connect to '''localhost:port'''. The following example uses the TigerVNC <code>vncviewer</code> command to connect to the running VNC server on cdr768. You will be prompted for the VNC password that you set up earlier in order to connect.
 
- [<b>laptop</b>:~]$ vncviewer localhost:<span style="Color:green">5905</span><br>
+ [<b>laptop</b>:~]$ vncviewer localhost:<span style="Color:red">5905</span><br>
  TigerVNC viewer v1.15.0
  Built on: 2025-02-16 03:59
  Copyright (C) 1999-2025 TigerVNC team and many others (see README.rst)
@@ -172,8 +156,6 @@ If you have a Linux desktop, open a new local terminal window and tell your VNC 
 If you are on a Mac or Windows desktop (not a linux distro) then instead of running the <code>vncviewer</code> from the command line, you may click the <i>TigerVNC Viewer</i> application icon and enter your '''localhost:port''' information as shown here: [[File:VNCviewerConnect3.png|400px|thumb'''Mac Tiger VNC Viewer Connection Details Dialogue Box''']].   As a side note, the default VNC port assumed by <i>TigerVNC Viewer</I> is 5900, therefore if you specified 5900 as the local port to be forwarded when you started your SSH tunnel, then you could simply specify '''localhost'''.  Windows users however may find they cannot set up an SSH tunnel on local port 5900 in the first place.
 
 Once <code>vncviewer</code> connects you will be presented with a [https://mate-desktop.org/ Linux MATE desktop]. To launch a terminal, click on the top menu on "Applications -> System Tools -> MATE Terminal". You may also add a shortcut to the top menu by right-clicking on "MATE Terminal" and by clicking on "Add this launcher to panel". Finally, to launch a program, invoke the command as you would normally within a <code>bash</code> session, for example <code>xclock</code>. To start a more complicated program like MATLAB, load the module and then run the <code>matlab</code> command.
-
-If you experience graphics issues when using VNC as described above, try using [https://ondemand.sharcnet.ca/ OpenOnDemand] on <b>nibi</b> cluster or [https://jupyterhub.rorqual.alliancecan.ca JupyterHub] on <b>rorqual</b> cluster.  Both systems offer a fully automated VDI web interface gui experience designed for ease of use and offer improved hardware performance and software support.
 
 = More information =
 
@@ -236,84 +218,24 @@ The procedure to login to gra-vdi.alliancecan.ca is a two step process:
 
 If you enter the wrong username/password for 1) you will still be prompted by 2).  If you then send your username/passcode then you will receive a message that says <b>Success, Logging you in...</b> and be returned to the login screen of 1).  The solution is to try again being sure to enter your correct username/password combination.  If you cannot recall your alliance ccdb password then visit [https://ccdb.alliancecan.ca/security/forgot here] to reset it assuming your account it not pending renewal by your PI.
 
-= Software =
+== OpenGL Graphics ==
 
-The VDI nodes support direct vncviewer connections and GPU-accelerated OpenGL graphics for appropriately-configured software applications. The VDI nodes also provide an extra set of software modules in the SnEnv environment, analogous to the StdEnv environments available on all our clusters.<br><br>
-On regular login nodes, a standard software environment and some default modules are automatically loaded when you log in.  This is not so on a VDI node, thus you will see:
+To run a graphics based program that utilizes hardware-based accelerated OpenGL, a couple of changes will be required in the above <b>Compute Nodes</b> section.
 
-{{Command|prompt=[name@gra-vdi4]$
-|module list
-|result=
-No modules loaded
-}}
+First, the <code>salloc</code> command must be modified to request a gpu node.  If this is not done the program will fall back to using software-based rendering on cpus which is relatively much slower.  To request the first gpu node that comes available (and in turn  minimize your queue wait time if the cluster has multiple gpu node types) simply specify:
 
-Therefore, before running any graphical software on gra-vdi you must first manually load one of the following   
+ [<b>l4</b>(login node):~] salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=1 --mem=16000 --account=def-piname
 
-== StdEnv ==
+If however the cluster you are using has multiple node types, where one is known to provide good graphics acceleration such as a node with a <b>t4</b> gpu, then specify :
 
-Most users will find it sufficient to load the StdEnv module on gra-vdi.  Doing so will provide access to the same software modules that are loaded by default on the clusters:
+ [<b>l4</b>(login node):~] salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=t4:1 --mem=16000 --account=def-piname
 
-{{Commands|prompt=[name@gra-vdi4]$ 
-|module load CcEnv StdEnv/2023
-|module avail
-}}
+Second, <code>vglrun</code> will probably need to be added just before the name of your <code>PROGRAM</code> on the command line of your VNC desktop terminal window.  For example :
 
-== SnEnv ==
+  [<b>c48</b>(compute node):~] vglrun -d egl PROGRAM
 
-In some rare cases users will need to load a locally installed module(s) on gra-vdi.  To do this the <code>SnEnv</code> must first be loaded:
+Then <code>vglrun</code> sets some extra environment variables to ensure your program will use correct virtualgl libraries.  If however your <code>PROGRAM</code> has already been patched to use the current cvmfs standard environment doing so will not be required. 
 
-{{Commands|prompt=[name@gra-vdi4]$ 
-|module load SnEnv
-|module avail
-}}
+== Portal Alternatives ==
 
-== NIX ==
-
-=== Notice === 
-
-The <code>nix</code> module is no longer available on gra-vdi (or graham).  Further there is no guarantee it will return.  Until a final decision is made the documentation in this section is being retained.
-
-=== Purpose ===
-
-Instead of loading SnEnv or StdEnv users may want to load the <code>nix</code> module which provides open-source software that is optimized to use accelerated OpenGL whenever possible. This module is only available on graham and gra-vdi and can be loaded as follows:
-
-{{Commands|prompt=[name@gra-vdi4]$ 
-|module load nix
-}}
-
-The nix and nix-env commands will now be in your path to manage software packages via NIX within your personal nix environment.
-
-=== Installing software ===
-
-To install a nix package into your environment, click the black terminal icon on the top menu bar or select <i>Applications -> System Tools -> Terminal</i>.  Once a terminal window appears, run <code>module load nix</code>.  You can now search for programs using the <code>nix search <regexp></code> command and install them in your environment using the <code>nix-env --install --attr <attribute></code> command.  As an example, to install [https://qgis.org QGIS] do the following:
-
-{{Commands|prompt=[name@gra-vdi4]$ 
-|nix search qgis
-|result=
-Attribute name: nixpkgs.qgis
-Package name: qgis
-Version: 2.18.20
-Description: User friendly Open Source Geographic Information System
-}}
-{{Commands|prompt=[name@gra-vdi4]$ 
-|nix-env --install --attr nixpkgs.qgis
-}}
-
-Your nix environment persists from one login to the next, so you only need to run an install command once. For example:
-
-{{Commands|prompt=[name@gra-vdi4]$ 
-|module load nix
-|qgis}}
-
-works!  In summary whatever software you install today will be available next time you load the nix module.
-
-=== OpenGL applications ===
-
-For accelerated OpenGL to work, it is necessary to adjust compiled binaries to pre-load "vglfaker.so" from VirtualGL.  This level of customization is automatically done for you on gra-vdi when you install any OpenGL based software package with nix.  It is however something that must be done manually after you download and install any software from outside of nix.  To do this we suggest using the <code>patchelf</code> utility to adjust the final binary.  It can be installed into nix with <code>nix-env --install --attr nixpkgs.patchelf</code> if it's not already on the system.  Then once you have built your OpenGL application against the system libraries and for example installed it as ''~/.local/bin/myglapp'' you can add the VirtualGL system library ''/usr/lib64/VirtualGL/libvglfaker.so'' by running:
-
-{{Commands|prompt=[name@gra-vdi4]$ 
-|module load nix
-|patchelf --add-needed /usr/lib64/VirtualGL/libvglfaker.so ~/.local/bin/myglapp
-}}
-
-Note that it is also possible to preload ''vglfaker.so'' via the <code>LD_PRELOAD</code> environment variable.  This is generally a bad idea as it applies indiscriminately to all binaries, and those that require a different ''vglfaker.so'' than that set in <code>LD_PRELOAD</code> will then fail.  It can be used safely in some cases in wrapper scripts.
+If you experience graphics issues when using VNC as described above, try instead using [https://ondemand.sharcnet.ca/ OpenOnDemand] on <b>nibi</b> cluster or [https://jupyterhub.rorqual.alliancecan.ca JupyterHub] on <b>rorqual</b> cluster.  Both systems offer an automated modern desktop VDI web interface gui experience that is designed for ease of use with improved hardware performance and software support.
