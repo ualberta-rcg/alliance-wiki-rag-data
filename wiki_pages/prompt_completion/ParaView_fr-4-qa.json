@@ -1,74 +1,58 @@
 [
   {
-    "question": "How do you establish an SSH tunnel for a ParaView client-server connection on Trillium?",
-    "answer": "You establish an SSH tunnel by executing the command `ssh YOURusername@trillium.alliancecan.ca -L11111:niaXYZW:11111 -N` on your Mac/Linux computer."
+    "question": "What packages are required to be installed on a CentOS VM before compiling ParaView or VisIt for a custom setup?",
+    "answer": "On a CentOS VM, you need to install `xauth`, `wget`, `gcc`, `gcc-c++`, `ncurses-devel`, `python-devel`, `libxcb-devel`, `patch`, `imake`, `libxml2-python`, `mesa-libGL`, `mesa-libGL-devel`, `mesa-libGLU`, `mesa-libGLU-devel`, `bzip2`, `bzip2-libs`, `libXt-devel`, `zlib-devel`, `flex`, and `byacc`."
   },
   {
-    "question": "What is the purpose of the SSH tunnel created for Trillium ParaView connections?",
-    "answer": "This SSH tunnel associates port 11111 on your local computer (`localhost`) with port 11111 on the compute node (`niaXYZW`) where the ParaView server is awaiting connections."
+    "question": "What command is used to link a specific header file on a CentOS VM as part of the prerequisites?",
+    "answer": "The command `sudo ln -s /usr/include/GL/glx.h /usr/local/include/GL/glx.h` is used to link the `glx.h` header file."
   },
   {
-    "question": "How do you configure the ParaView client to connect to the remote server on Trillium?",
-    "answer": "On your computer, start ParaView, go to 'File -> Connect', then click 'Add Server'. Configure the parameters as: `name = trillium`, `server type = Client/Server`, `host = localhost`, `port = 11111`. Then click 'Configure', select 'Manual', and click 'Save'."
+    "question": "How can a user copy their public SSH key to a cloud VM to simplify future logins?",
+    "answer": "On your computer, you can use the command `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'` to copy your public SSH key to the VM."
   },
   {
-    "question": "How do you confirm that the ParaView client has successfully connected to the server on Trillium?",
-    "answer": "The message in the terminal window where the server is running will change from `Accepting connection...` to `Client connected`."
+    "question": "Why is it necessary to compile ParaView with OSMesa support on a cloud VM?",
+    "answer": "It is necessary because most Arbutus VMs do not have access to a GPU, so OSMesa support is needed for ParaView to perform offscreen (software) rendering using the CPU."
   },
   {
-    "question": "What is the next step after successfully connecting the ParaView client to the server on Trillium?",
-    "answer": "After the connection is established, you can open a ParaView file, which will direct you to the remote file system, to visualize the data as usual."
+    "question": "What does the default configuration of OSMesa enable when compiling for a cloud VM?",
+    "answer": "The default configuration of OSMesa enables OpenSWR, which is Intel's software rasterization library for running OpenGL."
   },
   {
-    "question": "How should `pvserver` be executed for parallel rendering with multiple CPUs on Trillium?",
-    "answer": "For parallel rendering with multiple CPUs, `pvserver` should be executed with `mpiexec`, or by submitting a task script or requesting a task with `salloc` followed by `srun pvserver --mesa`."
+    "question": "Which drivers are built with OSMesa for offscreen CPU-based rendering, and which one is recommended?",
+    "answer": "Both `llvmpipe` (older and slower) and `SWR` (newer and faster) drivers are built. `SWR` is recommended for use."
   },
   {
-    "question": "What `salloc` command is used to request a task for parallel rendering with multiple CPUs on Trillium?",
-    "answer": "You can request a task using `salloc --ntasks=N*40 --nodes=N --time=1:00:00`, where `N` is the number of nodes and `N*40` is the total number of tasks (the product of the multiplication)."
+    "question": "What are the steps to compile CMake on the VM?",
+    "answer": "To compile CMake, you first download the tarball (e.g., `wget https://cmake.org/files/v4.1/cmake-4.1.1.tar.gz`), unpack it, `cd` into the directory, run `./bootstrap`, then `make`, and finally `sudo make install`."
   },
   {
-    "question": "How do you start the ParaView server using `srun` after allocating resources for parallel CPU rendering on Trillium?",
-    "answer": "After allocating resources, you need to first load the ParaView module (`module load paraview`), then run `srun pvserver --mesa`."
+    "question": "How do you compile LLVM on the VM for the ParaView server setup?",
+    "answer": "First, download LLVM (e.g., `wget https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.0/LLVM-21.1.0-Linux-X64.tar.xz`), unpack it, create and navigate to a `build` directory. Then run `cmake` with specific flags (`-DCMAKE_BUILD_TYPE=Release -DLLVM_BUILD_LLVM_DYLIB=ON -DLLVM_ENABLE_RTTI=ON -DLLVM_INSTALL_UTILS=ON -DLLVM_TARGETS_TO_BUILD:STRING=X86 ..`), followed by `make` and `sudo make install`."
   },
   {
-    "question": "Is the information regarding client-server visualization on the cloud current?",
-    "answer": "No, the section on client-server visualization on the cloud is marked as outdated."
+    "question": "What are the steps to compile Mesa with OSMesa support on the VM?",
+    "answer": "Download Mesa (e.g., `wget https://archive.mesa3d.org/mesa-25.2.3.tar.xz`), unpack it, `cd` into the directory, run `./configure` with specified flags (`--enable-opengl --disable-gles1 --disable-gles2 --disable-va --disable-xvmc --disable-vdpau --enable-shared-glapi --disable-texture-float --enable-gallium-llvm --enable-llvm-shared-libs --with-gallium-drivers=swrast,swr --disable-dri --disable-egl --disable-gbm --disable-glx --disable-osmesa --enable-gallium-osmesa`), then `make` and `sudo make install`."
   },
   {
-    "question": "Where can one find information about creating an instance for cloud client-server visualization?",
-    "answer": "The 'Cloud Quick Start/fr' page describes the creation of an instance."
+    "question": "How do you compile the ParaView server on the VM with OSMesa support?",
+    "answer": "Download ParaView (e.g., `wget https://www.paraview.org/files/v6.0/ParaView-v6.0.0.tar.gz`), unpack it, create and navigate to a `build` directory. Then run `cmake` with specific flags (`-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/centos/paraview -DPARAVIEW_USE_MPI=OFF -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_BUILD_QT_GUI=OFF -DVTK_OPENGL_HAS_OSMESA=ON -DVTK_USE_OFFSCREEN=ON -DVTK_USE_X=OFF ..`), followed by `make` and `make install`."
   },
   {
-    "question": "What packages are required to be installed on a CentOS instance for compiling ParaView and VisIt for cloud visualization?",
-    "answer": "On a CentOS instance, you need to install `xauth wget gcc gcc-c++ ncurses-devel python-devel libxcb-devel`, `patch imake libxml2-python mesa-libGL mesa-libGL-devel`, `mesa-libGLU mesa-libGLU-devel bzip2 bzip2-libs libXt-devel zlib-devel flex byacc`."
+    "question": "What is the command to start the ParaView server on the VM with SWR rendering?",
+    "answer": "To start the ParaView server, use the command `./paraview/bin/pvserver --force-offscreen-rendering --opengl-window-backend OSMesa`."
   },
   {
-    "question": "How can you copy your public SSH key to a cloud instance to simplify connections?",
-    "answer": "On your computer, you can run the command `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'` to copy your public key to the instance's `authorized_keys` file."
+    "question": "How do you set up an SSH tunnel from your local computer to the VM for the ParaView client-server connection?",
+    "answer": "On your computer, open a terminal and use the command `ssh centos@vm.ip.address -L 11111:localhost:11111` to organize an SSH tunnel from local port 11111 to the VM's port 11111."
   },
   {
-    "question": "Why is it necessary to compile ParaView with OSMesa for cloud instances?",
-    "answer": "It is necessary to compile ParaView with OSMesa because cloud instances typically do not have access to a GPU, requiring offscreen rendering."
+    "question": "After setting up the SSH tunnel, how do you connect the ParaView client on your computer to the server running on the VM?",
+    "answer": "Start the ParaView client on your computer and connect to `localhost:11111`."
   },
   {
-    "question": "What is activated by default when ParaView is compiled with OSMesa?",
-    "answer": "The default configuration of OSMesa activates OpenSWR, Intel's software rasterization library, which enables OpenGL operations."
-  },
-  {
-    "question": "What is the result of compiling ParaView with OSMesa for cloud instances?",
-    "answer": "The ParaView server will use OSMesa to construct an X-less offscreen render with a processor, using the newer and faster `llvmpipe` and `SWR` drivers; SWR is recommended."
-  },
-  {
-    "question": "What are the steps to compile CMake on a cloud instance?",
-    "answer": "To compile CMake, you need to download `cmake-3.7.0.tar.gz`, unpack it, navigate to its directory, then run `./bootstrap`, `make`, and `sudo make install`."
-  },
-  {
-    "question": "What are the initial steps for compiling LLVM on a cloud instance?",
-    "answer": "First, change directory to your home, then use `wget` to download `http://releases.llvm.org/3.9.1/llvm-3.9.1.src.tar.xz`, unpack it, create a `build` directory, and navigate into it."
-  },
-  {
-    "question": "Which CMake options are specified for compiling LLVM on a cloud instance?",
-    "answer": "The `cmake` command for LLVM compilation includes `-DCMAKE_BUILD_TYPE=Release`, `-DLLVM_BUILD_LLVM_DYLIB=ON`, `-DLLVM_ENABLE_RTTI=ON`, `-DLLVM_INSTALL_UTILS=ON`, and `-DLLVM_TARGETS_TO_BUILD:STRING=X86`."
+    "question": "What message indicates successful SWR rendering during a ParaView client-server connection to a cloud VM?",
+    "answer": "During rendering in the console, you should see the message 'SWR detected AVX2'."
   }
 ]

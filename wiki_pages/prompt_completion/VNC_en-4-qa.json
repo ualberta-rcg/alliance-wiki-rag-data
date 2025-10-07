@@ -1,94 +1,58 @@
 [
   {
-    "question": "How can I instantly terminate all vncserver processes running under my username on a node?",
-    "answer": "You can kill all vncserver processes instantly by running the command `pkill Xvnc -u $USER`."
+    "question": "What should I do if I experience repeated failures to establish a new VNC connection?",
+    "answer": "Repeated failing attempts to establish a new vncserver/vncviewer connection may be due to an old SSH tunnel still running on your desktop tying up ports. To identify and kill any such tunnels, open a terminal window on your desktop and run `ps ux | grep ssh` followed by `kill PID`."
   },
   {
-    "question": "How can I view all active vncserver sessions running under my username on a node?",
-    "answer": "You can display all vncserver sessions by running the command `vncserver -list`."
+    "question": "Which password should I use if my VNC screensaver times out and requests a password?",
+    "answer": "If your VNC screensaver times out and requests a password, enter your cluster account password to unlock it (not your vncserver password)."
   },
   {
-    "question": "What option should I use when starting a vncserver to allow multiple connections?",
-    "answer": "You should start the vncserver with the `-alwaysshared` option, for example: `vncserver -idletimeout 86400 -alwaysshared`."
+    "question": "What command can I use if the MATE desktop screensaver will not unlock?",
+    "answer": "If you are running the MATE desktop and the screensaver will not unlock, try running `killall -9 .mate-screensaver`."
   },
   {
-    "question": "What is the benefit of starting a vncserver with the `-AlwaysShared` option?",
-    "answer": "If a vncserver is started with the `-AlwaysShared` option, multiple connections can be made to it from any remote location, allowing you to seamlessly continue working from different places (e.g., office then home)."
+    "question": "Has the VNC screensaver issue been resolved on clusters?",
+    "answer": "This should no longer be a problem on our clusters as the VNC screensaver has been disabled."
   },
   {
-    "question": "What happens if a vncserver is *not* started with the `-AlwaysShared` option?",
-    "answer": "If a vncserver is not started with `-AlwaysShared`, only one vncviewer connection is possible. To reconnect from a different location, you would need to close all applications, shut down the vncserver, and then restart a new desktop and applications from scratch."
+    "question": "Describe the two-step login procedure for gra-vdi.alliancecan.ca.",
+    "answer": "The procedure to login to gra-vdi.alliancecan.ca is a two-step process: 1) enter your username and ccdb password, and 2) enter your username and Duo two-factor MFA passcode."
   },
   {
-    "question": "What could be a reason for repeated failures to establish a new vncserver/vncviewer connection?",
-    "answer": "Repeated failing attempts to connect may be due to an old SSH tunnel still running on your desktop and tying up ports."
+    "question": "What happens if I enter the wrong username/password in the first step of logging into gra-vdi.alliancecan.ca?",
+    "answer": "If you enter the wrong username/password for the first step, you will still be prompted by the second step. If you then send your username/passcode, you will receive a message that says 'Success, Logging you in...' and be returned to the login screen of the first step."
   },
   {
-    "question": "How do I identify and terminate old SSH tunnels on my desktop?",
-    "answer": "To identify old SSH tunnels, open a terminal and run `ps ux | grep ssh`. Then, use `kill PID` to terminate them, replacing PID with the process ID of the old tunnel."
+    "question": "How can I reset my Alliance ccdb password?",
+    "answer": "If you cannot recall your Alliance ccdb password, visit `https://ccdb.alliancecan.ca/security/forgot` to reset it, assuming your account is not pending renewal by your PI."
   },
   {
-    "question": "What password should I use if my VNC screensaver times out and asks for one?",
-    "answer": "You should enter your cluster account password to unlock the VNC screensaver, not your vncserver password."
+    "question": "What changes are required to run a graphics program that utilizes hardware-based accelerated OpenGL?",
+    "answer": "To run a graphics based program that utilizes hardware-based accelerated OpenGL, the `salloc` command must be modified to request a GPU node, and `vglrun` will probably need to be added just before the name of your `PROGRAM` on the command line of your VNC desktop terminal window."
   },
   {
-    "question": "If the MATE desktop screensaver will not unlock, what command can I use?",
-    "answer": "You can try running `killall -9 .mate-screensaver` if the MATE desktop screensaver will not unlock."
+    "question": "How do I request a GPU node using the `salloc` command to run OpenGL graphics programs?",
+    "answer": "To request the first GPU node that comes available, specify `salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=1 --mem=16000 --account=def-piname`. If a specific GPU type like 't4' is desired, use `salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=t4:1 --mem=16000 --account=def-piname`."
   },
   {
-    "question": "Is the VNC screensaver still an issue on the clusters?",
-    "answer": "No, the VNC screensaver has been disabled on the clusters."
+    "question": "Why is it important to request a GPU node for OpenGL graphics programs?",
+    "answer": "If a GPU node is not requested, the program will fall back to using software-based rendering on CPUs, which is relatively much slower than hardware-accelerated OpenGL."
   },
   {
-    "question": "Describe the two-step login process for gra-vdi.alliancecan.ca.",
-    "answer": "The login process for gra-vdi.alliancecan.ca involves two steps: 1) entering your username and CCDB password, and 2) entering your username and Duo two-factor MFA passcode."
+    "question": "What is the purpose of the `vglrun` command when running an OpenGL program?",
+    "answer": "`vglrun` sets some extra environment variables to ensure your program will use correct VirtualGL libraries."
   },
   {
-    "question": "What happens if I enter the wrong username or password in the first step of logging into gra-vdi.alliancecan.ca?",
-    "answer": "If you enter the wrong username/password in step 1, you will still be prompted for step 2. However, after entering your username/passcode for step 2, you will receive a message 'Success, Logging you in...' and then be returned to the login screen of step 1."
+    "question": "When is the `vglrun` command not required for an OpenGL program?",
+    "answer": "`vglrun` is not required if your `PROGRAM` has already been patched to use the current cvmfs standard environment."
   },
   {
-    "question": "How can I resolve the issue of being returned to the login screen after successfully completing the second step of login on gra-vdi.alliancecan.ca?",
-    "answer": "To resolve this, you need to try again, ensuring you enter the correct username/password combination for the first step of the login process."
+    "question": "What are some alternative solutions if I experience graphics issues when using VNC?",
+    "answer": "If you experience graphics issues when using VNC, you can try using OpenOnDemand on the nibi cluster (`https://ondemand.sharcnet.ca/`) or JupyterHub on the rorqual cluster (`https://jupyterhub.rorqual.alliancecan.ca/`)."
   },
   {
-    "question": "Where can I reset my Alliance CCDB password if I've forgotten it?",
-    "answer": "You can reset your Alliance CCDB password by visiting https://ccdb.alliancecan.ca/security/forgot, assuming your account is not pending renewal by your PI."
-  },
-  {
-    "question": "What capabilities do VDI nodes offer for software applications?",
-    "answer": "VDI nodes support direct vncviewer connections and provide GPU-accelerated OpenGL graphics for appropriately-configured software applications."
-  },
-  {
-    "question": "What additional software environment is available on VDI nodes?",
-    "answer": "VDI nodes provide an extra set of software modules in the SnEnv environment, which is analogous to the StdEnv environments found on all clusters."
-  },
-  {
-    "question": "How do VDI nodes differ from regular login nodes in terms of software environment loading?",
-    "answer": "On regular login nodes, a standard software environment and some default modules are automatically loaded. However, on VDI nodes, no modules are loaded by default, and users must manually load them before running any graphical software."
-  },
-  {
-    "question": "What is the expected output when running 'module list' on a VDI node before loading any modules?",
-    "answer": "The expected output is 'No modules loaded'."
-  },
-  {
-    "question": "How do most users load standard software modules on gra-vdi?",
-    "answer": "Most users can load standard software modules on gra-vdi by running `module load CcEnv StdEnv/2023`."
-  },
-  {
-    "question": "What does loading the StdEnv module on gra-vdi provide?",
-    "answer": "Loading the StdEnv module on gra-vdi provides access to the same software modules that are loaded by default on the clusters."
-  },
-  {
-    "question": "When is it necessary to load the SnEnv module on gra-vdi?",
-    "answer": "It is necessary to load the SnEnv module on gra-vdi in rare cases when users need to load locally installed module(s)."
-  },
-  {
-    "question": "What command is used to load the SnEnv module on gra-vdi?",
-    "answer": "The command to load the SnEnv module on gra-vdi is `module load SnEnv`."
-  },
-  {
-    "question": "Is the 'nix' module still available on gra-vdi or graham?",
-    "answer": "No, the `nix` module is no longer available on gra-vdi (or graham), and there is no guarantee it will return."
+    "question": "What benefits do OpenOnDemand and JupyterHub offer as alternatives to VNC for graphics?",
+    "answer": "Both OpenOnDemand and JupyterHub offer an automated modern desktop VDI web interface GUI experience that is designed for ease of use with improved hardware performance and software support."
   }
 ]

@@ -1,30 +1,78 @@
 [
   {
-    "question": "How can I check the available versions of the ParaView module?",
-    "answer": "You can show the available ParaView module versions by using the command `module spider paraview`."
+    "question": "What initial packages are required to compile ParaView or VisIt on a CentOS VM?",
+    "answer": "You need to install `xauth`, `wget`, `gcc`, `gcc-c++`, `ncurses-devel`, `python-devel`, `libxcb-devel`, `patch`, `imake`, `libxml2-python`, `mesa-libGL`, `mesa-libGL-devel`, `mesa-libGLU`, `mesa-libGLU-devel`, `bzip2`, `bzip2-libs`, `libXt-devel`, `zlib-devel`, `flex`, and `byacc`."
   },
   {
-    "question": "What command is used to display information about a specific ParaView module version, such as 5.11.0?",
-    "answer": "To show how to load a specific version like 5.11.0, use the command `module spider paraview/5.11.0`."
+    "question": "How do you install the base development and library packages on a CentOS VM?",
+    "answer": "Run the commands: `sudo yum install xauth wget gcc gcc-c++ ncurses-devel python-devel libxcb-devel` and `sudo yum install patch imake libxml2-python mesa-libGL mesa-libGL-devel mesa-libGLU mesa-libGLU-devel bzip2 bzip2-libs libXt-devel zlib-devel flex byacc`."
   },
   {
-    "question": "Which modules need to be loaded before starting ParaView 5.11.0, and what is the command to launch it?",
-    "answer": "You need to load `StdEnv/2020`, `gcc/9.3.0`, `openmpi/4.0.3`, and `paraview/5.11.0` modules, then start ParaView by running `paraview`."
+    "question": "What symbolic link needs to be created on a CentOS VM as part of the prerequisites?",
+    "answer": "A symbolic link from `/usr/include/GL/glx.h` to `/usr/local/include/GL/glx.h` needs to be created using `sudo ln -s /usr/include/GL/glx.h /usr/local/include/GL/glx.h`."
   },
   {
-    "question": "What is a necessary step for running the most recent versions of ParaView?",
-    "answer": "The most recent versions of ParaView require disabling the VirtualGL dynamic linker faker `LD_PRELOAD` by running the command `LD_PRELOAD=${LD_PRELOAD/libdlfaker.so/} paraview`."
+    "question": "How can you copy your SSH public key to a cloud VM to simplify future logins?",
+    "answer": "On your computer, execute the command: `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'`."
   },
   {
-    "question": "When is off-screen batch visualization recommended for ParaView?",
-    "answer": "Off-screen batch visualization is strongly recommended for large-scale and automated visualization."
+    "question": "Why is it necessary to compile ParaView with OSMesa support on a cloud VM?",
+    "answer": "It is necessary because most Arbutus VMs do not have access to a GPU, and OSMesa enables offscreen (software) rendering."
   },
   {
-    "question": "How can one perform batch rendering with ParaView?",
-    "answer": "ParaView supports Python scripting, allowing users to script their workflow and submit it as a regular, potentially parallel production job on a cluster."
+    "question": "What software rasterization library does the default OSMesa configuration enable for OpenGL?",
+    "answer": "The default configuration of OSMesa will enable OpenSWR (Intel's software rasterization library)."
   },
   {
-    "question": "Where can users find help with ParaView Python scripting for batch rendering?",
-    "answer": "For help with ParaView Python scripting, users should contact technical support."
+    "question": "What CPU-based drivers are built when ParaView is compiled with OSMesa support?",
+    "answer": "Both `llvmpipe` (older and slower) and `SWR` (newer and faster) drivers are built."
+  },
+  {
+    "question": "Which OSMesa driver is recommended for use with ParaView on a cloud VM?",
+    "answer": "`SWR` (Software Rasterizer) is the recommended driver."
+  },
+  {
+    "question": "What are the steps to compile CMake on a VM?",
+    "answer": "First, download CMake 4.1.1 using `wget https://cmake.org/files/v4.1/cmake-4.1.1.tar.gz`. Then, unpack it, navigate into its directory, run `./bootstrap`, `make`, and `sudo make install`."
+  },
+  {
+    "question": "How do you download and prepare LLVM for compilation on a VM?",
+    "answer": "Navigate to your home directory, download LLVM 21.1.0 using `wget https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.0/LLVM-21.1.0-Linux-X64.tar.xz`, unpack it, and then create and navigate into a `build` directory."
+  },
+  {
+    "question": "What CMake flags are used when configuring LLVM for compilation?",
+    "answer": "The CMake flags used are `-DCMAKE_BUILD_TYPE=Release`, `-DLLVM_BUILD_LLVM_DYLIB=ON`, `-DLLVM_ENABLE_RTTI=ON`, `-DLLVM_INSTALL_UTILS=ON`, and `-DLLVM_TARGETS_TO_BUILD:STRING=X86`."
+  },
+  {
+    "question": "What are the steps to compile Mesa with OSMesa on a VM?",
+    "answer": "First, download Mesa 25.2.3 from `https://archive.mesa3d.org/mesa-25.2.3.tar.xz`. Then, unpack it, run `./configure` with specific flags (e.g., `--enable-opengl`, `--enable-gallium-osmesa`), followed by `make` and `sudo make install`."
+  },
+  {
+    "question": "Which `configure` flags are important for enabling OSMesa and SWR drivers when compiling Mesa?",
+    "answer": "Important flags include `--enable-gallium-llvm`, `--enable-llvm-shared-libs`, `--with-gallium-drivers=swrast,swr`, `--disable-osmesa`, and `--enable-gallium-osmesa`."
+  },
+  {
+    "question": "What are the steps to compile the ParaView server on a VM for offscreen rendering?",
+    "answer": "Download ParaView 6.0.0 from `https://www.paraview.org/files/v6.0/ParaView-v6.0.0.tar.gz`, unpack it, create a `build` directory, and run `cmake` with specific flags (e.g., `-DPARAVIEW_USE_MPI=OFF`, `-DVTK_OPENGL_HAS_OSMESA=ON`), followed by `make` and `make install`."
+  },
+  {
+    "question": "What CMake flags are necessary for building the ParaView server with OSMesa and offscreen capabilities?",
+    "answer": "Key CMake flags include `-DPARAVIEW_USE_MPI=OFF`, `-DPARAVIEW_ENABLE_PYTHON=ON`, `-DPARAVIEW_BUILD_QT_GUI=OFF`, `-DVTK_OPENGL_HAS_OSMESA=ON`, `-DVTK_USE_OFFSCREEN=ON`, and `-DVTK_USE_X=OFF`."
+  },
+  {
+    "question": "How do you start the ParaView server on the VM with SWR rendering after compilation?",
+    "answer": "Execute the command `./paraview/bin/pvserver --force-offscreen-rendering --opengl-window-backend OSMesa`."
+  },
+  {
+    "question": "How do you set up an SSH tunnel from your local computer to the VM for the ParaView client-server connection?",
+    "answer": "On your computer, run `ssh centos@vm.ip.address -L 11111:localhost:11111` to tunnel local port 11111 to the VM's port 11111."
+  },
+  {
+    "question": "What message in the console indicates that SWR is being used for rendering when connecting to the ParaView server on the VM?",
+    "answer": "You should see the message `SWR detected AVX2` in the console during rendering."
+  },
+  {
+    "question": "Where should the ParaView client be configured to connect to the server running on the VM via an SSH tunnel?",
+    "answer": "The ParaView client on your computer should be configured to connect to `localhost:11111`."
   }
 ]

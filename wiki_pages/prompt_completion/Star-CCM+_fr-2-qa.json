@@ -1,66 +1,62 @@
 [
   {
-    "question": "What are the common SBATCH directives used in STAR-CCM+ job scripts for clusters like Fir, Rorqual, Nibi, Narval, and Trillium?",
-    "answer": "Common SBATCH directives include `--account=def-group`, `--time=00-01:00`, `--nodes=1`, `--mem=0`, and `--ntasks-per-node=1`. The `--ntasks-per-node` value should not be changed."
+    "question": "What is the purpose of the 'Scripts pour l'ordonnanceur' section?",
+    "answer": "The 'Scripts pour l'ordonnanceur' section provides example Slurm scripts for submitting STAR-CCM+ batch jobs on different clusters like Fir/Rorqual/Nibi and Narval."
   },
   {
-    "question": "Which modules should be loaded before running STAR-CCM+ jobs on these clusters?",
-    "answer": "You should load `StdEnv/2023` and `starccm-mixed/20.04.007` (or `starccm/20.04.007-R8`). The Trillium cluster also requires `CCEnv`."
+    "question": "What are the SBATCH directives for the Fir/Rorqual/Nibi cluster script?",
+    "answer": "For the Fir/Rorqual/Nibi cluster, the SBATCH directives are:\n- `--account=def-group` (Specify some account)\n- `--time=00-01:00` (Time limit: dd-hh:mm)\n- `--nodes=1` (Specify 1 or more nodes)\n- `--cpus-per-task=192` (Request all cores per node)\n- `--mem=0` (Request all memory per node)\n- `--ntasks-per-node=1` (Do not change this value)"
   },
   {
-    "question": "How do you specify the input simulation file and an optional Java macro file in a STAR-CCM+ SLURM script?",
-    "answer": "The input simulation file is specified by setting `SIM_FILE='mysample.sim'`, and an optional Java macro file can be included by uncommenting `JAVA_FILE='mymacros.java'` and providing the filename."
+    "question": "Which modules are loaded in the STAR-CCM+ job script for Fir/Rorqual/Nibi?",
+    "answer": "The modules loaded in the STAR-CCM+ job script for Fir/Rorqual/Nibi are `StdEnv/2023` and `starccm-mixed/20.04.007`."
   },
   {
-    "question": "How many CPUs per task are typically requested for STAR-CCM+ jobs on Fir/Rorqual/Nibi, Narval, and Trillium clusters?",
-    "answer": "Fir/Rorqual/Nibi and Trillium typically request `--cpus-per-task=192`, while Narval requests `--cpus-per-task=64`."
+    "question": "How is the input simulation file specified in the Fir/Rorqual/Nibi script?",
+    "answer": "The input simulation file is specified by setting the `SIM_FILE` variable, for example, `SIM_FILE='mysample.sim'`."
   },
   {
-    "question": "How is a Siemens Power on Demand (PoD) license configured and used within a STAR-CCM+ SLURM script?",
-    "answer": "For a Siemens PoD license, the `LM_PROJECT` environment variable must be set to your CD-ADAPCO PROJECT ID (e.g., `LM_PROJECT='my22digitpodkey'`), and the `starccm+` command includes `-power -podkey $LM_PROJECT`."
+    "question": "How is the temporary directory for STAR-CCM+ handled in the Fir/Rorqual/Nibi script?",
+    "answer": "The temporary directory is set by exporting `STARCCM_TMP=\"${SCRATCH}/.starccm-${EBVERSIONSTARCCM}\"` and then created with `mkdir -p \"$STARCCM_TMP\"`."
   },
   {
-    "question": "What is the main difference in the `starccm+` command when using an institutional license server compared to a Siemens PoD license in a job script?",
-    "answer": "When using an institutional license server, the `-power -podkey $LM_PROJECT` options are omitted from the `starccm+` command line."
+    "question": "How is the `NCORE` variable calculated in the Fir/Rorqual/Nibi job script?",
+    "answer": "The `NCORE` variable is calculated as the product of `SLURM_NNODES`, `SLURM_CPUS_PER_TASK`, and `SLURM_NTASKS_PER_NODE` using the expression `NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))`."
   },
   {
-    "question": "Which MPI implementation is used for STAR-CCM+ jobs on Fir/Rorqual/Nibi and Narval clusters?",
-    "answer": "On Fir/Rorqual/Nibi clusters, the `intel -fabric psm2` MPI implementation is used. On Narval, `openmpi` is used."
+    "question": "What is the command to run STAR-CCM+ with a Siemens PoD license on Fir/Rorqual/Nibi?",
+    "answer": "If an `LM_PROJECT` variable is set (indicating a Siemens PoD license server), the command to run STAR-CCM+ on Fir/Rorqual/Nibi is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi intel -fabric psm2`."
   },
   {
-    "question": "What special steps are required for using a Siemens PoD license on the Trillium cluster, including any workarounds for license failures?",
-    "answer": "On Trillium, you need to set `LM_PROJECT`, `FLEXPORT`, `VENDPORT`, and `LICSERVER` variables, export `CDLMD_LICENSE_FILE`, and use an `ssh nia-gw` command for license forwarding. There's also a workaround that retries starting `starccm+` up to 5 times if license failures occur."
+    "question": "What MPI implementation is used for STAR-CCM+ jobs on Fir/Rorqual/Nibi?",
+    "answer": "For STAR-CCM+ jobs on Fir/Rorqual/Nibi, the MPI implementation used is `intel -fabric psm2`."
   },
   {
-    "question": "What are the initial steps to configure an account for remote visualization with STAR-CCM+?",
-    "answer": "You must create the license file `~/.licenses/starccm.lic`. If using a POD license, configure `export LM_PROJECT='CD-ADAPCO PROJECT ID'` and add `-power` to the command line options."
+    "question": "What are the SBATCH directives for the Narval cluster script?",
+    "answer": "For the Narval cluster, the SBATCH directives are:\n- `--account=def-group` (indiquez le nom du compte)\n- `--time=00-01:00` (indiquez la limite de temps (jj-hh:mm))\n- `--nodes=1` (indiquez 1 ou plusieurs n\u0153uds)\n- `--cpus-per-task=64` (demandez tous les c\u0153urs par n\u0153ud)\n- `--mem=0` (demandez toute la m\u00e9moire par n\u0153ud)\n- `--ntasks-per-node=1` (ne pas modifier)"
   },
   {
-    "question": "How do you launch STAR-CCM+ version 15.04.010 or newer for remote visualization on compute nodes?",
-    "answer": "After connecting with TigerVNC, load `StdEnv/2020`, then `starccm-mixed/17.02.007` (or `starccm/16.04.007-R8`), and finally run `starccm+`."
+    "question": "Which modules are loaded in the STAR-CCM+ job script for Narval?",
+    "answer": "The modules loaded in the STAR-CCM+ job script for Narval are `StdEnv/2023` and `starccm-mixed/20.04.007`."
   },
   {
-    "question": "What commands are used to start STAR-CCM+ versions 13.06.012 or older for remote visualization on compute nodes?",
-    "answer": "For STAR-CCM+ versions 13.06.012 or older, load `StdEnv/2016`, then `module load starccm-mixed/13.06.012` (or `starccm/13.06.012-R8`), and run `starccm+ -mesa`."
+    "question": "How is the Siemens Power on Demand (PoD) Key specified in the Narval script?",
+    "answer": "In the Narval script, the Siemens Power on Demand (PoD) Key is specified by setting `LM_PROJECT='my22digitpodkey'`, which should be commented out when using an institutional license server."
   },
   {
-    "question": "How do you open a terminal on VDI nodes (gra-vdi) after connecting with TigerVNC to launch STAR-CCM+?",
-    "answer": "Once the remote desktop is displayed, click on `Applications-->Systems Tools-->Mate Terminal` to open a terminal window."
+    "question": "What is the command to run STAR-CCM+ with an institutional license server on Narval?",
+    "answer": "If `LM_PROJECT` is not set (indicating an institutional license server), the command to run STAR-CCM+ on Narval is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi openmpi`."
   },
   {
-    "question": "What is the current limitation regarding OpenGL acceleration for STAR-CCM+ on gra-vdi nodes?",
-    "answer": "Only the MESA implementation of OpenGL can currently be used on gra-vdi with STAR-CCM+ due to issues with VirtualGL, which typically provides local GPU acceleration for OpenGL graphics."
+    "question": "What MPI implementation is used for STAR-CCM+ jobs on Narval?",
+    "answer": "For STAR-CCM+ jobs on Narval, the MPI implementation used is `openmpi`."
   },
   {
-    "question": "What are the commands to launch STAR-CCM+ version 18.04.008 or newer for remote visualization on VDI nodes?",
-    "answer": "Load `CcEnv` and `StdEnv/2023`, then `starccm-mixed/18.04.008` (or `starccm/18.04.008-R8`), and run `starccm+ -rr server`."
+    "question": "What is a key difference in the `--cpus-per-task` SBATCH directive between Fir/Rorqual/Nibi and Narval job scripts?",
+    "answer": "The Fir/Rorqual/Nibi job script requests `--cpus-per-task=192`, while the Narval job script requests `--cpus-per-task=64`."
   },
   {
-    "question": "How do you start STAR-CCM+ versions from 15.04.010 up to 18.02.008 on VDI nodes for remote visualization?",
-    "answer": "Load `CcEnv` and `StdEnv/2020`, then `starccm-mixed/15.04.010` (or `starccm/15.04.010-R8`), and run `starccm+ -mesa`."
-  },
-  {
-    "question": "Which commands are used to launch STAR-CCM+ version 13.06.012 or older on VDI nodes for remote visualization?",
-    "answer": "Load `CcEnv` and `StdEnv/2016`, then `starccm-mixed/13.06.012` (or `starccm/13.06.012-R8`), and run `starccm+ -mesa`."
+    "question": "What is the difference in MPI fabric/implementation between Fir/Rorqual/Nibi and Narval for STAR-CCM+?",
+    "answer": "Fir/Rorqual/Nibi uses `-mpi intel -fabric psm2` for STAR-CCM+, whereas Narval uses `-mpi openmpi`."
   }
 ]

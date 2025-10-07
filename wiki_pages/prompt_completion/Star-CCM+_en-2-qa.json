@@ -1,114 +1,54 @@
 [
   {
-    "question": "What is the default Slurm account specified in the `starccm_job.sh` scripts across different clusters?",
-    "answer": "The default Slurm account specified is `def-group`."
+    "question": "How is the license server port extracted from the CDLMD_LICENSE_FILE in the Slurm script for Fir/Rorqual/Nibi?",
+    "answer": "The license server port is extracted using the command `port=$(cat $CDLMD_LICENSE_FILE | grep -Eo '[0-9]+$')`."
   },
   {
-    "question": "What is the default time limit set for STAR-CCM+ jobs in the provided Slurm scripts?",
-    "answer": "The default time limit is `00-01:00`."
+    "question": "What utility is used to generate the machinefile for STAR-CCM+ jobs on Fir/Rorqual/Nibi and Narval clusters?",
+    "answer": "The `slurm_hl2hl.py` utility is used to generate the machinefile: `slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile`."
   },
   {
-    "question": "How many nodes are generally requested in the STAR-CCM+ Slurm job scripts?",
-    "answer": "Generally, `1` node is requested."
+    "question": "How is the total number of cores (NCORE) calculated in the Slurm scripts for Fir/Rorqual/Nibi and Narval?",
+    "answer": "The total number of cores (NCORE) is calculated as `NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))`."
   },
   {
-    "question": "How much memory is typically requested per node in the STAR-CCM+ Slurm job scripts?",
-    "answer": "Typically, `0` (indicating all memory per node) is requested."
+    "question": "What is the `starccm+` command for using a Siemens PoD license server on the Fir/Rorqual/Nibi cluster?",
+    "answer": "For a Siemens PoD license server on Fir/Rorqual/Nibi, the command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi intel -fabric psm2`."
   },
   {
-    "question": "What value is set for `ntasks-per-node` in the STAR-CCM+ Slurm job scripts?",
-    "answer": "`ntasks-per-node` is set to `1`."
+    "question": "What is the `starccm+` command for using an institutional license server on the Fir/Rorqual/Nibi cluster?",
+    "answer": "For an institutional license server on Fir/Rorqual/Nibi, the command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi intel -fabric psm2`."
   },
   {
-    "question": "What variable is used to specify the input simulation filename in the STAR-CCM+ Slurm scripts?",
-    "answer": "`SIM_FILE` is used, typically set to `mysample.sim`."
+    "question": "Which MPI implementation and fabric are used for STAR-CCM+ jobs on the Fir/Rorqual/Nibi cluster?",
+    "answer": "On the Fir/Rorqual/Nibi cluster, STAR-CCM+ jobs use `intel` MPI with `psm2` fabric."
   },
   {
-    "question": "How is an input Java filename specified in the STAR-CCM+ Slurm scripts?",
-    "answer": "The `JAVA_FILE` variable can be uncommented and set, for example, to `mymacros.java`."
+    "question": "What is the `starccm+` command for using a Siemens PoD license server on the Narval cluster?",
+    "answer": "For a Siemens PoD license server on Narval, the command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi openmpi`."
   },
   {
-    "question": "How is the Siemens Power on Demand (PoD) Key specified in the STAR-CCM+ Slurm scripts?",
-    "answer": "It is specified using the `LM_PROJECT` environment variable, such as `LM_PROJECT='my22digitpodkey'`."
+    "question": "What is the `starccm+` command for using an institutional license server on the Narval cluster?",
+    "answer": "For an institutional license server on Narval, the command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi openmpi`."
   },
   {
-    "question": "What Python script is used to generate the `machinefile` for STAR-CCM+ jobs?",
-    "answer": "`slurm_hl2hl.py --format STAR-CCM+` is used to generate the machinefile in `$SLURM_TMPDIR`."
+    "question": "Which MPI implementation is used for STAR-CCM+ jobs on the Narval cluster?",
+    "answer": "On the Narval cluster, STAR-CCM+ jobs use `openmpi`."
   },
   {
-    "question": "How is the total number of cores (`NCORE`) calculated in the STAR-CCM+ Slurm scripts?",
-    "answer": "`NCORE` is calculated as `SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE`."
+    "question": "Which environment variable is checked to differentiate between Siemens PoD and institutional license server usage in the Slurm scripts?",
+    "answer": "The `LM_PROJECT` environment variable is checked (`if [ -n \"$LM_PROJECT\" ]; then`) to determine if a Siemens PoD license server is being used."
   },
   {
-    "question": "What is the `cpus-per-task` setting for STAR-CCM+ jobs on Fir/Rorqual/Nibi clusters?",
-    "answer": "`cpus-per-task` is set to `192`."
+    "question": "What are the default values for FLEXPORT, VENDPORT, and LICSERVER in the Trillium Slurm script configuration for the cd-adapco PoD license server?",
+    "answer": "The default values are `FLEXPORT=1999`, `VENDPORT=2099`, and `LICSERVER=flex.cd-adapco.com`."
   },
   {
-    "question": "Which environment modules are loaded for STAR-CCM+ on Fir/Rorqual/Nibi clusters?",
-    "answer": "`StdEnv/2023` and `starccm-mixed/20.04.007` modules are loaded."
+    "question": "How is the `CDLMD_LICENSE_FILE` explicitly set in the Trillium Slurm script?",
+    "answer": "The `CDLMD_LICENSE_FILE` is explicitly set as `export CDLMD_LICENSE_FILE=\"$FLEXPORT@127.0.0.1\"`."
   },
   {
-    "question": "How is the license server port identified and its reachability verified within the Fir/Rorqual/Nibi Slurm script?",
-    "answer": "The port is identified by `port=$(cat $CDLMD_LICENSE_FILE | grep -Eo '[0-9]+$')` and reachability is verified using `nmap $server -Pn -p $port`."
-  },
-  {
-    "question": "What is the command line for running STAR-CCM+ with a Siemens PoD license on Fir/Rorqual/Nibi clusters?",
-    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi intel -fabric psm2`."
-  },
-  {
-    "question": "What is the command line for running STAR-CCM+ with an institutional license on Fir/Rorqual/Nibi clusters?",
-    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi intel -fabric psm2`."
-  },
-  {
-    "question": "What is the `cpus-per-task` setting for STAR-CCM+ jobs on the Narval cluster?",
-    "answer": "`cpus-per-task` is set to `64`."
-  },
-  {
-    "question": "Which environment modules are loaded for STAR-CCM+ on the Narval cluster?",
-    "answer": "`StdEnv/2023` and `starccm-mixed/20.04.007` modules are loaded."
-  },
-  {
-    "question": "What MPI implementation is used for STAR-CCM+ jobs on the Narval cluster?",
-    "answer": "`openmpi` is used."
-  },
-  {
-    "question": "What is the command line for running STAR-CCM+ with a Siemens PoD license on the Narval cluster?",
-    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi openmpi`."
-  },
-  {
-    "question": "What is the command line for running STAR-CCM+ with an institutional license on the Narval cluster?",
-    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi openmpi`."
-  },
-  {
-    "question": "What is the `cpus-per-task` setting for STAR-CCM+ jobs on the Trillium cluster?",
-    "answer": "`cpus-per-task` is set to `192`."
-  },
-  {
-    "question": "Which environment modules are loaded for STAR-CCM+ on the Trillium cluster?",
-    "answer": "`CCEnv`, `StdEnv/2023`, and `starccm-mixed/20.04.007` modules are loaded."
-  },
-  {
-    "question": "What are the specific license server variables defined in the Trillium Slurm script?",
-    "answer": "`FLEXPORT=1999`, `VENDPORT=2099`, and `LICSERVER=flex.cd-adapco.com` are defined."
-  },
-  {
-    "question": "How is the `CDLMD_LICENSE_FILE` environment variable set for STAR-CCM+ jobs on Trillium, when not using `~/.licenses/starccm.lic`?",
-    "answer": "It is set as `export CDLMD_LICENSE_FILE=\"$FLEXPORT@127.0.0.1\"`."
-  },
-  {
-    "question": "What command is used to establish an SSH tunnel for license server ports on Trillium?",
-    "answer": "`ssh nia-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f` is used."
-  },
-  {
-    "question": "What mechanism is implemented in the Trillium script to handle potential STAR-CCM+ license failures during startup?",
-    "answer": "A `while` loop retries the STAR-CCM+ command up to 5 times if the exit status is not 0."
-  },
-  {
-    "question": "What is the command line for running STAR-CCM+ with a Siemens PoD license on Trillium?",
-    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
-  },
-  {
-    "question": "What is the command line for running STAR-CCM+ with an institutional license on Trillium?",
-    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
+    "question": "What command is used for SSH tunneling in the Trillium Slurm script to access license servers?",
+    "answer": "The SSH tunneling command used is `ssh tri-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f`."
   }
 ]

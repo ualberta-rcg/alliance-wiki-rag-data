@@ -1,42 +1,50 @@
 [
   {
-    "question": "What is the first step to connect to gra-vdi for ParaView visualization?",
-    "answer": "First, connect to gra-vdi as described in the TigerVNC documentation."
+    "question": "What does the Slurm job submission script for parallel batch rendering look like?",
+    "answer": "A Slurm job submission script named `distributed.sh` for parallel rendering includes `#!/bin/bash`, sets `--time=3:0:0`, `--mem-per-cpu=3600`, `--ntasks=4`, `--account=def-someuser`, and runs `srun pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py`."
   },
   {
-    "question": "What command should be run in the terminal after connecting to gra-vdi?",
-    "answer": "After connecting to gra-vdi, open a terminal window and run `module load CcEnv`."
+    "question": "How do you load the ParaView module and submit a parallel batch rendering job?",
+    "answer": "You load the ParaView module using `module load paraview/6.0.0` and then submit the batch job with `sbatch distributed.sh`."
   },
   {
-    "question": "How can I check the available ParaView module versions on Graham VDI?",
-    "answer": "You can show the available ParaView module versions by running `module spider paraview`."
+    "question": "When should client-server visualization in a cloud VM be used for ParaView?",
+    "answer": "This approach should be used only if you require a custom setup that is not supported by the cluster-installed ParaView."
   },
   {
-    "question": "What command shows how to load a specific ParaView version like 5.11.0?",
-    "answer": "To show how to load a specific version such as 5.11.0, use the command `module spider paraview/5.11.0`."
+    "question": "What is the first step to setting up a virtual machine for ParaView or VisIt visualization?",
+    "answer": "The first step is to launch a new virtual machine (VM) by following the Cloud Quick Start Guide."
   },
   {
-    "question": "Which modules need to be loaded to start ParaView version 5.11.0 on Graham VDI?",
-    "answer": "You need to load `StdEnv/2020`, `gcc/9.3.0`, `openmpi/4.0.3`, and `paraview/5.11.0`."
+    "question": "Which additional packages need to be installed on a CentOS VM to compile ParaView or VisIt?",
+    "answer": "On a CentOS VM, you need to install `xauth wget gcc gcc-c++ ncurses-devel python-devel libxcb-devel`, `patch imake libxml2-python mesa-libGL mesa-libGL-devel`, `mesa-libGLU mesa-libGLU-devel bzip2 bzip2-libs libXt-devel zlib-devel flex byacc`, and create a symlink with `sudo ln -s /usr/include/GL/glx.h /usr/local/include/GL/glx.h`."
   },
   {
-    "question": "How do you launch ParaView after loading the necessary modules on Graham VDI?",
-    "answer": "After loading the required modules, you can start ParaView by running the command `paraview`."
+    "question": "How can you simplify logins to a VM using an existing private-public SSH key pair?",
+    "answer": "On your computer, issue the command: `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'` to copy your public key to the VM's authorized_keys."
   },
   {
-    "question": "What adjustment is needed for recent ParaView versions when starting it on Graham VDI?",
-    "answer": "The most recent versions of ParaView require disabling the VirtualGL dynamic linker faker by setting `LD_PRELOAD=${LD_PRELOAD/libdlfaker.so/} paraview` before running the `paraview` command."
+    "question": "Why is OSMesa support required when compiling ParaView for a cloud VM?",
+    "answer": "OSMesa support is needed because most Arbutus VMs do not have GPU access, enabling ParaView to perform offscreen (software) rendering."
   },
   {
-    "question": "What is recommended for large-scale or automated visualization tasks?",
-    "answer": "For large-scale and automated visualization, it is strongly recommended to switch from interactive client-server to off-screen batch visualization."
+    "question": "What does the default OSMesa configuration enable for ParaView on a VM?",
+    "answer": "The default OSMesa configuration enables OpenSWR, Intel's software rasterization library for running OpenGL applications."
   },
   {
-    "question": "How can a ParaView visualization workflow be automated for batch rendering?",
-    "answer": "ParaView supports Python scripting, allowing you to script your workflow and submit it as a regular, possibly parallel production job on a cluster."
+    "question": "Which drivers are built with OSMesa for offscreen CPU-based rendering and which is recommended?",
+    "answer": "Both `llvmpipe` (older and slower) and `SWR` (newer and faster) drivers are built. SWR is recommended."
   },
   {
-    "question": "Who should be contacted for assistance with batch rendering?",
-    "answer": "If you need any help with batch rendering, please contact Technical support."
+    "question": "What are the steps to compile CMake on a VM?",
+    "answer": "To compile CMake on a VM, you need to `wget https://cmake.org/files/v4.1/cmake-4.1.1.tar.gz`, unpack it, `cd` into the directory, run `./bootstrap`, `make`, and then `sudo make install`."
+  },
+  {
+    "question": "What are the steps to compile LLVM on a VM, including the CMake configuration?",
+    "answer": "First, `cd`, then `wget https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.0/LLVM-21.1.0-Linux-X64.tar.xz`, unpack it, `mkdir -p build && cd build`. Then run cmake with the flags `-DCMAKE_BUILD_TYPE=Release -DLLVM_BUILD_LLVM_DYLIB=ON -DLLVM_ENABLE_RTTI=ON -DLLVM_INSTALL_UTILS=ON -DLLVM_TARGETS_TO_BUILD:STRING=X86 ..`. Finally, `make` and `sudo make install`."
+  },
+  {
+    "question": "What are the steps to compile Mesa with OSMesa on a VM, including the configure options?",
+    "answer": "First, `cd`, then `wget https://archive.mesa3d.org/mesa-25.2.3.tar.xz`, unpack it, and `cd` into the directory. Run `./configure` with `--enable-opengl --disable-gles1 --disable-gles2 --disable-va --disable-xvmc --disable-vdpau --enable-shared-glapi --disable-texture-float --enable-gallium-llvm --enable-llvm-shared-libs --with-gallium-drivers=swrast,swr --disable-dri --disable-egl --disable-gbm --disable-glx --disable-osmesa --enable-gallium-osmesa`. Finally, `make` and `sudo make install`."
   }
 ]

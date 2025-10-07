@@ -1,94 +1,78 @@
 [
   {
-    "question": "How do I connect the ParaView client to the remote parallel server after configuration?",
-    "answer": "Once the remote server is added to the configuration, select it from the list and click on 'Connect'. The terminal window that was showing 'Accepting connection' will then change to 'Client connected'."
+    "question": "What is the minimum number of cores required for visualization on Trillium using the large-scale interactive workflow?",
+    "answer": "On Trillium, you must schedule on whole nodes, i.e., in multiples of 192 cores, so the minimum requirement is 192 cores."
   },
   {
-    "question": "How can I verify if parallel rendering is active when visualizing a dataset?",
-    "answer": "To check for parallel rendering, you can color your dataset by the 'Process Id' variable, which is not available when running in serial."
+    "question": "What ParaView version compatibility is required between the local client and the remote host for a client-server setup?",
+    "answer": "ParaView requires the same major version on the local client and the remote host. For example, if the server is version 6.0.0, the client needs to be 6.0.x."
   },
   {
-    "question": "What is the recommended approach for large-scale and automated ParaView visualizations?",
+    "question": "What is the first step to starting a parallel CPU interactive job for large-scale interactive visualization?",
+    "answer": "First, install the same ParaView version on your computer as the one available on the cluster you will be using. Then, log into the cluster and start a parallel CPU interactive job."
+  },
+  {
+    "question": "What `salloc` command can be used to start a general parallel CPU interactive job?",
+    "answer": "`salloc --time=1:00:0 --ntasks=... --mem-per-cpu=3600 --account=def-someprof`"
+  },
+  {
+    "question": "What is the specific `salloc` command for starting a parallel CPU interactive job on Trillium?",
+    "answer": "`salloc --time=1:00:0 --ntasks=192 --account=def-someprof`"
+  },
+  {
+    "question": "What module must be loaded on Trillium before loading `paraview/6.0.0`?",
+    "answer": "On Trillium, you must load `StdEnv/2023` before attempting to load `paraview/6.0.0`."
+  },
+  {
+    "question": "How do you load the ParaView module within an interactive job?",
+    "answer": "`module load paraview/6.0.0`"
+  },
+  {
+    "question": "How do you start the ParaView server with off-screen rendering inside an interactive job?",
+    "answer": "`srun pvserver --force-offscreen-rendering --opengl-window-backend OSMesa`"
+  },
+  {
+    "question": "How do you set up an SSH tunnel from your local computer to a compute node for ParaView client-server connection?",
+    "answer": "From your computer, use a terminal to link local port 11111 to the compute node's port 11111 using the command: `ssh <username>@fir.alliancecan.ca -L 11111:fc30669:11111` (replace `fir` with the actual cluster name and `fc30669` with the compute node name)."
+  },
+  {
+    "question": "How do you connect the ParaView client on your computer to a remote server once the SSH tunnel is established?",
+    "answer": "Start ParaView on your computer, go to 'File -> Connect' (or click on the green 'Connect' button in the toolbar), click on 'Add Server', set name = fir, server type = Client/Server, host = localhost, port = 11111, click 'Configure', select 'Manual', and click 'Save'. Then, select the server from the list and click 'Connect'."
+  },
+  {
+    "question": "How can you verify that parallel rendering is occurring in ParaView?",
+    "answer": "You can color your dataset by the `Process Id` variable; this variable is unavailable when running in serial."
+  },
+  {
+    "question": "What is the recommended approach for large-scale and automated visualization?",
     "answer": "For large-scale and automated visualization, it is strongly recommended to switch from interactive client-server to off-screen batch visualization, using ParaView's Python scripting capabilities."
   },
   {
-    "question": "Where can I get help with scripting ParaView workflows for batch production?",
-    "answer": "If you need help with scripting your ParaView workflow, you should contact Technical support."
+    "question": "How do you get help with scripting ParaView workflows for batch production?",
+    "answer": "If you need any help with this, please contact Technical support."
   },
   {
-    "question": "How do I submit a serial batch job for ParaView visualization?",
-    "answer": "First, load the ParaView module (`module load paraview/6.0.0`), then submit your serial Slurm job script (`sbatch serial.sh`)."
+    "question": "What is the workflow for serial rendering in batch mode?",
+    "answer": "First, load the ParaView module (`module load paraview/6.0.0`), then submit the Slurm job script (`sbatch serial.sh`). The `serial.sh` script should contain: `#!/bin/bash #SBATCH --time=3:0:0 #SBATCH --mem-per-cpu=3600 #SBATCH --account=def-someuser pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py`"
   },
   {
-    "question": "What does a basic Slurm script for serial ParaView batch rendering look like?",
-    "answer": "A basic serial.sh script includes SBATCH directives for time, memory, and account, followed by the command: `pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py`."
+    "question": "What is the workflow for parallel rendering in batch mode?",
+    "answer": "First, load the ParaView module (`module load paraview/6.0.0`), then submit the Slurm job script (`sbatch distributed.sh`). The `distributed.sh` script should contain: `#!/bin/bash #SBATCH --time=3:0:0 #SBATCH --mem-per-cpu=3600 #SBATCH --ntasks=4 #SBATCH --account=def-someuser srun pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py`"
   },
   {
-    "question": "How do I submit a parallel batch job for ParaView visualization?",
-    "answer": "First, load the ParaView module (`module load paraview/6.0.0`), then submit your distributed Slurm job script (`sbatch distributed.sh`)."
+    "question": "When should client-server visualization in a cloud VM be used?",
+    "answer": "This approach is less common and should only be used if you require a custom setup not supported by the cluster-installed ParaView."
   },
   {
-    "question": "What does a basic Slurm script for parallel ParaView batch rendering look like?",
-    "answer": "A basic distributed.sh script includes SBATCH directives for time, memory, ntasks (e.g., 4), and account, followed by the command: `srun pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py`."
+    "question": "What guide explains how to launch a new virtual machine (VM) for cloud visualization?",
+    "answer": "The Cloud Quick Start Guide explains how to launch a new virtual machine (VM)."
   },
   {
-    "question": "What is the purpose of the 'Client-server visualization in a cloud VM' section?",
-    "answer": "This section describes the setup and workflow for running a ParaView server on a cloud VM, which is a less common approach."
+    "question": "Which packages need to be installed on a CentOS VM to compile ParaView or VisIt?",
+    "answer": "You need to install `xauth wget gcc gcc-c++ ncurses-devel python-devel libxcb-devel`, `patch imake libxml2-python mesa-libGL mesa-libGL-devel`, `mesa-libGLU mesa-libGLU-devel bzip2 bzip2-libs libXt-devel zlib-devel flex byacc`, and create a symlink: `sudo ln -s /usr/include/GL/glx.h /usr/local/include/GL/glx.h`."
   },
   {
-    "question": "When should I consider running a ParaView server on a cloud VM?",
-    "answer": "You should use this approach only if you require a custom setup that is not supported by the cluster-installed ParaView."
-  },
-  {
-    "question": "What guide should I refer to for launching a new virtual machine?",
-    "answer": "The [[Cloud Quick Start|Cloud Quick Start Guide]] explains how to launch a new virtual machine (VM)."
-  },
-  {
-    "question": "What additional packages might I need to install on a CentOS VM to compile ParaView or VisIt?",
-    "answer": "On a CentOS VM, you might need to install packages like `xauth`, `wget`, `gcc`, `gcc-c++`, `ncurses-devel`, `python-devel`, `libxcb-devel`, `patch`, `imake`, `libxml2-python`, `mesa-libGL`, `mesa-libGL-devel`, `mesa-libGLU`, `mesa-libGLU-devel`, `bzip2`, `bzip2-libs`, `libXt-devel`, `zlib-devel`, `flex`, and `byacc`."
-  },
-  {
-    "question": "How can I copy my SSH public key to a cloud VM to simplify logins?",
-    "answer": "You can copy your public key by issuing the command: `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'`."
-  },
-  {
-    "question": "Why is OSMesa support required for ParaView on a cloud VM?",
-    "answer": "OSMesa support is required because most Arbutus VMs do not have access to a GPU, and OSMesa enables offscreen (software) rendering."
-  },
-  {
-    "question": "Which software rasterization drivers are typically built with OSMesa for ParaView on a VM, and which is recommended?",
-    "answer": "ParaView with OSMesa will typically build with both `llvmpipe` (older and slower) and `SWR` (newer and faster) drivers. SWR is recommended."
-  },
-  {
-    "question": "What are the steps to compile cmake on a cloud VM?",
-    "answer": "To compile cmake, first `wget https://cmake.org/files/v4.1/cmake-4.1.1.tar.gz`, then unpack and `cd` into the directory, run `./bootstrap`, `make`, and finally `sudo make install`."
-  },
-  {
-    "question": "What are the steps to compile llvm on a cloud VM for ParaView?",
-    "answer": "To compile llvm: `cd`, `wget https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.0/LLVM-21.1.0-Linux-X64.tar.xz`, unpack, `mkdir -p build && cd build`, run specific `cmake` commands for configuration, `make`, and then `sudo make install`."
-  },
-  {
-    "question": "What are the steps to compile Mesa with OSMesa on a cloud VM?",
-    "answer": "To compile Mesa with OSMesa: `cd`, `wget https://archive.mesa3d.org/mesa-25.2.3.tar.xz`, unpack, run a specific `./configure` command with various flags (e.g., `--enable-opengl`, `--enable-gallium-osmesa`), `make`, and then `sudo make install`."
-  },
-  {
-    "question": "What are the steps to compile the ParaView server on a cloud VM?",
-    "answer": "To compile the ParaView server: `cd`, `wget https://www.paraview.org/files/v6.0/ParaView-v6.0.0.tar.gz`, unpack, `mkdir -p build && cd build`, run specific `cmake` commands for configuration (e.g., `-DPARAVIEW_USE_MPI=OFF`, `-DVTK_OPENGL_HAS_OSMESA=ON`), `make`, and then `make install`."
-  },
-  {
-    "question": "How do I start the ParaView server on a VM with SWR rendering?",
-    "answer": "You start the ParaView server with SWR rendering by executing: `./paraview/bin/pvserver --force-offscreen-rendering --opengl-window-backend OSMesa`."
-  },
-  {
-    "question": "How do I set up an SSH tunnel from my local computer to the VM for client-server ParaView connection?",
-    "answer": "You organize an SSH tunnel using the command: `ssh centos@vm.ip.address -L 11111:localhost:11111`."
-  },
-  {
-    "question": "How do I connect the ParaView client on my computer to the server running on the VM?",
-    "answer": "Start the ParaView client on your computer and connect to `localhost:11111`."
-  },
-  {
-    "question": "What message indicates successful SWR rendering in the VM console during ParaView client-server operation?",
-    "answer": "During rendering, you should see the message ''SWR detected AVX2.'' in the console."
+    "question": "How can you copy your public SSH key to a cloud VM to simplify logins?",
+    "answer": "From your computer, issue the command: `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'`"
   }
 ]

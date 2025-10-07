@@ -1,114 +1,102 @@
 [
   {
-    "question": "What is the purpose of the 'Large-scale interactive' tab?",
-    "answer": "This tab describes interactive client-server setup on all HPC clusters, where a client runs on your computer, and the server runs on the remote cluster."
+    "question": "How do you specify the amount of memory for a single-core JupyterLab session for visualization?",
+    "answer": "You set the 'Memory' in the JupyterHub Server Options based on the maximum amount of data you expect to process at a time."
   },
   {
-    "question": "Which HPC clusters support the interactive client-server setup described in the 'Large-scale interactive' tab?",
-    "answer": "Rorqual, Nibi, Fir, Trillium, and Narval support this setup."
+    "question": "What happens after pressing the 'Start' button in the JupyterHub Server Options for a visualization session?",
+    "answer": "Pressing 'Start' will submit a Slurm job to the cluster in the background, and you'll need to wait about one minute for the job to start and for the JupyterLab dashboard to appear."
   },
   {
-    "question": "What is a critical requirement for ParaView client and server versions to ensure compatibility?",
-    "answer": "ParaView requires the same major version on the local client and the remote host to prevent incompatibility."
+    "question": "What are the two main options to launch ParaView after a JupyterLab dashboard appears for single-core visualization?",
+    "answer": "The first option is to load the 'boost/1.85.0' and 'paraview/6.0.0' modules under 'Software Modules' on the left-hand side, then click the 'ParaView (VNC) button'. The alternative is to click your preferred 'Desktop' button, open a terminal inside the virtual desktop, and type 'module load boost/1.85.0 paraview/6.0.0' followed by 'paraview'."
   },
   {
-    "question": "What happens if the ParaView client and server major versions do not match?",
-    "answer": "Incompatibility typically shows as a failed handshake when establishing the client-server connection."
+    "question": "What modules need to be loaded to run ParaView in a JupyterLab virtual desktop terminal for single-core visualization?",
+    "answer": "You need to load the 'boost/1.85.0' and 'paraview/6.0.0' modules."
   },
   {
-    "question": "If the ParaView server is version 6.0.0, what client version is needed?",
-    "answer": "To use ParaView server version 6.0.0 on the cluster, you need client version 6.0.x on your computer."
+    "question": "Is the ParaView GUI application inherently multi-threaded?",
+    "answer": "No, the ParaView GUI application itself is single-threaded and cannot directly use multiple cores."
   },
   {
-    "question": "What is the 'Remote Render Threshold' setting in ParaView preferences?",
-    "answer": "It is an important setting in ParaView's preferences under 'Render View -> Remote/Parallel Rendering Options' that determines where small rendering tasks are performed."
+    "question": "Which ParaView filters support multithreading?",
+    "answer": "Some filters, such as contouring, clipping, or resampling, support multithreading via VTK backends like TBB or OpenMP."
   },
   {
-    "question": "What is the effect of setting 'Remote Render Threshold' to its default (20MB) or similar value?",
-    "answer": "Small rendering will be done on your computer's GPU, making rotation with a mouse fast, but anything modestly intensive (under 20MB) will be shipped to your computer, potentially slowing down visualization depending on your connection."
+    "question": "How is true parallel rendering achieved with ParaView in JupyterLab?",
+    "answer": "True parallel rendering requires connecting a single-core ParaView client to a parallel ParaView server, both of which can be launched within JupyterLab."
   },
   {
-    "question": "What happens if the 'Remote Render Threshold' is set to 0MB?",
-    "answer": "All rendering, including rotation, will be remote, utilizing cluster resources for everything, which is good for large data processing but may reduce interactivity."
+    "question": "What JupyterHub Server Options settings are different for multi-core visualization compared to single-core?",
+    "answer": "For multi-core visualization, you need to select your desired 'Number of Cores' (e.g., 4) and scale your 'Memory' request accordingly (e.g., 3600 MB per core, so 14400 MB for 4 cores)."
   },
   {
-    "question": "Can ParaView perform rasterization and ray tracing on cluster CPUs?",
-    "answer": "Yes, you can do both rasterization and ray tracing on cluster CPUs, allocating as many cores as necessary to your rendering."
+    "question": "How do you start the ParaView server for multi-core visualization within a JupyterLab virtual desktop?",
+    "answer": "After loading the 'boost/1.85.0' and 'paraview/6.0.0' modules, you open a terminal and type 'mpirun --oversubscribe -np 4 pvserver' (replacing 4 with your desired number of cores)."
   },
   {
-    "question": "Which modern CPU-based libraries offer performance similar to GPU-based rendering?",
-    "answer": "Modern CPU-based libraries such as OSPRay and OpenSWR offer performance quite similar to GPU-based rendering."
+    "question": "What information from the 'pvserver' command output is needed to connect the ParaView client?",
+    "answer": "You need the 'Connection URL' which provides the host and port number (e.g., 'cs://fc30669:11111')."
   },
   {
-    "question": "How does the ParaView server handle very large datasets for parallel rendering?",
-    "answer": "Since the ParaView server uses MPI for distributed-memory processing, for very large datasets one can do parallel rendering on a large number of CPU cores, either on a single node, or scattered across multiple nodes."
+    "question": "How do you configure the ParaView GUI client to connect to a parallel ParaView server running in the same JupyterLab session?",
+    "answer": "In the ParaView GUI, click 'Connect', then 'Add Server'. Set 'Server Type' to 'Client/Server', 'Host' to 'localhost', 'Port' to '11111' (or the port from 'pvserver' output), and 'Startup Type' to 'Manual'. Then click 'Connect' again."
   },
   {
-    "question": "How can one estimate the number of necessary cores for rendering a dataset?",
-    "answer": "The easiest way to estimate the number of necessary cores is to look at the amount of memory that you think you will need for your rendering and divide it by ~3.5 GB/core."
+    "question": "How can you verify that parallel rendering is active in ParaView?",
+    "answer": "You can colour your dataset by the 'Process Id' variable, which is unavailable when running in serial."
   },
   {
-    "question": "What is the recommended memory allocation per core for software rendering?",
-    "answer": "Since software rendering is CPU-intensive, it is not recommended to allocate more than 4GB/core."
+    "question": "Which clusters support single-core visualization via Open OnDemand?",
+    "answer": "Single-core visualization via Open OnDemand is supported on Nibi and Trillium."
   },
   {
-    "question": "How many cores would be required for a 40GB dataset just to hold the data?",
-    "answer": "A 40GB dataset would require at least 12 cores just to hold the data (40GB / 3.5 GB/core \u2248 11.4 cores)."
+    "question": "What are the web portals for Open OnDemand on Nibi and Trillium?",
+    "answer": "For Nibi, it's https://ondemand.sharcnet.ca, and for Trillium, it's https://ondemand.scinet.utoronto.ca/pun/sys/dashboard."
   },
   {
-    "question": "Why is it important to allocate additional memory for filters and data processing?",
-    "answer": "It is important to allocate some memory for filters and data processing because some operations, like a structured to unstructured dataset conversion, can increase your memory footprint by approximately 3X."
+    "question": "How do you launch a single-core ParaView instance via Open OnDemand?",
+    "answer": "After logging into Open OnDemand, find 'Desktop' (e.g., 'Compute Nodes | Nibi Desktop'), specify a CPU-only Slurm account and 1 CPU core, click 'Launch', wait for the job to start, then click 'Launch Nibi Desktop'. Inside the desktop, open a terminal and type 'module load paraview/6.0.0' followed by 'paraview'."
   },
   {
-    "question": "What should you do if your ParaView server gets killed when processing data?",
-    "answer": "If your ParaView server gets killed when processing data, you will need to increase the number of cores."
+    "question": "What are the resource limits for multi-core visualization on Nibi's Open OnDemand?",
+    "answer": "On Nibi's Open OnDemand, you can request up to 128GB memory and up to 8 cores for multi-core visualization."
   },
   {
-    "question": "What is the scheduling requirement for ParaView visualization on Trillium?",
-    "answer": "On Trillium, you must schedule on whole nodes, i.e., in multiples of 192 cores."
+    "question": "What is required for a ParaView client running on your computer to connect to a ParaView server on an HPC cluster?",
+    "answer": "ParaView requires the same major version on the local client and the remote host to prevent incompatibility and ensure a successful client-server connection (e.g., client version 6.0.x for server version 6.0.0)."
   },
   {
-    "question": "What is the minimum number of cores required for ParaView visualization on Trillium?",
-    "answer": "The minimum example on Trillium will require 192 cores."
+    "question": "What is the 'Remote Render Threshold' setting in ParaView preferences and how does it affect performance?",
+    "answer": "The 'Remote Render Threshold' (default 20MB) in 'Render View -> Remote/Parallel Rendering Options' determines where rendering occurs. If set to default, small rendering happens on your local GPU for fast rotation, but anything modestly intensive (under 20MB) is shipped to your computer. If set to 0MB, all rendering, including rotation, is done remotely on cluster resources, which is good for large data processing but less interactive."
   },
   {
-    "question": "What is the first step in the large-scale interactive visualization workflow?",
-    "answer": "First, install on your computer the same ParaView version as the one available on the cluster you will be using. Next, log into the cluster and start a parallel CPU interactive job."
+    "question": "Can HPC clusters perform rasterization and ray tracing using CPUs, and what libraries are used?",
+    "answer": "Yes, HPC clusters can do both rasterization and ray tracing on cluster CPUs. Modern CPU-based libraries like OSPRay and OpenSWR offer performance similar to GPU-based rendering."
   },
   {
-    "question": "What command is used to start a parallel CPU interactive job on a cluster?",
-    "answer": "The command is `salloc --time=1:00:0 --ntasks=... --mem-per-cpu=3600 --account=def-someprof`."
+    "question": "How can you estimate the number of cores needed for large-scale interactive visualization?",
+    "answer": "A rough estimate is to divide the amount of memory needed for rendering (e.g., 40GB for a dataset) by approximately 3.5 GB/core. It's recommended not to allocate more than 4GB/core, and additional memory should be considered for filters and data processing."
   },
   {
-    "question": "What command should be used to start a parallel CPU interactive job on Trillium for visualization using one node?",
-    "answer": "On Trillium, the command will be `salloc --time=1:00:0 --ntasks=192 --account=def-someprof`."
+    "question": "What is a specific core allocation requirement for ParaView visualization on the Trillium cluster?",
+    "answer": "On Trillium, you must schedule on whole nodes, meaning core allocations must be in multiples of 192 cores, making 192 cores the minimum for a visualization job."
   },
   {
-    "question": "What module must be loaded on Trillium before attempting to load `paraview/6.0.0`?",
-    "answer": "On Trillium, you must load `StdEnv/2023` before attempting to load `paraview/6.0.0`."
+    "question": "What is the command to start a parallel CPU interactive job for large-scale visualization on an HPC cluster?",
+    "answer": "The command is 'salloc --time=1:00:0 --ntasks=... --mem-per-cpu=3600 --account=def-someprof'. For Trillium, '--ntasks' would be 192."
   },
   {
-    "question": "After loading the ParaView module, what command is used to start the ParaView server?",
-    "answer": "The command is `srun pvserver --force-offscreen-rendering --opengl-window-backend OSMesa`."
+    "question": "What module needs to be loaded specifically on Trillium before loading the ParaView module?",
+    "answer": "On Trillium, you must load the 'StdEnv/2023' module before attempting to load 'paraview/6.0.0'."
   },
   {
-    "question": "What output indicates that the ParaView server is ready to accept client connections?",
-    "answer": "The server will display messages like 'Waiting for client...' and 'Accepting connection(s): fc30669:11111'."
+    "question": "What command starts the ParaView server on an HPC cluster for large-scale interactive visualization?",
+    "answer": "The command is 'srun pvserver --force-offscreen-rendering --opengl-window-backend OSMesa'."
   },
   {
-    "question": "What information needs to be noted from the ParaView server output for establishing an SSH tunnel?",
-    "answer": "You need to make a note of the node (e.g., fc30669) and the port (usually 11111)."
-  },
-  {
-    "question": "How do you link a local port on your computer to a remote port on the compute node using SSH?",
-    "answer": "In a terminal on your computer (Mac/Linux; Windows using a terminal emulator), use the command: `ssh <username>@fir.alliancecan.ca -L 11111:fc30669:11111` (replacing 'fir' and 'fc30669' with actual values)."
-  },
-  {
-    "question": "After establishing the SSH tunnel, how do you configure the ParaView client to connect to the remote server?",
-    "answer": "Start ParaView on your computer, go to 'File -> Connect' or click the green 'Connect' button, then click 'Add Server'. Set name = fir (or similar), server type = Client/Server, host = localhost, port = 11111. Click 'Configure', select 'Manual', and click 'Save'."
-  },
-  {
-    "question": "What happens in the first terminal window (where the server is running) once the ParaView client successfully connects?",
-    "answer": "The first terminal window, which previously read 'Accepting connection', will now read 'Client connected'."
+    "question": "How do you create an SSH tunnel from your local computer to the compute node where the ParaView server is running on the cluster?",
+    "answer": "In a terminal on your computer (Mac/Linux), use the command 'ssh <username>@fir.alliancecan.ca -L 11111:fc30669:11111', replacing 'fir' with the actual cluster name and 'fc30669' with the compute node name from the server output."
   }
 ]

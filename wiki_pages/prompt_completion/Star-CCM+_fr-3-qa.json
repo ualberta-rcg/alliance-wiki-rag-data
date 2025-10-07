@@ -1,30 +1,86 @@
 [
   {
-    "question": "Comment se connecter aux n\u0153uds VDI pour la visualisation \u00e0 distance de STAR-CCM+?",
-    "answer": "Connectez-vous \u00e0 gra-vdi avec TigerVNC."
+    "question": "What are the default SBATCH directives for the `starccm_job.sh` script on the Trillium cluster?",
+    "answer": "The default SBATCH directives are `--account=def-group`, `--time=00-01:00`, `--nodes=1`, `--cpus-per-task=192`, `--mem=0`, and `--ntasks-per-node=1`."
   },
   {
-    "question": "Comment ouvrir une fen\u00eatre de terminal sur les n\u0153uds VDI apr\u00e8s s'\u00eatre connect\u00e9 via TigerVNC?",
-    "answer": "Une fois le bureau distant affich\u00e9, cliquez sur 'Applications-->Systems Tools-->Mate Terminal' pour ouvrir une fen\u00eatre de terminal."
+    "question": "Which modules should be loaded for STAR-CCM+ on Trillium according to the provided job script?",
+    "answer": "You should load `CCEnv`, `StdEnv/2023`, and `starccm-mixed/20.04.007` (or optionally `starccm/20.04.007-R8`)."
   },
   {
-    "question": "Comment puis-je afficher les versions de Star-CCM+ disponibles sur les n\u0153uds VDI?",
-    "answer": "Si vous avez d\u00e9j\u00e0 charg\u00e9 un StdEnv, vous pouvez faire afficher les versions disponibles avec la commande `module avail starccm-mixed`."
+    "question": "How do you specify the input simulation file in the Trillium job script?",
+    "answer": "You specify the input simulation file by setting the `SIM_FILE` variable, for example: `SIM_FILE='mysample.sim'`."
   },
   {
-    "question": "Pourquoi seule l'impl\u00e9mentation MESA de OpenGL est-elle utilisable avec STAR-CCM+ sur gra-vdi?",
-    "answer": "Pr\u00e9sentement, seulement l'impl\u00e9mentation MESA de OpenGL peut \u00eatre utilis\u00e9e sur gra-vdi avec starccm en raison de probl\u00e8mes avec virtualgl qui offre l'acc\u00e9l\u00e9ration des GPU locaux pour les graphiques OpenGL."
+    "question": "How can you specify an input Java macro file in the Trillium job script?",
+    "answer": "You can uncomment and set the `JAVA_FILE` variable, for example: `#JAVA_FILE='mymacros.java'`."
   },
   {
-    "question": "Quelles sont les commandes pour charger et ex\u00e9cuter STAR-CCM+ version 18.04.008 ou plus r\u00e9cente sur les n\u0153uds VDI?",
-    "answer": "Chargez l'environnement avec `module load CcEnv StdEnv/2023`, puis `module load starccm-mixed/18.04.008` (ou `starccm/18.04.008-R8`), et enfin `starccm+ -rr server`."
+    "question": "What are the required settings for a Siemens Power on Demand (PoD) Key when using STAR-CCM+ on Trillium?",
+    "answer": "For a Siemens PoD Key, `LM_PROJECT` should be set to your 22-digit PoD key, `FLEXPORT` to `1999`, `VENDPORT` to `2099`, and `LICSERVER` to `flex.cd-adapco.com`. These settings replace those in `~/.licenses/starccm.lic`."
   },
   {
-    "question": "Comment charger et ex\u00e9cuter STAR-CCM+ pour les versions de 15.04.010 \u00e0 18.02.008 sur les n\u0153uds VDI?",
-    "answer": "Utilisez `module load CcEnv StdEnv/2020`, suivi de `module load starccm-mixed/15.04.010` (ou `starccm/15.04.010-R8`), et ex\u00e9cutez avec `starccm+ -mesa`."
+    "question": "How is the `CDLMD_LICENSE_FILE` environment variable set for license access on Trillium?",
+    "answer": "The `CDLMD_LICENSE_FILE` environment variable is set as `export CDLMD_LICENSE_FILE=\"$FLEXPORT@127.0.0.1\"`."
   },
   {
-    "question": "Quelles commandes faut-il utiliser pour les versions de STAR-CCM+ 13.06.012 ou ant\u00e9rieures sur les n\u0153uds VDI?",
-    "answer": "Les commandes sont `module load CcEnv StdEnv/2016`, puis `module load starccm-mixed/13.06.012` (ou `starccm/13.06.012-R8`), et enfin `starccm+ -mesa`."
+    "question": "What command is used to create an SSH tunnel for the STAR-CCM+ license server on Trillium?",
+    "answer": "The command `ssh tri-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f` is used to create an SSH tunnel for the license server."
+  },
+  {
+    "question": "What workaround is implemented in the Trillium job script to handle license failures?",
+    "answer": "A `while` loop is used to retry starting STAR-CCM+ up to 5 times (`i -le 5`) if the command's exit status (`$RET`) is not 0. There's a 5-second sleep before subsequent attempts after the first one."
+  },
+  {
+    "question": "What is the `starccm+` execution command for a Siemens PoD license within the Trillium job script?",
+    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
+  },
+  {
+    "question": "What is the `starccm+` execution command for an institutional license within the Trillium job script?",
+    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE`."
+  },
+  {
+    "question": "What are the preparation steps for configuring an account for remote visualization with STAR-CCM+?",
+    "answer": "You must create the license file `~/.licenses/starccm.lic`. If using a Power-on-demand (POD) license, you also need to set `export LM_PROJECT='CD-ADAPCO PROJECT ID'` and add `-power` to the command line options."
+  },
+  {
+    "question": "How do you connect to a compute node for remote visualization of STAR-CCM+?",
+    "answer": "You connect to a node using TigerVNC and then open a terminal window."
+  },
+  {
+    "question": "Which modules should be loaded for STAR-CCM+ versions 15.04.010 or newer on compute nodes for remote visualization?",
+    "answer": "Load `StdEnv/2020` and then `starccm-mixed/17.02.007` or `starccm/16.04.007-R8`."
+  },
+  {
+    "question": "What are the module loading steps for STAR-CCM+ versions 14.06.010, 14.04.013, or 14.02.012 on compute nodes for remote visualization?",
+    "answer": "Load `StdEnv/2016` and then `starccm-mixed/14.06.010` or `starccm/14.06.010-R8`."
+  },
+  {
+    "question": "How do you run STAR-CCM+ versions 13.06.012 or older on compute nodes for remote visualization?",
+    "answer": "Load `StdEnv/2016`, then `starccm-mixed/13.06.012` or `starccm/13.06.012-R8`, and run `starccm+ -mesa`."
+  },
+  {
+    "question": "How do you connect to VDI nodes for remote visualization with STAR-CCM+?",
+    "answer": "Connect to `gra-vdi` using TigerVNC, then open a terminal window (Applications-->Systems Tools-->Mate Terminal) on the remote desktop."
+  },
+  {
+    "question": "How can you check available STAR-CCM+ versions on VDI nodes?",
+    "answer": "If a `StdEnv` is already loaded, you can use the command `module avail starccm-mixed`."
+  },
+  {
+    "question": "Why is only the MESA implementation of OpenGL used for STAR-CCM+ on `gra-vdi`?",
+    "answer": "Only MESA OpenGL can be used due to issues with VirtualGL, which usually provides local GPU acceleration for OpenGL graphics."
+  },
+  {
+    "question": "Which modules and command are required to run STAR-CCM+ versions 18.04.008 or newer on VDI nodes?",
+    "answer": "Load `CcEnv` and `StdEnv/2023`, then `starccm-mixed/18.04.008` or `starccm/18.04.008-R8`, and run `starccm+ -rr server`."
+  },
+  {
+    "question": "What are the steps to run STAR-CCM+ versions from 15.04.010 up to 18.02.008 on VDI nodes?",
+    "answer": "Load `CcEnv` and `StdEnv/2020`, then `starccm-mixed/15.04.010` or `starccm/15.04.010-R8`, and run `starccm+ -mesa`."
+  },
+  {
+    "question": "How do you run STAR-CCM+ versions 13.06.012 or older on VDI nodes?",
+    "answer": "Load `CcEnv` and `StdEnv/2016`, then `starccm-mixed/13.06.012` or `starccm/13.06.012-R8`, and run `starccm+ -mesa`."
   }
 ]
