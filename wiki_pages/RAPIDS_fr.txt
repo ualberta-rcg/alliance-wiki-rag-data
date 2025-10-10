@@ -31,31 +31,21 @@ Les principales composantes sont :
 
 Pour créer une image Apptainer (auparavant [[Singularity/fr#Utilisez_plutôt_Apptainer|Singularity]]) pour RAPIDS, il faut d’abord trouver et sélectionner une image Docker fournie par NVIDIA.
 
-<div class="mw-translate-fuzzy">
 ==Trouver une image Docker== 
  
-À partir de RAPIDS v23.08, les deux types d’images Docker pour RAPIDS sont ''base'' et ''notebooks''. Pour chaque type, plusieurs images sont fournies pour les différentes combinaisons des versions de RAPIDS et de CUDA avec Ubuntu ou CentOS. Pour une image en particulier, la commande <tt>pull</tt> se trouve sous l'onglet ''Tags'' de chacun des sites.   
+À partir de RAPIDS v23.08, les deux types d’images Docker pour RAPIDS sont ''base'' et ''notebooks''. Pour chaque type, plusieurs images sont fournies pour les différentes combinaisons des versions de RAPIDS et de CUDA ainsi que plusieurs versiond de Python. Pour trouver une image en particulier, allez sous l'onglet ''Tags'' de chacun des sites.   
  
 * [https://catalog.ngc.nvidia.com/orgs/nvidia/teams/rapidsai/containers/base RAPIDS Base] : contient un environnement RAPIDS prêt à être utilisé pour soumettre une tâche à l'ordonnanceur.
 * [https://catalog.ngc.nvidia.com/orgs/nvidia/teams/rapidsai/containers/notebooks RAPIDS Notebooks] : ajoute à l'image Base un serveur Jupyter notebook et des exemples de notebooks. Utilisez ce type d'image pour travailler en mode interactif avec des noteboooks et des exemples.
-</div>
 
 <span id="Building_an_Apptainer_image"></span>
 ==Construire une image Apptainer==
 
-<div class="mw-translate-fuzzy">
-Par exemple, si la commande Docker <tt>pull</tt> pour une image sélectionnée se lit
-</div> 
+Par exemple, le tag d'une image Docker pour RAPIDS est 
 
-<div class="mw-translate-fuzzy">
-<source lang="console">docker pull nvcr.io/nvidia/rapidsai/rapidsai:cuda11.0-runtime-centos7</source> 
- 
-avec un ordinateur qui supporte Apptainer, vous pouvez construire une image Apptainer (ici ''rapids.sif'') avec la commande suivante, basée sur l'étiquette <code>pull</code>
- 
-<source lang="console">[name@server ~]$ apptainer build rapids.sif docker://nvcr.io/nvidia/rapidsai/rapidsai:cuda11.0-runtime-centos7</source>
-</div> 
+<source lang="console:> nvcr.io/nvidia/rapidsai/notebooks:25.04-cuda12.0-py3.12</source> 
 
-on a computer that supports Apptainer, you can build an Apptainer image (here ''rapids.sif'') with the following command: 
+Avec un ordinateur qui prend en charge Apptainer, vous pouvez construire une image Apptainer (ici ''rapids.sif'') avec la commande suivante&nbsp;:
  
 <source lang="console">[name@server ~]$ apptainer build rapids.sif docker://nvcr.io/nvidia/rapidsai/notebooks:25.04-cuda12.0-py3.12</source>
 
@@ -68,23 +58,17 @@ Une fois que vous avez une image Apptainer pour RAPIDS sur une de nos grappes, v
 <span id="Working_interactively_on_a_GPU_node"></span>
 ==Travailler interactivement sur un nœud GPU== 
 
-<div class="mw-translate-fuzzy">
 Si l’image Apptainer a été construite avec une image Docker de type notebooks, elle inclut un serveur Jupyter Notebook et peut être employée pour explorer RAPIDS interactivement sur un nœud de calcul GPU.<br>
-Pour demander une session interactive sur un nœud de calcul GPU, par exemple un GPU de type T4 de Graham, utilisez
-
-<source lang="console">[name@gra-login ~]$ salloc --ntasks=1 --cpus-per-task=2 --mem=10G --gres=gpu:t4:1 --time=1:0:0 --account=def-someuser</source>
-</div>
+Pour demander une session interactive sur un nœud de calcul GPU, par exemple
+<source lang="console">[name@cluster-login ~]$ salloc --ntasks=1 --cpus-per-task=2 --mem=10G --gpus-per-node=1 --time=1:0:0 --account=def-someuser</source>
 
 Quand la ressource est allouée, lancez l’interpréteur RAPIDS sur le nœud
 GPU avec
 
-<div class="mw-translate-fuzzy">
-<source lang="console">[name@gra#### ~]$ module load apptainer
-[name@gra#### ~]$ apptainer shell --nv -B /home -B /project -B /scratch  rapids.sif
+<source lang="console">[name@compute-node#### ~]$ module load apptainer
+[name@compute-node#### ~]$ apptainer shell --nv rapids.sif
 </source>
-* l'option <tt>--nv</tt> fait le ''bind mount'' du périphérique GPU de l’hôte sur le conteneur pour que l’accès au GPU puisse se faire de l’intérieur du conteneur Apptainer;
-* l'option  <tt>-B</tt> fait le ''bind mount'' des systèmes de fichiers auxquels vous voulez avoir accès dans le conteneur.
-</div>
+* l'option <tt>--nv</tt> fait le ''bind mount'' du périphérique GPU de l’hôte sur le conteneur pour que l’accès au GPU puisse se faire de l’intérieur du conteneur Apptainer.
 
 
 Lorsque l’invite de l’interpréteur change pour <tt>Apptainer></tt>, vous pouvez consulter les statistiques pour le GPU dans l'interpréteur pour vous assurer que vous avez accès au GPU.
@@ -97,28 +81,24 @@ Lorsque l’invite change pour <tt>Apptainer></tt>, vous pouvez lancer le serveu
 
 '''NOTE :''' À partir de la version 23.08, RAPIDS n'a pas besoin d'être activé après que Conda ait démarré puisque tous les paquets sont inclus dans l'environnnement Conda de base qui est activé par défaut dans ; par exemple, vous pouvez lancer le serveur Jupyter Notebook dans l'interpréteur du conteneur. 
 
-<div class="mw-translate-fuzzy">
-Puisqu’un nœud de calcul sur Graham n’est pas connecté directement à l’internet, il faut configurer un tunnel SSH pour faire la redirection de port entre votre ordinateur et le nœud GPU. Pour les détails, voyez [[Advanced Jupyter configuration/fr#Se_connecter_à_JupyterLab|comment se connecter à Jupyter Notebook]].
-</div>
+Si un nœud de calcul n’est pas connecté directement à l’internet, il faut configurer un tunnel SSH pour faire la redirection de port entre votre ordinateur et le nœud GPU. Pour les détails, voyez [[Advanced Jupyter configuration/fr#Se_connecter_à_JupyterLab|comment se connecter à Jupyter Notebook]].
 
 ==Soumettre une tâche RAPIDS à l'ordonnanceur==  
  
 Quand votre code RAPIDS est prêt, vous pouvez soumettre une tâche à l'ordonnanceur. La bonne pratique est [[Using node-local storage/fr|d'utiliser le disque local]] quand vous travaillez avec un conteneur sur un nœud de calcul.   
 
  
-<div class="mw-translate-fuzzy">
-'''Script de soumission'''
+'''Submission script'''
 {{File
   |name=submit.sh
   |lang="sh"
   |contents=
 #!/bin/bash
-#SBATCH --gres=gpu:t4:1
+#SBATCH --gpus-per-node=1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=10G
 #SBATCH --time=dd:hh:mm
 #SBATCH --account=def-someuser
-</div>
 
 module load apptainer
 
