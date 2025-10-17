@@ -83,6 +83,10 @@ Les valeurs correspondant aux serveurs de licence CMC et SHARCNET se trouvent da
 |}
 </div>
 
+ To use the SHARCNET license server, ansys jobs run on trillium also require setting :
+ <code>ssh tri-gw -fNL 1055:license1.computecanada.ca:1055</code>
+ <code>ssh tri-gw -fNL 1793:license1.computecanada.ca:1793</code>
+
 Si vous avez obtenu une licence de CMC, vous devez faire parvenir le nom d'utilisateur associé à votre compte avec l'Alliance à <cmcsupport@cmc.ca>, autrement la licence ne fonctionnera pas. Pour connaître le nombre de cœurs que vous pouvez utiliser avec une licence CMC, voyez les sections <I>Other Tricks and Tips</i> des  [https://www.cmc.ca/?s=Other+Tricks+and+Tips&lang=en/  guides Ansys Electronics Desktop et Ansys Mechanical/Fluids].
 
 <span id="Local_license_servers"></span>
@@ -189,19 +193,19 @@ Les deux onglets pour Narval peuvent fournir une alternative plus robuste si Flu
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account name
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify number of compute nodes (narval 1 node max)
 #SBATCH --ntasks-per-node=32  # Specify number of cores per node (graham 32 or 44, cedar 48, beluga 40, narval 64, or less)
 #SBATCH --mem=0               # Do not change (allocates all memory per compute node)
 #SBATCH --cpus-per-task=1     # Do not change
+</div>
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
 module load ansys/2023R2      # or newer versions (beluga, cedar, graham, narval)
-
-#module load StdEnv/2020      # no longer supported
-#module load ansys/2019R3     # or newer versions (narval only)
-#module load ansys/2021R2     # or newer versions (beluga, cedar, graham)
+</div>
 
 MYJOURNALFILE=sample.jou      # Specify your journal file name
 MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
@@ -224,6 +228,7 @@ fi
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
 
+<div class="mw-translate-fuzzy">
 if [ "$SLURM_NNODES" == 1 ]; then
  #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
@@ -232,6 +237,7 @@ else
 fi
 }}
 </tab>
+</div>
 
 <tab name="Plusieurs nœuds (par cœur)">
 {{File
@@ -240,19 +246,19 @@ fi
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 ##SBATCH --nodes=1            # Uncomment to specify (narval 1 node max)
 #SBATCH --ntasks=16           # Specify total number of cores
 #SBATCH --mem-per-cpu=4G      # Specify memory per core
 #SBATCH --cpus-per-task=1     # Do not change
+</div>
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
 module load ansys/2023R2      # or newer versions (beluga, cedar, graham, narval)
-
-#module load StdEnv/2020      # no longer supported
-#module load ansys/2019R3     # or newer versions (narval only)
-#module load ansys/2021R2     # or newer versions (beluga, cedar, graham)
+</div>
 
 MYJOURNALFILE=sample.jou      # Specify your journal file name
 MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
@@ -275,6 +281,7 @@ fi
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
 
+<div class="mw-translate-fuzzy">
 if [ "$SLURM_NNODES" == 1 ]; then
  #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
@@ -283,6 +290,7 @@ else
 fi
 }}
 </tab>
+</div>
 
 <tab name="Plusieurs nœuds (par nœud, Narval)">
 {{File
@@ -291,15 +299,19 @@ fi
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account name
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify number of compute nodes
 #SBATCH --ntasks-per-node=64  # Specify number of cores per node (narval 64 or less)
 #SBATCH --mem=0               # Do not change (allocates all memory per compute node)
 #SBATCH --cpus-per-task=1     # Do not change
+</div>
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
 module load ansys/2023R2      # or newer versions (narval only)
+</div>
 
 MYJOURNALFILE=sample.jou      # Specify your journal file name
 MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
@@ -327,15 +339,19 @@ fi
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account name
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 ##SBATCH --nodes=1            # Uncomment to specify number of compute nodes (optional)
 #SBATCH --ntasks=16           # Specify total number of cores
 #SBATCH --mem-per-cpu=4G      # Specify memory per core
 #SBATCH --cpus-per-task=1     # Do not change
+</div>
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change     
 module load ansys/2023R2      # or newer versions (narval only)
+</div>
 
 MYJOURNALFILE=sample.jou      # Specify your journal file name
 MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
@@ -356,40 +372,50 @@ fi
 }}
 </tab>
 
+<div class="mw-translate-fuzzy">
 <tab name="Plusieurs nœuds (par nœud, Niagara)">
 {{File
 |name=script-flu-bynode-intel-nia.sh
 |lang="bash"
 |contents=
 #!/bin/bash
+</div>
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group      # Specify account name
 #SBATCH --time=00-03:00          # Specify time limit dd-hh:mm
 #SBATCH --nodes=2                # Specify number of compute nodes
 #SBATCH --ntasks-per-node=80     # Specify number cores per node (niagara 80 or less)
 #SBATCH --mem=0                  # Do not change (allocate all memory per compute node)
 #SBATCH --cpus-per-task=1        # Do not change (required parameter)
+</div>
 
+<div class="mw-translate-fuzzy">
 module load CCEnv StdEnv/2023    # Do not change
 module load arch/avx512
 module load ansys/2023R2         # or newer versions (niagara only)
+</div>
 
 MYJOURNALFILE=sample.jou         # Specify your journal file name
 MYVERSION=3d                     # Specify 2d, 2ddp, 3d or 3ddp
 
+<div class="mw-translate-fuzzy">
 # These settings are used instead of your ~/.licenses/ansys.lic
 LICSERVER=license3.sharcnet.ca   # Specify license server hostname
 FLEXPORT=1055                    # Specify server flex port
 INTEPORT=2325                    # Specify server interconnect port
 VENDPORT=1793                    # Specify server vendor port
+</div>
 
 # ------- do not change any lines below --------
 
+<div class="mw-translate-fuzzy">
 ssh nia-gw -fNL $FLEXPORT:$LICSERVER:$FLEXPORT      # Do not change
 ssh nia-gw -fNL $INTEPORT:$LICSERVER:$INTEPORT      # Do not change
 ssh nia-gw -fNL $VENDPORT:$LICSERVER:$VENDPORT      # Do not change
 export ANSYSLMD_LICENSE_FILE=$FLEXPORT@localhost    # Do not change
 export ANSYSLI_SERVERS=$INTEPORT@localhost          # Do not change
+</div>
 
 slurm_hl2hl.py --format ANSYS-FLUENT > $SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
@@ -434,6 +460,7 @@ Les scripts suivants ne doivent être utilisés qu'avec des tâches Fluent qui s
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify number of compute nodes (narval 1 node max)
@@ -441,13 +468,12 @@ Les scripts suivants ne doivent être utilisés qu'avec des tâches Fluent qui s
 #SBATCH --mem=0               # Do not change (allocates all memory per compute node)
 #SBATCH --cpus-per-task=1     # Do not change
 #SBATCH --array=1-5%1         # Specify number of requeue attempts (2 or more, 5 is shown)
+</div>
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
 module load ansys/2023R2      # Specify version (beluga, cedar, graham, narval)
-
-#module load StdEnv/2020      # no longer supported
-#module load ansys/2019R3     # or newer versions (narval only)
-#module load ansys/2021R2     # or newer versions (beluga, cedar, graham)
+</div>
 
 MYJOURNALFILE=sample.jou      # Specify your journal file name
 MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
@@ -470,6 +496,7 @@ fi
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
 
+<div class="mw-translate-fuzzy">
 if [ "$SLURM_NNODES" == 1 ]; then
  #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
@@ -489,6 +516,7 @@ else
 fi
 }}
 </tab>
+</div>
 
 <tab name="Plusieurs nœuds (par cœur + remise en attente)">
 {{File
@@ -505,12 +533,10 @@ fi
 #SBATCH --cpus-per-task=1     # Do not change
 #SBATCH --array=1-5%1         # Specify number of requeue attempts (2 or more, 5 is shown)
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
 module load ansys/2023R2      # Specify version (beluga, cedar, graham, narval)
-
-#module load StdEnv/2020      # no longer supported
-#module load ansys/2019R3     # or newer versions (narval only)
-#module load ansys/2021R2     # or newer versions (beluga, cedar, graham)
+</div>
 
 MYJOURNALFILE=sample.jou      # Specify your journal file name
 MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
@@ -533,6 +559,7 @@ fi
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
 
+<div class="mw-translate-fuzzy">
 if [ "$SLURM_NNODES" == 1 ]; then
  #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
@@ -553,6 +580,7 @@ fi
 }}
 </tab>
 </tabs>
+</div>
 
 <span id="Solution_restart"></span>
 ==== Redémarrage ====
@@ -567,6 +595,7 @@ Les deux scripts suivants automatisent le redémarrage de tâches intensives qui
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account
 #SBATCH --time=07-00:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify number of compute nodes (narval 1 node max)
@@ -574,12 +603,12 @@ Les deux scripts suivants automatisent le redémarrage de tâches intensives qui
 #SBATCH --mem=0               # Do not change (allocates all memory per compute node)
 #SBATCH --cpus-per-task=1     # Do not change
 #SBATCH --array=1-5%1         # Specify number of solution restarts (2 or more, 5 is shown)
+</div>
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
 module load ansys/2023R2      # Specify version (beluga, cedar, graham, narval)
-
-slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
+</div>
 
 MYVERSION=3d                        # Specify 2d, 2ddp, 3d or 3ddp
 MYJOUFILE=sample.jou                # Specify your journal filename
@@ -605,6 +634,7 @@ fi
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
 
+<div class="mw-translate-fuzzy">
 # Specify 2d, 2ddp, 3d or 3ddp and replace sample with your journal filename …
 if [ "$SLURM_NNODES" == 1 ]; then
   #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
@@ -639,6 +669,7 @@ else
 fi
 }}
 </tab>
+</div>
 
 <tab name="Plusieurs nœuds (par cœur + redémarrage)">
 {{File
@@ -655,12 +686,10 @@ fi
 #SBATCH --cpus-per-task=1     # Do not change
 #SBATCH --array=1-5%1         # Specify number of restart aka time steps (2 or more, 5 is shown)
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
 module load ansys/2023R2      # Specify version (beluga, cedar, graham, narval)
-
-#module load StdEnv/2020      # no longer supported
-#module load ansys/2019R3     # or newer versions (narval only)
-#module load ansys/2021R2     # or newer versions (beluga, cedar, graham)
+</div>
 
 MYVERSION=3d                        # Specify 2d, 2ddp, 3d or 3ddp
 MYJOUFILE=sample.jou                # Specify your journal filename
@@ -686,6 +715,7 @@ fi
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
 
+<div class="mw-translate-fuzzy">
 if [ "$SLURM_NNODES" == 1 ]; then
   #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
@@ -720,6 +750,7 @@ fi
 }}
 </tab>
 </tabs>
+</div>
 
 <span id="Journal_files"></span>
 === Fichiers de journalisation ===

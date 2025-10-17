@@ -106,13 +106,11 @@ To check that you are doing parallel rendering, you can colour your dataset by t
 
 == Single-core visualization via Open OnDemand ==
 
-On [[Nibi]] or [[Trillium]], you can launch an Open OnDemand instance through a portal. Sign in to https://ondemand.sharcnet.ca (Nibi) or https://ondemand.scinet.utoronto.ca/pun/sys/dashboard
+On [[Nibi]] or [[Trillium]], you can launch an Open OnDemand instance through a portal. Sign in to https://ondemand.sharcnet.ca (Nibi) or https://ondemand.scinet.utoronto.ca
 (Trillium) with your Alliance account.
 
-Once logged in, find "Desktop" in the menu. On Nibi you will find it under Compute Nodes | Nibi
-Desktop. Specify a CPU-only Slurm account and other resources (1 CPU core) and click Launch. Wait for the job
-to start ("Starting" should change to "Running") and then click Launch Nibi Desktop. Inside the desktop, open
-a terminal and type:
+Once logged in, find "Desktop" in the menu. On Nibi you will find it under <i>Compute Nodes | Compute Desktop</i>. Specify a CPU-only Slurm account and other resources (1 CPU core) and click <i>Launch</i>. Wait for the job
+to start ("Starting" should change to "Running") and then click <i>Launch Compute Desktop</i>. Inside the desktop, open a terminal and type:
 
 {{Commands
 |module load paraview/6.0.0
@@ -147,7 +145,15 @@ Next, still inside the remote desktop, start another terminal and type:
 |paraview
 }}
 
-In ParaView GUI, click Connect button, click Add Server, select Server Type = Client/Server, Host = localhost, Port = 11111, Startup Type = Manual. Next, click Connect again to connect the remote ParaView client to the remote parallel server (both running inside the JupyterHub session). Now you can load a dataset and render it in parallel on 4 cores.
+In ParaView GUI:
+* Click <i>Connect</i> button, then:
+*# click <i>Add Server</i>;
+*# select <i>Server Type</i> = <b>Client/Server</b>;
+*# set <i>Host</i> = <b>localhost</b> (instead of the specific compute node name);
+*# set <i>Port</i> = <b>11111</b> (as seen in the <code>Connection URL</code> of the above example);
+*# select <i>Startup Type</i> = <b>Manual</b>.
+* Next, click <i>Connect</i> again to connect the remote ParaView client to the remote parallel server (both running inside the Compute Desktop session).
+* Now you can load a dataset and render it in parallel on 4 cores.
 
 To check that you are doing parallel rendering, you can colour your dataset by the Process Id variable (this variable is unavailable when running in serial).
 
@@ -190,9 +196,19 @@ Accepting connection(s): fc30669:11111
 
 :Wait for the server to be ready to accept client connection.
 
-3. Make a note of the node (in this case fc30669) and the port (usually 11111) and in another terminal on your computer (on Mac/Linux; in Windows use a terminal emulator) link the port 11111 on your computer and the same port on the compute node (make sure to use the correct compute node). Note that "fir" must be replaced by the actual cluster name.
+3. Make a note of the node (in this case fc30669) and the port (usually 11111) and in another terminal on your computer (on Mac/Linux; in Windows use a terminal emulator) link the port 11111 on your computer and the same port on the compute node (make sure to use the correct compute node). Note that "fir" must be replaced by the actual cluster name: Rorqual, Fir, Trillium, or Narval. For Nibi, see the note below.
 
 {{Command|prompt=[name@computer $]|ssh <username>@fir.alliancecan.ca -L 11111:fc30669:11111}}
+
+'''NOTE 4:''' Nibi limits inter-node traffic to ssh (not using port 11111), and it has some additional network
+traffic blocking the initial client-server handshake. For Nibi, please use this command on your computer
+instead
+
+{{Command|prompt=[name@computer $]|ssh -T -J <username>@nibi.alliancecan.ca -L 11111:localhost:11111 <username>@<nibi_compute_node>}}
+
+to route ssh port forwarding in two steps through the login node. The flag `-T` disables pseudo-terminal
+allocation and is important to facilitate the initial handshake, but it will also disable any interactive
+prompt in the shell so you will see no output after this command, and this is normal.
 
 4. Start ParaView on your computer, go to ''File -> Connect'' (or click on the green ''Connect'' button in the toolbar) and click on ''Add Server.'' You will need to point ParaView to your local port 11111, so you can do something like name = fir, server type = Client/Server, host = localhost, port = 11111; click ''Configure'', select ''Manual'' and click ''Save.''
 :Once the remote is added to the configuration, simply select the server from the list and click on ''Connect.'' The first terminal window that read ''Accepting connection'' will now read ''Client connected.''
@@ -276,7 +292,7 @@ Back on the VM, compile <code>cmake::</code>
 
 {{Commands|prompt=[name@VM $]
 |wget https://cmake.org/files/v4.1/cmake-4.1.1.tar.gz
-|unpack and cd there
+|tar -xf cmake-4.1.1.tar.gz && cd cmake-4.1.1
 |./bootstrap
 |make
 |sudo make install
@@ -286,7 +302,7 @@ Next, compile <code>llvm</code>:
 <source lang="console">
 cd
  wget https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.0/LLVM-21.1.0-Linux-X64.tar.xz
- unpack and cd there
+ # unpack and cd there
  mkdir -p build && cd build
  cmake \
   -DCMAKE_BUILD_TYPE=Release \
@@ -303,7 +319,7 @@ Next, compile Mesa with OSMesa:
 <source lang="console">
 cd
  wget https://archive.mesa3d.org/mesa-25.2.3.tar.xz
- unpack and cd there
+ # unpack and cd there
  ./configure \
   --enable-opengl --disable-gles1 --disable-gles2 \
   --disable-va --disable-xvmc --disable-vdpau \
@@ -323,7 +339,7 @@ Next, compile the ParaView server:
 <source lang="console">
 cd
  wget https://www.paraview.org/files/v6.0/ParaView-v6.0.0.tar.gz
- unpack and cd there
+ # unpack and cd there
  mkdir -p build && cd build
  cmake \
       -DCMAKE_BUILD_TYPE=Release \
@@ -351,5 +367,4 @@ Back on your computer, organize an SSH tunnel from the local port 11111 to the V
 ssh centos@vm.ip.address -L 11111:localhost:11111
 </source>
 
-Finally, start the ParaView client on your computer and connect to localhost:11111. If successful, you should be able to open files on the remote VM. During rendering in the console you should see the message ''SWR detected AVX2.''
-</tab>
+Finally, start the ParaView client on your computer and connect to <code>localhost:11111</code>. If successful, you should be able to open files on the remote VM. During rendering in the console you should see the message ''SWR detected AVX2.''

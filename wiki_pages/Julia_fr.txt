@@ -166,25 +166,24 @@ Il peut être utile de modifier cette variable quand plusieurs fils se disputent
 Il va sans dire que ces valeurs ne devraient être configurées qu'après avoir profilé les problèmes potentiels de concurrence. Puisque Julia et particulièrement ses <i>Base.Threads</i> évoluent très rapidement, vous devriez toujours consulter la documentation pour vous assurer que le fait de modifier la configuration par défaut aura effectivement le résultat désiré.
 
 = Utiliser les GPU =
-L'interface de programmation habituelle pour travailler avec les GPU est le paquet CUDA.jl qui s'installe avec
+L'interface de programmation habituelle pour travailler avec les GPU est le paquet CUDA.jl. Vous pouvez l'installer avec le gestionnaire de paquets Julia. Tléchargez d'abord le paquet sur un nœud de connexion.
 
- $ module load cuda/11.4 julia/1.8.1
+  # on a login node!
+ $ module load cuda/12.9 julia/1.11.3
  $ julia
+ julia> ENV["JULIA_PKG_PRECOMPILE_AUTO"]=0
  julia> import Pkg; Pkg.add("CUDA")
 
-Il est possible que la boîte à outils CUDA téléchargée lors de l'installation ne fonctionne pas avec le pilote CUDA qui est installé. Pour éviter ce problème, configurez Julia pour utiliser la boîte à outils locale de CUDA avec
+'''Tout ce qui suit doit être fait sur un nœud de calcul GPU.''' Il est possible que la boîte à outils CUDA téléchargée lors de l'installation ne fonctionne pas avec le pilote CUDA qui est installé. Pour éviter ce problème, configurez Julia pour utiliser la boîte à outils locale de CUDA avec
 
  julia> using CUDA
  julia> CUDA.set_runtime_version!(v"version_of_cuda", local_toolkit=true)
 where version_of_cuda is 12.2 if cuda/12.2 is loaded. 
 
-Pour les versions moins récentes de CUDA, essayez
- julia> CUDA.set_runtime_version!("local")
-
 Après avoir redémarré Julia, vous pouvez vérifier si la version CUDA est la bonne avec
 
  julia> CUDA.versioninfo()
- CUDA runtime 11.4, local installation
+ CUDA runtime 12.6, local installation
  ...
 
 Pour tester l'installation, lancez

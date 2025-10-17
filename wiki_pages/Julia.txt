@@ -206,31 +206,31 @@ It goes without saying that configuring these values should only be done when on
 
 <!--T:61-->
 = Using GPUs with Julia =
-Julia's primary programming interface for GPUs is the CUDA.jl package. The Julia package manager can be used to install it:
+Julia's primary programming interface for GPUs is the CUDA.jl package. The Julia package manager can be used to install it. First download the package on a login node:
 
  <!--T:62-->
-$ module load cuda/11.4 julia/1.8.1
+ # on a login node!
+ $ module load cuda/12.9 julia/1.11.3
  $ julia
+ julia> ENV["JULIA_PKG_PRECOMPILE_AUTO"]=0
  julia> import Pkg; Pkg.add("CUDA")
 
 <!--T:63-->
-It is possible that the CUDA toolkit downloaded during installation will not work with the installed CUDA driver. This problem can be avoided by configuring Julia to use the local CUDA toolkit:
+Everything that follows should be done on a GPU compute node. It is possible that the CUDA toolkit downloaded during installation will not work with the installed CUDA driver. This problem can be avoided by configuring Julia to use the local CUDA toolkit:
 
  <!--T:64-->
-julia> using CUDA
+ # on a GPU node!
+ $ julia
+ using CUDA
  julia> CUDA.set_runtime_version!(v"version_of_cuda", local_toolkit=true)
-where version_of_cuda is 12.2 if cuda/12.2 is loaded. 
-
-<!--T:76-->
-For older versions of cuda, please try
- julia> CUDA.set_runtime_version!("local")
+where version_of_cuda is 12.6 if cuda/12.6 is loaded. 
 
 <!--T:65-->
 After restarting Julia you can verify that it is using the correct CUDA version:
 
  <!--T:66-->
 julia> CUDA.versioninfo()
- CUDA runtime 11.4, local installation
+ CUDA runtime 12.6, local installation
  ...
 
 <!--T:67-->
