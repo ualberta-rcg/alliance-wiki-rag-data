@@ -53,20 +53,24 @@ Note :
 == Environnement logiciel ==
 Le système de fichiers CVMFS (<i>shared software distribution system</i>) rend presque tous les logiciels disponibles sur les nouvelles grappes. Sous Linux, les logiciels seraient typiquement installés dans <code>/usr/bin</code>, <code>/usr/include</code> et ainsi de suite, alors que dans notre cas, ils sont installés de manière identique sur toutes les nouvelles grappes sous <code>/cvmfs/soft.computecanada.ca</code>.
 
+<div class="mw-translate-fuzzy">
 Le module <code>gentoo/2020</code> est chargé par défaut et agit comme cœur pour la pile logicielle gérée par le gestionnaire de paquets Gentoo situé sous <code>/cvmfs/soft.computecanada.ca/nix/var/nix/profiles/16.09</code>.
 
 Indiquez ce chemin avec la variable d'environnement <code>$EBROOTGENTOO</code>. À cet endroit se trouvent tous les paquets usuels fournis dans un environnement Linux dont  <code>make</code>, <code>ls</code>, <code>cat</code>, <code>grep</code>. À la compilation d'un logiciel, le compilateur et l'éditeur de liens cherchent typiquement les fichiers d'en-tête et les bibliothèques à l'endroit approprié (avec les variables d'environnement <code>$CPATH</code> et <code>$LIBRARY_PATH</code> respectivement). 
 
 Cependant, dans le cas de certains logiciels, <code>/usr</code> est explicitement indiqué; si c'est le cas, la compilation s'arrête et vous devrez spécifier <code>$EBROOTGENTOO</code>. Il faudra quelquefois ajuster un Makefile, passer un indicateur <code>--with-</code> via le script de compilation ou éditer un fichier de configuration. Si vous ne savez pas comment procéder, contactez le [[Technical support/fr|soutien technique]].
+</div>
 
 De la même manière, si un paquet dépend d'une bibliothèque provenant d'un module autre que <code>gentoo</code>, vous devrez peut-être spécifier où se trouvent les fichiers d'en-tête et les bibliothèques du module. Ces autres modules ont aussi une variable d'environnement commençant par EBROOT et se terminant par le nom du module en majuscules. Par exemple, après avoir exécuté la commande <code>module load hdf5</code>, son installation se trouvera dans <code>$EBROOTHDF5</code>, ses fichiers d'en-tête dans <code>$EBROOTHDF5/include</code>, ses fichiers de bibliothèque dans <code>$EBROOTHDF5/lib</code> et ainsi de suite.
 
 Si un fichier d'en-tête ou une bibliothèque habituellement offerts dans une distribution de type Linux par un RPM ou autre gestionnaire de paquets ne se trouvent ni par <code>gentoo</code>, ni par un autre module, veuillez nous en informer; nous pourrons très probablement l'ajouter.
 
+<div class="mw-translate-fuzzy">
 '''Notes'''
 
 * Tous les binaires sous <code>/cvmfs/soft.computecanada.ca</code> utilisent un RUNPATH; les répertoires des bibliothèques d'exécution desquels dépendent ces binaires sont placés dans le binaire. Il <b>n'est donc pas nécessaire</b> d'utiliser <code>$LD_LIBRARY_PATH</code>. En fait, <code>$LD_LIBRARY_PATH</code> a préséance sur le RUNPATH et cette variable d'environnement ne devrait pas se trouver dans des endroits comme <code>/usr/lib64</code> ou <code>$EBROOTGENTOO/lib</code>. Si vous procédez ainsi, plusieurs binaires ne fonctionneront pas.
 * En dernier recours, utilisez <code>module --force purge</code> pour éliminer l'environnement CVMFS. Vous obtiendrez ainsi une installation CentOS-7 brute, sans modules. Ceci peut servir dans des cas spéciaux où vous compilez GCC par vous-même ou quand vous utilisez des chaînes d'outils de compilation comme [http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk MESA SDK]. Il ne serait nécessaire de purger des modules qu'à la compilation et ils peuvent être chargés à nouveau au lancement du logiciel.
+</div>
 
 <span id="Compiling_on_compute_nodes"></span>
 == Compiler avec un nœud de calcul ==

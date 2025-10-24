@@ -148,75 +148,14 @@ When the pipeline is launched, Nextflow will look at the <code>nextflow.config</
 ==== A configuration for our clusters ==== <!--T:16-->
 
 <!--T:17-->
-You can use the following config by changing the default value for nf-core processes and enter the correct information for the cluster you are using. This config is saved in a profile block that will be loaded at runtime. 
-</translate>
-{{File
-  |name=~/.nextflow/config
-  |lang="config"
-  |contents=
+Nf-core provides configurations for the following clusters: Narval, Rorqual, Trillium, Nibi, and Fir. The cluster is autodetected via the hostname with the exception of Fir which should be loaded using the <code>-profile</code> flag. This file can be placed in <code>~/.nextflow/config</code> [https://github.com/nf-core/configs/blob/master/conf/alliance_canada.config nf-core/configs GitHub repo]
 
-params {
-    config_profile_description = 'Alliance HPC config'
-    config_profile_contact = 'https://docs.alliancecan.ca/wiki/Technical_support'
-    config_profile_url = 'docs.alliancecan.ca/wiki/Nextflow'
-}
-
-
-singularity {
-  enabled = true
-  autoMounts = true
-}
-
-apptainer {
-  autoMounts = true
-}
-
-process {
-  executor = 'slurm' 
-  clusterOptions = '--account=<my-account>'
-  maxRetries = 1
-  errorStrategy = { task.exitStatus in [125,139] ? 'retry' : 'finish' }
-  memory = { check_max( 4.GB * task.attempt, 'memory' ) }
-  cpu = 1  
-  time = '3h' 
-}
-
-executor {
-  pollInterval = '60 sec'
-  submitRateLimit = '60/1min'
-  queueSize = 100 
-}
-
-profiles {
-  fir {
-    max_memory='750G'
-    max_cpu=192
-    max_time='168h'
-  }
-  nibi {
-    max_memory='750G'
-    max_cpu=192
-    max_time='168h'
-  }
-  narval {
-    max_memory='249G'
-    max_cpu=64
-    max_time='168h'
-  }
-  rorqual {
-    max_memory='750G'
-    max_cpu=192
-    max_time='168h'
-  }
-}
-}}
-<translate>
 <!--T:18-->
-Replace <code><my-account></code> with your own account, which looks like <code>def-pname</code>.
+The <code>$SLURM_ACCOUNT</code> environment variable needs to be set, which looks like <code>def-pname</code>. For the sake of ease this can be set in <code>~.bashrc</code>
 The <code>singularity.autoMounts = true</code> bits ensure that all the cluster File Systems (<code>/project</code>, <code>/scratch</code>, <code>/home</code> & <code>/localscratch</code>)  will be properly mounted inside the singularity container.
 
 <!--T:19-->
-This configuration ensures that there are no more than 100 jobs in the Slurm queue and that only 60 jobs are submitted per minute. It indicates that Rorqual machines have 192 cores and 750G of RAM with a maximum walltime of one week (168 hours).
+This configuration ensures that there are no more than 100 jobs in the Slurm queue and that only 60 jobs are submitted per minute. It indicates that Rorqual machines have 192 cores and 750 GB of RAM with a maximum walltime of one week (168 hours). These are different for Trillium, as Trillium has a different setup with nodes. CPU and memory cannot be specified as a whole node is requested at a time. 
 
 <!--T:20-->
 The config is linked to the system you are running on, but it is also related to the pipeline itself. For example, here cpu = 1 is the default value, but steps in the pipeline can have more than that. This can get quite complicated and labels in the <code>nf-core-smrnaseq_2.3.1/2_3_1/conf/base.config</code> file are used internally by the pipeline to identify a step with a non default configuration. We do not cover this more advanced topic here, but note that tweaking these labels could make a big difference in the queuing and execution time of your pipeline.

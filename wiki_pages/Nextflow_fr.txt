@@ -130,71 +130,18 @@ Quand le pipeline est prêt à être lancé, Nextflow examine le fichier <code>n
 <span id="A_configuration_for_our_clusters"></span>
 ==== Configuration pour nos grappes ====
 
-Vous pouvez utiliser la configuration suivante en modifiant la valeur par défaut des processus nf-core et en entrant les informations appropriées pour la grappe que vous utilisez. Cette configuration est enregistrée dans un bloc de profil qui sera chargé lors de l'exécution. 
-{{File
-  |name=~/.nextflow/config
-  |lang="config"
-  |contents=
+<div class="mw-translate-fuzzy">
+Vous pouvez utiliser la configuration suivante en modifiant la valeur par défaut des processus nf-core et en entrant les informations appropriées pour la grappe que vous utilisez. Cette configuration est enregistrée dans un bloc de profil qui sera chargé lors de l'exécution.
+</div>
 
-params {
-    config_profile_description = 'Alliance HPC config'
-    config_profile_contact = 'https://docs.alliancecan.ca/wiki/Technical_support'
-    config_profile_url = 'docs.alliancecan.ca/wiki/Nextflow'
-}
-
-
-singularity {
-  enabled = true
-  autoMounts = true
-}
-
-apptainer {
-  autoMounts = true
-}
-
-process {
-  executor = 'slurm' 
-  clusterOptions = '--account=<my-account>'
-  maxRetries = 1
-  errorStrategy = { task.exitStatus in [125,139] ? 'retry' : 'finish' }
-  memory = { check_max( 4.GB * task.attempt, 'memory' ) }
-  cpu = 1  
-  time = '3h' 
-}
-
-executor {
-  pollInterval = '60 sec'
-  submitRateLimit = '60/1min'
-  queueSize = 100 
-}
-
-profiles {
-  fir {
-    max_memory='750G'
-    max_cpu=192
-    max_time='168h'
-  }
-  nibi {
-    max_memory='750G'
-    max_cpu=192
-    max_time='168h'
-  }
-  narval {
-    max_memory='249G'
-    max_cpu=64
-    max_time='168h'
-  }
-  rorqual {
-    max_memory='750G'
-    max_cpu=192
-    max_time='168h'
-  }
-}
-}}
+<div class="mw-translate-fuzzy">
 Remplacez <code><my-account></code> par votre propre compte qui est semblable à <code>def-pname</code>.
 Le bit <code>singularity.autoMounts = true</code> fait en sorte que tous les systèmes de fichiers (<code>/project</code>, <code>/scratch</code>, <code>/home</code> & <code>/localscratch</code>) seront correctement montés à l'intérieur du conteneur Singularity.
+</div>
 
+<div class="mw-translate-fuzzy">
 Cette configuration garantit qu'il n'y a pas plus de 100 tâches dans la file d'attente Slurm et que seules 60 tâches sont soumises par minute. Elle indique que les nœuds de calcul Rorqual ont 192&nbsp;cœurs et 750&nbsp;G de RAM avec un temps réel maximum d'exécution d'une semaine (168&nbsp;heures).
+</div> 
 
 La configuration est liée au système sur lequel se fait l'exécution, mais elle est également liée au pipeline lui-même. Par exemple, ici <code>cpu = 1</code> est la valeur par défaut, mais certaines étapes du pipeline peuvent en utiliser plus. Cela peut devenir assez compliqué et les étiquettes dans le fichier <code>nf-core-smrnaseq_2.3.1/2_3_1/conf/base.config</code> sont utilisées par le pipeline à l'interne pour identifier une étape avec une configuration autre que celle par défaut. Nous n'abordons pas ce sujet ici, mais sachez qu'en modifiant ces étiquettes, vous pourriez observer des différences importantes dans le temps de mise en file d'attente et le temps d'exécution du pipeline.
 
