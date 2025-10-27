@@ -1,38 +1,34 @@
 [
   {
-    "question": "How are license server settings configured for Ansys Fluent jobs on the Niagara cluster?",
-    "answer": "For Ansys Fluent jobs on the Niagara cluster, license server details like hostname, flex port (FLEXPORT), interconnect port (INTEPORT), and vendor port (VENDPORT) are explicitly defined within the Slurm script, overriding any `~/.licenses/ansys.lic` configuration."
+    "question": "How is the total number of cores (NCORES) calculated in the Ansys Fluent multinode (by node) Trillium Slurm script?",
+    "answer": "The total number of cores (NCORES) is calculated as the product of the number of nodes (SLURM_NNODES), tasks per node (SLURM_NTASKS_PER_NODE), and CPUs per task (SLURM_CPUS_PER_TASK)."
   },
   {
-    "question": "What are the typical license server parameters specified in a Niagara Slurm script for Ansys Fluent?",
-    "answer": "A typical configuration in a Niagara Slurm script for Ansys Fluent would specify `LICSERVER=license3.sharcnet.ca`, `FLEXPORT=1055`, `INTEPORT=2325`, and `VENDPORT=1793`."
+    "question": "What error messages might a user encounter in the Ansys Fluent multinode (by node) Trillium Slurm script if certain directories or files are missing?",
+    "answer": "Users might see error messages indicating that a link to a writable `.ansys` directory, `.fluentconf` directory, or `.flrecent` file does not exist in their `$HOME` folder."
   },
   {
-    "question": "How does the Niagara Slurm script establish a connection to the Ansys license server?",
-    "answer": "The Niagara Slurm script establishes connections to the Ansys license server by creating SSH tunnels via `nia-gw` for the flex port, interconnect port, and vendor port, effectively routing license requests through `localhost`."
+    "question": "How can a user resolve the 'ERROR: A link to a writable .ansys directory does not exist' issue when running Ansys Fluent on Trillium?",
+    "answer": "To resolve this error, the user should remove `~/.ansys` if it exists, and then run `ln -s $SCRATCH/.ansys ~/.ansys`."
   },
   {
-    "question": "What environment variables are set for Ansys Fluent licensing within a Niagara Slurm script?",
-    "answer": "Within a Niagara Slurm script, the environment variables `ANSYSLMD_LICENSE_FILE` and `ANSYSLI_SERVERS` are set to `$FLEXPORT@localhost` and `$INTEPORT@localhost` respectively, using the locally tunneled license server ports."
+    "question": "What is the purpose of the 'License Requeue' scripts for Ansys Fluent jobs?",
+    "answer": "The 'License Requeue' scripts are designed for Fluent jobs that are known to complete normally but frequently require multiple attempts to successfully checkout licenses due to shortages."
   },
   {
-    "question": "How is the total number of cores (NCORES) determined for an Ansys Fluent job on Niagara?",
-    "answer": "The total number of cores (NCORES) for an Ansys Fluent job on Niagara is calculated by multiplying `SLURM_NNODES` (number of nodes), `SLURM_NTASKS_PER_NODE` (tasks per node), and `SLURM_CPUS_PER_TASK` (CPUs per task)."
+    "question": "When should 'License Requeue' scripts NOT be used for Ansys Fluent jobs?",
+    "answer": "These scripts are not recommended for Fluent jobs that might run for a long time before crashing, or that run to completion but contain unresolved journal file warnings, as simulations would be repeated unnecessarily."
   },
   {
-    "question": "What directories and files are required to be linked from `$HOME` to `$SCRATCH` for Ansys Fluent jobs on Niagara?",
-    "answer": "Ansys Fluent jobs on Niagara require symbolic links for `$HOME/.ansys`, `$HOME/.fluentconf` (directories), and `$HOME/.flrecent` (file) to corresponding writable locations in `$SCRATCH`. If these links are missing, the job will fail with an error message."
+    "question": "In the 'Multinode (by node + requeue)' Slurm script for Ansys Fluent, how is the number of requeue attempts configured?",
+    "answer": "The number of requeue attempts is specified using the `#SBATCH --array=1-5%1` directive, where `5` indicates the maximum number of requeue attempts."
   },
   {
-    "question": "What is the command to run Ansys Fluent in single-node mode on Niagara?",
-    "answer": "To run Ansys Fluent in single-node mode on Niagara, the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE`."
+    "question": "How is the total number of cores (NCORES) determined in the Fluent multinode (by node + requeue) Slurm script?",
+    "answer": "NCORES is determined by the calculation `NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))`."
   },
   {
-    "question": "What is the command to run Ansys Fluent in multi-node mode on Niagara?",
-    "answer": "To run Ansys Fluent in multi-node mode on Niagara, the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -ssh -pib -cnf=$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
-  },
-  {
-    "question": "When are license requeue scripts recommended for Ansys Fluent jobs?",
-    "answer": "License requeue scripts are only recommended for Ansys Fluent jobs that are known to complete successfully without errors but frequently fail to start due to temporary license shortages. They should not be used for jobs that might crash or have unresolved warnings."
+    "question": "Which Intel MPI modules are loaded for Narval cluster when using the Fluent multinode (by node + requeue) script?",
+    "answer": "For Narval, if `EBVERSIONGENTOO` is 2020, `intel/2021` and `intelmpi` modules are loaded. If `EBVERSIONGENTOO` is 2023, `intel/2023` and `intelmpi` modules are loaded."
   }
 ]

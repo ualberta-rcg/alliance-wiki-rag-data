@@ -1,186 +1,142 @@
 [
   {
     "question": "What is the recommended use for SCRATCH storage?",
-    "answer": "SCRATCH storage is best for intensive read/write operations on large files (over 100 MB), temporary files, checkpoint files, output from jobs, and other data that can be easily recreated. It should not be regarded as normal storage for important files."
+    "answer": "SCRATCH is the best choice for intensive read/write operations on large files (> 100 MB per file) and should be used for temporary files like checkpoint files, output from jobs, and other data that can easily be recreated."
   },
   {
     "question": "Are files stored on SCRATCH backed up?",
-    "answer": "No, important files must be copied off SCRATCH because they are not backed up there."
+    "answer": "No, important files must be copied off SCRATCH since they are not backed up there."
   },
   {
     "question": "What happens to older files on SCRATCH?",
     "answer": "Older files on SCRATCH are subject to purging."
   },
   {
-    "question": "What is the purpose of NEARLINE storage?",
-    "answer": "NEARLINE is a tape-based filesystem intended for inactive data, specifically datasets that are not expected to be accessed for months."
+    "question": "What type of data should NOT be stored on SCRATCH?",
+    "answer": "SCRATCH should not be regarded as normal storage; it is for transient files that you can afford to lose."
   },
   {
-    "question": "Where should inactive datasets be stored?",
-    "answer": "Inactive datasets that you do not expect to access for months should be stored in `/nearline`."
+    "question": "What is NEARLINE storage intended for?",
+    "answer": "NEARLINE is a tape-based filesystem intended for inactive data."
   },
   {
-    "question": "What is `$SLURM_TMPDIR`?",
-    "answer": "`$SLURM_TMPDIR` is an environment variable that holds a unique path to a temporary folder on a fast, local filesystem on each compute node allocated to a job."
+    "question": "What kind of datasets are good candidates for NEARLINE storage?",
+    "answer": "Datasets which you do not expect to access for months are good candidates to be stored in /nearline."
+  },
+  {
+    "question": "What is the purpose of the `$SLURM_TMPDIR` environment variable?",
+    "answer": "While a job is running, `$SLURM_TMPDIR` holds a unique path to a temporary folder on a fast, local filesystem on each compute node allocated to the job, to be used for temporary files needed only for the duration of the job."
   },
   {
     "question": "When are the contents of `$SLURM_TMPDIR` deleted?",
-    "answer": "The directory and its contents in `$SLURM_TMPDIR` are deleted when the job ends."
+    "answer": "When the job ends, the directory and its contents are deleted."
   },
   {
-    "question": "What is the advantage of using `$SLURM_TMPDIR`?",
-    "answer": "The advantage of using `$SLURM_TMPDIR` is increased performance due to the filesystem being local to the compute node, making it well-suited for temporary files or large collections of small files."
+    "question": "What is the advantage of using `$SLURM_TMPDIR` compared to other networked filesystems?",
+    "answer": "Its advantage is increased performance due to the filesystem being local to the compute node."
   },
   {
-    "question": "How can users check their individual space and file count usage on the entire project space?",
+    "question": "What kind of files is `$SLURM_TMPDIR` especially well-suited for?",
+    "answer": "It is especially well-suited for large collections of small files (for example, smaller than a few megabytes per file)."
+  },
+  {
+    "question": "Is `$SLURM_TMPDIR` shared or exclusive to a single job?",
+    "answer": "This filesystem is shared between all jobs running on the node."
+  },
+  {
+    "question": "How can a user obtain an estimate of their space and file count use on the entire project space?",
     "answer": "Users can obtain an estimate of their space and file count use on the entire project space by running the command `lfs quota -u $USER /project`."
   },
   {
-    "question": "How can users estimate the number of files in a specific directory within project space?",
+    "question": "How can a user estimate the number of files in a specific directory (and its subdirectories)?",
     "answer": "Users can obtain an estimate for the number of files in a given directory (and its subdirectories) using the command `lfs find <path to the directory> -type f | wc -l`."
   },
   {
-    "question": "What is a key best practice for managing data in scratch and project spaces?",
-    "answer": "Regularly clean up your data in the scratch and project spaces, as these filesystems are used for huge data collections."
+    "question": "What is a general best practice for data management in scratch and project spaces?",
+    "answer": "Regularly clean up your data in the scratch and project spaces, because those filesystems are used for huge data collections."
   },
   {
-    "question": "What is a recommended method for safely deleting files?",
+    "question": "What is the recommended process for safely deleting a set of files?",
     "answer": "To safely delete files, create a temporary directory `toDelete`, move the files to be deleted into it, verify its contents, and then delete `toDelete` recursively."
   },
   {
-    "question": "What should be avoided when using `rm` commands?",
-    "answer": "If possible, avoid using `*` and `/` characters in your `rm` commands, and always navigate to the parent directory and double-check you are in the correct directory before deleting."
+    "question": "What caution should be exercised when using `rm` commands in shell scripts?",
+    "answer": "In shell scripts, if environment variables are used in `rm` commands, each variable has to be tested before use, as empty or undefined variables can cause catastrophic errors, and any input value has to be checked against malicious or erroneous use of the script."
   },
   {
-    "question": "What is the best practice for storing text files?",
+    "question": "What is the recommendation for using text format for files?",
     "answer": "Only use text format for files that are smaller than a few megabytes."
   },
   {
-    "question": "Where should temporary files be stored for optimal performance?",
-    "answer": "As far as possible, use scratch and local storage for temporary files, utilizing the temporary directory created by the job scheduler, named `$SLURM_TMPDIR`."
+    "question": "Where should temporary files be stored?",
+    "answer": "As far as possible, use scratch and local storage for temporary files; for local storage, the temporary directory created by the job scheduler, named `$SLURM_TMPDIR`, can be used."
   },
   {
-    "question": "What is the fastest way for a program to search within a file?",
-    "answer": "If a program must search within a file, it is fastest to do it by first reading it completely before searching."
+    "question": "How can programs optimize searching within a file?",
+    "answer": "If your program must search within a file, it is fastest to do it by first reading it completely before searching."
   },
   {
-    "question": "What should be done with files that are no longer used but must be retained?",
-    "answer": "If you no longer use certain files but they must be retained, archive and compress them, and if possible, move them to an alternative location like Nearline."
+    "question": "What should be done with files that are no longer actively used but must be retained?",
+    "answer": "If you no longer use certain files but they must be retained, archive and compress them, and if possible move them to an alternative location like nearline."
   },
   {
-    "question": "What issues can parallel write access to shared filesystems cause?",
-    "answer": "Having any sort of parallel write access to a file stored on a shared filesystem like home, scratch, and project is likely to create problems unless a specialized tool such as MPI-IO is used."
+    "question": "What potential issues can arise from parallel write access to a file on a shared filesystem?",
+    "answer": "Having any sort of parallel write access to a file stored on a shared filesystem like home, scratch, and project is likely to create problems unless you are using a specialized tool such as MPI-IO."
   },
   {
-    "question": "How can users get assistance if available storage options don't meet their needs?",
+    "question": "When should users contact technical support regarding storage options?",
     "answer": "If your needs are not well served by the available storage options, you should contact technical support."
   },
   {
-    "question": "What are the default storage allocations for users and groups on clusters?",
-    "answer": "By default, each user has access to home and scratch spaces, and each group has access to 1 TB of project space."
+    "question": "What default storage spaces do users and groups have access to on the clusters?",
+    "answer": "By default on our clusters, each user has access to the home and scratch spaces, and each group has access to 1 TB of project space."
   },
   {
-    "question": "How can users increase their project and scratch space allocations?",
-    "answer": "Small increases in project and scratch spaces are available through the Rapid Access Service (RAS), while larger increases in project spaces are available through the annual Resource Allocation Competition (RAC)."
+    "question": "How can users obtain small or larger increases in project and scratch spaces?",
+    "answer": "Small increases in project and scratch spaces are available through the Rapid Access Service, while larger increases in project spaces are available through the annual Resource Allocation Competition."
   },
   {
-    "question": "What is the default quota for Home Space on Fir cluster?",
-    "answer": "On the Fir cluster, the default quota for Home Space is 50 GB and 500K files per user."
+    "question": "What command can be used to check current quota usage for various filesystems?",
+    "answer": "You can see your current quota usage for various filesystems on our clusters using the command `diskusage_report`."
   },
   {
-    "question": "Is Home Space on the Fir cluster backed up?",
-    "answer": "Yes, Home Space on the Fir cluster is backed up."
+    "question": "What is the default quota for Home Space on the Fir cluster?",
+    "answer": "The default quota for Home Space on the Fir cluster is 50 GB and 500,000 files per user."
   },
   {
-    "question": "What is the default quota for Scratch Space on Fir cluster?",
-    "answer": "On the Fir cluster, the default quota for Scratch Space is 20 TB and 1M files per user."
+    "question": "Is Home Space backed up on the Fir cluster?",
+    "answer": "Yes, Home Space is backed up on the Fir cluster."
   },
   {
-    "question": "Is Scratch Space on Fir cluster backed up?",
-    "answer": "No, Scratch Space on the Fir cluster is not backed up."
+    "question": "What is the default quota for Scratch Space on the Fir cluster?",
+    "answer": "The default quota for Scratch Space on the Fir cluster is 20 TB and 1 million files per user."
   },
   {
-    "question": "Are files on Fir's Scratch Space purged?",
-    "answer": "Yes, files older than 60 days are purged from Fir's Scratch Space."
+    "question": "What is the purging policy for Scratch Space on the Fir cluster?",
+    "answer": "On the Fir cluster, files older than 60 days are purged from Scratch Space."
   },
   {
-    "question": "What is the default quota for Project Space on Fir cluster?",
-    "answer": "On the Fir cluster, the default quota for Project Space is 1 TB and 500K files per group."
+    "question": "What is the default quota for Project Space on the Fir cluster?",
+    "answer": "The default quota for Project Space on the Fir cluster is 1 TB and 500,000 files per group."
   },
   {
-    "question": "Can Project Space on Fir cluster be increased?",
-    "answer": "Yes, Project Space on Fir cluster can be increased to 40 TB per group via a RAS request, or more through RAC."
+    "question": "Can Project Space be increased on the Fir cluster, and if so, to what maximum?",
+    "answer": "Yes, Project space on the Fir cluster can be increased up to 40 TB per group by a RAS request, or through the annual Resource Allocation Competition."
   },
   {
-    "question": "Is Nearline Space on Fir cluster mounted on compute nodes?",
-    "answer": "No, Nearline Space on the Fir cluster is not mounted on compute nodes."
+    "question": "What is the default quota for Nearline Space on the Fir cluster?",
+    "answer": "The default quota for Nearline Space on the Fir cluster is 2 TB and 5,000 files per group."
   },
   {
-    "question": "What is the default quota for Home Space on Nibi cluster?",
-    "answer": "On the Nibi cluster, the default quota for Home Space is 50 GB and 500K files per user."
+    "question": "Is Nearline Space mounted on compute nodes on the Fir cluster?",
+    "answer": "No, Nearline Space is not mounted on compute nodes on the Fir cluster."
   },
   {
-    "question": "Is Home Space on Nibi cluster Lustre-based?",
-    "answer": "No, Home Space on the Nibi cluster is not Lustre-based."
-  },
-  {
-    "question": "Does Nibi's Scratch Space have a soft quota?",
-    "answer": "Yes, Nibi's Scratch Space has a 1 TB soft quota per researcher, which can be exceeded for up to 60 days."
-  },
-  {
-    "question": "Is Scratch Space on Nibi cluster backed up?",
-    "answer": "No, Scratch Space on the Nibi cluster is not backed up."
-  },
-  {
-    "question": "What is the default quota for Nearline Space on Nibi cluster?",
-    "answer": "On the Nibi cluster, the default quota for Nearline Space is 10 TB and 5000 files per group."
-  },
-  {
-    "question": "What is the default quota for Home Space on Narval and Rorqual clusters?",
-    "answer": "On Narval and Rorqual clusters, the default quota for Home Space is 50 GB and 500K files per user."
-  },
-  {
-    "question": "Is Nearline Space on Narval and Rorqual clusters backed up?",
-    "answer": "Yes, Nearline Space on Narval and Rorqual clusters is backed up."
-  },
-  {
-    "question": "What is the default quota for Home Space on Niagara cluster?",
-    "answer": "On the Niagara cluster, the default quota for Home Space is 100 GB per user."
-  },
-  {
-    "question": "What is the block size for Project space on Niagara?",
-    "answer": "The block size for Project space on Niagara is 16 MB."
-  },
-  {
-    "question": "Is Niagara's $HOME mounted on compute nodes with read/write access?",
-    "answer": "Niagara's $HOME is mounted on compute nodes, but it is read-only."
-  },
-  {
-    "question": "What is the expiration time for $SCRATCH on Niagara?",
-    "answer": "The expiration time for $SCRATCH on Niagara is 2 months."
-  },
-  {
-    "question": "What does $BBUFFER stand for on Niagara?",
-    "answer": "$BBUFFER stands for Burst Buffer, a faster parallel storage tier for temporary data."
-  },
-  {
-    "question": "What is the default Home Space quota on TamIA?",
-    "answer": "The default Home Space quota on TamIA is 25 GB per user."
-  },
-  {
-    "question": "Is Home Space on TamIA backed up?",
-    "answer": "No, Home Space on TamIA is not backed up."
-  },
-  {
-    "question": "What is the default Project Space quota for CIFAR AI Chairs on Vulcan?",
-    "answer": "On Vulcan, the default Project Space quota for CIFAR AI Chairs is 12.5 TB."
-  },
-  {
-    "question": "How long are nightly backups retained for home and project spaces?",
-    "answer": "Nightly backups for home and project spaces are retained for 30 days, and deleted files are retained for an additional 60 days."
+    "question": "What is the general backup policy for home and project spaces?",
+    "answer": "The backup policy on the home and project space is nightly backups which are retained for 30 days, while deleted files are retained for a further 60 days."
   },
   {
     "question": "How can a user recover a previous version of a file or directory?",
-    "answer": "To recover a previous version of a file or directory, contact technical support with the full path for the file(s) and the desired version (by date)."
+    "answer": "To recover a previous version of a file or directory, you should contact technical support with the full path for the file(s) and desired version (by date)."
   }
 ]

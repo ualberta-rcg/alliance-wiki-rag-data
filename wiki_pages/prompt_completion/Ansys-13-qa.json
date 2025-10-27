@@ -1,50 +1,46 @@
 [
   {
-    "question": "How can you automate DPM injection and interaction settings in an Ansys Fluent journal file?",
-    "answer": "You can include commands like '/define/models/dpm/interaction/coupled-calculations yes', '/define/models/dpm/injections/delete-injection injection-0:1', and '/define/models/dpm/injections/create injection-0:1 no yes file no zinjection01.inj no no no no' in your journal file after solution initialization."
+    "question": "What are the SBATCH directives required for a single-node Ansys CFX job script?",
+    "answer": "The necessary SBATCH directives for a single-node Ansys CFX job script are `--account`, `--time`, `--nodes=1`, `--ntasks-per-node`, `--mem`, and `--cpus-per-task=1`."
   },
   {
-    "question": "What does a basic manually created steady injection file for DPM simulations look like?",
-    "answer": "A basic manually created steady injection file, such as 'zinjection01.inj', would include lines defining the number of injections (e.g., '(z=4 12)') and then the particle properties (e.g., '( x y z u v w diameter t mass-flow mass frequency time name ) (( 2.90e-02 5.00e-03 0.0 -1.00e-03 0.0 0.0 1.00e-04 2.93e+02 1.00e-06 0.0 0.0 0.0 ) injection-0:1 )')."
+    "question": "Which modules should be loaded for Ansys CFX single-node jobs when using the StdEnv/2023 environment?",
+    "answer": "For Ansys CFX single-node jobs with StdEnv/2023, you should load `module load StdEnv/2023` and `module load ansys/2023R2` (or newer module versions)."
   },
   {
-    "question": "Where can you find detailed information on the steady file format for DPM injection files?",
-    "answer": "Detailed information can be found in subsection 'Part III: Solution Mode | Chapter 24: Modeling Discrete Phase | 24.3. Setting Initial Conditions for the Discrete Phase | 24.3.13 Point Properties for File Injections | 24.3.13.1 Steady File Format' of the '2024R2 Fluent Customization Manual'."
+    "question": "How do you execute the `cfx5solve` command for a single-node job on the Narval cluster versus other clusters?",
+    "answer": "On the Narval cluster, you run `cfx5solve -def YOURFILE.def -start-method \"Open MPI Local Parallel\" -part $SLURM_CPUS_ON_NODE`. For other clusters, the command is `cfx5solve -def YOURFILE.def -start-method \"Intel MPI Local Parallel\" -part $SLURM_CPUS_ON_NODE`."
   },
   {
-    "question": "How do you display a summary of command-line options for Ansys CFX?",
-    "answer": "You can print a summary of command-line options by running 'cfx5solve -help' after manually loading the appropriate Ansys module version."
+    "question": "What are the maximum core limits per node for single-node Ansys CFX jobs on Graham, Cedar, Beluga, and Narval clusters?",
+    "answer": "The maximum cores per node are: Graham 44, Cedar 32 or 48, Beluga 40, and Narval 64."
   },
   {
-    "question": "What is the default precision for cfx5solve and how can it be changed?",
-    "answer": "By default, cfx5solve runs in single precision. To run it in double precision, you should add the '-double' option, which will also double the memory requirements."
+    "question": "What are the SBATCH directives required for a multi-node Ansys CFX job script?",
+    "answer": "The necessary SBATCH directives for a multi-node Ansys CFX job script are `--account`, `--time`, `--nodes` (2 or more), `--ntasks-per-node`, `--mem=0`, and `--cpus-per-task=1`."
   },
   {
-    "question": "What are the default mesh size limits for cfx5solve and how can larger meshes be handled?",
-    "answer": "By default, cfx5solve supports meshes with up to 80 million structured elements or 200 million unstructured elements. For larger meshes, up to 2 billion elements, you should add the '-large' option."
+    "question": "Which modules should be loaded for Ansys CFX multi-node jobs when using the StdEnv/2023 environment?",
+    "answer": "For Ansys CFX multi-node jobs with StdEnv/2023, you should load `module load StdEnv/2023` and `module load ansys/2023R2` (or newer module versions)."
   },
   {
-    "question": "Where can users find more detailed information about cfx5solve command-line options?",
-    "answer": "Users should consult the ANSYS CFX-Solver Manager User's Guide for further details on cfx5solve command-line options."
+    "question": "How is the `cfx5solve` command executed for a multi-node job on the Narval cluster compared to other clusters?",
+    "answer": "On the Narval cluster, you run `cfx5solve -def YOURFILE.def -start-method \"Open MPI Distributed Parallel\" -par-dist $NNODES`. For other clusters, you first set `export I_MPI_HYDRA_BOOTSTRAP=ssh` and `unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS`, then run `cfx5solve -def YOURFILE.def -start-method \"Intel MPI Distributed Parallel\" -par-dist $NNODES`."
   },
   {
-    "question": "What are the SBATCH parameters for a single-node Ansys CFX job script?",
-    "answer": "For a single-node Ansys CFX job script, the SBATCH parameters are typically: '--account=def-group', '--time=00-03:00', '--nodes=1' (do not change), '--ntasks-per-node=4' (up to cluster max), '--mem=16G' (or 0 for all node memory), and '--cpus-per-task=1'."
+    "question": "What tool is used to determine the number of nodes (`NNODES`) for Ansys CFX multi-node jobs?",
+    "answer": "The `slurm_hl2hl.py --format ANSYS-CFX` utility is used to determine the number of nodes (`NNODES`)."
   },
   {
-    "question": "How do you specify the start method for a single-node Ansys CFX job on Narval versus other clusters?",
-    "answer": "On Narval, use '-start-method \"Open MPI Local Parallel\"', while on other clusters, use '-start-method \"Intel MPI Local Parallel\"', both with '-part $SLURM_CPUS_ON_NODE'."
+    "question": "What is the initialization procedure for an Ansys Workbench project file before its first submission to a cluster queue?",
+    "answer": "Before first submission, connect to the cluster via TigerVNC, navigate to the project directory, start Workbench with the appropriate Ansys module, open the project, right-click on 'Setup' and select 'Clear All Generated Data', then exit Workbench by choosing 'File -> Exit' and clicking 'No' when prompted to save changes."
   },
   {
-    "question": "What are the SBATCH parameters for a multinode Ansys CFX job script?",
-    "answer": "For a multinode Ansys CFX job script, the SBATCH parameters include: '--account=def-group', '--time=00-03:00', '--nodes=2' (or more), '--ntasks-per-node=64' (up to cluster max), '--mem=0' (to use all memory), and '--cpus-per-task=1'."
+    "question": "How can I prevent an Ansys Workbench job from saving the solution automatically after successful completion, especially for scaling tests?",
+    "answer": "To prevent automatic saving, remove the line `;Save(Overwrite=True)` from the last line of your Workbench Slurm script."
   },
   {
-    "question": "How do you specify the start method for a multinode Ansys CFX job on Narval versus other clusters?",
-    "answer": "On Narval, use '-start-method \"Open MPI Distributed Parallel\" -par-dist $NNODES'. For other clusters, set 'export I_MPI_HYDRA_BOOTSTRAP=ssh' and 'unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS', then use '-start-method \"Intel MPI Distributed Parallel\" -par-dist $NNODES'."
-  },
-  {
-    "question": "Which Ansys CFX module versions are recommended for use with Slurm scripts?",
-    "answer": "The recommended module versions for Ansys CFX Slurm scripts are 'StdEnv/2023' and 'ansys/2023R2' or newer module versions."
+    "question": "What alternative methods can be used to manage Workbench project files during multiple test runs for scaling, to avoid repeatedly clearing solutions manually?",
+    "answer": "As an alternative, you can maintain a copy of the original `YOURPROJECT.wbpj` file and its `YOURPROJECT_files` subdirectory, and restore them after each solution is written."
   }
 ]

@@ -1,58 +1,78 @@
 [
   {
-    "question": "What packages are required to be installed on a CentOS VM before compiling ParaView or VisIt for a custom setup?",
-    "answer": "On a CentOS VM, you need to install `xauth`, `wget`, `gcc`, `gcc-c++`, `ncurses-devel`, `python-devel`, `libxcb-devel`, `patch`, `imake`, `libxml2-python`, `mesa-libGL`, `mesa-libGL-devel`, `mesa-libGLU`, `mesa-libGLU-devel`, `bzip2`, `bzip2-libs`, `libXt-devel`, `zlib-devel`, `flex`, and `byacc`."
+    "question": "How do you start a parallel ParaView server in an Open OnDemand session with multiple cores?",
+    "answer": "After loading the `paraview/6.0.0` module, you can start the server by executing `mpirun --oversubscribe -np 4 pvserver` in a virtual desktop terminal."
   },
   {
-    "question": "What command is used to link a specific header file on a CentOS VM as part of the prerequisites?",
-    "answer": "The command `sudo ln -s /usr/include/GL/glx.h /usr/local/include/GL/glx.h` is used to link the `glx.h` header file."
+    "question": "What command is used to launch the ParaView client in an Open OnDemand virtual desktop for multi-core visualization?",
+    "answer": "After loading the `paraview/6.0.0` module in a new terminal within the virtual desktop, you run `paraview`."
   },
   {
-    "question": "How can a user copy their public SSH key to a cloud VM to simplify future logins?",
-    "answer": "On your computer, you can use the command `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'` to copy your public SSH key to the VM."
+    "question": "What information do you need from the `pvserver` output to connect the ParaView client?",
+    "answer": "You need the `Connection URL`, specifically the host (e.g., `g4.nibi.sharcnet`) and the port (e.g., `11111`)."
   },
   {
-    "question": "Why is it necessary to compile ParaView with OSMesa support on a cloud VM?",
-    "answer": "It is necessary because most Arbutus VMs do not have access to a GPU, so OSMesa support is needed for ParaView to perform offscreen (software) rendering using the CPU."
+    "question": "What steps are required to connect the ParaView client to the parallel server in an Open OnDemand session?",
+    "answer": "In the ParaView interface, click \"Connect\", then \"Add Server\". Set \"Server Type\" to \"Client/Server\", \"Host\" to \"localhost\", \"Port\" to \"11111\", and \"Startup Type\" to \"Manual\". Finally, select the server and click \"Connect\"."
   },
   {
-    "question": "What does the default configuration of OSMesa enable when compiling for a cloud VM?",
-    "answer": "The default configuration of OSMesa enables OpenSWR, which is Intel's software rasterization library for running OpenGL."
+    "question": "How can you verify if ParaView is performing parallel rendering?",
+    "answer": "You can verify parallel rendering by coloring your dataset with the \"Process Id\" variable, which is not available in sequential mode."
   },
   {
-    "question": "Which drivers are built with OSMesa for offscreen CPU-based rendering, and which one is recommended?",
-    "answer": "Both `llvmpipe` (older and slower) and `SWR` (newer and faster) drivers are built. `SWR` is recommended for use."
+    "question": "What is the purpose of the \"Longues t\u00e2ches interactives\" (Long interactive tasks) section?",
+    "answer": "This section describes the interactive client-server configuration for HPC clusters where a ParaView client runs on your local computer and the server runs remotely on the cluster."
   },
   {
-    "question": "What are the steps to compile CMake on the VM?",
-    "answer": "To compile CMake, you first download the tarball (e.g., `wget https://cmake.org/files/v4.1/cmake-4.1.1.tar.gz`), unpack it, `cd` into the directory, run `./bootstrap`, then `make`, and finally `sudo make install`."
+    "question": "Which HPC clusters support the client-server interactive configuration described in the \"Longues t\u00e2ches interactives\" section?",
+    "answer": "The client-server configuration is supported on Rorqual, Nibi, Fir, Trillium, and Narval."
   },
   {
-    "question": "How do you compile LLVM on the VM for the ParaView server setup?",
-    "answer": "First, download LLVM (e.g., `wget https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.0/LLVM-21.1.0-Linux-X64.tar.xz`), unpack it, create and navigate to a `build` directory. Then run `cmake` with specific flags (`-DCMAKE_BUILD_TYPE=Release -DLLVM_BUILD_LLVM_DYLIB=ON -DLLVM_ENABLE_RTTI=ON -DLLVM_INSTALL_UTILS=ON -DLLVM_TARGETS_TO_BUILD:STRING=X86 ..`), followed by `make` and `sudo make install`."
+    "question": "What is an important compatibility requirement for the ParaView client and server versions in a client-server setup?",
+    "answer": "The same major version of ParaView must be installed on both the local client and the remote host to avoid incompatibilities that could prevent connection. For example, a 6.0.0 server requires a 6.0.0 client."
   },
   {
-    "question": "What are the steps to compile Mesa with OSMesa support on the VM?",
-    "answer": "Download Mesa (e.g., `wget https://archive.mesa3d.org/mesa-25.2.3.tar.xz`), unpack it, `cd` into the directory, run `./configure` with specified flags (`--enable-opengl --disable-gles1 --disable-gles2 --disable-va --disable-xvmc --disable-vdpau --enable-shared-glapi --disable-texture-float --enable-gallium-llvm --enable-llvm-shared-libs --with-gallium-drivers=swrast,swr --disable-dri --disable-egl --disable-gbm --disable-glx --disable-osmesa --enable-gallium-osmesa`), then `make` and `sudo make install`."
+    "question": "What is the \"Remote Render Threshold\" parameter in ParaView and why is it important for client-server visualization?",
+    "answer": "It's a parameter in ParaView preferences (`Render View -> Remote/Parallel Rendering Options`) that determines where rendering is performed. It's important because it affects rendering speed and interactivity, especially with large datasets and varying network connections."
   },
   {
-    "question": "How do you compile the ParaView server on the VM with OSMesa support?",
-    "answer": "Download ParaView (e.g., `wget https://www.paraview.org/files/v6.0/ParaView-v6.0.0.tar.gz`), unpack it, create and navigate to a `build` directory. Then run `cmake` with specific flags (`-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/centos/paraview -DPARAVIEW_USE_MPI=OFF -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_BUILD_QT_GUI=OFF -DVTK_OPENGL_HAS_OSMESA=ON -DVTK_USE_OFFSCREEN=ON -DVTK_USE_X=OFF ..`), followed by `make` and `make install`."
+    "question": "What happens if the \"Remote Render Threshold\" is set to its default value (20MB) or a similar value?",
+    "answer": "A small render will be performed on your computer's GPU, resulting in fast mouse rotation. However, any more intensive rendering (near 20MB) will be sent to your computer, which could slow down visualization depending on your connection."
   },
   {
-    "question": "What is the command to start the ParaView server on the VM with SWR rendering?",
-    "answer": "To start the ParaView server, use the command `./paraview/bin/pvserver --force-offscreen-rendering --opengl-window-backend OSMesa`."
+    "question": "What is the effect of setting the \"Remote Render Threshold\" to 0MB?",
+    "answer": "Setting it to 0MB means all rendering, including rotation, will be performed remotely on the cluster resources, which is beneficial for large datasets but may reduce interactivity."
   },
   {
-    "question": "How do you set up an SSH tunnel from your local computer to the VM for the ParaView client-server connection?",
-    "answer": "On your computer, open a terminal and use the command `ssh centos@vm.ip.address -L 11111:localhost:11111` to organize an SSH tunnel from local port 11111 to the VM's port 11111."
+    "question": "What types of rendering can be performed on the cluster's CPUs?",
+    "answer": "Both rasterization and ray tracing can be performed on the cluster's CPUs."
   },
   {
-    "question": "After setting up the SSH tunnel, how do you connect the ParaView client on your computer to the server running on the VM?",
-    "answer": "Start the ParaView client on your computer and connect to `localhost:11111`."
+    "question": "What modern CPU libraries are mentioned for rendering with performance similar to GPU rendering?",
+    "answer": "OSPRay and OpenSWR are mentioned as modern CPU libraries offering similar performance to GPU rendering."
   },
   {
-    "question": "What message indicates successful SWR rendering during a ParaView client-server connection to a cloud VM?",
-    "answer": "During rendering in the console, you should see the message 'SWR detected AVX2'."
+    "question": "Why is it possible to perform parallel rendering on a large number of CPU cores for very large datasets?",
+    "answer": "It is possible because the ParaView server uses MPI for distributed memory processing."
+  },
+  {
+    "question": "How can you estimate the number of CPU cores needed for a ParaView rendering task?",
+    "answer": "The simplest way is to calculate the total memory required for your render and divide it by approximately 3.5GB per core."
+  },
+  {
+    "question": "How many cores would be needed for a 40GB dataset, based on the provided estimation method?",
+    "answer": "A 40GB dataset would require at least 12 cores (40GB / 3.5GB/core \u2248 11.4 cores, rounded up to 12)."
+  },
+  {
+    "question": "What is the recommended maximum memory allocation per core for software rendering, and why?",
+    "answer": "It is not recommended to allocate more than 4GB per core because software rendering is very CPU-intensive."
+  },
+  {
+    "question": "What factors can significantly increase the memory footprint during data processing in ParaView?",
+    "answer": "Filters and data processing (e.g., converting a structured dataset to an unstructured dataset) can multiply the memory footprint by approximately three."
+  },
+  {
+    "question": "What should you do if your ParaView server is unexpectedly interrupted while processing data?",
+    "answer": "If the server is interrupted, you should increase the number of cores allocated to the task."
   }
 ]

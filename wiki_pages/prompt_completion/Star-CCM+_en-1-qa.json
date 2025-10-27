@@ -1,86 +1,62 @@
 [
   {
     "question": "What is STAR-CCM+?",
-    "answer": "STAR-CCM+ is a multidisciplinary engineering simulation suite designed to model acoustics, fluid dynamics, heat transfer, rheology, multiphase flows, particle flows, solid mechanics, reacting flows, electrochemistry, and electromagnetics."
+    "answer": "STAR-CCM+ is a multidisciplinary engineering simulation suite developed by Siemens, used to model acoustics, fluid dynamics, heat transfer, rheology, multiphase flows, particle flows, solid mechanics, reacting flows, electrochemistry, and electromagnetics."
   },
   {
-    "question": "Who develops STAR-CCM+?",
-    "answer": "STAR-CCM+ is developed by Siemens."
+    "question": "Do I need my own license to use STAR-CCM+?",
+    "answer": "Yes, you will need to have your own license to use STAR-CCM+, as the host provides the binaries but not the licenses."
   },
   {
-    "question": "Does the provider supply STAR-CCM+ licenses?",
-    "answer": "No, we have authorization to host STAR-CCM+ binaries but do not provide licenses. Users need to have their own license."
-  },
-  {
-    "question": "Where can a remote POD license for STAR-CCM+ be purchased?",
+    "question": "Where can I purchase a remote POD license for STAR-CCM+?",
     "answer": "A remote POD license can be purchased directly from Siemens."
   },
   {
-    "question": "What are the options for using a STAR-CCM+ license?",
-    "answer": "You can use a remote POD license purchased from Siemens, or a local license hosted at your institution, provided it can be accessed through the firewall from the cluster where jobs are to be run."
+    "question": "Can I use a local institutional license for STAR-CCM+?",
+    "answer": "Yes, a local license hosted at your institution can be used, provided it can be accessed through the firewall from the cluster where jobs are to be run."
   },
   {
     "question": "How do I configure my account to use a license server with the STAR-CCM+ module?",
-    "answer": "To configure your account, create a license file `$HOME/.licenses/starccm.lic` with a specific layout."
+    "answer": "To configure your account, create a license file named `$HOME/.licenses/starccm.lic` with the content `SERVER <server> ANY <port>\nUSE_SERVER`, replacing `<server>` with the hostname or IP address and `<port>` with the static vendor port of your license server."
   },
   {
-    "question": "What is the required layout for the `starccm.lic` file?",
-    "answer": "The `starccm.lic` file should have the layout: `SERVER <server> ANY <port>\nUSE_SERVER`."
+    "question": "Is it necessary to manually set the `CDLMD_LICENSE_FILE` environment variable for STAR-CCM+?",
+    "answer": "No, it is not required to manually set `CDLMD_LICENSE_FILE` in your Slurm script; when a Star-CCM+ module is loaded, this variable is automatically set to your `$HOME/.licenses/starccm.lic` file."
   },
   {
-    "question": "What information should be specified in the `starccm.lic` file?",
-    "answer": "You need to change `<server>` to specify the hostname (or IP address) and `<port>` to specify the static vendor port of the license server."
+    "question": "What specific steps are required for researchers with a Siemens POD license?",
+    "answer": "Researchers with a POD license must manually set the `LM_PROJECT` environment variable equal to their CD-ADAPCO PROJECT ID in their Slurm script. Additionally, the `~/.licenses/starccm.lic` file should be configured as `SERVER flex.cd-adapco.com ANY 1999\nUSE_SERVER`."
   },
   {
-    "question": "Is it necessary to manually set the `CDLMD_LICENSE_FILE` environment variable in a Slurm script for STAR-CCM+?",
-    "answer": "No, manually setting `CDLMD_LICENSE_FILE` equal to `<port>@<server>` in your Slurm script is not required. When a Star-CCM+ module is loaded, this variable is automatically set to your `$HOME/.licenses/starccm.lic` file."
+    "question": "What should I do when submitting a job for the first time with a Siemens remote pay-on-usage license server?",
+    "answer": "If you are using a Siemens remote pay-on-usage license server, create a `~/.licenses/starccm.lic` file with the content `SERVER flex.cd-adapco.com ANY 1999\nUSE_SERVER`, and license checkouts should work immediately."
   },
   {
-    "question": "What additional step is required for researchers with a POD license for STAR-CCM+?",
-    "answer": "Researchers with a POD license must manually set the `LM_PROJECT` environment variable equal to `YOUR CD-ADAPCO PROJECT ID` in their Slurm script."
+    "question": "What steps are needed if I'm using an institutional license server for STAR-CCM+ on a cluster?",
+    "answer": "After creating your `~/.licenses/starccm.lic` file, you must submit a problem ticket to technical support to coordinate the necessary one-time network firewall changes required to access it from the Alliance cluster."
   },
   {
-    "question": "How should the `~/.licenses/starccm.lic` file be configured for a POD license?",
-    "answer": "For a POD license, the `~/.licenses/starccm.lic` file should be configured as: `SERVER flex.cd-adapco.com ANY 1999\nUSE_SERVER`."
+    "question": "What is a common troubleshooting step if I have problems getting STAR-CCM+ licensing to work?",
+    "answer": "If you still have problems with licensing, try removing or renaming the file `~/.flexlmrc`, as previous search paths or license server settings might be stored in it."
   },
   {
-    "question": "What is the procedure for using a Siemens remote pay-on-usage license server when submitting STAR-CCM+ batch jobs?",
-    "answer": "If using a Siemens remote pay-on-usage license server, create a `~/.licenses/starccm.lic` file as shown in the 'Configuring your account - POD license file' section, and license checkouts should immediately work."
+    "question": "Where do temporary output files from STAR-CCM+ jobs accumulate, and how can they be removed?",
+    "answer": "Temporary output files from STAR-CCM+ jobs may accumulate in hidden directories named `~/.star-version_number`, consuming quota space. These can be removed by periodically running `rm -ri ~/.starccm*` and replying yes when prompted."
   },
   {
-    "question": "What is required to use an institutional license server for STAR-CCM+ batch job submission?",
-    "answer": "After creating your `~/.licenses/starccm.lic` file, you must submit a problem ticket to technical support so they can help coordinate necessary one-time network firewall changes required to access it."
+    "question": "What Slurm module typically needs to be loaded for STAR-CCM+ jobs on Fir/Rorqual/Nibi clusters using StdEnv/2023?",
+    "answer": "For STAR-CCM+ jobs on Fir/Rorqual/Nibi clusters using StdEnv/2023, you typically need to load `starccm-mixed/20.04.007` (or `starccm/20.04.007-R8`)."
   },
   {
-    "question": "What should I do if I encounter licensing problems with STAR-CCM+?",
-    "answer": "If you still have problems getting the licensing to work, try removing or renaming the file `~/.flexlmrc` as it may contain previous search paths and/or license server settings."
+    "question": "How is the number of cores (`NCORE`) calculated in the example Slurm scripts for STAR-CCM+?",
+    "answer": "The number of cores (`NCORE`) is calculated as `NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))`."
   },
   {
-    "question": "Do STAR-CCM+ jobs create temporary files, and how can they be managed?",
-    "answer": "Yes, temporary output files from STAR-CCM+ job runs may accumulate in hidden directories named `~/.star-version_number`, consuming quota space. These can be removed by periodically running `rm -ri ~/.starccm*` and replying yes when prompted."
+    "question": "What is the command to launch STAR-CCM+ for a Siemens PoD license on Fir/Rorqual/Nibi clusters in a Slurm script?",
+    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi intel -fabric psm2`."
   },
   {
-    "question": "Which module should be loaded for STAR-CCM+ on Fir/Rorqual/Nibi clusters?",
-    "answer": "On Fir/Rorqual/Nibi clusters, `module load StdEnv/2023` and then `module load starccm-mixed/20.04.007` (or `starccm/20.04.007-R8`) should be loaded."
-  },
-  {
-    "question": "What is the recommended value for `#SBATCH --cpus-per-task` in a STAR-CCM+ Slurm script on Fir/Rorqual/Nibi?",
-    "answer": "The recommended value is `--cpus-per-task=192` to request all cores per node (32 or 48)."
-  },
-  {
-    "question": "How is the input simulation file specified in a STAR-CCM+ Slurm script?",
-    "answer": "The input simulation filename is specified by setting `SIM_FILE='mysample.sim'`."
-  },
-  {
-    "question": "How is the `LM_PROJECT` variable used in the Slurm script for Siemens Power on Demand (PoD) Key?",
-    "answer": "For Siemens PoD, the `LM_PROJECT` variable should be set to your 22-digit PoD key, e.g., `LM_PROJECT='my22digitpodkey'`."
-  },
-  {
-    "question": "How does the Slurm script on Fir/Rorqual/Nibi check the license server status?",
-    "answer": "The Slurm script checks the license server status by using `nmap` on the server and port extracted from `$CDLMD_LICENSE_FILE`."
-  },
-  {
-    "question": "What MPI implementation is used when running STAR-CCM+ on Fir/Rorqual/Nibi with a Siemens PoD license server?",
-    "answer": "When running STAR-CCM+ on Fir/Rorqual/Nibi with a Siemens PoD license server, the `intel` MPI implementation with `psm2` fabric is used."
+    "question": "What is the command to launch STAR-CCM+ for an institutional license on Narval clusters in a Slurm script?",
+    "answer": "The command is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi openmpi`."
   }
 ]

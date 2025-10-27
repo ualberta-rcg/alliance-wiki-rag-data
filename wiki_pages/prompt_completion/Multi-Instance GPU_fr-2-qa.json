@@ -1,54 +1,46 @@
 [
   {
-    "question": "O\u00f9 puis-je trouver le maximum recommand\u00e9 de c\u0153urs CPU et de m\u00e9moire syst\u00e8me par instance?",
-    "answer": "Vous pouvez consulter 'le tableau des ratios' pour conna\u00eetre le maximum recommand\u00e9 de c\u0153urs CPU et de m\u00e9moire syst\u00e8me par instance."
+    "question": "Comment puis-je obtenir la liste de tous les gabarits GPU sur une grappe sp\u00e9cifique ?",
+    "answer": "Pour lister tous les gabarits GPU sur une grappe, vous pouvez utiliser la commande suivante : `sinfo -o \"%G\" | grep gpu | sed 's/gpu://g' | sed 's/,/\\n/g' | cut -d: -f1 | sort | uniq`."
   },
   {
-    "question": "Comment puis-je demander une instance de 20Go \u00e0 3/8 de la puissance pour une t\u00e2che interactive d'une heure?",
-    "answer": "Utilisez la commande `salloc --account=def-someuser --gpus=a100_3g.20gb:1 --cpus-per-task=2 --mem=40gb --time=1:0:0`."
+    "question": "O\u00f9 puis-je trouver les informations sur le nombre maximum recommand\u00e9 de c\u0153urs CPU et de m\u00e9moire syst\u00e8me par instance de GPU ?",
+    "answer": "Les informations sur le nombre maximum recommand\u00e9 de c\u0153urs CPU et de m\u00e9moire syst\u00e8me par instance sont disponibles dans le 'tableau des ratios' sous la section 'Allocations_and_compute_scheduling/fr#Ratios_dans_les_bundles'."
   },
   {
-    "question": "Comment soumettre un script de t\u00e2ches en lot pour une instance de 20Go \u00e0 4/8 de la puissance pendant 24 heures, en utilisant les ressources recommand\u00e9es?",
-    "answer": "Vous pouvez utiliser un script SLURM comme `a100_4g.20gb_mig_job.sh` avec les param\u00e8tres `#SBATCH --gpus=a100_4g.20gb:1`, `#SBATCH --cpus-per-task=6`, `#SBATCH --mem=62gb`, et `#SBATCH --time=24:00:00`."
+    "question": "Comment demander une instance GPU (A100 3g.20gb) pour une t\u00e2che interactive d'une heure avec 2 c\u0153urs CPU et 40 Go de m\u00e9moire ?",
+    "answer": "Vous pouvez soumettre une telle t\u00e2che interactive avec la commande : `salloc --account=def-someuser --gpus=a100_3g.20gb:1 --cpus-per-task=2 --mem=40gb --time=1:0:0`."
   },
   {
-    "question": "Combien de c\u0153urs CPU et de m\u00e9moire GPU sont recommand\u00e9s pour une instance 3g.20gb ou 4g.20gb sur Narval?",
-    "answer": "Sur Narval, les instances 3g.20gb et 4g.20gb sont configur\u00e9es avec 6 c\u0153urs CPU par t\u00e2che et 62 Go de RAM GPU."
+    "question": "Comment soumettre un script de t\u00e2ches en lot qui demande une instance GPU (A100 4g.20gb) pour 24 heures avec les c\u0153urs et la m\u00e9moire syst\u00e8me recommand\u00e9s sur Narval ?",
+    "answer": "Vous pouvez utiliser un script SLURM comme l'exemple suivant :\n```sh\n#!/bin/bash\n#SBATCH --account=def-someuser\n#SBATCH --gpus=a100_4g.20gb:1 \n#SBATCH --cpus-per-task=6    # There are 6 CPU cores per 3g.20gb and 4g.20gb on Narval.\n#SBATCH --mem=62gb           # There are 62GB GPU RAM per 3g.20gb and 4g.20gb on Narval.\n#SBATCH --time=24:00:00\n\nhostname\nnvidia-smi\n```"
   },
   {
-    "question": "O\u00f9 puis-je consulter l'historique de mes t\u00e2ches pour d\u00e9cider de les migrer vers une instance?",
-    "answer": "L'historique de vos t\u00e2ches est disponible sur le portail d'utilisation de Narval (actuellement en pr\u00e9paration)."
+    "question": "Quel est un bon indicateur pour \u00e9valuer la puissance de calcul totale demand\u00e9e \u00e0 un GPU afin de d\u00e9cider si une t\u00e2che doit \u00eatre migr\u00e9e vers une instance ?",
+    "answer": "La consommation d\u2019\u00e9nergie est un bon indicateur de la puissance de calcul totale demand\u00e9e au GPU."
   },
   {
-    "question": "Quel est un bon indicateur pour \u00e9valuer la puissance de calcul totale demand\u00e9e \u00e0 un GPU?",
-    "answer": "La consommation d'\u00e9nergie est un bon indicateur de la puissance de calcul totale demand\u00e9e au GPU."
+    "question": "Comment l'historique de consommation d'\u00e9nergie d'une t\u00e2che peut-il aider \u00e0 d\u00e9terminer la pertinence de l'utilisation d'une instance GPU ?",
+    "answer": "Si une t\u00e2che qui n\u00e9cessitait un GPU A100 entier avec un TDP maximal de 400W n'utilisait que 100W en moyenne (soit seulement 50W de plus que la consommation au repos), cela indique une sous-utilisation et sugg\u00e8re que la t\u00e2che pourrait b\u00e9n\u00e9ficier d'une instance GPU."
   },
   {
-    "question": "Quand la consommation d'\u00e9nergie sugg\u00e8re-t-elle qu'une t\u00e2che pourrait \u00eatre ex\u00e9cut\u00e9e sur une instance?",
-    "answer": "Si une t\u00e2che n\u00e9cessitait un GPU A100 entier avec un TDP maximal de 400 W mais n'utilisait que 100 W en moyenne (50 W de plus que la consommation au repos), elle pourrait \u00eatre un bon candidat pour une instance."
+    "question": "Quelles autres m\u00e9triques, en plus de la consommation d'\u00e9nergie, peuvent fournir des informations sur l'utilisation du GPU pour d\u00e9cider de migrer une t\u00e2che vers une instance ?",
+    "answer": "Les fonctionnalit\u00e9s du GPU, telles que l'utilisation g\u00e9n\u00e9rale du GPU, la quantit\u00e9 maximale de m\u00e9moire GPU et la quantit\u00e9 moyenne de c\u0153urs CPU n\u00e9cessaires pour ex\u00e9cuter la t\u00e2che, sont \u00e9galement importantes."
   },
   {
-    "question": "En plus de la consommation d'\u00e9nergie, quelles autres informations peuvent aider \u00e0 \u00e9valuer l'utilisation d'un GPU?",
-    "answer": "Les fonctionnalit\u00e9s du GPU peuvent \u00e9galement fournir des informations sur son utilisation si la consommation d'\u00e9nergie n'est pas suffisante."
+    "question": "Comment l'utilisation du GPU et la m\u00e9moire GPU utilis\u00e9e peuvent-elles aider \u00e0 d\u00e9terminer si une t\u00e2che devrait s'ex\u00e9cuter sur une instance ?",
+    "answer": "Si le graphique d'utilisation du GPU montre que la t\u00e2che utilise moins de 25% de la puissance de calcul disponible d'un GPU A100 entier, et si elle utilise par exemple un maximum de 3Go de m\u00e9moire GPU sur 40Go, cela indique que la t\u00e2che pourrait facilement s'ex\u00e9cuter sur une instance plus petite comme 3g.20Go ou 4g.20Go."
   },
   {
-    "question": "Comment l'utilisation du GPU peut-elle indiquer si une t\u00e2che est adapt\u00e9e \u00e0 une instance?",
-    "answer": "Si un graphique d'utilisation du GPU montre qu'une t\u00e2che utilise moins de 25% de la puissance de calcul disponible d'un GPU A100 entier, elle pourrait \u00eatre migr\u00e9e vers une instance."
+    "question": "O\u00f9 puis-je consulter l'historique de mes t\u00e2ches pour \u00e9valuer leur utilisation des ressources ?",
+    "answer": "L'historique de vos t\u00e2ches est disponible sur le portail d'utilisation de Narval (dont la pr\u00e9paration est en cours)."
   },
   {
-    "question": "Quels sont les autres facteurs \u00e0 consid\u00e9rer pour d\u00e9cider de migrer une t\u00e2che vers une instance, en dehors de l'\u00e9nergie et de l'utilisation du GPU?",
-    "answer": "Il faut aussi prendre en compte la quantit\u00e9 maximale de m\u00e9moire GPU et la quantit\u00e9 moyenne de c\u0153urs CPU n\u00e9cessaires \u00e0 la t\u00e2che."
+    "question": "Comment puis-je surveiller les m\u00e9triques du GPU d'une t\u00e2che en cours d'ex\u00e9cution en temps r\u00e9el ?",
+    "answer": "Pour surveiller une t\u00e2che en cours d'ex\u00e9cution, vous pouvez vous connecter au n\u0153ud sur lequel la t\u00e2che se trouve et utiliser la commande `nvidia-smi` pour lire les m\u00e9triques du GPU en temps r\u00e9el."
   },
   {
-    "question": "Si une t\u00e2che utilise 3Go de m\u00e9moire GPU sur 40Go d'un A100 et un seul c\u0153ur de processeur, sur quelles instances pourrait-elle s'ex\u00e9cuter?",
-    "answer": "Une telle t\u00e2che pourrait facilement s'ex\u00e9cuter sur une instance de 3g.20Go ou de 4g.20Go, avec de la puissance et de la m\u00e9moire disponibles."
-  },
-  {
-    "question": "Comment peut-on surveiller l'utilisation d'une t\u00e2che GPU en temps r\u00e9el?",
-    "answer": "Vous pouvez vous connecter au n\u0153ud o\u00f9 la t\u00e2che est en cours d'ex\u00e9cution et utiliser la commande `nvidia-smi` pour lire les m\u00e9triques du GPU en temps r\u00e9el."
-  },
-  {
-    "question": "Quelles sont les limites de l'utilisation de `nvidia-smi` pour la surveillance des t\u00e2ches?",
-    "answer": "`nvidia-smi` ne fournit pas de valeurs maximales et moyennes pour la m\u00e9moire et la puissance pour l'ensemble de la t\u00e2che, mais peut aider \u00e0 identifier une sous-utilisation du GPU."
+    "question": "Quelles sont les limites de l'utilisation de `nvidia-smi` pour la surveillance en temps r\u00e9el des t\u00e2ches GPU ?",
+    "answer": "L'utilisation de `nvidia-smi` en temps r\u00e9el ne fournit pas les valeurs maximales et moyennes de la m\u00e9moire et de la puissance pour l'ensemble de la t\u00e2che, mais elle peut \u00eatre utile pour identifier une sous-utilisation ponctuelle du GPU."
   }
 ]

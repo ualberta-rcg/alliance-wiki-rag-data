@@ -1,38 +1,38 @@
 [
   {
-    "question": "Quelle est la limite de c\u0153urs par utilisateur avec une licence Ansys de CMC?",
-    "answer": "Selon les guides de d\u00e9marrage rapide d'Ansys, il pourrait y avoir une limite de 64 c\u0153urs par utilisateur avec une licence CMC."
+    "question": "Comment ex\u00e9cuter une t\u00e2che Ansys Additive Manufacturing sur gra-vdi ?",
+    "answer": "Pour ex\u00e9cuter une t\u00e2che Ansys Additive Manufacturing sur gra-vdi, lancez Workbench, ouvrez votre fichier de projet, r\u00e9initialisez l'espace de travail, lancez Mechanical en s\u00e9lectionnant l'option 'Distributed' et sp\u00e9cifiez les c\u0153urs, puis sauvegardez le projet et cliquez sur 'Solve'."
   },
   {
-    "question": "Comment configurer le fichier de licence pour utiliser la licence SHARCNET sur les grappes?",
-    "answer": "Pour utiliser la licence SHARCNET, configurez votre fichier `~/.licenses/ansys.lic` avec les lignes suivantes :\n`setenv(\"ANSYSLMD_LICENSE_FILE\", \"1055@license3.sharcnet.ca\")`\n`setenv(\"ANSYSLI_SERVERS\", \"2325@license3.sharcnet.ca\")`"
+    "question": "Comment v\u00e9rifier l'utilisation des ressources par une t\u00e2che Ansys en cours sur gra-vdi ?",
+    "answer": "Pour v\u00e9rifier l'utilisation des ressources, ouvrez un autre terminal et lancez `top -u $USER` ou `ps u -u $USER | grep ansys`."
   },
   {
-    "question": "Comment v\u00e9rifier le nombre de licences Ansys utilis\u00e9es, \u00e0 la fois par mon nom d'utilisateur et par tous les utilisateurs?",
-    "answer": "Pour v\u00e9rifier les licences utilis\u00e9es, lancez les commandes suivantes :\n`ssh graham.computecanada.ca`\n`module load ansys`\n`lmutil lmstat -c $ANSYSLMD_LICENSE_FILE -a | grep \"Users of\\|$USER\"`"
+    "question": "Quelle commande utiliser pour arr\u00eater les processus Ansys persistants sur gra-vdi ?",
+    "answer": "Utilisez la commande `pkill -9 -e -u $USER -f \"ansys|mwrpcss|mwfwrapper|ENGINE\"` pour terminer les processus Ansys non n\u00e9cessaires."
   },
   {
-    "question": "Que faire si des licences Ansys restent utilis\u00e9es sous mon nom d'utilisateur sans justification (processus bloqu\u00e9s)?",
-    "answer": "Si des licences sont bloqu\u00e9es, connectez-vous au n\u0153ud concern\u00e9 (par exemple, gra-vdi3.sharcnet.ca ou gra-vdi4.sharcnet.ca pour gra-vdi) et utilisez la commande `pkill -9 -e -u $USER -f \"ansys\"` dans un terminal pour lib\u00e9rer les processus."
+    "question": "Pourquoi les licences Ansys peuvent-elles \u00eatre bloqu\u00e9es sur gra-vdi par des processus persistants ?",
+    "answer": "Des processus persistants peuvent bloquer les licences si une session d'interface graphique Ansys (Fluent, Workbench, etc.) n'est pas correctement termin\u00e9e avant la d\u00e9connexion manuelle ou inattendue de vncviewer (par exemple, suite \u00e0 une panne de r\u00e9seau temporaire ou un syst\u00e8me de fichiers bloqu\u00e9)."
   },
   {
-    "question": "Comment utiliser les modules Ansys locaux sur gra-vdi?",
-    "answer": "Sur gra-vdi, connectez-vous avec TigerVNC, ouvrez un terminal, chargez un module SnEnv Ansys (par exemple, `module load SnEnv ansys/2021R2`), puis lancez un programme Ansys comme `runwb2`, `fluent`, `cfx5`, `icemcfd`, ou `apdl`."
+    "question": "Quelles sont les \u00e9tapes de pr\u00e9paration pour soumettre un projet Ansys Additive Manufacturing \u00e0 une grappe ?",
+    "answer": "Avant de soumettre, ouvrez votre simulation avec l'interface graphique de Workbench dans le m\u00eame r\u00e9pertoire que celui de la t\u00e2che, enregistrez-la \u00e0 nouveau en utilisant la m\u00eame version du module Ansys, puis cr\u00e9ez un script Slurm."
   },
   {
-    "question": "Quels sont les avantages d'utiliser des modules Ansys locaux sur gra-vdi?",
-    "answer": "Les modules locaux incluent des programmes et versions d'Ansys non encore pris en charge par l'environnement standard. Ils permettent de s\u00e9lectionner le serveur de licences CMC ou d'utiliser SHARCNET par d\u00e9faut. Les param\u00e8tres de `~/.licenses/ansys.lic` peuvent \u00e9galement \u00eatre utilis\u00e9s pour `runwb2` afin de sp\u00e9cifier un serveur distant."
+    "question": "Comment activer les \u00e9tudes param\u00e9triques dans un script Slurm pour un projet Ansys Additive Manufacturing ?",
+    "answer": "Pour effectuer des \u00e9tudes param\u00e9triques, remplacez la commande `Update()` par `UpdateAllDesignPoints()` dans le script Slurm."
   },
   {
-    "question": "Comment choisir le serveur de licence lors du lancement d'un programme Ansys \u00e0 partir d'un module local sur gra-vdi?",
-    "answer": "Apr\u00e8s avoir lanc\u00e9 le programme, vous devrez accepter les conditions en appuyant sur 'y', puis vous pourrez accepter le serveur SHARCNET par d\u00e9faut en appuyant sur 'Enter' pour l'option 'n', ou changer 'n' en 'y' pour utiliser le serveur de licence CMC."
+    "question": "Comment \u00e9viter de r\u00e9initialiser manuellement la solution et les points de conception lors des tests sur une grappe ?",
+    "answer": "Pour \u00e9viter de r\u00e9initialiser, soit remplacez `Save(Overwrite=True)` par `Save (Overwrite=False)` dans le script Slurm, soit enregistrez une copie du fichier YOURPROJECT.wbpj d'origine et de son r\u00e9pertoire `YOURPROJECT_files` avant chaque ex\u00e9cution de test."
   },
   {
-    "question": "Quelles sont les composantes que la commande `cfx5` peut d\u00e9marrer \u00e0 partir d'un module local sur gra-vdi?",
-    "answer": "La commande `cfx5` peut d\u00e9marrer les composantes suivantes : CFX-Launcher, CFX-Pre, CFD-Post, et CFX-Solver."
+    "question": "Comment obtenir un instantan\u00e9 de l'utilisation des ressources par une t\u00e2che Ansys en cours sur un ou plusieurs n\u0153uds de calcul d'une grappe ?",
+    "answer": "Utilisez la commande `srun --jobid=myjobid top -bn1 -u $USER | grep R | grep -v top` pour obtenir un instantan\u00e9 de l'utilisation des ressources."
   },
   {
-    "question": "Que dois-je faire si les probl\u00e8mes de licence Ansys persistent apr\u00e8s la suppression du r\u00e9pertoire `~/.ansys`?",
-    "answer": "Si les probl\u00e8mes persistent, contactez le soutien technique et fournissez le contenu de votre fichier `~/.licenses/ansys.lic`."
+    "question": "Comment effectuer des tests de scalabilit\u00e9 pour les t\u00e2ches Ansys Additive Manufacturing sur une grappe ?",
+    "answer": "Apr\u00e8s avoir obtenu le 'Job Wall-clock time' avec `seff jobid` pour une t\u00e2che courte, doublez le nombre de c\u0153urs. Si le 'Wall-clock time' diminue d'environ 50%, vous pouvez continuer \u00e0 doubler le nombre de c\u0153urs pour optimiser la scalabilit\u00e9."
   }
 ]

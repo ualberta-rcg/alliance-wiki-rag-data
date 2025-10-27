@@ -1,106 +1,78 @@
 [
   {
-    "question": "What is the recommended memory allocation for all cores in a Shared Memory Parallel (SMP) Mechanical job using GPUs?",
-    "answer": "The recommended memory allocation is `#SBATCH --mem=32G` for all cores."
-  },
-  {
-    "question": "How many cores are typically specified for a Shared Memory Parallel (SMP) Mechanical job with GPUs?",
-    "answer": "Eight cores (`#SBATCH --ntasks=8`) are specified for an SMP Mechanical job with GPUs."
-  },
-  {
-    "question": "How many nodes are used for a Shared Memory Parallel (SMP) Mechanical job with GPUs?",
-    "answer": "Only one node (`#SBATCH --nodes=1`) is used for an SMP Mechanical job with GPUs."
-  },
-  {
-    "question": "How many GPUs per node are specified for a Shared Memory Parallel (SMP) Mechanical job?",
-    "answer": "One GPU per node (`#SBATCH --gpus-per-node=1`) is specified."
-  },
-  {
-    "question": "Which Ansys module is loaded for a Shared Memory Parallel (SMP) Mechanical job with StdEnv/2023?",
-    "answer": "`ansys/2024R1.03` is loaded."
-  },
-  {
-    "question": "What environment variable needs to be exported to print GPU devices in a Mechanical GPU job?",
-    "answer": "`export ANSGPU_PRINTDEVICES=1` needs to be exported."
-  },
-  {
-    "question": "How is a Shared Memory Parallel (SMP) Mechanical job with GPU acceleration run?",
-    "answer": "It's run using `mapdl -smp -acc nvidia -na $SLURM_GPUS_ON_NODE -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp`."
-  },
-  {
-    "question": "What is the memory per CPU specified for a Distributed Memory Parallel (DMP) Mechanical job using GPUs?",
-    "answer": "The memory per CPU is specified as `#SBATCH --mem-per-cpu=4G`."
-  },
-  {
-    "question": "How many nodes are specified for a Distributed Memory Parallel (DMP) Mechanical job using GPUs?",
-    "answer": "One node (`#SBATCH --nodes=1`) is specified for a DMP Mechanical job with GPUs."
-  },
-  {
-    "question": "How many cores per node are specified for a Distributed Memory Parallel (DMP) Mechanical job using GPUs?",
-    "answer": "Eight cores per node (`#SBATCH --ntasks-per-node=8`) are specified."
-  },
-  {
-    "question": "What specific library path adjustment is made for Cedar clusters when running Distributed Memory Parallel (DMP) Mechanical jobs with GPUs?",
-    "answer": "If the cluster is Cedar, a symbolic link to `libstdc++.so.6.0.29` is created in `outdir-$SLURM_JOBID`, and `LD_LIBRARY_PATH` is exported to point to this directory."
-  },
-  {
-    "question": "How is a Distributed Memory Parallel (DMP) Mechanical GPU job executed on Beluga?",
-    "answer": "On Beluga, `export KMP_AFFINITY=none` is set, and the job is run with `mapdl -dis -acc nvidia -na $SLURM_GPUS_ON_NODE -mpi intelmpi -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp`."
-  },
-  {
-    "question": "How is a Distributed Memory Parallel (DMP) Mechanical GPU job executed on clusters other than Beluga?",
-    "answer": "It is executed with `mapdl -dis -acc nvidia -na $SLURM_GPUS_ON_NODE -mpi openmpi -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp`."
-  },
-  {
-    "question": "What is the default total memory and database memory allocated for APDL jobs by Ansys?",
+    "question": "What are the default memory allocations for APDL jobs in Ansys?",
     "answer": "Ansys allocates 1024 MB total memory and 1024 MB database memory by default for APDL jobs."
   },
   {
-    "question": "How can the default memory allocation for APDL jobs be manually adjusted?",
-    "answer": "The values can be changed by adding arguments `-m <total_memory_MB>` and/or `-db <database_memory_MB>` to the `mapdl` command line."
+    "question": "How can the default memory allocations for APDL jobs be changed?",
+    "answer": "These values can be manually specified (or changed) by adding arguments `-m 1024` and/or `-db 1024` to the mapdl command line in the submission scripts."
   },
   {
-    "question": "What arguments might be required when using a remote institutional license server with multiple Ansys licenses for APDL jobs?",
-    "answer": "It may be necessary to add `-p aa_r` or `-ppf anshpc` to the `mapdl` command, depending on the Ansys module used."
+    "question": "What license server arguments might be necessary when using a remote institutional license server with multiple Ansys licenses for APDL jobs?",
+    "answer": "It may be necessary to add `-p aa_r` or `-ppf anshpc` to the mapdl command line, depending on which Ansys module you are using."
   },
   {
-    "question": "Which type of Mechanical parallel scripts typically offer better performance?",
-    "answer": "The single node (SMP Shared Memory Parallel) scripts typically perform better than the multinode (DIS Distributed Memory Parallel) scripts."
+    "question": "Which type of Mechanical scripts (SMP or multinode DMP) generally performs better and should be used whenever possible?",
+    "answer": "The single node (SMP Shared Memory Parallel) scripts will typically perform better than the multinode (DIS Distributed Memory Parallel) scripts and therefore should be used whenever possible."
   },
   {
-    "question": "What is a best practice for Ansys module version compatibility with APDL input files?",
-    "answer": "The Ansys module loaded in the script should ideally match the version used to generate the input file."
+    "question": "How can users ensure compatibility between the Ansys module loaded and the version used to generate an APDL input file?",
+    "answer": "To help avoid compatibility issues, the Ansys module loaded in your script should ideally match the version used to generate the input file, which can be checked by grepping the input file for 'version'."
   },
   {
-    "question": "How can one check the Workbench version used to generate an APDL input file?",
-    "answer": "By running `cat YOURAPDLFILE.inp | grep version` on the command line, you can find a line like `! ANSYS input file written by Workbench version 2019 R3`."
+    "question": "What are the two modes in which Ansys Rocky can run simulations?",
+    "answer": "Ansys Rocky can run simulations in GUI mode or non-GUI mode."
   },
   {
-    "question": "Can Ansys Rocky be run in non-GUI mode?",
-    "answer": "Yes, Ansys Rocky can run simulations in non-GUI mode."
+    "question": "What compute resources does Ansys Rocky support for its simulations?",
+    "answer": "Ansys Rocky supports running simulations with CPUs only or with CPUs and GPUs."
   },
   {
-    "question": "What hardware configurations does Ansys Rocky support for simulations?",
-    "answer": "Both CPUs only and CPUs with GPUs are supported."
-  },
-  {
-    "question": "Where are the provided Ansys Rocky Slurm scripts currently usable?",
-    "answer": "The scripts are currently only usable on Graham, as the Rocky module is installed there locally."
+    "question": "On which cluster are the provided Ansys Rocky Slurm scripts currently usable?",
+    "answer": "The provided Ansys Rocky Slurm scripts are only usable on Graham, as the Rocky module is currently only installed there locally."
   },
   {
     "question": "How can a user get a full listing of command-line options for Ansys Rocky?",
-    "answer": "By loading any Rocky module and running `Rocky -h` on the command line."
+    "answer": "To get a full listing of command-line options, run `Rocky -h` on the command line after loading any Rocky module."
   },
   {
-    "question": "When running GPU-based Ansys Rocky for coupled problems, how many CPUs should be requested?",
-    "answer": "The number of CPUs should be increased to a maximum until the scalability limit of the coupled application is reached."
+    "question": "When running GPU-based Rocky for coupled problems, how many CPUs should be requested from Slurm?",
+    "answer": "When Rocky is being run with GPUs to solve coupled problems, the number of CPUs requested from Slurm should be increased to a maximum until the scalability limit of the coupled application is reached."
   },
   {
-    "question": "How many CPUs should be requested when running GPU-based Ansys Rocky for standalone uncoupled problems?",
-    "answer": "Only a minimal number of CPUs, possibly 2 or 3, should be requested for optimal performance."
+    "question": "When running GPU-based Rocky for standalone uncoupled problems, what is the recommendation for CPU requests?",
+    "answer": "If Rocky is run with GPUs to solve standalone uncoupled problems, only a minimal number of CPUs (e.g., 2 or possibly 3) should be requested that will allow Rocky to still run optimally."
   },
   {
-    "question": "Under what condition are 'rocky_hpc' licenses required for Ansys Rocky?",
-    "answer": "`rocky_hpc` licenses are required when Rocky is run with 4 or more CPUs."
+    "question": "What type of licenses are required if Ansys Rocky is run with 4 or more CPUs?",
+    "answer": "If Rocky is run with 4 or more CPUs, `rocky_hpc` licenses will be required."
+  },
+  {
+    "question": "Which license server provides the `rocky_hpc` licenses?",
+    "answer": "The SHARCNET license provides `rocky_hpc` licenses."
+  },
+  {
+    "question": "Which Ansys Rocky module is currently available on Graham for StdEnv/2023?",
+    "answer": "The `ansysrocky/2024R2.0` module is available on Graham for StdEnv/2023."
+  },
+  {
+    "question": "What is the SBATCH directive to specify the number of GPUs per node for a Mechanical GPU job?",
+    "answer": "The SBATCH directive for specifying GPUs per node is `--gpus-per-node=1`, or `--gpus-per-node=h100:1` for specific types like H100."
+  },
+  {
+    "question": "How do you enable printing of detected GPU devices in a Mechanical GPU job script?",
+    "answer": "You can enable printing of detected GPU devices by setting `export ANSGPU_PRINTDEVICES=1` in the script."
+  },
+  {
+    "question": "What is the `mapdl` command for running a Shared Memory Parallel (SMP) Mechanical job with GPU acceleration?",
+    "answer": "The `mapdl` command is `mapdl -smp -acc nvidia -na $SLURM_GPUS_ON_NODE -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp`."
+  },
+  {
+    "question": "How is the `LD_LIBRARY_PATH` handled for a Distributed Memory Parallel (DMP) GPU Mechanical job on the Cedar cluster?",
+    "answer": "On the Cedar cluster, a symbolic link to `libstdc++.so.6.0.29` from the GCC library is created in the job's output directory, and this directory is then added to the `LD_LIBRARY_PATH`."
+  },
+  {
+    "question": "Which MPI implementation is used for Distributed Memory Parallel (DMP) GPU Mechanical jobs on Beluga versus other clusters?",
+    "answer": "On Beluga, `intelmpi` is used, while on other clusters, `openmpi` is used for DMP GPU Mechanical jobs."
   }
 ]

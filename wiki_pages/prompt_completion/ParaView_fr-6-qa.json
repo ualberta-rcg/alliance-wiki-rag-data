@@ -1,0 +1,70 @@
+[
+  {
+    "question": "Comment effectuer le rendu par lots s\u00e9quentiel pour ParaView sur les grappes?",
+    "answer": "Vous devez charger le module ParaView (`module load paraview/6.0.0`) puis soumettre un script de t\u00e2che par lots, par exemple `sbatch serial.sh`. Le script `serial.sh` doit inclure les directives Slurm pour le temps, la m\u00e9moire et le compte, puis ex\u00e9cuter `pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py` pour lancer votre script Python ParaView."
+  },
+  {
+    "question": "Quel est un exemple de contenu pour un script de t\u00e2che par lots s\u00e9quentiel nomm\u00e9 `serial.sh` pour ParaView?",
+    "answer": "```bash\n#!/bin/bash\n#SBATCH --time=3:0:0\n#SBATCH --mem-per-cpu=3600\n#SBATCH --account=def-someuser\npvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py\n```"
+  },
+  {
+    "question": "Comment effectuer le rendu par lots parall\u00e8le pour ParaView sur les grappes?",
+    "answer": "Chargez le module ParaView (`module load paraview/6.0.0`) et soumettez un script de t\u00e2che par lots, par exemple `sbatch distributed.sh`. Le script `distributed.sh` doit inclure les directives Slurm pour le temps, la m\u00e9moire, le nombre de t\u00e2ches (`--ntasks=4`), et le compte, puis ex\u00e9cuter `srun pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py`."
+  },
+  {
+    "question": "Quel est un exemple de contenu pour un script de t\u00e2che par lots parall\u00e8le nomm\u00e9 `distributed.sh` pour ParaView?",
+    "answer": "```bash\n#!/bin/bash\n#SBATCH --time=3:0:0\n#SBATCH --mem-per-cpu=3600\n#SBATCH --ntasks=4\n#SBATCH --account=def-someuser\nsrun pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py\n```"
+  },
+  {
+    "question": "Quand la visualisation client-serveur sur une machine virtuelle infonuagique doit-elle \u00eatre envisag\u00e9e pour ParaView?",
+    "answer": "Cette approche est moins courante et ne doit \u00eatre utilis\u00e9e que si vous avez besoin d'une configuration personnalis\u00e9e non prise en charge par l'installation de ParaView sur la grappe."
+  },
+  {
+    "question": "Quels paquets logiciels doivent \u00eatre install\u00e9s sur une VM CentOS avant de compiler ParaView et VisIt?",
+    "answer": "Vous devez installer `xauth wget gcc gcc-c++ ncurses-devel python-devel libxcb-devel`, `patch imake libxml2-python mesa-libGL mesa-libGL-devel`, `mesa-libGLU mesa-libGLU-devel bzip2 bzip2-libs libXt-devel zlib-devel flex byacc`. De plus, un lien symbolique doit \u00eatre cr\u00e9\u00e9 : `sudo ln -s /usr/include/GL/glx.h /usr/local/include/GL/glx.h`."
+  },
+  {
+    "question": "Comment puis-je simplifier la connexion SSH \u00e0 ma machine virtuelle infonuagique si j'ai ma propre paire de cl\u00e9s SSH?",
+    "answer": "Depuis votre ordinateur local, vous pouvez copier votre cl\u00e9 publique vers la machine virtuelle en ex\u00e9cutant : `cat ~/.ssh/id_rsa.pub | ssh -i ~/.ssh/cloudwestkey.pem centos@vm.ip.address 'cat >>.ssh/authorized_keys'`."
+  },
+  {
+    "question": "Pourquoi est-il n\u00e9cessaire de compiler ParaView avec OSMesa pour la visualisation sur une machine virtuelle infonuagique?",
+    "answer": "Les machines virtuelles infonuagiques n'ont g\u00e9n\u00e9ralement pas acc\u00e8s \u00e0 un GPU, ce qui rend n\u00e9cessaire la compilation de ParaView avec OSMesa pour permettre le rendu hors \u00e9cran."
+  },
+  {
+    "question": "Quelle biblioth\u00e8que la configuration OSMesa par d\u00e9faut active-t-elle pour ParaView, et quels sont ses avantages?",
+    "answer": "La configuration OSMesa par d\u00e9faut active OpenSWR, la biblioth\u00e8que logicielle de tramage (rasterization) d'Intel qui permet \u00e0 OpenGL de fonctionner. Il en r\u00e9sulte un serveur ParaView qui utilise OSMesa pour un rendu hors \u00e9cran sans X avec un CPU, en exploitant les pilotes `llvmpipe` et `SWR` plus r\u00e9cents et plus rapides. SWR est recommand\u00e9."
+  },
+  {
+    "question": "Quelles sont les \u00e9tapes pour compiler CMake sur une machine virtuelle infonuagique pour la compilation de ParaView?",
+    "answer": "Tout d'abord, t\u00e9l\u00e9chargez CMake : `wget https://cmake.org/files/v4.1/cmake-4.1.1.tar.gz`. Ensuite, extrayez et naviguez dans le r\u00e9pertoire : `tar -xf cmake-4.1.1.tar.gz && cd cmake-4.1.1`. Enfin, construisez et installez : `./bootstrap`, `make`, `sudo make install`."
+  },
+  {
+    "question": "Quelles sont les \u00e9tapes pour compiler LLVM sur une machine virtuelle infonuagique pour la compilation de ParaView?",
+    "answer": "D'abord, naviguez vers votre r\u00e9pertoire personnel (`cd`) et t\u00e9l\u00e9chargez LLVM : `wget https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.0/LLVM-21.1.0-Linux-X64.tar.xz`. Apr\u00e8s avoir d\u00e9compress\u00e9 et entr\u00e9 dans le r\u00e9pertoire, cr\u00e9ez un r\u00e9pertoire de compilation (`mkdir -p build && cd build`) et ex\u00e9cutez cmake avec les drapeaux sp\u00e9cifi\u00e9s :\n```\n cmake \\\n  -DCMAKE_BUILD_TYPE=Release \\\n  -DLLVM_BUILD_LLVM_DYLIB=ON \\\n  -DLLVM_ENABLE_RTTI=ON \\\n  -DLLVM_INSTALL_UTILS=ON \\\n  -DLLVM_TARGETS_TO_BUILD:STRING=X86 \\\n  ..\n```\nPuis, ex\u00e9cutez `make` et `sudo make install`."
+  },
+  {
+    "question": "Quelles sont les \u00e9tapes pour compiler Mesa avec OSMesa sur une machine virtuelle infonuagique?",
+    "answer": "D'abord, naviguez vers votre r\u00e9pertoire personnel (`cd`) et t\u00e9l\u00e9chargez Mesa : `wget https://archive.mesa3d.org/mesa-25.2.3.tar.xz`. Apr\u00e8s avoir d\u00e9compress\u00e9 et entr\u00e9 dans le r\u00e9pertoire, configurez Mesa avec les options suivantes :\n```\n ./configure \\\n  --enable-opengl --disable-gles1 --disable-gles2 \\\n  --disable-va --disable-xvmc --disable-vdpau \\\n  --enable-shared-glapi \\\n  --disable-texture-float \\\n  --enable-gallium-llvm --enable-llvm-shared-libs \\\n  --with-gallium-drivers=swrast,swr \\\n  --disable-dri \\\n  --disable-egl --disable-gbm \\\n  --disable-glx \\\n  --disable-osmesa --enable-gallium-osmesa\n```\nEnfin, ex\u00e9cutez `make` et `sudo make install`."
+  },
+  {
+    "question": "Quelles sont les \u00e9tapes pour compiler le serveur ParaView sur une machine virtuelle infonuagique?",
+    "answer": "D'abord, naviguez vers votre r\u00e9pertoire personnel (`cd`) et t\u00e9l\u00e9chargez ParaView : `wget https://www.paraview.org/files/v6.0/ParaView-v6.0.0.tar.gz`. Apr\u00e8s avoir d\u00e9compress\u00e9 et entr\u00e9 dans le r\u00e9pertoire, cr\u00e9ez un r\u00e9pertoire de compilation (`mkdir -p build && cd build`) et ex\u00e9cutez cmake avec les drapeaux sp\u00e9cifi\u00e9s :\n```\n cmake \\\n      -DCMAKE_BUILD_TYPE=Release \\\n      -DCMAKE_INSTALL_PREFIX=/home/centos/paraview \\\n      -DPARAVIEW_USE_MPI=OFF \\\n      -DPARAVIEW_ENABLE_PYTHON=ON \\\n      -DPARAVIEW_BUILD_QT_GUI=OFF \\\n      -DVTK_OPENGL_HAS_OSMESA=ON \\\n      -DVTK_USE_OFFSCREEN=ON \\\n      -DVTK_USE_X=OFF \\\n      ..\n```\nPuis, ex\u00e9cutez `make` et `make install`."
+  },
+  {
+    "question": "Comment lancez-vous le serveur ParaView avec SWR sur une machine virtuelle infonuagique apr\u00e8s la compilation?",
+    "answer": "Ex\u00e9cutez la commande suivante depuis le r\u00e9pertoire d'installation de ParaView : `./paraview/bin/pvserver --force-offscreen-rendering --opengl-window-backend OSMesa`."
+  },
+  {
+    "question": "Comment cr\u00e9er un tunnel SSH depuis votre ordinateur local pour connecter le client ParaView au serveur ex\u00e9cut\u00e9 sur une machine virtuelle infonuagique?",
+    "answer": "Depuis votre ordinateur local, ex\u00e9cutez : `ssh centos@vm.ip.address -L 11111:localhost:11111`. Cela redirige le port local 11111 vers le port 11111 de la machine virtuelle."
+  },
+  {
+    "question": "Apr\u00e8s avoir \u00e9tabli le tunnel SSH, comment connectez-vous le client ParaView local au serveur ex\u00e9cut\u00e9 sur la machine virtuelle infonuagique?",
+    "answer": "Lancez le client ParaView sur votre ordinateur local et connectez-vous \u00e0 `localhost:11111`."
+  },
+  {
+    "question": "Comment v\u00e9rifier que SWR (Software Rasterizer) est utilis\u00e9 pour le rendu lors de la connexion \u00e0 un serveur ParaView sur une VM?",
+    "answer": "Pendant l'op\u00e9ration de rendu, le message \"SWR detected AVX2\" devrait s'afficher sur la console o\u00f9 le serveur ParaView est en cours d'ex\u00e9cution."
+  }
+]

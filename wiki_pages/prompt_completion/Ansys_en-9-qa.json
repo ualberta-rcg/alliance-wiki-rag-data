@@ -1,30 +1,66 @@
 [
   {
-    "question": "What is the primary purpose of the `script-flu-bycore+restart.sh` script?",
-    "answer": "This script is designed for automating the restart of Fluent jobs, particularly very large ones that may exceed typical runtime limits, by resuming from the most recent saved time step files."
+    "question": "What is the purpose of the `script-flu-bycore+restart.sh` script for Ansys Fluent?",
+    "answer": "This script is designed for multinode Fluent jobs that utilize a 'by core' allocation strategy and support solution restarts, suitable for very large jobs that might exceed typical runtime limits."
   },
   {
-    "question": "Which SLURM parameters are configured in the `script-flu-bycore+restart.sh` script for resource allocation?",
-    "answer": "The script specifies the SLURM account (`--account=def-group`), time limit (`--time=00-03:00`), total number of cores (`--ntasks=16`), memory per core (`--mem-per-cpu=4G`), and a job array for restarts (`--array=1-5%1`). It also specifies `cpus-per-task=1`."
+    "question": "Which `StdEnv` module should be loaded when using the `script-flu-bycore+restart.sh` script for Ansys Fluent?",
+    "answer": "The `StdEnv/2023` module should be loaded, and it should not be changed."
   },
   {
-    "question": "What software modules are loaded to run Fluent using the `script-flu-bycore+restart.sh` script?",
-    "answer": "The script loads `StdEnv/2023` and `ansys/2023R2` (or newer versions). For Narval clusters, it conditionally loads `intel/2021 intelmpi` (for `EBVERSIONGENTOO` 2020) or `intel/2023 intelmpi` (for `EBVERSIONGENTOO` 2023)."
+    "question": "Which Ansys module version is specified as a recommendation for the `script-flu-bycore+restart.sh` script?",
+    "answer": "The script specifies `ansys/2023R2` or newer versions."
   },
   {
-    "question": "How does the script differentiate between an initial Fluent run and a restart run?",
-    "answer": "The script uses the `SLURM_ARRAY_TASK_ID` variable. If `SLURM_ARRAY_TASK_ID` is 1, it executes the initial Fluent command with `MYJOUFILE`. For subsequent array tasks (restarts), it uses `MYJOUFILERES` and automatically links the most recent `.cas` and `.dat` output files to `MYCASFILERES` and `MYDATFILERES`."
+    "question": "What user-defined variables are required for the `script-flu-bycore+restart.sh` script?",
+    "answer": "Users need to specify `MYVERSION` (e.g., 2d, 2ddp, 3d, 3ddp), `MYJOUFILE` (initial journal filename), `MYJOUFILERES` (restart journal filename), `MYCASFILERES` (restart case filename), and `MYDATFILERES` (restart data filename)."
   },
   {
-    "question": "What is the role of Fluent journal files and how do they support different file formats?",
-    "answer": "Fluent journal files contain Text-User-Interface (TUI) commands to load case/data files, run the solver, and write results, allowing users to automate simulations and change parameters. They can be set to use the legacy `.cas/.dat` file format (`/file/cff-files no`, default for 2019R3 or older) or the more efficient `.cas.h5/.dat.h5` format (`/file/cff-files yes`, default for 2020R1 or newer)."
+    "question": "How is the total number of cores calculated in the `script-flu-bycore+restart.sh` script?",
+    "answer": "The total number of cores (`NCORES`) is calculated by multiplying `SLURM_NTASKS` by `SLURM_CPUS_PER_TASK`."
   },
   {
-    "question": "What happens after a Fluent job completes successfully within the `script-flu-bycore+restart.sh` script?",
-    "answer": "If the job completes successfully and it's not the last scheduled array task (`SLURM_ARRAY_TASK_ID -lt $SLURM_ARRAY_TASK_COUNT`), the script creates symbolic links to the most recent output `.cas` and `.dat` files for the next restart attempt. If it's the last task, it prints a 'Job completed successfully!' message and cancels the entire job array (`scancel $SLURM_ARRAY_JOB_ID`)."
+    "question": "How does the `script-flu-bycore+restart.sh` script handle the execution difference between a single node and multiple nodes?",
+    "answer": "For a single node (`SLURM_NNODES == 1`), Fluent is run with `-pshmem` for shared memory parallel. For multiple nodes, Fluent is run with `-pib` (or `-peth` for nibi cluster) and a machinefile (`-cnf=/tmp/machinefile-$SLURM_JOB_ID`) for distributed memory parallel."
   },
   {
-    "question": "How can users determine the total number of cores that Fluent will use in the `script-flu-bycore+restart.sh` script?",
-    "answer": "The total number of cores, `NCORES`, is calculated by multiplying the value of `SLURM_NTASKS` (total number of tasks/cores requested) by `SLURM_CPUS_PER_TASK`. For example, if `SLURM_NTASKS=16` and `SLURM_CPUS_PER_TASK=1`, `NCORES` will be 16."
+    "question": "How does the script differentiate between an initial run and a restart run within the job array?",
+    "answer": "If `SLURM_ARRAY_TASK_ID` is 1, it runs the initial journal file (`$MYJOUFILE`). For subsequent tasks (`SLURM_ARRAY_TASK_ID` > 1), it runs the restart journal file (`$MYJOUFILERES`)."
+  },
+  {
+    "question": "What happens if a Fluent job completes successfully but is not the last task in the job array for the `script-flu-bycore+restart.sh` script?",
+    "answer": "The script will print 'Restarting job with the most recent output dat file' and create symbolic links for the `MYCASFILERES` and `MYDATFILERES` to the latest output files, preparing for the next restart."
+  },
+  {
+    "question": "What happens if a Fluent job fails in the `script-flu-bycore+restart.sh` script?",
+    "answer": "If the Fluent command exits with a non-zero status, the script will print 'Simulation failed. Exiting now.' and terminate."
+  },
+  {
+    "question": "What is the default number of solution restarts specified in the `script-flu-bycore+restart.sh` script?",
+    "answer": "The script specifies `--array=1-5%1`, indicating 5 restart attempts (or time steps), with 2 or more recommended."
+  },
+  {
+    "question": "What types of simulations are Fluent journal files commonly used for?",
+    "answer": "Fluent journal files are used for running series of simulations under different conditions with a single case file, by changing parameters via Text-User-Interface (TUI) commands."
+  },
+  {
+    "question": "Where can users find more information about commands for Fluent's Text-User-Interface (TUI) for journal files?",
+    "answer": "Users should refer to the Fluent User's Guide for more information and a list of all commands that can be used."
+  },
+  {
+    "question": "How do Fluent journal files specify the file format for reading and writing case and data files?",
+    "answer": "The command `/file/cff-files no` is used for the legacy `.cas/.dat` file format, and `/file/cff-files yes` is used for the more efficient `.cas.h5/.dat.h5` file format."
+  },
+  {
+    "question": "Which Fluent module versions use the legacy `.cas/.dat` file format by default?",
+    "answer": "Fluent module versions 2019R3 or older use the legacy `.cas/.dat` file format by default."
+  },
+  {
+    "question": "Which Fluent module versions use the `.cas.h5/.dat.h5` file format by default?",
+    "answer": "Fluent module versions 2020R1 or newer use the more efficient `.cas.h5/.dat.h5` file format by default."
+  },
+  {
+    "question": "What are the default SBATCH resource requests specified in the `script-flu-bycore+restart.sh` script?",
+    "answer": "The script requests a time limit of 3 hours (`00-03:00`), a total of 16 cores (`--ntasks=16`), and 4GB of memory per core (`--mem-per-cpu=4G`). It also allows optionally uncommenting a line to specify the number of nodes, with Narval having a 1-node maximum."
   }
 ]

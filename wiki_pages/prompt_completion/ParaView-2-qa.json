@@ -1,78 +1,42 @@
 [
   {
-    "question": "What GPU configuration should be selected when setting up a single-core ParaView visualization session in JupyterHub?",
-    "answer": "When setting up a single-core ParaView visualization session in JupyterHub, you should select 'None' under 'GPU configuration' in the Server Options."
+    "question": "What are the essential JupyterHub Server Options settings for performing single-core remote visualization?",
+    "answer": "For single-core remote visualization, you must select a CPU account (not GPUs), set GPU configuration to 'None', choose '1' for Number of Cores, specify the Time required for the session, set Memory based on your data size, and select 'JupyterLab' for the User interface."
   },
   {
-    "question": "How many CPU cores should be requested for a single-core ParaView visualization session in JupyterHub?",
-    "answer": "For a single-core ParaView visualization session in JupyterHub, you should select '1' under 'Number of Cores'."
+    "question": "After configuring JupyterHub, how long should I wait for the JupyterLab dashboard to appear?",
+    "answer": "You should wait about one minute for the job to start and the JupyterLab dashboard to appear in your browser."
   },
   {
-    "question": "How should memory be set for a single-core JupyterLab session for visualization?",
-    "answer": "The memory for a single-core JupyterLab session should be set based on the maximum amount of data to be processed at a time."
+    "question": "What is one way to launch ParaView interactively for single-core visualization after the JupyterLab dashboard is ready?",
+    "answer": "One way is to load the `boost/1.85.0` and `paraview/6.0.0` modules under 'Software Modules' on the left-hand side, then click the 'ParaView (VNC)' button that appears. If it doesn't start automatically, a shortcut should be on the virtual desktop."
   },
   {
-    "question": "Which user interface should be selected in the JupyterHub Server Options for ParaView visualization?",
-    "answer": "You should select 'JupyterLab' under 'User interface' in the JupyterHub Server Options."
+    "question": "What is an alternative method to launch ParaView in a single-core JupyterLab session using a terminal?",
+    "answer": "Alternatively, you can click on your preferred 'Desktop' button to open a virtual desktop session. Inside this virtual desktop, open a terminal and type `module load boost/1.85.0 paraview/6.0.0` followed by `paraview`."
   },
   {
-    "question": "What happens in the background after pressing the 'Start' button for a JupyterLab session?",
-    "answer": "After pressing the 'Start' button, a Slurm job will be submitted to the cluster in the background."
+    "question": "Can the ParaView GUI application utilize multiple CPU cores directly for rendering?",
+    "answer": "No, the ParaView GUI application itself is single-threaded and cannot directly use multiple cores. However, some filters do support multithreading."
   },
   {
-    "question": "How long should one wait for the JupyterLab job to start and the dashboard to appear?",
-    "answer": "You should wait about one minute for the job to start and for the JupyterLab dashboard to appear in your browser."
+    "question": "How can true parallel rendering be achieved with ParaView on the clusters?",
+    "answer": "For true parallel rendering, you need to connect the single-core ParaView client to a parallel ParaView server, both of which can be launched within a JupyterLab session."
   },
   {
-    "question": "What are the two primary methods to start ParaView after a single-core JupyterLab session is running?",
-    "answer": "After the JupyterLab session starts, you can either load the 'boost/1.85.0' and 'paraview/6.0.0' modules and click the 'ParaView (VNC)' button, or open a preferred virtual desktop, launch a terminal, and type 'module load boost/1.85.0 paraview/6.0.0' followed by 'paraview'."
+    "question": "What are the key differences in JupyterHub Server Options settings when configuring for multi-core visualization compared to single-core?",
+    "answer": "For multi-core visualization, you'll select your desired 'Number of Cores' (e.g., 4) and scale your 'Memory' request accordingly (e.g., 14400 MB for 4 cores, based on 3600 MB per core)."
   },
   {
-    "question": "Which software modules need to be loaded to start ParaView in a single-core JupyterLab session?",
-    "answer": "You need to load the 'boost/1.85.0' module and then the 'paraview/6.0.0' module."
+    "question": "How do you start a parallel ParaView server within a multi-core JupyterLab session?",
+    "answer": "After opening your preferred virtual desktop and a terminal, first load the modules with `module load boost/1.85.0 paraview/6.0.0`. Then, start the server by typing `mpirun --oversubscribe -np 4 pvserver` (replacing 4 with your desired core count)."
   },
   {
-    "question": "What should you do if the ParaView (VNC) button does not automatically start ParaView?",
-    "answer": "If the ParaView (VNC) button does not start ParaView automatically, a shortcut button should be on the virtual desktop; click on it and wait for ParaView to start."
+    "question": "What steps are required in the ParaView GUI to connect to a remote parallel server running in a JupyterLab session?",
+    "answer": "In the ParaView GUI, click the 'Connect' button, then 'Add Server'. Select 'Client/Server' as the Server Type, set 'Host' to `localhost`, 'Port' to `11111` (or the port shown in the server's Connection URL), and 'Startup Type' to 'Manual'. Finally, click 'Connect' again to establish the connection."
   },
   {
-    "question": "Can the ParaView GUI application directly utilize multiple cores for rendering?",
-    "answer": "No, the ParaView GUI application itself is single-threaded and cannot directly use multiple cores."
-  },
-  {
-    "question": "How can true parallel rendering be achieved with ParaView?",
-    "answer": "For true parallel rendering, you need to connect the single-core ParaView client to a parallel ParaView server, both of which can be launched within JupyterLab."
-  },
-  {
-    "question": "What are the key differences in JupyterHub Server Options settings when configuring multi-core visualization compared to single-core?",
-    "answer": "For multi-core visualization, you need to select your desired number of cores (e.g., 4) under 'Number of Cores' and scale your memory request accordingly (e.g., 14400 MB for 4 cores, which is 3600 MB per core)."
-  },
-  {
-    "question": "What resources will be available inside a multi-core JupyterLab session once it starts, for example, with 4 cores requested?",
-    "answer": "When a multi-core JupyterLab session starts with 4 cores requested, you will have access to 1 MPI task with 4 CPU cores."
-  },
-  {
-    "question": "How do you start the parallel ParaView server within a multi-core JupyterLab virtual desktop session?",
-    "answer": "Inside the virtual desktop, after loading the 'boost/1.85.0' and 'paraview/6.0.0' modules, you open a terminal and type 'mpirun --oversubscribe -np 4 pvserver' (replacing 4 with your desired number of cores)."
-  },
-  {
-    "question": "How do you start the ParaView client GUI in a multi-core JupyterLab session after the server is running?",
-    "answer": "You open another terminal inside the virtual desktop, load the 'boost/1.85.0' and 'paraview/6.0.0' modules, and then type 'paraview'."
-  },
-  {
-    "question": "What steps are required in the ParaView GUI to connect the client to a remote parallel server running in JupyterLab?",
-    "answer": "In the ParaView GUI, click the 'Connect' button, then 'Add Server'. Set 'Server Type' to 'Client/Server', 'Host' to 'localhost', 'Port' to '11111', and 'Startup Type' to 'Manual'. Then, click 'Connect' again to establish the connection."
-  },
-  {
-    "question": "What value should be used for the 'Host' when connecting the ParaView client to a parallel server running in the same JupyterLab session?",
-    "answer": "You should set 'Host' to 'localhost' when connecting the ParaView client to a parallel server running within the same JupyterLab session."
-  },
-  {
-    "question": "What port number should be used when connecting a ParaView client to a parallel server in JupyterLab?",
-    "answer": "The port number to use is '11111', which is typically displayed in the 'Connection URL' output when starting the pvserver."
-  },
-  {
-    "question": "What 'Startup Type' should be selected when configuring a ParaView server connection in the GUI for a JupyterLab session?",
-    "answer": "You should select 'Manual' for the 'Startup Type' when configuring a ParaView server connection in the GUI for a JupyterLab session."
+    "question": "How can one confirm that parallel rendering is active when visualizing a dataset in ParaView?",
+    "answer": "You can confirm parallel rendering is active by coloring your dataset by the `Process Id` variable, which is only available when running in parallel and not in serial."
   }
 ]

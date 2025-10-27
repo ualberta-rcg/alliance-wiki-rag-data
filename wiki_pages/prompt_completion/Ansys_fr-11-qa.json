@@ -1,98 +1,102 @@
 [
   {
-    "question": "How do you configure Fluent to use the more efficient .cas.h5/.dat.h5 file formats?",
-    "answer": "For Fluent versions 2020R1 and later, you should add the command `/file/cff-files yes` to your journal file."
+    "question": "How can DPM interactions with the continuous phase be enabled through a journal file in Ansys Fluent?",
+    "answer": "To enable DPM interactions with the continuous phase, add the command `/define/models/dpm/interaction/coupled-calculations yes` to your journal file after solution initialization."
   },
   {
-    "question": "What is the purpose of the `sample1.jou` journal file?",
-    "answer": "`sample1.jou` is an example journal file designed for a steady Fluent simulation. It reads an input case, runs the solver for a specified number of iterations, writes a final output data file, and can optionally generate a simulation report before exiting Fluent cleanly."
+    "question": "How do you delete an existing DPM injection named 'injection-0:1' in Ansys Fluent via a journal file?",
+    "answer": "You can delete an existing DPM injection by including the command `/define/models/dpm/injections/delete-injection injection-0:1` in your journal file."
   },
   {
-    "question": "How can you prevent Fluent from overwriting files by default in a journal file?",
-    "answer": "To prevent files from being overwritten by default, include the command `/file/confirm-overwrite no` in your journal file."
+    "question": "What journal file command is used to create a new DPM injection from a file named 'zinjection01.inj'?",
+    "answer": "The command `/define/models/dpm/injections/create injection-0:1 no yes file no zinjection01.inj no no no no` can be used in a journal file to create a new injection from 'zinjection01.inj'."
   },
   {
-    "question": "How do you set Fluent to write a data file every 100 iterations using a journal file?",
-    "answer": "You can set Fluent to write a data file every 100 iterations by including the command `/file/auto-save/data-frequency 100` in your journal file."
+    "question": "How can one list the particles associated with a specific DPM injection using a journal file command?",
+    "answer": "To list the particles, use the command `/define/models/dpm/injections/list-particles injection-0:1` in your journal file, replacing 'injection-0:1' with your injection's name."
   },
   {
-    "question": "How do you configure Fluent to retain only the 5 most recent data files during auto-saving?",
-    "answer": "To retain only the 5 most recent data files, add the command `/file/auto-save/retain-most-recent-files y` to your journal file."
+    "question": "What command allows you to list the properties of a DPM injection in Ansys Fluent through a journal file?",
+    "answer": "The command `/define/models/dpm/injections/list-injection-properties injection-0:1` can be added to your journal file to list the properties of a DPM injection."
   },
   {
-    "question": "How can you specify an output sub-directory and root name for auto-saved data files in Fluent?",
-    "answer": "You can specify an output sub-directory and root name for auto-saved data files using the command `/file/auto-save/root-name output/FFF-out` in your journal file."
+    "question": "What is the structure of a basic manually created DPM injection file (e.g., zinjection01.inj) for a steady state simulation?",
+    "answer": "A basic DPM injection file (e.g., zinjection01.inj) for a steady state simulation might look like this: `$ cat zinjection01.inj (z=4 12) ( x y z u v w diam\u00e8tre t d\u00e9bit massique fr\u00e9quence massique temps nom ) (( 2.90e-02 5.00e-03 0.0 -1,00e-03 0,0 0,0 1,00e-04 2,93e+02 1,00e-06 0,0 0,0 0,0 ) injection-0:1 )`."
   },
   {
-    "question": "What command is used to run the Fluent solver for a specific number of iterations in a journal file?",
-    "answer": "The command `/solve/iterate [number_of_iterations]` is used, for example, `/solve/iterate 1000` to run for 1000 iterations."
+    "question": "Where can one find detailed information on the steady file format for DPM injections?",
+    "answer": "Detailed information on the steady file format for DPM injections can be found in the `2024R2 Fluent Customization Manual, Part III: Solution Mode | Chapter 24: Modeling Discrete Phase | 24.3. Setting Initial Conditions for the Discrete Phase | 24.3.13 Point Properties for File Injections | 24.3.13.1 Steady File Format`."
   },
   {
-    "question": "How do you set the physical time step size for a transient simulation in a Fluent journal file?",
-    "answer": "The physical time step size for a transient simulation is set using the command `/solve/set/time-step [value]`, for example, `/solve/set/time-step 0.0001`."
+    "question": "How can users view a summary of the command-line options for cfx5solve in Ansys CFX?",
+    "answer": "Users can display a summary of command-line options for cfx5solve by running `cfx5solve -help`."
   },
   {
-    "question": "What command initiates hybrid initialization in a Fluent journal file?",
-    "answer": "The command `/solve/initialize/hyb-initialization` initiates hybrid initialization in a Fluent journal file."
+    "question": "What is the default precision for cfx5solve in Ansys CFX?",
+    "answer": "By default, cfx5solve runs in single precision (`-single`)."
   },
   {
-    "question": "How do you perform a dual-time iteration with 1000 time steps and 75 maximum iterations per time step in a Fluent journal file?",
-    "answer": "You can perform this by using the command `/solve/dual-time-iterate 1000 75` in your Fluent journal file."
+    "question": "How do you run cfx5solve in double precision, and what is the implication?",
+    "answer": "To run cfx5solve in double precision, add the option `-double`. This will also double the memory requirements."
   },
   {
-    "question": "What is the initial step for using User-Defined Functions (UDFs) with Fluent on a cluster?",
-    "answer": "The first step is to transfer your UDF source file (e.g., `sampleudf.c`) and any additional dependency files to the cluster."
+    "question": "How can cfx5solve handle meshes larger than the default limits?",
+    "answer": "For meshes larger than the default limits (80 million structured elements or 200 million unstructured elements), up to 2 billion elements, add the option `-large` to cfx5solve."
   },
   {
-    "question": "What is important when transferring a UDF source file from a Windows machine to a Linux cluster?",
-    "answer": "It is crucial to ensure that the text mode of your transfer client is used; otherwise, Fluent may not be able to read the file correctly on the Linux cluster."
+    "question": "Where can I find more details about options for the partitioner, interpolator, or solver in Ansys CFX?",
+    "answer": "You can consult the ANSYS CFX-Solver Manager guide for more details on different combinations of options for the partitioner, interpolator, or solver."
   },
   {
-    "question": "Where should the UDF file be placed on the cluster?",
-    "answer": "The UDF file must be placed in the same directory where your journal, case, and data files reside."
+    "question": "What `start-method` is used for single-node CFX simulations on Narval according to the provided script?",
+    "answer": "For single-node CFX simulations on Narval, the `start-method` specified is `Open MPI Local Parallel`."
   },
   {
-    "question": "What should be checked in Fluent's dialog boxes before submitting tasks that use UDFs?",
-    "answer": "Before submitting UDF tasks, verify that the 'Interpreted UDFs' and 'UDF Library Manager' dialog boxes in Fluent are not configured to use a UDF. This ensures that only the commands in your journal file control UDF usage."
+    "question": "What `start-method` is used for single-node CFX simulations on clusters other than Narval according to the provided script?",
+    "answer": "For single-node CFX simulations on clusters other than Narval, the `start-method` specified is `Intel MPI Local Parallel`."
   },
   {
-    "question": "How do you instruct Fluent to interpret a UDF at runtime using a journal file?",
-    "answer": "To instruct Fluent to interpret your UDF at runtime, add the command `define/user-defined/interpreted-functions \"sampleudf.c\" \"cpp\" 10000 no` to your journal file before reading or initializing case/data files."
+    "question": "What `start-method` is used for multi-node CFX simulations on Narval according to the provided script?",
+    "answer": "For multi-node CFX simulations on Narval, the `start-method` specified is `Open MPI Distributed Parallel`."
   },
   {
-    "question": "What is required for an interpreted UDF to work with parallel Fluent tasks?",
-    "answer": "For an interpreted UDF to work with parallel Fluent tasks, it must be parallelized as described in the relevant documentation section."
+    "question": "What `start-method` is used for multi-node CFX simulations on clusters other than Narval in the provided CFX script?",
+    "answer": "For multi-node CFX simulations on clusters other than Narval, the `start-method` specified is `Intel MPI Distributed Parallel`, along with `export I_MPI_HYDRA_BOOTSTRAP=ssh` and `unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS`."
   },
   {
-    "question": "What is the first requirement for using a compiled UDF on the cluster?",
-    "answer": "Your UDF must be compiled on one of the clusters at least once. This process creates a `libudf` subdirectory containing the necessary `libudf.so` shared library."
+    "question": "What steps are required to initialize an Ansys Workbench project before its first submission to a cluster?",
+    "answer": "To initialize an Ansys Workbench project, connect to the cluster via TigerVNC, launch Workbench with the correct Ansys module version in the project directory, open the project, right-click 'Setup' and select 'Clear All Generated Data', then exit Workbench by clicking 'File -> Exit' and choosing 'No' when prompted to save modified project."
   },
   {
-    "question": "Why can't a `libudf` directory be directly copied from a remote system (like a laptop) to the Alliance clusters?",
-    "answer": "It cannot be directly copied because the shared library dependencies will not be satisfied, which would cause Fluent to crash upon startup."
+    "question": "How can a user avoid overwriting the solution when running multiple test jobs for scaling with Ansys Workbench?",
+    "answer": "To avoid overwriting the solution during scaling tests, you can either remove `;Save(Overwrite=True)` from the last line of the Slurm script or save a copy of the initialized `YOURPROJECT.wbpj` file and its `YOURPROJECT_files` subdirectory before each job submission and restore them afterwards."
   },
   {
-    "question": "If a UDF has already been compiled on one cluster, can its `libudf` directory be transferred to another?",
-    "answer": "Yes, once compiled on one of our clusters, the `libudf` directory can be transferred to any other cluster, provided that your account loads the same version of the `StdEnv` environment module."
+    "question": "What is the command to submit an Ansys Workbench project to the queue after customizing the Slurm scripts?",
+    "answer": "After customizing the Slurm scripts, you can submit an Ansys Workbench project to the queue using the command `sbatch script-wbpj-202X.sh`."
   },
   {
-    "question": "How do you load a compiled UDF using a journal file for a Fluent task?",
-    "answer": "You can load a compiled UDF by uncommenting the line `define/user-defined/compiled-functions load libudf` in your journal file when submitting a task."
+    "question": "What are the common SBATCH parameters specified in the single-node Workbench Slurm script for StdEnv/2023?",
+    "answer": "The common SBATCH parameters are `--account=def-account` (for specifying the account), `--time=00-03:00` (for time limit), `--mem=16G` (for total memory), `--ntasks=4` (for number of cores), and `--nodes=1` (for a single compute node)."
   },
   {
-    "question": "Why should both the `compile` and `load` commands for a compiled UDF not be left uncommented in a journal file during task submission?",
-    "answer": "Leaving both uncommented will cause your UDF to be automatically recompiled for each task, which is inefficient and can lead to 'racetime' build conflicts if multiple tasks are executed from the same directory."
+    "question": "How is the `MEMPAR` variable set in the Ansys Workbench Slurm script, and what does it represent?",
+    "answer": "The `MEMPAR` variable is set based on `SLURM_NNODES`. If `SLURM_NNODES` is 1, `MEMPAR` is 0 for SMP (shared memory parallel). Otherwise, it's 1 for DMP (distributed memory parallel)."
   },
   {
-    "question": "How can you compile a UDF using the Fluent graphical interface?",
-    "answer": "To compile a UDF via the Fluent graphical interface, you add the UDF source file in the 'Compiled UDFs' dialog box and then click 'Build'."
+    "question": "How are `SolveHandlers.xml` settings configured within the Ansys Workbench Slurm script?",
+    "answer": "`SolveHandlers.xml` is configured by using `sed` commands to set `Distribute` based on `MEMPAR` and `MaxNumber` of processors based on `SLURM_NTASKS`, and `UserConfigured` to \"1\"."
   },
   {
-    "question": "What must be done before a UDF can be used with a parallel Fluent task (SMP or MPI)?",
-    "answer": "Before a UDF can be used with a parallel Fluent task, it must be parallelized by adding compilation directives, predicates, and reduction macros to your sequential UDF."
+    "question": "What environment variables are exported by the Ansys Workbench Slurm script?",
+    "answer": "The script exports `KMP_AFFINITY=disabled` and `I_MPI_HYDRA_BOOTSTRAP=ssh`."
   },
   {
-    "question": "Where can detailed information about parallelizing UDFs be found?",
-    "answer": "Detailed information about parallelizing UDFs is available in the 'Fluent Customization Manual, Part I: Chapter 7: Parallel Considerations' within the online documentation."
+    "question": "What command is used to run Ansys Workbench in batch mode without saving the solution in the provided script?",
+    "answer": "The command `runwb2 -B -E \"Update()\" -F YOURPROJECT.wbpj` is used to run Ansys Workbench in batch mode and update the project without saving the solution."
+  },
+  {
+    "question": "How can Ansys Workbench be run in batch mode to update and save the solution?",
+    "answer": "Ansys Workbench can be run in batch mode to update and save the solution by using the command `runwb2 -B -E \"Update();Save(Overwrite=True)\" -F YOURPROJECT.wbpj`."
   }
 ]

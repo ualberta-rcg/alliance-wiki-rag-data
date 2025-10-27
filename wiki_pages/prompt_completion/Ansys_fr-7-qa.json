@@ -1,38 +1,66 @@
 [
   {
-    "question": "What is the name of the Slurm script used for running Ansys Fluent on multiple nodes (per node) on Niagara?",
-    "answer": "The script is named `script-flu-bynode-intel-nia.sh`."
+    "question": "What should I do if I get an 'ERROR: A link to a writable .ansys directory does not exist.' when running an Ansys job on Niagara?",
+    "answer": "If you encounter this error, remove `~/.ansys` if it exists and then run the command `ln -s $SCRATCH/.ansys ~/.ansys`. Afterward, resubmit your job."
   },
   {
-    "question": "What modules must be loaded to run Ansys Fluent using the `script-flu-bynode-intel-nia.sh` script on Niagara?",
-    "answer": "You must load `CCEnv StdEnv/2023`, `arch/avx512`, and `ansys/2023R2` (or newer versions)."
+    "question": "How do I resolve the 'ERROR: A link to a writable .fluentconf directory does not exist.' message in an Ansys job?",
+    "answer": "To resolve this error, remove `~/.fluentconf` if it exists and then create a symbolic link using `ln -s $SCRATCH/.fluentconf ~/.fluentconf`. Then, resubmit your job."
   },
   {
-    "question": "How are license settings typically configured for Ansys Fluent jobs submitted with `script-flu-bynode-intel-nia.sh` on Niagara?",
-    "answer": "License settings are explicitly defined within the script itself, specifying `LICSERVER`, `FLEXPORT`, `INTEPORT`, and `VENDPORT`. These settings are then used to set up SSH port forwarding to `localhost` and export the `ANSYSLMD_LICENSE_FILE` and `ANSYSLI_SERVERS` variables to point to `localhost`."
+    "question": "What action should I take if I encounter the error 'ERROR: A link to a writable .flrecent file does not exist.'?",
+    "answer": "If you see this error, remove `~/.flrecent` if one exists and then run `ln -s $SCRATCH/.flrecent ~/.flrecent`. After this, resubmit your job."
   },
   {
-    "question": "What are the default values for the license server, flex port, interconnect port, and vendor port specified in the Niagara Fluent script?",
-    "answer": "The script specifies `LICSERVER=license3.sharcnet.ca`, `FLEXPORT=1055`, `INTEPORT=2325`, and `VENDPORT=1793`."
+    "question": "What is the primary purpose of the license requeue scripts for Ansys Fluent jobs?",
+    "answer": "The license requeue scripts are intended for Fluent jobs that are known to complete normally without outputting errors, but which generally require multiple attempts to acquire licenses at startup."
   },
   {
-    "question": "What environmental checks does the Fluent Niagara script perform before execution?",
-    "answer": "The script checks if `~/.ansys`, `~/.fluentconf`, and `~/.flrecent` are symbolic links to writable directories/files. If not, it will print an error and instruct the user to create such links to the `$SCRATCH` directory."
+    "question": "When are the license requeue scripts not recommended for Ansys Fluent tasks?",
+    "answer": "These scripts are not recommended for Fluent tasks that may run for a long time before crashing or run to completion but contain journaling warnings. In such cases, simulations would be repeated from the start until the maximum number of requeue attempts is reached."
   },
   {
-    "question": "What command is used to launch Fluent for multi-node tasks within the Niagara Slurm script?",
-    "answer": "For multi-node tasks, the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -ssh -pib -cnf=$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
+    "question": "What is a potential drawback of using license requeue scripts if a simulation fails for reasons other than licensing?",
+    "answer": "If a simulation fails for reasons other than license absence (e.g., divergence), the job will still be re-queued, potentially wasting compute time."
   },
   {
-    "question": "What is the purpose of the `ssh nia-gw -fNL` commands in the Niagara Fluent Slurm script?",
-    "answer": "These commands are used to establish SSH tunnels to forward the Ansys license ports (flex, interconnect, and vendor ports) from the specified license server (`LICSERVER`) to `localhost` on the compute node, allowing Fluent to access the license locally."
+    "question": "How can I specify the number of requeue attempts in an Ansys Fluent job script?",
+    "answer": "You can specify the number of requeue attempts using the `#SBATCH --array=1-5%1` directive in your Slurm script, where `1-5%1` indicates 5 attempts (2 or more are recommended)."
   },
   {
-    "question": "What is the maximum number of cores per node recommended for Fluent on Niagara with the provided script?",
-    "answer": "The script suggests a maximum of 80 cores per node for Niagara (`#SBATCH --ntasks-per-node=80`)."
+    "question": "What should I do if a requeued job fails due to a simulation problem rather than a license issue?",
+    "answer": "If you discover that a requeued job is failing due to a simulation problem, you should immediately cancel the task using `scancel jobid` and correct the problem."
   },
   {
-    "question": "What memory allocation setting is used in the Niagara Fluent Slurm script?",
-    "answer": "The script sets `#SBATCH --mem=0`, which allocates all available memory per compute node."
+    "question": "What is the purpose of the Ansys Fluent solution restart scripts?",
+    "answer": "The solution restart scripts automate the restarting of intensive tasks that require more than the maximum allowed seven days of execution on most clusters, by resuming from the most recently saved timestep files."
+  },
+  {
+    "question": "What files must be present to use the Ansys Fluent solution restart scripts?",
+    "answer": "To use the solution restart scripts, a group of `sample.cas`, `sample.dat`, and `sample.jou` files must be present."
+  },
+  {
+    "question": "How should the `sample.jou` file be modified for use with solution restart scripts?",
+    "answer": "The `sample.jou` file should be modified to contain `/solve/dual-time-iterate 1` and `/file/auto-save/data-frequency 1`."
+  },
+  {
+    "question": "How do I create and modify `sample-restart.jou` for a Fluent solution restart?",
+    "answer": "First, create `sample-restart.jou` by copying `sample.jou` (e.g., `cp sample.jou sample-restart.jou`). Then, modify `sample-restart.jou` to contain `/file/read-cas-data sample-restart` instead of `/file/read-cas-data sample`, and comment out the initialization line by preceding it with a semicolon, such as `; /solve/initialize/initialize-flow`."
+  },
+  {
+    "question": "If subsequent steps run faster than the initial step, how can I adjust `sample-restart.jou`?",
+    "answer": "If your second and subsequent steps run twice as fast as the initial step, you can modify `sample-restart.jou` to specify `/solve/dual-time-iterate 2`."
+  },
+  {
+    "question": "Where will the results of each step be saved when using the Fluent solution restart scripts?",
+    "answer": "A results file for each step will be saved in the output subdirectory."
+  },
+  {
+    "question": "How is the total simulation duration calculated when using the solution restart feature in Fluent?",
+    "answer": "Assuming a fixed timestep value and that 2 is chosen for `dual-time-iterate` in the restart script, the total simulation duration will be `1*Dt + 2*Nrestart*Dt`, where `Nrestart` is the number of restarts defined in the Slurm script."
+  },
+  {
+    "question": "What is the total number of steps (and generated result files) when using the Fluent solution restart feature?",
+    "answer": "The total number of steps (and generated result files) will be `1 + 2*Nrestart`, where `Nrestart` is the number of restarts defined in the Slurm script."
   }
 ]

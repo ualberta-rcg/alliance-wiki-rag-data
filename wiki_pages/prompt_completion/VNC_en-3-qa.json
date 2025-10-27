@@ -1,82 +1,142 @@
 [
   {
+    "question": "What environment variable should be set after an interactive job starts on a compute node to avoid repetitive desktop errors?",
+    "answer": "You should set the environment variable `XDG_RUNTIME_DIR=${SLURM_TMPDIR}`."
+  },
+  {
     "question": "How do you start a VNC server on a compute node?",
-    "answer": "After logging into a compute node, run the `vncserver` command. It will display information like 'Desktop 'TurboVNC: c48.nibi.sharcnet:1 (yourusername)' started on display c48.nibi.sharcnet:1' and the path to the log file."
+    "answer": "Start a VNC server with the `vncserver` command."
   },
   {
-    "question": "Where is the log file for the VNC server located on a compute node?",
-    "answer": "The log file is typically located at `/home/yourusername/.vnc/c48.nibi.sharcnet:1.log`, where `c48.nibi.sharcnet:1` will reflect your specific compute node and display number."
+    "question": "How can you check which compute node your job is running on if you are unsure?",
+    "answer": "If unsure, use the `hostname` command to check."
   },
   {
-    "question": "How can you determine which TCP port your VNC server is listening on?",
-    "answer": "Run `grep -iE \"\\sport|kill\" /home/yourusername/.vnc/c48.nibi.sharcnet:1.log` on the compute node. The output will show the listening port, for example, 'Listening for VNC connections on TCP port 5901'."
+    "question": "What is an important security step when starting a VNC server for the first time?",
+    "answer": "The first time you do this you will be prompted to set a password for your VNC server. DO NOT LEAVE THIS BLANK otherwise anyone could connect to it and gain access to the files in your account."
   },
   {
-    "question": "What is the general SSH tunnel command format for connecting to a VNC server on most clusters (excluding nibi)?",
-    "answer": "The command format is `ssh username@clustername -L localforwardedport:computenode:remotelisteningport`."
+    "question": "How can you change your VNC server password later?",
+    "answer": "You may change the password later using the `vncpasswd` command."
   },
   {
-    "question": "Provide an example of setting up an SSH tunnel to a VNC server on a 'rorqual' cluster compute node 'rc12509', using local port 5905 and remote port 5901.",
-    "answer": "The command would be `ssh username@rorqual.alliancecan.ca -L 5905:rc12509:5901`."
+    "question": "What output confirms that a VNC server has started successfully on a compute node?",
+    "answer": "A message similar to `Desktop 'TurboVNC: c48.nibi.sharcnet:1 (yourusername)' started on display c48.nibi.sharcnet:1` will appear, along with the log file location."
   },
   {
-    "question": "What is the specific SSH tunnel command format required for the 'nibi' cluster?",
-    "answer": "For 'nibi', the command format is `ssh -J username@clustername -L localforwardedport:localhost:remotelisteningport computenode`. An SSH key pair must also be created on your laptop, with the public key in your `~/.ssh/authorized_keys` file on `nibi`."
+    "question": "How do you determine the TCP port your VNC server is listening on?",
+    "answer": "Run the `grep` command on the log file: `grep -iE \"\\sport|kill\" /home/yourusername/.vnc/c48.nibi.sharcnet:1.log`."
   },
   {
-    "question": "Give an example of setting up an SSH tunnel to a VNC server on a 'nibi' compute node 'c48', using local port 5905 and remote port 5901.",
-    "answer": "The command would be `ssh -J username@nibi.alliancecan.ca -L 5905:localhost:5901 c48`."
+    "question": "What is the next step after starting a VNC server on a compute node?",
+    "answer": "Once your VNC server has been started, you must create a secure \"bridge\" or \"tunnel\" from your laptop to the compute node where your vncserver is running."
   },
   {
-    "question": "What happens to the VNC server if you exit the compute node your SSH tunnel is connected to?",
-    "answer": "If you exit the node, the SSH tunnel will break, and you will no longer be able to connect with vncviewer. However, the vncserver will continue running, and you can regain access by starting a new tunnel."
+    "question": "How many types of SSH tunnel commands are mentioned for connecting to a VNC server?",
+    "answer": "There are two types of tunnel commands that may be used depending on which cluster you are using."
   },
   {
-    "question": "How do you connect to a VNC server from a Linux desktop after setting up an SSH tunnel?",
-    "answer": "Open a new local terminal window and run the `vncviewer` command, specifying `localhost:port`. For example, `vncviewer localhost:5905`."
+    "question": "What is the general SSH tunnel command format for clusters other than nibi?",
+    "answer": "For all clusters (except nibi) the recommended form of the tunnel command is `ssh username@clustername -L localforwardedport:computenode:remotelisteningport`."
   },
   {
-    "question": "How do Mac or Windows users connect to a VNC server using TigerVNC Viewer?",
-    "answer": "Mac or Windows users can click the TigerVNC Viewer application icon and enter `localhost:port` in the \"Connection Details\" dialogue box."
+    "question": "Provide an example of an SSH tunnel command for a cluster like rorqual.",
+    "answer": "An example is: `ssh username@rorqual.alliancecan.ca -L 5905:rc12509:5901`."
+  },
+  {
+    "question": "What is the specific SSH tunnel command format required for the nibi cluster?",
+    "answer": "For nibi, a new form of the tunnel command `ssh -J username@clustername -L localforwardedport:localhost:remotelisteningport computenode` must be used."
+  },
+  {
+    "question": "What additional requirement is necessary for using the new SSH tunnel command form on nibi?",
+    "answer": "A SSH key pair must be created on your laptop with the contents of the pub key entered into your `~/.ssh/authorized_keys` file on `nibi`."
+  },
+  {
+    "question": "Can the nibi-specific SSH tunnel command work on other clusters?",
+    "answer": "Yes, this approach will also work on any other cluster."
+  },
+  {
+    "question": "Provide an example of the SSH tunnel command for the nibi cluster, given `c48` as the compute node and `5905` as the local port.",
+    "answer": "The tunnel command would be: `ssh -J username@nibi.alliancecan.ca -L 5905:localhost:5901 c48`."
+  },
+  {
+    "question": "What happens if you exit the node that your SSH tunnel is connected to?",
+    "answer": "If you exit the node that your tunnel is connected to, you will no longer be able to connect to the VNC server with vncviewer."
+  },
+  {
+    "question": "Can you regain access to a VNC server if you close the SSH tunnel but the VNC server is still running?",
+    "answer": "Yes, since your vncserver will continue running, you may regain access to it by simply starting a new tunnel."
+  },
+  {
+    "question": "How do Linux desktop users connect to the VNC server after setting up a tunnel?",
+    "answer": "If you have a Linux desktop, open a new local terminal window and tell your VNC client to connect to `localhost:port`."
+  },
+  {
+    "question": "What command is used to connect to a VNC server using TigerVNC from a Linux command line?",
+    "answer": "The `vncviewer` command, for example: `vncviewer localhost:5905`."
+  },
+  {
+    "question": "What information is required to connect to the VNC server using `vncviewer`?",
+    "answer": "You will be prompted for the VNC password that you set up earlier in order to connect."
+  },
+  {
+    "question": "How do Mac or Windows users connect to the VNC server without using the command line?",
+    "answer": "Mac or Windows users can click the *TigerVNC Viewer* application icon and enter their `localhost:port` information."
   },
   {
     "question": "What is the default VNC port assumed by TigerVNC Viewer?",
-    "answer": "The default VNC port assumed by TigerVNC Viewer is 5900. If your local forwarded port is 5900, you can simply specify `localhost` in the connection details."
+    "answer": "The default VNC port assumed by TigerVNC Viewer is 5900."
   },
   {
-    "question": "What kind of desktop environment is presented once `vncviewer` connects?",
-    "answer": "`vncviewer` connects you to a Linux MATE desktop."
+    "question": "Are there any known issues for Windows users when setting up an SSH tunnel on local port 5900?",
+    "answer": "Windows users however may find they cannot set up an SSH tunnel on local port 5900 in the first place."
   },
   {
-    "question": "How can you launch a terminal in the Linux MATE desktop through VNC?",
+    "question": "What type of desktop environment is presented once `vncviewer` connects?",
+    "answer": "You will be presented with a Linux MATE desktop."
+  },
+  {
+    "question": "How do you launch a terminal within the Linux MATE desktop?",
     "answer": "To launch a terminal, click on the top menu on \"Applications -> System Tools -> MATE Terminal\"."
   },
   {
-    "question": "How do you reset your VNC server password?",
-    "answer": "Use the `vncpasswd` command from the terminal on the cluster node. You will be prompted to enter and verify a new password, and optionally a view-only password."
+    "question": "How can you add a shortcut for MATE Terminal to the top menu?",
+    "answer": "You may add a shortcut to the top menu by right-clicking on \"MATE Terminal\" and by clicking on \"Add this launcher to panel\"."
   },
   {
-    "question": "How can you completely remove your VNC configuration, including the password?",
-    "answer": "Delete your `~/.vnc` directory. The next time you run `vncserver`, you will be prompted to set a new password."
+    "question": "How do you launch a program within the VNC desktop?",
+    "answer": "To launch a program, invoke the command as you would normally within a `bash` session."
   },
   {
-    "question": "How do you terminate a specific running vncserver?",
-    "answer": "First, list your VNC sessions using `vncserver -list` to find the display number (e.g., `:44`). Then, terminate it with `vncserver -kill :DISPLAY#`, for example, `vncserver -kill :44`."
+    "question": "How do you start a more complicated program like MATLAB within the VNC desktop?",
+    "answer": "To start a more complicated program like MATLAB, load the module and then run the `matlab` command."
   },
   {
-    "question": "How can you instantly kill all vncservers running under your username on a node?",
-    "answer": "Run the command `pkill Xvnc -u $USER`."
+    "question": "What command is used to reset your VNC server password?",
+    "answer": "To reset your VNC server password, use the `vncpasswd` command."
   },
   {
-    "question": "What option is required to allow multiple connections to a VNC server?",
-    "answer": "The `vncserver` must be started with the additional `-AlwaysShared` option, for example, `vncserver -idletimeout 86400 -alwaysshared`."
+    "question": "How can you completely remove your VNC configuration and password?",
+    "answer": "Optionally you can completely remove your VNC configuration (including your password) by deleting your `~/.vnc` directory."
   },
   {
-    "question": "What is a common reason for repeated failures to establish a VNC server/viewer connection?",
-    "answer": "Repeated failures may be due to an old SSH tunnel still running on your desktop and tying up ports."
+    "question": "How do you terminate a single running VNC server?",
+    "answer": "If a running vncserver is no longer needed, terminate it with `vncserver -kill :DISPLAY#`."
   },
   {
-    "question": "How do you identify and kill old SSH tunnels on your desktop that might be causing connection failures?",
-    "answer": "Open a terminal window on your desktop, run `ps ux | grep ssh` to identify the process ID (PID) of any lingering SSH tunnels, and then use `kill PID` to terminate them."
+    "question": "How can you kill all VNC servers running under your username on a node instantly?",
+    "answer": "If you have multiple vncservers running on a node, you may kill them ALL instantly by running `pkill Xvnc -u $USER`."
+  },
+  {
+    "question": "How can you list all VNC servers running under your username?",
+    "answer": "All vncserver(s) running under your username (on a login or compute node) can be displayed with `vncserver -list`."
+  },
+  {
+    "question": "Which option allows multiple connections to a VNC server?",
+    "answer": "If a vncserver was started with the additional `-AlwaysShared` option then multiple connections to it can be made by establishing a new tunnel and vncviewer from any remote location."
+  },
+  {
+    "question": "What is the connection behavior if a VNC server is not started with the `-AlwaysShared` option?",
+    "answer": "If your vncserver was not started with `vncserver -AlwaysShared` then only one vncviewer connection will be possible."
   }
 ]

@@ -1,66 +1,58 @@
 [
   {
-    "question": "Combien de c\u0153urs chaque n\u0153ud NUMA poss\u00e8de-t-il sur les n\u0153uds GPU ?",
-    "answer": "Chaque n\u0153ud NUMA poss\u00e8de 12 c\u0153urs (1,5 CCD par n\u0153ud)."
+    "question": "Comment le socket est-il divis\u00e9 sur les n\u0153uds GPU?",
+    "answer": "Le socket est divis\u00e9 en 4 n\u0153uds NUMA sur les n\u0153uds GPU."
   },
   {
-    "question": "Combien de canaux de m\u00e9moire chaque n\u0153ud NUMA a-t-il sur les n\u0153uds GPU ?",
-    "answer": "Chaque n\u0153ud NUMA a 3 canaux de m\u00e9moire."
+    "question": "Quelles sont les caract\u00e9ristiques de chaque n\u0153ud NUMA sur les n\u0153uds GPU?",
+    "answer": "Chaque n\u0153ud NUMA sur les n\u0153uds GPU a 12 c\u0153urs (1.5 CCD par n\u0153ud) et 3 canaux de m\u00e9moire."
   },
   {
-    "question": "Comment sont connect\u00e9s les acc\u00e9l\u00e9rateurs GPU sur les n\u0153uds ?",
-    "answer": "Les 4 acc\u00e9l\u00e9rateurs de n\u0153ud sont connect\u00e9s via SXM5."
+    "question": "Combien d'acc\u00e9l\u00e9rateurs NVidia H100 sont pr\u00e9sents sur un n\u0153ud GPU et comment sont-ils connect\u00e9s?",
+    "answer": "Il y a 2 acc\u00e9l\u00e9rateurs NVidia H100 80GB, et les 4 acc\u00e9l\u00e9rateurs du n\u0153ud sont connect\u00e9s via SXM5."
   },
   {
-    "question": "Quel est l'objectif principal des recommandations de r\u00e9glage de la performance pour les n\u0153uds GPU ?",
-    "answer": "L'objectif est de profiter au mieux de l\u2019architecture EPYC 9454 CPU et d'obtenir la localit\u00e9 optimale pour les CPU et GPU."
+    "question": "Quel est l'objectif du r\u00e9glage de la performance sur les n\u0153uds GPU?",
+    "answer": "Le r\u00e9glage de la performance vise \u00e0 profiter au mieux de l\u2019architecture EPYC 9454 CPU et \u00e0 obtenir la localit\u00e9 optimale pour les CPU et GPU."
   },
   {
-    "question": "Comment lier les fils \u00e0 des CCD pour optimiser la performance sur les n\u0153uds GPU ?",
-    "answer": "Pour lier les fils \u00e0 des CCD, utilisez `#SBATCH --cpus-per-task=8`. Chaque CCD contient 8 c\u0153urs intimement li\u00e9s et une cache L3 de 32 MiB."
+    "question": "Comment lier les fils \u00e0 des CCD pour optimiser la performance sur les n\u0153uds GPU?",
+    "answer": "Pour lier les fils \u00e0 des CCD, utilisez l'option Slurm `#SBATCH --cpus-per-task=8`. Chaque CCD contient 8 c\u0153urs intimement li\u00e9s et une cache L3 de 32 MiB, ce qui diminue la latence et am\u00e9liore l\u2019utilisation de la cache."
   },
   {
-    "question": "Quel est l'avantage de garder les fils d'ex\u00e9cution dans un seul CCD ?",
-    "answer": "Garder les fils d'ex\u00e9cution dans un seul CCD diminue la latence entre les CCD et am\u00e9liore l\u2019utilisation de la cache."
+    "question": "Quelle est la recommandation pour associer les t\u00e2ches aux n\u0153uds NUMA sur les n\u0153uds GPU?",
+    "answer": "Avec 4 n\u0153uds NUMA par socket (NPS=4), il est recommand\u00e9 de lancer 4 t\u00e2ches par n\u0153ud (ou un multiple de 4) pour obtenir la meilleure performance. Les options Slurm recommand\u00e9es sont `#SBATCH --ntasks-per-node=4` et `#SBATCH --cpus-per-task=12`."
   },
   {
-    "question": "Comment associer les t\u00e2ches aux n\u0153uds NUMA pour une performance optimale sur les n\u0153uds GPU ?",
-    "answer": "Avec 4 n\u0153uds NUMA par socket (NPS=4), lancez 4 t\u00e2ches par n\u0153ud (ou un multiple de 4) en utilisant `#SBATCH --ntasks-per-node=4` et `#SBATCH --cpus-per-task=12`."
+    "question": "Quel est l'avantage d'associer les t\u00e2ches aux n\u0153uds NUMA sur les n\u0153uds GPU?",
+    "answer": "Associer les t\u00e2ches aux n\u0153uds NUMA garde chaque t\u00e2che dans un domaine NUMA, ce qui permet un acc\u00e8s local \u00e0 la m\u00e9moire et au GPU."
   },
   {
-    "question": "Quel est le b\u00e9n\u00e9fice de bien associer les t\u00e2ches aux domaines NUMA ?",
-    "answer": "Ceci garde chaque t\u00e2che dans un domaine NUMA et permet un acc\u00e8s local \u00e0 la m\u00e9moire et au GPU."
+    "question": "Quelle option Slurm doit \u00eatre utilis\u00e9e pour demander une seule instance H100-80gb?",
+    "answer": "Pour demander une seule instance H100-80gb, utilisez l'option Slurm `--gpus=h100:1`."
   },
   {
-    "question": "Quelle option Slurm doit \u00eatre utilis\u00e9e pour demander une seule instance H100-80gb ?",
-    "answer": "Utilisez `--gpus=h100:1` pour demander une seule instance H100-80gb."
+    "question": "Quelles options Slurm sont disponibles pour demander plusieurs instances H100-80gb par n\u0153ud?",
+    "answer": "Pour demander plusieurs instances H100-80gb par n\u0153ud, utilisez les options Slurm suivantes : `--gpus-per-node=h100:2`, `--gpus-per-node=h100:3`, ou `--gpus-per-node=h100:4`."
   },
   {
-    "question": "Comment demander plusieurs instances H100-80gb par n\u0153ud avec Slurm ?",
-    "answer": "Pour demander plusieurs H100-80gb par n\u0153ud, utilisez `--gpus-per-node=h100:2`, `--gpus-per-node=h100:3`, ou `--gpus-per-node=h100:4`."
+    "question": "Comment demander plusieurs instances H100 r\u00e9parties?",
+    "answer": "Pour demander plusieurs instances H100 r\u00e9parties, utilisez l'option Slurm `--gpus=h100:n`, o\u00f9 'n' est le nombre de GPU demand\u00e9."
   },
   {
-    "question": "Comment demander plusieurs instances H100 r\u00e9parties en sp\u00e9cifiant un nombre 'n' de GPU ?",
-    "answer": "Utilisez `--gpus=h100:n`, o\u00f9 'n' est le nombre de GPU demand\u00e9."
+    "question": "Quelle technologie est utilis\u00e9e par environ la moiti\u00e9 des n\u0153uds GPU, et combien de tailles d'instances sont disponibles?",
+    "answer": "Environ la moiti\u00e9 des n\u0153uds GPU utilisent la technologie MIG, et trois tailles d'instances sont disponibles."
   },
   {
-    "question": "Quelle technologie est utilis\u00e9e par environ la moiti\u00e9 des n\u0153uds GPU pour des instances partielles ?",
-    "answer": "Environ la moiti\u00e9 des n\u0153uds GPU utilisent la technologie MIG (Multi-Instance GPU)."
+    "question": "D\u00e9crivez l'instance GPU '1g.10gb' et comment la demander avec Slurm.",
+    "answer": "L'instance '1g.10gb' offre 1/8e de la puissance de calcul avec 10GB de m\u00e9moire GPU. Pour la demander, utilisez l'option Slurm `--gpus=nvidia_h100_80gb_hbm3_1g.10gb:1`."
   },
   {
-    "question": "Quelles sont les trois tailles d'instances MIG disponibles et leurs caract\u00e9ristiques ?",
-    "answer": "Les trois tailles d'instances MIG disponibles sont:\n- `1g.10gb` : 1/8 de la puissance de calcul avec 10GB de m\u00e9moire GPU\n- `2g.20gb` : 2/8 de la puissance de calcul avec 20GB de m\u00e9moire GPU\n- `3g.40gb` : 3/8 de la puissance de calcul avec 40GB de m\u00e9moire GPU."
+    "question": "D\u00e9crivez l'instance GPU '2g.20gb' et comment la demander avec Slurm.",
+    "answer": "L'instance '2g.20gb' offre 2/8e de la puissance de calcul avec 20GB de m\u00e9moire GPU. Pour la demander, utilisez l'option Slurm `--gpus=nvidia_h100_80gb_hbm3_2g.20gb:1`."
   },
   {
-    "question": "Comment demander une instance GPU MIG '1g.10gb' avec Slurm ?",
-    "answer": "Utilisez `--gpus=nvidia_h100_80gb_hbm3_1g.10gb:1` pour demander une instance MIG '1g.10gb'."
-  },
-  {
-    "question": "Comment demander une instance GPU MIG '2g.20gb' avec Slurm ?",
-    "answer": "Utilisez `--gpus=nvidia_h100_80gb_hbm3_2g.20gb:1` pour demander une instance MIG '2g.20gb'."
-  },
-  {
-    "question": "Comment demander une instance GPU MIG '3g.40gb' avec Slurm ?",
-    "answer": "Utilisez `--gpus=nvidia_h100_80gb_hbm3_3g.40gb:1` pour demander une instance MIG '3g.40gb'."
+    "question": "D\u00e9crivez l'instance GPU '3g.40gb' et comment la demander avec Slurm.",
+    "answer": "L'instance '3g.40gb' offre 3/8e de la puissance de calcul avec 40GB de m\u00e9moire GPU. Pour la demander, utilisez l'option Slurm `--gpus=nvidia_h100_80gb_hbm3_3g.40gb:1`."
   }
 ]

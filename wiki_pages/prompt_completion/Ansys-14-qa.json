@@ -1,46 +1,34 @@
 [
   {
-    "question": "What modules are loaded for a multinode Ansys CFX job using StdEnv/2023?",
-    "answer": "The modules `StdEnv/2023` and `ansys/2023R2` (or newer versions) are loaded for a multinode Ansys CFX job."
+    "question": "How do I submit an Ansys Workbench project to the queue?",
+    "answer": "You can submit an Ansys Workbench project to the queue by customizing one of the provided Slurm scripts (e.g., `script-wbpj-202X.sh`) and then running the `sbatch script-wbpj-202X.sh` command."
   },
   {
-    "question": "How is the number of nodes determined for the `par-dist` option in a multinode Ansys CFX job script?",
-    "answer": "The `NNODES` variable, used for the `par-dist` option, is determined by executing the command `$(slurm_hl2hl.py --format ANSYS-CFX)`."
+    "question": "What are the typical Slurm script requirements for an Ansys Workbench job using StdEnv/2023?",
+    "answer": "For an Ansys Workbench job using StdEnv/2023, the Slurm script typically requires specifying the account (`#SBATCH --account`), time limit (`#SBATCH --time`), total memory (`#SBATCH --mem`), number of cores (`#SBATCH --ntasks`), and must be run on a single node (`#SBATCH --nodes=1`). The script also loads `StdEnv/2023 ansys/2023R2` (or newer versions)."
   },
   {
-    "question": "What is the recommended MPI method for multinode Ansys CFX jobs on Narval clusters?",
-    "answer": "On Narval clusters, the recommended MPI method for multinode Ansys CFX jobs is 'Open MPI Distributed Parallel'."
+    "question": "How do Ansys Workbench Slurm scripts configure shared memory (SMP) or distributed memory (DMP) parallelism?",
+    "answer": "Ansys Workbench Slurm scripts determine the memory parallelism (`MEMPAR`) based on the number of nodes. If `SLURM_NNODES` is 1, `MEMPAR` is set to 0 for Shared Memory Parallel (SMP); otherwise, it's set to 1 for Distributed Memory Parallel (DMP). This value is then written into the `SolveHandlers.xml` file."
   },
   {
-    "question": "Which MPI method is used for multinode Ansys CFX jobs on clusters other than Narval?",
-    "answer": "For clusters other than Narval, 'Intel MPI Distributed Parallel' is used for multinode Ansys CFX jobs."
+    "question": "What commands are used to run Ansys Workbench in a Slurm script?",
+    "answer": "The command `runwb2 -B -E \"Update()\" -F YOURPROJECT.wbpj` is used to run Ansys Workbench in batch mode to update a project. An alternative, commented-out line, `runwb2 -B -E \"Update();Save(Overwrite=True)\" -F YOURPROJECT.wbpj`, shows how to also save the solution."
   },
   {
-    "question": "What are the initial steps to prepare an Ansys Workbench project file before submitting it to a cluster queue for the first time?",
-    "answer": "First, connect to the cluster with TigerVNC. Then, navigate to the project file's directory, start Workbench using the same Ansys module, open the project, right-click 'Setup' and select 'Clear All Generated Data'. Finally, exit Workbench by selecting 'File -> Exit' and click 'No' when prompted to save modifications."
+    "question": "How can I prevent a running Ansys Workbench job from overwriting the solution when it completes successfully?",
+    "answer": "To avoid overwriting the solution, you should remove `;Save(Overwrite=True)` from within the last line of your Workbench Slurm script, leaving only `runwb2 -B -E \"Update()\" -F YOURPROJECT.wbpj`."
   },
   {
-    "question": "How can a user avoid overwriting an initialized solution when running multiple test jobs in Ansys Workbench on a cluster?",
-    "answer": "To avoid overwriting the solution, remove `;Save(Overwrite=True)` from the last line of the Slurm script, or keep a copy of the original `YOURPROJECT.wbpj` file and its corresponding `YOURPROJECT_files` subdirectory and restore them after each run."
+    "question": "What steps are needed to prepare an Ansys Workbench project file before its first submission to a cluster queue?",
+    "answer": "Before submitting a project file for the first time, you need to connect to the cluster with TigerVNC, navigate to the project directory, start Workbench with the same Ansys module used for creation, open the project, right-click 'Setup' and select 'Clear All Generated Data', then exit Workbench without saving the modified project when prompted."
   },
   {
-    "question": "What is the SBATCH directive for specifying the total memory for a single-node Ansys Workbench job in the `script-wbpj-2023.sh` example?",
-    "answer": "The SBATCH directive `--mem=16G` is used to specify 16GB of total memory for a single-node Ansys Workbench job. Users can set it to 0 to allocate all node memory."
+    "question": "How do I generate an input file for Ansys Mechanical APDL jobs?",
+    "answer": "You can generate an input file for Ansys Mechanical APDL jobs from within your interactive Workbench Mechanical session by clicking 'Solution -> Tools -> Write Input Files', then specifying `File name:` as `YOURAPDLFILE.inp` and `Save as type:` as `APDL Input Files (*.inp)`."
   },
   {
-    "question": "How is the `MEMPAR` variable configured in the `script-wbpj-2023.sh` for single-node Ansys Workbench jobs?",
-    "answer": "For single-node Ansys Workbench jobs, `MEMPAR` is set to `0` to indicate Shared Memory Parallel (SMP)."
-  },
-  {
-    "question": "What environment variables are exported in the `script-wbpj-2023.sh` for Ansys Workbench jobs?",
-    "answer": "The environment variables `KMP_AFFINITY=disabled` and `I_MPI_HYDRA_BOOTSTRAP=ssh` are exported in the `script-wbpj-2023.sh`."
-  },
-  {
-    "question": "What is the primary command used to run Ansys Workbench in batch mode within the `script-wbpj-2023.sh`?",
-    "answer": "The primary command is `runwb2 -B -E \"Update()\" -F YOURPROJECT.wbpj`, which runs Workbench in batch mode to update the project without saving by default."
-  },
-  {
-    "question": "Which file is modified by `sed` commands in the Ansys Workbench Slurm script to configure solver settings?",
-    "answer": "The file `~/.mw/Application\\ Data/Ansys/.../SolveHandlers.xml` is modified by `sed` commands to set parameters like 'Distribute' (MEMPAR) and 'MaxNumberProcessors' (SLURM_NTASKS)."
+    "question": "How are Ansys Mechanical APDL jobs submitted to the queue?",
+    "answer": "APDL jobs are submitted to the queue by running the `sbatch script-name.sh` command after creating a suitable Slurm script."
   }
 ]

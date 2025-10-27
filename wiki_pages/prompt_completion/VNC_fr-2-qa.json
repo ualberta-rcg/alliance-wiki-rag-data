@@ -1,82 +1,114 @@
 [
   {
-    "question": "What is required to connect to VNC?",
-    "answer": "You need a VNC server to connect to."
+    "question": "What is required to connect to a VNC server?",
+    "answer": "You need an active VNC server, which can be launched on either a login node or a compute node."
   },
   {
-    "question": "What types of VNC servers can be used for connection?",
-    "answer": "A VNC server launched on a login node or a compute node can be used."
+    "question": "What types of applications are suitable for a remote VNC desktop on a login node?",
+    "answer": "You can use non-GPU demanding applications, provided they adhere to certain memory and CPU time limits."
   },
   {
-    "question": "What kind of applications are suitable for a remote VNC desktop on a login node?",
-    "answer": "Less demanding applications that do not require a GPU are suitable, subject to certain memory and CPU time limits."
+    "question": "How do I connect to a login node, for example, Nibi?",
+    "answer": "You can connect using the SSH command: `ssh nibi.alliancecan.ca`."
   },
   {
-    "question": "What is the initial step to use a VNC desktop on a login node?",
-    "answer": "First, connect to a login node, for example, on Nibi."
+    "question": "What should I do before starting a new vncserver on a login node?",
+    "answer": "You should check for and kill any unneeded active vncservers using `vncserver -list` and `pkill Xvnc -u $USER` respectively."
   },
   {
-    "question": "How do you connect to a Nibi login node from your laptop?",
-    "answer": "Use the command `ssh nibi.alliancecan.ca`."
+    "question": "How do I start a vncserver on a login node with an idle timeout?",
+    "answer": "You can launch it using a command like: `vncserver -idletimeout 86400`."
   },
   {
-    "question": "How can you check for active VNC servers on the connected Nibi login node?",
-    "answer": "Launch `vncserver -list` to see if other vncservers you no longer need are still active."
+    "question": "What is the vncserver command (provided by StdEnv/2023) based on?",
+    "answer": "The vncserver command is based on TurboVNC."
   },
   {
-    "question": "What command is used to kill unwanted active VNC servers on a login node?",
-    "answer": "The `pkill` command is used to kill them."
+    "question": "What is the purpose of the `-idletimeout seconds` option when starting a vncserver?",
+    "answer": "This option will cause your vncserver to definitively close after the specified number of seconds if there's no connection to VNC Viewer, in case you forget to log out of your session."
   },
   {
-    "question": "Provide the command to kill all Xvnc processes for the current user on a login node.",
-    "answer": "The command is `pkill Xvnc -u $USER`."
+    "question": "What needs to be done the first time a vncserver is started?",
+    "answer": "You will need to define a password, which can be modified later."
   },
   {
-    "question": "What is the first step to launch a VNC server on a login node?",
-    "answer": "Launch `vncserver` on the login node."
+    "question": "How is the VNC password used?",
+    "answer": "This password will be required to connect to your VNC desktop with a vncclient (such as vncviewer)."
   },
   {
-    "question": "What is an example command to start a `vncserver` on a login node with an idle timeout of 86400 seconds?",
-    "answer": "An example command is `vncserver -idletimeout 86400`."
+    "question": "How can I determine the listening port of my new vncserver?",
+    "answer": "You can find the listening port by using the `grep` command on the log file, for example: `grep -iE \"\\sport|kill\" /home/yourusername/.vnc/l4.nibi.sharcnet:1.log`."
   },
   {
-    "question": "What VNC software is the `vncserver` command provided by StdEnv/2023 based on?",
-    "answer": "The `vncserver` command is based on TurboVNC."
+    "question": "Will the vncserver remain active if I exit the login node?",
+    "answer": "Yes, you can exit the login node, and the vncserver will remain active until the idle timeout limit is reached."
   },
   {
-    "question": "What option should be added when starting a new `vncserver` on a login node to ensure it closes after a period of inactivity?",
-    "answer": "Add `idletimeout seconds` to cause the `vncserver` to close after S seconds without connection to VNC Viewer."
+    "question": "How do I start an SSH tunnel to forward a local port to my VNC server's port?",
+    "answer": "On your local machine, you would typically use a command like: `ssh nibi.computecanada.ca -L 5905:l4:5901`, replacing the ports and hostnames as needed."
   },
   {
-    "question": "What must be done when `vncserver` is started for the first time?",
-    "answer": "You must define a password."
+    "question": "How do I connect to the vncviewer after setting up the SSH tunnel?",
+    "answer": "On your computer's command line, enter: `vncviewer localhost:5905`, using the local forwarded port."
   },
   {
-    "question": "What is the purpose of the password set for `vncserver`?",
-    "answer": "The password will be required to connect to your desktop with a VNC client (such as vncviewer)."
+    "question": "Can I connect to vncviewer on macOS or Windows without using the command line?",
+    "answer": "Yes, you can click on the 'TigerVNC Viewer' application icon and enter `localhost:5905` in the 'Connection Details'."
   },
   {
-    "question": "Under what condition is the same password required for multiple VNC connections?",
-    "answer": "The same password is required if `vncserver` was started with the `-alwaysshared` option."
+    "question": "What are the typical resource limits for login nodes, such as Graham?",
+    "answer": "On Graham, these limits are generally 8GB of memory and 1 hour of CPU usage per process, though this can vary by cluster."
   },
   {
-    "question": "How can you determine the listening port of the new `vncserver`?",
-    "answer": "Determine the listening port with the `grep` command on the log file."
+    "question": "When should I consider launching a VNC server on a compute node instead of a login node?",
+    "answer": "You should use a compute node if you need more resources than what's available on login nodes, or if no VDI node is available for dedicated access."
   },
   {
-    "question": "What command can be used to find the TCP port a vncserver is listening on from its log file?",
-    "answer": "The command `grep -iE \"\\sport|kill\" /home/yourusername/.vnc/l4.nibi.sharcnet:1.log` can be used."
+    "question": "What is the first step to start a VNC server on a compute node?",
+    "answer": "First, connect to a cluster (e.g., Nibi) and create an allocation on a compute node using the `salloc` command."
   },
   {
-    "question": "What happens to the vncserver if you quit the login node after starting it with an idle timeout?",
-    "answer": "The vncserver will remain active until the time limit defined with the `-idletimeout` option is reached."
+    "question": "How do I request an interactive job with specific resources using `salloc`?",
+    "answer": "For example, to request 4 CPUs and 16GB of memory for 1 hour, you would use: `salloc --time=1:00:00 --cpus-per-task=4 --mem=16000 --account=def-piusername`."
   },
   {
-    "question": "What is the third step on your local machine to connect to the VNC server?",
-    "answer": "Start an SSH tunnel to forward an arbitrary local port (e.g., 5905) to the port your VNC server is listening on (e.g., 5901)."
+    "question": "What environment variable should be set after an interactive task is started on a compute node?",
+    "answer": "You should define `export XDG_RUNTIME_DIR=${SLURM_TMPDIR}` to avoid repetitive errors."
   },
   {
-    "question": "What is an example SSH command to set up port forwarding for a VNC connection from your laptop to a login node, forwarding local port 5905 to remote port 5901 on 'l4'?",
-    "answer": "An example command is `ssh nibi.computecanada.ca -L 5905:l4:5901`."
+    "question": "What happens if I start `vncserver` for the first time on a compute node?",
+    "answer": "An invite will ask for a password for your VNC server, which you must enter for security."
+  },
+  {
+    "question": "How can I change my VNC password after it has been set?",
+    "answer": "You can change your VNC password later using the `vncpasswd` command."
+  },
+  {
+    "question": "How do I establish an SSH tunnel to a VNC server on a compute node for clusters other than Nibi?",
+    "answer": "You can use the format: `ssh username@clustername -L localforwardedport:computnode:remotelisteningport`. For example, `ssh username@rorqual.alliancecan.ca -L 5905:rc12509:5901`."
+  },
+  {
+    "question": "How do I establish an SSH tunnel to a VNC server on a compute node for Nibi?",
+    "answer": "For Nibi, use the format: `ssh -J username@clustername -L localforwardedport:localhost:remotelisteningport computenode`. For example, `ssh -J username@nibi.alliancecan.ca -L 5905:localhost:5901 c48`."
+  },
+  {
+    "question": "What additional requirement is there for establishing an SSH tunnel to Nibi?",
+    "answer": "An SSH key pair must be created on your local machine, with the public key entered into your `~/.ssh/authorized_keys` file on Nibi."
+  },
+  {
+    "question": "What happens if I disconnect the node to which my SSH tunnel is connected?",
+    "answer": "You will no longer be able to connect to the VNC server with vncviewer, but the vncserver will continue to run, and you can access it with a new tunnel."
+  },
+  {
+    "question": "After connecting with vncviewer, what Linux desktop will be displayed?",
+    "answer": "A MATE Linux desktop will be displayed."
+  },
+  {
+    "question": "How do I launch a terminal within the MATE desktop environment?",
+    "answer": "You can launch a terminal by clicking on 'Applications -> System Tools -> MATE Terminal' in the top menu."
+  },
+  {
+    "question": "How do I launch a complex program like MATLAB on the VNC desktop?",
+    "answer": "First, load the necessary module, then execute the `matlab` command as you would in a normal `bash` session."
   }
 ]

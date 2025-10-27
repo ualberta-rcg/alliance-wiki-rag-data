@@ -1,62 +1,54 @@
 [
   {
-    "question": "When is it useful to modify the JULIA_THREAD_SLEEP_THRESHOLD variable?",
-    "answer": "It can be useful to modify this variable when multiple threads frequently contend for a shared resource, as it might be preferable to eliminate spinning threads more quickly."
+    "question": "Dans quel cas est-il utile de modifier la variable JULIA_THREAD_SLEEP_THRESHOLD ?",
+    "answer": "Il est utile de modifier la variable JULIA_THREAD_SLEEP_THRESHOLD lorsque plusieurs fils se disputent fr\u00e9quemment une ressource partag\u00e9e, car cela permet d'\u00e9liminer plus rapidement les fils en rotation."
   },
   {
-    "question": "What is the impact of spinning threads in a high-contention scenario?",
-    "answer": "In a context of strong contention, spinning threads would only increase the load on the CPUs."
+    "question": "Quel est l'impact des fils en rotation dans un contexte de forte concurrence ?",
+    "answer": "Dans un contexte de forte concurrence, les fils en rotation ne feraient qu'augmenter la charge sur les CPU."
   },
   {
-    "question": "What effect does setting the JULIA_THREAD_SLEEP_THRESHOLD to infinite have?",
-    "answer": "When a resource is rarely solicited, a low latency can occur if threads are prevented from sleeping by setting the threshold to infinite."
+    "question": "Comment peut-on atteindre une basse latence lorsque une ressource est rarement sollicit\u00e9e via JULIA_THREAD_SLEEP_THRESHOLD ?",
+    "answer": "Une basse latence peut se produire si l'on refuse aux fils de dormir, ce qui est r\u00e9alis\u00e9 en d\u00e9finissant le seuil de JULIA_THREAD_SLEEP_THRESHOLD comme \u00e9tant infini."
   },
   {
-    "question": "When should JULIA_THREAD_SLEEP_THRESHOLD values be configured?",
-    "answer": "These values should only be configured after profiling potential concurrency problems."
+    "question": "Quand faut-il configurer les valeurs li\u00e9es au comportement des fils dans Julia ?",
+    "answer": "Ces valeurs ne devraient \u00eatre configur\u00e9es qu'apr\u00e8s avoir profil\u00e9 les probl\u00e8mes potentiels de concurrence."
   },
   {
-    "question": "What should users consult before modifying default configurations for Julia's threading?",
-    "answer": "Given that Julia and particularly its Base.Threads evolve very rapidly, users should always consult the documentation to ensure that modifying the default configuration will have the desired result."
+    "question": "Que faut-il faire avant de modifier la configuration par d\u00e9faut de Base.Threads dans Julia ?",
+    "answer": "Il est recommand\u00e9 de toujours consulter la documentation, car Julia et particuli\u00e8rement ses Base.Threads \u00e9voluent tr\u00e8s rapidement, afin de s'assurer que la modification aura le r\u00e9sultat d\u00e9sir\u00e9."
   },
   {
-    "question": "What is the standard programming interface for using GPUs with Julia?",
-    "answer": "The standard programming interface for working with GPUs in Julia is the CUDA.jl package."
+    "question": "Quel est le paquet habituel pour travailler avec les GPU en Julia ?",
+    "answer": "Le paquet CUDA.jl est l'interface de programmation habituelle pour travailler avec les GPU."
   },
   {
-    "question": "How do you install the CUDA.jl package?",
-    "answer": "First, load the necessary modules (`module load cuda/11.4 julia/1.8.1`), then start Julia and run `import Pkg; Pkg.add(\"CUDA\")`."
+    "question": "O\u00f9 et comment installer le paquet CUDA.jl initialement ?",
+    "answer": "Le paquet CUDA.jl doit \u00eatre t\u00e9l\u00e9charg\u00e9 et install\u00e9 sur un n\u0153ud de connexion en utilisant le gestionnaire de paquets Julia, apr\u00e8s avoir charg\u00e9 les modules `cuda` et `julia` et d\u00e9fini `ENV[\"JULIA_PKG_PRECOMPILE_AUTO\"]=0`."
   },
   {
-    "question": "What potential issue might arise during CUDA.jl installation related to the CUDA toolkit?",
-    "answer": "It is possible that the CUDA toolkit downloaded during installation may not work with the installed CUDA driver."
+    "question": "Quelles sont les commandes pour installer CUDA.jl sur un n\u0153ud de connexion ?",
+    "answer": "Sur un n\u0153ud de connexion, il faut ex\u00e9cuter : `$ module load cuda/12.9 julia/1.11.3`, puis dans Julia : `julia> ENV[\"JULIA_PKG_PRECOMPILE_AUTO\"]=0` et `julia> import Pkg; Pkg.add(\"CUDA\")`."
   },
   {
-    "question": "How can you configure Julia to use the local CUDA toolkit to avoid compatibility issues for recent CUDA versions?",
-    "answer": "To configure Julia to use the local CUDA toolkit, load the appropriate `cuda` module, then in Julia, use `using CUDA` and `CUDA.set_runtime_version!(v\"version_of_cuda\", local_toolkit=true)`, replacing \"version_of_cuda\" with the actual version (e.g., 12.2 for `cuda/12.2`)."
+    "question": "Sur quel type de n\u0153ud doit \u00eatre effectu\u00e9e la configuration subs\u00e9quente de CUDA.jl ?",
+    "answer": "Toutes les \u00e9tapes subs\u00e9quentes \u00e0 l'installation de CUDA.jl doivent \u00eatre effectu\u00e9es sur un n\u0153ud de calcul GPU."
   },
   {
-    "question": "How do you configure Julia to use the local CUDA toolkit for older CUDA versions?",
-    "answer": "For older CUDA versions, load the appropriate `cuda` module, then in Julia, use `using CUDA` and `CUDA.set_runtime_version!(\"local\")`."
+    "question": "Comment r\u00e9soudre un probl\u00e8me d'incompatibilit\u00e9 entre la bo\u00eete \u00e0 outils CUDA t\u00e9l\u00e9charg\u00e9e et le pilote CUDA install\u00e9 ?",
+    "answer": "Pour \u00e9viter ce probl\u00e8me, il faut configurer Julia pour utiliser la bo\u00eete \u00e0 outils locale de CUDA avec la commande `julia> CUDA.set_runtime_version!(v\"version_of_cuda\", local_toolkit=true)` sur un n\u0153ud de calcul GPU."
   },
   {
-    "question": "How do you verify the CUDA version after configuring Julia to use the local toolkit?",
-    "answer": "After restarting Julia, run `julia> CUDA.versioninfo()` to verify the CUDA version."
+    "question": "Comment v\u00e9rifier la version de CUDA apr\u00e8s avoir red\u00e9marr\u00e9 Julia et configur\u00e9 la bo\u00eete \u00e0 outils locale ?",
+    "answer": "Apr\u00e8s avoir red\u00e9marr\u00e9 Julia, on peut v\u00e9rifier la version de CUDA en ex\u00e9cutant `julia> CUDA.versioninfo()`."
   },
   {
-    "question": "How can you test if the CUDA.jl installation is working correctly?",
-    "answer": "To test the installation, you can create a CuArray and perform an operation on it, for example: `julia> a = CuArray([1,2,3]); a.+=1`."
+    "question": "Comment peut-on tester l'installation de CUDA.jl ?",
+    "answer": "Pour tester l'installation de CUDA.jl, on peut cr\u00e9er et manipuler un tableau CuArray, par exemple avec `julia> a = CuArray([1,2,3])` suivi de `julia> a.+=1`."
   },
   {
-    "question": "Where can users find more information about Julia?",
-    "answer": "Users can find more information in webinars produced by SHARCNET."
-  },
-  {
-    "question": "What are the titles and durations of the SHARCNET webinars on Julia?",
-    "answer": "The webinars are: \"Julia: A first perspective\" (47 minutes), \"Julia: A second perspective\" (57 minutes), and \"Julia: A third perspective - parallel computing explained\" (65 minutes)."
-  },
-  {
-    "question": "Is there an upcoming webinar about Julia parallel computing?",
-    "answer": "Yes, \"Julia: Parallel computing revisited\" is currently in preparation."
+    "question": "Quels sont les webinaires disponibles de SHARCNET pour Julia ?",
+    "answer": "Les webinaires disponibles de SHARCNET sont 'Julia: A first perspective' (47 minutes), 'Julia: A second perspective' (57 minutes), 'Julia: A third perspective - parallel computing explained' (65 minutes), et 'Julia: Parallel computing revisited' (en pr\u00e9paration)."
   }
 ]

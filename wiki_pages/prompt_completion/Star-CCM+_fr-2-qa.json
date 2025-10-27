@@ -1,62 +1,86 @@
 [
   {
-    "question": "What is the purpose of the 'Scripts pour l'ordonnanceur' section?",
-    "answer": "The 'Scripts pour l'ordonnanceur' section provides example Slurm scripts for submitting STAR-CCM+ batch jobs on different clusters like Fir/Rorqual/Nibi and Narval."
+    "question": "What is the primary purpose of the 'Scripts pour l'ordonnanceur' section?",
+    "answer": "The 'Scripts pour l'ordonnanceur' section provides example Slurm batch scripts for running STAR-CCM+ jobs on different clusters like Fir/Rorqual/Nibi and Narval."
   },
   {
-    "question": "What are the SBATCH directives for the Fir/Rorqual/Nibi cluster script?",
-    "answer": "For the Fir/Rorqual/Nibi cluster, the SBATCH directives are:\n- `--account=def-group` (Specify some account)\n- `--time=00-01:00` (Time limit: dd-hh:mm)\n- `--nodes=1` (Specify 1 or more nodes)\n- `--cpus-per-task=192` (Request all cores per node)\n- `--mem=0` (Request all memory per node)\n- `--ntasks-per-node=1` (Do not change this value)"
+    "question": "What is the recommended filename for STAR-CCM+ scheduler scripts?",
+    "answer": "The recommended filename for STAR-CCM+ scheduler scripts is `starccm_job.sh`."
   },
   {
-    "question": "Which modules are loaded in the STAR-CCM+ job script for Fir/Rorqual/Nibi?",
-    "answer": "The modules loaded in the STAR-CCM+ job script for Fir/Rorqual/Nibi are `StdEnv/2023` and `starccm-mixed/20.04.007`."
+    "question": "Which SBATCH directive is used to specify the account in the provided job scripts?",
+    "answer": "The `SBATCH --account=def-group` directive is used to specify the account."
   },
   {
-    "question": "How is the input simulation file specified in the Fir/Rorqual/Nibi script?",
-    "answer": "The input simulation file is specified by setting the `SIM_FILE` variable, for example, `SIM_FILE='mysample.sim'`."
+    "question": "What is the default time limit set in the example `starccm_job.sh` scripts?",
+    "answer": "The default time limit set is `00-01:00` (1 hour)."
   },
   {
-    "question": "How is the temporary directory for STAR-CCM+ handled in the Fir/Rorqual/Nibi script?",
-    "answer": "The temporary directory is set by exporting `STARCCM_TMP=\"${SCRATCH}/.starccm-${EBVERSIONSTARCCM}\"` and then created with `mkdir -p \"$STARCCM_TMP\"`."
+    "question": "How many nodes are typically requested in the example STAR-CCM+ job scripts?",
+    "answer": "The example scripts typically request 1 node using `SBATCH --nodes=1`."
   },
   {
-    "question": "How is the `NCORE` variable calculated in the Fir/Rorqual/Nibi job script?",
-    "answer": "The `NCORE` variable is calculated as the product of `SLURM_NNODES`, `SLURM_CPUS_PER_TASK`, and `SLURM_NTASKS_PER_NODE` using the expression `NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))`."
+    "question": "How is memory requested in the example STAR-CCM+ job scripts?",
+    "answer": "All memory per node is requested using `SBATCH --mem=0`."
   },
   {
-    "question": "What is the command to run STAR-CCM+ with a Siemens PoD license on Fir/Rorqual/Nibi?",
-    "answer": "If an `LM_PROJECT` variable is set (indicating a Siemens PoD license server), the command to run STAR-CCM+ on Fir/Rorqual/Nibi is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi intel -fabric psm2`."
+    "question": "What value is specified for `ntasks-per-node` in the example scripts, and should it be modified?",
+    "answer": "The value `1` is specified for `ntasks-per-node`, and this value should not be changed."
   },
   {
-    "question": "What MPI implementation is used for STAR-CCM+ jobs on Fir/Rorqual/Nibi?",
-    "answer": "For STAR-CCM+ jobs on Fir/Rorqual/Nibi, the MPI implementation used is `intel -fabric psm2`."
+    "question": "Which standard environment module is loaded in the example STAR-CCM+ scheduler scripts?",
+    "answer": "The `StdEnv/2023` module is loaded."
   },
   {
-    "question": "What are the SBATCH directives for the Narval cluster script?",
-    "answer": "For the Narval cluster, the SBATCH directives are:\n- `--account=def-group` (indiquez le nom du compte)\n- `--time=00-01:00` (indiquez la limite de temps (jj-hh:mm))\n- `--nodes=1` (indiquez 1 ou plusieurs n\u0153uds)\n- `--cpus-per-task=64` (demandez tous les c\u0153urs par n\u0153ud)\n- `--mem=0` (demandez toute la m\u00e9moire par n\u0153ud)\n- `--ntasks-per-node=1` (ne pas modifier)"
+    "question": "Which specific STAR-CCM+ module version is loaded in the example scripts for Fir/Rorqual/Nibi and Narval?",
+    "answer": "The `starccm-mixed/20.04.007` module is loaded in the example scripts."
   },
   {
-    "question": "Which modules are loaded in the STAR-CCM+ job script for Narval?",
-    "answer": "The modules loaded in the STAR-CCM+ job script for Narval are `StdEnv/2023` and `starccm-mixed/20.04.007`."
+    "question": "How is the input simulation file specified in the STAR-CCM+ job scripts?",
+    "answer": "The input simulation file is specified using the `SIM_FILE` variable, for example, `SIM_FILE='mysample.sim'`."
   },
   {
-    "question": "How is the Siemens Power on Demand (PoD) Key specified in the Narval script?",
-    "answer": "In the Narval script, the Siemens Power on Demand (PoD) Key is specified by setting `LM_PROJECT='my22digitpodkey'`, which should be commented out when using an institutional license server."
+    "question": "Is it possible to use a Java macro file with the STAR-CCM+ job scripts, and if so, how is it specified?",
+    "answer": "Yes, an optional Java macro file can be used by uncommenting and setting the `JAVA_FILE` variable, for example, `#JAVA_FILE='mymacros.java'`."
   },
   {
-    "question": "What is the command to run STAR-CCM+ with an institutional license server on Narval?",
-    "answer": "If `LM_PROJECT` is not set (indicating an institutional license server), the command to run STAR-CCM+ on Narval is `starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi openmpi`."
+    "question": "How many CPUs per task are requested for jobs on Fir/Rorqual/Nibi clusters according to the example script?",
+    "answer": "`192` CPUs per task are requested, aiming to utilize all cores per node (noting that the description mentions 32 or 48 cores)."
   },
   {
-    "question": "What MPI implementation is used for STAR-CCM+ jobs on Narval?",
-    "answer": "For STAR-CCM+ jobs on Narval, the MPI implementation used is `openmpi`."
+    "question": "How is the temporary directory for STAR-CCM+ set up in the Fir/Rorqual/Nibi job script?",
+    "answer": "The `STARCCM_TMP` environment variable is set to `${SCRATCH}/.starccm-${EBVERSIONSTARCCM}`, and the directory is then created using `mkdir -p \"$STARCCM_TMP\"`."
   },
   {
-    "question": "What is a key difference in the `--cpus-per-task` SBATCH directive between Fir/Rorqual/Nibi and Narval job scripts?",
-    "answer": "The Fir/Rorqual/Nibi job script requests `--cpus-per-task=192`, while the Narval job script requests `--cpus-per-task=64`."
+    "question": "How do the Fir/Rorqual/Nibi scripts check the license server connectivity?",
+    "answer": "The scripts extract the server and port from the `CDLMD_LICENSE_FILE` and then use `nmap` to check connectivity to that server and port."
   },
   {
-    "question": "What is the difference in MPI fabric/implementation between Fir/Rorqual/Nibi and Narval for STAR-CCM+?",
-    "answer": "Fir/Rorqual/Nibi uses `-mpi intel -fabric psm2` for STAR-CCM+, whereas Narval uses `-mpi openmpi`."
+    "question": "Which MPI implementation and fabric are used for STAR-CCM+ jobs on Fir/Rorqual/Nibi when using a license server?",
+    "answer": "Intel MPI with `psm2` fabric is used (`-mpi intel -fabric psm2`)."
+  },
+  {
+    "question": "How many CPUs per task are requested for jobs on Narval clusters?",
+    "answer": "`64` CPUs per task are requested, aiming to use all cores per node."
+  },
+  {
+    "question": "How is the `LM_PROJECT` variable configured in the example script for Narval?",
+    "answer": "For Siemens Power on Demand (PoD) licenses, `LM_PROJECT='my22digitpodkey'` is set. This line should be commented out when using an institutional license server."
+  },
+  {
+    "question": "Which MPI implementation is used for STAR-CCM+ jobs on Narval when running with a license server?",
+    "answer": "OpenMPI is used (`-mpi openmpi`)."
+  },
+  {
+    "question": "How do the STAR-CCM+ job scripts determine whether to use a Siemens PoD or an institutional license server?",
+    "answer": "The scripts check if the `LM_PROJECT` environment variable is set. If it is (non-empty), the Siemens PoD license server configuration is used; otherwise, the institutional license server configuration is applied."
+  },
+  {
+    "question": "What are some common `jvmargs` passed to the `starccm+` command in the scheduler scripts?",
+    "answer": "Common `jvmargs` include `-Xmx4G` for JVM heap size and `-Djava.io.tmpdir=$SLURM_TMPDIR` for the Java I/O temporary directory."
+  },
+  {
+    "question": "How are parallel execution settings like the number of cores and machinefile configured for `starccm+` in the scripts?",
+    "answer": "The number of cores is set using `-np $NCORE`, and the machinefile is specified with `-machinefile $SLURM_TMPDIR/machinefile`. The `NCORE` variable is calculated based on `SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE`."
   }
 ]

@@ -1,70 +1,86 @@
 [
   {
-    "question": "What is Julia?",
+    "question": "What is Julia designed for?",
     "answer": "Julia is a programming language designed for performance, ease of use, and portability."
   },
   {
-    "question": "How is Julia typically made available on Alliance clusters?",
+    "question": "Where is Julia available on the Alliance clusters?",
     "answer": "Julia is available as a module on the Alliance clusters."
   },
   {
-    "question": "Where are Julia packages installed by default when added to a project for the first time?",
-    "answer": "Packages are downloaded, installed in `~/.julia`, and precompiled the first time they are added to a Julia project."
+    "question": "How are packages installed the first time in a Julia project?",
+    "answer": "The first time a package is added to a Julia project (using Pkg.add or the package mode), it will be downloaded, installed in ~/.julia, and precompiled."
   },
   {
-    "question": "Can different Julia projects share packages or use different versions of the same package?",
-    "answer": "Yes, the data in `~/.julia` will be reused for the same package across different projects. Also, different versions of the same package can coexist in `~/.julia` and be added to different projects."
+    "question": "Can the same Julia package be used in multiple projects?",
+    "answer": "Yes, the same package can be added to different projects, in which case the data in ~/.julia will be reused."
   },
   {
-    "question": "How do Julia projects compare to Python's virtual environments?",
-    "answer": "Compared to Python, Julia projects replace \"virtual environments\" while avoiding code duplication."
+    "question": "Do different versions of the same Julia package coexist?",
+    "answer": "Yes, different versions of the same package can be added to different projects and will coexist in ~/.julia."
   },
   {
-    "question": "How are binary dependencies handled in Julia 1.6 and later versions?",
-    "answer": "From Julia 1.6 onwards, Julia packages include their binary dependencies, so there is no need to load any software module for them."
+    "question": "How do Julia projects compare to Python virtual environments?",
+    "answer": "Compared to Python, Julia projects replace 'virtual environments' while avoiding code duplication."
   },
   {
-    "question": "What issues might arise with Julia 1.5 and earlier versions when a package depends on system-provided binaries?",
-    "answer": "With Julia 1.5 and earlier, users may encounter problems if a package relies on system-provided binaries, as Julia's attempts to install dependencies via `yum` or `apt` (with `sudo`) will not work on Alliance clusters."
+    "question": "How are binary dependencies handled in Julia packages from version 1.6 onwards?",
+    "answer": "From Julia 1.6 onwards, Julia packages include their binary dependencies (such as libraries), so there is no need to load any software module."
   },
   {
-    "question": "What is the recommended procedure to install a Julia 1.5 or earlier package like JLD that depends on HDF5 on Alliance clusters?",
-    "answer": "The recommended procedure involves loading the `gcc`, `hdf5`, and `julia/1.4.1` modules, then inside Julia, using `Libdl` to push `ENV[\"HDF5_DIR\"] * \"/lib\"` to `Libdl.DL_LOAD_PATH`, and finally adding the package using `Pkg.add(\"JLD\")`."
+    "question": "What is the recommendation for loading software modules with Julia 1.6 and later?",
+    "answer": "From Julia 1.6 onwards, it is recommended not to load any software module because Julia packages include their binary dependencies."
   },
   {
-    "question": "Why is it important to extend `Libdl.DL_LOAD_PATH` for older Julia packages like JLD, even on systems where it might seem to work without it?",
-    "answer": "Extending `Libdl.DL_LOAD_PATH` using the environment variable defined by the module (e.g., `HDF5_DIR`) is considered best practice because it ensures uniform functionality across all systems, preventing failures on clusters like Cedar that do not have HDF5 installed system-wide."
+    "question": "What issues might arise with Julia 1.5 and earlier regarding system-provided binaries on clusters?",
+    "answer": "With Julia 1.5 and earlier, you may run into problems if a package depends on system-provided binaries because Julia's attempts to install such dependencies using yum or apt with sudo will not work on our clusters."
   },
   {
-    "question": "Which package is recommended over JLD for HDF5 interactions in Julia, and why?",
-    "answer": "JLD2 is recommended over JLD because it has superseded JLD and no longer relies on a system-installed HDF5 library, making it more portable."
+    "question": "How should Julia's package manager find a system-provided HDF5 library for Julia 1.5 and earlier on clusters?",
+    "answer": "For Julia 1.5 and earlier, you must provide extra information to allow Julia's package manager (Pkg) to find the HDF5 library by loading the appropriate module first and then using the environment variable defined by the module (e.g., HDF5_DIR) to extend Libdl.DL_LOAD_PATH."
   },
   {
-    "question": "What specific issue occurs when installing Julia packages on the Narval cluster?",
-    "answer": "On the Narval cluster, Julia sometimes crashes with a segmentation fault during the precompilation step when installing packages in `/home` directories, due to a bug in the filesystem software."
+    "question": "Provide the command sequence for setting up JLD with a system-provided HDF5 library using Julia 1.4.1.",
+    "answer": "```bash\n$ module load gcc/7.3.0 hdf5 julia/1.4.1\n$ julia\njulia> using Libdl\njulia> push!(Libdl.DL_LOAD_PATH, ENV[\"HDF5_DIR\"] * \"/lib\")\njulia> using Pkg\njulia> Pkg.add(\"JLD\")\njulia> using JLD\n```"
   },
   {
-    "question": "What is the workaround for the package installation issue on the Narval cluster?",
-    "answer": "Until the bug is resolved, users should use an alternate location, such as `/project`, for their Julia \"depot\" on Narval."
+    "question": "Why is it best practice to extend `Libdl.DL_LOAD_PATH` with environment variables for system libraries on all Alliance systems?",
+    "answer": "It's best practice because while it might work without it on systems like Graham (due to system-wide HDF5), it would fail on systems like Cedar. This method ensures uniform functionality on all systems."
   },
   {
-    "question": "Why is installing Julia packages in the home directory potentially problematic?",
-    "answer": "Installing Julia packages in the home directory can create a large number of files (e.g., Gadfly.jl creates about 37,000 files), which can lead to exceeding the user's home directory quota."
+    "question": "Which Julia package has replaced JLD and why is it more portable?",
+    "answer": "The JLD package has been superseded by JLD2, which is more portable because it no longer relies on a system-installed HDF5 library."
   },
   {
-    "question": "How can users change their Julia depot path to avoid home directory quota issues?",
-    "answer": "Users can store their personal Julia depot in a different location, such as their project space, by setting the `JULIA_DEPOT_PATH` environment variable in their `~/.bashrc` file."
+    "question": "What is a known bug related to Julia package installation on the Narval cluster?",
+    "answer": "On the Narval cluster, Julia sometimes crashes with a segmentation fault during the precompilation step when installing packages in /home directories, due to a bug in the filesystem software."
   },
   {
-    "question": "Provide an example of how a user 'alice' in project 'def-bob' would change her Julia depot path.",
-    "answer": "Alice would add `export JULIA_DEPOT_PATH=\"/project/def-bob/alice/julia:$JULIA_DEPOT_PATH\"` to her `~/.bashrc` file."
+    "question": "What is the temporary solution for installing Julia packages on Narval until the filesystem bug is resolved?",
+    "answer": "Until the bug is resolved, you should use an alternate location, such as `/project`, for your Julia 'depot' on Narval."
   },
   {
-    "question": "What happens to the `~/.julia` directory if the `JULIA_DEPOT_PATH` environment variable is changed?",
-    "answer": "The new directory will be used preferentially, but files in `~/.julia` will still be considered, and `~/.julia` will still be used for some files like command history."
+    "question": "Why might installing Julia packages in your home directory cause issues?",
+    "answer": "Installing Julia packages in your home directory can create large numbers of files, potentially causing you to exceed your home directory quota."
   },
   {
-    "question": "What is recommended to do with an existing `~/.julia` depot when changing the depot path to a new location?",
-    "answer": "It is better to remove the existing `~/.julia` depot first using `rm -rf $HOME/.julia`."
+    "question": "How much space and how many files can `Gadfly.jl` create in `~/.julia`?",
+    "answer": "Installing just the `Gadfly.jl` plotting package from an empty `~/.julia` directory can result in around 96MB and 37,000 files, which accounts for 7% of the total number of files allowed by a home directory quota."
+  },
+  {
+    "question": "How can users avoid exceeding their home directory quota when installing many Julia packages?",
+    "answer": "To avoid exceeding the home directory quota, users can store their personal Julia 'depot' (containing packages, registries, precompiled files, etc.) in a different location, such as their project space."
+  },
+  {
+    "question": "How can a user named 'alice' in project 'def-bob' change her Julia depot path?",
+    "answer": "User `alice`, a member of the `def-bob` project, could add `export JULIA_DEPOT_PATH=\"/project/def-bob/alice/julia:$JULIA_DEPOT_PATH\"` to her `~/.bashrc` file."
+  },
+  {
+    "question": "If `JULIA_DEPOT_PATH` is changed, will `~/.julia` still be used?",
+    "answer": "Yes, even after changing `JULIA_DEPOT_PATH`, files in `~/.julia` will still be considered, and `~/.julia` will still be used for some files like command history."
+  },
+  {
+    "question": "What should be done if a user has an existing `~/.julia` depot when moving their depot to a new location?",
+    "answer": "When moving your depot to a different location, it is better to remove your existing `~/.julia` depot first using `rm -rf $HOME/.julia` if you have one."
   }
 ]

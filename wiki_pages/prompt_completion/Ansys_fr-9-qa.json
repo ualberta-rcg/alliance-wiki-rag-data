@@ -1,62 +1,78 @@
 [
   {
-    "question": "What is the purpose of the provided Slurm scripts named 'Plusieurs n\u0153uds (par n\u0153ud + red\u00e9marrage)' and 'Plusieurs n\u0153uds (par c\u0153ur + red\u00e9marrage)'?",
-    "answer": "These scripts are designed to automate the restart of long-running Ansys Fluent simulations from recently saved time-step files, especially for tasks that might exceed the maximum allowed execution time on clusters."
+    "question": "What is the primary purpose of journal files in Ansys Fluent?",
+    "answer": "Journal files can contain all commands of Fluent's Text User Interface (TUI) and can be used to modify simulation parameters or perform a series of simulations under different conditions."
   },
   {
-    "question": "Which Slurm directive is used in these scripts to enable solution restarts?",
-    "answer": "The `#SBATCH --array=1-5%1` directive is used, allowing for a specified number of restart attempts (e.g., 5 in the example)."
+    "question": "How do you configure Fluent journal files to use the more efficient .cas.h5/.dat.h5 file formats starting from version 2020R1?",
+    "answer": "You need to add the command `/file/cff-files yes` to the journal file."
   },
   {
-    "question": "What Ansys Fluent files are required for the restart scripts to function?",
-    "answer": "A group of `sample.cas`, `sample.dat`, and `sample.jou` files must be present initially. Additionally, a `sample-restart.jou`, `sample-restart.cas.h5`, and `sample-restart.dat.h5` are used for subsequent restarts."
+    "question": "What does the command `/file/confirm-overwrite no` achieve in a Fluent journal file?",
+    "answer": "This command prevents Fluent from asking for confirmation when overwriting files by default."
   },
   {
-    "question": "How do these restart scripts handle the latest output files for subsequent restarts?",
-    "answer": "If a job attempt is successful and it's not the last one in the array, the scripts link the most recent `.cas` and `.dat` output files (e.g., `output/*.cas` and `output/*.dat`) to the specified restart filenames (`MYCASFILERES` and `MYDATFILERES`)."
+    "question": "How can a Fluent journal file read an input case and data file named `FFF-in`?",
+    "answer": "It uses the command `/file/read-case-data FFF-in`."
   },
   {
-    "question": "What happens if a job attempt in the array completes successfully?",
-    "answer": "If a job completes successfully, the script prints a success message and then uses `scancel $SLURM_ARRAY_JOB_ID` to terminate the entire Slurm array job."
+    "question": "In a Fluent journal file, what command is used to run the solver for a specified number of iterations, for example, 1000?",
+    "answer": "The command is `/solve/iterate 1000`."
   },
   {
-    "question": "What happens if a job attempt fails and it's not the last attempt in the array?",
-    "answer": "If a job attempt fails and there are still remaining attempts in the array, the script indicates that the job will be resubmitted."
+    "question": "How do you write the final output case and data file named `FFF-out` from a Fluent journal file?",
+    "answer": "The command `/file/write-case-data FFF-out` is used."
   },
   {
-    "question": "What Ansys Fluent version is specified by default in the restart scripts?",
-    "answer": "The `MYVERSION` variable is set to `3d` by default, but it can be changed to `2d`, `2ddp`, or `3ddp`."
+    "question": "What command allows saving a simulation report to a file (e.g., \"My_Simulation_Report.txt\") in a Fluent journal script?",
+    "answer": "The command `/report/summary y \"My_Simulation_Report.txt\"` is used."
   },
   {
-    "question": "How is the total number of cores calculated in the 'Plusieurs n\u0153uds (par n\u0153ud + red\u00e9marrage)' script?",
-    "answer": "The total number of cores (`NCORES`) is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
+    "question": "How can Fluent be cleanly shut down from within a journal file?",
+    "answer": "By using the `/exit` or `exit` command."
   },
   {
-    "question": "How is the total number of cores calculated in the 'Plusieurs n\u0153uds (par c\u0153ur + red\u00e9marrage)' script?",
-    "answer": "The total number of cores (`NCORES`) is calculated as `SLURM_NTASKS * SLURM_CPUS_PER_TASK`."
+    "question": "According to the `sample2.jou` example, how often are data files automatically saved?",
+    "answer": "Data files are automatically saved every 100 iterations, as indicated by `/file/auto-save/data-frequency 100`."
   },
   {
-    "question": "What environment modules are loaded for Ansys Fluent in these restart scripts?",
-    "answer": "The scripts load `StdEnv/2023` and `ansys/2023R2` (or newer versions specific to the cluster)."
+    "question": "How many most recent data files are retained by the auto-save function in the `sample2.jou` example?",
+    "answer": "The 5 most recent data files are retained, as set by `/file/auto-save/retain-most-recent-files y`."
   },
   {
-    "question": "How do these scripts determine the MPI implementation to use on Narval cluster?",
-    "answer": "On the Narval cluster, the scripts conditionally load `intel/2021 intelmpi` (for `EBVERSIONGENTOO == 2020`) or `intel/2023 intelmpi` (for `EBVERSIONGENTOO == 2023`), and unset some Intel MPI variables, before executing Fluent with `affinity=0 -mpi=intel`."
+    "question": "In `sample2.jou`, what is the root name for automatically saved data files?",
+    "answer": "The root name is `output/FFF-out`, which appends the iteration number."
   },
   {
-    "question": "What is the maximum time limit specified for jobs using the 'Plusieurs n\u0153uds (par n\u0153ud + red\u00e9marrage)' script?",
-    "answer": "The script specifies a maximum time limit of `07-00:00` (7 days)."
+    "question": "What command sets the physical time step size to 0.0001 in a transient Fluent simulation journal file?",
+    "answer": "The command is `/solve/set/time-step 0.0001`."
   },
   {
-    "question": "What is the maximum number of nodes that can be specified for Narval in the 'Plusieurs n\u0153uds (par n\u0153ud + red\u00e9marrage)' script?",
-    "answer": "The script notes that for Narval, the maximum number of compute nodes is 1 (`#SBATCH --nodes=1 (narval 1 node max)`)."
+    "question": "How is the reporting interval for convergence monitors set to 1 in a transient simulation journal file like `sample3.jou`?",
+    "answer": "It is set using the command `/solve/set/reporting-interval 1`."
   },
   {
-    "question": "What is the instruction regarding memory allocation in the 'Plusieurs n\u0153uds (par n\u0153ud + red\u00e9marrage)' script?",
-    "answer": "The instruction is `#SBATCH --mem=0`, which means 'Do not change (allocates all memory per compute node)'."
+    "question": "What command is used to initialize the flow using the hybrid method in the `sample3.jou` example?",
+    "answer": "The command is `/solve/initialize/hyb-initialization`."
   },
   {
-    "question": "What is the purpose of the `slurm_hl2hl.py` command in these scripts?",
-    "answer": "The `slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID` command is used to generate a machinefile that Fluent uses for parallel execution, specifically for configuring the communication between nodes."
+    "question": "How are dual-time iterations and maximum iterations per time step specified in a transient Fluent journal file, as shown in `sample3.jou`?",
+    "answer": "They are specified using `/solve/dual-time-iterate 1000 75`, where 1000 is the number of time steps and 75 is the maximum iterations per time step."
+  },
+  {
+    "question": "What is the initial step for using a User-Defined Function (UDF) on the cluster?",
+    "answer": "The first step is to transfer your UDF source file (e.g., `sampleudf.c`) and any additional dependency files to the cluster."
+  },
+  {
+    "question": "Where should the UDF file be placed on the cluster?",
+    "answer": "The UDF must be placed in the same directory where your journal, case, and data files reside."
+  },
+  {
+    "question": "What is an important consideration when transferring a UDF from a Windows machine to a Linux-based cluster?",
+    "answer": "You must ensure that the text mode of your transfer client is used, otherwise Fluent may not be able to read the file correctly on the Linux cluster."
+  },
+  {
+    "question": "Before submitting a job that uses an interpreted or compiled UDF via a journal file, what should be verified in Fluent's GUI?",
+    "answer": "You should verify that the `Interpreted UDFs` and `UDF Library Manager` dialogs are not configured to use a UDF, to ensure only journal file commands have control during job submission."
   }
 ]

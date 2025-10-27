@@ -1,58 +1,90 @@
 [
   {
-    "question": "Which modules should be loaded for Ansys Fluent jobs on compute nodes using `StdEnv/2023`?",
-    "answer": "Users should load `module load StdEnv/2023` and `module load ansys/2023R2` or newer versions."
+    "question": "What is the recommended Slurm account specification for the \"Multinode (by core)\" Fluent script using Intel MPI?",
+    "answer": "The recommended Slurm account specification is `#SBATCH --account=def-group`."
   },
   {
-    "question": "How do you specify the journal file name in the `script-flu-bynode-intel.sh` Slurm script?",
-    "answer": "The journal file name is specified using the `MYJOURNALFILE` variable, for example, `MYJOURNALFILE=sample.jou`."
+    "question": "What is the default time limit specified in the \"Multinode (by core)\" Fluent script using Intel MPI?",
+    "answer": "The default time limit specified is `#SBATCH --time=00-03:00`."
   },
   {
-    "question": "What are the common Fluent versions that can be specified in the Slurm scripts?",
-    "answer": "Common Fluent versions include `2d`, `2ddp`, `3d`, or `3ddp`, specified via the `MYVERSION` variable."
+    "question": "How many total cores are requested by default in the \"Multinode (by core)\" Fluent script using Intel MPI?",
+    "answer": "The script requests 16 total cores by default (`#SBATCH --ntasks=16`)."
   },
   {
-    "question": "How is the machinefile generated for an Intel MPI Fluent job?",
-    "answer": "The machinefile is generated using `slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID`."
+    "question": "What is the memory allocation per CPU in the \"Multinode (by core)\" Fluent script using Intel MPI?",
+    "answer": "The memory allocation per CPU is 4GB (`#SBATCH --mem-per-cpu=4G`)."
   },
   {
-    "question": "How are the total number of cores (`NCORES`) calculated in an Intel MPI Fluent job using the 'Multinode (by node)' script?",
-    "answer": "The total number of cores is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
+    "question": "Which environment module should be loaded according to the \"Multinode (by core)\" Fluent script using Intel MPI?",
+    "answer": "The script specifies `module load StdEnv/2023`."
   },
   {
-    "question": "What is the Fluent command for running a single-node Intel MPI job?",
+    "question": "Which Ansys module version is recommended in the \"Multinode (by core)\" Fluent script using Intel MPI?",
+    "answer": "The recommended Ansys module is `ansys/2023R2` or newer versions."
+  },
+  {
+    "question": "How is the journal file name specified in the \"Multinode (by core)\" Fluent script using Intel MPI?",
+    "answer": "The journal file name is specified by `MYJOURNALFILE=sample.jou`."
+  },
+  {
+    "question": "What are the supported `MYVERSION` values in the Fluent scripts?",
+    "answer": "The supported `MYVERSION` values are 2d, 2ddp, 3d, or 3ddp."
+  },
+  {
+    "question": "How are Intel MPI modules loaded for the Narval cluster when the Gentoo version is 2020?",
+    "answer": "For `EBVERSIONGENTOO == 2020` on the Narval cluster, `intel/2021 intelmpi` should be loaded, and `INTELMPI_ROOT` should be set to `$I_MPI_ROOT/mpi/latest` along with `HCOLL_RCACHE=^ucs`."
+  },
+  {
+    "question": "How are Intel MPI modules loaded for the Narval cluster when the Gentoo version is 2023?",
+    "answer": "For `EBVERSIONGENTOO == 2023` on the Narval cluster, `intel/2023 intelmpi` should be loaded, and `INTELMPI_ROOT` should be set to `$I_MPI_ROOT`."
+  },
+  {
+    "question": "What command is used to generate the machine file for Intel MPI Fluent jobs?",
+    "answer": "The command `slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID` is used to generate the machine file."
+  },
+  {
+    "question": "How is the total number of cores (`NCORES`) calculated in the \"Multinode (by core)\" Fluent script?",
+    "answer": "NCORES is calculated as `SLURM_NTASKS * SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "What is the Fluent command for running a single-node job with Intel MPI?",
     "answer": "The command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE`."
   },
   {
-    "question": "What is the Fluent command for running a multi-node Intel MPI job?",
+    "question": "What is the Fluent command for running a multi-node job on the Nibi cluster with Intel MPI?",
+    "answer": "The command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
+  },
+  {
+    "question": "What is the Fluent command for running a multi-node job on clusters other than Nibi with Intel MPI?",
     "answer": "The command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
   },
   {
-    "question": "How does the 'Multinode (by core)' script specify the total number of cores?",
-    "answer": "It uses the `#SBATCH --ntasks` directive, for example, `#SBATCH --ntasks=16`."
+    "question": "What is the maximum number of cores per node for the Narval cluster specified in the \"Multinode (by node, narval)\" Fluent script using OpenMPI?",
+    "answer": "The maximum number of cores per node for Narval is 64 or less (`#SBATCH --ntasks-per-node=64`)."
   },
   {
-    "question": "How is memory per CPU specified in the 'Multinode (by core)' Fluent script?",
-    "answer": "Memory per CPU is specified using `#SBATCH --mem-per-cpu`, for example, `#SBATCH --mem-per-cpu=4G`."
+    "question": "What memory setting is used for the \"Multinode (by node, narval)\" Fluent script using OpenMPI?",
+    "answer": "The script uses `#SBATCH --mem=0`, which allocates all memory per compute node."
   },
   {
-    "question": "What Open MPI-specific environment variables are set for Fluent jobs on Narval cluster?",
-    "answer": "The `OPENMPI_ROOT` and `OMPI_MCA_hwloc_base_binding_policy` environment variables are exported, for example, `export OPENMPI_ROOT=$EBROOTOPENMPI` and `export OMPI_MCA_hwloc_base_binding_policy=core`."
+    "question": "What environment variables are exported for OpenMPI Fluent jobs?",
+    "answer": "`OPENMPI_ROOT=$EBROOTOPENMPI` and `OMPI_MCA_hwloc_base_binding_policy=core` are exported."
   },
   {
-    "question": "How is the machinefile specifically created for Open MPI Fluent jobs on Narval?",
-    "answer": "It's created by first running `slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/mf-$SLURM_JOB_ID` and then processing that temporary file to generate `/tmp/machinefile-$SLURM_JOB_ID`."
+    "question": "How is the machine file generated for OpenMPI Fluent jobs?",
+    "answer": "First, `slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/mf-$SLURM_JOB_ID` is run, then a loop processes this file to create `/tmp/machinefile-$SLURM_JOB_ID` with host-core counts."
   },
   {
-    "question": "What is the Fluent command for running a single-node Open MPI job on Narval?",
+    "question": "How is the total number of cores (`NCORES`) calculated in the \"Multinode (by node, narval)\" Fluent script using OpenMPI?",
+    "answer": "NCORES is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
+  },
+  {
+    "question": "What is the Fluent command for running a single-node job with OpenMPI?",
     "answer": "The command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pshmem -i $MYJOURNALFILE`."
   },
   {
-    "question": "What is the Fluent command for running a multi-node Open MPI job on Narval?",
+    "question": "What is the Fluent command for running a multi-node job with OpenMPI?",
     "answer": "The command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
-  },
-  {
-    "question": "What Intel MPI modules are loaded on Narval cluster if `EBVERSIONGENTOO` is 2020?",
-    "answer": "If `CC_CLUSTER` is narval and `EBVERSIONGENTOO` is 2020, `intel/2021 intelmpi` modules are loaded."
   }
 ]

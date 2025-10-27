@@ -1,50 +1,54 @@
 [
   {
-    "question": "What is the purpose of the `script-flu-bycore+restart.sh` script?",
-    "answer": "The script automates the restart of Ansys Fluent simulations from recently saved time step files, particularly for tasks that may exceed typical job time limits."
+    "question": "How do you configure Fluent to interpret a User-Defined Function (UDF) at runtime?",
+    "answer": "To configure Fluent to interpret a UDF at runtime, add the command `define/user-defined/interpreted-functions \"sampleudf.c\" \"cpp\" 10000 no` to your journal file before the case/data files are read or initialized. Remember to replace \"sampleudf.c\" with your actual source file name."
   },
   {
-    "question": "How do you specify the number of solution restarts for a Fluent job using this script?",
-    "answer": "The number of restart attempts (or time steps) is specified using the `#SBATCH --array=1-5%1` parameter, where '5' represents the total number of attempts."
+    "question": "What is required before using an interpreted UDF with parallel tasks in Fluent?",
+    "answer": "Before an interpreted UDF can be used with parallel tasks in Fluent, it must be parallelized as described in the dedicated section on parallel UDFs."
   },
   {
-    "question": "What Slurm parameters are configured for a Fluent job requesting restarts by core?",
-    "answer": "The script includes parameters such as `--account` (e.g., `def-group`), `--time` (e.g., `00-03:00`), `--ntasks` (total number of cores, e.g., `16`), `--mem-per-cpu` (e.g., `4G`), `--cpus-per-task=1`, and `--array` (for restarts)."
+    "question": "What is the process for using a compiled UDF in Fluent on the clusters?",
+    "answer": "To use a compiled UDF, it must first be compiled on one of the clusters, which creates a `libudf` subdirectory containing `libudf.so`. This `libudf` directory can then be transferred to other clusters if the same `StdEnv` module version is loaded. In your journal file, uncomment the `load libudf` line to use it, but avoid leaving both `compile` and `load` lines uncommented for submitted tasks."
   },
   {
-    "question": "Which Ansys Fluent module and standard environment are loaded by default in the `bycore+restart.sh` script?",
-    "answer": "The script loads `StdEnv/2023` and `ansys/2023R2` (or newer versions). Older versions like `ansys/2019R3` or `ansys/2021R2` for `StdEnv/2020` are also mentioned as previously supported."
+    "question": "Why can't I just copy the `libudf` directory from my local machine to the cluster?",
+    "answer": "You cannot simply copy the `libudf` directory from a distant system to the cluster because the shared library dependencies will not be met, causing Fluent to crash at startup."
   },
   {
-    "question": "How are the initial and restart journal files specified in the script?",
-    "answer": "The initial journal file is specified by `MYJOUFILE` (e.g., `sample.jou`), and the restart journal file is specified by `MYJOUFILERES` (e.g., `sample-restart.jou`)."
+    "question": "Is it efficient to recompile a UDF for every job submission?",
+    "answer": "No, recompiling a UDF for every job submission by leaving both `compile` and `load` lines uncommented in the journal file is very inefficient and can lead to \"racetime\" build conflicts if multiple jobs run from the same directory."
   },
   {
-    "question": "What is the naming convention for restart case and data files in the script?",
-    "answer": "The restart case file is named `MYCASFILERES` (e.g., `sample-restart.cas.h5`), and the restart data file is named `MYDATFILERES` (e.g., `sample-restart.dat.h5`)."
+    "question": "How can I compile a UDF using Fluent's graphical interface?",
+    "answer": "To compile a UDF using Fluent's graphical interface, add the UDF source file in the \"Compiled UDFs\" dialog box and click \"Build\"."
   },
   {
-    "question": "How does the script determine if it's running the initial job step or a restart step?",
-    "answer": "The script uses the `SLURM_ARRAY_TASK_ID` variable: if `SLURM_ARRAY_TASK_ID == 1`, it's the initial run; otherwise, it's a restart step."
+    "question": "What is necessary for a UDF to work with parallel Fluent tasks?",
+    "answer": "Before a UDF can be used with parallel Fluent tasks (single-node SMP and multi-node MPI), it must be parallelized by adding compilation directives, predicates, and reduction macros to the sequential UDF."
   },
   {
-    "question": "What actions are taken after a successful step in a restart job to prepare for the next restart?",
-    "answer": "If a step completes successfully and more restarts are pending, the script creates symbolic links (`ln -sfv`) for `MYCASFILERES` and `MYDATFILERES` to point to the most recently saved output case and data files in the `output/` directory."
+    "question": "What happens if a UDF is not parallelized for parallel Fluent tasks?",
+    "answer": "If a UDF is not parallelized for parallel Fluent tasks, Fluent will run slowly at best or crash immediately at worst."
   },
   {
-    "question": "How does the script handle job completion or failure in a restart sequence?",
-    "answer": "If Fluent completes successfully (`$? -eq 0`), the script echoes success and cancels the array job. If it fails, it echoes a failure message and will proceed to the next attempt in the array if `SLURM_ARRAY_TASK_ID` is less than `SLURM_ARRAY_TASK_COUNT`."
+    "question": "Where can I find detailed information on parallelizing a UDF?",
+    "answer": "Detailed information on parallelizing a UDF can be found in the `Fluent Customization Manual, Part I: Chapter 7: Parallel Considerations`, which is available in the online documentation."
   },
   {
-    "question": "What is the primary function of Fluent journal files?",
-    "answer": "Fluent journal files contain Text User Interface (TUI) commands that can be used to modify simulation parameters, such as temperature, pressure, or flow speed, and to perform a series of simulations under different conditions."
+    "question": "How are UDFs used to customize Discrete Phase Models (DPM) in Fluent?",
+    "answer": "UDFs can customize DPM by defining particle injections through `Point Properties` in the graphical interface or by reading an injection text file. Once configured, commands can be added to the journal file to automate these steps, such as `/define/models/dpm/interaction/coupled-calculations yes` and `/define/models/dpm/injections/create`."
   },
   {
-    "question": "How do journal files manage different Fluent file formats?",
-    "answer": "Journal files use `/file/cff-file no` for the `.cas/.dat` formats (default for modules up to 2019R3) and `/file/cff-files yes` for the more efficient `.cas.h5/.dat.h5` formats (from 2020R1 onwards)."
+    "question": "What kind of information is specified in `Point Properties` for DPM injection?",
+    "answer": "`Point Properties` for DPM injection specify variables like source position, initial trajectory, mass flow rate, duration, temperature, and more, depending on the injection type."
   },
   {
-    "question": "Where can users find more detailed information about Fluent TUI commands for journal files?",
-    "answer": "Users should consult the Fluent user guide for further information and a comprehensive list of commands."
+    "question": "What is the typical file extension for manually created injection text files for DPM?",
+    "answer": "Manually created injection text files for DPM usually have a `.inj` extension."
+  },
+  {
+    "question": "How do you enable interaction between the discrete and continuous phases in the Discrete Phase Model?",
+    "answer": "To enable interaction, you need to select `Interaction with Continuous Phase` in the Discrete Phase Model dialog box, which updates DPM source terms at each flow iteration. This can also be set via the journal file with `/define/models/dpm/interaction/coupled-calculations yes`."
   }
 ]

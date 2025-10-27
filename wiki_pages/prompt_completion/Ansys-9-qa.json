@@ -1,42 +1,50 @@
 [
   {
-    "question": "What module versions are specified for Ansys Fluent jobs using the multinode restart script?",
-    "answer": "The script specifies loading `StdEnv/2023` and `ansys/2023R2` (or newer versions) for Beluga, Cedar, Graham, and Narval clusters."
+    "question": "What is the filename for the Ansys Fluent multinode (by node + restart) Slurm script?",
+    "answer": "The filename is `script-flu-bynode+restart.sh`."
   },
   {
-    "question": "What variables need to be customized in the Ansys Fluent multinode restart script?",
-    "answer": "You need to customize `MYVERSION` (e.g., '2d', '2ddp', '3d', '3ddp'), `MYJOUFILE` (your initial journal filename), `MYJOUFILERES` (your journal restart filename), `MYCASFILERES` (your case restart filename), and `MYDATFILERES` (your data restart filename)."
+    "question": "What is the primary purpose of the `script-flu-bynode+restart.sh` Slurm script?",
+    "answer": "It is designed to automate restarting very large Ansys Fluent jobs that exceed typical runtime limits, by restarting from the most recent saved time step files."
   },
   {
-    "question": "How are the total number of cores (`NCORES`) calculated in the Ansys Fluent multinode restart script?",
+    "question": "What is the default time limit specified for a job using the `script-flu-bynode+restart.sh` script?",
+    "answer": "The default time limit is `07-00:00`, which corresponds to 7 days."
+  },
+  {
+    "question": "How many solution restarts are specified by default in this script?",
+    "answer": "The script specifies 5 solution restarts (`#SBATCH --array=1-5%1`)."
+  },
+  {
+    "question": "What Ansys Fluent version is loaded by default in the `script-flu-bynode+restart.sh`?",
+    "answer": "The script loads `ansys/2023R2`, but notes that newer versions can also be specified."
+  },
+  {
+    "question": "Which user-defined variables must be customized in the `script-flu-bynode+restart.sh`?",
+    "answer": "Users need to specify `MYVERSION` (e.g., 2d, 2ddp, 3d, or 3ddp), `MYJOUFILE` (initial journal filename), `MYJOUFILERES` (restart journal filename), `MYCASFILERES` (restart case filename), and `MYDATFILERES` (restart data filename)."
+  },
+  {
+    "question": "How does the script determine whether to run an initial job or a restart job?",
+    "answer": "It uses `SLURM_ARRAY_TASK_ID`. If `SLURM_ARRAY_TASK_ID` is 1, it executes the initial journal file (`$MYJOUFILE`). For any subsequent `SLURM_ARRAY_TASK_ID`, it uses the restart journal file (`$MYJOUFILERES`)."
+  },
+  {
+    "question": "What mechanism is used to ensure subsequent restarts use the latest output files?",
+    "answer": "After a successful job attempt (if not the final one), the script creates symbolic links (`ln -sfv`) from the most recent `.cas` and `.dat` files found in the `output/` directory to the `MYCASFILERES` and `MYDATFILERES` paths for the next restart."
+  },
+  {
+    "question": "What is the output message if a job attempt fails, but more restarts are scheduled?",
+    "answer": "The script will output \"Job attempt $SLURM_ARRAY_TASK_ID of $SLURM_ARRAY_TASK_COUNT failed due to license or simulation issue!\" followed by \"Resubmitting job now \u2026\" if there are remaining array tasks."
+  },
+  {
+    "question": "What happens when all specified job attempts in the array fail?",
+    "answer": "If all job attempts fail, the script outputs \"All job attempts failed exiting now.\" and the job terminates."
+  },
+  {
+    "question": "How is the total number of cores (`NCORES`) calculated within this script?",
     "answer": "The total number of cores (`NCORES`) is calculated as the product of `SLURM_NNODES`, `SLURM_NTASKS_PER_NODE`, and `SLURM_CPUS_PER_TASK`."
   },
   {
-    "question": "What command is used to generate the machine file for Ansys Fluent multinode jobs in the restart script?",
-    "answer": "The command `slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID` is used to generate the machine file."
-  },
-  {
-    "question": "How does the Fluent multinode restart script handle single-node versus multi-node execution?",
-    "answer": "For single-node execution (`SLURM_NNODES == 1`), Fluent is run with `-pshmem`. For multi-node execution, it uses `-pib` and specifies the machine file with `-cnf=/tmp/machinefile-$SLURM_JOB_ID`."
-  },
-  {
-    "question": "How does the Ansys Fluent restart script differentiate between an initial run and a subsequent restart?",
-    "answer": "The script checks the `SLURM_ARRAY_TASK_ID`. If `SLURM_ARRAY_TASK_ID` is 1, it uses `MYJOUFILE` for the initial run. Otherwise, it uses `MYJOUFILERES` for restarts."
-  },
-  {
-    "question": "What happens after a successful completion of a Fluent job within the restart script?",
-    "answer": "If the job completes successfully (`$? -eq 0`), and it's not the last task in the array (`SLURM_ARRAY_TASK_ID -lt SLURM_ARRAY_TASK_COUNT`), it links the most recent output `.cas` and `.dat` files to the restart filenames (`MYCASFILERES`, `MYDATFILERES`) to prepare for the next restart. If it's the last task, it prints 'Job completed successfully! Exiting now.' and calls `scancel` on the job ID."
-  },
-  {
-    "question": "What actions are taken if a Fluent simulation fails in the restart script?",
-    "answer": "If the simulation fails, the script prints 'Simulation failed. Exiting \u2026'."
-  },
-  {
-    "question": "What older Ansys and StdEnv module versions are explicitly mentioned as no longer supported or older in the script?",
-    "answer": "The script comments indicate that `StdEnv/2020` is 'no longer supported' and `ansys/2019R3` (narval only) and `ansys/2021R2` (beluga, cedar, graham) are 'older versions'."
-  },
-  {
-    "question": "What specific configurations are applied if the cluster is 'narval' and `EBVERSIONGENTOO` is 2020 in the Fluent restart script?",
-    "answer": "If the cluster is 'narval' and `EBVERSIONGENTOO` is 2020, the script loads `intel/2021 intelmpi`, sets `INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest`, sets `HCOLL_RCACHE=^ucs`, and unsets `I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS` and `I_MPI_ROOT`."
+    "question": "How does the script configure MPI settings for different clusters?",
+    "answer": "If `CC_CLUSTER` is `narval` and `EBVERSIONGENTOO` is 2020 or 2023, it loads specific Intel MPI modules. For multi-node execution, it uses `-peth` for `nibi` and `-pib` for other clusters, alongside the `intel` MPI library."
   }
 ]

@@ -1,42 +1,46 @@
 [
   {
-    "question": "What is the purpose of the `script-flu-bynode-openmpi.sh` script for Ansys Fluent?",
-    "answer": "This Slurm script is designed for running Ansys Fluent in multinode mode on Narval clusters using Open MPI, configured to allocate all memory per compute node."
+    "question": "How is the total number of cores (NCORES) calculated in the Fluent multinode (by node) OpenMPI script for Narval?",
+    "answer": "The NCORES variable is calculated by multiplying `SLURM_NNODES`, `SLURM_NTASKS_PER_NODE`, and `SLURM_CPUS_PER_TASK`."
   },
   {
-    "question": "Which modules are required to run Ansys Fluent with the `script-flu-bynode-openmpi.sh` on Narval?",
-    "answer": "You need to load `StdEnv/2023` and `ansys/2023R2` (or newer versions specific to Narval)."
+    "question": "What command is used to execute Fluent for a single node in a multinode (by node) OpenMPI script on Narval?",
+    "answer": "For a single node, Fluent is executed with: `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pshmem -i $MYJOURNALFILE`."
   },
   {
-    "question": "How is the total number of cores calculated within the `script-flu-bynode-openmpi.sh` script?",
-    "answer": "The total number of cores (`NCORES`) is calculated by multiplying `SLURM_NNODES` (number of nodes), `SLURM_NTASKS_PER_NODE` (tasks per node), and `SLURM_CPUS_PER_TASK` (CPUs per task)."
+    "question": "What command is used to execute Fluent for multiple nodes in a multinode (by node) OpenMPI script on Narval?",
+    "answer": "For multiple nodes, Fluent is executed with: `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
   },
   {
-    "question": "What is the maximum number of cores per node specified for Narval in the `script-flu-bynode-openmpi.sh` script?",
-    "answer": "The script specifies 64 cores per node or less for Narval."
+    "question": "What are the Slurm directives specified for memory and tasks in the Fluent multinode (by core) OpenMPI script on Narval?",
+    "answer": "The script specifies `#SBATCH --ntasks=16` for the total number of cores and `#SBATCH --mem-per-cpu=4G` for memory per core."
   },
   {
-    "question": "How does the `script-flu-bynode-openmpi.sh` script differentiate Fluent execution for single versus multiple nodes?",
-    "answer": "For a single node (`$SLURM_NNODES == 1`), Fluent runs with `-pshmem`. For multiple nodes, it uses `-pib` and specifies a machinefile (`-cnf=/tmp/machinefile-$SLURM_JOB_ID`)."
+    "question": "Which modules should be loaded for the Fluent multinode (by core) OpenMPI script on Narval?",
+    "answer": "The script loads `StdEnv/2023` and `ansys/2023R2` (or newer versions)."
   },
   {
-    "question": "What is the key difference in Slurm memory allocation between the 'by node' and 'by core' OpenMPI scripts for Fluent on Narval?",
-    "answer": "The 'by node' script (`script-flu-bynode-openmpi.sh`) uses `--mem=0` to allocate all memory per compute node, while the 'by core' script (`script-flu-bycore-openmpi.sh`) uses `--mem-per-cpu` to specify memory per core."
+    "question": "What OpenMPI-related environment variables are set in the Fluent multinode (by core) OpenMPI script on Narval?",
+    "answer": "The script sets `export OPENMPI_ROOT=$EBROOTOPENMPI` and `export OMPI_MCA_hwloc_base_binding_policy=core`."
   },
   {
-    "question": "What user-defined variables must be specified in the Ansys Fluent Slurm scripts for Narval?",
-    "answer": "Users must specify `MYJOURNALFILE` (your journal file name) and `MYVERSION` (e.g., '3d' for 3D double precision)."
+    "question": "How is the total number of cores (NCORES) calculated in the Fluent multinode (by core) OpenMPI script on Narval?",
+    "answer": "NCORES is calculated as `SLURM_NTASKS * SLURM_CPUS_PER_TASK`."
   },
   {
-    "question": "Which modules are necessary for running Ansys Fluent on Niagara using the `script-flu-bynode-intel-nia.sh` script?",
-    "answer": "The required modules are `CCEnv`, `StdEnv/2023`, `arch/avx512`, and `ansys/2023R2` (or newer versions available on Niagara)."
+    "question": "What is the maximum number of cores per node allowed on Trillium for a Fluent job according to the multinode (by node) Intel script?",
+    "answer": "The maximum number of cores per node specified in the script for Trillium is 192."
   },
   {
-    "question": "What is the recommended maximum number of cores per node for Niagara in the `script-flu-bynode-intel-nia.sh` script?",
-    "answer": "The script recommends 80 cores per node or less for Niagara."
+    "question": "Which Ansys module is loaded in the Fluent multinode (by node) Intel script for Trillium?",
+    "answer": "The script loads `ansys/2023R2` (or newer versions) along with `StdEnv/2023`."
   },
   {
-    "question": "How is memory configured in the `script-flu-bynode-intel-nia.sh` Slurm script for Niagara?",
-    "answer": "The script sets `#SBATCH --mem=0`, which allocates all available memory per compute node."
+    "question": "How are license server settings configured in the Fluent multinode (by node) Intel script for Trillium, and what values are used?",
+    "answer": "The script specifies `LICSERVER=license1.computecanada.ca`, `FLEXPORT=1055`, and `VENDPORT=1793`. It then uses `ssh tri-gw` to tunnel these ports to `localhost` and sets `ANSYSLMD_LICENSE_FILE` and `ANSYSLI_SERVERS` accordingly, overriding the `~/.licenses/ansys.lic` file."
+  },
+  {
+    "question": "Where is the machinefile for Fluent stored when running the multinode (by node) Intel script on Trillium?",
+    "answer": "The machinefile is stored at `$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID`."
   }
 ]

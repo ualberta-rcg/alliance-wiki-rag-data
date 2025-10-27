@@ -1,62 +1,82 @@
 [
   {
-    "question": "Where can users find product release and update information for Ansys?",
-    "answer": "Ansys posts Product Release and Updates for the latest versions on their website, and similar information for previous releases can be found on the Ansys blog page using the FILTERS search bar, or by specifying a version number in the Press Release search bar."
-  },
-  {
-    "question": "What is the latest Ansys release module that was recently installed?",
-    "answer": "The module for the latest ANSYS release recently installed is `ansys/2025R1.02`."
-  },
-  {
-    "question": "What is required to use the ansys/2025R1.02 module?",
-    "answer": "To use the `ansys/2025R1.02` module, a suitably updated license server, such as CMCs, is required."
-  },
-  {
-    "question": "Which Ansys module versions are currently supported by the SHARCNET license server?",
-    "answer": "Until its upgrade is complete, the SHARCNET license server will only support jobs run with `ansys/2024R2.04` or older versions."
-  },
-  {
-    "question": "How should users request the installation of a new Ansys version or report a problem with an existing module?",
-    "answer": "Users should submit a ticket to technical support to request a new version installation or report a problem with an existing module."
-  },
-  {
-    "question": "How are Ansys service packs reflected in module names starting with Ansys 2024?",
-    "answer": "Starting with Ansys 2024, a separate Ansys module will appear with a decimal and two digits after the release number whenever a service pack is installed, such as `ansys/2024R1.03` for Service Pack 3."
-  },
-  {
-    "question": "How can users load the latest module version that includes the latest installed service pack?",
-    "answer": "Most users can load the latest module version equipped with the latest installed service pack by simply running `module load ansys`."
-  },
-  {
-    "question": "Are Ansys service packs expected to impact numerical results?",
-    "answer": "While service packs are not expected to impact numerical results, the changes they make are extensive, allowing groups to continue using earlier versions if computations were already done with them."
-  },
-  {
-    "question": "Where can users find detailed descriptions of Ansys service pack changes?",
-    "answer": "Detailed descriptions of what each service pack does can be found by searching the link `https://storage.ansys.com/staticfiles/cp/Readme/release2024R1/info_combined.pdf` for 'Service Pack Details', and future versions will be similarly searchable by modifying the version number in the link."
-  },
-  {
-    "question": "What is the typical procedure for running an Ansys Fluent job on a cluster?",
-    "answer": "The typical procedure involves preparing the job on a desktop using Ansys Workbench, exporting case and data files, transferring them to a cluster's `/project` or `/scratch` filesystem, creating a journal file, running the solver, and then downloading the results for import back into Fluent."
-  },
-  {
-    "question": "How do you prepare a Fluent job on a desktop machine?",
-    "answer": "You prepare your Fluent job using Fluent from the Ansys Workbench on your desktop machine up to the point where you would run the calculation."
-  },
-  {
-    "question": "How do you export a case file from Ansys Fluent?",
-    "answer": "You can export the case file from Ansys Fluent using `File > Export > Case\u2026`."
-  },
-  {
-    "question": "How do you export a data file if you want to continue a previous Ansys Fluent calculation?",
-    "answer": "If you need to continue a previous calculation, you can export a data file using `File > Export > Data\u2026`."
-  },
-  {
-    "question": "Where should Fluent case and data files be transferred on the cluster?",
-    "answer": "The case and data files should be transferred to a directory on the `/project` or `/scratch` filesystem on the cluster."
+    "question": "Where should Ansys Fluent case and data files be transferred on the cluster?",
+    "answer": "The case file and, if needed, the data file should be transferred to a directory on the `/project` or `/scratch` filesystem on the cluster."
   },
   {
     "question": "What is the purpose of a journal file in Ansys Fluent?",
-    "answer": "A journal file's purpose in Ansys Fluent is to load the case file (and optionally the data file), run the solver, and finally write the results."
+    "answer": "A journal file is used to load the case file (and optionally the data file), run the solver, and finally write the results."
+  },
+  {
+    "question": "What parameters need to be adjusted in a journal file?",
+    "answer": "You need to adjust the filenames and the desired number of iterations in the journal file."
+  },
+  {
+    "question": "When should I consider modifying my Slurm script to requeue Ansys Fluent jobs?",
+    "answer": "You should consider modifying your script to requeue jobs if they frequently fail to start due to license shortages and manual resubmission is not convenient."
+  },
+  {
+    "question": "What is the maximum number of times an Ansys Fluent job can be requeued due to license shortages?",
+    "answer": "An Ansys Fluent job can be requeued up to 4 times."
+  },
+  {
+    "question": "What is a potential risk of using job requeueing for Ansys Fluent simulations?",
+    "answer": "A potential risk is that simulations failing due to non-license related issues (such as divergence) will also be requeued, resulting in lost compute time."
+  },
+  {
+    "question": "What is recommended to confirm if a requeued job failure is license-related?",
+    "answer": "It is strongly recommended to monitor and inspect each Slurm output file to confirm each requeue attempt is license related."
+  },
+  {
+    "question": "What should be done if a requeued Ansys Fluent job fails due to a simulation issue?",
+    "answer": "If a job is requeued due to a simulation issue, you should immediately manually kill the job progression with `scancel jobid` and correct the problem."
+  },
+  {
+    "question": "After an Ansys Fluent job runs, how can the data file be imported back into Fluent?",
+    "answer": "After running the job, you can download the data file and import it back into Fluent with 'File > Import > Data\u2026'."
+  },
+  {
+    "question": "Which type of Slurm script is generally recommended for most Ansys Fluent jobs?",
+    "answer": "Most Ansys Fluent jobs should use the 'by node' script to minimize solution latency and maximize performance over as few nodes as possible."
+  },
+  {
+    "question": "Under what circumstances might a 'by core' script be preferable for Ansys Fluent jobs?",
+    "answer": "Very large jobs might wait less in the queue if they use a 'by core' script."
+  },
+  {
+    "question": "What are the disadvantages of running large Ansys Fluent jobs with a 'by core' script over many nodes?",
+    "answer": "The startup time can be significantly longer, and the jobs will be more vulnerable to crashing if any of the compute nodes fail during the simulation."
+  },
+  {
+    "question": "How do the Ansys Fluent Slurm scripts manage memory communication for single-node vs. multi-node execution?",
+    "answer": "The scripts ensure Fluent uses shared memory for communication when run on a single node or distributed memory (utilizing MPI and the appropriate HPC interconnect) when run over multiple nodes."
+  },
+  {
+    "question": "What options are available if Fluent crashes during the initial auto mesh partitioning phase using standard Intel-based scripts?",
+    "answer": "The narval tabs (OpenMPI scripts) may offer a more robust alternative, or you can manually perform the mesh partitioning in the Fluent GUI and then rerun the job on the cluster with the Intel scripts."
+  },
+  {
+    "question": "What is the recommended cell density per core for optimal efficiency in mesh partitioning for Fluent?",
+    "answer": "For optimal efficiency, ensure at least 10,000 cells per core."
+  },
+  {
+    "question": "What are the `--nodes` and `--ntasks-per-node` settings for the 'Multinode (by node)' Intel Fluent Slurm script?",
+    "answer": "The script specifies `--nodes=1` (with a note that Narval has a 1 node max) and `--ntasks-per-node=32` (max all cores of a compute node)."
+  },
+  {
+    "question": "Which Ansys Fluent versions are specified in the 'Multinode (by node)' Intel Fluent Slurm script?",
+    "answer": "The script specifies `ansys/2023R2` or newer versions."
+  },
+  {
+    "question": "What environment modules are loaded in the 'Multinode (by node)' Intel Fluent Slurm script?",
+    "answer": "The script loads `StdEnv/2023` and `ansys/2023R2` (or newer versions)."
+  },
+  {
+    "question": "What are the possible values for the `MYVERSION` variable in the Fluent Slurm script?",
+    "answer": "The `MYVERSION` variable can be `2d`, `2ddp`, `3d`, or `3ddp`."
+  },
+  {
+    "question": "How is the total number of cores (`NCORES`) calculated in the Fluent Slurm script?",
+    "answer": "`NCORES` is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
   }
 ]

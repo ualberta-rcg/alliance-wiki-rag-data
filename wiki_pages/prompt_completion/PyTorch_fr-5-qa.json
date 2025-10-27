@@ -1,50 +1,38 @@
 [
   {
-    "question": "What is Data Parallelism in the context of PyTorch?",
-    "answer": "Data Parallelism refers to methods to perform training over multiple replicas of a model in parallel, where each replica receives a different chunk of training data at each iteration."
+    "question": "What is Data Parallelism in the context of model training?",
+    "answer": "Data Parallelism refers to methods used to train a model by running multiple replicas of it in parallel, where each replica processes a different chunk of training data during each iteration."
   },
   {
-    "question": "What is a key benefit of using Data Parallelism?",
-    "answer": "Using Data Parallelism may provide a significant speed-up by iterating through all examples in a large dataset approximately N times faster, where N is the number of model replicas."
+    "question": "How are gradients and parameters handled when using Data Parallelism?",
+    "answer": "At the end of an iteration, gradients are aggregated, and the parameters of all model replicas are updated either synchronously or asynchronously, depending on the specific method."
   },
   {
-    "question": "What adjustment is necessary in Data Parallelism to ensure a trained model is equivalent to one without it?",
-    "answer": "The user must scale either the learning rate or the desired batch size in function of the number of replicas."
+    "question": "What is a significant advantage of using Data Parallelism?",
+    "answer": "Data Parallelism can provide a significant speed-up by iterating through all examples in a large dataset approximately N times faster, where N is the number of model replicas."
   },
   {
-    "question": "What is a size requirement for models when using Data Parallelism with multiple GPUs?",
-    "answer": "In the multiple-GPU case, the model must be small enough to fit inside the memory of a single GPU."
+    "question": "What is an important consideration for achieving equivalent training results when using Data Parallelism compared to single-model training?",
+    "answer": "To get a trained model equivalent to one without Data Parallelism, the user must scale either the learning rate or the desired batch size based on the number of replicas."
   },
   {
-    "question": "Which PyTorch class is recommended by developers for data parallelism with multiple GPUs?",
-    "answer": "The `DistributedDataParallel` class is recommended by the PyTorch developers for data parallelism with multiple GPUs, whether with a single node or with multiple nodes."
+    "question": "What is a constraint on model size when using Data Parallelism with multiple GPUs?",
+    "answer": "In the multiple-GPU case, each GPU hosts a replica of the model, meaning the model must be small enough to fit inside the memory of a single GPU."
   },
   {
-    "question": "How many GPUs are requested in the `pytorch-ddp-test.sh` script for multi-GPU data parallelism?",
-    "answer": "The `pytorch-ddp-test.sh` script requests 2 GPUs using the `#SBATCH --gres=gpu:2` directive."
+    "question": "Which PyTorch class is recommended by developers for multi-GPU Data Parallelism?",
+    "answer": "The `DistributedDataParallel` class is recommended by PyTorch developers for multi-GPU Data Parallelism, applicable for both single and multiple nodes."
   },
   {
-    "question": "How many tasks per node are requested in the `pytorch-ddp-test.sh` script for multi-GPU data parallelism?",
-    "answer": "The `pytorch-ddp-test.sh` script requests 2 tasks per node using the `#SBATCH --tasks-per-node=2` directive."
+    "question": "What is PyTorch Lightning?",
+    "answer": "PyTorch Lightning is a Python package that provides interfaces to PyTorch, making common, code-heavy tasks like multi-GPU training more straightforward."
   },
   {
-    "question": "Which environment variable is used to store the master node's IP address in the `pytorch-ddp-test.sh` script?",
-    "answer": "The `MASTER_ADDR` environment variable is used to store the master node\u2019s IP address, set as `export MASTER_ADDR=$(hostname)`."
+    "question": "What does the `pytorch-ddp-test.sh` script demonstrate?",
+    "answer": "The `pytorch-ddp-test.sh` script provides an example of submitting a job using the Python wheel with a virtual environment for multi-GPU Data Parallelism, specifically with several GPUs distributed across two nodes."
   },
   {
-    "question": "How is the process group initialized in the `pytorch-ddp-test.py` script for distributed training?",
-    "answer": "The process group is initialized using `dist.init_process_group` with parameters like `backend`, `init_method`, `world_size`, and `rank`."
-  },
-  {
-    "question": "How is a PyTorch model prepared for `DistributedDataParallel` in the `pytorch-ddp-test.py` script?",
-    "answer": "The model is first moved to CUDA (`net.cuda()`) and then wrapped with `torch.nn.parallel.DistributedDataParallel(net, device_ids=[current_device])`."
-  },
-  {
-    "question": "What type of sampler is used with `DataLoader` for distributed training in `pytorch-ddp-test.py`?",
-    "answer": "A `torch.utils.data.distributed.DistributedSampler` is used with `DataLoader` for distributed training."
-  },
-  {
-    "question": "What other Python package, besides `DistributedDataParallel`, is mentioned for implementing data parallelism tutorials?",
-    "answer": "PyTorch Lightning is also presented with tutorials for data parallelism."
+    "question": "What is the purpose of the `pytorch-ddp-test.py` script?",
+    "answer": "The `pytorch-ddp-test.py` script demonstrates how to implement distributed data parallel training, including initializing a process group, making a neural network model, and preparing data for a CIFAR10 classification task."
   }
 ]

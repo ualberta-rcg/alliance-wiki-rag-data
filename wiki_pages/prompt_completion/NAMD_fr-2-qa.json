@@ -1,134 +1,70 @@
 [
   {
-    "question": "What cluster is the first multi-GPU UCX task example configured for?",
-    "answer": "The first example for multi-GPU UCX tasks is configured for B\u00e9luga."
+    "question": "What is the purpose of the UCX with GPU tasks example for B\u00e9luga?",
+    "answer": "The example for B\u00e9luga demonstrates how to use 8 processes across 2 nodes, with each process utilizing 10 threads and 1 GPU, to fully leverage the B\u00e9luga GPU nodes for NAMD jobs, which offers the best performance."
   },
   {
-    "question": "How many processes and nodes are used in the B\u00e9luga multi-GPU UCX task example?",
-    "answer": "The B\u00e9luga example uses 8 processes in total across 2 nodes."
+    "question": "How many cores and GPUs do B\u00e9luga's GPU nodes have, according to the example?",
+    "answer": "B\u00e9luga's GPU nodes have 40 cores and 4 GPUs per node."
   },
   {
-    "question": "How many threads and GPUs does each process use in the B\u00e9luga multi-GPU UCX task example?",
-    "answer": "Each process uses 10 threads and 1 GPU."
+    "question": "Why might NAMD report only 72 cores being used in the B\u00e9luga multi-GPU example, even if more are allocated?",
+    "answer": "One core per task is reserved for a communication thread, which makes NAMD reporting 72 cores used a normal occurrence."
   },
   {
-    "question": "What are the core and GPU specifications of B\u00e9luga GPU nodes according to the multi-GPU UCX example?",
-    "answer": "B\u00e9luga GPU nodes have 40 cores and 4 GPUs per node."
-  },
-  {
-    "question": "Why does NAMD report 72 cores used in the B\u00e9luga multi-GPU UCX task example, despite the node specifications?",
-    "answer": "NAMD reports 72 cores used because 1 core per task is reserved for a communication thread."
-  },
-  {
-    "question": "Which cluster is the second multi-GPU UCX task example configured for?",
-    "answer": "The second example for multi-GPU UCX tasks is configured for Narval."
-  },
-  {
-    "question": "How many processes and nodes are used in the Narval multi-GPU UCX task example?",
-    "answer": "The Narval example uses 8 processes in total across 2 nodes."
-  },
-  {
-    "question": "How many threads and GPUs does each process use in the Narval multi-GPU UCX task example?",
-    "answer": "Each process (task) uses 12 threads and 1 GPU."
-  },
-  {
-    "question": "What are the core and GPU specifications of Narval GPU nodes according to the multi-GPU UCX example?",
+    "question": "What are the specifications of Narval GPU nodes mentioned in the multi-GPU task example?",
     "answer": "Narval GPU nodes have 48 cores and 4 GPUs per node."
   },
   {
-    "question": "Why does NAMD report 88 cores used in the Narval multi-GPU UCX task example?",
-    "answer": "NAMD reports 88 cores used because 1 core per task has to be reserved for a communications thread."
+    "question": "In the Narval multi-GPU example, how many processes, threads per process, and GPUs per process are utilized?",
+    "answer": "The example uses 8 processes in total on 2 nodes, with each process (task) utilizing 12 threads and 1 GPU."
   },
   {
-    "question": "What should be adjusted when using a multi-GPU UCX script on a different cluster?",
+    "question": "Why does NAMD report only 88 cores being used in the Narval multi-GPU example?",
+    "answer": "One core per task has to be reserved for a communications thread, so NAMD reporting that only 88 cores are being used is normal."
+  },
+  {
+    "question": "How should one adapt the multi-GPU script for use on a different cluster?",
     "answer": "To use the script on another cluster, you should check the characteristics of the available nodes on that cluster and adjust the `--cpus-per-task` and `--gpus-per-node` options accordingly."
   },
   {
-    "question": "Can UCX versions of NAMD be used on all clusters?",
-    "answer": "Yes, UCX versions can be used on all clusters."
+    "question": "Can UCX versions of NAMD be used across all clusters?",
+    "answer": "Yes, UCX versions of NAMD can be used on all clusters."
   },
   {
-    "question": "What Slurm options are specified in the provided `ucx_namd_job.sh` script for multi-GPU tasks?",
-    "answer": "The script specifies `--nodes=2`, `--ntasks-per-node=4`, `--cpus-per-task=10`, `--gpus-per-node=v100:4`, `--mem=0`, `--time=0:15:00`, and `--account=def-specifyaccount`."
+    "question": "What modules are loaded in the UCX NAMD job script example for multi-GPU tasks?",
+    "answer": "The example script loads `StdEnv/2020`, `intel/2020.1.217`, `cuda/11.0`, and `namd-ucx-smp/2.14`."
   },
   {
-    "question": "Which modules are loaded in the `ucx_namd_job.sh` script example for multi-GPU tasks?",
-    "answer": "The script loads `StdEnv/2020`, `intel/2020.1.217`, `cuda/11.0`, and `namd-ucx-smp/2.14` modules."
+    "question": "What is the purpose of the `Molecular Dynamics Performance Guide`?",
+    "answer": "The `Molecular Dynamics Performance Guide`, created by an ACENET team, describes optimal conditions for running tasks on clusters with AMBER, GROMACS, OpenMM, and NAMD."
   },
   {
-    "question": "How is the `NUM_PES` variable calculated in the multi-GPU UCX example script?",
-    "answer": "The `NUM_PES` variable is calculated as `$(expr $SLURM_CPUS_PER_TASK - 1 )`."
+    "question": "Why is it recommended to perform benchmarking for NAMD simulations?",
+    "answer": "Benchmarking is recommended because NAMD's performance varies with the simulated system (especially the number of atoms), making it very useful for optimizing long-duration simulations and documenting resource allocation requests."
   },
   {
-    "question": "What is the `srun` command used to execute NAMD in the multi-GPU UCX example script?",
-    "answer": "The `srun` command used is `srun --cpus-per-task=$SLURM_CPUS_PER_TASK --mpi=pmi2 namd2 ++ppn $NUM_PES apoa1.namd`."
+    "question": "What are the suggestions for obtaining relevant benchmarking results?",
+    "answer": "To obtain relevant results, it's suggested to vary the number of steps so that the simulation runs for a few minutes, and data collection occurs at intervals of at least a few seconds. Running for too short a time can lead to variations in duration results."
   },
   {
-    "question": "What is the 'Molecular Dynamics Performance Guide' and who created it?",
-    "answer": "The 'Molecular Dynamics Performance Guide' was created by an ACENET team and describes optimal conditions for running tasks with AMBER, GROMACS, and OpenMM on their clusters."
+    "question": "Which cluster was used for the standard apoa1 benchmarking data presented?",
+    "answer": "The standard apoa1 benchmarking data was performed on the Graham cluster."
   },
   {
-    "question": "Why is benchmarking useful for NAMD simulations?",
-    "answer": "Benchmarking is useful because NAMD performance varies with the simulated systems, especially concerning the number of atoms. It can help for long-duration simulations and to document resource allocation requests."
+    "question": "What are the node specifications for the Graham cluster mentioned in the benchmarking context?",
+    "answer": "The Graham cluster has 32-core CPU nodes and GPU nodes with 32 cores and 2 GPUs."
   },
   {
-    "question": "What recommendations are given for obtaining relevant benchmarking results?",
-    "answer": "It is suggested to vary the number of steps so that the simulation runs for a few minutes and to collect duration data at intervals of at least a few seconds to avoid variations if the execution time is too short."
+    "question": "How is efficiency calculated in the NAMD 2.12 CPU benchmarking table?",
+    "answer": "Efficiency is calculated using the formula: (duration with 1 core) / (N * (duration with N cores))."
   },
   {
-    "question": "On which cluster were the provided `apoa1` benchmarking data collected?",
-    "answer": "The `apoa1` benchmarking data were collected on the Graham cluster."
+    "question": "Based on the NAMD 2.12 CPU benchmarking data, what is an acceptable number of cores for the described system simulation?",
+    "answer": "It is acceptable to use 256 cores for simulating the system, as the efficiency remains at 90%."
   },
   {
-    "question": "What are the characteristics of Graham's nodes mentioned in the benchmarking section?",
-    "answer": "Graham has CPU nodes with 32 cores and GPU nodes with 32 cores and 2 GPUs."
-  },
-  {
-    "question": "How is efficiency calculated in the CPU-only benchmarking table for NAMD 2.12?",
-    "answer": "Efficiency is calculated as (duration with 1 core) / (N * (duration with N cores))."
-  },
-  {
-    "question": "What NAMD version and module were used for the CPU-only benchmarking table?",
-    "answer": "NAMD 2.12 loaded with the verbs module was used."
-  },
-  {
-    "question": "According to the first benchmarking table, what is an acceptable number of cores for simulating the system?",
-    "answer": "It is acceptable to use 256 cores for simulating the system."
-  },
-  {
-    "question": "What is the consequence of requesting more cores than needed for a NAMD job?",
-    "answer": "If more cores than needed are requested, your tasks will wait longer in the queue, affecting your overall result."
-  },
-  {
-    "question": "Which NAMD module is used for single-node GPU simulations in the benchmarking data?",
-    "answer": "The multicore module of NAMD is used for single-node GPU simulations."
-  },
-  {
-    "question": "Which NAMD module is used for multi-node GPU tasks in the benchmarking data?",
-    "answer": "The verbs-smp module is used for multi-node GPU tasks."
-  },
-  {
-    "question": "What does the GPU benchmarking data suggest about using multiple nodes?",
-    "answer": "The GPU benchmarking data indicates that it is absolutely useless to use more than one node since performance decreases with 2 nodes or more."
-  },
-  {
-    "question": "What is the most efficient single-node GPU configuration according to the benchmarking data for Graham?",
-    "answer": "On a single node, it is preferable to use 1 GPU/16 cores for maximum efficiency."
-  },
-  {
-    "question": "What single-node GPU configuration is acceptable if faster results are prioritized?",
-    "answer": "The use of 2 GPU/32 cores on a single node is acceptable if your results need to be produced quickly."
-  },
-  {
-    "question": "Is there an advantage to using 4 or 8 cores on Graham GPU nodes for NAMD tasks?",
-    "answer": "No, there is no advantage to using 4 or 8 cores because the priority is the same for all 1 GPU/16 cores tasks on Graham's GPU nodes."
-  },
-  {
-    "question": "Is it more economical to use GPUs or non-GPU nodes on Graham for NAMD tasks?",
-    "answer": "It is more economical to use GPUs because a GPU node (2 GPU/32 cores) on Graham processes the task faster than 4 non-GPU nodes, even though the cost of a GPU node is nearly twice that of a non-GPU node."
-  },
-  {
-    "question": "Under what circumstances might one consider not using GPUs, despite their economic advantage?",
-    "answer": "One might consider not using GPUs if the waiting time becomes too long, as CPU nodes are more numerous."
+    "question": "What happens if you request more cores than necessary for your NAMD tasks?",
+    "answer": "If you request more cores than needed, your tasks will experience longer wait times in the queue, which will negatively affect your overall results."
   }
 ]

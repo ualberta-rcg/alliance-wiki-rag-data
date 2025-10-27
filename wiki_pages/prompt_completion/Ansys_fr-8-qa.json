@@ -1,54 +1,62 @@
 [
   {
-    "question": "Quel est le but des scripts de remise en file d'attente pour Ansys Fluent?",
-    "answer": "Ces scripts sont destin\u00e9s aux t\u00e2ches Fluent qui se terminent normalement mais n\u00e9cessitent souvent plusieurs tentatives de remise en file d'attente pour obtenir des licences."
+    "question": "What is the purpose of the Fluent solution restart scripts?",
+    "answer": "The Fluent solution restart scripts automate the restarting of intensive tasks that require more than the maximum allowed execution time on most clusters, by restarting from the most recently saved time step files."
   },
   {
-    "question": "Quand ne doit-on PAS utiliser les scripts de remise en file d'attente pour Ansys Fluent?",
-    "answer": "Ils ne sont pas recommand\u00e9s pour les t\u00e2ches Fluent qui peuvent s'ex\u00e9cuter longtemps avant de planter ou se terminer avec des avertissements de journalisation, car cela entra\u00eenerait la r\u00e9p\u00e9tition de la simulation depuis le d\u00e9but, gaspillant du temps de calcul."
+    "question": "What files are required to start a Fluent simulation with the restart script?",
+    "answer": "To start a Fluent simulation with the restart script, a group of `sample.cas`, `sample.dat`, and `sample.jou` files must be present."
   },
   {
-    "question": "Comment v\u00e9rifier si une remise en file d'attente est due \u00e0 un probl\u00e8me de licence ou \u00e0 un \u00e9chec de simulation?",
-    "answer": "Il est fortement recommand\u00e9 de v\u00e9rifier les fichiers de sortie de l'ordonnanceur pour d\u00e9terminer la cause de chaque tentative de remise en attente. Si c'est un probl\u00e8me de simulation, la t\u00e2che doit \u00eatre annul\u00e9e avec `scancel jobid`."
+    "question": "How should the `sample.jou` file be modified for use with the restart scripts?",
+    "answer": "The `sample.jou` file should be modified to contain `/solve/dual-time-iterate 1` and `/file/auto-save/data-frequency 1`."
   },
   {
-    "question": "Que faut-il sp\u00e9cifier dans un script Slurm pour activer la remise en file d'attente des t\u00e2ches Fluent?",
-    "answer": "Il faut ajouter la ligne `#SBATCH --array=1-5%1` (o\u00f9 5 peut \u00eatre remplac\u00e9 par le nombre de tentatives souhait\u00e9, 2 ou plus)."
+    "question": "How do you create and modify the `sample-restart.jou` file for solution restarts?",
+    "answer": "First, create `sample-restart.jou` by copying `sample.jou`. Then, modify `sample-restart.jou` to contain `/file/read-cas-data sample-restart` instead of `/file/read-cas-data sample` and comment out the initialization line (e.g., `;/solve/initialize/initialize-flow`). If subsequent steps are twice as fast, change `/solve/dual-time-iterate` to `2`."
   },
   {
-    "question": "Quel est l'objectif des scripts de red\u00e9marrage de solution pour Ansys Fluent?",
-    "answer": "Ces scripts automatisent le red\u00e9marrage des t\u00e2ches intensives qui n\u00e9cessitent plus que le maximum de sept jours d'ex\u00e9cution autoris\u00e9 sur la plupart des grappes, en reprenant \u00e0 partir des fichiers de pas de temps les plus r\u00e9cemment sauvegard\u00e9s."
+    "question": "What Slurm parameter is used to specify the number of solution restarts in the provided scripts?",
+    "answer": "The Slurm parameter `--array=1-5%1` is used to specify the number of solution restarts, with `1-5%1` indicating 5 restart attempts."
   },
   {
-    "question": "Quels fichiers sont n\u00e9cessaires pour initier un red\u00e9marrage de simulation Ansys Fluent?",
-    "answer": "Un groupe de fichiers `sample.cas`, `sample.dat` et `sample.jou` doit \u00eatre pr\u00e9sent."
+    "question": "What is the maximum time limit that can be specified for a Fluent restart job on most clusters?",
+    "answer": "The maximum time limit that can be specified for a Fluent restart job is `07-00:00` days."
   },
   {
-    "question": "Comment pr\u00e9parer le fichier `sample.jou` pour une simulation avec red\u00e9marrage?",
-    "answer": "Le fichier `sample.jou` doit contenir `/solve/dual-time-iterate 1` et `/file/auto-save/data-frequency 1`."
+    "question": "Which Ansys module version is loaded in the example Fluent restart scripts for StdEnv/2023?",
+    "answer": "The example Fluent restart scripts load `ansys/2023R2` or newer versions for StdEnv/2023."
   },
   {
-    "question": "Quelles modifications doivent \u00eatre faites au fichier `sample-restart.jou` pour un red\u00e9marrage de solution Fluent?",
-    "answer": "Le fichier `sample-restart.jou` doit contenir `/file/read-cas-data sample-restart` au lieu de `sample` et la ligne d'initialisation (par exemple, `/solve/initialize/initialize-flow`) doit \u00eatre comment\u00e9e en la pr\u00e9c\u00e9dant d'un point-virgule."
+    "question": "How are journal files used in Fluent simulations?",
+    "answer": "Journal files can contain all Fluent TUI (Text User Interface) commands, allowing users to modify simulation parameters like temperature, pressure, or flow velocity, and perform a series of simulations under different conditions."
   },
   {
-    "question": "Que se passe-t-il si les pas suivants d'une simulation Fluent sont deux fois plus rapides que le pas initial lors d'un red\u00e9marrage?",
-    "answer": "Dans le fichier `sample-restart.jou`, il faut sp\u00e9cifier `/solve/dual-time-iterate 2`. La solution ne red\u00e9marrera qu'apr\u00e8s que les deux pas suivant le pas initial soient termin\u00e9s."
+    "question": "Where can users find more information about Fluent commands for journal files?",
+    "answer": "Users can consult the Fluent user guide for more information and a list of commands."
   },
   {
-    "question": "O\u00f9 les fichiers de r\u00e9sultats de chaque pas sont-ils enregistr\u00e9s lors d'une simulation Fluent avec red\u00e9marrage?",
-    "answer": "Un fichier de r\u00e9sultats pour chaque pas sera enregistr\u00e9 dans un sous-r\u00e9pertoire de sortie."
+    "question": "What is the command to configure Fluent to use the older .cas/.dat file formats?",
+    "answer": "To configure Fluent to use the older .cas/.dat file formats, the command `/file/cff-files no` is used in the journal file."
   },
   {
-    "question": "Quelle est la dur\u00e9e totale de la simulation si `2` est choisi pour l'it\u00e9ration \u00e0 double temps et Nrestart est le nombre de red\u00e9marrages?",
-    "answer": "La dur\u00e9e totale de la simulation sera `1*Dt + 2*Nrestart*Dt`."
+    "question": "How do you configure Fluent to use the more efficient .cas.h5/.dat.h5 file formats?",
+    "answer": "To configure Fluent to use the more efficient .cas.h5/.dat.h5 file formats (available from versions 2020R1), the command `/file/cff-files yes` should be used in the journal file."
   },
   {
-    "question": "Quel est le nombre total de pas de simulation et de fichiers de r\u00e9sultats g\u00e9n\u00e9r\u00e9s si `2` est choisi pour l'it\u00e9ration \u00e0 double temps et Nrestart est le nombre de red\u00e9marrages?",
-    "answer": "Le nombre total de pas (et de fichiers de r\u00e9sultats g\u00e9n\u00e9r\u00e9s) sera `1 + 2*Nrestart`."
+    "question": "What does the `auto-save/data-frequency` command do in a Fluent journal file?",
+    "answer": "The `auto-save/data-frequency` command specifies how often data files are saved, for example, `100` to save every 100 iterations or time steps."
   },
   {
-    "question": "Quelle est la dur\u00e9e maximale pour le temps demand\u00e9 dans le script Slurm pour les t\u00e2ches de red\u00e9marrage Fluent?",
-    "answer": "Le temps demand\u00e9 peut aller jusqu'\u00e0 `#SBATCH --time=07-00:00` jours."
+    "question": "How can Fluent be configured to retain only the most recent auto-saved data files?",
+    "answer": "Fluent can be configured to retain only the most recent auto-saved data files by adding `/file/auto-save/retain-most-recent-files y` to the journal file."
+  },
+  {
+    "question": "In a Fluent transient simulation journal file, what command sets the physical time step size?",
+    "answer": "The command `/solve/set/time-step 0.0001` sets the physical time step size in a Fluent transient simulation journal file."
+  },
+  {
+    "question": "How can one use the restart scripts to perform a variable number of solution steps instead of fixed time steps?",
+    "answer": "By setting `/solve/dual-time-iterate 1` in `sample.jou` and if the first and subsequent steps require similar execution times, then `1` should be chosen for the `dual-time-iterate` value in `sample-restart.jou` as well. The total duration of the simulation will be `1*Dt + Nrestart*Dt` where `Nrestart` is defined in the Slurm script."
   }
 ]

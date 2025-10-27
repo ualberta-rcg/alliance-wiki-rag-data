@@ -1,66 +1,62 @@
 [
   {
-    "question": "How can I prevent the 'Software rasterizer found, hardware acceleration will be disabled' warning when running Fluent 2025R1 within Workbench?",
-    "answer": "Before clicking the start button for Fluent 2025R1 within Workbench, go to the Environment tab in the Fluent Launcher panel and copy/paste 'HOOPS_PICTURE=opengl' into the empty input box. Alternatively, set 'export HOOPS_PICTURE=opengl' in your environment before starting Workbench."
+    "question": "What are the limitations for running jobs with the SHARCNET Ansys license?",
+    "answer": "The SHARCNET Ansys license permits each researcher to run a maximum of 8 simultaneous jobs using up to 512 hpc cores across all clusters."
   },
   {
-    "question": "What are the recommended core settings for Ansys Mechanical in Workbench on gra-vdi?",
-    "answer": "When running Mechanical in Workbench on gra-vdi, ensure to tick 'Distributed' in the upper ribbon Solver panel and specify a maximum of 24 cores."
+    "question": "Can you provide examples of maximum core combinations for SHARCNET Ansys jobs?",
+    "answer": "Yes, allowed maximum even-sized combinations include 1x512, 2x256, 4x128, or 8x64 simultaneous jobs across all clusters."
   },
   {
-    "question": "What are the recommended core settings for Ansys Fluent in Workbench on gra-vdi?",
-    "answer": "When running Fluent in Workbench on gra-vdi, untick 'Distributed' and specify a maximum of 12 cores."
+    "question": "What should be done if a job fails due to a SHARCNET license shortage?",
+    "answer": "If a job fails on startup due to a shortage of licenses, it needs to be manually resubmitted."
   },
   {
-    "question": "What is the memory limit for Ansys programs on gra-vdi?",
-    "answer": "Do not attempt to use more than 128GB memory on gra-vdi, otherwise Ansys will hit the hard limit and be terminated."
+    "question": "What measures might be taken if many SHARCNET Ansys license shortages are reported?",
+    "answer": "If many license shortages are reported, the total job limit per researcher may be decreased (to 6 or 4), and/or the total hpc core limit per researcher may be decreased (to 384 or 256 cores)."
   },
   {
-    "question": "Where should I run Ansys if I require more than 128GB of memory or more cores than allowed on gra-vdi?",
-    "answer": "If you need more cores or memory than what gra-vdi offers, you should use a cluster compute node to run your graphical session."
+    "question": "What should a researcher do if they need more than 512 hpc cores for their Ansys research?",
+    "answer": "Researchers needing more than 512 hpc cores should consider using their institution's local ANSYS License server if available, and potentially contributing to its expansion."
   },
   {
-    "question": "How many cores should I use for pre-processing or post-processing tasks with Ansys on gra-vdi if I'm not running a calculation?",
-    "answer": "When doing pre-processing or post-processing work with Ansys on gra-vdi and not running a calculation, please only use 4 cores to avoid checking out unnecessary HPC licenses."
+    "question": "What are the benefits of purchasing an Ansys license subscription from CMC?",
+    "answer": "Benefits include not needing a local institutional license server, not needing to obtain and reconfigure a physical license annually, the ability to use the license almost anywhere (home, institutions, or any Alliance cluster), and access to installation instructions for Windows machines to run SpaceClaim."
   },
   {
-    "question": "How can I terminate all Ansys processes if Workbench or other Ansys programs freeze or don't start properly on gra-vdi?",
-    "answer": "Open a new terminal window on gra-vdi and run the command `pkill -9 -e -u $USER -f \"ansys|fluent|mwrpcss|mwfwrapper|ENGINE|mono\"` to kill all Ansys processes."
+    "question": "What is the typical core limit per user for CMC Ansys licenses according to their Quick Start Guides?",
+    "answer": "According to the CMC Ansys Quick Start Guides, there may be a 64 core limit per user."
   },
   {
-    "question": "What should I do if Ansys problems persist on gra-vdi after working in the GUI on compute nodes?",
-    "answer": "If the problem persists after working on compute nodes, try running `rm -rf .ansys` in your home directory."
+    "question": "How do I configure my `ansys.lic` file to use the SHARCNET Ansys license?",
+    "answer": "You need to configure your `~/.licenses/ansys.lic` file with the following lines: `setenv(\"ANSYSLMD_LICENSE_FILE\", \"1055@license3.sharcnet.ca\")` and `setenv(\"ANSYSLI_SERVERS\", \"2325@license3.sharcnet.ca\")`."
   },
   {
-    "question": "Is the Ansys/2025R1 module compatible with the SHARCNET license server on gra-vdi?",
-    "answer": "The Ansys/2025R1 module is not usable with the SHARCNET license server on gra-vdi until an upgrade is completed, which is expected early August/2025."
+    "question": "How can I check the number of SHARCNET Ansys licenses in use by my username and all users?",
+    "answer": "To check, run `ssh graham.computecanada.ca`, then `module load ansys`, followed by `lmutil lmstat -c $ANSYSLMD_LICENSE_FILE -a | grep \"Users of|$USER\"`."
   },
   {
-    "question": "Which environment module should be loaded for Ansys/2025R1 or newer versions on gra-vdi?",
-    "answer": "On gra-vdi, Ansys module versions 2025R1 or newer are only installed under CcEnv, not SnEnv."
+    "question": "What should I do if Ansys licenses are unexpectedly tied up by my username on gra-vdi?",
+    "answer": "Connect to the specific gra-vdi node (e.g., `gra-vdi3.sharcnet.ca` or `gra-vdi4.sharcnet.ca`) via TigerVNC, open a terminal window, and run `pkill -9 -e -u $USER -f \"ansys\"` to terminate rogue processes."
   },
   {
-    "question": "Are there known issues with Ansys Mechanical GUI in version 2025R1 on gra-vdi?",
-    "answer": "Yes, the GUI interface for some programs like Ansys Mechanical in version 2025R1 does not work properly on gra-vdi and will not be fixed as gra-vdi is to be retired soon."
+    "question": "Why is it important to specify the full hostname when connecting to gra-vdi via TigerVNC to kill rogue processes?",
+    "answer": "It is necessary because gra-vdi consists of two nodes (gra-vdi3 and gra-vdi4), and researchers are randomly placed on one. Specifying the full hostname ensures you log into the correct node to run `pkill`."
   },
   {
-    "question": "How do I load and run Ensight on gra-vdi?",
-    "answer": "To load Ensight on gra-vdi, run `module load SnEnv` and `ansys/2024R2.04` (or older versions back to 2021R2), then run `ensight`."
+    "question": "What are the choices for loading Ansys modules when using gra-vdi?",
+    "answer": "Researchers can choose to load Ansys modules from the global environment (after loading CcEnv) or from modules installed locally on the machine itself (after loading SnEnv)."
   },
   {
-    "question": "How do I launch Ansys Rocky in GUI mode on gra-vdi?",
-    "answer": "After loading the appropriate Rocky and Ansys modules (e.g., `module load clumod ansysrocky/2024R2.0 CcEnv StdEnv/2023 ansys/2024R2.04`), you can launch the GUI by running `Rocky-gui`."
+    "question": "When are settings from `~/.licenses/ansys.lic` used with local Ansys modules on gra-vdi?",
+    "answer": "Settings from `~/.licenses/ansys.lic` are only used when `-gui` is appended to the Ansys program name (e.g., `fluent-gui` instead of `fluent`)."
   },
   {
-    "question": "Can Ansys Rocky utilize GPUs when run on gra-vdi?",
-    "answer": "Rocky should only be used with CPUs and not GPUs when run on gra-vdi, as the machine only has one GPU intended for graphics."
+    "question": "What are the recommended uses for Ansys on gra-vdi?",
+    "answer": "Suitable usage includes running a single job interactively (in the GUI or from the command line) with up to 8 cores and 128GB RAM, creating or modifying simulation input files, and post-processing or visualizing data."
   },
   {
-    "question": "Is Ansys Rocky included with the SHARCNET license?",
-    "answer": "Yes, the SHARCNET license includes Rocky and is free for all researchers across the Alliance to use."
-  },
-  {
-    "question": "Which versions of Ansys Rocky are available on gra-vdi and graham clusters for 2024R2 or older?",
-    "answer": "Rocky for versions 2024R2 or older is only available on gra-vdi and graham clusters, with installation on all clusters expected in June."
+    "question": "How do you load and use a local Ansys module on gra-vdi?",
+    "answer": "First, connect to `gra-vdi.computecanada.ca` with TigerVNC. Then, open a new terminal window and load a module (e.g., `module load SnEnv ansys/2024R2`). Finally, directly start an Ansys program from the command line (e.g., `runwb2` or `fluent-gui`)."
   }
 ]

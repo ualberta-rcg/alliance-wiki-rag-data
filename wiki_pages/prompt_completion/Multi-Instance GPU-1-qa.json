@@ -1,74 +1,126 @@
 [
   {
-    "question": "What is Multi-Instance GPU (MIG) technology?",
-    "answer": "Multi-Instance GPU (MIG) is a technology that allows partitioning a single GPU, such as NVidia A100s and H100s, into multiple independent virtual GPU instances."
+    "question": "What problem does Multi-Instance GPU (MIG) technology aim to solve?",
+    "answer": "Many programs are unable to fully use modern GPUs such as NVidia A100s and H100s."
   },
   {
-    "question": "How are resources allocated to individual GPU instances created with MIG?",
-    "answer": "Each GPU instance receives a portion of the original GPU's computational resources and memory, which are detached and protected from other instances by on-chip protections."
+    "question": "What is Multi-Instance GPU (MIG) technology?",
+    "answer": "MIG is a technology that allows partitioning a single GPU into multiple instances, making each one a completely independent virtual GPU."
+  },
+  {
+    "question": "How are resources distributed among GPU instances created by MIG?",
+    "answer": "Each of the GPU instances gets a portion of the original GPU's computational resources and memory, all detached from the other instances by on-chip protections."
   },
   {
     "question": "What are the advantages of using GPU instances for jobs?",
-    "answer": "Using GPU instances is less wasteful, usage is billed accordingly, jobs consume less allocated priority compared to a full GPU, enabling users to execute more jobs and experience shorter wait times."
+    "answer": "Using GPU instances is less wasteful, usage is billed accordingly, jobs use less of your allocated priority compared to a full GPU, allowing you to execute more jobs and have shorter wait times."
   },
   {
-    "question": "When should a job be considered for a GPU instance instead of a full GPU?",
+    "question": "When should a job be considered for evaluation and testing on a GPU instance instead of a full GPU?",
     "answer": "Jobs that use less than half of the computing power of a full GPU and less than half of the available memory should be evaluated and tested on an instance."
   },
   {
-    "question": "Does MIG technology support CUDA Inter-Process Communication (IPC)?",
-    "answer": "No, the MIG technology does not support CUDA Inter-Process Communication (IPC)."
+    "question": "What is the typical performance impact when suitable jobs are run on GPU instances?",
+    "answer": "In most cases, these jobs will run just as fast and consume less than half of the computing resource."
   },
   {
-    "question": "What is the impact of MIG not supporting CUDA Inter-Process Communication (IPC)?",
-    "answer": "This limitation reduces communication efficiency between instances, and launching an executable on more than one instance at a time does not improve performance and should be avoided."
+    "question": "What is a key limitation of MIG technology concerning data transfers between GPUs?",
+    "answer": "The MIG technology does not support CUDA Inter-Process Communication (IPC), which optimizes data transfers between GPUs over NVLink and NVSwitch."
   },
   {
-    "question": "Are graphic APIs like OpenGL and Vulkan supported by MIG instances?",
-    "answer": "No, graphic APIs such as OpenGL, Vulkan, etc., are not supported by MIG instances."
+    "question": "What is the consequence of MIG technology not supporting CUDA IPC?",
+    "answer": "This limitation reduces communication efficiency between instances."
   },
   {
-    "question": "When might a job require a full GPU rather than a MIG instance?",
-    "answer": "GPU jobs requiring many CPU cores may require a full GPU instead of an instance."
+    "question": "Is it recommended to launch an executable on multiple MIG instances simultaneously?",
+    "answer": "No, launching an executable on more than one instance at a time does not improve performance and should be avoided."
   },
   {
-    "question": "What factors determine the maximum number of CPU cores per MIG instance?",
-    "answer": "The maximum number of CPU cores per instance depends on the number of cores per full GPU and on the configured MIG profiles, both of which vary between clusters and GPU nodes."
+    "question": "Are graphic APIs like OpenGL and Vulkan supported by MIG technology?",
+    "answer": "No, graphic APIs such as OpenGL and Vulkan are not supported."
   },
   {
-    "question": "Which specific NVIDIA GPUs are used for MIG instances on the Narval and Rorqual clusters?",
-    "answer": "Narval uses NVIDIA A100-40gb GPUs, and Rorqual uses NVIDIA H100-80gb GPUs for MIG instances."
+    "question": "Under what condition might a GPU job require a full GPU instead of a MIG instance?",
+    "answer": "GPU jobs requiring many CPU cores may also require a full GPU instead of an instance."
   },
   {
-    "question": "How does a MIG profile name like '3g.20gb' describe an instance?",
-    "answer": "A profile name like '3g.20gb' indicates that the instance has 20 GB of GPU memory and offers 3/8th of the computing performance of a full GPU."
+    "question": "What factors determine the maximum number of CPU cores available per MIG instance?",
+    "answer": "The maximum number of CPU cores per instance depends on the number of cores per full GPU and on the configured MIG profiles."
   },
   {
-    "question": "How can one list all available MIG configurations on a given cluster?",
-    "answer": "One can run the command `sinfo -o \"%G\"|grep gpu|sed 's/gpu://g'|sed 's/,/\n/g'|cut -d: -f1|sort|uniq` to list all flavors of MIGs and full-size GPU names available on a cluster."
+    "question": "Do MIG profiles and CPU core ratios remain consistent across all systems?",
+    "answer": "No, both vary between clusters and between GPU nodes in a cluster."
   },
   {
-    "question": "Where can users find recommended maximum CPU cores and system memory for MIG instances?",
-    "answer": "The recommended maximum number of CPU cores and amount of system memory per instance are listed in the 'table of ratios in bundles'."
+    "question": "What are the supported NVIDIA GPUs for MIG instances on the Narval cluster?",
+    "answer": "Narval supports NVIDIA A100-40gb GPUs for MIG instances."
   },
   {
-    "question": "Provide an example salloc command for requesting a 3g.20gb GPU instance for an interactive job.",
-    "answer": "An example command is: `salloc --account=def-someuser --gpus=a100_3g.20gb:1 --cpus-per-task=2 --mem=40gb --time=1:0:0`."
+    "question": "What are the supported NVIDIA GPUs for MIG instances on the Rorqual cluster?",
+    "answer": "Rorqual supports NVIDIA H100-80gb GPUs for MIG instances."
   },
   {
-    "question": "What are some metrics that indicate a job might be better suited for a GPU instance?",
-    "answer": "Low power consumption (e.g., 100W average on a 400W TDP GPU), low GPU functionality utilization (e.g., less than 25%), low maximum GPU memory usage (e.g., 3GB out of 40GB), and low CPU core usage (e.g., a single core) can indicate suitability for a GPU instance."
+    "question": "Can you give examples of supported MIG profiles available on Nibi?",
+    "answer": "Nibi supports profiles like nvidia_h100_80gb_hbm3_1g.10gb, nvidia_h100_80gb_hbm3_2g.20gb, and nvidia_h100_80gb_hbm3_3g.40gb."
   },
   {
-    "question": "How can I monitor the usage of a running job in real-time to assess its suitability for an instance?",
-    "answer": "You can monitor a running job by attaching to the node where it's running and using `nvidia-smi` to read GPU metrics in real time."
+    "question": "What information does a MIG profile name typically convey, using `3g.20gb` as an example?",
+    "answer": "The profile name describes the size of the instance; for example, a `3g.20gb` instance has 20 GB of GPU memory and offers 3/8ths of the computing performance of a full GPU."
   },
   {
-    "question": "Is it possible to run multiple MIG instances on the same GPU for independent tasks?",
-    "answer": "No, while theoretically possible, the system does not support using multiple MIG instances on the same GPU for independent tasks."
+    "question": "How do less powerful MIG profiles affect resource allocation and priority?",
+    "answer": "Using less powerful profiles will have a lower impact on your allocation and priority."
   },
   {
-    "question": "What is the recommended alternative for running multiple independent tasks on a GPU if MIG instances are not supported for this use case?",
-    "answer": "If you want to run multiple independent tasks on a GPU, you should use MPS (Hyper-Q / MPS) rather than MIG."
+    "question": "What command can be used to list all available MIG flavors and full-size GPU names on a cluster?",
+    "answer": "One can run the command `sinfo -o \"%G\"|grep gpu|sed 's/gpu://g'|sed 's/,/\\n/g'|cut -d: -f1|sort|uniq`."
+  },
+  {
+    "question": "Where can users find the recommended maximum number of CPU cores and amount of system memory per instance?",
+    "answer": "The recommended maximum number of CPU cores and amount of system memory per instance are listed in the table of ratios in bundles."
+  },
+  {
+    "question": "Provide an example salloc command for requesting a 3g.20gb A100 MIG instance for a 1-hour interactive job with 2 CPU cores and 40GB memory.",
+    "answer": "An example command is `salloc --account=def-someuser --gpus=a100_3g.20gb:1 --cpus-per-task=2 --mem=40gb --time=1:0:0`."
+  },
+  {
+    "question": "What are the key resource requests specified in the example batch job script `a100_4g.20gb_mig_job.sh`?",
+    "answer": "The script requests an a100_4g.20gb GPU, 6 CPU cores, 62GB system memory, and a time limit of 24 hours."
+  },
+  {
+    "question": "Where can users find information about their current and past jobs to determine if they should use a MIG instance?",
+    "answer": "Users can find information on current and past jobs on the Narval usage portal."
+  },
+  {
+    "question": "What metric is a good indicator of the total computing power requested from a GPU?",
+    "answer": "Power consumption is a good indicator of the total computing power requested from the GPU."
+  },
+  {
+    "question": "In addition to power consumption, what other metric can help understand GPU usage for instance suitability?",
+    "answer": "GPU functionality utilization may also provide insights on the usage of the GPU in cases where power consumption is not sufficient."
+  },
+  {
+    "question": "What are the final metrics to consider for determining if a job is suitable for a GPU instance?",
+    "answer": "The final metrics to consider are the maximum amount of GPU memory and the average number of CPU cores required to run the job."
+  },
+  {
+    "question": "What method can be used to monitor a running job's GPU metrics in real time?",
+    "answer": "Another way to monitor the usage of a running job is by attaching to the node where the job is currently running and then by using `nvidia-smi` to read the GPU metrics in real time."
+  },
+  {
+    "question": "Does real-time `nvidia-smi` monitoring provide maximum and average values for memory and power usage for the entire job?",
+    "answer": "No, this will not provide maximum and average values for memory and power usage of the entire job."
+  },
+  {
+    "question": "What is the primary benefit of using `nvidia-smi` for real-time monitoring of a running job?",
+    "answer": "It may be helpful to identify and troubleshoot underperforming jobs."
+  },
+  {
+    "question": "Is it currently supported to use multiple MIG instances on the same physical GPU?",
+    "answer": "No, while this is possible in principle, it is not supported."
+  },
+  {
+    "question": "If running multiple independent tasks on a GPU, and MIG is not supported for that, what alternative is suggested?",
+    "answer": "If you want to run multiple independent tasks on a GPU, you should use MPS rather than MIG."
   }
 ]

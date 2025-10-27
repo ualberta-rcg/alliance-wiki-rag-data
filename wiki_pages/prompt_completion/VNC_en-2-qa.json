@@ -1,62 +1,74 @@
 [
   {
-    "question": "What is the `vncserver` command provided by `StdEnv/2023` based on?",
-    "answer": "The `vncserver` command provided by `StdEnv/2023` is based on TurboVNC."
+    "question": "What is the vncserver command provided by StdEnv/2023 based on?",
+    "answer": "The vncserver command provided by StdEnv/2023 is based on TurboVNC."
   },
   {
-    "question": "Why should the `-idletimeout seconds` option be added when starting a new `vncserver` on a login node?",
-    "answer": "Adding the `-idletimeout seconds` option ensures that your `vncserver` eventually terminates (once S seconds have elapsed with no VNC viewer connections) if you forget to terminate your vncviewer session by clicking `System -> Log out` in the VNC desktop."
+    "question": "Why should the `-idletimeout seconds` option be added when starting a new vncserver on a login node?",
+    "answer": "Adding `-idletimeout seconds` ensures that your vncserver eventually terminates if no VNC viewer connections are made for the specified duration, in case you forget to log out of your vncviewer session."
   },
   {
-    "question": "When are you required to set a password for your VNC server?",
-    "answer": "The first time you start `vncserver`, you will be required to set a password."
+    "question": "When are you required to set a password for the vncserver?",
+    "answer": "The first time you start vncserver, you will be required to set a password."
   },
   {
-    "question": "What is the purpose of the VNC server password?",
-    "answer": "The VNC server password is required to remotely connect to your desktop with a vncclient (such as vncviewer)."
+    "question": "Can the vncserver password be changed later?",
+    "answer": "Yes, the vncserver password can be changed later."
   },
   {
-    "question": "How can you allow multiple connections to the same VNC server?",
-    "answer": "Multiple connections to a VNC server are possible if it was started by appending the additional `-alwaysshared` option."
+    "question": "What is the purpose of the password set for the vncserver?",
+    "answer": "The password is required to remotely connect to your desktop with a vncclient (such as vncviewer)."
   },
   {
-    "question": "How do you determine which TCP port your `vncserver` is listening on from a login node?",
-    "answer": "You can determine the port by running `grep -iE \"\\sport|kill\" /home/yourusername/.vnc/l4.nibi.sharcnet:1.log` on the login node, which will show output like 'Listening for VNC connections on TCP port 5901'."
+    "question": "When can the same password be used for multiple VNC connections?",
+    "answer": "The same password will be required for multiple connections if you started your vncserver by appending the additional `-alwaysshared` option."
   },
   {
-    "question": "Can you exit the login node after starting your `vncserver`?",
-    "answer": "Yes, you may exit the login node, and your `vncserver` will continue running until the time limit assigned by the `-idletimeout` option is reached."
+    "question": "How can you determine which port your vncserver is listening on?",
+    "answer": "You can determine the listening port by running `grep -iE \"\\sport|kill\" /home/yourusername/.vnc/l4.nibi.sharcnet:1.log` on the login node, which will show output like 'Listening for VNC connections on TCP port 5901'."
   },
   {
-    "question": "How do you start an SSH tunnel from your desktop to forward a port for a VNC server running on a login node?",
-    "answer": "You start an SSH tunnel using a command like `ssh nibi.computecanada.ca -L 5905:l4:5901`, where `5905` is an arbitrary local port, `l4` is the login node, and `5901` is the VNC server's listening port."
+    "question": "Does the vncserver continue running after exiting the login node?",
+    "answer": "Yes, the vncserver you started will continue running until the time limit specified with the `-idletimeout` option is reached."
   },
   {
-    "question": "How do you connect to the VNC server using `vncviewer` after setting up an SSH tunnel?",
-    "answer": "From the desktop command line, enter `vncviewer localhost:5905`. Mac or Windows users can also click the `TigerVNC Viewer` application icon and enter `localhost:5905` in the 'Connection Details' dialogue box."
+    "question": "What is the purpose of starting an SSH tunnel on your desktop?",
+    "answer": "Starting an SSH tunnel will forward an arbitrary local port (e.g., 5905) to the port your VNC server is listening on remotely (e.g., 5901)."
   },
   {
-    "question": "What are the limitations of running VNC servers on cluster login nodes?",
-    "answer": "Memory and cputime limits apply on cluster login nodes, making them unsuitable for programs requiring more resources."
+    "question": "What is an example SSH tunnel command for connecting to a VNC server on `nibi.computecanada.ca`?",
+    "answer": "An example SSH tunnel command is `ssh nibi.computecanada.ca -L 5905:l4:5901`, where `5905` is the local port and `5901` is the remote VNC server port on login node `l4`."
   },
   {
-    "question": "When should you start a VNC server on a cluster compute node instead of a login node?",
-    "answer": "You should start a VNC server on a cluster compute node if your program requires memory and/or cputime limits greater than those provided on cluster login nodes."
+    "question": "How do you connect to a remote VNC desktop using the TigerVNC Viewer application icon?",
+    "answer": "You click the TigerVNC Viewer application icon and enter `localhost:5905` (or your chosen forwarded port) in the 'VNC viewer: Connection details' popup window dialogue box."
   },
   {
-    "question": "What is the first step to starting a VNC server on a compute node?",
-    "answer": "The first step is to log into a cluster and create a compute node allocation using the `salloc` command, such as `salloc --time=1:00:00 --cpus-per-task=4 --mem=16000 --account=def-piusername`."
+    "question": "How do you connect to a remote VNC desktop using the vncviewer command line on your laptop?",
+    "answer": "You open a terminal window and run `vncviewer localhost:5905` (or your chosen forwarded port) on the command line."
   },
   {
-    "question": "What environment variable needs to be set on a compute node to avoid repetitive desktop errors before starting a VNC server?",
-    "answer": "You should set the environment variable `export XDG_RUNTIME_DIR=${SLURM_TMPDIR}` on the compute node."
+    "question": "What happens after initiating a VNC viewer connection to a remote desktop?",
+    "answer": "After initiating the connection, a popup window will appear requesting the VNC authentication password that you previously set up."
   },
   {
-    "question": "What critical security instruction is given regarding the VNC server password when starting it on a compute node?",
-    "answer": "You must set a password for your VNC server and 'DO NOT LEAVE THIS BLANK', otherwise anyone could connect to it and gain access to your account's files."
+    "question": "What are the limitations for applications running in a remote desktop on login nodes?",
+    "answer": "Applications run in a remote desktop on login nodes are subject to memory and cputime limits."
   },
   {
-    "question": "How can you change your VNC server password after it has been set?",
-    "answer": "You may change the password later using the `vncpasswd` command."
+    "question": "When should a cluster compute node be used for VNC instead of a login node?",
+    "answer": "A cluster compute node should be used if your program requires memory and/or cputime limits greater than those provided on a cluster login node, or if you need GPU access for applications or graphics acceleration."
+  },
+  {
+    "question": "What command is used to create a compute node allocation for an interactive job?",
+    "answer": "The `salloc` command is used to create a compute node allocation for an interactive job, for example: `salloc --time=1:00:00 --cpus-per-task=4 --mem=16000 --account=def-piusername`."
+  },
+  {
+    "question": "By default, does starting a VNC server on a compute node provide hardware-accelerated OpenGL capabilities?",
+    "answer": "No, by default, this approach will not have hardware-accelerated OpenGL capabilities."
+  },
+  {
+    "question": "What is the time limit for an `salloc` interactive job?",
+    "answer": "A 24-hour time limit applies to `salloc` interactive jobs."
   }
 ]

@@ -1,122 +1,62 @@
 [
   {
-    "question": "What is the default account to specify in the Fluent multinode (by core) Intel MPI Slurm script?",
-    "answer": "The default account to specify is `def-group`."
+    "question": "How is Ansys Fluent executed on a single node when using the OpenMPI multinode (by node, narval) Slurm script?",
+    "answer": "When `$SLURM_NNODES` is 1, Fluent is run using the command `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pshmem -i $MYJOURNALFILE`."
   },
   {
-    "question": "What is the default time limit for a Fluent multinode (by core) Intel MPI job?",
-    "answer": "The default time limit is 3 hours (00-03:00)."
+    "question": "How is Ansys Fluent executed on multiple nodes with the OpenMPI multinode (by node, narval) Slurm script?",
+    "answer": "When `$SLURM_NNODES` is not 1, Fluent is run using the command `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
   },
   {
-    "question": "How many total cores are specified by default in the Fluent multinode (by core) Intel MPI script?",
-    "answer": "The default total number of cores specified is 16 (`#SBATCH --ntasks=16`)."
+    "question": "What is the filename for the Fluent multinode (by core, narval) OpenMPI Slurm script?",
+    "answer": "The filename for this script is `script-flu-bycore-openmpi.sh`."
   },
   {
-    "question": "What is the memory allocation per CPU for a Fluent multinode (by core) Intel MPI job?",
-    "answer": "The memory per CPU is specified as 4G (`#SBATCH --mem-per-cpu=4G`)."
+    "question": "What is the specified time limit in the `script-flu-bycore-openmpi.sh` for Fluent jobs?",
+    "answer": "The specified time limit is `00-03:00` (3 hours)."
   },
   {
-    "question": "Which standard environment module should be loaded for Ansys Fluent 2023R2 jobs?",
-    "answer": "The `StdEnv/2023` module should be loaded."
+    "question": "How many total cores are specified for a Fluent job in the `script-flu-bycore-openmpi.sh` script?",
+    "answer": "The script specifies 16 total cores across all nodes (`#SBATCH --ntasks=16`)."
   },
   {
-    "question": "Which Ansys module version is loaded in the provided Fluent multinode (by core) Intel MPI script?",
-    "answer": "The `ansys/2023R2` module (or newer versions) is loaded."
+    "question": "What memory allocation per core is requested in the `script-flu-bycore-openmpi.sh` script?",
+    "answer": "The script requests `4G` of memory per core (`#SBATCH --mem-per-cpu=4G`)."
   },
   {
-    "question": "What variable is used to specify the journal file name in the Fluent multinode (by core) Intel MPI script?",
-    "answer": "`MYJOURNALFILE=sample.jou` is used to specify the journal file name."
+    "question": "Which standard environment and Ansys module versions are loaded in the `script-flu-bycore-openmpi.sh` script?",
+    "answer": "The script loads `StdEnv/2023` and `ansys/2023R2` (or newer versions)."
   },
   {
-    "question": "What variable is used to specify the Fluent version (e.g., 2d, 3d) in the Fluent multinode (by core) Intel MPI script?",
-    "answer": "`MYVERSION=3d` is used to specify the Fluent version."
+    "question": "What OpenMPI-related environment variables are exported in the `script-flu-bycore-openmpi.sh` script?",
+    "answer": "The script exports `OPENMPI_ROOT=$EBROOTOPENMPI` and `OMPI_MCA_hwloc_base_binding_policy=core`."
   },
   {
-    "question": "How are Intel MPI environment variables configured for Narval with StdEnv/2023 in the Fluent scripts?",
-    "answer": "If `CC_CLUSTER` is narval and `EBVERSIONGENTOO` is 2023, then `module load intel/2023 intelmpi` is run, and `export INTELMPI_ROOT=$I_MPI_ROOT` is set."
+    "question": "What is the filename for the Fluent multinode (by node, trillium) Intel Slurm script?",
+    "answer": "The filename for this script is `script-flu-bynode-intel-tri.sh`."
   },
   {
-    "question": "How are Intel MPI environment variables configured for Narval with StdEnv/2020 in the Fluent scripts?",
-    "answer": "If `CC_CLUSTER` is narval and `EBVERSIONGENTOO` is 2020, then `module load intel/2021 intelmpi` is run, and `export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest` and `export HCOLL_RCACHE=^ucs` are set."
+    "question": "How many compute nodes are specified in the `script-flu-bynode-intel-tri.sh` script for Fluent jobs on Trillium?",
+    "answer": "The script specifies 1 compute node (`#SBATCH --nodes=1`)."
   },
   {
-    "question": "What command creates the machinefile for ANSYS-FLUENT jobs?",
-    "answer": "`slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID` creates the machinefile."
+    "question": "How many cores per node are specified in the `script-flu-bynode-intel-tri.sh` script?",
+    "answer": "The script specifies 16 cores per node (`#SBATCH --ntasks-per-node=16`), with a maximum of 192 on Trillium."
   },
   {
-    "question": "How is the total number of cores (NCORES) calculated in the Fluent multinode (by core) Intel MPI script?",
-    "answer": "`NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))` calculates the total number of cores."
+    "question": "What are the default license server, flex port, and vendor port values configured in the `script-flu-bynode-intel-tri.sh` script for Trillium?",
+    "answer": "The license server is `license1.computecanada.ca`, the flex port is `1055`, and the vendor port is `1793`."
   },
   {
-    "question": "How is Fluent run on a single node in the Fluent multinode (by core) Intel MPI script?",
-    "answer": "It's run using `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE`."
+    "question": "Which SSH commands are used in the Trillium Fluent script (`script-flu-bynode-intel-tri.sh`) to establish license forwarding?",
+    "answer": "The commands are `ssh tri-gw -fNL $FLEXPORT:$LICSERVER:$FLEXPORT` and `ssh nia-gw -fNL $VENDPORT:$LICSERVER:$VENDPORT`."
   },
   {
-    "question": "How is Fluent run on multiple nodes in the Fluent multinode (by core) Intel MPI script?",
-    "answer": "It's run using `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
+    "question": "What check does the `script-flu-bynode-intel-tri.sh` perform regarding the Ansys configuration directory?",
+    "answer": "It checks if a symbolic link to a writable `.ansys` directory exists in the user's home folder (`if [ ! -L \"$HOME/.ansys\" ]; then`)."
   },
   {
-    "question": "What is the purpose of `export I_MPI_HYDRA_BOOTSTRAP=ssh` in Fluent scripts?",
-    "answer": "It should be uncommented on Beluga or Cedar clusters."
-  },
-  {
-    "question": "What is the specified number of compute nodes for Fluent multinode (by node) Open MPI on Narval?",
-    "answer": "The script specifies 1 node (`#SBATCH --nodes=1`)."
-  },
-  {
-    "question": "What is the specified number of cores per node for Fluent multinode (by node) Open MPI on Narval?",
-    "answer": "The script specifies 64 cores per node (`#SBATCH --ntasks-per-node=64`) or less for Narval."
-  },
-  {
-    "question": "What memory setting is used for Fluent multinode (by node) Open MPI on Narval?",
-    "answer": "`#SBATCH --mem=0` is used, which allocates all memory per compute node."
-  },
-  {
-    "question": "Which environment variables are exported for Open MPI in the Narval Fluent scripts?",
-    "answer": "`export OPENMPI_ROOT=$EBROOTOPENMPI` and `export OMPI_MCA_hwloc_base_binding_policy=core` are exported."
-  },
-  {
-    "question": "What is the command to run Fluent on a single node using Open MPI in the Narval script?",
-    "answer": "`fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pshmem -i $MYJOURNALFILE` is used."
-  },
-  {
-    "question": "What is the command to run Fluent on multiple nodes using Open MPI in the Narval script?",
-    "answer": "`fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE` is used."
-  },
-  {
-    "question": "What is the default number of compute nodes for a Fluent multinode (by node) Intel MPI job on Niagara?",
-    "answer": "The default number of compute nodes is 2 (`#SBATCH --nodes=2`)."
-  },
-  {
-    "question": "What is the default number of cores per node for a Fluent multinode (by node) Intel MPI job on Niagara?",
-    "answer": "The default number of cores per node is 80 (`#SBATCH --ntasks-per-node=80`) or less."
-  },
-  {
-    "question": "Which modules are loaded for Ansys Fluent jobs on Niagara?",
-    "answer": "`CCEnv StdEnv/2023`, `arch/avx512`, and `ansys/2023R2` (or newer versions) are loaded."
-  },
-  {
-    "question": "How are license server settings specified in the Niagara Fluent Slurm script?",
-    "answer": "LICSERVER, FLEXPORT, INTEPORT, and VENDPORT variables are defined in the script, and SSH tunnels are created to `localhost` for these ports, which are then used in `ANSYSLMD_LICENSE_FILE` and `ANSYSLI_SERVERS`."
-  },
-  {
-    "question": "What SSH commands are used for license tunneling on Niagara?",
-    "answer": "Commands like `ssh nia-gw -fNL $FLEXPORT:$LICSERVER:$FLEXPORT` are used for tunneling."
-  },
-  {
-    "question": "What environment variables are set for Fluent licensing on Niagara after SSH tunneling?",
-    "answer": "`export ANSYSLMD_LICENSE_FILE=$FLEXPORT@localhost` and `export ANSYSLI_SERVERS=$INTEPORT@localhost` are set."
-  },
-  {
-    "question": "What error message appears if the `~/.ansys` directory link does not exist on Niagara?",
-    "answer": "An error message `ERROR: A link to a writable .ansys directory does not exist.` will appear, with a suggestion to run `ln -s $SCRATCH/.ansys ~/.ansys`."
-  },
-  {
-    "question": "What error message appears if the `~/.fluentconf` directory link does not exist on Niagara?",
-    "answer": "An error message `ERROR: A link to a writable .fluentconf directory does not exist.` will appear, with a suggestion to run `ln -s $SCRATCH/.fluentconf ~/.fluentconf`."
-  },
-  {
-    "question": "What error message appears if the `~/.flrecent` file link does not exist on Niagara?",
-    "answer": "An error message `ERROR: A link to a writable .flrecent file does not exist.` will appear, with a suggestion to run `ln -s $SCRATCH/.flrecent ~/.flrecent`."
+    "question": "What is the recommended action if the `script-flu-bynode-intel-tri.sh` reports an error about a missing link to a writable `.ansys` directory?",
+    "answer": "The user should remove `~/.ansys` if it exists and then run `ln -s $SCRATCH/.ansys ~/.ansys`."
   }
 ]

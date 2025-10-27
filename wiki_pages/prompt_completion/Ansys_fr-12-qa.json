@@ -1,82 +1,358 @@
 [
   {
-    "question": "How do you instruct Fluent to interpret a User-Defined Function (UDF)?",
-    "answer": "Add the command `define/user-defined/interpreted-functions \"sampleudf.c\" \"cpp\" 10000 no` to your journal file before the case/data files are read or initialized, replacing `sampleudf.c` with your source file name."
+    "question": "How do you enable parallel execution for Ansys Workbench in a Slurm script for single-node tasks?",
+    "answer": "To enable parallel execution for Ansys Workbench in a Slurm script, set the `MEMPAR` variable to `0` for Shared Memory Parallel (SMP) if `SLURM_NNODES` is 1, or `1` for Distributed Memory Parallel (DMP) otherwise. The `SolveHandlers.xml` file is then modified to reflect this setting."
   },
   {
-    "question": "Does the command for an interpreted UDF change for sequential versus parallel simulations?",
-    "answer": "No, the command for an interpreted UDF remains the same whether the simulation is executed sequentially or in parallel."
+    "question": "How do you specify the maximum number of processors for Ansys Workbench within a Slurm script?",
+    "answer": "The maximum number of processors for Ansys Workbench is set by modifying the `SolveHandlers.xml` file, specifically the `<MaxNumber.Processors>` tag, to the value of `$SLURM_NTASKS`."
   },
   {
-    "question": "What is a prerequisite to ensure that only the journal file controls UDF execution for an interpreted UDF?",
-    "answer": "Open your case file in the Fluent graphical interface, delete all managed definitions, and re-save it to ensure only the journal file's commands are in control."
+    "question": "What are the `KMP_AFFINITY` and `I_MPI_HYDRA_BOOTSTRAP` environment variables configured for in Workbench Slurm scripts?",
+    "answer": "In Workbench Slurm scripts, `KMP_AFFINITY` is set to `disabled` and `I_MPI_HYDRA_BOOTSTRAP` is set to `ssh`."
   },
   {
-    "question": "What is required before a UDF can be used as a compiled UDF?",
-    "answer": "Your UDF must be compiled on one of our clusters at least once, which will create a `libudf` subdirectory containing the required `libudf.so` shared library."
+    "question": "How can you run an Ansys Workbench project in batch mode without saving the solution at the end?",
+    "answer": "To run an Ansys Workbench project in batch mode without saving the solution, use the command `runwb2 -B -E \"Update()\" -F YOURPROJECT.wbpj` in your Slurm script. The line `#runwb2 -B -E \"Update();Save(Overwrite=True)\" -F YOURPROJECT.wbpj` is commented out for this purpose."
   },
   {
-    "question": "Can the `libudf` directory be copied from a remote system, like a laptop, to the Alliance clusters?",
-    "answer": "No, the `libudf` directory cannot be simply copied from a remote system because shared library dependencies will not be met, causing Fluent to crash upon startup."
+    "question": "How do you generate an input file for Ansys Mechanical?",
+    "answer": "An input file for Ansys Mechanical (APDL) can be generated in an interactive Workbench Mechanical session by navigating to `Solution -> Tools -> Write Input Files`, then specifying `File name:` as `YOURAPDLFILE.inp` and `Save as type:` for APDL input files (*.inp)."
   },
   {
-    "question": "Under what conditions can a compiled `libudf` directory be transferred between Alliance clusters?",
-    "answer": "Once compiled on one of our clusters, the newly created `libudf` can be transferred to any other Alliance cluster, provided your account loads the same version of the StdEnv environment module."
+    "question": "What is the command to submit APDL tasks to the queue?",
+    "answer": "APDL tasks can be submitted to the queue using the `sbatch script-name.sh` command."
   },
   {
-    "question": "How should you configure your journal file to use a compiled UDF without recompiling it for every task?",
-    "answer": "Uncomment only the 'load' line (`define/user-defined/compiled-functions load libudf`) in your journal file when submitting a task, not both 'compile' and 'load'."
+    "question": "On which clusters have the Ansys Mechanical Slurm scripts been tested?",
+    "answer": "The Ansys Mechanical Slurm scripts have been tested on Graham, Narval, Cedar, and Beluga."
   },
   {
-    "question": "What are the drawbacks of leaving both the 'compile' and 'load' commands uncommented for a compiled UDF in a journal file?",
-    "answer": "It is inefficient as the UDF will be automatically recompiled for each task, and it can lead to 'racetime' build conflicts if multiple tasks are executed from the same directory."
+    "question": "What is the default memory allocation for Ansys APDL tasks?",
+    "answer": "By default, Ansys allocates 1024MB of total memory and 1024MB of database memory for APDL tasks."
   },
   {
-    "question": "How can you compile a UDF using Fluent's graphical interface?",
-    "answer": "Add the UDF source file in the 'Compiled UDFs' dialog and click 'Build'."
+    "question": "How can the default memory allocation for Ansys APDL tasks be customized?",
+    "answer": "The default memory allocation can be manually defined or modified by adding arguments like `-m 1024` for total memory and/or `-db 1024` for database memory to the last `mapdl` command line in the Slurm scripts."
   },
   {
-    "question": "What command is used in the journal file to compile a UDF?",
-    "answer": "The command is `define/user-defined/compiled-functions compile libudf yes sampleudf.c \"\" \"\"`."
+    "question": "What additional arguments might be necessary when using a remote institutional license server with multiple Ansys licenses for APDL tasks?",
+    "answer": "If using a remote institutional license server with multiple Ansys licenses, it might be necessary to add arguments like `-p aa_r` or `-ppf anshpc` to the `mapdl` command, depending on the module being used."
   },
   {
-    "question": "What command is used in the journal file to load a compiled UDF?",
-    "answer": "The command is `define/user-defined/compiled-functions load libudf`."
+    "question": "Why is it important to perform detailed scaling tests for Mechanical tasks before running them in production?",
+    "answer": "It is important to perform detailed scaling tests before running production Mechanical tasks to ensure the optimal number of cores and the correct minimum amount of memory are being used."
   },
   {
-    "question": "What must be done before a UDF can be used with a parallel Fluent task?",
-    "answer": "It must be parallelized, which involves adding compilation directives, predicates, and reduction macros to your sequential UDF."
+    "question": "Which type of Mechanical parallelization (SMP or DMP) is generally preferred for better performance?",
+    "answer": "Scripts for single nodes with Shared Memory Parallel (SMP) typically offer better performance than scripts for multiple nodes with Distributed Memory Parallel (DMP) and should be used whenever possible."
   },
   {
-    "question": "Why is UDF parallelization necessary for parallel Fluent tasks?",
-    "answer": "Parallelization controls how and which processes (host and/or compute) execute specific parts of the UDF code, ensuring efficient execution; without it, Fluent will run slowly or crash immediately."
+    "question": "What is the recommended compatibility between the Ansys module loaded in a script and the input file version for Mechanical tasks?",
+    "answer": "To prevent compatibility issues, the Ansys module loaded in your script should ideally match the version used to generate the input file."
   },
   {
-    "question": "Where can detailed information on UDF parallelization be found?",
-    "answer": "Detailed information is described in `Fluent Customization Manual, Part I: Chapter 7: Parallel Considerations`, available in the online documentation."
+    "question": "Can Ansys Rocky simulations be executed in both graphical and non-graphical modes?",
+    "answer": "Yes, Ansys Rocky can execute simulations in both graphical and non-graphical modes."
   },
   {
-    "question": "Can User-Defined Functions (UDFs) be used to customize Discrete Phase Models (DPM)?",
-    "answer": "Yes, UDFs can be used to customize Discrete Phase Models (DPM)."
+    "question": "Does Ansys Rocky support CPU-only execution or CPU+GPU execution?",
+    "answer": "Ansys Rocky supports running simulations with processors only or with processors and GPUs."
   },
   {
-    "question": "How do you define particle injection for DPM when using a UDF?",
-    "answer": "Particle injection must be defined by specifying 'Point Properties' with variables such as source position, initial trajectory, mass flow rate, duration, temperature, etc., based on the injection type."
+    "question": "How can one obtain a comprehensive list of command-line options for Ansys Rocky?",
+    "answer": "A complete list of command-line options for Rocky can be obtained by running `Rocky -h` on the command line after loading a Rocky module."
   },
   {
-    "question": "What are the initial injection types available in Fluent's 'Set Injection Properties' dialog?",
-    "answer": "The initial injection types available are `single`, `group`, `surface`, and `flat-fan-atomizer`."
+    "question": "When using Rocky with GPUs for coupled problems, how should the number of requested CPUs be adjusted?",
+    "answer": "When Rocky is run with GPUs to solve coupled problems, the number of CPUs requested (on the same node) should be increased to the maximum until the scalability limit of the coupled application is reached."
   },
   {
-    "question": "How can you specify Point Properties by reading an injection text file in Fluent?",
-    "answer": "Select `File` in the 'Injection Type' dropdown menu, specify the injection name, then click the 'File' button next to the 'OK' button in the 'Set Injection Properties' dialog to select an injection file (e.g., .dpm or .inj extension)."
+    "question": "What are the CPU requirements for Ansys Rocky when running standalone decoupled problems with GPUs?",
+    "answer": "When Rocky is run with GPUs for standalone decoupled problems, only a minimal number of CPUs (e.g., 2 or 3) should be requested to allow Rocky to function optimally."
   },
   {
-    "question": "What command allows DPM source terms to be updated at each flow iteration in Fluent?",
-    "answer": "The command `define/models/dpm/interaction/coupled-calculations yes` enables updating DPM source terms at each flow iteration."
+    "question": "Under what conditions are `rocky_hpc` licenses required for Ansys Rocky, and which license typically provides them?",
+    "answer": "When Ansys Rocky is executed with 4 or more CPUs, `rocky_hpc` licenses are required, which are provided by the SHARCNET license."
   },
   {
-    "question": "Provide an example of how DPM injection steps can be automated by adding commands to a journal file after solution initialization.",
-    "answer": "Example commands include:\n`/define/models/dpm/interaction/coupled-calculations yes`\n`/define/models/dpm/injections/delete-injection injection-0:1`\n`/define/models/dpm/injections/create injection-0:1 no yes file no zinjection01.inj no no no no`\n`/define/models/dpm/injections/list-particles injection-0:1`\n`/define/models/dpm/injections/list-injection-properties injection-0:1`"
+    "question": "What is the maximum duration for running Ansys interactively on a single compute node?",
+    "answer": "Ansys can be run interactively on a single compute node for up to 24 hours."
+  },
+  {
+    "question": "What is the recommended approach for interactively testing intensive Ansys simulations?",
+    "answer": "The ideal approach for interactively testing intensive Ansys simulations is to run them on a single compute node, requesting all cores and memory with `salloc` as described in TigerVNC."
+  },
+  {
+    "question": "What modules are necessary to launch Ansys Fluent or CFX interactively on compute nodes?",
+    "answer": "To launch Ansys Fluent or CFX interactively on compute nodes, `StdEnv/2020` and `ansys/2021R1` (or newer versions) modules need to be loaded."
+  },
+  {
+    "question": "What commands are used to launch Fluent or CFX interactively in graphical mode on compute nodes?",
+    "answer": "To launch Fluent, use `fluent -mpi=intel`. To launch CFX, use `QTWEBENGINE_DISABLE_SANDBOX=1 cfx5`."
+  },
+  {
+    "question": "What modules and commands are needed to run Ansys Mapdl interactively with a GUI on compute nodes?",
+    "answer": "To run Ansys Mapdl interactively with a GUI, load `StdEnv/2020` and `ansys/2021R2` (or newer versions), then use `mapdl -g` or `launcher` followed by clicking the RUN button."
+  },
+  {
+    "question": "What is a common issue with Ansys Mechanical Workbench dropdown menus in graphical mode, and how can it be resolved?",
+    "answer": "A common issue is that the dropdown menus of Ansys Mechanical Workbench do not respond correctly. The solution is to launch `xfwm4 --replace &` on the command line before starting Workbench. For a default fix, modify `~/.vnc/xstartup` and replace `mate-session` with `xfce4-session`."
+  },
+  {
+    "question": "Which Ansys Fluent version has a known issue on compute nodes and what is the workaround?",
+    "answer": "Fluent in `ansys/2022R2` does not work on compute nodes at the moment; users should use another version."
+  },
+  {
+    "question": "How can Ansys Ensight be run interactively on compute nodes?",
+    "answer": "To run Ensight interactively on compute nodes, load `StdEnv/2020` and an Ansys module (e.g., `ansys/2022R2`), set `LD_LIBRARY_PATH` to the correct Qt library path, and then execute `ensight -X`."
+  },
+  {
+    "question": "What modules are required to run Ansys Rocky interactively on compute nodes?",
+    "answer": "To run Ansys Rocky interactively on compute nodes, load modules like `ansysrocky/2023R2 StdEnv/2020 ansys/2023R2`, or `ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04`, or `StdEnv/2023 ansys/2025R1`."
+  },
+  {
+    "question": "How can one request a compute node on Graham for interactive Rocky use with CPUs and GPUs?",
+    "answer": "To request a compute node on Graham for interactive Rocky use with 4 CPUs and 1 GPU for a maximum of 8 hours, launch `salloc --time=08:00:00 --nodes=1 --cpus-per-task=4 --gres=gpu:v100:1 --mem=32G --account=someaccount`."
+  },
+  {
+    "question": "What are the resource limits for running Ansys programs on Graham VDI nodes?",
+    "answer": "Ansys programs can be run for up to 7 days on Graham VDI nodes (gra-vdi.alliancecan.ca), using a maximum of 8 cores (or 16 cores) and 128 GB of memory."
+  },
+  {
+    "question": "What are the main benefits of using VDI for Ansys tasks?",
+    "answer": "VDI provides OpenGL GPU acceleration, which is ideal for high-performance graphics, and can be used to create or modify simulation input files, post-process data, or visualize simulation results."
+  },
+  {
+    "question": "How can two simultaneous Ansys tasks be run on VDI nodes?",
+    "answer": "Two simultaneous Ansys tasks can be run by connecting with VNC to `gra-vdi3.sharcnet.ca` for the first session and `gra-vdi4.sharcnet.ca` for the second session, then starting Ansys graphically in each."
+  },
+  {
+    "question": "Is there a time limit for running simulations on gra-vdi, unlike compute nodes with Slurm?",
+    "answer": "No, there is no time limit constraint on gra-vdi when running simulations, unlike compute nodes which impose Slurm limits via `salloc`."
+  },
+  {
+    "question": "What modules are typically needed for Ansys Fluids on VDI nodes?",
+    "answer": "For Ansys Fluids on VDI nodes, `CcEnv StdEnv/2023` and `ansys/2024R2.04` (or older versions) are typically needed."
+  },
+  {
+    "question": "Why is `unset SESSION_MANAGER` used before launching Ansys Fluids on VDI nodes?",
+    "answer": "The `unset SESSION_MANAGER` command is used to avoid a 'Qt: Session management error' message when launching Ansys Fluids on VDI nodes."
+  },
+  {
+    "question": "What is a common error encountered when launching `icemcfd` on VDI, and how is it resolved?",
+    "answer": "A common error is 'Error segmentation violation - exiting after doing an emergency save'. To resolve it, do not click OK; instead, go to `Settings Tab -> Display -> tick X11 -> Apply -> OK -> File -> Exit` (once), and the error should not recur."
+  },
+  {
+    "question": "What modules are typically needed for Ansys Mapdl on VDI nodes?",
+    "answer": "For Ansys Mapdl on VDI nodes, `CcEnv StdEnv/2023` and `ansys/2024R2.04` (or older versions) are typically needed."
+  },
+  {
+    "question": "How do you launch Mapdl graphically on VDI nodes?",
+    "answer": "To launch Mapdl graphically on VDI nodes, use `mapdl -g` or `unset SESSION_MANAGER; launcher -> click RUN button`."
+  },
+  {
+    "question": "What modules are typically loaded for Ansys Workbench on VDI nodes, differentiating between local and global environments?",
+    "answer": "For local modules, load `SnEnv` followed by an `ansys` version (e.g., `ansys/2024R.04`). For global environment, load `CcEnv StdEnv/2023` followed by an `ansys` version (e.g., `ansys/2025R1`)."
+  },
+  {
+    "question": "What is the distinction between `runwb2` and `runwb2-gui` for local Ansys modules when launching Workbench on VDI?",
+    "answer": "For local Ansys modules (`SnEnv`), `runwb2` defaults to the SHARCNET license server. `runwb2-gui` should be used to read your `~/.licenses/ansys.lic` file for a remote server, or to select the CMC server interactively."
+  },
+  {
+    "question": "How can the 'Software rasterizer' warning be prevented when starting Fluent from Workbench 2025R1 on VDI?",
+    "answer": "To prevent the 'Software rasterizer' warning, either set `HOOPS_PICTURE=opengl` in your environment before starting Workbench or copy/paste `HOOPS_PICTURE=opengl` into the empty input field on the `Environment` tab of the Fluent Launcher panel before clicking 'Start'."
+  },
+  {
+    "question": "What are the recommended maximum core limits for Mechanical and Fluent when running in Workbench on gra-vdi?",
+    "answer": "When running Mechanical in Workbench on gra-vdi, specify a maximum of **24 cores**. When running Fluent, specify a maximum of **12 cores**."
+  },
+  {
+    "question": "How many cores should be used for old pre-processing or post-processing tasks with Ansys on gra-vdi if no calculations are being run?",
+    "answer": "For old pre-processing or post-processing tasks on gra-vdi without running calculations, use only **4 cores** to avoid unnecessarily consuming HPC licenses."
+  },
+  {
+    "question": "How can all Ansys processes be stopped on gra-vdi if the GUI freezes or doesn't start correctly?",
+    "answer": "If Ansys isn't working correctly, open a new terminal window on gra-vdi and run `pkill -9 -e -u $USER -f \"ansys|fluent|mwrpcss|mwfwrapper|ENGINE|mono\"` to stop all Ansys processes."
+  },
+  {
+    "question": "Is executing graphical Ansys programs remotely via SSH redirection supported?",
+    "answer": "No, executing graphical Ansys programs remotely via SSH redirection to your local computer is neither tested nor supported."
+  },
+  {
+    "question": "Why is SSH not recommended for interactive Ansys graphical programs?",
+    "answer": "SSH is not recommended for interactive graphical Ansys programs due to potentially unacceptable interactive response times for basic menu tasks and very long startup times, as demonstrated by a test where it took 40 minutes for the GUI with SSH compared to 34 seconds with `vncviewer`."
+  },
+  {
+    "question": "Is the SHARCNET Ansys license free for academic use?",
+    "answer": "Yes, the SHARCNET Ansys license is free for academic use by Alliance researchers on Alliance systems."
+  },
+  {
+    "question": "What are the restrictions on using the SHARCNET Ansys license for commercial purposes?",
+    "answer": "The SHARCNET Ansys license can only be used for publishable academic research; the production of results for private commercial purposes is strictly prohibited."
+  },
+  {
+    "question": "What products are included in the SHARCNET Multiphysics Campus Solution license, upgraded in May 2020?",
+    "answer": "The SHARCNET Multiphysics Campus Solution license includes HF, EM, Electronics HPC, Mechanical, and CFD products."
+  },
+  {
+    "question": "Are Ansys Rocky and LS-DYNA included in the SHARCNET license?",
+    "answer": "Yes, Rocky and LS-DYNA are now included in the SHARCNET license."
+  },
+  {
+    "question": "Is Lumerical available with the SHARCNET Ansys modules?",
+    "answer": "Lumerical is not currently available but is installed with recent Ansys modules and can be used with other configured Ansys servers."
+  },
+  {
+    "question": "What is the purpose of the `anshpc` license group in the SHARCNET license?",
+    "answer": "A group of 1986 `anshpc` licenses is included in the SHARCNET license to support large parallel tasks with most Ansys products."
+  },
+  {
+    "question": "What was the HPC core limit per user for SHARCNET Ansys licenses as of December 2022?",
+    "answer": "As of December 2022, each user could run 4 jobs using a total of 252 `anshpc` (plus 4 `anshpc` per task), allowing for various uniform task size combinations."
+  },
+  {
+    "question": "What is the updated HPC core limit per user (October 2024) for SHARCNET Ansys licenses?",
+    "answer": "As of October 2024, the limit was increased to 8 tasks and 512 HPC cores per user (collectively across all clusters for all applications) for a test period."
+  },
+  {
+    "question": "Why is it recommended to close Ansys GUI applications immediately after job completion on VDI?",
+    "answer": "It is recommended to close Ansys GUI applications immediately after job completion on VDI to release any licenses that may be consumed while the application is inactive, making them available for other users."
+  },
+  {
+    "question": "What are some advantages of purchasing your own Ansys license from CMC?",
+    "answer": "Advantages include not needing a local institutional license server, not needing to acquire a physical license with each renewal, license usability almost anywhere (home, institutions, all Alliance clusters), and access to Windows Ansys versions for running SpaceClaim on your own computer."
+  },
+  {
+    "question": "What is a potential serious limitation of the CMC Ansys license?",
+    "answer": "A potentially serious limitation is that there might be a limit of 64 cores per user with the CMC license."
+  },
+  {
+    "question": "How should the `ansys.lic` file be configured to use the SHARCNET license on clusters?",
+    "answer": "To use the SHARCNET license, configure your `~/.licenses/ansys.lic` file with `setenv(\"ANSYSLMD_LICENSE_FILE\", \"1055@license3.sharcnet.ca\")` and `setenv(\"ANSYSLI_SERVERS\", \"2325@license3.sharcnet.ca\")`."
+  },
+  {
+    "question": "How can one check the number of Ansys licenses associated with their username and used by all users?",
+    "answer": "To check license usage, log into a cluster (e.g., `ssh graham.computecanada.ca`), load the `ansys` module, and then run `lmutil lmstat -c $ANSYSLMD_LICENSE_FILE -a | grep \"Users of|$USER\"`."
+  },
+  {
+    "question": "What command can be used to free up Ansys licenses if they are stuck due to an improperly closed GUI session on gra-vdi?",
+    "answer": "To free up stuck Ansys licenses, connect to the VDI node (e.g., `gra-vdi3.sharcnet.ca` or `gra-vdi4.sharcnet.ca`), open a terminal, and run `pkill -9 -e -u $USER -f \"ansys\"`."
+  },
+  {
+    "question": "What are the two options for loading Ansys modules on gra-vdi?",
+    "answer": "On gra-vdi, you can either load Ansys modules from the global environment (after loading `CcEnv`) or load locally installed Ansys modules (after loading `SnEnv`)."
+  },
+  {
+    "question": "What are the advantages of using local Ansys modules on gra-vdi?",
+    "answer": "Local Ansys modules may include certain Ansys programs and versions not yet supported by the standard environment. When starting programs from local modules, you can select the CMC license server or accept the default SHARCNET license server."
+  },
+  {
+    "question": "Do local Ansys modules on gra-vdi use the `~/.licenses/ansys.lic` file by default?",
+    "answer": "Local Ansys modules do not currently use `~/.licenses/ansys.lic` by default, except when starting `runwb2`, where it overrides the default SHARCNET license server settings."
+  },
+  {
+    "question": "What specific components are available when launching `cfx5` from local Ansys modules?",
+    "answer": "When launching `cfx5` from local Ansys modules, the following components are available: CFX-Launcher, CFX-Pre, CFD-Post, and CFX-Solver."
+  },
+  {
+    "question": "What happened to license feature preferences configured with `anslic_admin` after September 9, 2021?",
+    "answer": "License feature preferences previously configured with `anslic_admin` are no longer supported since September 9, 2021."
+  },
+  {
+    "question": "What should be done if a license issue occurs with Ansys on gra-vdi?",
+    "answer": "If a license issue occurs, try deleting the `~/.ansys` directory from your `/home` account to clear settings. If problems persist, contact technical support and provide the contents of your `~/.licenses/ansys.lic` file."
+  },
+  {
+    "question": "What is the initial setup required for Ansys Additive Manufacturing?",
+    "answer": "First, configure your `~/.licenses/ansys.lic` file to point to the license server with a valid Ansys Mechanical license on all systems where the software will be used."
+  },
+  {
+    "question": "How do you download the `AdditiveWizard.wbex` extension for Ansys Additive Manufacturing?",
+    "answer": "The `AdditiveWizard.wbex` extension can be downloaded from `https://catalog.ansys.com/`."
+  },
+  {
+    "question": "What are the steps to install the `AdditiveWizard.wbex` extension in Ansys Workbench?",
+    "answer": "To install the extension, launch Workbench, open the Extension Manager by clicking `ACT Start` then `Manage Extensions`, click the `+` box, and select and install your `AdditiveWizard.wbex` file."
+  },
+  {
+    "question": "How do you load the `AdditiveWizard` extension for the current Workbench session only?",
+    "answer": "To load the `AdditiveWizard` extension for the current session only, click to select its box in the Extension Manager."
+  },
+  {
+    "question": "How do you load the `AdditiveWizard` extension for the current and future Workbench sessions?",
+    "answer": "To load the `AdditiveWizard` extension for current and future sessions, click the arrow in the bottom right corner of its box and select `Load extension`."
+  },
+  {
+    "question": "How do you remove the `AdditiveWizard` extension for the current Workbench session?",
+    "answer": "To remove the `AdditiveWizard` extension for the current session, click to deselect its box in the Extension Manager."
+  },
+  {
+    "question": "How do you prevent the `AdditiveWizard` extension from loading in future Workbench sessions?",
+    "answer": "To prevent the `AdditiveWizard` extension from loading in future sessions, click the arrow in the bottom right corner of its box and select `Do not load as default`."
+  },
+  {
+    "question": "What are the core limits for running a single Ansys Additive Manufacturing task on gra-vdi?",
+    "answer": "You can run a single Ansys Additive Manufacturing task on gra-vdi using up to 16 cores."
+  },
+  {
+    "question": "How can one check the resource usage for an Additive Manufacturing task running on gra-vdi?",
+    "answer": "To check resource usage, open another terminal on gra-vdi and launch `top -u $USER` or `ps u -u $USER | grep ansys`."
+  },
+  {
+    "question": "How can unnecessary processes from previous tasks be terminated on gra-vdi?",
+    "answer": "Unnecessary processes can be terminated with `pkill -9 -e -u $USER -f \"ansys|mwrpcss|mwfwrapper|ENGINE\"`."
+  },
+  {
+    "question": "What can cause persistent processes to block licenses or cause errors on gra-vdi?",
+    "answer": "Persistent processes can block licenses or cause other unusual errors if an Ansys GUI session is not properly terminated before `vncviewer` is manually or unexpectedly closed (e.g., due to network outage or a stuck file system)."
+  },
+  {
+    "question": "What preparation is needed for a newly downloaded Additive Manufacturing project before submitting it to a cluster queue?",
+    "answer": "Before submission, open the simulation with the Workbench GUI in the submission directory, save it again using the same Ansys module version, and create a Slurm script."
+  },
+  {
+    "question": "How can parametric studies be performed with an Additive Manufacturing project?",
+    "answer": "For parametric studies, replace `Update()` with `UpdateAllDesignPoints()` in the Slurm script."
+  },
+  {
+    "question": "How can the optimal number of cores and memory for an Additive Manufacturing task be determined?",
+    "answer": "Determine the optimal number of cores and memory by submitting several short test tasks."
+  },
+  {
+    "question": "How can one avoid manually clearing the solution and recreating design points between Additive Manufacturing test runs?",
+    "answer": "To avoid manual clearing and recreation, either replace `Save(Overwrite=True)` with `Save(Overwrite=False)` in the script, or save a copy of the original project file and its corresponding directory before each test run and restore them afterwards."
+  },
+  {
+    "question": "How can a replay file be executed on a cluster for an Additive Manufacturing project?",
+    "answer": "A replay file can be executed on the cluster by loading the Ansys module (e.g., `ansys/2019R3`), removing any `.lock` files, and then running `runwb2 -R myreplay.wbjn`."
+  },
+  {
+    "question": "How can a snapshot of resource usage for a running Additive Manufacturing task be obtained?",
+    "answer": "After a few minutes, a snapshot of resource usage can be obtained by running `srun --jobid=myjobid top -bn1 -u $USER | grep R | grep -v top` on the login node."
+  },
+  {
+    "question": "How are scalability tests performed for Additive Manufacturing tasks?",
+    "answer": "Scalability tests are performed by submitting short tasks, then doubling the number of cores. If the 'Job Wall-clock time' (obtained with `seff jobid`) decreases by approximately 50%, one can continue doubling the number of cores."
+  },
+  {
+    "question": "Where can the latest Ansys documentation, tutorials, and videos be found publicly?",
+    "answer": "The latest Ansys documentation, tutorials, and videos can be found on the publicly accessible Ansys Help site at `https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/prod_page.html?pn=Fluent&pid=Fluent&lang=en`."
+  },
+  {
+    "question": "Is a login always required to access Ansys documentation for specific versions?",
+    "answer": "While developer documentation and the latest release documentation might not require a login, documentation for Ansys versions like 2024R1, 2024R2, and 2025R1 *will* require a login."
+  },
+  {
+    "question": "What is the process to access Ansys Help for a specific version (e.g., 2023R2) without requiring a login via gra-vdi?",
+    "answer": "To access Ansys Help for a specific version without login via gra-vdi, connect with TigerVNC, close Firefox/Workbench if open, launch Firefox, open a new terminal, launch Workbench (`module load CcEnv StdEnv/2023 ansys; runwb2`), click `Help -> ANSYS Workbench Help`, close Workbench, then navigate on the documentation page to select the product and change the 'Release Year'."
+  },
+  {
+    "question": "Where can Ansys 'how-to' videos be found online?",
+    "answer": "Ansys 'how-to' videos can be found on YouTube at `https://www.youtube.com/@AnsysHowTo/videos`."
+  },
+  {
+    "question": "Where is the Ansys Innovation Space located?",
+    "answer": "The Ansys Innovation Space for Customer Support & Training is located at `https://innovationspace.ansys.com/`."
   }
 ]

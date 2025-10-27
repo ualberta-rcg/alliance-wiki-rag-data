@@ -1,50 +1,42 @@
 [
   {
-    "question": "What are the initial steps to prepare an Ansys Workbench project file before its first submission to a cluster queue?",
-    "answer": "You need to connect to the cluster via TigerVNC, navigate to the project directory, start Workbench with the appropriate Ansys module, open the project, right-click on 'Setup' to 'Clear All Generated Data', then exit Workbench, and select 'No' when prompted to save changes to the project."
+    "question": "What is the first step to prepare an Ansys Workbench project file for submission to a cluster queue?",
+    "answer": "The first step is to connect to the cluster using TigerVNC and switch to the directory where the project file (e.g., YOURPROJECT.wbpj) is located. Then, start Workbench with the same Ansys module used to create the project."
   },
   {
-    "question": "How can I prevent an Ansys Workbench job from overwriting previous solutions after a successful run?",
-    "answer": "To prevent overwriting solutions, remove the command `;Save(Overwrite=True)` from the last line of your Slurm script."
+    "question": "How do you clear all generated data within an Ansys Workbench project before submitting it to a cluster?",
+    "answer": "After opening the project in Workbench, right-click on 'Setup' in the main window and select 'Clear All Generated Data'."
   },
   {
-    "question": "What is an alternative strategy to manage initialized Workbench project files for scaling tests, other than modifying the Slurm script's save command?",
-    "answer": "As an alternative, keep a copy of the original `YOURPROJECT.wbpj` file and its `YOURPROJECT_files` subdirectory, and restore them after each solution is written."
+    "question": "What should you do after clearing generated data in Ansys Workbench and before quitting?",
+    "answer": "After clearing generated data, go to the top menu bar, select 'File -> Exit' to exit Workbench. When prompted 'The current project has been modified. Do you want to save it?', click the 'No' button."
   },
   {
-    "question": "How are Ansys Workbench project files typically submitted to the job queue?",
-    "answer": "Project files are submitted by customizing one of the provided Slurm scripts (e.g., `script-wbpj-202X.sh`) and then executing it with the `sbatch` command."
+    "question": "How can you submit an Ansys Workbench project file to the queue using Slurm?",
+    "answer": "A project file can be submitted to the queue by customizing one of the provided Slurm scripts and then running the `sbatch script-wbpj-202X.sh` command."
   },
   {
-    "question": "What is the Slurm SBATCH directive used to specify the memory allocation for an Ansys Workbench job?",
-    "answer": "The `#SBATCH --mem=16G` directive specifies a total memory of 16GB. Setting this to `0` (`--mem=0`) allocates all available node memory."
+    "question": "How can you prevent the Workbench solution from being overwritten each time a test job completes successfully?",
+    "answer": "To prevent overwriting the solution, either remove `;Save(Overwrite=True)` from the last line of your Slurm script, or keep a copy of the initialized `YOURPROJECT.wbpj` file and its corresponding `YOURPROJECT_files` subdirectory and restore them after the solution is written."
   },
   {
-    "question": "Are multi-node Ansys Workbench jobs supported by the provided Slurm scripts?",
-    "answer": "No, multi-node execution is not supported; the scripts explicitly state `#SBATCH --nodes=1 # Do not change (multi-node not supported)`."
+    "question": "What is the purpose of the `MEMPAR` variable in the Ansys Workbench Slurm scripts?",
+    "answer": "The `MEMPAR` variable determines the parallel execution type: `MEMPAR=0` is set for SMP (shared memory parallel) when running on a single node, and `MEMPAR=1` is set for DMP (distributed memory parallel) when running on multiple nodes."
   },
   {
-    "question": "What does the `MEMPAR` variable control in the Ansys Workbench Slurm scripts?",
-    "answer": "The `MEMPAR` variable is set to `0` for SMP (shared memory parallel) when running on a single node. If multi-node were supported, it would be `1` for DMP (distributed memory parallel)."
+    "question": "What `sbatch` parameters are specified in the 'Single node (StdEnv/2023)' Workbench Slurm script?",
+    "answer": "The script specifies `#SBATCH --account=def-account`, `#SBATCH --time=00-03:00`, `#SBATCH --mem=16G`, `#SBATCH --ntasks=4`, and `#SBATCH --nodes=1`."
   },
   {
-    "question": "What is the command used within a Slurm script to execute Ansys Workbench in batch mode to update a project?",
-    "answer": "The command `runwb2 -B -E \"Update()\" -F YOURPROJECT.wbpj` is used to update the project in batch mode."
+    "question": "Are multi-node Workbench jobs supported by the provided Slurm scripts?",
+    "answer": "No, the provided Slurm scripts for Workbench explicitly state `#SBATCH --nodes=1 # Do not change (multi-node not supported)`."
   },
   {
-    "question": "What environment variables are typically exported in a Workbench Slurm script to configure MPI affinity?",
-    "answer": "The environment variables `KMP_AFFINITY=disabled` and `I_MPI_HYDRA_BOOTSTRAP=ssh` are exported."
+    "question": "Which Ansys and environment modules are loaded in the 'Single node (StdEnv/2023)' Workbench Slurm script?",
+    "answer": "The script loads `StdEnv/2023` and `ansys/2023R2` (or newer Ansys module versions)."
   },
   {
-    "question": "What Ansys module versions are specified for use with `StdEnv/2023` in the Workbench Slurm scripts?",
-    "answer": "For `StdEnv/2023`, the scripts load `ansys/2023R2` or newer Ansys module versions."
-  },
-  {
-    "question": "What is the purpose of the command `rm -fv *_files/.lock` in the Ansys Workbench Slurm script?",
-    "answer": "This command removes any existing lock files (`.lock`) from project directories, which helps ensure a clean start for Workbench operations."
-  },
-  {
-    "question": "How do the Slurm scripts modify the `SolveHandlers.xml` file for Workbench jobs?",
-    "answer": "The scripts modify `SolveHandlers.xml` to set the distribution method (`MEMPAR`) and the maximum number of processors (`$SLURM_NTASKS`), and also set `UserConfigured=\"1\"`."
+    "question": "What environment variables are exported in the Workbench Slurm scripts?",
+    "answer": "The scripts export `KMP_AFFINITY=disabled` and `I_MPI_HYDRA_BOOTSTRAP=ssh`."
   }
 ]

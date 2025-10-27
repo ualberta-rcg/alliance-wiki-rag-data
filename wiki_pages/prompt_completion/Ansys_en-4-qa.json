@@ -1,58 +1,54 @@
 [
   {
-    "question": "How can frequent job failures due to license shortages be mitigated for Fluent jobs?",
-    "answer": "Consider modifying your Slurm script to requeue the job up to 4 times, as shown under the 'by node + requeue' tab."
+    "question": "What is the Fluent command for a single node job using Intel MPI with shared memory?",
+    "answer": "For a single node job using Intel MPI with shared memory, the Fluent command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE`."
   },
   {
-    "question": "What is a potential downside of using job requeue for license shortages?",
-    "answer": "The requeue mechanism might also re-run simulations that fail due to non-license related issues (like divergence), leading to lost compute time."
+    "question": "How does the Fluent command differ for multinode jobs on the Nibi cluster when using Intel MPI?",
+    "answer": "For multinode jobs on the Nibi cluster using Intel MPI, the Fluent command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`, utilizing `-peth` for Ethernet communication."
   },
   {
-    "question": "What action should be taken if a requeued Fluent job fails due to a simulation issue?",
-    "answer": "Immediately manually kill the job progression with `scancel jobid` and correct the underlying problem."
+    "question": "What MPI communication method is used for multinode Fluent jobs on clusters other than Nibi when using Intel MPI?",
+    "answer": "For multinode Fluent jobs on clusters other than Nibi using Intel MPI, InfiniBand (specified by `-pib`) is used for communication."
   },
   {
-    "question": "What are the general steps to take after a Fluent job has finished running on a cluster?",
-    "answer": "You can download the data file and import it back into Fluent using 'File > Import > Data\u2026'."
+    "question": "What is the recommended Ansys Fluent module version to load in the provided Slurm scripts?",
+    "answer": "The scripts recommend loading `ansys/2023R2` or newer versions of the Ansys Fluent module."
   },
   {
-    "question": "What type of Slurm script is generally recommended for most Fluent jobs?",
-    "answer": "Most Fluent jobs should use a 'by node' script to minimize solution latency and maximize performance over as few nodes as possible."
+    "question": "What is the purpose of the `MYVERSION` variable in the Fluent Slurm scripts?",
+    "answer": "The `MYVERSION` variable specifies the Fluent solver version, which can be `2d`, `2ddp`, `3d`, or `3ddp`."
   },
   {
-    "question": "When might a 'by core' Fluent Slurm script be preferable for large jobs?",
-    "answer": "Very large jobs might experience shorter wait times in the queue if a 'by core' script is used."
+    "question": "How is the `NCORES` variable calculated in a 'Multinode (by core)' Fluent Slurm script?",
+    "answer": "In a 'Multinode (by core)' Fluent Slurm script, `NCORES` is calculated as `SLURM_NTASKS * SLURM_CPUS_PER_TASK`."
   },
   {
-    "question": "What is a disadvantage of using 'by core' scripts for very large Fluent jobs?",
-    "answer": "The startup time of a job using many nodes with a 'by core' script can be significantly longer, potentially offsetting some benefits."
+    "question": "Which Intel MPI modules should be loaded on Narval if `EBVERSIONGENTOO` is 2020?",
+    "answer": "If `EBVERSIONGENTOO` is 2020 on Narval, you should load `intel/2021 intelmpi`."
   },
   {
-    "question": "How do Fluent Slurm scripts handle communication when running on a single node versus multiple nodes?",
-    "answer": "The scripts ensure Fluent uses shared memory for communication on a single node and distributed memory (MPI with HPC interconnect) when run over multiple nodes."
+    "question": "Which Intel MPI modules should be loaded on Narval if `EBVERSIONGENTOO` is 2023?",
+    "answer": "If `EBVERSIONGENTOO` is 2023 on Narval, you should load `intel/2023 intelmpi`."
   },
   {
-    "question": "What is the recommended efficiency for Fluent mesh partitions?",
-    "answer": "For optimal efficiency, ensure at least 10000 cells per core, and the number of mesh partitions should be an integral multiple of the number of cores."
+    "question": "What environment modules are exported for Open MPI in the 'Multinode (by node, narval)' script?",
+    "answer": "The environment variables `OPENMPI_ROOT=$EBROOTOPENMPI` and `OMPI_MCA_hwloc_base_binding_policy=core` are exported for Open MPI in the 'Multinode (by node, narval)' script."
   },
   {
-    "question": "What are the common Slurm SBATCH directives for a 'Multinode (by node)' Fluent job script using Intel MPI?",
-    "answer": "The script typically includes `--account=def-group`, `--time=00-03:00`, `--nodes=1`, `--ntasks-per-node=32`, `--mem=0`, and `--cpus-per-task=1`."
+    "question": "What is the maximum number of cores per node specified for Narval in the 'Multinode (by node, narval)' Slurm script?",
+    "answer": "The 'Multinode (by node, narval)' Slurm script specifies a maximum of 64 cores per node for Narval (`#SBATCH --ntasks-per-node=64`)."
   },
   {
-    "question": "Which modules should be loaded for a Fluent job using the 'Multinode (by node)' Intel script on current systems?",
-    "answer": "You should load `StdEnv/2023` and `ansys/2023R2` (or newer versions)."
+    "question": "What is the common filename used for the journal file in the example Fluent Slurm scripts?",
+    "answer": "The common filename for the journal file specified in the example Fluent Slurm scripts is `sample.jou`."
   },
   {
-    "question": "How is the total number of cores (NCORES) calculated within a Fluent Slurm script?",
-    "answer": "NCORES is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
+    "question": "What is the filename for the 'Multinode (by core)' Fluent Slurm script using Intel MPI?",
+    "answer": "The filename for the 'Multinode (by core)' Fluent Slurm script using Intel MPI is `script-flu-bycore-intel.sh`."
   },
   {
-    "question": "What command is used to run Fluent on a single node in the provided 'Multinode (by node)' Intel script example?",
-    "answer": "On a single node, Fluent is run using `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE`."
-  },
-  {
-    "question": "What command is used to run Fluent on multiple nodes in the provided 'Multinode (by node)' Intel script example?",
-    "answer": "On multiple nodes, Fluent is run using `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
+    "question": "What is the filename for the 'Multinode (by node, narval)' Fluent Slurm script using Open MPI?",
+    "answer": "The filename for the 'Multinode (by node, narval)' Fluent Slurm script using Open MPI is `script-flu-bynode-openmpi.sh`."
   }
 ]

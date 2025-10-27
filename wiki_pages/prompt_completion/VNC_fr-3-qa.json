@@ -1,50 +1,130 @@
 [
   {
-    "question": "Comment se connecter \u00e0 vncviewer via la ligne de commande sur un ordinateur portable apr\u00e8s avoir \u00e9tabli le tunnel SSH ?",
-    "answer": "Sur la ligne de commande de votre ordinateur, entrez `vncviewer localhost:PORT`, o\u00f9 `PORT` est le port local transf\u00e9r\u00e9 par le tunnel SSH (par exemple, `5905`)."
+    "question": "Comment puis-je identifier le port sur lequel mon serveur VNC \u00e9coute apr\u00e8s l'avoir d\u00e9marr\u00e9 ?",
+    "answer": "Lancez la commande `grep -iE \"\\sport|kill\" /home/yourusername/.vnc/c48.nibi.sharcnet:1.log` dans le fichier de journalisation. L'exemple montre 'Listening for VNC connections on TCP port 5901'."
   },
   {
-    "question": "Comment se connecter \u00e0 un serveur VNC en utilisant l'interface graphique de TigerVNC Viewer sur macOS ou Windows ?",
-    "answer": "Sous macOS ou Windows, vous pouvez cliquer sur l'ic\u00f4ne de l'application `TigerVNC Viewer` et entrer `localhost:PORT` (par exemple, `localhost:5905`) dans les d\u00e9tails de connexion ('Connection Details')."
+    "question": "Quelle commande SSH est utilis\u00e9e pour \u00e9tablir un tunnel s\u00e9curis\u00e9 vers un serveur VNC sur les grappes (sauf Nibi) ?",
+    "answer": "Pour toutes les grappes (sauf Nibi), la commande est `ssh username@clustername -L localforwardedport:computnode:remotelisteningport`. Par exemple, `ssh username@rorqual.alliancecan.ca -L 5905:rc12509:5901`."
   },
   {
-    "question": "Quelles sont les limitations d'utilisation des ressources pour les serveurs VNC ex\u00e9cut\u00e9s sur les n\u0153uds de connexion ?",
-    "answer": "Les n\u0153uds de connexion ont des limites impos\u00e9es en termes d'utilisation de la m\u00e9moire et du temps de CPU. Par exemple, sur Graham, ces limites sont de 8Go de m\u00e9moire et de 1 heure d'utilisation de CPU par processus, bien que cela puisse varier selon la grappe."
+    "question": "Quelle est la forme de la commande SSH pour \u00e9tablir un tunnel vers un serveur VNC sur Nibi ?",
+    "answer": "Pour Nibi, la commande est `ssh -J username@clustername -L localforwardedport:localhost:remotelisteningport computenode`. Par exemple, `ssh -J username@nibi.alliancecan.ca -L 5905:localhost:5901 c48`."
   },
   {
-    "question": "Quand faut-il lancer un serveur VNC sur un n\u0153ud de calcul au lieu d'un n\u0153ud de connexion ?",
-    "answer": "Vous devriez lancer votre serveur VNC sur un n\u0153ud de calcul si vous avez besoin de plus de ressources que celles offertes par les n\u0153uds de connexion, ou si aucun n\u0153ud VDI n'est disponible."
+    "question": "Quelles sont les exigences suppl\u00e9mentaires pour \u00e9tablir un tunnel SSH sur Nibi ?",
+    "answer": "Une paire de cl\u00e9s SSH doit \u00eatre cr\u00e9\u00e9e sur votre ordinateur, et le contenu de la cl\u00e9 publique doit \u00eatre saisi dans votre fichier `~/.ssh/authorized_keys` sur `nibi`."
   },
   {
-    "question": "Quels sont les avantages de d\u00e9marrer un serveur VNC sur un n\u0153ud de calcul ?",
-    "answer": "D\u00e9marrer un serveur VNC sur un n\u0153ud de calcul permet d'obtenir un acc\u00e8s d\u00e9di\u00e9 au serveur par redirection de port, sans toutefois b\u00e9n\u00e9ficier de toutes les fonctionnalit\u00e9s graphiques ou de OpenGL acc\u00e9l\u00e9r\u00e9."
+    "question": "Que se passe-t-il si je quitte le n\u0153ud auquel mon tunnel SSH est connect\u00e9 ?",
+    "answer": "Si vous quittez le n\u0153ud auquel votre tunnel est connect\u00e9, vous ne pourrez plus vous connecter au serveur VNC avec vncviewer. Cependant, le vncserver continuera de fonctionner, et vous pourrez toujours y acc\u00e9der avec un nouveau tunnel."
   },
   {
-    "question": "Quelle est la premi\u00e8re \u00e9tape pour d\u00e9marrer un serveur VNC sur un n\u0153ud de calcul ?",
-    "answer": "Avant de d\u00e9marrer votre serveur VNC sur un n\u0153ud de calcul, vous devez vous connecter \u00e0 une grappe (par exemple Nibi) et cr\u00e9er une allocation sur un n\u0153ud de connexion avec la commande `salloc`, en sp\u00e9cifiant les ressources requises (par exemple, temps, CPU, m\u00e9moire)."
+    "question": "Comment se connecter au serveur VNC depuis un ordinateur Linux via la ligne de commande ?",
+    "answer": "Ouvrez une nouvelle fen\u00eatre de terminal et connectez votre client VNC \u00e0 `localhost:port`, par exemple `vncviewer localhost:5905`. Vous devrez entrer le mot de passe d\u00e9fini pr\u00e9c\u00e9demment."
   },
   {
-    "question": "Donnez un exemple de commande `salloc` pour demander une t\u00e2che interactive avec 4 CPU et 16 Go de m\u00e9moire.",
-    "answer": "Un exemple de commande `salloc` est : `salloc --time=1:00:00 --cpus-per-task=4 --mem=16000 --account=def-piusername`."
+    "question": "Comment les utilisateurs macOS ou Windows peuvent-ils se connecter au serveur VNC sans utiliser la ligne de commande ?",
+    "answer": "Vous pouvez cliquer sur l'ic\u00f4ne de l'application `TigerVNC Viewer` et entrer `localhost:port` (par exemple, `localhost:5905`) dans les 'Connection Details'."
   },
   {
-    "question": "Quelle variable d'environnement doit \u00eatre d\u00e9finie une fois qu'une t\u00e2che interactive est d\u00e9marr\u00e9e sur un n\u0153ud de calcul pour VNC ?",
-    "answer": "Une fois la t\u00e2che interactive d\u00e9marr\u00e9e, vous devez d\u00e9finir la variable d'environnement `XDG_RUNTIME_DIR` en ex\u00e9cutant la commande `export XDG_RUNTIME_DIR=${SLURM_TMPDIR}`."
+    "question": "Quel est le port VNC par d\u00e9faut utilis\u00e9 par TigerVNC Viewer ?",
+    "answer": "Le port VNC par d\u00e9faut utilis\u00e9 par TigerVNC Viewer est 5900."
   },
   {
-    "question": "Comment d\u00e9marrer un serveur VNC sur un n\u0153ud de calcul ?",
-    "answer": "Apr\u00e8s avoir d\u00e9fini la variable d'environnement et s'\u00eatre assur\u00e9 d'\u00eatre sur le bon n\u0153ud de calcul, d\u00e9marrez le serveur VNC avec la commande `vncserver`."
+    "question": "Si j'ai configur\u00e9 mon tunnel SSH avec le port local 5900, comment puis-je me connecter via `vncviewer` ?",
+    "answer": "Si vous avez sp\u00e9cifi\u00e9 5900 comme port local \u00e0 transf\u00e9rer au d\u00e9marrage de votre tunnel SSH, vous pourriez simplement sp\u00e9cifier `localhost` dans `vncviewer`."
   },
   {
-    "question": "Est-il n\u00e9cessaire de d\u00e9finir un mot de passe lors du premier d\u00e9marrage de `vncserver` ?",
-    "answer": "Oui, si vous d\u00e9marrez `vncserver` pour la premi\u00e8re fois, une invite vous demandera un mot de passe pour votre serveur VNC. Il est crucial d'en entrer un, car autrement n'importe qui pourrait se connecter et acc\u00e9der aux fichiers de votre compte."
+    "question": "Est-ce qu'il y a un probl\u00e8me connu avec la configuration d'un tunnel SSH sur le port local 5900 sous Windows ?",
+    "answer": "Oui, sous Windows, vous pourriez ne pas pouvoir configurer un tunnel SSH sur le port local 5900."
   },
   {
-    "question": "Comment v\u00e9rifier le nom du n\u0153ud de calcul sur lequel le serveur VNC est ex\u00e9cut\u00e9 ?",
-    "answer": "Si vous avez des doutes sur le n\u0153ud de calcul o\u00f9 la t\u00e2che est ex\u00e9cut\u00e9e, vous pouvez utiliser la commande `hostname` pour le v\u00e9rifier."
+    "question": "Quel bureau Linux s'affiche une fois `vncviewer` connect\u00e9 ?",
+    "answer": "Un bureau Linux MATE s'affichera."
   },
   {
-    "question": "Comment identifier le port sur lequel un serveur VNC \u00e9coute sur un n\u0153ud de calcul ?",
-    "answer": "Lancez la commande `grep -iE \"\\sport|kill\" /home/yourusername/.vnc/NODE_NAME:DISPLAY#.log` dans le fichier de journalisation du serveur VNC pour identifier le port d'\u00e9coute (par exemple, `5901`)."
+    "question": "Comment lancer un terminal sur le bureau MATE ?",
+    "answer": "Pour lancer un terminal, cliquez sur 'Applications -> System Tools -> MATE Terminal' dans le menu du haut."
+  },
+  {
+    "question": "Comment lancer un programme complexe comme MATLAB sur le bureau MATE ?",
+    "answer": "Pour d\u00e9marrer un programme plus complexe comme MATLAB, chargez le module, puis ex\u00e9cutez la commande `matlab`."
+  },
+  {
+    "question": "Comment r\u00e9initialiser mon mot de passe VNC ?",
+    "answer": "Pour r\u00e9initialiser votre mot de passe, utilisez la commande `vncpasswd`."
+  },
+  {
+    "question": "Comment puis-je supprimer d\u00e9finitivement ma configuration VNC, y compris mon mot de passe ?",
+    "answer": "Vous pouvez choisir de supprimer d\u00e9finitivement votre configuration VNC en supprimant votre r\u00e9pertoire `~/.vnc`. La prochaine fois que vous lancerez `vncserver`, une invite vous demandera de d\u00e9finir un nouveau mot de passe."
+  },
+  {
+    "question": "Comment tuer un vncserver actif sp\u00e9cifique ?",
+    "answer": "Tuez-le avec `vncserver -kill :DISPLAY#`, en rempla\u00e7ant `DISPLAY#` par le num\u00e9ro d'affichage, par exemple `vncserver -kill :44`."
+  },
+  {
+    "question": "Comment tuer tous les vncservers actifs sous mon nom d'utilisateur sur un n\u0153ud ?",
+    "answer": "Vous pouvez les tuer TOUS du m\u00eame coup avec `pkill Xvnc -u $USER`."
+  },
+  {
+    "question": "Comment lister tous les vncservers ex\u00e9cut\u00e9s sous mon nom d'utilisateur ?",
+    "answer": "Tous les vncservers ex\u00e9cut\u00e9s sous votre nom d'utilisateur (sur un n\u0153ud de connexion ou de calcul) peuvent \u00eatre list\u00e9s avec `vncserver -list`."
+  },
+  {
+    "question": "Comment activer les connexions multiples \u00e0 un m\u00eame vncserver ?",
+    "answer": "Si un vncserver a \u00e9t\u00e9 d\u00e9marr\u00e9 avec l'option suppl\u00e9mentaire `-AlwaysShared`, plusieurs connexions peuvent \u00eatre \u00e9tablies en cr\u00e9ant un nouveau tunnel et un nouveau vncviewer."
+  },
+  {
+    "question": "Que se passe-t-il si un vncserver n'a pas \u00e9t\u00e9 d\u00e9marr\u00e9 avec l'option `-AlwaysShared` ?",
+    "answer": "Si un vncserver n'a pas \u00e9t\u00e9 d\u00e9marr\u00e9 avec `vncserver -AlwaysShared`, une seule connexion `vncviewer` sera possible. Pour vous reconnecter depuis un autre endroit, vous devrez fermer toutes les applications sur le bureau et fermer le vncserver, puis cr\u00e9er un nouveau bureau et ouvrir les applications."
+  },
+  {
+    "question": "Quelle est une cause courante d'\u00e9checs r\u00e9p\u00e9t\u00e9s lors de l'\u00e9tablissement d'une nouvelle connexion vncserver/vncviewer ?",
+    "answer": "Des \u00e9checs r\u00e9p\u00e9t\u00e9s \u00e0 \u00e9tablir une nouvelle connexion vncserver/vncviewer pourraient \u00eatre caus\u00e9s par un tunnel SSH existant sur votre ordinateur qui bloquerait les ports."
+  },
+  {
+    "question": "Comment puis-je identifier et tuer les tunnels SSH existants qui pourraient bloquer les ports ?",
+    "answer": "Ouvrez une fen\u00eatre de terminal sur votre ordinateur et lancez la commande `ps ux | grep ssh` suivie de `kill PID` pour les processus pertinents."
+  },
+  {
+    "question": "Quel mot de passe dois-je utiliser si mon \u00e9cran de veille VNC se verrouille et demande un mot de passe ?",
+    "answer": "Si un mot de passe vous est demand\u00e9, entrez le mot de passe de votre compte sur la grappe et non le mot de passe vncserver."
+  },
+  {
+    "question": "Que faire si l'\u00e9cran de veille du bureau MATE ne se d\u00e9verrouille pas ?",
+    "answer": "Essayez avec la commande `killall -9 .mate-screensaver`. Cela ne devrait plus se produire car l'\u00e9cran de veille VNC a \u00e9t\u00e9 d\u00e9sactiv\u00e9 sur les grappes."
+  },
+  {
+    "question": "Sur quelles grappes le module `nix` est-il disponible ?",
+    "answer": "Le module `nix` est seulement disponible sur Graham et gra-vdi."
+  },
+  {
+    "question": "Comment charger le module `nix` ?",
+    "answer": "Il peut \u00eatre charg\u00e9 avec la commande `module load nix`."
+  },
+  {
+    "question": "Quelles commandes deviennent disponibles apr\u00e8s le chargement du module `nix` ?",
+    "answer": "Les commandes `nix` et `nix-env` seront dans votre chemin pour g\u00e9rer les paquets logiciels via nix dans votre environnement nix personnel."
+  },
+  {
+    "question": "Comment chercher des programmes avec `nix` ?",
+    "answer": "Vous pouvez chercher des programmes avec la commande `nix search <regexp>`."
+  },
+  {
+    "question": "Comment installer un paquet `nix` comme QGIS ?",
+    "answer": "Pour installer un paquet nix, utilisez `nix-env --install --attr <attribute>`. Par exemple, pour installer QGIS, utilisez `nix-env --install --attr nixpkgs.qgis`."
+  },
+  {
+    "question": "La configuration de l'environnement `nix` est-elle persistante ?",
+    "answer": "Votre environnement nix persiste entre vos connexions; vous n'avez donc qu'\u00e0 lancer une fois la commande d'installation."
+  },
+  {
+    "question": "Quelles sont les alternatives de portail VDI enti\u00e8rement automatis\u00e9es si je rencontre des probl\u00e8mes graphiques avec VNC ?",
+    "answer": "Si vous rencontrez des probl\u00e8mes graphiques \u00e0 l'utilisation de VNC, essayez d'utiliser `OpenOnDemand` sur nibi ou `JupyterHub` sur rorqual."
+  },
+  {
+    "question": "Quels sont les avantages d'utiliser `OpenOnDemand` ou `JupyterHub` par rapport \u00e0 VNC pour une interface VDI ?",
+    "answer": "Ils offrent une interface web VDI enti\u00e8rement automatis\u00e9e con\u00e7ue pour une utilisation simplifi\u00e9e, ainsi que des performances mat\u00e9rielles am\u00e9lior\u00e9es et une meilleure prise en charge logicielle."
   }
 ]

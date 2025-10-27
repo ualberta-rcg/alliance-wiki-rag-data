@@ -1,34 +1,78 @@
 [
   {
-    "question": "What should I do if I encounter an error about a missing writable `.flrecent` file for an Ansys Fluent job?",
-    "answer": "If a link to a writable `.flrecent` file does not exist, you should remove the existing `~/.flrecent` if it's there, and then run `ln -s $SCRATCH/.flrecent ~/.flrecent`. After this, you can try submitting your job again."
+    "question": "What should I do if I encounter an error stating 'A link to a writable .fluentconf directory does not exist'?",
+    "answer": "If you receive an 'ERROR: A link to a writable .fluentconf directory does not exist,' you should remove `~/.fluentconf` if it exists and then run the command `ln -s $SCRATCH/.fluentconf ~/.fluentconf`. Afterward, try submitting your job again."
   },
   {
-    "question": "What directories and files are created if the required Ansys configuration links are missing in the provided script?",
-    "answer": "If links to `.ansys`, `.fluentconf`, or `.flrecent` are missing, the script will create the directories `$SCRATCH/.ansys` and `$SCRATCH/.fluentconf` and touch the file `$SCRATCH/.flrecent`."
+    "question": "How can I fix the 'ERROR: A link to a writable .flrecent file does not exist'?",
+    "answer": "To fix this error, remove `~/.flrecent` if it exists and then execute the command `ln -s $SCRATCH/.flrecent ~/.flrecent`. After running this, attempt to submit your job again."
   },
   {
-    "question": "How is Ansys Fluent launched on a single node according to the Niagara 'by node' script?",
-    "answer": "On a single node, Fluent is launched using the command `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE`."
+    "question": "What directories and files are created if the `~/.ansys`, `~/.fluentconf`, and `~/.flrecent` checks pass in the Fluent Trillium script?",
+    "answer": "If the checks pass, the script will create the directories `$SCRATCH/.ansys` and `$SCRATCH/.fluentconf`, and touch the file `$SCRATCH/.flrecent`."
   },
   {
-    "question": "How is Ansys Fluent launched on multiple nodes using the Niagara 'by node' script?",
-    "answer": "On multiple nodes, Fluent is launched using the command `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -ssh -pib -cnf=$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
+    "question": "What Fluent command is used for a single-node job on Trillium, as specified in the script?",
+    "answer": "For a single-node job, the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE`."
   },
   {
-    "question": "When are the Fluent 'License requeue' scripts appropriate to use?",
-    "answer": "These scripts should only be used for Fluent jobs that are known to complete normally without errors but typically require multiple attempts to check out licenses due to shortages."
+    "question": "What Fluent command is used for a multi-node job on Trillium, as specified in the script?",
+    "answer": "For a multi-node job, the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -ssh -pib -cnf=$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
   },
   {
-    "question": "When should Fluent 'License requeue' scripts be avoided?",
-    "answer": "They are not recommended for Fluent jobs that might run for a long time before crashing or that complete with unresolved journal file warnings, as such simulations would be repeatedly run from the beginning until the maximum requeue attempts are reached."
+    "question": "When should the license requeue scripts for Fluent jobs be utilized?",
+    "answer": "These scripts should only be used for Fluent jobs that are known to complete normally without generating errors, but frequently require multiple attempts to check out licenses."
   },
   {
-    "question": "What happens after a job successfully completes when using a Fluent 'License requeue' script?",
-    "answer": "If a job submitted with a 'License requeue' script completes successfully, a 'Job completed successfully! Exiting now.' message will be displayed, and the entire job array (`scancel $SLURM_ARRAY_JOB_ID`) will be terminated."
+    "question": "For what types of Fluent jobs are the license requeue scripts not recommended?",
+    "answer": "They are not recommended for Fluent jobs that might run for a long time before crashing, or for jobs that complete but contain unresolved journal file warnings, as these would cause simulations to be repeated unnecessarily."
   },
   {
-    "question": "What is the behavior of a Fluent 'License requeue' script if a job attempt fails?",
-    "answer": "If a job attempt fails, a message indicating the failure will be printed. If the current attempt is less than the total number of requeue attempts, the job will be resubmitted. Otherwise, if all attempts have failed, it will exit."
+    "question": "What is the alternative for Fluent jobs not suitable for license requeue scripts?",
+    "answer": "For jobs not suitable for license requeue scripts, the general purpose scripts (not the requeue ones) should be used instead."
+  },
+  {
+    "question": "How is the number of requeue attempts specified in the `script-flu-bynode+requeue.sh`?",
+    "answer": "The number of requeue attempts is specified by the `#SBATCH --array=1-5%1` line, where '5' indicates the number of attempts."
+  },
+  {
+    "question": "Which Ansys module version is specified for the `script-flu-bynode+requeue.sh`?",
+    "answer": "The script specifies `ansys/2023R2` or newer versions."
+  },
+  {
+    "question": "What happens if a job completes successfully when using a license requeue script?",
+    "answer": "If a job completes successfully, the script will print 'Job completed successfully! Exiting now.' and then cancel the entire job array using `scancel $SLURM_ARRAY_JOB_ID`."
+  },
+  {
+    "question": "What is the script's behavior if a job attempt fails but more requeue attempts are available?",
+    "answer": "If a job attempt fails and more requeue attempts are available, the script will print a failure message and 'Resubmitting job now \u2026'."
+  },
+  {
+    "question": "What message is displayed if all requeue attempts for a job fail?",
+    "answer": "If all job attempts fail, the script will display 'All job attempts failed exiting now.'."
+  },
+  {
+    "question": "What is the default time limit configured in the `script-flu-bynode+requeue.sh`?",
+    "answer": "The default time limit is `00-03:00` (3 hours)."
+  },
+  {
+    "question": "How many compute nodes are requested by default in the `script-flu-bynode+requeue.sh`?",
+    "answer": "The script requests 1 compute node by default (`#SBATCH --nodes=1`), which is the maximum for Narval."
+  },
+  {
+    "question": "What is the default number of cores per compute node specified in the `script-flu-bynode+requeue.sh`?",
+    "answer": "The default number of cores per compute node is 32 (`#SBATCH --ntasks-per-node=32`)."
+  },
+  {
+    "question": "What is the memory allocation setting in the `script-flu-bynode+requeue.sh`?",
+    "answer": "The memory setting is `#SBATCH --mem=0`, which allocates all memory per compute node and should not be changed."
+  },
+  {
+    "question": "What is the purpose of `slurm_hl2hl.py` in the `script-flu-bynode+requeue.sh`?",
+    "answer": "`slurm_hl2hl.py --format ANSYS-FLUENT` is used to generate a machinefile (`/tmp/machinefile-$SLURM_JOB_ID`) for Fluent."
+  },
+  {
+    "question": "How is the total number of cores (`NCORES`) calculated in the `script-flu-bynode+requeue.sh`?",
+    "answer": "`NCORES` is calculated by multiplying the number of nodes (`SLURM_NNODES`), tasks per node (`SLURM_NTASKS_PER_NODE`), and CPUs per task (`SLURM_CPUS_PER_TASK`)."
   }
 ]

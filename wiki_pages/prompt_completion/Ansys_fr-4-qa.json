@@ -1,78 +1,62 @@
 [
   {
-    "question": "Why are Ansys MPI implementations not directly compatible with the Slurm scheduler?",
-    "answer": "None of the MPI implementations included in the Ansys suite are compatible with the Slurm scheduler."
+    "question": "After a Fluent job is completed, how can a user access the results and bring them back into Fluent?",
+    "answer": "When the job is finished, users can download the data file and import it back into Fluent using `File > Import > Data\u2026`."
   },
   {
-    "question": "How should parallel Ansys tasks be launched given the incompatibility with Slurm?",
-    "answer": "Special directives specific to each Ansys package must be used to launch parallel tasks."
+    "question": "Which type of Fluent Slurm script is generally recommended for minimizing wait times and maximizing performance?",
+    "answer": "Most Fluent tasks should use the 'par n\u0153ud' (per node) script to minimize wait time and maximize performance by using the fewest possible nodes."
   },
   {
-    "question": "What is the initial step for running an Ansys Fluent task on a cluster?",
-    "answer": "Prepare your task with Fluent from Ansys Workbench up to the point where the calculations would be executed."
+    "question": "What is a potential trade-off when using the 'par c\u0153ur' (per core) script for Fluent tasks requiring many CPU cores?",
+    "answer": "While the 'par c\u0153ur' script might reduce queue time for tasks demanding many CPU cores, starting a multi-node task can take significantly longer, which diminishes its overall benefit."
   },
   {
-    "question": "How do you export a case file from Ansys Fluent for cluster submission?",
-    "answer": "Export the case file using 'File > Export > Case\u2026' or locate the directory where Fluent saves project files. Case file names often follow a format like `FFF-1.cas.gz`."
+    "question": "What risk is associated with running intensive Fluent tasks across a large, indeterminate number of nodes?",
+    "answer": "Running intensive tasks on a very large, indeterminate number of nodes makes them much more susceptible to crashing if one of the compute nodes fails during the simulation."
   },
   {
-    "question": "If I want to continue a previous calculation, how do I export the necessary data file?",
-    "answer": "Export a data file using 'File > Export > Data\u2026' or find it in the same project directory, typically named `FFF-1.dat.gz`."
+    "question": "How do the Fluent Slurm scripts handle memory for single-node versus multi-node tasks?",
+    "answer": "The Fluent Slurm scripts use shared memory for single-node tasks and distributed memory (with MPI and the appropriate CHP interconnect) for multi-node tasks."
   },
   {
-    "question": "Where should Fluent case and data files be transferred on the cluster?",
-    "answer": "Transfer the case and data files to the `/project` or `/scratch` file system of the cluster."
+    "question": "What are the suggested alternatives if Fluent crashes during automatic mesh partitioning on Narval when using standard Intel scripts?",
+    "answer": "If Fluent crashes during automatic mesh partitioning on Narval with standard Intel scripts, an alternative is to use the OpenMPI scripts, or perform manual mesh partitioning in the Fluent graphical interface and then re-run the task on the cluster with Intel scripts."
   },
   {
-    "question": "What is recommended for naming exported files before transferring them to the cluster?",
-    "answer": "Save them with names that are easier to identify than `FFF-1.*` or rename them during the upload process."
+    "question": "What are the requirements for mesh partitioning to achieve optimal efficiency in Fluent?",
+    "answer": "For optimal mesh partitioning efficiency, the number of mesh partitions must be an integer multiple of the number of cores, and there should be at least 10,000 cells per core."
   },
   {
-    "question": "What is the purpose of creating a journal file for Ansys Fluent tasks?",
-    "answer": "A journal file is created to load case and data files, launch the solver, and record the results."
+    "question": "What is the function of the `#SBATCH --mem=0` directive in the `script-flu-bynode-intel.sh` Slurm script?",
+    "answer": "The `#SBATCH --mem=0` directive in the `script-flu-bynode-intel.sh` Slurm script ensures that all available memory per compute node is allocated."
   },
   {
-    "question": "What needs to be adjusted in the journal file before submitting a Fluent task?",
-    "answer": "The names of the files and the number of iterations need to be adjusted."
+    "question": "Which standard environment and Ansys module versions are loaded in the `script-flu-bynode-intel.sh` example?",
+    "answer": "The `script-flu-bynode-intel.sh` example loads `StdEnv/2023` and `ansys/2023R2` (or newer versions)."
   },
   {
-    "question": "How can frequent task failures due to licensing issues be addressed?",
-    "answer": "You can modify your script to re-queue the task (up to 4 times), similar to the script under the 'Plusieurs n\u0153uds (par c\u0153ur + remise en attente)' tab."
+    "question": "How is the total number of cores (`NCORES`) determined in the `script-flu-bynode-intel.sh` Slurm script?",
+    "answer": "The total number of cores (`NCORES`) is calculated as `SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK`."
   },
   {
-    "question": "What is a disadvantage of re-queuing tasks due to license problems?",
-    "answer": "This method also re-queues simulations that failed for other reasons, such as divergence, which wastes computational time."
+    "question": "What Fluent command is used for single-node tasks in the `script-flu-bynode-intel.sh` script?",
+    "answer": "For single-node tasks, the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE`, with `export I_MPI_HYDRA_BOOTSTRAP=ssh` optionally uncommented on Beluga or Cedar."
   },
   {
-    "question": "What action should be taken if a re-queued task fails due to a simulation issue rather than a license problem?",
-    "answer": "Immediately cancel the task with `scancel jobid` and correct the simulation problem."
+    "question": "What Fluent command is used for multi-node tasks in the `script-flu-bynode-intel.sh` script?",
+    "answer": "For multi-node tasks, the command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE`."
   },
   {
-    "question": "What is the final step after an Ansys Fluent task is completed on the cluster?",
-    "answer": "You can download the data file and import it back into Fluent using 'File > Import > Data\u2026'."
+    "question": "What is the maximum number of compute nodes that can be specified for Fluent jobs on Narval using the `script-flu-bynode-intel.sh` script?",
+    "answer": "The `script-flu-bynode-intel.sh` script specifies a maximum of 1 compute node (`#SBATCH --nodes=1`) for Narval."
   },
   {
-    "question": "Which type of Slurm script is generally recommended for Fluent tasks to optimize performance and reduce wait times?",
-    "answer": "The 'par n\u0153ud' (per-node) script is recommended to minimize wait time and maximize performance by using the fewest possible nodes."
+    "question": "What are the recommended `ntasks-per-node` values for Graham, Cedar, Beluga, and Narval in the `script-flu-bynode-intel.sh` script?",
+    "answer": "The `script-flu-bynode-intel.sh` script recommends `ntasks-per-node` values of 32 for Graham, 48 for Cedar, 40 for Beluga, and 64 for Narval, or fewer."
   },
   {
-    "question": "When might a 'par c\u0153ur' (per-core) script be more suitable for Fluent tasks?",
-    "answer": "Tasks requiring a large number of CPU cores might experience shorter queue times with a 'par c\u0153ur' script."
-  },
-  {
-    "question": "What are the risks associated with running intensive tasks on a large, indeterminate number of nodes using 'par c\u0153ur' scripts?",
-    "answer": "Such tasks are more likely to crash if a compute node fails during the simulation, and starting them can take significantly longer."
-  },
-  {
-    "question": "How do the Fluent Slurm scripts manage memory for tasks?",
-    "answer": "They use shared memory for single-node tasks and distributed memory (with MPI and appropriate CHP interconnect) for multi-node tasks."
-  },
-  {
-    "question": "What options are available if Fluent crashes during initial automatic mesh partitioning on Narval with standard Intel scripts?",
-    "answer": "The 'Plusieurs n\u0153uds' tabs for Narval offer a more robust alternative, or you can manually partition the mesh in the Fluent graphical interface before re-submitting the task."
-  },
-  {
-    "question": "What is the recommended best practice for mesh partitioning efficiency in Fluent?",
-    "answer": "The number of mesh partitions should be an integer multiple of the number of cores, and ideally, there should be at least 10,000 cells per core."
+    "question": "What user-defined variables need to be set in the `script-flu-bynode-intel.sh` submission script?",
+    "answer": "Users need to specify `MYJOURNALFILE` (journal file name) and `MYVERSION` (2d, 2ddp, 3d, or 3ddp) in the submission script."
   }
 ]

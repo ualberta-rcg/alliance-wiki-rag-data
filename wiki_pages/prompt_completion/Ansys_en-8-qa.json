@@ -1,62 +1,94 @@
 [
   {
-    "question": "What is the purpose of the 'Multinode (by node + restart)' Slurm script for Ansys Fluent?",
-    "answer": "This script is provided to automate restarting very large jobs that require more than the typical seven-day maximum runtime window available on most clusters, restarting from the most recent saved time step files."
+    "question": "What is the primary purpose of the `script-flu-bynode+restart.sh` script?",
+    "answer": "This script is provided to automate restarting very large jobs that require more than the typical seven-day maximum runtime window available on most clusters."
   },
   {
-    "question": "What is the maximum time limit specified in the 'Multinode (by node + restart)' Slurm script?",
-    "answer": "The maximum time limit specified is 7 days and 0 hours (`07-00:00`)."
+    "question": "How is the Slurm account specified in the provided script?",
+    "answer": "The Slurm account is specified using `#SBATCH --account=def-group`."
   },
   {
-    "question": "How many compute nodes are requested by default in the 'Multinode (by node + restart)' Slurm script?",
-    "answer": "The script specifies `nodes=1` by default, though it has logic for single or multiple nodes."
+    "question": "What is the maximum time limit configured for a job using this script?",
+    "answer": "The maximum time limit is set to `07-00:00` (7 days and 0 hours)."
   },
   {
-    "question": "How is the number of cores per node specified in the 'Multinode (by node + restart)' script?",
-    "answer": "The number of cores per node is specified by `#SBATCH --ntasks-per-node=32`, with examples like 'graham 32 or 44, cedar 48, beluga 40, narval 64, or less'."
+    "question": "How many compute nodes are requested by default in this Fluent restart script?",
+    "answer": "One compute node is requested by default, specified by `#SBATCH --nodes=1` (narval 1 node max)."
   },
   {
-    "question": "How does the 'Multinode (by node + restart)' script handle memory allocation?",
-    "answer": "The script allocates all memory per compute node by setting `#SBATCH --mem=0`."
+    "question": "What is the default number of cores specified per node in this script?",
+    "answer": "The script specifies `#SBATCH --ntasks-per-node=32`, which means 32 cores per node (maximum all cores of a compute node)."
   },
   {
-    "question": "What is the purpose of the `--array` Slurm parameter in the restart script?",
-    "answer": "The `--array=1-5%1` parameter specifies the number of solution restarts, with 5 shown as an example (must be 2 or more)."
+    "question": "What memory allocation setting is used in the `script-flu-bynode+restart.sh` script?",
+    "answer": "The script uses `#SBATCH --mem=0`, which allocates all memory per compute node."
   },
   {
-    "question": "Which standard environment and Ansys module versions are loaded in the 'Multinode (by node + restart)' script?",
-    "answer": "The script loads `StdEnv/2023` and `ansys/2023R2` (or newer versions for beluga, cedar, graham, narval)."
+    "question": "How is the number of solution restarts configured in the Slurm script?",
+    "answer": "The number of solution restarts is specified using `#SBATCH --array=1-5%1`, indicating 5 attempts are shown, with 2 or more recommended."
   },
   {
-    "question": "What are the key user-defined filenames required for the Fluent restart script?",
-    "answer": "The key user-defined filenames are `MYJOUFILE` (initial journal), `MYJOUFILERES` (journal restart), `MYCASFILERES` (case restart), and `MYDATFILERES` (data restart)."
+    "question": "Which standard environment module is loaded by the script?",
+    "answer": "`StdEnv/2023` is loaded."
   },
   {
-    "question": "How does the script determine the total number of cores to use for the Fluent simulation?",
-    "answer": "The script calculates `NCORES` as `((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))`."
+    "question": "Which Ansys Fluent module version is specified for use in this script?",
+    "answer": "`ansys/2023R2` or newer versions can be specified."
   },
   {
-    "question": "How does the 'Multinode (by node + restart)' script differentiate between the initial run and subsequent restarts?",
-    "answer": "If `SLURM_ARRAY_TASK_ID == 1`, it executes Fluent with `MYJOUFILE`; otherwise, it executes Fluent with `MYJOUFILERES`."
+    "question": "What variable is used to specify the initial journal filename?",
+    "answer": "`MYJOUFILE=sample.jou` is used to specify the initial journal filename."
   },
   {
-    "question": "What happens if a Fluent job completes successfully but is not the last restart attempt?",
-    "answer": "The script outputs a message, then symbolically links the most recent `.cas` and `.dat` output files to `MYCASFILERES` and `MYDATFILERES` respectively, and restarts the job."
+    "question": "What variable is used for the journal filename when restarting a Fluent job?",
+    "answer": "`MYJOUFILERES=sample-restart.jou` is used for the journal restart filename."
   },
   {
-    "question": "What action does the script take if the simulation fails?",
-    "answer": "If the simulation fails, the script outputs 'Simulation failed. Exiting \u2026' and terminates."
+    "question": "What variable is used for the case restart filename?",
+    "answer": "`MYCASFILERES=sample-restart.cas.h5` is used for the cas restart filename."
   },
   {
-    "question": "What is the command to run Fluent in the single node configuration for the restart script?",
-    "answer": "The command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -i $MYJOUFILE` for the first run or `fluent -g $MYVERSION -t $NCORES -affinity=0 -i $MYJOUFILERES` for restarts."
+    "question": "What variable is used for the data restart filename?",
+    "answer": "`MYDATFILERES=sample-restart.dat.h5` is used for the dat restart filename."
   },
   {
-    "question": "What is the command to run Fluent in a multinode configuration using the restart script?",
-    "answer": "The command is `fluent -g $MYVERSION -t $NCORES -affinity=0 -cnf=/tmp/machinefile-$SLURM_JOB_ID -mpi=intel -ssh -i $MYJOUFILE` for the first run or `fluent -g $MYVERSION -t $NCORES -affinity=0 -cnf=/tmp/machinefile-$SLURM_JOB_ID -mpi=intel -ssh -i $MYJOUFILERES` for restarts."
+    "question": "How is the total number of cores (NCORES) calculated within the script?",
+    "answer": "`NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))` calculates the total number of cores."
   },
   {
-    "question": "How does the 'Multinode (by node + restart)' script handle Narval-specific Intel MPI configurations?",
-    "answer": "For Narval, it conditionally loads `intel/2021 intelmpi` or `intel/2023 intelmpi` based on `EBVERSIONGENTOO`, and sets `INTELMPI_ROOT` and `HCOLL_RCACHE` accordingly, while unsetting `I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS` and `I_MPI_ROOT`."
+    "question": "What Fluent command is executed for the initial task (`SLURM_ARRAY_TASK_ID == 1`) in a single-node job?",
+    "answer": "For the initial task in a single-node job, `fluent -g 2ddp -t $NCORES -affinity=0 -i $MYJOUFILE` is executed."
+  },
+  {
+    "question": "What Fluent command is executed for subsequent restart tasks in a single-node job?",
+    "answer": "For subsequent restart tasks in a single-node job, `fluent -g 2ddp -t $NCORES -affinity=0 -i $MYJOUFILERES` is executed."
+  },
+  {
+    "question": "How does the script restart a job with the most recent output data file?",
+    "answer": "It creates symbolic links: `ln -sfv output/$(ls -ltr output | grep .cas | tail -n1 | awk '{print $9}') $MYCASFILERES` and `ln -sfv output/$(ls -ltr output | grep .dat | tail -n1 | awk '{print $9}') $MYDATFILERES`."
+  },
+  {
+    "question": "What happens if the current task ID is less than the total number of tasks in the array and the job completed successfully?",
+    "answer": "The script prints \"Restarting job with the most recent output dat file \u2026\" and links the most recent output files for the restart."
+  },
+  {
+    "question": "What command is used to terminate the entire job array if the job completes successfully?",
+    "answer": "`scancel $SLURM_ARRAY_JOB_ID` is used to terminate the entire job array."
+  },
+  {
+    "question": "What does the script output if a simulation fails?",
+    "answer": "The script outputs `Simulation failed. Exiting \u2026` if a simulation fails."
+  },
+  {
+    "question": "What is the role of `slurm_hl2hl.py` in the script?",
+    "answer": "`slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID` creates a machine file for Fluent, piping its output to `/tmp/machinefile-$SLURM_JOB_ID`."
+  },
+  {
+    "question": "What does `MYVERSION=3d` define in the context of the Fluent command?",
+    "answer": "`MYVERSION=3d` specifies the Fluent version type, which can be `2d`, `2ddp`, `3d`, or `3ddp`."
+  },
+  {
+    "question": "How does the script differentiate Fluent execution commands for the 'nibi' cluster versus other clusters in a multinode setup?",
+    "answer": "For 'nibi', it uses `-mpi=intel -peth`, while for other clusters, it uses `-mpi=intel -pib`."
   }
 ]

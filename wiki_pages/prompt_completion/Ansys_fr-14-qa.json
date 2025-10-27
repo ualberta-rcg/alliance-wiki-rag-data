@@ -1,66 +1,146 @@
 [
   {
-    "question": "Is multi-node execution supported for Ansys Workbench Slurm scripts?",
-    "answer": "No, multi-node execution is not supported for Ansys Workbench Slurm scripts; they are designed for single-node use."
+    "question": "How can I run Ansys programs interactively in graphical mode?",
+    "answer": "Ansys programs can be run interactively in graphical mode on compute nodes of the clusters or on Graham VDI nodes."
   },
   {
-    "question": "How is the MEMPAR variable configured in Ansys Workbench Slurm scripts?",
-    "answer": "The MEMPAR variable is set to 0 for Shared Memory Parallel (SMP) and 1 for Distributed Memory Parallel (DMP), based on the SLURM_NNODES value (which is typically 1 for Workbench scripts)."
+    "question": "What is the typical duration for running Ansys interactively on a single compute node?",
+    "answer": "Ansys can be executed interactively on a single compute node for a duration of up to 24 hours."
   },
   {
-    "question": "What environment variables are typically exported before running Ansys Workbench projects in batch mode?",
-    "answer": "The environment variables `KMP_AFFINITY=disabled` and `I_MPI_HYDRA_BOOTSTRAP=ssh` are exported."
+    "question": "How do I connect to a compute node for interactive graphical Ansys sessions?",
+    "answer": "You should connect using `vncviewer` as described in the TigerVNC documentation for compute nodes."
   },
   {
-    "question": "What is the command to run an Ansys Workbench project in batch mode to update it?",
-    "answer": "The command is `runwb2 -B -E \"Update()\" -F YOURPROJECT.wbpj`."
+    "question": "Which modules should I load to run Ansys Fluids graphically on compute nodes?",
+    "answer": "You should load `StdEnv/2020` and `ansys/2021R1` (or newer versions) to run Ansys Fluids graphically on compute nodes."
   },
   {
-    "question": "How can I prevent the Ansys Workbench solution from being overwritten when performing scaling tests?",
-    "answer": "You can prevent overwriting by removing or commenting out `Save(Overwrite=True)` from the last line of the Slurm script."
+    "question": "What commands are used to launch Ansys Fluent or CFX graphically on compute nodes after loading the necessary modules?",
+    "answer": "To launch Fluent, use `fluent -mpi=intel`. To launch CFX, use `QTWEBENGINE_DISABLE_SANDBOX=1 cfx5`."
   },
   {
-    "question": "How do you generate an input file for Ansys Mechanical (APDL) from Workbench?",
-    "answer": "In your interactive Workbench Mechanical session, click `Solution -> Tools -> Write Input Files`, then specify `File name:` as YOURAPDLFILE.inp and `Save as type:` as 'APDL input files (*.inp)'."
+    "question": "What modules are required to run Ansys Mapdl graphically on compute nodes?",
+    "answer": "To run Ansys Mapdl graphically, load `StdEnv/2020` and `ansys/2021R2` (or newer versions)."
   },
   {
-    "question": "On which clusters have the Ansys Mechanical Slurm scripts been tested?",
-    "answer": "The Ansys Mechanical Slurm scripts have been tested on Graham, Narval, Cedar, and Beluga."
+    "question": "How do I start Ansys Mapdl in graphical mode on compute nodes?",
+    "answer": "You can start it by running `mapdl -g` or by launching the `launcher` command and then clicking the RUN button."
   },
   {
-    "question": "What command is used to run Ansys Mechanical in Shared Memory Parallel (SMP) mode on CPU?",
-    "answer": "The command is `mapdl -smp -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp`."
+    "question": "Which modules should I load for Ansys Workbench graphical use on compute nodes?",
+    "answer": "Load `StdEnv/2020` and `ansys/2021R2` (or newer versions) for Ansys Workbench graphical use on compute nodes."
   },
   {
-    "question": "Which MPI implementation is used for Ansys Mechanical Distributed Memory Parallel (DMP) on CPU for different clusters?",
-    "answer": "Intel MPI is used for Beluga, while Open MPI is used for other clusters."
+    "question": "Are there any special commands needed before launching Ansys Workbench for graphical use on compute nodes, especially for Ansys Mechanical or CFD-Post?",
+    "answer": "Yes, for Ansys Mechanical, run `xfwm4 --replace &`. For CFD-Post, set `export QTWEBENGINE_DISABLE_SANDBOX=1`."
   },
   {
-    "question": "What is the command to run Ansys Mechanical in Shared Memory Parallel (SMP) mode with GPU acceleration?",
-    "answer": "The command is `mapdl -smp -acc nvidia -na $SLURM_GPUS_ON_NODE -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp`, after exporting `ANSGPU_PRINTDEVICES=1`."
+    "question": "How do I launch Ansys Workbench graphically on compute nodes?",
+    "answer": "After loading the required modules and any special commands, run `runwb2`."
   },
   {
-    "question": "What are the default memory allocations for Ansys APDL tasks?",
-    "answer": "Ansys APDL tasks are allocated 1024MB of total memory and 1024MB for databases by default."
+    "question": "What is a known issue with Ansys Mechanical Workbench dropdown menus on compute nodes and how to resolve it?",
+    "answer": "The dropdown menus may not respond correctly. As a solution, launch `xfwm4 --replace` on the command line before starting Workbench. To make `xfwm4` default, modify `$HOME/.vnc/xstartup` and replace `mate-session` with `xfce4-session`."
   },
   {
-    "question": "How can the default memory allocation for Ansys APDL tasks be manually adjusted?",
-    "answer": "You can manually adjust memory allocation by adding `-m <value>` for total memory and/or `-db <value>` for database memory to the `mapdl` command line."
+    "question": "Is Ansys Fluent in version 2022R2 supported for graphical use on compute nodes?",
+    "answer": "No, Fluent in `ansys/2022R2` does not work on compute nodes at the moment; another version should be used."
   },
   {
-    "question": "What additional arguments might be necessary for Ansys Mechanical tasks using a remote institutional license server with multiple licenses?",
-    "answer": "It may be necessary to add arguments such as `-p aa_r` or `-ppf anshpc`, depending on the module being used."
+    "question": "What modules and commands are used to run Ansys Ensight graphically on compute nodes?",
+    "answer": "Load `StdEnv/2020 ansys/2022R2` (or `2022R1`, `2021R2`, `2021R1`). Then, export `LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib` (where A and B are version specific) and run `ensight -X`."
   },
   {
-    "question": "Which type of parallel script is generally recommended for better performance in Ansys Mechanical?",
-    "answer": "Single node Shared Memory Parallel (SMP) scripts are generally recommended over multi-node Distributed Memory Parallel (DMP) scripts for better performance."
+    "question": "What are the modules required to run Ansys Rocky graphically on compute nodes?",
+    "answer": "You can load `ansysrocky/2023R2 StdEnv/2020 ansys/2023R2`, `ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04`, or `StdEnv/2023 ansys/2025R1`."
   },
   {
-    "question": "How can one check the Workbench version used to create an APDL input file?",
-    "answer": "You can check the Workbench version by running `cat YOURAPDLFILE.inp | grep version`."
+    "question": "How do I launch Ansys Rocky graphically on compute nodes?",
+    "answer": "You can use `Rocky` (which reads `~/licenses/ansys.lic`), `Rocky-gui` (for selecting CMC or SHARCNET servers), `RockySolver`, or `RockySchedular`."
   },
   {
-    "question": "What is the importance of matching the Ansys module version with the input file for Mechanical tasks?",
-    "answer": "To prevent compatibility issues, the module loaded in your script should ideally match the version used to generate the input file."
+    "question": "Are older versions of Ansys Rocky (2024R2 or less recent) available on all compute clusters for graphical use?",
+    "answer": "No, versions 2024R2 or less recent only work on gra-vdi and Graham; installation on other clusters is planned for June."
+  },
+  {
+    "question": "Is the SHARCNET license for Ansys Rocky available for research use?",
+    "answer": "Yes, the SHARCNET license includes Rocky, and its use is free for research purposes."
+  },
+  {
+    "question": "How can I request a compute node on Graham for interactive Ansys Rocky use with specific resources?",
+    "answer": "You can launch `salloc --time=08:00:00 --nodes=1 --cpus-per-task=4 --gres=gpu:v100:1 --mem=32G --account=someaccount` to request 4 CPUs, 1 V100 GPU, and 32GB memory for 8 hours."
+  },
+  {
+    "question": "What are the maximum resource limits for Ansys programs on Graham VDI nodes?",
+    "answer": "Ansys programs can be run for up to 7 days, using a maximum of 8 (or 16) cores and 128 GB of memory on Graham VDI nodes."
+  },
+  {
+    "question": "What is the benefit of using VDI nodes for Ansys graphical applications?",
+    "answer": "The VDI system provides GPU OpenGL acceleration, which is ideal for high-performance graphics. It's suitable for creating or modifying simulation input files, post-processing data, or visualizing simulation results."
+  },
+  {
+    "question": "How do I connect to a VDI node for Ansys graphical sessions?",
+    "answer": "You should connect to `gra-vdi.computecanada.ca` using `TigerVNC`."
+  },
+  {
+    "question": "How can I run two simultaneous Ansys tasks graphically on VDI nodes?",
+    "answer": "Use two distinct VNC sessions. Connect the first to `gra-vdi3.sharcnet.ca` and the second to `gra-vdi4.sharcnet.ca` using VNC. Start Ansys graphically in each session, ensuring simulations run in different directories to avoid file conflicts."
+  },
+  {
+    "question": "Are there time limits for running Ansys simulations on VDI nodes?",
+    "answer": "Unlike compute node connections, there are no time limit constraints on gra-vdi when running simulations."
+  },
+  {
+    "question": "What modules are needed to run Ansys Fluids graphically on VDI nodes?",
+    "answer": "Load `CcEnv StdEnv/2023` and `ansys/2024R2.04` (or older versions)."
+  },
+  {
+    "question": "What command helps prevent a 'Qt: Session management error' when launching Fluent on VDI nodes?",
+    "answer": "Use `unset SESSION_MANAGER` before launching `fluent`."
+  },
+  {
+    "question": "How can I resolve the 'Error segmentation violation' when launching `icemcfd` on VDI nodes?",
+    "answer": "Do not click OK on the error message. Instead, go to `Settings Tab -> Display -> tick X11 -> Apply -> OK -> File -> Exit`. The error should not reoccur on subsequent launches."
+  },
+  {
+    "question": "What are the module requirements for running Ansys Mapdl graphically on VDI nodes?",
+    "answer": "Load `CcEnv StdEnv/2023` and `ansys/2024R2.04` (or older versions)."
+  },
+  {
+    "question": "How do I launch Ansys Mapdl graphically on VDI nodes?",
+    "answer": "You can use `mapdl -g` to start the GUI directly, or `unset SESSION_MANAGER; launcher -> click RUN button`."
+  },
+  {
+    "question": "Which modules should be loaded for Ansys Workbench graphical use on VDI nodes, for both local and global environments?",
+    "answer": "For local modules, load `SnEnv` and `ansys/2024R.04` (or older). For global modules, load `CcEnv StdEnv/2023` and `ansys/2025R1` (or newer)."
+  },
+  {
+    "question": "What is the difference between `runwb2` and `runwb2-gui` when using local Ansys modules on VDI nodes?",
+    "answer": "`runwb2` uses the SHARCNET license server by default. `runwb2-gui` reads your `~/.licenses/ansys.lic` file or offers an interactive choice for CMC/SHARCNET servers."
+  },
+  {
+    "question": "What should I do to avoid a 'Warning: Software rasterizer found' message when launching Fluent from Workbench with version 2025R1 on VDI nodes?",
+    "answer": "Before clicking 'Start' in the Fluent Launcher, go to the 'Environment' tab and copy/paste `HOOPS_PICTURE=opengl` into the empty input field, or define `export HOOPS_PICTURE=opengl` in your environment before starting Workbench."
+  },
+  {
+    "question": "What are the recommended core and memory limits when running Mechanical or Fluent in Workbench on VDI nodes?",
+    "answer": "For Mechanical, check 'Distributed' and specify a maximum of 24 cores. For Fluent, do not check 'Distributed' and specify a maximum of 12 cores. Do not use more than 128GB of memory. For pre/post-processing without computation, use only 4 cores to avoid unnecessary HPC license consumption."
+  },
+  {
+    "question": "How can I terminate all Ansys processes if the graphical interface freezes or does not start correctly on VDI nodes?",
+    "answer": "Open a new terminal window on gra-vdi and execute `pkill -9 -e -u $USER -f \"ansys|fluent|mwrpcss|mwfwrapper|ENGINE|mono\"`."
+  },
+  {
+    "question": "What modules are needed to run Ansys Ensight graphically on VDI nodes?",
+    "answer": "Load `SnEnv` and `ansys/2024R2.04` (or older versions back to 2021R2)."
+  },
+  {
+    "question": "What are the modules required to run Ansys Rocky graphically on VDI nodes?",
+    "answer": "You can load `clumod ansysrocky/2023R2 CcEnv StdEnv/2020 ansys/2023R2`, `clumod ansysrocky/2024R2.0 CcEnv StdEnv/2023 ansys/2024R2.04`, or `CcEnv StdEnv/2023 ansys/2025R1`."
+  },
+  {
+    "question": "Can Ansys Rocky use GPUs on gra-vdi for computation?",
+    "answer": "No, Rocky can only use CPUs on gra-vdi as there is currently only one GPU dedicated to graphics."
   }
 ]

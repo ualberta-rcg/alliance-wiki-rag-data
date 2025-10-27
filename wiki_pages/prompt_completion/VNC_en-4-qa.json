@@ -1,58 +1,74 @@
 [
   {
-    "question": "What should I do if I experience repeated failures to establish a new VNC connection?",
-    "answer": "Repeated failing attempts to establish a new vncserver/vncviewer connection may be due to an old SSH tunnel still running on your desktop tying up ports. To identify and kill any such tunnels, open a terminal window on your desktop and run `ps ux | grep ssh` followed by `kill PID`."
+    "question": "What is the benefit of starting a `vncserver` with the `-alwaysshared` option?",
+    "answer": "Starting a `vncserver` with the `-alwaysshared` option allows for multiple connections to the same desktop, enabling a user to seamlessly continue working from different remote locations (e.g., office and home) without needing to restart the server or applications."
   },
   {
-    "question": "Which password should I use if my VNC screensaver times out and requests a password?",
-    "answer": "If your VNC screensaver times out and requests a password, enter your cluster account password to unlock it (not your vncserver password)."
+    "question": "What happens if a `vncserver` is started without the `-AlwaysShared` option?",
+    "answer": "If a `vncserver` is not started with `-AlwaysShared`, only one `vncviewer` connection is possible. To reconnect from a different location, all applications must be closed, the `vncserver` shut down, and a new desktop and applications restarted from scratch."
   },
   {
-    "question": "What command can I use if the MATE desktop screensaver will not unlock?",
+    "question": "What is a common reason for repeated failures to connect to a VNC server?",
+    "answer": "Repeated failing attempts to establish a new vncserver/vncviewer connection may be due to an old SSH tunnel still running on your desktop tying up ports."
+  },
+  {
+    "question": "How can you identify and terminate old SSH tunnels on your desktop?",
+    "answer": "To identify and kill any old SSH tunnels, open a terminal window on your desktop and run `ps ux | grep ssh` to find the process ID (PID), then use `kill PID`."
+  },
+  {
+    "question": "Which password should be used to unlock a VNC screensaver?",
+    "answer": "If your VNC screensaver times out and requests a password, you should enter your cluster account password, not your vncserver password."
+  },
+  {
+    "question": "What command can be used if the MATE desktop screensaver will not unlock?",
     "answer": "If you are running the MATE desktop and the screensaver will not unlock, try running `killall -9 .mate-screensaver`."
   },
   {
     "question": "Has the VNC screensaver issue been resolved on clusters?",
-    "answer": "This should no longer be a problem on our clusters as the VNC screensaver has been disabled."
+    "answer": "Yes, the VNC screensaver has been disabled on our clusters, so this should no longer be a problem."
   },
   {
-    "question": "Describe the two-step login procedure for gra-vdi.alliancecan.ca.",
-    "answer": "The procedure to login to gra-vdi.alliancecan.ca is a two-step process: 1) enter your username and ccdb password, and 2) enter your username and Duo two-factor MFA passcode."
+    "question": "Describe the two-step login procedure for `gra-vdi.alliancecan.ca`.",
+    "answer": "The login procedure for `gra-vdi.alliancecan.ca` involves two steps: first, entering your username and CCDB password, and second, entering your username and Duo two-factor MFA passcode."
   },
   {
-    "question": "What happens if I enter the wrong username/password in the first step of logging into gra-vdi.alliancecan.ca?",
-    "answer": "If you enter the wrong username/password for the first step, you will still be prompted by the second step. If you then send your username/passcode, you will receive a message that says 'Success, Logging you in...' and be returned to the login screen of the first step."
+    "question": "What happens if an incorrect username/password is entered during the first step of the `gra-vdi.alliancecan.ca` login process?",
+    "answer": "If you enter the wrong username/password in the first step of the `gra-vdi.alliancecan.ca` login, you will still be prompted for the second step (Duo two-factor MFA). After sending the Duo passcode, you will receive a 'Success, Logging you in...' message but be returned to the first login screen."
   },
   {
-    "question": "How can I reset my Alliance ccdb password?",
-    "answer": "If you cannot recall your Alliance ccdb password, visit `https://ccdb.alliancecan.ca/security/forgot` to reset it, assuming your account is not pending renewal by your PI."
+    "question": "How can one reset their Alliance CCDB password?",
+    "answer": "You can reset your Alliance CCDB password by visiting `https://ccdb.alliancecan.ca/security/forgot`, assuming your account is not pending renewal by your PI."
   },
   {
-    "question": "What changes are required to run a graphics program that utilizes hardware-based accelerated OpenGL?",
-    "answer": "To run a graphics based program that utilizes hardware-based accelerated OpenGL, the `salloc` command must be modified to request a GPU node, and `vglrun` will probably need to be added just before the name of your `PROGRAM` on the command line of your VNC desktop terminal window."
+    "question": "What is necessary to run a graphics program that uses hardware-based accelerated OpenGL with VNC?",
+    "answer": "To run a graphics program that utilizes hardware-based accelerated OpenGL, the `salloc` command must be modified to request a GPU node, and `vglrun` may need to be added before the program name in the VNC desktop terminal."
   },
   {
-    "question": "How do I request a GPU node using the `salloc` command to run OpenGL graphics programs?",
-    "answer": "To request the first GPU node that comes available, specify `salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=1 --mem=16000 --account=def-piname`. If a specific GPU type like 't4' is desired, use `salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=t4:1 --mem=16000 --account=def-piname`."
+    "question": "Why is it important to modify the `salloc` command to request a GPU node for OpenGL graphics?",
+    "answer": "Modifying the `salloc` command to request a GPU node for OpenGL graphics is important because if not done, the program will fall back to using software-based rendering on CPUs, which is much slower."
   },
   {
-    "question": "Why is it important to request a GPU node for OpenGL graphics programs?",
-    "answer": "If a GPU node is not requested, the program will fall back to using software-based rendering on CPUs, which is relatively much slower than hardware-accelerated OpenGL."
+    "question": "How can you request a GPU node with `salloc` to minimize queue wait time?",
+    "answer": "To request the first available GPU node and minimize queue wait time, use the `salloc` command with `--gpus-per-node=1`, for example: `salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=1 --mem=16000 --account=def-piname`."
   },
   {
-    "question": "What is the purpose of the `vglrun` command when running an OpenGL program?",
-    "answer": "`vglrun` sets some extra environment variables to ensure your program will use correct VirtualGL libraries."
+    "question": "How do you request a specific GPU type, like a 't4' GPU, using the `salloc` command?",
+    "answer": "To request a specific GPU type, such as a 't4' GPU, use `salloc` with `--gpus-per-node=t4:1`, for example: `salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=t4:1 --mem=16000 --account=def-piname`."
+  },
+  {
+    "question": "When might the `vglrun` command be necessary for an OpenGL program in a VNC desktop?",
+    "answer": "The `vglrun` command will probably need to be added just before the name of your `PROGRAM` on the command line of your VNC desktop terminal window to ensure the program uses the correct VirtualGL libraries for hardware acceleration."
   },
   {
     "question": "When is the `vglrun` command not required for an OpenGL program?",
-    "answer": "`vglrun` is not required if your `PROGRAM` has already been patched to use the current cvmfs standard environment."
+    "answer": "The `vglrun` command is not required if your program has already been patched to use the current cvmfs standard environment."
   },
   {
-    "question": "What are some alternative solutions if I experience graphics issues when using VNC?",
-    "answer": "If you experience graphics issues when using VNC, you can try using OpenOnDemand on the nibi cluster (`https://ondemand.sharcnet.ca/`) or JupyterHub on the rorqual cluster (`https://jupyterhub.rorqual.alliancecan.ca/`)."
+    "question": "What are some alternative portals if you encounter graphics issues with VNC?",
+    "answer": "If you experience graphics issues with VNC, you can try using OpenOnDemand on the nibi cluster or JupyterHub on the rorqual cluster as alternatives."
   },
   {
-    "question": "What benefits do OpenOnDemand and JupyterHub offer as alternatives to VNC for graphics?",
-    "answer": "Both OpenOnDemand and JupyterHub offer an automated modern desktop VDI web interface GUI experience that is designed for ease of use with improved hardware performance and software support."
+    "question": "What benefits do OpenOnDemand and JupyterHub offer as VNC alternatives?",
+    "answer": "OpenOnDemand and JupyterHub offer an automated modern desktop VDI web interface GUI experience designed for ease of use with improved hardware performance and software support."
   }
 ]

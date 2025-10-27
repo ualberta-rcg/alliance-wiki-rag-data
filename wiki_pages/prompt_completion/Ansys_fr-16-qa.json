@@ -1,226 +1,50 @@
 [
   {
-    "question": "How long can Ansys programs be run interactively on a single compute node?",
-    "answer": "Ansys programs can be run interactively on a single compute node for up to 24 hours."
+    "question": "What should I do if the Ansys graphical interface (GUI) freezes or does not start correctly?",
+    "answer": "If the Ansys graphical interface (Workbench or other programs) freezes or fails to start, especially after a vnsviewer disconnection, open a new terminal on gra-vdi and run `pkill -9 -e -u $USER -f \"ansys|fluent|mwrpcss|mwfwrapper|ENGINE|mono\"` to stop all Ansys processes. If the issue persists and you previously used the GUI on compute nodes, try `rm -rf .ansys`. If the problem relates to storage (/home, /project, or /scratch), Ansys should function normally once the storage issue is resolved."
   },
   {
-    "question": "What is the ideal approach for testing intensive Ansys simulations on compute nodes?",
-    "answer": "The ideal approach is to run Ansys interactively on a single compute node for up to 24 hours, requesting all cores and memory using `salloc`."
+    "question": "What could cause Ansys GUI processes to persist and block licenses or cause errors?",
+    "answer": "Persistent processes can block licenses or cause other unusual errors if an Ansys GUI session (Fluent, Workbench, etc.) is not properly terminated before the vncviewer is manually or unexpectedly closed (e.g., due to a temporary network outage or a blocked file system). In the latter case, processes might not be killed until normal disk access is restored."
   },
   {
-    "question": "How do you launch Ansys Fluent in graphical mode on compute nodes?",
-    "answer": "Load the `StdEnv/2020` module, then `ansys/2021R1` (or newer), and run `fluent -mpi=intel`."
+    "question": "How do I launch Ensight from gra-vdi?",
+    "answer": "To launch Ensight from gra-vdi, load the `SnEnv` module, followed by `ansys/2024R2.04` (or older versions back to 2021R2), and then execute `ensight`."
   },
   {
-    "question": "What command is used to launch Ansys CFX in graphical mode on compute nodes?",
-    "answer": "Load the `StdEnv/2020` module, then `ansys/2021R1` (or newer), and run `QTWEBENGINE_DISABLE_SANDBOX=1 cfx5`."
+    "question": "Which modules should be loaded to use Rocky on gra-vdi?",
+    "answer": "To use Rocky on gra-vdi, you can load `clumod ansysrocky/2023R2 CcEnv StdEnv/2020 ansys/2023R2`, `clumod ansysrocky/2024R2.0 CcEnv StdEnv/2023 ansys/2024R2.04`, or `CcEnv StdEnv/2023 ansys/2025R1`."
   },
   {
-    "question": "How do you start Ansys Mapdl in graphical mode on compute nodes?",
-    "answer": "Load the `StdEnv/2020` module, then `ansys/2021R2` (or newer), and run either `mapdl -g` or `launcher` followed by clicking the RUN button."
+    "question": "What are the different commands to launch Rocky programs on gra-vdi?",
+    "answer": "You can launch Rocky programs using `Rocky` (which reads `~/licenses/ansys.lic`), `Rocky-gui` (which allows selection of CMC or SHARCNET servers via local ansysrocky modules), `RockySolver` (to run the solver directly from the command line), or `RockySchedular` (to launch the graphical interface for submitting and running tasks on the current node, though this is untested)."
   },
   {
-    "question": "What modules should be loaded to run Ansys Workbench in graphical mode on compute nodes?",
-    "answer": "Load `StdEnv/2020` and `ansys/2021R2` (or newer versions)."
+    "question": "On which clusters is Rocky 2024R2 and older available?",
+    "answer": "Rocky for 2024R2 and older versions is currently only available on gra-vdi and Graham clusters; installation on other clusters is planned for June."
   },
   {
-    "question": "What command is necessary before starting Ansys Workbench if you are using Ansys Mechanical on compute nodes?",
-    "answer": "Run `xfwm4 --replace &` on the command line."
+    "question": "Is Rocky 2025R1 supported by the SHARCNET license server?",
+    "answer": "Rocky for 2025R1 and newer versions is provided on all clusters by the Ansys module, but it is not yet supported by the SHARCNET license server."
   },
   {
-    "question": "What environment variable is needed if you are using CFD-Post with Ansys Workbench on compute nodes?",
-    "answer": "Set `export QTWEBENGINE_DISABLE_SANDBOX=1`."
+    "question": "Can Rocky use GPUs on gra-vdi?",
+    "answer": "No, Rocky can only use CPUs on gra-vdi as there is currently only one GPU dedicated to graphics."
   },
   {
-    "question": "How do you start Ansys Workbench on compute nodes?",
-    "answer": "After loading `StdEnv/2020` and `ansys/2021R2` (or newer), and potentially running `xfwm4 --replace &` and setting `export QTWEBENGINE_DISABLE_SANDBOX=1`, run `runwb2`."
+    "question": "Is the SHARCNET license free for Rocky usage?",
+    "answer": "Yes, the SHARCNET license now includes Rocky, and its use is free for academic research."
   },
   {
-    "question": "What is a workaround for unresponsive dropdown menus in Ansys Mechanical Workbench on compute nodes?",
-    "answer": "Launch `xfwm4 --replace` on the command line before starting Workbench."
+    "question": "Is running Ansys GUI programs via SSH X-redirection recommended?",
+    "answer": "No, running Ansys GUI programs via SSH X-redirection to your local computer is neither tested nor supported. It relies on a correctly configured X display server or a suitable X client emulator, and users often find the interactive response times unacceptable, although it might be useful for basic menu operations or running calculations."
   },
   {
-    "question": "How can you configure `xfwm4` to be the default for Workbench sessions?",
-    "answer": "Modify `$HOME/.vnc/xstartup` and replace `mate-session` with `xfce4-session`."
+    "question": "Why is SSH X-redirection generally slow for Ansys GUI programs?",
+    "answer": "SSH X-redirection can be very slow for Ansys GUI programs, with startup times potentially taking up to 40 minutes in tests, compared to 34 seconds with vncviewer. This is due to network dependency and the overhead of rendering graphics over SSH."
   },
   {
-    "question": "Which version of Fluent does not currently work on compute nodes within Workbench?",
-    "answer": "Fluent in `ansys/2022R2` does not work on compute nodes and an alternative version should be used."
-  },
-  {
-    "question": "What should be done when running a parallel analysis program like Mechanical or Fluent on a single compute node via Workbench?",
-    "answer": "Do not check the \"Distributed\" box and indicate a number of cores equal to your `salloc` session minus 1."
-  },
-  {
-    "question": "How do you launch Ensight in graphical mode on compute nodes?",
-    "answer": "Load `StdEnv/2020` and an Ansys module (e.g., `ansys/2022R2`), then set `export LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib` (replacing A and B with appropriate version numbers), and finally run `ensight -X`."
-  },
-  {
-    "question": "Is Ansys/2022R2 Ensight fully tested on compute nodes?",
-    "answer": "Ansys/2022R2 Ensight has been minimally tested on compute nodes; users are asked to report any encountered issues."
-  },
-  {
-    "question": "What modules are needed to run Ansys Rocky in graphical mode on compute nodes?",
-    "answer": "For `ansysrocky/2023R2`, load `ansysrocky/2023R2 StdEnv/2020 ansys/2023R2`. For `ansysrocky/2024R2.0`, load `ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04`. For `ansys/2025R1`, load `StdEnv/2023 ansys/2025R1`."
-  },
-  {
-    "question": "How do you launch the Ansys Rocky GUI on compute nodes?",
-    "answer": "After loading the required modules, run `Rocky`. The Ansys module reads `~/licenses/ansys.lic`. Alternatively, `Rocky-gui` allows selecting CMC or SHARCNET servers."
-  },
-  {
-    "question": "What command directly launches the Rocky solver from the command line on compute nodes?",
-    "answer": "`RockySolver`."
-  },
-  {
-    "question": "Which Rocky versions are currently available only on gra-vdi and Graham compute nodes?",
-    "answer": "Versions 2024R2 or older are only available on gra-vdi and Graham; installation on other clusters is planned for June."
-  },
-  {
-    "question": "What is the status of Ansys Rocky versions 2025R1 and newer regarding license server support?",
-    "answer": "Versions 2025R1 and newer are provided in the Ansys module on all clusters but are not yet supported by the SHARCNET license server."
-  },
-  {
-    "question": "Is the SHARCNET license free for Rocky usage in research?",
-    "answer": "Yes, the SHARCNET license includes Rocky and its use is free for research."
-  },
-  {
-    "question": "Does Rocky support GPU-accelerated computing?",
-    "answer": "Yes, Rocky takes supports GPU-accelerated computing (though it's noted as untested and undocumented)."
-  },
-  {
-    "question": "How can one request a Graham compute node for interactive Rocky use with 4 CPUs and 1 GPU for up to 8 hours?",
-    "answer": "Use the command: `salloc --time=08:00:00 --nodes=1 --cpus-per-task=4 --gres=gpu:v100:1 --mem=32G --account=someaccount`."
-  },
-  {
-    "question": "How long can Ansys programs be run on Graham VDI nodes?",
-    "answer": "Ansys programs can be executed for up to 7 days on Graham VDI nodes."
-  },
-  {
-    "question": "What are the maximum resource limits for Ansys programs on Graham VDI nodes?",
-    "answer": "A maximum of 8 cores (up to 16 cores) and 128 GB of memory."
-  },
-  {
-    "question": "What advantage does the VDI system offer for graphical applications?",
-    "answer": "The VDI system provides OpenGL GPU acceleration, which is ideal for high-performance graphics."
-  },
-  {
-    "question": "What tasks can be performed using VDI for Ansys?",
-    "answer": "VDI can be used to create or modify simulation input files, post-process data, or visualize simulation results."
-  },
-  {
-    "question": "How do you connect to Graham VDI nodes?",
-    "answer": "Connect to `gra-vdi.computecanada.ca` using `TigerVNC`."
-  },
-  {
-    "question": "What is the recommended maximum size for a parallel Ansys task on gra-vdi?",
-    "answer": "The maximum size should be limited to 16 cores to avoid overloading servers and impacting other users."
-  },
-  {
-    "question": "How can a user run two simultaneous Ansys tasks on VDI nodes?",
-    "answer": "Use two distinct VNC sessions; connect the first to `gra-vdi3.sharcnet.ca` and the second to `gra-vdi4.sharecnet.ca`."
-  },
-  {
-    "question": "Why should simultaneous Ansys simulations generally be run in different directories on VDI nodes?",
-    "answer": "To avoid file conflicts."
-  },
-  {
-    "question": "Is there a time limit constraint for running Ansys simulations on gra-vdi, unlike compute node connections?",
-    "answer": "No, there is no time limit constraint on gra-vdi."
-  },
-  {
-    "question": "What modules should be loaded to run Ansys Fluids in graphical mode on VDI nodes?",
-    "answer": "Load `CcEnv StdEnv/2023` and `ansys/2024R2.04` (or older versions)."
-  },
-  {
-    "question": "What command should be executed before launching Fluent or CFX on VDI nodes to prevent an error message?",
-    "answer": "`unset SESSION_MANAGER`."
-  },
-  {
-    "question": "How do you launch Fluent, CFX, or ICEM CFD graphically on VDI nodes?",
-    "answer": "After loading modules and unsetting `SESSION_MANAGER`, run `fluent | cfx5 | icemcfd`."
-  },
-  {
-    "question": "What is the solution if `icemcfd` displays an \"Error segmentation violation\" message upon launch on VDI nodes?",
-    "answer": "Do not click OK. Instead, go to `Settings Tab -> Display -> tick X11 -> Apply -> OK -> File -> Exit`. The error should not reoccur on subsequent launches."
-  },
-  {
-    "question": "How do you launch Ansys Mapdl in graphical mode on VDI nodes?",
-    "answer": "Load `CcEnv StdEnv/2023` and `ansys/2024R2.04` (or older versions), then run `mapdl -g` or `unset SESSION_MANAGER; launcher` and click the RUN button."
-  },
-  {
-    "question": "What modules are used for Workbench with `SnEnv` on VDI nodes?",
-    "answer": "Load `SnEnv` and `ansys/2024R.04` (or older versions)."
-  },
-  {
-    "question": "What command is used to launch Workbench with `SnEnv` on VDI nodes?",
-    "answer": "Run `runwb2` or `runwb2-gui`."
-  },
-  {
-    "question": "What modules are used for Workbench with `CcEnv` on VDI nodes?",
-    "answer": "Load `CcEnv StdEnv/2023` and `ansys/2025R1` (or newer versions)."
-  },
-  {
-    "question": "What is a limitation for `ansys/2025R1` Workbench on VDI nodes?",
-    "answer": "It is not available on the SHARCNET license server before its update."
-  },
-  {
-    "question": "How does `runwb2` from local Ansys modules behave regarding license servers on VDI nodes?",
-    "answer": "By default, it uses the SHARCNET license server as defined in the Ansys module file."
-  },
-  {
-    "question": "How can a user specify a remote license server when launching Workbench with local Ansys modules on VDI?",
-    "answer": "Launch Workbench with `runwb2-gui`, which will read the `~/.licenses/ansys.lic` file."
-  },
-  {
-    "question": "What interactive option is offered by `runwb2-gui` for license servers?",
-    "answer": "It offers an interactive option to use the CMC server (routed via the SHARCNET CMC CadPASS), eliminating the need to configure it in your `ansys.lic` file."
-  },
-  {
-    "question": "What warning might appear when starting Fluent from Workbench with version 2025R1, and how can it be prevented?",
-    "answer": "The warning \"Warning: Software rasterizer found, hardware acceleration will be disabled.\" might appear. Prevent it by setting `HOOPS_PICTURE=opengl` in the Fluent Launcher's Environment tab or by defining `export HOOPS_PICTURE=opengl` in your environment before starting Workbench."
-  },
-  {
-    "question": "When running Ansys Mechanical in Workbench on gra-vdi, what are the recommended settings for cores and memory?",
-    "answer": "Check \"Distributed\" in the Solver panel and specify a maximum of 24 cores. Do not try to use more than 128GB of memory."
-  },
-  {
-    "question": "When running Fluent in Workbench on gra-vdi, what are the recommended settings for cores and memory?",
-    "answer": "Do not check \"Distributed\" and specify a maximum of 12 cores. Do not try to use more than 128GB of memory."
-  },
-  {
-    "question": "What should be done if only performing pre-processing or post-processing tasks in Ansys Workbench on gra-vdi without running calculations?",
-    "answer": "Use only 4 cores, otherwise HPC licenses will be drawn unnecessarily."
-  },
-  {
-    "question": "What is a general troubleshooting step if the Workbench GUI or Ansys programs freeze or fail to start correctly on gra-vdi?",
-    "answer": "Open a new terminal on gra-vdi and run `pkill -9 -e -u $USER -f \"ansys|fluent|mwrpcss|mwfwrapper|ENGINE|mono\"` to terminate all Ansys processes."
-  },
-  {
-    "question": "What additional step should be tried if issues persist after `pkill` and you previously used the GUI on compute nodes?",
-    "answer": "Try running `rm -rf .ansys`."
-  },
-  {
-    "question": "What does a problem with `/home`, `/project`, or `/scratch` (e.g., the `df` command freezing) likely indicate for Ansys functionality?",
-    "answer": "Ansys will likely resume normal operation once the storage issue is resolved."
-  },
-  {
-    "question": "What modules are loaded to run Ensight with `SnEnv` on VDI nodes?",
-    "answer": "Load `SnEnv` and `ansys/2024R2.04` (or older versions back to 2021R2)."
-  },
-  {
-    "question": "How do you launch Ensight on VDI nodes after loading modules?",
-    "answer": "Run `ensight`."
-  },
-  {
-    "question": "What modules are required to run Ansys Rocky graphically on VDI nodes?",
-    "answer": "Load `clumod ansysrocky/2023R2 CcEnv StdEnv/2020 ansys/2023R2`, or `clumod ansysrocky/2024R2.0 CcEnv StdEnv/2023 ansys/2024R2.04`, or `CcEnv StdEnv/2023 ansys/2025R1`."
-  },
-  {
-    "question": "What command is used to launch the Ansys Rocky GUI on VDI nodes?",
-    "answer": "Run `Rocky` (which reads `~/licenses/ansys.lic`) or `Rocky-gui` (which provides server selection)."
-  },
-  {
-    "question": "What is the limitation for Rocky's use of GPUs on gra-vdi?",
-    "answer": "Rocky can only use CPUs on gra-vdi as there is currently only one GPU dedicated to graphics."
+    "question": "What are the basic steps to attempt running an Ansys GUI program via SSH X-redirection?",
+    "answer": "The basic steps are: 1) `ssh -Y username@graham.computecanada.ca`; 2) `salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task=4 [--gpus-per-node=1] --account=def-mygroup`; 3) Once connected to a compute node, test by running `xclock`. If the clock appears, load the desired Ansys module and try to run the program."
   }
 ]

@@ -1,58 +1,70 @@
 [
   {
-    "question": "How do you compile LLVM?",
-    "answer": "First, download the source (`wget http://releases.llvm.org/3.9.1/llvm-3.9.1.src.tar.xz`), then unpack it, create a build directory, and run `cmake` with specific flags (`-DCMAKE_BUILD_TYPE=Release`, `-DLLVM_BUILD_LLVM_DYLIB=ON`, etc.), followed by `make` and `sudo make install`."
+    "question": "Combien de c\u0153urs un utilisateur doit-il demander au minimum pour une visualisation sur Trillium, compte tenu de ses exigences en mati\u00e8re de n\u0153uds entiers ?",
+    "answer": "Sur Trillium, vous devez demander des n\u0153uds entiers, c'est-\u00e0-dire par multiples de 192 c\u0153urs. Par cons\u00e9quent, l'exemple minimal sur Trillium n\u00e9cessitera 192 c\u0153urs."
   },
   {
-    "question": "What are the configuration flags for compiling Mesa with OSMesa?",
-    "answer": "When running `./configure`, use the flags: `--enable-opengl --disable-gles1 --disable-gles2 --disable-va --disable-xvmc --disable-vdpau --enable-shared-glapi --disable-texture-float --enable-gallium-llvm --enable-llvm-shared-libs --with-gallium-drivers=swrast,swr --disable-dri --disable-egl --disable-gbm --disable-glx --disable-osmesa --enable-gallium-osmesa`."
+    "question": "Quelle est la premi\u00e8re \u00e9tape pour configurer une visualisation interactive de longue dur\u00e9e avec ParaView en mode client-serveur ?",
+    "answer": "Sur votre poste de travail, installez la m\u00eame version de ParaView que celle que vous utiliserez sur la grappe; connectez-vous ensuite \u00e0 la grappe et lancez une t\u00e2che interactive parall\u00e8le avec plusieurs c\u0153urs CPU."
   },
   {
-    "question": "How do you compile the ParaView server for offscreen rendering with OSMesa?",
-    "answer": "Download the ParaView source (`wget http://www.paraview.org/files/v5.2/ParaView-v5.2.0.tar.gz`), unpack it, create a build directory, and run `cmake` with specific flags (`-DCMAKE_BUILD_TYPE=Release`, `-DCMAKE_INSTALL_PREFIX=/home/centos/paraview`, `-DPARAVIEW_USE_MPI=OFF`, `-DPARAVIEW_ENABLE_PYTHON=ON`, `-DPARAVIEW_BUILD_QT_GUI=OFF`, `-DVTK_OPENGL_HAS_OSMESA=ON`, `-DVTK_USE_OFFSCREEN=ON`, `-DVTK_USE_X=OFF`), then run `make` and `make install`."
+    "question": "Quelle commande salloc utiliser pour lancer une t\u00e2che interactive parall\u00e8le g\u00e9n\u00e9rale pour la visualisation client-serveur ?",
+    "answer": "La commande est `salloc --time=1:00:0 --ntasks=... --mem-per-cpu=3600 --account=def-someprof`."
   },
   {
-    "question": "How do you start the ParaView server on an instance for SWR rendering?",
-    "answer": "You can start the server using the command `./paraview/bin/pvserver --mesa-swr-avx2`."
+    "question": "Quelle est la commande salloc sp\u00e9cifique pour lancer une t\u00e2che de visualisation interactive sur un seul n\u0153ud de Trillium ?",
+    "answer": "Pour Trillium, supposant que vous utilisez un seul n\u0153ud pour la visualisation, la commande est `salloc --time=1:00:0 --ntasks=192 --account=def-someprof`."
   },
   {
-    "question": "How do you set up an SSH tunnel from your computer to an instance for ParaView client-server mode?",
-    "answer": "Use the command `ssh centos@vm.ip.address -L 11111:localhost:11111` from your computer to tunnel local port 11111 to the instance's port 11111."
+    "question": "Quels modules doivent \u00eatre charg\u00e9s sur la grappe avant de d\u00e9marrer le serveur ParaView ?",
+    "answer": "Vous devez charger le module `paraview/6.0.0`. Sur Trillium, vous devez charger `StdEnv/2023` avant de tenter de charger `paraview/6.0.0`."
   },
   {
-    "question": "After setting up the SSH tunnel, how do you connect the ParaView client to the instance?",
-    "answer": "Start the ParaView client on your computer and connect it to `localhost:11111`."
+    "question": "Comment d\u00e9marrer le serveur ParaView avec rendu hors \u00e9cran sur la grappe ?",
+    "answer": "La commande \u00e0 utiliser est `srun pvserver --force-offscreen-rendering --opengl-window-backend OSMesa`."
   },
   {
-    "question": "What message indicates that SWR is detected during ParaView rendering in client-server mode?",
-    "answer": "The console will display \"SWR detected AVX2\" during rendering."
+    "question": "Comment configurer un tunnel SSH pour connecter le client ParaView local au serveur sur une grappe comme Fir, Rorqual, Trillium ou Narval ?",
+    "answer": "Dans un terminal sur votre ordinateur Mac/Linux, utilisez la commande `ssh <username>@fir.alliancecan.ca -L 11111:fc30669:11111`, en rempla\u00e7ant `fir` par le nom de la grappe et `fc30669` par le n\u0153ud de calcul."
   },
   {
-    "question": "What is an alternative to client-server mode for some ParaView visualizations?",
-    "answer": "You can use ParaView via JupyterLab, which utilizes a VNC remote desktop."
+    "question": "Pourquoi la configuration du tunnel SSH est-elle diff\u00e9rente pour Nibi, et quelle commande doit \u00eatre utilis\u00e9e ?",
+    "answer": "Nibi restreint la communication entre les n\u0153uds par l'utilisation de SSH et bloque certains \u00e9changes lors de la connexion client-serveur initiale. Pour Nibi, utilisez la commande `ssh -T -J <username>@nibi.alliancecan.ca -L 11111:localhost:11111 <username>@<nibi_compute_node>` pour rediriger le port SSH en deux \u00e9tapes."
   },
   {
-    "question": "How do you launch ParaView through JupyterLab?",
-    "answer": "First, launch a JupyterLab instance, then load a `paraview` module. A ParaView launch icon will appear, allowing you to start your visualization."
+    "question": "Quel est le r\u00f4le de l'indicateur `-T` dans la commande SSH pour Nibi, et quelle est sa cons\u00e9quence ?",
+    "answer": "L'indicateur `T` d\u00e9sactive l'allocation du pseudo-terminal et joue un r\u00f4le important dans la connexion initiale. Par contre, il d\u00e9sactive aussi les invites interactives dans l'interpr\u00e9teur et il est normal que vous ne voyiez rien en sortie apr\u00e8s cette commande."
   },
   {
-    "question": "What is Nibi Open OnDemand used for in ParaView visualizations?",
-    "answer": "It's used for small interactive visualizations requiring up to 250GB and 16 cores, using a VNC remote desktop."
+    "question": "Quelles \u00e9tapes suivre dans l'interface de ParaView sur l'ordinateur local pour se connecter au serveur distant ?",
+    "answer": "Sur votre ordinateur, d\u00e9marrez ParaView; allez \u00e0 \"File -> Connect\" (ou cliquez sur le bouton vert \"Connect\" dans la barre d'outils); cliquez sur \"Add Server\". Pointez ParaView \u00e0 votre port local 11111 pour avoir des param\u00e8tres semblables \u00e0 \"name = fir, server type = Client/Server, host = localhost, port = 11111\"; cliquez sur \"Configure\"; cliquez sur \"Manual\" puis sur \"Save\". Une fois que la connexion est ajout\u00e9e \u00e0 la configuration, s\u00e9lectionnez le serveur dans la liste affich\u00e9e et cliquez sur \"Connect\"."
   },
   {
-    "question": "What VNC client is preferred for Nibi Open OnDemand?",
-    "answer": "Tiger VNC is the preferred VNC client."
+    "question": "Comment peut-on v\u00e9rifier si le rendu ParaView s'effectue en parall\u00e8le ?",
+    "answer": "Pour v\u00e9rifier que vous effectuez un rendu parall\u00e8le, vous pouvez colorer votre jeu de donn\u00e9es avec la variable 'Process Id' (cette variable n'est pas disponible en mode s\u00e9quentiel)."
   },
   {
-    "question": "How do you launch ParaView on Nibi Open OnDemand, particularly with newer versions?",
-    "answer": "After loading the necessary modules (e.g., `module load StdEnv/2020 gcc/9.3.0 openmpi/4.0.3 paraview/5.11.0`), launch ParaView using `LD_PRELOAD=${LD_PRELOAD/libdlfaker.so/} paraview` to disable the fake dynamic linker used for VirtualGL."
+    "question": "Quelle est la m\u00e9thode recommand\u00e9e pour les t\u00e2ches de visualisation longues, intensives et automatis\u00e9es ?",
+    "answer": "Pour des t\u00e2ches de visualisation longues, intensives et automatis\u00e9es, nous vous recommandons fortement de passer \u00e0 une visualisation par lots hors \u00e9cran."
   },
   {
-    "question": "What is recommended for intensive and automatic ParaView visualizations?",
-    "answer": "Non-interactive offscreen batch rendering is recommended, possibly by preparing Python scripts and submitting them as parallel tasks."
+    "question": "Comment ParaView permet-il la programmation des flux de travail de visualisation pour les t\u00e2ches par lots ?",
+    "answer": "ParaView prend en charge les scripts Python en entr\u00e9e, ce qui vous permet de programmer votre flux de travail de visualisation et de le lui soumettre via une t\u00e2che de calcul standard."
   },
   {
-    "question": "Where can you get assistance for batch rendering ParaView visualizations?",
-    "answer": "You can contact technical support for assistance with batch rendering."
+    "question": "Quelle est la proc\u00e9dure pour lancer un rendu s\u00e9quentiel en lots de ParaView sur la grappe ?",
+    "answer": "La proc\u00e9dure devrait ressembler \u00e0 `module load paraview/6.0.0` suivi de `sbatch serial.sh`."
+  },
+  {
+    "question": "Quelles informations minimales le script `serial.sh` pour un rendu s\u00e9quentiel en lots doit-il contenir ?",
+    "answer": "Le script `serial.sh` doit inclure les directives Slurm pour le temps, la m\u00e9moire par CPU et le compte (`#SBATCH --time=3:0:0`, `#SBATCH --mem-per-cpu=3600`, `#SBATCH --account=def-someuser`) et ex\u00e9cuter la commande `pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py`."
+  },
+  {
+    "question": "Quelle est la proc\u00e9dure pour lancer un rendu parall\u00e8le en lots de ParaView sur la grappe ?",
+    "answer": "La proc\u00e9dure devrait ressembler \u00e0 `module load paraview/6.0.0` suivi de `sbatch distributed.sh`."
+  },
+  {
+    "question": "Quelles informations minimales le script `distributed.sh` pour un rendu parall\u00e8le en lots doit-il contenir ?",
+    "answer": "Le script `distributed.sh` doit inclure les directives Slurm pour le temps, la m\u00e9moire par CPU, le nombre de t\u00e2ches et le compte (`#SBATCH --time=3:0:0`, `#SBATCH --mem-per-cpu=3600`, `#SBATCH --ntasks=4`, `#SBATCH --account=def-someuser`) et ex\u00e9cuter la commande `srun pvbatch --force-offscreen-rendering --opengl-window-backend OSMesa script.py`."
   }
 ]
