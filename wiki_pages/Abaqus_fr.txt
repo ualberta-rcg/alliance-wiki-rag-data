@@ -3,24 +3,21 @@
 __FORCETOC__
 [https://www.3ds.com/products-services/simulia/products/abaqus/ Abaqus FEA] est un progiciel commercial pour l'analyse d'éléments finis et l'ingénierie assistée par ordinateur.
 
+<div class="mw-translate-fuzzy">
 = Votre licence =
 Des modules Abaqus sont disponibles sur nos grappes, mais vous devez posséder votre propre licence. Pour configurer votre compte sur les grappes que vous voulez utiliser, connectez-vous et créez sur chacune un fichier <code>$HOME/.licenses/abaqus.lic</code> qui contient les deux lignes suivantes, pour les versions 202X et 6.14.1 respectivement. Remplacez ensuite <code>port@server</code> par le numéro du port flexlm et l'adresse IP (ou le nom complet du domaine) de votre serveur de licence Abaqus.
+</div>
 
-{{File
-|name=abaqus.lic
-|contents=
-prepend_path("ABAQUSLM_LICENSE_FILE","port@server")
-prepend_path("LM_LICENSE_FILE","port@server")
-}}
-
+<div class="mw-translate-fuzzy">
 Si votre licence n'est pas configurée pour une grappe en particulier, les administrateurs de systèmes des deux parties devront effectuer certaines modifications. Ceci est nécessaire pour que les ports flexlm et TCP de votre serveur Abaqus puissent être rejoints par tous les nœuds de calcul quand vos tâches dans la queue seront exécutées. Pour que nous puissions vous assister dans cette tâche, écrivez au [[Technical support/fr|soutien technique]] en indiquant
 * le numéro du port flexlm
 * le numéro du port statique
 * l'adresse IP de votre serveur de licence Abaqus.
 En retour vous recevrez une liste d'adresses IP et votre administrateur de système pourra ouvrir les pare-feu de votre serveur local pour que la grappe puisse se connecter via les deux ports. Une entente spéciale doit habituellement être négociée et signée avec SIMULIA pour qu'une telle licence puisse être utilisée à distance avec notre matériel.
+</div>
 
-= Soumettre une tâche =
-Vous trouverez ci-dessous des prototypes de scripts Slurm pour soumettre des simulations parallèles sur un ou plusieurs nœuds de calcul en utilisant des fils et MPI. Dans la plupart des cas, il suffira d'utiliser un des <b>scripts du répertoire /project</b> dans une des sections pour un nœud simple. Dans la dernière ligne des scripts, l'argument <code>memory=</code> est optionnel et sert aux tâches qui demandent beaucoup de mémoire ou qui posent problème; la valeur de déplacement de 3072Mo pourrait nécessiter un ajustement. Pour obtenir la liste des arguments en ligne de commande, chargez un module Abaqus et lancez <code>abaqus -help | less</code>.
+= Cluster job submission =
+Below are prototype Slurm scripts for submitting thread and mpi-based parallel simulations to single or multiple compute nodes.  Most users will find it sufficient to use one of the <b>project directory scripts</b> provided in the <i>Single node computing</i> sections. The optional <code>memory=</code> argument found in the last line of the scripts is intended for larger memory or problematic jobs where 3072MB offset value may require tuning.  A listing of all Abaqus command line arguments can be obtained by loading an Abaqus module and running: <code>abaqus -help | less</code>.
 
 Pour une tâche sur un nœud simple d'une durée de moins de 24 heures, le <i>script du répertoire /project</i> sous le premier onglet devrait suffire. Pour une tâche de plus longue durée, utilisez un script de redémarrage.
 
@@ -502,17 +499,12 @@ MINIMISER LES ENTRÉES/SORTIES. SI LA LIMITE SUPÉRIEURE DE MÉMOIRE EST SUPÉRI
 MENTIONNÉE PRÉCÉDEMMENT, ET L'UTILISATION DU DISQUE /SCRATCH SERA À PEU PRÈS PROPORTIONNELLE À LA DIFFÉRENCE
 ENTRE <CODE>MEMORY TO MINIMIZE I/O</CODE> ESTIMÉE ET LA LIMITE SUPÉRIEURE DE LA MÉMOIRE. TOUTEFOIS, IL EST IMPOSSIBLE D'ÉVALUER AVEC PRÉCISION L'ESPACE /SCRATCH DU DISQUE.
 
+<div class="mw-translate-fuzzy">
 = Mode graphique =
 Abaqus peut être utilisé interactivement en mode graphique sur une grappe ou sur gra-vdi avec VCN.
+</div> 
 
-== Sur une grappe ==
-1. [[VNC/fr#Nœuds_de_calcul|Connectez-vous à un nœud de calcul (durée maximale 3 heures) avec TigerVNC]].<br>
-2. Ouvrez une nouvelle fenêtre de terminal et entrez
- module load StdEnv/2020 abaqus/2021
-3. Lancez l'application avec<br>
- abaqus cae -mesa
-
-<span id="On_demand"></span>
+<span id="OnDemand"></span>
 <div class="mw-translate-fuzzy">
 == Sur gra-vdi ==
 1. [[VNC/fr#Nœuds_VDI|Connectez-vous à un nœud VDI (durée maximale 24 heures) avec TigerVNC]].<br>
@@ -524,54 +516,46 @@ Abaqus peut être utilisé interactivement en mode graphique sur une grappe ou s
  abaqus cae
 </div>
 
-To run abaqus interactively in a gui desktop do the following :
-
-1. Connect to the following url from your laptop browser<br>
- <code>ondemand.sharcnet.ca</code>
-2. Open a new terminal window and enter one of the following:
- module load StdEnv/2020 abaqus/2021
+1. Connect to an OnDemand system using one of the following URLs in your laptop browser :<br>
+ [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) NIBI]: <code>https://ondemand.sharcnet.ca</code>
+ FIR: <code>https://jupyterhub.fir.alliancecan.ca</code>
+ RORQUAL: <code>https://jupyterhub.rorqual.alliancecan.ca</code>
+ TRILLIUM: <code>https://ondemand.scinet.utoronto.ca</code>
+2. Open a new terminal window within your desktop and load one of :
+ module load StdEnv/2020 abaqus/2021, or
+ module load StdEnv/2023 abaqus/2025 <- coming soon
 3. Start the application in graphical mode:<br>
  abaqus cae
 
-Note that a module for <code>abaqus/2025</code> is in the process of being installed and when its ready will appear as an option in the above 3 steps showing how to optionally load it instead.
-
-== On gra-vdi ==
-
-IMPORTANT:  Gra-vdi will be permanently shutdown very soon, so use of it should be discontinued.  Instead you may use the new Ondemand system as described in the section above.
-
-1. Connect to gra-vdi with [[VNC#VDI_nodes|TigerVNC]]<br><br>
-2. Open a new terminal window and enter one of the following:
- module load CcEnv StdEnv/2016 abaqus/6.14.1 or
- module load CcEnv StdEnv/2016 abaqus/2020 or
- module load CcEnv StdEnv/2020 abaqus/2021
-3. Start the application with<br>
- abaqus cae
-
+<div class="mw-translate-fuzzy">
 Pour qu'Abaqus puisse démarrer en mode graphique, il faut au moins une licence CAE libre (non utilisée). La licence SHARCNET comporte 2 licences libres et 2 licences réservées. Si les 4 sont utilisées selon
+</div>
 
- [gra-vdi3:~] abaqus licensing lmstat -c $ABAQUSLM_LICENSE_FILE -a | grep "Users of cae"
+<div class="mw-translate-fuzzy">
+[gra-vdi3:~] abaqus licensing lmstat -c $ABAQUSLM_LICENSE_FILE -a | grep "Users of cae"
  Users of cae:  (Total of 4 licenses issued;  Total of 4 licenses in use)
+</div>
 
-Les messages d'erreur suivants seront affichés quand vous tenterez de lancer Abaqus cae&nbsp;:
+<span id="VncViewer"></span>
+<div class="mw-translate-fuzzy">
+== Sur une grappe ==
+1. [[VNC/fr#Nœuds_de_calcul|Connectez-vous à un nœud de calcul (durée maximale 3 heures) avec TigerVNC]].<br>
+2. Ouvrez une nouvelle fenêtre de terminal et entrez
+ module load StdEnv/2020 abaqus/2021
+3. Lancez l'application avec<br>
+ abaqus cae -mesa
+</div>
 
- [gra-vdi3:~] abaqus cae
- ABAQUSLM_LICENSE_FILE=27050@license3.sharcnet.ca
- /opt/sharcnet/abaqus/2020/Commands/abaqus cae
- No socket connection to license server manager.
- Feature:       cae
- License path:  27050@license3.sharcnet.ca:
- FLEXnet Licensing error:-7,96
- For further information, refer to the FLEXnet Licensing documentation,
- or contact your local Abaqus representative.
- Number of requested licenses: 1
- Number of total licenses:     4
- Number of licenses in use:    2
- Number of available licenses: 2
- Abaqus Error: Abaqus/CAE Kernel exited with an error.
+1. Connect with a VncViewer client to a login or compute node by following [[VNC|TigerVNC]]<br>
+2. Open a new terminal window and enter the following<br>
+ module load StdEnv/2020 abaqus/2021, or
+ module load StdEnv/2023 abaqus/2025 <- coming soon
+3. Start the application with<br>
+ abaqus cae -mesa
 
 = Site-specific use =
 == SHARCNET license == 
-The SHARCNET license has been renewed until 17-jan-2026.  It provides a small but free license consisting of 2 cae and 35 execute tokens where usage limits are imposed 10 tokens/user and 15 tokens/group.  For groups that have purchased dedicated tokens, the free token usage limits are added to their reservation.  The free tokens are available on a first come first serve basis and mainly intended for testing and light usage before deciding whether or not to purchase dedicated tokens.  Costs for dedicated tokens (in 2021) were approximately CAD$110 per compute token and CAD$400 per GUI token: submit a ticket to request an official quote.  The license can be used by any Alliance researcher, but only on SHARCNET hardware.  Groups that purchase dedicated tokens to run on the SHARCNET license server may likewise only use them on SHARCNET hardware including gra-vdi (for running Abaqus in full graphical mode) and Graham or Dusky clusters (for submitting compute batch jobs to the queue).  Before you can use the license, you must contact [[technical support]] and request access.  In your email 1) mention that it is for use on SHARCNET systems and 2) include a copy/paste of the following <code>License Agreement</code> statement with your full name and username entered in the indicated locations.  Please note that every user must do this it cannot be done one time only for a group; this includes PIs who have purchased their own dedicated tokens.
+The SHARCNET license has been renewed until 17-jan-2026.  It provides a small but free license consisting of 2 cae and 35 execute tokens where usage limits are imposed 10 tokens/user and 15 tokens/group.  For groups that have purchased dedicated tokens, the free token usage limits are added to their reservation.  The free tokens are available on a first come first serve basis and mainly intended for testing and light usage before deciding whether or not to purchase dedicated tokens.  Costs for dedicated tokens (in 2021) were approximately CAD$110 per compute token and CAD$400 per GUI token: submit a ticket to request an official quote.  The license can be used by any Alliance researcher, but only on SHARCNET hardware.  Groups that purchase dedicated tokens to run on the SHARCNET license server may likewise only use them on SHARCNET hardware including the SHARCNET [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) OOD] system (to run Abaqus in graphical mode) or Nibi/Dusky clusters (for submitting compute batch jobs to the queue).  Before you can use the license, you must contact [[technical support]] and request access.  In your email 1) mention that it is for use on SHARCNET systems and 2) include a copy/paste of the following <code>License Agreement</code> statement with your full name and username entered in the indicated locations.  Please note that every user must do this it cannot be done one time only for a group; this includes PIs who have purchased their own dedicated tokens.
 
 ===Entente===
 <pre>----------------------------------------------------------------------------------
@@ -590,36 +574,39 @@ for the following purposes:
    facts, up to the point of proof-of-concept in a laboratory    
 -----------------------------------------------------------------------------------</pre>
 
+<div class="mw-translate-fuzzy">
 === Configurer le fichier de licence ===
 Configurez votre fichier de licence comme suit (pour utilisation uniquement sur les systèmes SHARCNET Graham, gra-vdi et Dusky).
+</div>  
 <source lang="bash">
-[gra-login1:~] cat ~/.licenses/abaqus.lic
-prepend_path("LM_LICENSE_FILE","27050@license3.sharcnet.ca")
+[l2 (nibi login node):~] cat ~/.licenses/abaqus.lic
 prepend_path("ABAQUSLM_LICENSE_FILE","27050@license3.sharcnet.ca")
 </source>
 
+<div class="mw-translate-fuzzy">
 Si vos tâches se terminent anormalement et que le fichier de sortie de l'ordonnanceur contient le message d'erreur ''*** ABAQUS/eliT_CheckLicense rank 0 terminated by signal 11 (Segmentation fault)'', vérifiez si votre fichier  <code>abaqus.lic</code> contient  ''ABAQUSLM_LICENSE_FILE'' pour Abaqus/2020. 
 Si le fichier de sortie contient ''License server machine is down or not responding etc.'',  vérifiez si le fichier <code>abaqus.lic</code> contient ''LM_LICENSE_FILE'' pour Abaqus/6.14.1, comme montré. Puisque le fichier <code>abaqus.lic</code> montré contient les deux énoncés, vous ne devriez pas avoir ce problème.
+</div>
 
-=== Interroger le serveur de licences===
-Connectez-vous à Graham, chargez Abaqus et exécutez une des commandes suivantesnbsp;:
+=== Query license server ===
+Log into nibi cluster, load abaqus and then run one of the following:
 <source lang="bash">
-ssh graham.alliancecan.ca
+ssh nibi.alliancecan.ca
 module load StdEnv/2020
 module load abaqus
 </source>
 
 I) Vérifiez s'il y a des tâches lancées et des tâches dans la queue pour le serveur de licence SHARCNET.
 <source lang="bash">
-abaqus licensing lmstat -c $LM_LICENSE_FILE -a | egrep "Users|start|queued"
+abaqus licensing lmstat -c $ABAQUSLM_LICENSE_FILE -a | egrep "Users|start|queued"
 </source>
 II)  Vérifiez s'il y a des tâches lancées et des tâches dans la queue pour le serveur de licence SHARCNET et s'il indique des réservations de produits par groupe d'acquisition.
 <source lang="bash">
-abaqus licensing lmstat -c $LM_LICENSE_FILE -a | egrep "Users|start|queued|RESERVATION"
+abaqus licensing lmstat -c $ABAQUSLM_LICENSE_FILE -a | egrep "Users|start|queued|RESERVATION"
 </source>
 III)  Vérifiez si le serveur de licences SHARCNET montre une disponibilité pour le produit cae standard et explicite.
 <source lang="bash">
-abaqus licensing lmstat -c $LM_LICENSE_FILE -a | grep "Users of" | egrep "cae|standard|explicit"
+abaqus licensing lmstat -c $ABAQUSLM_LICENSE_FILE -a | grep "Users of" | egrep "cae|standard|explicit"
 </source>
 
 <!--T:94-->
@@ -630,21 +617,21 @@ When the output of query I) above indicates that a job for a particular username
 <!--T:96-->
 The following shows the situation where a user submitted two 6-core jobs (each requiring 12 tokens) in quick succession.  The scheduler then started each job on a different node in the order they were submitted.  Since the user had 10 Abaqus compute tokens, the first job (27527287) was able to acquire exactly enough (10) tokens for the solver to begin running.  The second job (27527297) not having access to any more tokens entered an idle "queued" state (as can be seen from the lmstat output) until the first job completed, wasting the available resources and depreciating the user's fair share level in the process ...
 
- [roberpj@gra-login1:~] sq
+ [l2 (nibi login node):~] sq
             JOBID     USER              ACCOUNT           NAME  ST  TIME_LEFT NODES CPUS TRES_PER_N MIN_MEM NODELIST (REASON) 
-         27530366  roberpj         cc-debug_cpu  scriptsp2.txt   R    9:56:13     1    6        N/A      8G gra107 (None) 
-         27530407  roberpj         cc-debug_cpu  scriptsp2.txt   R    9:59:37     1    6        N/A      8G gra292 (None) 
+         27530366  roberpj         cc-debug_cpu  scriptsp2.txt   R    9:56:13     1    6        N/A      8G     c107  (None) 
+         27530407  roberpj         cc-debug_cpu  scriptsp2.txt   R    9:59:37     1    6        N/A      8G     c292  (None) 
 
- [roberpj@gra-login1:~] abaqus licensing lmstat -c $LM_LICENSE_FILE -a | egrep "Users|start|queued"
+ [l2 (nibi login node):~] abaqus licensing lmstat -c $ABAQUSLM_LICENSE_FILE -a | egrep "Users|start|queued"
  Users of abaqus:  (Total of 78 licenses issued;  Total of 53 licenses in use)
-    roberpj gra107 /dev/tty (v62.6) (license3.sharcnet.ca/27050 1042), start Mon 11/25 17:15, 10 licenses
-    roberpj gra292 /dev/tty (v62.6) (license3.sharcnet.ca/27050 125) queued for 10 licenses
+    roberpj c107 /dev/tty (v62.6) (license3.sharcnet.ca/27050 1042), start Mon 11/25 17:15, 10 licenses
+    roberpj c292 /dev/tty (v62.6) (license3.sharcnet.ca/27050 125) queued for 10 licenses
 
 <!--T:97-->
 To avoid license shortage problems when submitting multiple jobs when working with expensive Abaqus tokens either use a [https://docs.alliancecan.ca/wiki/Running_jobs#Cancellation_of_jobs_with_dependency_conditions_which_cannot_be_met job dependency], [https://docs.alliancecan.ca/wiki/Job_arrays job array] or at the very least set up a slurm [https://docs.alliancecan.ca/wiki/Running_jobs#Email_notification email notification] to know when your job completes before manually submitting another one.
 
-=== Indiquer les ressources pour la tâche ===
-Pour garantir une utilisation optimale de vos jetons Abaqus et de nos ressources, il est important de bien spécifier la mémoire et le ncpus requis dans votre script Slurm. Les valeurs peuvent être obtenues en soumettant quelques courtes tâches de test à la file d'attente, puis en vérifiant leur utilisation. Pour les tâches <b>terminées</b>, utilisez <code>seff JobNumber</code> pour afficher la <i>mémoire utilisée</i> totale et l'<i>efficacité de la mémoire</i>. Si l'<i>efficacité de la mémoire</i> est inférieure à environ 90%, diminuez la valeur du paramètre <code>#SBATCH --mem=</code> dans votre script Slurm. Notez que la commande <code>seff JobNumber</code> affiche également le total du <i>CPU (temps) utilisé</i> et l'<i>efficacité du processeur</i>. Si l'efficacité du processeur est inférieure à environ 90%, effectuez des tests de mise à l'échelle pour déterminer le nombre optimal de processeurs pour des performances optimales, puis mettez à jour la valeur de <code>#SBATCH --cpus-per-task=</code> dans votre script Slurm. Pour les tâches en cours d'exécution, utilisez la commande <code>srun --jobid=29821580 --pty top -d 5 -u $USER</code> pour surveiller le %CPU, le %MEM et le RES pour chaque processus parent Abaqus sur le nœud de calcul. Les colonnes %CPU et %MEM affichent le pourcentage d'utilisation par rapport au total disponible sur le nœud tandis que la colonne RES affiche la taille de la mémoire résidente par processus (dans un format facilement lisible pour les valeurs supérieures à 1 Go). De plus amples informations sur la manière de [[Running jobs#Monitoring_jobs|surveiller les tâches]] sont disponibles sur notre wiki de documentation
+=== Specify job resources ===
+To ensure optimal usage of both your Abaqus tokens and our resources, it's important to carefully specify the required memory and ncpus in your Slurm script.  The values can be determined by submitting a few short test jobs to the queue then checking their utilization.  For <b>completed</b> jobs use <code>seff JobNumber</code> to show the total <i>Memory Utilized</i> and <i>Memory Efficiency</i>. If the <i>Memory Efficiency</i> is less than ~90%, decrease the value of the <code>#SBATCH --mem=</code> setting in your Slurm script accordingly.  Notice that the <code>seff JobNumber</code> command also shows the total <i>CPU (time) Utilized</i> and <i>CPU Efficiency</i>. If the <i>CPU Efficiency</i> is less than ~90%, perform scaling tests to determine the optimal number of CPUs for optimal performance and then update the value of <code>#SBATCH --cpus-per-task=</code> in your Slurm script.  For <b>running</b> jobs, use the <code>srun --jobid=29821580 --pty top -d 5 -u $USER</code> command to watch the %CPU, %MEM and RES for each Abaqus parent process on the compute node. The %CPU and %MEM columns display the percent usage relative to the total available on the node while the RES column shows the per process resident memory size (in human readable format for values over 1GB). Further information regarding how to [[Running jobs#Monitoring_jobs|monitor jobs]] is available on our documentation wiki
 
 <span id="Core_token_mapping"></span>
 === Correspondance cœur-jeton ===
@@ -657,11 +644,14 @@ où TOKENS = floor[5 X CORES^0.422]
 
 Chaque GPU nécessite un jeton additionnel.
 
-== Licence Western ==
-La licence de site Western ne peut être utilisée que par les chercheuses et chercheurs de Western sur le matériel situé sur le campus de Western. Présentement, la grappe Dusky est la seule qui satisfait ces conditions. Graham et gra-vdi sont exclus car ils sont situés sur le campus de Waterloo. Contactez l'administrateur du serveur de licences Western Abaqus <jmilner@robarts.ca> pour vous renseigner sur l'utilisation de la licence Western. Vous devrez fournir votre nom d'utilisateur et éventuellement prendre des dispositions pour acheter des jetons. Si l'accès vous est accordé, vous pouvez procéder à la configuration de votre fichier <code>abaqus.lic</code> pour qu'il pointe vers le serveur de licences Western comme suit&nbsp;:
+== Western license ==
+The Western site license may only be used by Western researchers on hardware located at Western's campus.  Currently, only the Dusky cluster satisfies this condition. Nibi and SHARCNET OOD system are excluded since they are located on Waterloo's campus.  Contact the Western Abaqus license server administrator <jmilner@robarts.ca> to inquire about using the Western Abaqus license.  You will need to provide your username and possibly make arrangements to purchase tokens.  If you are granted access then you may proceed to configure your <code>abaqus.lic</code> file to point to the Western license server:
 
+<span id="Configure_license_file"></span>
+<div class="mw-translate-fuzzy">
 ===Configurer le fichier de licences===
 Configurez votre fichier de licence comme suit (pour utilisation uniquement sur Dusky).
+</div>
 
 <source lang="bash">
 [dus241:~] cat .licenses/abaqus.lic
@@ -669,18 +659,3 @@ prepend_path("LM_LICENSE_FILE","27000@license4.sharcnet.ca")
 prepend_path("ABAQUSLM_LICENSE_FILE","27000@license4.sharcnet.ca")
 </source>
 Par la suite, soumettez votre tâche tel que décrit à la section <i>Soumettre une tâche sur une grappe</i> ci-dessus. Si un problème survient, écrivez au [[Technical support/fr|soutien technique]] en indiquant que vous utilisez la licence du site Western sur Dusky. Ajoutez le numéro de la tâche qui pose problème et copiez le ou les messages d'erreur s'il y a lieu.
-
-= Documentation en ligne =
-Vous pouvez consulter la documentation pour la plus récente version sur gra-vdi comme suit&nbsp;:
-
-Préparation de votre compte
-# [[VNC/fr#Nœuds_VDI|Connectez-vous à <b>gra-vdi.com</b> avec TigerVNC]].
-# Sur gra-vdi, ouvrez une fenêtre de terminal et entrez <code>firefox</code> (appuyez sur Entrée).
-# Dans la barre d'adresse, entrez <code>about:config</code> (appuyez sur Entrée) -> cliquez sur le bouton <i>I accept the risk</i>.
-# Dans la barre de recherche, entrez <code>unique</code> et double-cliquez sur <code>privacy.file_unique_origin</code> pour changer <i>true'</i> en <i>false</i>. 
-
-Afficher la documentation
-# [[VNC/fr#Nœuds_VDI|Connectez-vous à <b>gra-vdi.com</b> avec TigerVNC]].
-# Sur gra-vdi, ouvrez une fenêtre de terminal et entrez <code>firefox</code> (appuyez sur Entrée).
-# Dans la barre de recherche, copiez-collez un des énoncés suivants&nbsp;: <br><code>file:///opt/sharcnet/abaqus/2020/doc/English/DSSIMULIA_Established.htm</code>, ou<br><code>file:///opt/sharcnet/abaqus/2021/doc/English/DSSIMULIA_Established.htm</code>
-# Cliquez sur un sujet, par exemple <i>Abaqus -> Analysis -> Analysis Techniques -> Analysis Continuation Techniques</i>.

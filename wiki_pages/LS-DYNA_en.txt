@@ -1,5 +1,3 @@
-{{Outdated}}
-
 <languages />
 [[Category:Software]]
 
@@ -50,23 +48,23 @@ where <port> is an integer number and <server> is the hostname or IP address of 
 
 ==== SHARCNET ==== 
 
-The SHARCNET Ansys license supports running SMP and MPP LS-DYNA jobs.  It can be used for free by anyone (on a core and job limited basis) on Graham, Narval or Cedar clusters by adding the following lines to your slurm script:
+The SHARCNET Ansys license supports running SMP and MPP LS-DYNA jobs.  It can be used for free by anyone (on a core and job limited basis) on Nibi cluster by adding the following lines to your slurm script:
  export LSTC_LICENSE=ansys
- export ANSYSLMD_LICENSE_FILE=1055@license3.sharcnet.ca
+ export ANSYSLMD_LICENSE_FILE=1055@license1.computecanada.ca
 
 === CMC license === 
 
 If your LS-DYNA license was purchased from CMC, set the following two environment variables according to the cluster you are using:
  export LSTC_LICENSE=ansys
- Beluga:  export ANSYSLMD_LICENSE_FILE=6624@10.20.73.21
- Cedar:   export ANSYSLMD_LICENSE_FILE=6624@172.16.121.25
- Graham:  export ANSYSLMD_LICENSE_FILE=6624@10.25.1.56 <--- NewIP Feb21/2025
- Narval:  export ANSYSLMD_LICENSE_FILE=6624@10.100.64.10
- Niagara: export ANSYSLMD_LICENSE_FILE=6624@172.16.205.199
+ Fir:      export ANSYSLMD_LICENSE_FILE=6624@172.26.0.101
+ Nibi:     export ANSYSLMD_LICENSE_FILE=6624@10.25.1.56
+ Narval:   export ANSYSLMD_LICENSE_FILE=6624@10.100.64.10
+ Rorqual:  export ANSYSLMD_LICENSE_FILE=6624@10.100.64.10
+ Trillium: export ANSYSLMD_LICENSE_FILE=6624@172.16.205.198
 
 where the IP address corresponds to the respective CADpass servers.  No firewall changes are required to use a CMC license on any cluster since these have already been done.  Since the remote CMC server that hosts LS=DYNA licenses is Ansys-based, these variables cannot be defined in your <code>~/.licenses/ls-dyna.lic</code> file.  The file however must exist (even if it's empty) for any <code>ls-dyna</code> module to load.  To ensure this is the case, run <code>touch ~/.licenses/ls-dyna.lic</code> once from the command line (or each time in your slurm scripts).  Note that only module versions >= 13.1.1 will work with Ansys license servers.
 
-= Cluster batch job submission =
+= Cluster job submission =
 
 LS-DYNA provides binaries for running jobs on a single compute node (SMP - Shared Memory Parallel using OpenMP) or across multiple compute nodes (MPP - Message Passing Parallel using MPI).  This section provides slurm scripts for each job type.
 
@@ -86,11 +84,11 @@ Modules for running jobs on a single compute node can be listed with: <code>modu
 #SBATCH --nodes=1               # Do not change
 
 #module load StdEnv/2020        # Versions 12.0, 13.0, 13.1.1
-#export RSNT_ARCH=avx2          # Uncomment on beluga, nibi, rorqual
+#export RSNT_ARCH=avx2
 #module load intel/2020.1.217
 #module load ls-dyna/13.1.1
 
-module load StdEnv/2023         # Version 12.2.1 (more versions added on request)
+module load StdEnv/2023         # Version 12.2.1
 module load intel/2023.2.1
 module load ls-dyna/12.2.1
 
@@ -119,18 +117,18 @@ Jobs can be submitted to a specified number of <b>whole</b> compute nodes with t
 #!/bin/bash
 #SBATCH --account=def-account    # Specify
 #SBATCH --time=0-03:00           # D-HH:MM
-#SBATCH --ntasks-per-node=40     # Specify all cores per node (beluga 40, cedar 48, graham 44, beluga 40, narval 64)
-#SBATCH --nodes=2                # Specify number compute nodes (1 or more)
+#SBATCH --ntasks-per-node=192    # Specify all cores per node (narval/nibi/fir/trillium 192)
+#SBATCH --nodes=1                # Specify number compute nodes (1 or more)
 #SBATCH --mem=0                  # Use all memory per compute node (do not change)
 ##SBATCH --constraint=cascade    # Uncomment to specify a cluster specific node type
 
 #module load StdEnv/2020         # Versions 12.0, 13.0, 13.1.1
-#export RSNT_ARCH=avx2           # Uncomment on beluga, nibi, rorqual
+#export RSNT_ARCH=avx2
 #module load intel/2020.1.217
 #module load openmpi/4.0.3
 #module load ls-dyna-mpi/13.1.1 
 
-module load StdEnv/2023          # Version 12.2.1 (more versions added on request)
+module load StdEnv/2023          # Version 12.2.1
 module load intel/2023.2.1
 module load ls-dyna-mpi/12.2.1
 
@@ -193,28 +191,26 @@ where
 
 == Performance testing ==
 
-Depending on the simulation LS-DYNA may (or may not) be able to efficiently use very many cores in parallel.  Therefore before running a full simulation, standard scaling tests should be run to determine the optimal number of cores that can be used before simulation slowdown occurs, where the <tt>seff jobnumber</tt> command can be used to determine the Job Wall-clock time, CPU Efficiency and Memory Efficiency of successfully completed test jobs.  In addition, recent testing with airbag jobs submitted to the queue on different clusters found significantly better performance on Cedar and Narval than on Graham.  The testing was done with 6 cores on a single node using the ls-dyna/12.2.1 module and 6 cores evenly distributed across two nodes using the ls-dyna-mpi/12.2.1 module.  Although limited, the results point out that significant performance variance can occur on different systems for a given simulation setup.  Therefore before running full LD-DYNA simulations, it is recommended to both A) conduct standard scaling tests on a given cluster and B) run identical test cases on each cluster before settling on an optimal job size, module version and cluster configuration.
+Depending on the simulation LS-DYNA may not be able to efficiently use very many cores in parallel.  Scaling test jobs should therefore always be run before submitting long jobs.  Doing this will help determine the maximum number of cores that can be used before performance degradation begins to occur.   To extract test job statistics such as Job Wall-clock time, CPU Efficiency and Memory Efficiency either the <tt>seff jobnumber</tt> command or a cluster job portal such as [https://portal.nibi.sharcnet.ca this] can be used.  In the past scaling test jobs for the standard airbag problem have shown significantly different performance characteristics in the past depending which cluster they were being run on.  These tests however were rather small using only 6 cores on a single node with the ls-dyna/12.2.1 module and 6 cores evenly distributed across two nodes with the ls-dyna-mpi/12.2.1 module.  Scaling tests should instead be run using the actual research simulation and cluster where the full production runs will be done to get reliable results.
 
-= Visualization with LS-PrePost=
+= Graphical use =
 
-LSTC provides [https://www.lstc.com/products/ls-prepost LS-PrePost] for pre- and post-processing of LS-DYNA [https://www.dynaexamples.com/ models].  This program is made available by a separate module. It does not require a license and can be used on any cluster node or on the Graham VDI nodes.
+LSTC provides [https://www.lstc.com/products/ls-prepost LS-PrePost] for pre- and post-processing of LS-DYNA [https://www.dynaexamples.com/ models].  This program is made available by a separate module and does not require a license.  To run abaqus graphically in a remote gui desktop do one of the following where the OnDemand desktop approach is recommended :
 
-== Cluster nodes ==
-Connect to a compute node or to a login node with [[VNC#VDI_Nodes|TigerVNC]] and open a terminal:
+== OnDemand ==
+1. Connect to an OnDemand system using one of the following URLs in your laptop browser :<br>
+ [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) NIBI]: <code>https://ondemand.sharcnet.ca</code>
+ FIR: <code>https://jupyterhub.fir.alliancecan.ca</code>
+ RORQUAL: <code>https://jupyterhub.rorqual.alliancecan.ca</code>
+ TRILLIUM: <code>https://ondemand.scinet.utoronto.ca</code>
+2. Open a new terminal window in your desktop and run :
  module load StdEnv/2020
- 
- module load ls-prepost/4.8
- lsprepost
- 
  module load ls-prepost/4.9
  lsprepost OR lspp49
 
-== VDI nodes ==
-Connect to gra-vdi with [[VNC#VDI_Nodes|TigerVNC]] and open a new terminal:
- module load CcEnv StdEnv/2020
- 
- module load ls-prepost/4.8
- lsprepost
- 
+== VncViewer ==
+1. Connect with a VncViewer client to a login or compute node by following [[VNC|TigerVNC]]<br>
+2. Open a new terminal window in your desktop and run:
+ module load StdEnv/2020
  module load ls-prepost/4.9
  lsprepost OR lspp49

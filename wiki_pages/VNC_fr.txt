@@ -9,9 +9,7 @@ Pour certains paquets complexes (par exemple [[MATLAB/fr|MATLAB]]), il est parfo
 <span id="Setup"></span>
 = Configuration =
 
-<div class="mw-translate-fuzzy">
-Pour vous connecter au serveur VNC, vous devez d'abord installer un client VNC sur votre ordinateur. Nous recommandons le paquet [http://tigervnc.org/ TigerVNC] disponible pour Windows, macOS et pour la plupart des distributions Linux. Nous abordons ici le téléchargement, l'installation et la configuration de TigerVNC de manière sécuritaire pour chaque système d'exploitation. Les étapes de configuration du certificat ne sont requises que pour se connecter aux nœuds VDI afin que l'autorité de signature présentée par vncserver soit connue. Si un message est affiché rapportant un problème avec un certificat, soit qu'il n'est pas configuré correctement, soit que la connexion à notre serveur n'est pas faite; n'entrez pas votre mot de passe.
-</div>
+Pour vous connecter au serveur VNC, vous devez d'abord installer un client VNC sur votre ordinateur. Nous recommandons le paquet [http://tigervnc.org/ TigerVNC] disponible pour Windows, macOS et pour la plupart des distributions Linux. Nous abordons ici le téléchargement, l'installation et la configuration de TigerVNC de manière sécuritaire pour chaque système d'exploitation.
 
 == Windows ==
 
@@ -40,9 +38,7 @@ Installez TigerVNC Viewer pour votre version de Linux :
 | <code>emerge -av net-misc/tigervnc</code>
 |}
 
-<div class="mw-translate-fuzzy">
-Lancez TigerVNC par le menu des applications ou en entrant <code>vncviewer</code> sur la ligne de commande. Dans la fenêtre <i>VNC Viewer: Connection Details</i>, cliquez sur <i>Options -> Security</i> et cochez toutes les cases sauf <i>Excryption None</i>. Entrez le chemin approprié dans le champ <i>Path to X509 CA Certificate</i>.
-</div>  
+Lancez TigerVNC par le menu des applications ou en entrant <code>vncviewer</code> sur la ligne de commande de votre ordinateur.  
 
 <span id="Connect"></span>
 = Connexion =
@@ -64,38 +60,30 @@ Lancez ensuite <code>vncserver -list</code> pour savoir si d'autres vncservers d
 
 Étape 1 : Vous pouvez maintenant lancer vncserver sur le nœud de connexion, comme ci-dessous.
 
-<div class="mw-translate-fuzzy">
  [<b>l4</b>(login node):~] vncserver -idletimeout 86400<br>
  Desktop 'TurboVNC: l4.nibi.sharcnet:1 (yourusername)' started on display <b>l4</b>.nibi.sharcnet:1<br>
  Starting applications specified in /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/xstartup.turbovnc
- Log file is /home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log
-</div>
+ Log file is <span style="Color:green">/home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log</span>
 
 Notez que la commande vncserver fournie par StdEnv/2023 est basée sur [https://turbovnc.org turbovnc]. Lors du démarrage d'un nouveau vncserver sur un nœud de connexion, ajoutez <code>-idletimeout seconds</code> comme indiqué ci-dessus. Cela causera la fermeture définitive de votre <code>vncserver</code> (après S secondes sans connexion à VNC Viewer) si vous oubliez de fermer votre session vncviewer en cliquant sur <code>System -> Log out</code> sur le bureau VNC. Au premier démarrage de vncserver, vous devrez définir un mot de passe qui [[VNC/fr#Mot_de_passe| pourra être modifié ultérieurement]]. Ce mot de passe sera requis pour vous connecter à  votre bureau avec un vncclient (tel que vncviewer). Le même mot de passe sera requis lors de l'établissement de [[VNC/fr#Connexions_multiples | connexions multiples]] en supposant que vous ayez démarré vncserver en ajoutant l'option <code>-alwaysshared</code>.
 
 Étape 2 : Déterminez maintenant quel est le port qui écoute le nouveau vncserver (dans cet exemple, il s'agit de 5901) avec la commande <code>grep</code> sur le fichier de journalisation.
 
-<div class="mw-translate-fuzzy">
- [<b>l4</b>(login node):~] grep -iE "\sport|kill"  /home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log
+ [<b>l4</b>(login node):~] grep -iE "\sport|kill" <span style="Color:green">/home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log</span>
  25/08/2025 15:16:20 Listening for VNC connections on TCP port <span style="Color:blue">5901</span>
-</div>
 
 <div class="mw-translate-fuzzy">
 Vous pouvez maintenant quitter le nœud de connexion et le vcnserver restera actif jusqu'à ce que la limite de temps définie avec l'option <codfe>-idletimeout</code> soit atteinte.
 </div>
 
-<div class="mw-translate-fuzzy">
- [<b>l4</b>(login node):~]  exit
+ [<b><span style="Color:green">l4</span></b>(login node):~]  exit
  [<b>laptop</b>:~]
-</div>
 
 <div class="mw-translate-fuzzy">
 Étape 3 : Sur votre bureau, démarrez un tunnel SSH pour transférer un port arbitraire (5905 dans cet exemple) vers le port que votre serveur VNC écoute (5901 selon ce qui précède).
 </div>
 
- <div class="mw-translate-fuzzy">
-[<b>laptop</b>:~] ssh nibi.computecanada.ca -L <span style="Color:red">5905</span>:<b>l4</b>:<span style="Color:blue">5901</span>
-</div>
+ [<b>laptop</b>:~] ssh nibi.computecanada.ca -L <span style="Color:red">5905</span>:<b><span style="Color:green">l4</span></b>:<span style="Color:blue">5901</span>
 
 <div class="mw-translate-fuzzy">
 4) Sur la ligne de commande dans votre ordinateur, entrez ce qui suit pour vous connecter à vncviewer via le port qui vous a été donné.
@@ -133,12 +121,10 @@ Une fois la tâche interactive démarrée, définissez une variable d'environnem
 
 Ensuite, démarrez un serveur VNC avec <code>vncserver</code> et portez attention au nœud de calcul dans lequel la tâche est exécutée (<b>c48</b> dans notre exemple). En cas de doute, utilisez la commande <code>hostname</code> pour vérifier de quel nœud il s'agit. Si vous faites ceci pour la première fois, une invite demandera un mot de passe pour votre serveur VNC. <b>VOUS DEVEZ ENTRER UN MOT DE PASSE</b>, autrement n'importe qui pourra se connecter et obtenir l'accès aux fichiers dans votre compte. Vous pourrez changer le mot de passe par la suite avec la commande <code>vncpasswd</code>. Revenons à l'exemple&nbsp;:
 
-<div class="mw-translate-fuzzy">
  [<b>c48</b>(compute node):~] vncserver<br>
  Desktop 'TurboVNC: c48.nibi.sharcnet:1 (yourusername)' started on display <b>c48</b>.nibi.sharcnet:1<br>
  Starting applications specified in /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/xstartup.turbovnc
- Log file is /home/yourusername/.vnc/<b>c48</b>.nibi.sharcnet:1.log
-</div>
+ Log file is <span style="Color:green">/home/yourusername/.vnc/<b>c48</b>.nibi.sharcnet:1.log</span>
 
 Lancez la commande <code>grep</code> dans le fichier de journalisation pour identifier le port sur lequel votre serveur VCN écoute.
 
@@ -273,9 +259,7 @@ La connexion à gra-vdi.alliancecan.ca se fait en deux étapes&nbsp;:
 Si vous entrez un nom d'utilisateur/mot de passe erroné pour l'étape 1, vous aurez quand même à passer l'étape 2. Si vous saisissez ensuite votre nom d'utilisateur/mot de passe, vous recevrez un message indiquant que la connexion est établie et vous reviendrez vers l'écran de connexion de l'étape 1. La solution est de réessayer en vous assurant d'avoir saisi la bonne combinaison nom d'utilisateur/mot de passe. Si vous ne vous souvenez plus de votre mot de passe CCDB, allez sur [https://ccdb.alliancecan.ca/security/forgot here] pour le réinitialiser, à condition que votre compte ne soit pas en attente de renouvellement par la chercheuse principale ou le chercheur principal.
 
 <span id="OpenGL_Graphics"></span>
-<div class="mw-translate-fuzzy">
-= Logiciels =
-</div>
+== OpenGL ==
 
 <div class="mw-translate-fuzzy">
 == NIX ==
@@ -283,25 +267,19 @@ Si vous entrez un nom d'utilisateur/mot de passe erroné pour l'étape 1, vous a
 
 First, the <code>salloc</code> command must be modified to request a gpu node.  If this is not done the program will fall back to using software-based rendering on cpus which is relatively much slower.  To request the first gpu node that comes available (and in turn  minimize your queue wait time if the cluster has multiple gpu node types) simply specify:
 
-<div class="mw-translate-fuzzy">
-Plutôt que de charger SnEnv ou StEnv, vous pouvez aussi charger le module <code>nix</code> qui offre des logiciels libres optimisés pour OpenGL accéléré, lorsque possible. Ce module est seulement disponible sur Graham et gra-vdi et peut être chargé avec
-</div>
+ [<b>l4</b>(login node):~] salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=1 --mem=16000 --account=def-piname
 
 <div class="mw-translate-fuzzy">
 Les commandes nix et nix-env seront alors dans votre chemin pour gérer les paquets logiciels via nix dans votre environnement nix personnel.
 </div>
 
-<div class="mw-translate-fuzzy">
-===Installation de logiciels===
-</div>
+ [<b>l4</b>(login node):~] salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=t4:1 --mem=16000 --account=def-piname
 
 <div class="mw-translate-fuzzy">
 Pour installer un paquet nix dans votre environnement, cliquez sur l'icône du terminal dans la barre de menu supérieure ou sélectionnez <i>Applications -> System Tools -> Terminal</i>. Vous pouvez maintenant chercher des programmes avec la commande <code>nix search <regexp></code> et les installer avec  <code>nix-env --install --attr <attribute></code>. Par exemple, pour installer [https://qgis.org QGIS], utilisez
 </div>
 
-<div class="mw-translate-fuzzy">
-Votre environnement nix persiste entre vos connexions; vous n'avez donc qu'à lancer une fois la commande d'installation.
-</div>
+  [<b>c48</b>(compute node):~] vglrun -d egl PROGRAM
 
 Then <code>vglrun</code> sets some extra environment variables to ensure your program will use correct virtualgl libraries.  If however your <code>PROGRAM</code> has already been patched to use the current cvmfs standard environment doing so will not be required. 
 

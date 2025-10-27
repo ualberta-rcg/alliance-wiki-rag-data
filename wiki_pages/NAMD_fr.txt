@@ -12,21 +12,17 @@ Le logiciel est installé par notre équipe technique et est disponible via des 
 <span id="Environment_modules"></span>
 = Modules d'environnement =
 
-<div class="mw-translate-fuzzy">
-La plus récente version 3.0.1 est installée sur toutes nos grappes. La version précédente 2.14 est aussi disponible, mais elle ne peut pas être utilisée avec des GPU H100. Vous pouvez utiliser la version GPU seulement sur Narval.
-</div>
+La plus récente version 3.0.2 (27 août 2025) est installée sur toutes nos grappes; elle comporte [https://www.ks.uiuc.edu/Research/namd/3.0.2/announce.html plusieurs améliorations] en comparaison de la version 3.0.1. La version 2.14 est aussi disponible, mais elle ne peut pas être utilisée avec des GPU H100. Vous pouvez utiliser la version GPU seulement sur Narval.
 
 Pour les tâches exécutées sur plusieurs nœuds, utilisez UCX.
 
 <span id="Submission_scripts"></span>
-= Scripts =
+= Scripts  de soumission des tâches =
 
 L'information sur l'ordonnanceur Slurm se trouve à la page [[Running jobs/fr|Exécuter des tâches]].
 
-<div class="mw-translate-fuzzy">
-== Tâches séquentielles et tâches multifils == 
-Le script suivant est pour une simulation séquentielle sur un seul cœur. Pour utiliser plus de cœurs, augmentez la valeur de <tt>--cpus-per-task</tt>, sans dépasser le nombre de cœurs disponible sur le nœud.
-</div>
+== Tâches multifils avec CPU == 
+Le script suivant est pour une simulation multifil. Pour utiliser plus de cœurs, augmentez la valeur de <tt>--cpus-per-task</tt>, sans dépasser le nombre de cœurs disponibles sur le nœud. Pour déterminer le nombre de cœurs à utiliser, voyez <i>Performance et étalonnage</i> plus loin.
 
 {{File
   |name=serial_namd_job.sh
@@ -45,9 +41,7 @@ namd3 +p$SLURM_CPUS_PER_TASK  +idlepoll +setcpuaffinity stmv.namd
 }}
 
 <span id="Multi-node_CPU_jobs"></span>
-<div class="mw-translate-fuzzy">
-== Tâches parallèles sur CPU ==
-</div>
+== Tâches sur plusieurs nœuds avec CPU ==
 
 
 
@@ -111,18 +105,18 @@ namd3 +p$SLURM_CPUS_PER_TASK  +idlepoll stmv.namd
 Cet exemple est pour Béluga et suppose que des nœuds entiers sont utilisés, ce qui offre une meilleure performance pour les tâches NAMD. L'exemple utilise 8 processus sur 2 nœuds, chaque processus utilisant 10 fils et 1 GPU. Ceci utilise pleinement les nœuds GPU de Béluga qui ont 40 cœurs et 4 GPU par nœud. Remarquez que 1 cœur par tâche est réservé à un fil de communication; il est donc normal que NAMD ne rapporte que 72 cœurs utilisés.
 </div>
 
-This example is for narval and it assumes that full nodes are used, which gives best performance for NAMD jobs. It uses 8 processes in total on 2 nodes, each process(task) using 12 threads and 1 GPU.   This fully utilizes Narval GPU nodes which have 48 cores and 4 GPUs per node.  Note that 1 core per task has to be reserved for a communications thread, so NAMD will report that only 88 cores are being used but this is normal.  
+<div class="mw-translate-fuzzy">
+Cet exemple est pour Narval et suppose que des nœuds entiers sont utilisés, ce qui offre une meilleure performance pour les tâches NAMD. L'exemple utilise 8 processus sur 2 nœuds, chaque processus utilisant 12 fils et 1 GPU. Ceci utilise pleinement les nœuds GPU de Narval qui ont 48 cœurs et 4 GPU par nœud. Remarquez que 1 cœur par tâche est réservé à un fil de communication; il est donc normal que NAMD ne rapporte que 88 cœurs utilisés.
+</div>  
 
 Pour utiliser ce script sur une autre grappe, voyez les caractéristiques des nœuds disponibles sur la grappe et ajustez les options --cpus-per-task et --gpus-per-node en conséquence.
 
-<div class="mw-translate-fuzzy">
-'''NOTE''' : Les versions UCX peuvent être utilisées sur toutes les grappes.
-{{File
+'''REMARQUE''' : Dans cet exemple, la version 2.14 ne devrait pas être utilisée sur les grappes qui ont des GPU H100. La version UCX NAMD 3.0.1 pour les GPU H100 n'est pas encore installée sur nos grappes.
+
   |name=ucx_namd_job.sh
   |lang="sh"
   |contents=
 #!/bin/bash
-</div>
 
 {{File
   |name=ucx_namd_job.sh
@@ -130,22 +124,18 @@ Pour utiliser ce script sur une autre grappe, voyez les caractéristiques des n�
   |contents=
 #!/bin/bash
 
-<div class="mw-translate-fuzzy">
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=4
-#SBATCH --cpus-per-task=10 # number of threads per task (process)
-#SBATCH --gpus-per-node=v100:4
+#SBATCH --cpus-per-task=12 # number of threads per task (process)
+#SBATCH --gpus-per-node=a100:4
 #SBATCH --mem=0            # memory per node, 0 means all memory
 #SBATCH --time=0:15:00
 #SBATCH --account=def-specifyaccount
-</div>
 
-<div class="mw-translate-fuzzy">
 module load StdEnv/2020  intel/2020.1.217  cuda/11.0 namd-ucx-smp/2.14
 NUM_PES=$(expr $SLURM_CPUS_PER_TASK - 1 )
-srun --cpus-per-task=$SLURM_CPUS_PER_TASK --mpi=pmi2 namd2 ++ppn $NUM_PES apoa1.namd
+srun --cpus-per-task=$SLURM_CPUS_PER_TASK --mpi=pmi2 namd2 ++ppn $NUM_PES stmv.namd
 }}
-</div>
 
 
 

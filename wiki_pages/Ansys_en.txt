@@ -9,14 +9,12 @@
 We are a hosting provider for Ansys. This means that we have the software installed on our clusters, but we do not provide a generic license accessible to everyone. However, many institutions, faculties, and departments already have licenses that can be used on our clusters.  Once the legal aspects are worked out for licensing, there will be remaining technical aspects. The license server on your end will need to be reachable by our compute nodes. This will require our technical team to get in touch with the technical people managing your license software. In some cases, this has already been done. You should then be able to load the Ansys module, and it should find its license automatically. If this is not the case, please contact our [[technical support]] so that they can arrange this for you.
 
 == Configuring your license file ==
-Our module for Ansys is designed to look for license information in a few places. One of those places is your /home folder. You can specify your license server by creating a file named <code>$HOME/.licenses/ansys.lic</code> consisting of two lines as shown.  Customize the file to replacing FLEXPORT, INTEPORT and LICSERVER with appropriate values for your server. 
+Our module for Ansys is designed to look for license information in a few places. One of those places is your /home folder. You can specify your license server by creating a file named <code>$HOME/.licenses/ansys.lic</code> consisting of two lines as shown.  Customize the file by replacing FLEXPORT and LICSERVER with the appropriate values for your server. 
 
 {| class="wikitable" style="text-align:left; border:1px solid #BBB; background-color:#F9F9F9; width:50%;"
 |+ style="text-align:left; background-color:#F2F2F2; font-size:110%" | FILE: ansys.lic
 |-
 | style="border-style: none none none none; font-size: 100%; padding-left:10%; padding-bottom:0;" | setenv("ANSYSLMD_LICENSE_FILE", "<b>FLEXPORT</span>@LICSERVER</b>")
-|-
-| style="border-style: none none none none; font-size: 100%; padding-left:10%; padding-top:0;" | setenv("ANSYSLI_SERVERS", "<b>INTEPORT@LICSERVER</b>") 
 |}
 
 The following table provides established values for the CMC and SHARCNET license servers.  To use a different server, locate the corresponding values as explained in [[#Local_license_servers|Local license servers]].
@@ -27,70 +25,56 @@ The following table provides established values for the CMC and SHARCNET license
 ! System/Cluster
 ! LICSERVER
 ! FLEXPORT
-! INTEPORT
-! VENDPORT
-! NOTICES
+! NOTES
 |-
 |CMC
 |fir
 |<code>172.26.0.101</code>
 |<code>6624</code>
-|<code>2325</code>
-|n/a
 |None
-|-
-| CMC
-| nibi
-| <code>10.25.1.56</code>
-| <code>6624</code>
-| <code>2325</code>
-| n/a
-| NewIP Feb21/2025
 |-
 | CMC
 | narval/rorqual
 | <code>10.100.64.10</code>
 | <code>6624</code>
-| <code>2325</code>
-| n/a
 | None
 |-
-|CMC
-|trillium
-|<code>172.16.205.198</code>
-|<code>6624</code>
-|<code>2325</code>
-|n/a
-|None
+| CMC
+| nibi
+| <code>10.25.1.56</code>
+| <code>6624</code>
+| NewIP Feb21/2025
+|-
+| CMC
+| trillium
+| <code>172.16.205.198</code>
+| <code>6624</code>
+| None
+|-
+| SHARCNET
+| fir
+| <code>license1.computecanada.ca</code>
+| <code>1055</code>
+| Currently <span style="Color:red">NOT</span> working
 |-
 | SHARCNET
 | narval/rorqual
 | <code>license3.sharcnet.ca</code>
 | <code>1055</code>
-| <code>2325</code>
-| n/a
 | Supports <= ansys/2024R2.04
 |-
 | SHARCNET
 | nibi
 | <code>license1.computecanada.ca</code>
 | <code>1055</code>
-| <code>2325</code>
-| n/a
 | Supports <= ansys/2025R1.02
 |-
 | SHARCNET
 | trillium
 | <code>localhost</code>
 | <code>1055</code>
-| <code>2325</code>
-| n/a
-| Supports <= ansys/2025R1.02
+| Currently <span style="Color:red">NOT</span> working
 |}
-
- To use the SHARCNET license server, ansys jobs run on trillium also require setting :
- <code>ssh tri-gw -fNL 1055:license1.computecanada.ca:1055</code>
- <code>ssh tri-gw -fNL 1793:license1.computecanada.ca:1793</code>
 
 Researchers who purchase a new CMC license subscription must [https://www.cmc.ca/support/ submit] your Alliance account username otherwise license checkouts will fail. The number of cores that can be used with a CMC license is described in the <i>Other Tricks and Tips</i> sections of the [https://www.cmc.ca/?s=Other+Tricks+and+Tips&lang=en/ Ansys Electronics Desktop and  Ansys Mechanical/Fluids quick start guides].
 
@@ -100,20 +84,17 @@ Before a local institutional Ansys license server can be used on the Alliance, f
 
 ==== Ready to use ====
 
-To use an ANSYS License server that has already been set up for use on the cluster where you will be submitting jobs, contact your local Ansys license server administrator and get the following three pieces (1->3) of information:
- 1) the fully qualified hostname (LICSERVER) of the server
- 2) the Ansys flex port (FLEXPORT) number commonly 1055
- 3) the Ansys licensing interconnect port (INTEPORT) number commonly 2325
-Once the three pieces of information are collected, configure your <code>~/.licenses/ansys.lic</code> file by plugging the values for LICSERVER, FLEXPORT and INTEPORT into the <code>FILE: ansys.lic</code> template above.
+To use a local institutional ANSYS License server whose network/firewall connections have already been setup for use on an Alliance cluster, contact your local Ansys license server administrator and get the following two pieces of information:
+ 1) the configured Ansys flex port (FLEXPORT) number commonly 1055
+ 2) the fully qualified hostname (LICSERVER) of the license server
+Then simply configure your <code>~/.licenses/ansys.lic</code> file by plugging the values for FLEXPORT and LICSERVER into the <code>FILE: ansys.lic</code> template above.
 
 ==== Setup required ====
 
-If your local Ansys license server has never been setup for use on the Alliance cluster(s) where you will be submitting jobs, then in addition to (1->3) above, you will ALSO need to get the following items (4,5) from the administrator:
-  4) the static vendor port (VENDPORT) number from your local Ansys server administrator
-  5) confirmation that <servername> will resolve to the same IP as LICSERVER on Alliance clusters
-where the <servername> can be found in the first line of the license file with format "SERVER <servername> <host id> <lmgrd port>".  Item (5) is required; otherwise, Ansys license checkouts will not work on any remote cluster at the Alliance.  If it turns out <servername> does not meet this requirement then request your license administrator to change <servername> to either the same fully qualified hostname as LICSERVER or at least to a hostname that will resolve to the same IP address as LICSERVER remotely.
-
-Finally, send (1->4) by email to [[technical support]] being sure to mention which Alliance cluster(s) you want to run Ansys jobs on. Alliance system administrators will then proceed to open the firewall so license checkout requests can reach your license server from the specified cluster(s) compute nodes.  In return you will then receive a range of IP addresses to forward to your server administrator can then open the local firewall to permit inbound Ansys license connections from the cluster(s) on EACH of the ports defined by FLEXPORT, INTEPORT and VENDPORT.
+To use a local Ansys license server that has never been setup for use with an Alliance cluster, then you will ALSO need to get the following from your local Ansys license server administrator:
+  3) the statically configured vendor port (VENDPORT) of the license server
+  4) confirmation <servername> will resolve to the same IP address as LICSERVER on the cluster
+where the <servername> can be found in the first line of the license file with format "SERVER <servername> <host id> <lmgrd port>".   Send items 1->3 by email to [[technical support]] and mention which Alliance cluster you want to run Ansys jobs on.  An Alliance system administrator will then open the outbound cluster firewall so license checkout requests can reach your license server from the cluster compute nodes.  A range of IP addresses will then be sent back to you.  Give these to your local network administrator.  Request the firewall into your local license server be opened so that Ansys license connection (checkout requests) can reach your servers FLEXPORT and VENDPORT ports across the IP range.
 
 == Checking license ==
 
@@ -374,7 +355,7 @@ VENDPORT=1793                         # Specify server vendor port
 # ------- do not change any lines below --------
 
 ssh tri-gw -fNL $FLEXPORT:$LICSERVER:$FLEXPORT      # Do not change
-ssh nia-gw -fNL $VENDPORT:$LICSERVER:$VENDPORT      # Do not change
+ssh tri-gw -fNL $VENDPORT:$LICSERVER:$VENDPORT      # Do not change
 export ANSYSLMD_LICENSE_FILE=$FLEXPORT@localhost    # Do not change
 export ANSYSLI_SERVERS=$INTEPORT@localhost          # Do not change
 
@@ -456,7 +437,11 @@ if [ "$SLURM_NNODES" == 1 ]; then
  #export I_MPI_HYDRA_BOOTSTRAP=ssh
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
 else
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ if [[ "${CC_CLUSTER}" == nibi ]]; then
+   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ else
+   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ fi
 fi
 if [ $? -eq 0 ]; then
     echo "Job completed successfully! Exiting now."
@@ -515,7 +500,11 @@ if [ "$SLURM_NNODES" == 1 ]; then
  #export I_MPI_HYDRA_BOOTSTRAP=ssh
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
 else
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ if [[ "${CC_CLUSTER}" == nibi ]]; then
+   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ else
+   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ fi
 fi
 if [ $? -eq 0 ]; then
     echo "Job completed successfully! Exiting now."
@@ -673,9 +662,17 @@ if [ "$SLURM_NNODES" == 1 ]; then
   fi
 else 
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
-    fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILE
+    if [[ "${CC_CLUSTER}" == nibi ]]; then
+      fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILE
+    else
+      fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILE
+    fi
   else
-    fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILERES
+    if [[ "${CC_CLUSTER}" == nibi ]]; then
+      fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILERES
+    else
+      fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILERES
+    fi
   fi
 fi
 if [ $? -eq 0 ]; then
