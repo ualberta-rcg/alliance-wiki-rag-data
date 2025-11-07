@@ -41,7 +41,7 @@ Prenez bien connaissance de la présente page. La page [[Frequently Asked Questi
 
 Il y a deux moyens de se connecter à Trillium&nbsp;:
 
-* Via un navigateur avec Open OnDemand. Cette méthode est recommandée si vous ne connaissez pas bien Linux ou la ligne de commande. Voir [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart cette docmentation de SciNet].
+* Via un navigateur avec Open OnDemand. Cette méthode est recommandée si vous ne connaissez pas bien Linux ou la ligne de commande. Voir [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart cette documentation de SciNet].
 * Via un terminal avec ssh, comme décrit ci-dessous.
 
 Comme pour tous les systèmes de SciNet et de l'Alliance, l'accès s'effectue via [[SSH/fr|SSH]]. De plus, pour Trillium en particulier, l'authentification est uniquement autorisée via des clés SSH téléversées dans [https://ccdb.alliancecan.ca CCDB]. Pour savoir comment générer votre paire de clés SSH, téléverser et utiliser vos clés SSH, voir [[SSH Keys/fr| Clés SSH]].
@@ -63,6 +63,7 @@ $ ssh -i /PATH/TO/SSH_PRIVATE_KEY  MYALLIANCEUSERNAME@trillium-gpu.scinet.utoron
 où <code>/PATH/TO/SSH_PRIVATE_KEY</code> est le chemin de votre clé SSH privée et <code>MYALLIANCEUSERNAME</code> est votre nom d'utilisateur CCDB.
 
 '''Remarques'''
+* À votre première connexion, assurez-vous que vous êtes bien sur Trillium en vérifiant si [[SSH security improvements/fr#Trillium|l'empreinte de la clé hôte du nœud de connexion]] correspond. 
 * Les nœuds de connexion de Trillium vous permettent de développer, de modifier, de compiler, de préparer et de soumettre des tâches.
 * Les nœuds de connexion CPU et GPU ne font pas partie des nœuds de calcul, mais ils ont la même architecture, le même système d'exploitation et la même pile logicielle que les nœuds de calcul CPU et GPU.
 * Vous pouvez vous connecter via SSH d'un nœud de connexion à un autre en utilisant leurs noms d'hôte internes <code>tri-login01, ..., tri-login06</code> et <code>trig-login01</code> (ce dernier étant le nœud de connexion GPU).
@@ -402,7 +403,7 @@ $ sbatch mpi_job.sh
 <ul>
 <li>accéder au répertoire de soumission,</li>
 <li>charger les modules,</li>
-<li>précharger une bibliothèque optimisant MPI-IO pour le système de fichiers VAST; si vous utilisez intelmpi au lieu d'openmpi, utilisez plutôt <code>source /scinet/vast/etc/vastpreload-intelmpi.bash</code>,</li>
+<li>précharger une bibliothèque optimisant MPI-IO pour le système de fichiers VAST; si vous utilisez IntelMPI au lieu d'OpenMPI, utilisez plutôt <code>source /scinet/vast/etc/vastpreload-intelmpi.bash</code>. '''Pour que le préchargement de la bibliothèque VAST fonctionne, il faut utiliser <code>mpirun</code> plutôt que <code>srun</code>'''; </li>
 <li>exécuter l'application <code>mpi_example</code> (l'ordonnanceur indiquera à <code>mpirun</code> ou <code>srun</code> le nombre de processus à exécuter).</li>
 </ul>
 </li>
@@ -498,7 +499,7 @@ $ sbatch hybrid_job.sh
 <ul>
 <li>changer le répertoire de soumission,</li>
 <li>charger les modules,</li>
-<li>précharger une bibliothèque qui adapte MPI-IO pour le système de fichiers  VAST; si vous utilisez intelmpi au lieu d'openmpi, utilisez plutôt <code>source /scinet/vast/etc/vastpreload-intelmpi.bash</code>,</li>
+<li>précharger une bibliothèque optimisant MPI-IO pour le système de fichiers VAST; si vous utilisez IntelMPI au lieu d'OpenMPI, utilisez plutôt <code>source /scinet/vast/etc/vastpreload-intelmpi.bash</code>. '''Pour que le préchargement de la bibliothèque VAST fonctionne, il faut utiliser <code>mpirun</code> plutôt que <code>srun</code>''';</li>
 <li>exécuter l'application <code>hybrid_example</code>; même si l'ordonnanceur indique à <code>mpirun</code> combien de processus il faut exécuter, il faut quand même distribuer également les processus et les fils sur l'ensemble des cœurs,  ce qui est fait par l’option --map-by. Si vous utilisez plus de 8 fils par processus (tâche ou rang MPI) mais au plus 24, changez ''l3cache'' pour ''numa''. Si vous utilisez plus de 24 fils par processus, changez pour ''socket''.</li>
 </ul>
 </li>

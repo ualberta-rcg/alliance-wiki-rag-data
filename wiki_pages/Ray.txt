@@ -20,90 +20,84 @@ The preferred option is to install it using the Python [https://pythonwheels.com
 :{{Command|prompt=(venv) [name@server ~]|pip install --no-index ray }}
 
 = Job submission = <!--T:10-->
+In the example that follows, we submit a job that spawns a single-node Ray cluster with 200GB RAM, 48 CPU cores and 4 H100 GPUs per node. 
 
-== Single Node ==
-Below is an example of a job that spawns a single-node Ray cluster with 6 cpus and 1 GPU. 
-
-{{File
-  |name=ray-example.sh
-  |lang="bash"
-  |contents=
-#!/bin/bash
-#SBATCH --ntasks=1
-#SBATCH --gpus-per-task=1
-#SBATCH --cpus-per-task=6  
-#SBATCH --mem=32000M       
-#SBATCH --time=0-00:05
-#SBATCH --output=%N-%j.out
-
-export HEAD_NODE=$(hostname) # store head node's address
-export RAY_PORT=34567 # choose a port to start Ray on the head node 
-
-module load python gcc/9.3.0 arrow
-virtualenv --no-download $SLURM_TMPDIR/env
-source $SLURM_TMPDIR/env/bin/activate
-
-pip install ray --no-index
-
-# Launch single-node ray cluster as a background process: only node is the head node! 
-ray start --head --node-ip-address=$HEAD_NODE --port=$RAY_PORT --num-cpus=$SLURM_CPUS_PER_TASK --num-gpus=1 --block &
-sleep 10
-
-python ray-example.py
-}}
-
-In this simple example, we connect to the single-node Ray cluster launched in the job submission script, then we check that Ray sees the resources allocated to the job.
-
-{{File
-  |name=ray-example.py
-  |lang="python"
-  |contents=
-import ray
-import os
-
-# Connect to Ray cluster
-ray.init(address=f"{os.environ['HEAD_NODE']}:{os.environ['RAY_PORT']}",_node_ip_address=os.environ['HEAD_NODE'])
-
-# Check that ray can see 6 cpus and 1 GPU
-print(ray.available_resources())
-}}
-
-== Multiple Nodes ==
-In the example that follows, we submit a job that spawns a two-node Ray cluster with 6 cpus and 1 GPU per node. 
+The script can be used for multi-node Ray clusters by changing the default value set by the line <code>#SBATCH --nodes=1</code>, or overriding it with <code>sbatch</code>'s <code>--nodes=</code> command-line argument. 
 
 {{File
   |name=ray-example.sh
   |lang="bash"
   |contents=
 #!/bin/bash
-#SBATCH --nodes 2
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gpus-per-task=1
-#SBATCH --cpus-per-task=6  
-#SBATCH --mem=32000M       
+#SBATCH --gpus-per-task=h100:4
+#SBATCH --cpus-per-task=48
+#SBATCH --mem=200G
 #SBATCH --time=0-00:10
 #SBATCH --output=%N-%j.out
 
-## Create a virtualenv and install Ray on all nodes ##
+
+# 1. Load modules
+module load python
+
+
+# 2. & 3. Create a virtualenv and install Ray on all nodes
+#         Then, activate that virtualenv in this shell.
 srun -N $SLURM_NNODES -n $SLURM_NNODES config_env.sh
-
-export HEAD_NODE=$(hostname) # store head node's address
-export RAY_PORT=34567 # choose a port to start Ray on the head node 
-
 source $SLURM_TMPDIR/ENV/bin/activate
 
-## Start Ray cluster Head Node ##
-ray start --head --node-ip-address=$HEAD_NODE --port=$RAY_PORT --num-cpus=$SLURM_CPUS_PER_TASK --num-gpus=1 --block &
-sleep 10
 
-## Launch worker nodes on all the other nodes allocated by the job ##
-srun launch_ray.sh &
+# Define Ray head node address (this node) & port (any free port will do)
+export HEAD_NODE=$(hostname)
+export RAY_PORT=$(
+    python -c 'import socket;             \
+               s=socket.socket();         \
+               s.bind(("", 0));           \
+               print(s.getsockname()[1]); \
+               s.close()'
+)
+
+
+# Craft --multi-prog configuration for Ray
+ray_multiprog_config="$SLURM_TMPDIR/ray-multiprog.conf"
+cat <<EOF >"$ray_multiprog_config"
+0   ray start --block --head --node-ip-address="$HEAD_NODE" --port=$RAY_PORT
+*   ray start --block --address "${HEAD_NODE}:${RAY_PORT}"
+EOF
+
+#
+# Some older Ray versions malfunctioned if the worker nodes started before
+# the head node. In that case, please modify the worker-node launch configuration
+# above to add a 10-second delay, using the following alternative lines:
+#
+# cat <<EOF >"$ray_multiprog_config"
+# 0   ray start --block --head --node-ip-address="$HEAD_NODE" --port=$RAY_PORT
+# *   sh -c 'sleep 10; ray start --block --address "${HEAD_NODE}:${RAY_PORT}" "\$@"' sh
+# EOF
+#
+
+
+# Launch head and workers on any/all nodes allocated to the job.
+srun -N $SLURM_NNODES -n $SLURM_NNODES    \
+     --multi-prog "$ray_multiprog_config" \
+     --num-cpus   "${SLURM_CPUS_ON_NODE}" \
+     --num-gpus   "${SLURM_GPUS_ON_NODE}" &
 ray_cluster_pid=$!
 
-python test_ray.py
 
-## Shut down Ray worker nodes after the Python script exits ##
+# Run your own script here
+python test_ray.py "$@"
+
+
+# Shut down Ray worker nodes after the Python script exits.
+# Await its exit.
 kill $ray_cluster_pid
+wait
+
+
+# Stage out your results, if any
+# cp $SLURM_TMPDIR/results.json ~/scratch/
 
 }}
 
@@ -114,42 +108,16 @@ Where the script <code>config_env.sh</code> is:
   |lang="bash"
   |contents=
 #!/bin/bash
-
 module load python
 
 virtualenv --no-download $SLURM_TMPDIR/ENV
-
 source $SLURM_TMPDIR/ENV/bin/activate
 
-pip install --upgrade pip --no-index
-
-pip install ray --no-index
+pip install --no-index --upgrade pip
+pip install --no-index ray
 }}
 
-And the script <code>launch_ray.sh</code> is:
-
-{{File
-  |name=launch_ray.sh
-  |lang="bash"
-  |contents=
-#!/bin/bash
-
-source $SLURM_TMPDIR/ENV/bin/activate
-module load gcc/9.3.0 arrow
-
-if [[ "$SLURM_PROCID" -eq "0" ]]; then
-        echo "Ray head node already started..."
-        sleep 10
-
-else
-        ray start --address "${HEAD_NODE}:${RAY_PORT}" --num-cpus="${SLURM_CPUS_PER_TASK}" --num-gpus=1 --block
-        sleep 5
-        echo "ray worker started!"
-fi
-
-}}
-
-In this simple example, we connect to the two-node Ray cluster launched in the job submission script, then we check that Ray sees the resources allocated to the job.
+In this simple example, we connect to the Ray cluster launched in the job submission script, then we check that Ray sees the resources allocated to the job.
 
 {{File
   |name=test_ray.py

@@ -1,5 +1,3 @@
-{{Outdated}}
-
 <languages />
 [[Category:Software]]
 
@@ -126,8 +124,10 @@ Pour vérifier si <code>ansys.lic</code> est bien configuré et fonctionne corre
  [gra-login:~] $EBROOTANSYS/v$(echo ${EBVERSIONANSYS:2:2}${EBVERSIONANSYS:5:1})/licensingclient/linx64/lmutil lmstat -c $ANSYSLMD_LICENSE_FILE 1> /dev/null && echo Success {{!}}{{!}} echo Fail
 </div>
 
+<div class="mw-translate-fuzzy">
 Si le résultat est <code>Success</code>, la licence devrait fonctionner quand des tâches sont soumises. <br>
 Par contre si le résultat est <code>Fail</code>, écrivez au [[technical support/fr|soutien technique]].
+</div>
 
 <span id="Version_compatibility"></span>
 = Compatibilité des versions =
@@ -1296,12 +1296,17 @@ Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use
 <span id="Graphical_use"></span>
 = Mode graphique =
 
+<div class="mw-translate-fuzzy">
 Les programmes Ansys fonctionnent interactivement en mode graphique sur les nœuds de calcul des grappes ou sur les nœuds VDI de Graham.
+</div> 
 
-<span id="Compute_nodes"></span>
-== Nœuds de calcul == 
+ [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) NIBI]: <code>https://ondemand.sharcnet.ca</code>
+ [https://docs.alliancecan.ca/wiki/Fir FIR]: <code>https://jupyterhub.fir.alliancecan.ca</code>
+ [https://docs.alliancecan.ca/wiki/Rorqual RORQUAL]: <code>https://jupyterhub.rorqual.alliancecan.ca</code>
+ [https://docs.alliancecan.ca/wiki/Narval NARVAL]:  <code>https://jupyterhub.narval.alliancecan.ca/</code>
+ [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart TRILLIUM]: <code>https://ondemand.scinet.utoronto.ca</code>
 
-Ansys peut être exécuté interactivement sur un nœud de calcul simple pour une durée pouvant aller jusqu'à 24 heures. C'est l'approche idéale pour tester des simulations intensives puisque tous les cœurs et la mémoire peuvent être demandés avec salloc comme décrit dans [[VNC/fr#Nœuds _de_calcul|TigerVNC]]. Une fois la connexion faite avec vncviewer, toutes les versions suivantes peuvent être lancées après que les modules requis ont été chargés.
+Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then a H100 gpu resource should be requested and an OpenGL driver argument added when starting fluent as shown below.
 
 <div class="mw-translate-fuzzy">
 === Fluids ===
@@ -1341,6 +1346,7 @@ Ansys peut être exécuté interactivement sur un nœud de calcul simple pour un
 Remarque : ansys/2022R2 Ensight a été peu testé sur les nœuds de calcul; veuillez nous faire part des problèmes que vous rencontrez.
 </div>
 
+<div class="mw-translate-fuzzy">
 === Rocky ===
 ::: <code>module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2</code>
 ::: <code>module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04</code>
@@ -1355,76 +1361,12 @@ Remarque : ansys/2022R2 Ensight a été peu testé sur les nœuds de calcul; veu
 ::: o Rocky prend en charge le calcul accéléré avec GPU (non testé, non documenté).
 ::: o Pour demander un nœud de calcul sur Graham pour utilisation interactive avec 4 CPU et 1 GPU pour un maximum de 8 heures, lancez
 :::   <code>salloc --time=08:00:00 --nodes=1 --cpus-per-task=4 --gres=gpu:v100:1 --mem=32G --account=someaccount</code>
-
-<span id="VDI_nodes"></span>
-== Nœuds VDI ==
-
-Les programmes Ansys peuvent être exécutés jusqu'à 7&nbsp;jours sur les nœuds Graham VDI (gra-vdi.alliancecan.ca) en utilisant un maximum de 8&nbsp;cœurs (maximum de 16&nbsp;cœurs) et 128 Go&nbsp;de mémoire. Le système VDI fournit une accélération GPU OpenGL, ce qui est idéal pour les  graphiques à haute performance. On peut utiliser VDI pour créer ou modifier des fichiers d'entrée de simulation, post-traiter des données ou visualiser des résultats de simulation. Connectez-vous d'abord à gra-vdi.computecanada.ca avec [[VNC/fr#Nœuds_VDI|TigerVNC]] puis ouvrez une nouvelle fenêtre de terminal et démarrez l'une des <b>versions de programme prises en charge</b> montrées ci-dessous. La barre verticale <code>|</code> est utilisée pour séparer les commandes. La taille maximale d'une tâche parallèle exécutée sur gra-vdi doit être limitée à 16&nbsp;cœurs pour éviter de surcharger les serveurs et de nuire aux autres utilisateurs. Pour exécuter deux tâches simultanées (16&nbsp;cœurs maximum chacune), utilisez deux sessions VCN distinctes. Pour la première session, connectez-vous avec VNC à gra-vdi3.sharcnet.ca. Pour la deuxième session, connectez-vous à gra-vdi4.sharecnet.ca aussi avec VNC. Dans chacune des sessions, démarrez Ansys en mode graphique et faites exécuter la simulation. Notez que les simulations simultanées doivent en général être exécutées dans des répertoires différents pour éviter les conflits de fichiers. Contrairement aux connexions VNC des nœuds de calcul (qui imposent des limites Slurm via salloc), il n'y a pas de contrainte de limite de temps sur gra-vdi lors de l'exécution des simulations.
-
-=== Fluids ===
-::: <code>module load CcEnv StdEnv/2023</code>
-::: <code>module load ansys/2024R2.04</code> (ou versions moins récentes)
-::: <code>unset SESSION_MANAGER</code>
-::: <code>fluent | cfx5 | icemcfd</code>
-::: o La commande <code>unset SESSION_MANAGER</code> permet d'éviter le message d'erreur suivant au lancement de Fluent.
-::: [<span style="Color:#ff7f50">Qt: Session management error: None of the authentication protocols specified are supported</span>]
-::: o Si le message suivant est affiché au lancement de icemcfd ...
-::: [<span style="Color:#ff7f50">Error segmentation violation - exiting after doing an emergency save</span>]
-::: ... ne cliquez pas sur le bouton OK, autrement icemcfd va planter. Faites plutôt ce qui suit (une seule fois)&nbsp;:
-::: sélectionnez <i>Settings Tab -> Display -> tick X11 -> Apply -> OK -> File -> Exit</i>
-::: L'erreur ne devrait pas se produire quand vous démarrez de nouveau icemcfd.
-
-=== Mapdl ===
-::: <code>module load CcEnv StdEnv/2023</code>
-::: <code>ansys/2024R2.04</code> (or older versions)
-::: <code>mapdl -g</code> (to start the gui directly), or,
-::: <code>unset SESSION_MANAGER; launcher -> click RUN button</code>
-
-=== Workbench ===
-
-<div class="mw-translate-fuzzy">
-::: <code>module load SnEnv</code>
-::: <code>module load ansys/2024R.04</code> (or older versions)
-::: <code>runwb2</code> or <code>runwb2-gui</code>  (see NOTE1 below)
-::: ------------------------------------------------------------------
 </div>
 
 <div class="mw-translate-fuzzy">
-::: <code>module load CcEnv StdEnv/2023</code>
-::: <code>module load ansys/2025R1</code> (ou versions plus récentes)
-::: <code>runwb2</code>  (non disponible sur le serveur de licence SHARCNET avant sa mise à jour)
-::: ------------------------------------------------------------------
-</div>
-
-<div class="mw-translate-fuzzy">
-::: REMARQUE 1 : Pour les modules Ansys installés localement, la commande <code>runwb2</code> de <code>SnEnv</code> utilise par défaut le serveur de licence SHARCNET, tel que défini dans le fichier du module Ansys que vous chargez. Pour utiliser un serveur distant, lancez plutôt Workbench avec <code>runwb2-gui</code>, car ce script enveloppant (<i>wrapper</i>) lira votre fichier <code>~/.licenses/ansys.lic</code> comme les modules disponibles sous <code>StdEnv/2023</code>. De plus, l'option interactive d'utilisation du serveur CMC (acheminé via le serveur SHARCNET CMC CadPASS) sera proposée, éliminant ainsi la nécessité de le configurer dans votre fichier ansys.lic.
-::: REMARQUE 2 : Lorsque vous démarrez Fluent à partir de Workbench avec la version 2025R1, avant de cliquer sur le bouton ''Start'', cliquez sur l'onglet <i>Environment</i> du panneau de lancement de <i>Fluent Launcher</i> et copiez/collez HOOPS_PICTURE=opengl dans le champ de saisie vide. Vous pouvez aussi définir <code>export HOOPS_PICTURE=opengl</code> dans votre environnement avant de démarrer Workbench. L'une ou l'autre de ces actions empêchera le message suivant, qui apparaîtrait dans les messages de démarrage de l'interface utilisateur : [<span style="Color:#ff7f50">Warning: Software rasterizer found, hardware acceleration will be disabled.</span>]
-::: REMARQUE 3 : Lorsque vous exécutez Mechanical dans Workbench sur gra-vdi, assurez-vous de cocher <i>Distributed</I> dans le panneau <i>Solver</i> du ruban supérieur et de spécifier une valeur maximale de <b>24&nbsp;cœurs</b>. Lorsque vous exécutez Fluent sur gra-vdi, ne cochez pas <i>Distributed</I> et spécifiez une valeur maximale de <b>12&nbsp;cœurs</b>. N'essayez pas d'utiliser plus de 128Go de mémoire, sinon Ansys atteindra la limite et sera arrêté. Si vous avez besoin de plus de cœurs ou de mémoire, utilisez un nœud de calcul sur une grappe pour exécuter votre session graphique (comme décrit dans la section <i>Nœuds de calcul</i> ci-dessus). Lorsque vous effectuez une ancienne tâche de prétraitement ou de post-traitement avec Ansys sur gra-vdi et que vous n'exécutez pas de calcul, utilisez uniquement <b>4&nbsp;cœurs</b>, sinon les licences HPC seront extraites inutilement.
-::: REMARQUE 4 : Dans de très rares cas, l'interface graphique de Workbench ou de certains programmes qu'il exécute se bloquent ou ne démarrent pas correctement, notamment si vnsviewer se déconnecte avant que Ansys soit fermé correctement. En général, si Ansys ne fonctionne pas correctement, ouvrez une nouvelle fenêtre de terminal sur gra-vdi et exécutez <code>pkill -9 -e -u $USER -f "ansys|fluent|mwrpcss|mwfwrapper|ENGINE|mono"</code> pour arrêter complètement tous les processus Ansys. Si le problème persiste et que vous utilisiez l'interface graphique sur des nœuds de calcul avant de travailler sur gra-vdi, essayez d'exécuter <code>rm -rf .ansys</code>. Si le problème concerne /home, /project ou /scratch (la commande df bloque), il est fort probable qu'Ansys recommence à fonctionner normalement une fois le problème de stockage résolu.
-</div>
-
-=== Ensight ===
-::: <code>module load SnEnv</code>
-::: <code>ansys/2024R2.04</code> (or older versions back to 2021R2)
-::: <code>ensight</code><br>
-
-=== Rocky ===
-::: <code>module load clumod ansysrocky/2023R2 CcEnv StdEnv/2020 ansys/2023R2</code>, ou
-::: <code>module load clumod ansysrocky/2024R2.0 CcEnv StdEnv/2023 ansys/2024R2.04</code>, ou
-::: <code>module load CcEnv StdEnv/2023 ansys/2025R1</code>
-::: <code>Rocky</code> Le module Ansys lit ~/licenses/ansys.lic<br>
-::: <code>Rocky-gui</code> Fournit par les modules ansysrocky locaux la sélection des serveurs CMC ou SHARCNET<br>
-::: <code>RockySolver</code> Exécute le solveur rocky à partir de la ligne de commande  (l'ajout de -h pour <i>help</i> n'est pas testé)
-::: <code>RockySchedular</code> Lance l'interface graphique pour soumettre et exécuter des tâches sur le nœud courant (non testé)
-::: o Rocky pour 2024R2 et moins récentes est disponible uniquement sur gra-vdi et Graham clusters; l'installation sur toutes les grappes est prévue pour juin
-::: o Rocky pour 2025R1 et plus récentes est fourni sur toutes les grappes par le module ansys (pas pris en charge par le serveur de licence SHARCNET)
-::: o Rocky ne peut utiliser que des CPU sur gra-vdi puisqu'il n'y a présentement qu'un seul GPU dédié aux graphiques
-::: o La licence SHARCNET inclut maintenant Rocky dont l'utilisation est sans frais pour la recherche
-::: o Voir la page [https://innovationspace.ansys.com/ais-rocky/ https://innovationspace.ansys.com/ais-rocky/ Rocky Innovation Space]
-::: o Pour des détails voir  [https://innovationspace.ansys.com/knowledge/forums/topic/ansys-rocky-2024-r2-release-highlights/ Ansys Rocky 2024 R2 Release Highlights] et [https://innovationspace.ansys.com/knowledge/forums/topic/ansys-rocky-2025-r1-release-highlights/ Ansys Rocky 2025 R1 Release Highlights]
-
 == Problèmes avec SSH==
 :::Certains programmes d'interface graphique ANSYS peuvent être exécutés à distance sur un nœud de calcul d'une de nos grappes par redirection X via SSH vers votre ordinateur local. Contrairement à VNC, cette approche n'est ni testée ni prise en charge car elle repose sur un serveur d'affichage X correctement configuré pour votre système d'exploitation particulier OU sur la sélection, l'installation et la configuration d'un paquet d'émulateur client X approprié tel que MobaXterm. La plupart d'entre vous trouverez les temps de réponse interactifs inacceptables pour les tâches de menu de base, sans parler de l'exécution de tâches plus complexes telles que celles nécessitant du rendu graphique. Les temps d'attente pour démarrer des programmes avec interface graphique peuvent également être très longs, dépendant de votre connexion Internet. Dans un test par exemple, il a fallu 40&nbsp;minutes pour obtenir l'interface graphique avec SSH alors que vncviewer n'a pris que 34&nbsp;secondes. Malgré la lenteur potentielle lors de la connexion via SSH pour exécuter des programmes avec interface graphique, cela peut toujours être intéressant si votre seul objectif est d'ouvrir une simulation et d'effectuer des opérations de menu de base ou d'exécuter des calculs. Ces étapes de base sont un point de départ : 1) ssh -Y username@graham.computecanada.ca; 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task =4 [--gpus-per-node=1] --account=def-mygroup; 3) une fois connecté à un nœud de calcul, essayez d'exécuter <code>xclock</code>. Si l'horloge apparaît sur votre bureau, chargez le module Ansys souhaité et essayez d'exécuter le programme.
+</div>
 
 <span id="Site-specific_usage"></span>
 = Particularités selon le site d'utilisation =
@@ -1591,24 +1533,4 @@ Une fois la tâche complétée, son ''Job Wall-clock time'' peut être obtenu av
 <span id="Help_resources"></span>
 = Aide =
 
-<span id="Online_documentation"></span>
-== Documentation en ligne ==
-
-A publicly accessible online version of the [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/prod_page.html?pn=Fluent&pid=Fluent&lang=en Ansys Help site] with full Documentation, Tutorial and Videos for the <b>LATEST</b> Ansys release version.  Developer documentation is available [https://developer.ansys.com/docs here] also without login. To access documentation for Ansys versions 2024R1, 2024R2 AND 2025R1 you however WILL need to login [https://ansyshelp.ansys.com/ here].  There is documentation for Multiphysics System Coupling versions 2023R1 ---> 202R2 available [https://ansysapi.ansys.com here] where again login will be required.   To access the Ansys Help for a specific version such as 2023R2 perform the below steps precisely which should work for any module installed under StdEnv/2023 (thus back to 2022R2) and **NOT** require login:
-# Connect to <b>gra-vdi.computecanada.ca</b> with tigervnc as described [[VNC#VDI_Nodes|here]].
-# If the Firefox browser or the Ansys Workbench is open, close it now.
-# Start Firefox by clicking <I>Applications -> Internet -> Firefox</I>.
-# Open a <b><i>new</I></b> terminal window by clicking  <I>Applications -> System Tools -> Mate Terminal</I>.
-# Start Workbench by typing the following in your terminal: <i>module load CcEnv StdEnv/2023 ansys; runwb2</i>
-# Go to the upper Workbench menu bar and click  <I>Help -> ANSYS Workbench Help</I>.  The <b>Workbench Users' Guide</b> should appear loaded in Firefox.
-# At this point Workbench is no longer needed so close it by clicking the <I>>Unsaved Project - Workbench</I> tab located along the bottom frame (doing this will bring Workbench into focus) and then click <I>File -> Exit</I>.
-# In the top middle of the Ansys documentation page, click the word <I>HOME</I> located just left of <I>API DOCS</I>.
-# Now scroll down and you should see a list of Ansys product icons and/or alphabetical ranges.
-# Select a product to view its documentation.  The documentation for the latest release version will be displayed by default.  Change the version by clicking the <I>Release Year</I> pull down located above and just to the right of the Ansys documentation page search bar.
-# To search for documentation corresponding to a different Ansys product, click <I>HOME</I> again.
-
-== Vidéos sur YouTube==
-[https://www.youtube.com/@AnsysHowTo/videos Ansys How To]
-
-== Innovation Space ==
-[https://innovationspace.ansys.com/ Customer Support & Training: Ansys Innovation Space].
+Documentation for recent versions Ansys 202[4|5]R[1|2] is fully available [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/main_page.html?lang=en here].  Documentation for older versions such as Ansys 2023R[1|2] however requires [https://ansyshelp.ansys.com/ login].  Developer documentation can be found in the Ansys Developer [https://developer.ansys.com Portal]. Additional learning resources include the Ansys HowTo [https://www.youtube.com/@AnsysHowTo/videos videos], the Ansys Educator [https://innovationspace.ansys.com/educator-hub/ Educator Hub] and the Ansys Webinar [https://www.ansys.com/events/ansys-academic-webinar-series series].

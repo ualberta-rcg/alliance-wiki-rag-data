@@ -1,5 +1,3 @@
-{{Outdated}}
-
 <languages />
 [[Category:Software]]
 
@@ -1427,135 +1425,57 @@ Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use
 = Graphical use = <!--T:94-->
 
 <!--T:941-->
-Ansys programs may be run interactively in GUI mode on cluster compute nodes or Graham VDI Nodes.
+To run Ansys programs in graphical mode click on one of the following OnDemand or Jupyterhub links.  A job submission web page to configure the resources for an interactive session should appear in your browser : 
 
-== Compute nodes == <!--T:943--> 
+ <!--T:6807-->
+[https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) NIBI]: <code>https://ondemand.sharcnet.ca</code>
+ [https://docs.alliancecan.ca/wiki/Fir FIR]: <code>https://jupyterhub.fir.alliancecan.ca</code>
+ [https://docs.alliancecan.ca/wiki/Rorqual RORQUAL]: <code>https://jupyterhub.rorqual.alliancecan.ca</code>
+ [https://docs.alliancecan.ca/wiki/Narval NARVAL]:  <code>https://jupyterhub.narval.alliancecan.ca/</code>
+ [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart TRILLIUM]: <code>https://ondemand.scinet.utoronto.ca</code>
 
-<!--T:201-->
-Ansys can be run interactively on a single compute node for up to 24 hours.  This approach is ideal for testing large simulations since all cores and memory can be requested with salloc as described in [[VNC#Compute_Nodes|TigerVNC]].  Once connected with vncviewer, any of the following program versions can be started after loading the required modules as shown below.
+<!--T:6808-->
+Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then a H100 gpu resource should be requested and an OpenGL driver argument added when starting fluent as shown below.
 
 <!--T:1670-->
 === Fluids ===
-::: <code>module load StdEnv/2020 ansys/2021R2</code>
 ::: <code>module load StdEnv/2023 ansys/2022R2</code> (or newer versions)
-::: <code>fluent -mpi=intel</code>, or,
-::: <code>QTWEBENGINE_DISABLE_SANDBOX=1 cfx5</code>
+::: <code>fluent -mpi=intel -driver opengl|null</code>, or,
+::: <code>cfx5 -graphics ogl|mesa</code>
 
 <!--T:1680-->
 === Mapdl ===
-::: <code>module load StdEnv/2020 ansys/2021R2</code>
 ::: <code>module load StdEnv/2023 ansys/2022R2</code> (or newer versions)
 ::: <code>mapdl -g</code>, or via launcher,
 ::: <code>launcher</code> --> click RUN button
 
 <!--T:1671-->
 === Workbench ===
-::: <code>module load StdEnv/2020 ansys/2021R2</code>
 ::: <code>module load StdEnv/2023 ansys/2022R2</code> (or newer versions)
 ::: <code>xfwm4 --replace &</code> (only needed if using Ansys Mechanical)
 ::: <code>export QTWEBENGINE_DISABLE_SANDBOX=1</code> (only needed if using CFD-Post)
 ::: <code>runwb2</code>
 ::: <br>
-::: NOTES :When running an Analysis Program such as Mechanical or Fluent in parallel on a single node, untick <i>Distributed</i> and specify a value of cores equal to your <b>salloc session setting minus 1</b>. The pulldown menus in the Ansys Mechanical workbench do not respond properly. As a workaround run <code>xfwm4 --replace</code> on the command line before starting workbench as shown. To make xfwm4 your default edit <code>$HOME/.vnc/xstartup</code> and change <code>mate-session</code> to <code>xfce4-session</code>.  Lastly, fluent from ansys/2022R2 does not currently work on compute nodes please use a different version.
+::: NOTE: When running an Analysis Program such as Mechanical or Fluent in parallel on a single node, untick <i>Distributed</i> and specify a value of cores equal to your <b>salloc session setting minus 1</b>. The pulldown menus in the Ansys Mechanical workbench do not respond properly. As a workaround run <code>xfwm4 --replace</code> on the command line before starting workbench as shown. To make xfwm4 your default edit <code>$HOME/.vnc/xstartup</code> and change <code>mate-session</code> to <code>xfce4-session</code>.
 
 <!--T:1673-->
 === Ensight ===
-::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>, or
-::: <code>module load StdEnv/2020 ansys/2022R1; A=221; B=5.12.6</code>, or
-::: <code>module load StdEnv/2020 ansys/2021R2; A=212; B=5.12.6</code>, or
-::: <code>module load StdEnv/2020 ansys/2021R1; A=211; B=5.12.6</code>
+::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>
 ::: <code>export LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib</code>
 ::: <code>ensight -X</code>
-Note: ansys/2022R2 Ensight is lightly tested on compute nodes. Please let us know if you find any problems using it.
 
 <!--T:1682-->
 === Rocky ===
-::: <code>module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2</code>
-::: <code>module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04</code>
-::: <code>module load StdEnv/2023 ansys/2025R1</code>
+::: <code>module load StdEnv/2023 ansys/2025R1</code> (or newer versions)
 ::: <code>Rocky</code> The ansys module handles reading your ~/licenses/ansys.lic<br>
-::: <code>Rocky-gui</code> Provided by local ansysrocky modules option to select the CMC or SHARCNET server<br>
 ::: <code>RockySolver</code> Run rocky solver directly from command line (add -h for help, untested)
 ::: <code>RockySchedular</code> Start rocky schedular gui to submit/run jobs on present node (untested)
-::: o Rocky for versions 2024R2 or older is only available on gra-vdi and graham clusters (install on all clusters expected in June)
-::: o Rocky for versions 2025R1 and greater is bundled in the ansys module on all clusters (not yet supported by SHARCNET license server)
 ::: o The SHARCNET license includes Rocky and is therefore free for all researchers to use
 ::: o Rocky supports GPU-accelerated computing however this capability not been tested or documented yet
-::: o To request a graham compute node for interactive use with 4 cpus and 1 gpu for a time limit of 8hrs run:
-:::   <code>salloc --time=08:00:00 --nodes=1 --cpus-per-task=4 --gres=gpu:v100:1 --mem=32G --account=someaccount</code>
-
-== VDI nodes == <!--T:947-->
-
-<!--T:125-->
-Ansys programs can be run for up to 7days on grahams VDI nodes (gra-vdi.alliancecan.ca) using 8 cores (16 cores max) and 128GB memory.  The VDI System provides GPU OpenGL acceleration therefore it is ideal for performing tasks that benefit from high performance graphics.  One might use VDI to create or modify simulation input files, post-process data or visualize simulation results.  To log in connect with [[VNC#VDI_Nodes|TigerVNC]] then open a new terminal window and start one of the program versions shown below.  The vertical bar <code>|</code> notation is used to separate the various commands.   The maximum job size for any parallel job run on gra-vdi should be limited to 16cores to avoid overloading the servers and impacting other users.  To run two simultaneous gui jobs (16 cores max each) on gra-vdi establish two independent vnc sessions.  For the first session, connect to gra-vdi3.sharcnet.ca with vnc. For the second session connect to gra-vdi4.sharecnet.ca also with vnc.  Then within each session, start Ansys in gui mode and run your simulation.  Note that simultaneous simulations should in general be run in different directories to avoid file conflict issues.  Unlike compute nodes vnc connections (which impose slurm limits through salloc) there is no time limit constraint on gra-vdi when running simulations.
-
-<!--T:1675-->
-=== Fluids ===
-::: <code>module load CcEnv StdEnv/2023</code>
-::: <code>ansys/2024R2.04</code> (or older versions)
-::: <code>unset SESSION_MANAGER</code>
-::: <code>fluent | cfx5 | icemcfd</code>
-::: o Where unsetting SESSION_MANAGER prevents the following Qt message from appearing when starting fluent:
-::: [<span style="Color:#ff7f50">Qt: Session management error: None of the authentication protocols specified are supported</span>]
-::: o In the event the following message appears in a popup window when starting icemcfd ...
-::: [<span style="Color:#ff7f50">Error segmentation violation - exiting after doing an emergency save</span>]
-::: ... do not click the popup OK button otherwise icemcfd will crash.  Instead do the following (one time only):
-::: click the Settings Tab -> Display -> tick X11 -> Apply -> OK -> File -> Exit
-::: The error popup should no longer appear when icemcfd is restarted.
-
-<!--T:1681-->
-=== Mapdl ===
-::: <code>module load CcEnv StdEnv/2023</code>
-::: <code>ansys/2024R2.04</code> (or older versions)
-::: <code>mapdl -g</code> (to start the gui directly), or,
-::: <code>unset SESSION_MANAGER; launcher -> click RUN button</code>
-
-=== Workbench === <!--T:1676-->
-
-<!--T:4755-->
-::: <code>module load SnEnv</code>
-::: <code>module load ansys/2024R2.04</code> (or older versions)
-::: <code>runwb2</code> or <code>runwb2-gui</code>  (see NOTE1 below)
-::: ------------------------------------------------------------------
-
-<!--T:4767-->
-::: <code>module load CcEnv StdEnv/2023</code>
-::: <code>module load ansys/2025R1</code> (or newer versions)
-::: <code>runwb2</code>  (see NOTE5 below)
-::: ------------------------------------------------------------------
-
-<!--T:4777-->
-::: NOTE1: The <code>runwb2</code> command (for locally installed) ansys modules provided by <code>SnEnv</code> will use the SHARCNET license server by default, as set in the ansys module file that you load.  To use a remote server, start workbench with <code>runwb2-gui</code> instead as this wrapper script will read your <code>~/.licenses/ansys.lic</code> file similar to modules available under <code>StdEnv/2023</code> on the clusters.  In addition an interactive option to use the CMC server (routed through the SHARCNET CMC CadPASS server) will be offered, thus removing the need to configure it in your ansys.lic file.
-::: NOTE2: When starting fluent from within workbench with version 2025R1 before clicking the start button, click the Environment tab in the Fluent Launcher panel and copy/paste HOOPS_PICTURE=opengl in the empty input box.  Optionally set <code>export HOOPS_PICTURE=opengl</code> in your environment before starting workbench. Doing either of these will eliminate the following red warning that will other wise appear in the tui startup messages: [<span style="Color:#ff7f50">Warning: Software rasterizer found, hardware acceleration will be disabled.</span>]
-::: NOTE3: When running Mechanical in Workbench on gra-vdi be sure to <b>tic</b> <i>Distributed</I> in the upper ribbon Solver panel and specify a maximum value of <b>24</b> cores.  When running Fluent on gra-vdi instead, <b>untic</b> <i>Distributed</I> and specify a maximum value of <b>12</b> cores.  Do not attempt to use more than 128GB memory otherwise Ansys will hit the hard limit and be killed. If you need more cores or memory then please use a cluster compute node to run your graphical session on (as described in the previous Compute nodes section above).  When doing old pre-processing or post-processing work with Ansys on gra-vdi and not running calculation, please only use <b>4</b> cores otherwise hpc licenses will be checked out unnecessarily.
-::: NOTE4: On rare occasions Ansys workbench or some programs that run within it will freeze or not start properly; Inparticular if vncviewer unexpectedly disconnected before Ansys could be cleanly shutdown.  In general, if Ansys is not behaving properly open a new terminal window on gra-vdi and run  <code>pkill -9 -e -u $USER -f "ansys|fluent|mwrpcss|mwfwrapper|ENGINE|mono"</code> to fully kill off all Ansys processes.  If the problem persists then try running <code>rm -rf .ansys</code> if you have been working in the gui on compute nodes before working on gra-vdi.  If the problem involves home, project or scratch (the df command hangs) then its highly probable ansys will resume working normally again once the attached storage issue is resolved.
-::: NOTE5: The ansys/2025R1 module is not usable with the SHARCNET license server until an upgrade is complete expected early august/2025.  On gra-vdi module versions ansys/2025 or newer are not installed under SnEnv and may only be used under CcEnv.  The gui interphase for some programs available in ansys/2025R1 such as Ansys Mechanical do not work properly on gra-vdi and will not be fixed as gra-vdi is to be retired soon.
-
-<!--T:6805-->
-=== Ensight ===
-::: <code>module load SnEnv</code>
-::: <code>ansys/2024R2.04</code> (or older versions back to 2021R2)
-::: <code>ensight</code><br>
-
-<!--T:1679-->
-=== Rocky ===
-::: <code>module load clumod ansysrocky/2023R2 CcEnv StdEnv/2020 ansys/2023R2</code>, or,
-::: <code>module load clumod ansysrocky/2024R2.0 CcEnv StdEnv/2023 ansys/2024R2.04</code>, or,
-::: <code>module load CcEnv StdEnv/2023 ansys/2025R1</code>
-::: <code>Rocky</code> The ansys module handles reading your ~/licenses/ansys.lic<br>
-::: <code>Rocky-gui</code> Provided by local ansysrocky modules option to select the CMC or SHARCNET server<br>
-::: <code>RockySolver</code> Run rocky solver directly from command line (add -h for help, untested)
-::: <code>RockySchedular</code> Start rocky schedular gui to submit/run jobs on present node (untested)
-::: o Rocky for versions 2024R2 or older is only available on gra-vdi and graham clusters (install on all clusters expected in June)
-::: o Rocky for versions 2025R1 and greater is bundled in the ansys module on all clusters (not yet supported by SHARCNET license server)
-::: o Rocky should only be used with cpus and not gpus when run on gra-vdi since the machine only has one gpu intended for graphics
-::: o The SHARCNET license includes Rocky and is therefore free for all researchers across the Alliance to use
-::: o The Rocky Innovation Space is located [https://innovationspace.ansys.com/ais-rocky/ https://innovationspace.ansys.com/ais-rocky/]
-::: o For Ansys Rocky 2024 R2 and 2025 R1  Release Highlights click [https://innovationspace.ansys.com/knowledge/forums/topic/ansys-rocky-2024-r2-release-highlights/ here] and [https://innovationspace.ansys.com/knowledge/forums/topic/ansys-rocky-2025-r1-release-highlights/ here]
 
 <!--T:1674-->
 == SSH issues ==
-::: Some Ansys GUI programs can be run remotely on a cluster compute node by X forwarding over SSH to your local desktop.  Unlike VNC, this approach is untested and unsupported since it relies on a properly setup X display server for your particular operating system OR the selection, installation and configuration of a suitable X client emulator package such as MobaXterm.  Most users will find interactive response times unacceptably slow for basic menu tasks let alone performing more complex tasks such as those involving graphics rendering.  Startup times for GUI programs can also be very slow depending on your Internet connection. For example, in one test it took 40 minutes to fully start the gui up over SSH while starting it with vncviewer required only 34 seconds.  Despite the potential slowness when connecting over SSH to run GUI programs, doing so may still be of interest if your only goal is to open a simulation and perform some basic menu operations or run some calculations. The basic steps are given here as a starting point: 1) ssh -Y username@graham.computecanada.ca; 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task=4 [--gpus-per-node=1] --account=def-mygroup; 3) once connected onto a compute node try running <code>xclock</code>.  If the clock appears on your desktop, proceed to load the desired Ansys module and try running the program.
+::: Some Ansys GUI programs can be run remotely on a cluster compute node by forwarding X over SSH to your local desktop.  Unlike VNC, this approach is untested and unsupported since it relies on a properly setup X display server for your particular operating system OR the selection, installation and configuration of a suitable X client emulator package such as MobaXterm.  Most users will find interactive response times unacceptably slow for basic menu tasks let alone performing more complex tasks such as those involving graphics rendering.  Startup times for GUI programs can also be very slow depending on your Internet connection. For example, in one test it took 40 minutes to fully start the gui up over SSH while starting it with vncviewer required only 34 seconds.  Despite the potential slowness when connecting over SSH to run GUI programs, doing so may still be of interest if your only goal is to open a simulation and perform some basic menu operations or run some calculations. The basic steps are given here as a starting point: 1) ssh -Y username@alliancecan.ca 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task=4 [--gpus-per-node=1] --account=def-mygroup; 3) once connected onto a compute node try running <code>xclock</code>.  If the clock appears on your desktop, proceed to load the desired Ansys module and try running the program.
 
 = Site-specific usage = <!--T:86-->
 
@@ -1719,28 +1639,7 @@ After a job completes, its "Job Wall-clock time" can be obtained from <code>seff
 
 = Help resources = <!--T:8-->
 
-== Online documentation == <!--T:81-->
-
 <!--T:6804-->
-A publicly accessible online version of the [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/prod_page.html?pn=Fluent&pid=Fluent&lang=en Ansys Help site] with full Documentation, Tutorial and Videos for the <b>LATEST</b> Ansys release version.  Developer documentation is available [https://developer.ansys.com/docs here] also without login. To access documentation for Ansys versions 2024R1, 2024R2 AND 2025R1 you however WILL need to login [https://ansyshelp.ansys.com/ here].  There is documentation for Multiphysics System Coupling versions 2023R1 ---> 202R2 available [https://ansysapi.ansys.com here] where again login will be required.   To access the Ansys Help for a specific version such as 2023R2 perform the below steps precisely which should work for any module installed under StdEnv/2023 (thus back to 2022R2) and **NOT** require login:
-# Connect to <b>gra-vdi.computecanada.ca</b> with tigervnc as described [[VNC#VDI_Nodes|here]].
-# If the Firefox browser or the Ansys Workbench is open, close it now.
-# Start Firefox by clicking <I>Applications -> Internet -> Firefox</I>.
-# Open a <b><i>new</I></b> terminal window by clicking  <I>Applications -> System Tools -> Mate Terminal</I>.
-# Start Workbench by typing the following in your terminal: <i>module load CcEnv StdEnv/2023 ansys; runwb2</i>
-# Go to the upper Workbench menu bar and click  <I>Help -> ANSYS Workbench Help</I>.  The <b>Workbench Users' Guide</b> should appear loaded in Firefox.
-# At this point Workbench is no longer needed so close it by clicking the <I>>Unsaved Project - Workbench</I> tab located along the bottom frame (doing this will bring Workbench into focus) and then click <I>File -> Exit</I>.
-# In the top middle of the Ansys documentation page, click the word <I>HOME</I> located just left of <I>API DOCS</I>.
-# Now scroll down and you should see a list of Ansys product icons and/or alphabetical ranges.
-# Select a product to view its documentation.  The documentation for the latest release version will be displayed by default.  Change the version by clicking the <I>Release Year</I> pull down located above and just to the right of the Ansys documentation page search bar.
-# To search for documentation corresponding to a different Ansys product, click <I>HOME</I> again.
-
-<!--T:82-->
-== YouTube videos ==
-Search the Ansys How To videos [https://www.youtube.com/@AnsysHowTo/videos here].
-
-<!--T:83-->
-== Innovation Space ==
-Search the Ansys Innovation Space [https://innovationspace.ansys.com/ here].
+Documentation for recent versions Ansys 202[4|5]R[1|2] is fully available [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/main_page.html?lang=en here].  Documentation for older versions such as Ansys 2023R[1|2] however requires [https://ansyshelp.ansys.com/ login].  Developer documentation can be found in the Ansys Developer [https://developer.ansys.com Portal]. Additional learning resources include the Ansys HowTo [https://www.youtube.com/@AnsysHowTo/videos videos], the Ansys Educator [https://innovationspace.ansys.com/educator-hub/ Educator Hub] and the Ansys Webinar [https://www.ansys.com/events/ansys-academic-webinar-series series].
 
 </translate>
