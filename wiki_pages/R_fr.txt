@@ -13,8 +13,8 @@ Chargez d'abord un module R. Comme plusieurs versions sont disponibles, consulte
 |module spider r
 }}
 Pour charger un module R particulier, utilisez une variante de la commande  
-{{Command
-|module load gcc/9.3.0 r/4.0.2
+{{Command	
+|module load r/4.5.0
 }} 
 Pour plus d'information, consultez [[Utiliser des modules|Utiliser des modules]].
 
@@ -23,15 +23,13 @@ Vous pouvez maintenant démarrer l'interpréteur et entrer le code R dans cet en
 |lang="R"
 |R
 |result=
-R version 4.0.2 (2020-06-22) -- "Taking Off Again"
-Copyright (C) 2020 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+R version 4.5.0 (2025-04-11) -- "How About a Twenty-Six"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
-
-  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -47,7 +45,7 @@ Type 'q()' to quit R.
 > q()
 }}
 
-Pour exécuter des scripts R, utilisez la commande <code>Rscript</code> suivie du fichier contenant les commandes R&nbsp;:
+Pour exécuter des scripts R de manière non interactive, utilisez la commande <code>Rscript</code> suivie du fichier contenant les commandes R&nbsp;:
 
 {{Command|Rscript computation.R}}
 
@@ -64,19 +62,20 @@ Voici un exemple de script simple :
 #SBATCH --account=def-someacct   # replace this with your own account
 #SBATCH --mem-per-cpu=2000M      # memory; default unit is megabytes
 #SBATCH --time=0-00:15           # time (DD-HH:MM)
-module load gcc/9.3.0 r/4.0.2              # Adjust version and add the gcc module used for installing packages.
+module load StdEnv/2023 r/4.5.0  # Adjust version as needed
 
 Rscript computation.R
 }}
 Pour plus d'information, consultez [[Running jobs/fr|Exécuter des tâches]].
 
+<span id="Installing_R_packages"></span>
 == Installation des paquets R == 
 
 === install.packages() ===
 
 Pour installer des paquets du [https://cran.r-project.org/ CRAN], vous pouvez utiliser <code>install.packages</code> dans une session R interactive sur un nœud de connexion. Puisque les nœuds de calcul de la plupart de nos grappes n'ont pas accès à l'internet, il n'est pas possible d'installer les paquets R dans une tâche en lots ou dans une tâche interactive. Parce que plusieurs paquets R sont développés avec la famille de compilateurs GNU, nous vous recommandons de [[Utiliser des modules|charger un module <code>gcc</code>]] avant de les installer et de toujours utilisez la même version du <code>gcc</code>.
 {{Command
-|module load gcc/9.3.0 r/4.0.2
+|module load gcc/12.3.0 r/4.5.0
 }}
 
 ==== Installation pour une version particulière de R ====
@@ -107,11 +106,7 @@ Dans le script de soumission, vous devez ensuite charger le module R que vous vo
 === Dépendances ===
 Certains paquets utilisent des bibliothèques qui sont déjà installées sur nos grappes. Si la bibliothèque se trouve dans la liste des [[Available software/fr|logiciels disponibles]], chargez le [[Utiliser des modules/en|module]] approprié avant d'installer le paquet.
 
-Par exemple, le paquet <code>rgdal</code> utilise la bibliothèque <code>gdal</code>. En lançant la commande <code>module spider gdal/2.2.1</code> nous voyons que les modules <code>nixpkgs</code> et <code>gcc</code> sont requis.  Si vous avez chargé <code>gcc</code> comme indiqué plus haut, ces deux modules devraient déjà être chargés. Vérifiez ceci avec la commande
-
-{{Command
-|module list
-}} 
+Par exemple, le paquet <code>rgdal</code> utilise la bibliothèque <code>gdal</code>. En lançant la commande <code>module spider gdal/2.2.1</code> nous voyons que les modules <code>nixpkgs</code> et <code>gcc</code> sont requis. Pour savoir comment charger ce module, entrez la commande <code>module spider gdal/3.9.1</code>.
 
 Si l'installation d'un paquet échoue, portez attention au message d'erreur qui pourrait indiquer d'autres modules qui seraient requis. Pour plus d'information sur les commandes de <code>module</code>, consultez [[Utiliser des modules]].
 
@@ -122,6 +117,7 @@ Si vous cherchez à installer un paquet que vous avez téléchargé, c'est-à-di
 |R CMD INSTALL -l 'path for your local (home) R library' archive_package.tgz
 }}
 
+<span id="Using_system_calls_in_R"></span>
 ==Appels système==
 
 La commande R <code>system()</code> permet d'exécuter des commandes dans l'environnement actif, à l'intérieur de R; ceci risque de causer des problèmes sur nos grappes parce que R donne une valeur incorrecte à la variable d'environnement <code>LD_LIBRARY_PATH</code>. Utilisez plutôt la syntaxe <code>system("LD_LIBRARY_PATH=$RSNT_LD_LIBRARY_PATH <my system call>")</code> dans vos appels système.
@@ -171,6 +167,7 @@ Ce script peut être utilisé comme suit
 [1] "Processing with name:'Hello' and number:'42'"
 }}
 
+<span id="Exploiting_parallelism_in_R"></span>
 ==Parallélisation==
 
 Si les processeurs de nos grappes sont on ne peut plus ordinaires, ce qui rend ces <i>supercalculateurs</i> intéressants, c'est qu'ils offrent des milliers de CPU sur un réseau très performant. Pour profiter de cet avantage, vous devez utiliser la programmation parallèle. Cependant, avant d'allouer beaucoup de temps et d'effort à paralléliser votre code R, assurez-vous que votre implémentation séquentielle est aussi efficiente que possible. Comme dans tout langage interprété, d'importants goulots d'étranglement (<i>bottlenecks</i>) sont causés par les boucles et particulièrement les boucles imbriquées, ce qui a un impact sur la performance. Lorsque possible, essayez d'utiliser les fonctions vectorielles et les autres éléments plus fonctionnels comme la famille des fonctions <code>apply</code> et la fonction <code>ifelse</code>. Vous obtiendrez souvent un gain de performance en éliminant une boucle plutôt que de paralléliser son exécution avec plusieurs cœurs CPU. 
@@ -197,6 +194,7 @@ La méthode générale pour utiliser foreach est :
 # enregistrez le paquet dorsal;
 # appelez foreach() en le laissant sur la même ligne que l'opérateur %do% (série) ou %dopar%.
 
+<span id="Running"></span>
 ====Exécution==== 
 
 1. Placez le code R dans un fichier script, ici le fichier <i>test_foreach.R</i>.
@@ -251,7 +249,8 @@ Copiez ce qui suit dans le script <i>job_foreach.sh</i>.
 #SBATCH --mail-user=yourname@someplace.com # Send email updates to you or someone else
 #SBATCH --mail-type=ALL          # send an email in all cases (job started, job ended, job aborted)
 
-module load gcc/9.3.0 r/4.0.2
+module load StdEnv/2023 r/4.5.0
+
 export R_LIBS=~/local/R_libs/
 R CMD BATCH --no-save --no-restore test_foreach.R
 
@@ -310,7 +309,7 @@ stopCluster(cl)
 #SBATCH --mem-per-cpu=512M      # mémoire par coeur CPU; valeur en Mo par défaut
 #SBATCH --time=00:05:00         # temps (HH:MM:SS)
 
-module load gcc/9.3.0 r/4.0.2
+module load StdEnv/2023 r/4.5.0
 
 # Export the nodes names. 
 # If all processes are allocated on the same node, NODESLIST contains : node1 node1 node1 node1
@@ -328,7 +327,6 @@ sont placés sur des nœuds différents, ajoutez la ligne <code>#SBATCH --ntasks
 Pour plus d'information sur comment soumettre une tâche, voyez [[Running jobs/fr|Exécuter des tâches]].
 
 === Rmpi ===
-Les directives qui suivent ne fonctionnent pas sur [[Cedar/fr|Cedar]]; utilisez plutôt une autre grappe.
 
 ====Installation====
 La procédure suivante installe [https://cran.r-project.org/web/packages/Rmpi/index.html Rmpi], une interface (<i>wrapper</i>) pour les routines MPI qui permet d'exécuter R en parallèle.
@@ -338,16 +336,16 @@ La procédure suivante installe [https://cran.r-project.org/web/packages/Rmpi/in
 module spider r
 </source>
 
-2.  Sélectionnez la version et chargez le module OpenMPI approprié. Dans notre exemple, la version 4.0.3 est utilisée, pour que les processus s'exécutent correctement.
+2.  Sélectionnez la version de R et chargez le module OpenMPI approprié.
  <source lang="bash">
-module load gcc/11.3.0
-module load r/4.2.1
-module load openmpi/4.1.4
+module load gcc/12.3
+module load openmpi/4.1.5
+module load r/4.5.0
 </source>
 
 3. Téléchargez [https://cran.r-project.org/web/packages/Rmpi/index.html la dernière version de Rmpi]  en remplaçant le numéro de la version selon le cas.
  <source lang="bash">
-wget https://cran.r-project.org/src/contrib/Rmpi_0.6-9.2.tar.gz
+wget https://cran.r-project.org/src/contrib/Rmpi_0.7-3.3.tar.gz
 </source>
 
 4. Indiquez le répertoire dans lequel vous voulez copier les fichiers; vous devez avoir une permission d'écriture pour ce répertoire. Le nom du répertoire peut être modifié.
@@ -358,11 +356,12 @@ export R_LIBS=~/local/R_libs/
 
 5. Lancez la commande d'installation.
  <source lang="bash">
-R CMD INSTALL --configure-args="--with-Rmpi-include=$EBROOTOPENMPI/include   --with-Rmpi-libpath=$EBROOTOPENMPI/lib --with-Rmpi-type='OPENMPI' " Rmpi_0.6-9.2.tar.gz 
+R CMD INSTALL --configure-args="--with-Rmpi-include=$EBROOTOPENMPI/include   --with-Rmpi-libpath=$EBROOTOPENMPI/lib --with-Rmpi-type='OPENMPI' " Rmpi_0.7-3.3.tar.gz 
 </source>
 
 Portez attention au message d'erreur qui s'affiche quand l'installation d'un paquet échoue; il pourrait indiquer d'autres modules qui seraient nécessaires.
 
+<span id="Running"></span>
 ====Exécution====
 
 1. Placez le code R dans un fichier script, ici le fichier <i>test.R</i>.
@@ -401,9 +400,8 @@ mpi.quit()
 #SBATCH --mem-per-cpu=2048M      # mémoire par coeur CPU; valeur en Mo par défaut
 #SBATCH --time=0-00:15           # temps (JJ-HH:MM)
 
-module load gcc/11.3.0
-module load r/4.2.1
-module load openmpi/4.1.4
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 r/4.5.0
+
 export R_LIBS=~/local/R_libs/
 mpirun -np 1 R CMD BATCH test.R test.txt
 }}

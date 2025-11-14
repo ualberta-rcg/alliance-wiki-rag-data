@@ -3,21 +3,22 @@
 __FORCETOC__
 [https://www.3ds.com/products-services/simulia/products/abaqus/ Abaqus FEA] est un progiciel commercial pour l'analyse d'éléments finis et l'ingénierie assistée par ordinateur.
 
-<div class="mw-translate-fuzzy">
 = Votre licence =
-Des modules Abaqus sont disponibles sur nos grappes, mais vous devez posséder votre propre licence. Pour configurer votre compte sur les grappes que vous voulez utiliser, connectez-vous et créez sur chacune un fichier <code>$HOME/.licenses/abaqus.lic</code> qui contient les deux lignes suivantes, pour les versions 202X et 6.14.1 respectivement. Remplacez ensuite <code>port@server</code> par le numéro du port flexlm et l'adresse IP (ou le nom complet du domaine) de votre serveur de licence Abaqus.
-</div>
+Des modules Abaqus sont disponibles sur nos grappes, mais vous devez posséder votre propre licence. Pour configurer votre compte sur les grappes que vous voulez utiliser, connectez-vous et créez sur chacune un fichier <code>$HOME/.licenses/abaqus.lic</code> qui contient la ligne suivante. Remplacez ensuite <code>port@server</code> par le numéro du port flexlm et l'adresse IP (ou le nom complet du domaine) de votre serveur de licence Abaqus. Si vous voulez utiliser la version 6.14.1, remplacez ABAQUSLM_LICENSE_FILE par LM_LICENSE_FILE.
 
-<div class="mw-translate-fuzzy">
+{{File
+|name=abaqus.lic
+|contents=
+prepend_path("ABAQUSLM_LICENSE_FILE","port@server")
+}}
 Si votre licence n'est pas configurée pour une grappe en particulier, les administrateurs de systèmes des deux parties devront effectuer certaines modifications. Ceci est nécessaire pour que les ports flexlm et TCP de votre serveur Abaqus puissent être rejoints par tous les nœuds de calcul quand vos tâches dans la queue seront exécutées. Pour que nous puissions vous assister dans cette tâche, écrivez au [[Technical support/fr|soutien technique]] en indiquant
 * le numéro du port flexlm
 * le numéro du port statique
 * l'adresse IP de votre serveur de licence Abaqus.
 En retour vous recevrez une liste d'adresses IP et votre administrateur de système pourra ouvrir les pare-feu de votre serveur local pour que la grappe puisse se connecter via les deux ports. Une entente spéciale doit habituellement être négociée et signée avec SIMULIA pour qu'une telle licence puisse être utilisée à distance avec notre matériel.
-</div>
 
-= Cluster job submission =
-Below are prototype Slurm scripts for submitting thread and mpi-based parallel simulations to single or multiple compute nodes.  Most users will find it sufficient to use one of the <b>project directory scripts</b> provided in the <i>Single node computing</i> sections. The optional <code>memory=</code> argument found in the last line of the scripts is intended for larger memory or problematic jobs where 3072MB offset value may require tuning.  A listing of all Abaqus command line arguments can be obtained by loading an Abaqus module and running: <code>abaqus -help | less</code>.
+= Soumettre une tâche sur nor grappes=
+Vous trouverez ci-dessous des prototypes de scripts Slurm pour soumettre des simulations parallèles sur un ou plusieurs nœuds de calcul en utilisant des fils et MPI. Dans la plupart des cas, il suffira d'utiliser un des scripts du répertoire /project dans une des sections pour un nœud simple. Dans la dernière ligne des scripts, l'argument <code>memory=</code> est optionnel et sert aux tâches qui demandent beaucoup de mémoire ou qui posent problème; la valeur de déplacement de 3072Mo pourrait nécessiter un ajustement. Pour obtenir la liste des arguments en ligne de commande, chargez un module Abaqus et lancez <code>abaqus -help | less</code>.
 
 Pour une tâche sur un nœud simple d'une durée de moins de 24 heures, le <i>script du répertoire /project</i> sous le premier onglet devrait suffire. Pour une tâche de plus longue durée, utilisez un script de redémarrage.
 
@@ -499,58 +500,36 @@ MINIMISER LES ENTRÉES/SORTIES. SI LA LIMITE SUPÉRIEURE DE MÉMOIRE EST SUPÉRI
 MENTIONNÉE PRÉCÉDEMMENT, ET L'UTILISATION DU DISQUE /SCRATCH SERA À PEU PRÈS PROPORTIONNELLE À LA DIFFÉRENCE
 ENTRE <CODE>MEMORY TO MINIMIZE I/O</CODE> ESTIMÉE ET LA LIMITE SUPÉRIEURE DE LA MÉMOIRE. TOUTEFOIS, IL EST IMPOSSIBLE D'ÉVALUER AVEC PRÉCISION L'ESPACE /SCRATCH DU DISQUE.
 
-<div class="mw-translate-fuzzy">
 = Mode graphique =
-Abaqus peut être utilisé interactivement en mode graphique sur une grappe ou sur gra-vdi avec VCN.
-</div> 
+Sur nos grappes, il est maintenant recommandé d'utiliser Open OnDemand ou JupyterLab pour travailler avec des applications graphiques. 
 
-<span id="OnDemand"></span>
-<div class="mw-translate-fuzzy">
-== Sur gra-vdi ==
-1. [[VNC/fr#Nœuds_VDI|Connectez-vous à un nœud VDI (durée maximale 24 heures) avec TigerVNC]].<br>
-2. Ouvrez une nouvelle fenêtre de terminal et entrez un des énoncés suivants&nbsp;:
- module load StdEnv/2016 abaqus/6.14.1 ou
- module load StdEnv/2016 abaqus/2020 ou 
- module load StdEnv/2020 abaqus/2021
-3. Lancez l'application avec<br>
- abaqus cae
-</div>
+== OnDemand ==
 
-1. Connect to an OnDemand system using one of the following URLs in your laptop browser :<br>
- [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) NIBI]: <code>https://ondemand.sharcnet.ca</code>
+1. Dans votre navigateur, connectez-vous à un système OnDemand avec une des adresses suivantes .<br>
+
+[https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) NIBI]: <code>https://ondemand.sharcnet.ca</code>
  FIR: <code>https://jupyterhub.fir.alliancecan.ca</code>
  RORQUAL: <code>https://jupyterhub.rorqual.alliancecan.ca</code>
  TRILLIUM: <code>https://ondemand.scinet.utoronto.ca</code>
-2. Open a new terminal window within your desktop and load one of :
- module load StdEnv/2020 abaqus/2021, or
- module load StdEnv/2023 abaqus/2025 <- coming soon
-3. Start the application in graphical mode:<br>
+
+2. Ouvrez une nouvelle fenêtre de terminal et chargez 
+ module load StdEnv/2020 abaqus/2021 OU
+ module load StdEnv/2023 abaqus/2025 (en préparation)
+3. Lancez l'application en mode graphique avec<br>
  abaqus cae
 
-<div class="mw-translate-fuzzy">
-Pour qu'Abaqus puisse démarrer en mode graphique, il faut au moins une licence CAE libre (non utilisée). La licence SHARCNET comporte 2 licences libres et 2 licences réservées. Si les 4 sont utilisées selon
-</div>
+Pour lancer Abaqus en mode graphique, il faut au moins une licence CAE non utilisée, selon
 
-<div class="mw-translate-fuzzy">
-[gra-vdi3:~] abaqus licensing lmstat -c $ABAQUSLM_LICENSE_FILE -a | grep "Users of cae"
- Users of cae:  (Total of 4 licenses issued;  Total of 4 licenses in use)
-</div>
+ $ abaqus licensing lmstat -c $ABAQUSLM_LICENSE_FILE -a | grep "Users of cae"
+ Users of cae:  (Total of 4 licenses issued;  Total of 3 licenses in use)
 
-<span id="VncViewer"></span>
-<div class="mw-translate-fuzzy">
-== Sur une grappe ==
-1. [[VNC/fr#Nœuds_de_calcul|Connectez-vous à un nœud de calcul (durée maximale 3 heures) avec TigerVNC]].<br>
+== VncViewer ==
+
+1. Connectez-vous à un client VncViewer comme décrit dans [[VNC/frTigerVNC]].<br>
 2. Ouvrez une nouvelle fenêtre de terminal et entrez
- module load StdEnv/2020 abaqus/2021
+ module load StdEnv/2020 abaqus/2021 OU
+ module load StdEnv/2023 abaqus/2025 (en préparation)
 3. Lancez l'application avec<br>
- abaqus cae -mesa
-</div>
-
-1. Connect with a VncViewer client to a login or compute node by following [[VNC|TigerVNC]]<br>
-2. Open a new terminal window and enter the following<br>
- module load StdEnv/2020 abaqus/2021, or
- module load StdEnv/2023 abaqus/2025 <- coming soon
-3. Start the application with<br>
  abaqus cae -mesa
 
 = Site-specific use =
@@ -574,22 +553,18 @@ for the following purposes:
    facts, up to the point of proof-of-concept in a laboratory    
 -----------------------------------------------------------------------------------</pre>
 
-<div class="mw-translate-fuzzy">
 === Configurer le fichier de licence ===
-Configurez votre fichier de licence comme suit (pour utilisation uniquement sur les systèmes SHARCNET Graham, gra-vdi et Dusky).
-</div>  
+Configurez votre fichier de licence comme suit (uniquement sur les systèmes SHARCNET comme les grappes Nibi et Dusky) ou sur le système de bureau OOD de SHARCNET.  
 <source lang="bash">
 [l2 (nibi login node):~] cat ~/.licenses/abaqus.lic
 prepend_path("ABAQUSLM_LICENSE_FILE","27050@license3.sharcnet.ca")
 </source>
 
-<div class="mw-translate-fuzzy">
-Si vos tâches se terminent anormalement et que le fichier de sortie de l'ordonnanceur contient le message d'erreur ''*** ABAQUS/eliT_CheckLicense rank 0 terminated by signal 11 (Segmentation fault)'', vérifiez si votre fichier  <code>abaqus.lic</code> contient  ''ABAQUSLM_LICENSE_FILE'' pour Abaqus/2020. 
-Si le fichier de sortie contient ''License server machine is down or not responding etc.'',  vérifiez si le fichier <code>abaqus.lic</code> contient ''LM_LICENSE_FILE'' pour Abaqus/6.14.1, comme montré. Puisque le fichier <code>abaqus.lic</code> montré contient les deux énoncés, vous ne devriez pas avoir ce problème.
-</div>
+Si votre tâche se termine anormalement avec le message d'erreur ''*** ABAQUS/eliT_CheckLicense rank 0 terminated by signal 11 (Segmentation fault)'', vérifiez si votre fichier  <code>abaqus.lic</code> contient  ''ABAQUSLM_LICENSE_FILE'' pour Abaqus/202X. 
+Si le message d'erreur est ''License server machine is down or not responding etc.'' et que vous utilisez Abaqus/6.14.1, remplacez ABAQUSLM_LICENSE_FILE par LM_LICENSE_FILE.
 
-=== Query license server ===
-Log into nibi cluster, load abaqus and then run one of the following:
+=== Interroger le serveur de licences===
+Connectez-vous à Nibi, chargez Abaqus et exécutez une des commandes suivantesnbsp;:
 <source lang="bash">
 ssh nibi.alliancecan.ca
 module load StdEnv/2020
@@ -644,14 +619,11 @@ où TOKENS = floor[5 X CORES^0.422]
 
 Chaque GPU nécessite un jeton additionnel.
 
-== Western license ==
-The Western site license may only be used by Western researchers on hardware located at Western's campus.  Currently, only the Dusky cluster satisfies this condition. Nibi and SHARCNET OOD system are excluded since they are located on Waterloo's campus.  Contact the Western Abaqus license server administrator <jmilner@robarts.ca> to inquire about using the Western Abaqus license.  You will need to provide your username and possibly make arrangements to purchase tokens.  If you are granted access then you may proceed to configure your <code>abaqus.lic</code> file to point to the Western license server:
+== Licence Western ==
+La licence du site Western est réservée aux chercheuses et chercheurs de Western et ne peut être utilisée que sur du matériel situé sur le campus. Actuellement, seul la grappe Dusky remplit cette condition. Nibi et le système SHARCNET OOD sont exclus, car ils sont situés sur le campus de Waterloo. Pour toute question concernant l'utilisation de la licence Abaqus de Western, veuillez contacter l'administrateur à l'adresse <jmilner@robarts.ca>. Vous devrez fournir votre nom d'utilisateur et possiblement prévoir l'achat de jetons. Si votre demande est acceptée, vous pourrez configurer votre fichier <code>abaqus.lic</code> pour qu'il pointe vers le serveur de licences de Western.
 
 <span id="Configure_license_file"></span>
-<div class="mw-translate-fuzzy">
 ===Configurer le fichier de licences===
-Configurez votre fichier de licence comme suit (pour utilisation uniquement sur Dusky).
-</div>
 
 <source lang="bash">
 [dus241:~] cat .licenses/abaqus.lic

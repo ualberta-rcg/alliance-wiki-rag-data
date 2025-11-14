@@ -45,10 +45,8 @@ namd3 +p$SLURM_CPUS_PER_TASK  +idlepoll +setcpuaffinity stmv.namd
 
 
 
-<div class="mw-translate-fuzzy">
 ===Tâches UCX===
-L'exemple suivant utilise 80 processus à raison de 40 processus par nœud sur 2 nœuds et utilise ainsi pleinement les 80 cœurs. Le script  suppose que des nœuds entiers sont utilisés; ainsi, sur Béluga, <code>ntasks-per-node</code> devrait être 40. Les tâches NAMD qui utilisent des nœuds entiers offrent la meilleure performance.
-</div>
+L'exemple suivant est pour 384 tâches sur 2 nœuds à raison de 192 tâches par nœud. Le script suppose que des nœuds entiers sont utilisés; ainsi, <code>ntasks-per-node</code> devrait être égal au nombre de cœurs disponibles pour le nœud (192 sur Fir, Rorqual, Nibi et Trillium). Pour une meilleure performance, les tâches UCX devraient utiliser des nœuds entiers. Utilisez la version UCX uniquement si la version multicœurs de NAMD ne convient pas à vos besoins et que vous avez besoin de plusieurs nœuds.
 
 {{File
   |name=ucx_namd_job.sh
@@ -70,10 +68,8 @@ srun --mpi=pmi2 namd3 stmv.namd
 
 
 
-<div class="mw-translate-fuzzy">
-=== Tâches utilisant 1 GPU ===
-Le prochain exemple utilise huit cœurs CPU et un GPU P100 sur un seul nœud.
-</div>
+=== Tâches multifil avec GPU ===
+Le prochain exemple utilise 16 cœurs CPU et un GPU P100 sur un seul nœud. Le nombre de cœurs CPU et de GPU peut être augmenté jusqu'au maximum pour le nœud.
 
 '''Important''' : NAMD 3 offre un nouveau paramètre d’entrée, ce qui dirige plus de calculs vers le GPU. Cela peut améliorer considérablement la performance.
 
@@ -99,15 +95,11 @@ namd3 +p$SLURM_CPUS_PER_TASK  +idlepoll stmv.namd
 }}
 
 
-<div class="mw-translate-fuzzy">
-== Tâches utilisant plusieurs GPU ==
+== Tâches avec plusieurs nœuds GPU ==
 === Tâches UCX avec GPU ===
-Cet exemple est pour Béluga et suppose que des nœuds entiers sont utilisés, ce qui offre une meilleure performance pour les tâches NAMD. L'exemple utilise 8 processus sur 2 nœuds, chaque processus utilisant 10 fils et 1 GPU. Ceci utilise pleinement les nœuds GPU de Béluga qui ont 40 cœurs et 4 GPU par nœud. Remarquez que 1 cœur par tâche est réservé à un fil de communication; il est donc normal que NAMD ne rapporte que 72 cœurs utilisés.
-</div>
+Puisqu'un seul nœud GPU offre une bonne puissance de calcul, leur utilisation est justifiée uniquement quand la tâche peut les utiliser à leur plein potentiel.
 
-<div class="mw-translate-fuzzy">
-Cet exemple est pour Narval et suppose que des nœuds entiers sont utilisés, ce qui offre une meilleure performance pour les tâches NAMD. L'exemple utilise 8 processus sur 2 nœuds, chaque processus utilisant 12 fils et 1 GPU. Ceci utilise pleinement les nœuds GPU de Narval qui ont 48 cœurs et 4 GPU par nœud. Remarquez que 1 cœur par tâche est réservé à un fil de communication; il est donc normal que NAMD ne rapporte que 88 cœurs utilisés.
-</div>  
+Cet exemple est pour Narval et suppose que des nœuds entiers sont utilisés, ce qui offre une meilleure performance pour les tâches NAMD. L'exemple est pour 8 tâches sur 2 nœuds, chacune utilisant 12 fils et 1 GPU. Ceci utilise pleinement les nœuds GPU de Narval qui ont 48 cœurs et 4 GPU par nœud. Remarquez que 1 cœur par tâche est réservé à un fil de communication; il est donc normal que NAMD ne rapporte que 88 cœurs utilisés.  
 
 Pour utiliser ce script sur une autre grappe, voyez les caractéristiques des nœuds disponibles sur la grappe et ajustez les options --cpus-per-task et --gpus-per-node en conséquence.
 

@@ -58,7 +58,7 @@ pip install torch --no-index
 python pytorch-test.py
 }}
 
-See https://docs.alliancecan.ca/wiki/Allocations_and_compute_scheduling#Ratios_in_bundles for more information on the appropriate number of CPUs and Memory per GPU for each cluster.
+See [[Allocations and compute scheduling#Ratios_in_bundles|Ratios in bundles]] for more information on the appropriate number of CPUs and Memory per GPU for each cluster.
 
 The Python script <code>pytorch-test.py</code> has the form
 
@@ -389,7 +389,7 @@ Using this approach may provide a significant speed-up by iterating through all 
 
 An important caveat of this approach, is that in order to get a trained model that is equivalent to the same model trained without Data Parallelism, the user must scale either the learning rate or the desired batch size in function of the number of replicas. See [https://discuss.pytorch.org/t/should-we-split-batch-size-according-to-ngpu-per-node-when-distributeddataparallel/72769/13 this discussion] for more information. 
 
-In the multiple-GPU case, each GPU hosts a replica of your model. Consequently, the model must be '''small enough to fit inside the memory of a single GPU'''. Refer to the sections on Model Parallelism further down this page for options on how to train very large models that do not fit inside a single GPU.
+In the multiple-GPU case, each GPU hosts a replica of your model. Consequently, the model must be '''small enough to fit inside the memory of a single GPU'''.
 
 There are several ways to perform Data Parallelism using PyTorch. This section features tutorials on three of them: using the '''DistributedDataParallel''' class directly with one or multiple GPUs, and using the '''PyTorch Lightning''' package.
 
@@ -685,7 +685,7 @@ if __name__=='__main__':
 
 In cases where a model is fairly small, such that it does not take up a large portion of GPU memory and it cannot use a reasonable amount of its compute capacity, it is <b>not advisable to use a GPU</b>. Use [[PyTorch#PyTorch_with_Multiple_CPUs|one or more CPUs]] instead. However, in a scenario where you have such a model, but have a very large dataset and wish to perform training with a small batch size, taking advantage of Data parallelism on a GPU becomes a viable option. 
 
-In the example that follows, we adapt the code from the previous section to run on a single GPU. This task is fairly small - with a batch size of 512 images, our model takes up about 1GB of GPU memory space, and it uses only about 6% of its compute capacity during training. This is a model that '''should not''' be trained on our a GPU on our clusters. However, using Data Parallelism, we can fit several replicas of this model on a single GPU and increase our resource usage, while getting a nice speed-up. We use Nvidia's [https://docs.nvidia.com/deploy/mps/index.html Multi-Process Service (MPS)], along with [https://docs.computecanada.ca/wiki/MPI MPI] to efficiently place multiple model replicas on one GPU:
+In the example that follows, we adapt the code from the previous section to run on a single GPU. This task is fairly small - with a batch size of 512 images, our model takes up about 1GB of GPU memory space, and it uses only about 6% of its compute capacity during training. This is a model that '''should not''' be trained on a GPU on our clusters. However, using Data Parallelism, we can fit several replicas of this model on a single GPU and increase our resource usage, while getting a nice speed-up. We use Nvidia's [https://docs.nvidia.com/deploy/mps/index.html Multi-Process Service (MPS)], along with [https://docs.computecanada.ca/wiki/MPI MPI] to efficiently place multiple model replicas on one GPU:
 
 {{File
   |name=pytorch-gpu-mps.sh

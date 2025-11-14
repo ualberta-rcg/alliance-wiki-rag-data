@@ -1,4 +1,5 @@
 <languages />
+
 [https://www.nextflow.io Nextflow] est un logiciel permettant d'exécuter des flux de travail scientifiques reproductibles. Le terme <i>Nextflow</i> est utilisé pour décrire à la fois le langage spécifique au domaine (DSL) dans lequel les pipelines sont écrits et le logiciel utilisé pour interpréter ces flux de travail.
 
 
@@ -7,155 +8,265 @@ Chargez le module Nextflow avec <code>module load nextflow</code>.
 
 Bien que vous puissiez créer votre propre flux de travail, vous pouvez également utiliser les pipelines  [https://nf-co.re/ nf-core] qui sont publiés. Nous décrivons ici une configuration simple qui vous permettra d'exécuter des pipelines nf-core sur nos systèmes et vous aidera à configurer correctement Nextflow pour vos propres pipelines.
 
-Dans notre exemple, nous utilisons le pipeline  <code>nf-core/smrnaseq</code>. 
+<div class="mw-translate-fuzzy">
+Dans notre exemple, nous utilisons le pipeline  <code>nf-core/smrnaseq</code>.
+</div> 
 
-==== Installation ====
-Cette procédure doit être exécutée sur un nœud de connexion. 
+<div lang="en" dir="ltr" class="mw-content-ltr">
+* Step 1: Set up the configuration file.
+* Step 2: Install nf-core.
+* Step 3: Download the container image and pipeline.
+* Step 4: Prepare the inputs.
+* Step 5: Create a job script.
+</div>
 
-Installez d'abord un paquet pip pour aider à la configuration; veuillez noter que les outils nf-core peuvent prendre beaucoup de temps à installer.
+<div lang="en" dir="ltr" class="mw-content-ltr">
+==== Step 1: Set up the configuration file ====
+</div>
+
+<div class="mw-translate-fuzzy">
+Vous pouvez obtenir de [https://github.com/nf-core/configs/blob/master/conf/alliance_canada.confignf nf-core] un fichier de configuration pour nos grappes et le placer dans <code>~/.nextflow/config</code>.
+Si vous utilisez ce fichier sur Fir, le profil doit être chargé avec l'indicateur <code>-profile fir</code> pour la commande <code>nextflow</code>. Sur les autres grappes, le profil est sélectionné automatiquement selon le nom de l'hôte.
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+<syntaxhighlight lang="bash">
+curl -o ~/.nextflow/config https://raw.githubusercontent.com/nf-core/configs/refs/heads/master/conf/alliance_canada.config
+</syntaxhighlight>
+</div>
+
+<div class="mw-translate-fuzzy">
+Il faut configurer la variable d'environnement <code>$SLURM_ACCOUNT</code> (semblable à <code>def-pname</code>), ce qui peut se faire dans le fichier <code>~/.bashrc</code>.
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+<syntaxhighlight lang="bash">
+export SLURM_ACCOUNT=def-pname
+</syntaxhighlight>
+</div>
+
+<div class="mw-translate-fuzzy">
+Cette configuration garantit qu'il n'y a pas plus de 100 tâches dans la file d'attente Slurm et que seul 60 tâches sont soumises par minute. Elle indique que les nœuds de calcul de Rorqual ont 192&nbsp;cœurs et 750GB de RAM avec un temps réel maximum d'exécution d'une semaine (168&nbsp;heures). Ceci est différent sur Trillium puisque les nœuds sont configurés autrement. Comme un seul nœud entier est demandé à la fois, la mémoire et les CPU ne sont pas spécifiés.
+</div> 
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+'''We discourage you from running nf-core pipelines or any other generic Nextflow pipeline on Trillium.''' We recommend running a pipeline on [[Trillium]] only if it was designed specifically for Trillium.
+</div>
+
+<div class="mw-translate-fuzzy">
+La configuration est liée au système sur lequel se fait l'exécution, mais elle est également liée au pipeline lui-même. Par exemple, ici <code>cpu = 1</code> est la valeur par défaut, mais certaines étapes du pipeline peuvent en utiliser plus. Cela peut devenir assez compliqué et les étiquettes dans le fichier <code>nf-core-smrnaseq_2.3.1/2_3_1/conf/base.config</code> sont utilisées par le pipeline à l'interne pour identifier une étape avec une configuration autre que celle par défaut. Nous n'abordons pas ce sujet ici, mais sachez qu'en modifiant ces étiquettes, vous pourriez observer des différences importantes dans le temps de mise en file d'attente et le temps d'exécution du pipeline.
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+==== Step 2. Install nf-core ====
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+To use nf-core pipelines on an Alliance cluster, the pipelines must be downloaded on a login node because some clusters do not allow internet access from the compute nodes.
+Run the following on a '''login node''' to install <code>nf-core</code>. 
 <source lang="bash">
-module purge # assurez-vous que les modules déjà chargés ne polluent pas l'installation 
+module purge 
 module load python/3.11
-module load rust # sans rust, les installations nf-core se termineront en erreur
-module load postgresql # PostgresSQL ne sera pas utilisé ici mais certains modules Python qui ont psycopg2 comme dépendance pourraient planter
+module load rust         # New nf-core installations will error out if rust hasn't been loaded
+module load postgresql   # Python modules which list psycopg2 as a dependency may crash without postgresql here.
 python -m venv nf-core-env
 source nf-core-env/bin/activate
 python -m pip install nf_core==2.13
 </source>
+</div>
 
-Entrez le nom du pipeline à tester et chargez Nextflow et [[Apptainer/fr|Apptainer]] (Apptainer a succédé à  [[Singularity/fr|Singularity]]). Nextflow s'intègre bien à Apptainer. 
+<div lang="en" dir="ltr" class="mw-content-ltr">
+We use <code>pip</code> to install a [[Python]] package to help with the setup. The nf-core tools can be slow to install; this step may take several minutes.
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+==== Step 3. Download the container images and the pipeline ====
+Set the name of the pipeline to be tested, and load Nextflow and the container utility [[Apptainer]]. 
+Nextflow integrates well with Apptainer. 
+As noted above, we are using hte <code>rna-seq</code> pipeline as an example.
+</div> 
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
 <source lang="bash">
-export NFCORE_PL=smrnaseq
-export PL_VERSION=2.3.1
-module load nextflow/23
-module load apptainer/1
+export NFCORE_PL=rnaseq
+export PL_VERSION=3.21.0
+module load nextflow
+module load apptainer
 </source>
-Une étape importante consiste à télécharger toutes les images Apptainer qui seront utilisées pour exécuter le pipeline, en même temps que nous téléchargeons le flux de travail lui-même. Si cela n'est pas fait, Nextflow essaiera de télécharger les images à partir des nœuds de calcul, juste avant l'exécution des étapes. Cela ne fonctionnera pas sur la plupart de nos grappes car il n'y a pas de connexion internet sur les nœuds de calcul.
+</div>
 
-Créez un dossier dans lequel les images seront stockées et configurez la variable d'environnement <code>NXF_SINGULARITY_CACHEDIR</code> pour y pointer. Les images des flux de travail sont souvent volumineuses; ne les stockez donc pas dans votre espace $HOME car son quota est limité. Stockez-les plutôt dans l'espace <code>/project</code>. 
+<div lang="en" dir="ltr" class="mw-content-ltr">
+Create a directory to use as a cache:
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
 <source lang="bash">
 mkdir /project/<def-group>/NXF_SINGULARITY_CACHEDIR
 export NXF_SINGULARITY_CACHEDIR=/project/<def-group>/NXF_SINGULARITY_CACHEDIR
 </source>
+</div>
 
-Partagez ce dossier avec les membres de votre groupe qui utiliseront Nextflow avec Apptainer, afin de réduire la duplication.
-De plus, vous pouvez ajouter la commande <code>export</code> à votre <code>~/.bashrc</code> pour plus de commodité.
+<div lang="en" dir="ltr" class="mw-content-ltr">
+Nextflow will store container images in the directory pointed to by <code>$NXF_SINGULARITY_CACHEDIR</code>. 
+"Singularity" was a predecessor to "Apptainer" so the name of the variable still reflects that.
+Workflow images tend to be big, so do not store them in your $HOME space because it has a small quota. 
+Instead, store them in <code>/project</code> space.
+</div> 
 
-La commande suivante télécharge le pipeline <code>smrnaseq</code> dans votre répertoire /scratch et place toutes les images dans le répertoire cache.
+<div lang="en" dir="ltr" class="mw-content-ltr">
+You should share this folder with other members of your group who are planning to use Nextflow with Apptainer, in order to reduce duplication and save space.
+Also, you may add the <code>export</code> command to your <code>~/.bashrc</code> as a convenience.
+</div>
 
+<div lang="en" dir="ltr" class="mw-content-ltr">
+Run the following command to download the <code>rnaseq</code> pipeline and container images.
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
 <source lang="bash">
 cd ~/scratch
-nf-core download   --container-cache-utilisation amend --container-system  singularity   --compress none -r ${PL_VERSION}  -p 6  ${NFCORE_PL}
-# Alteratively, you can run the download tool in interactive mode
-nf-core download
-# Here is what your Singularity image cache will look like after completion:
-ls  $NXF_SINGULARITY_CACHEDIR/
-depot.galaxyproject.org-singularity-bioconvert-1.1.1--pyhdfd78af_0.img
-depot.galaxyproject.org-singularity-blat-36--0.img
-depot.galaxyproject.org-singularity-bowtie-1.3.1--py310h7b97f60_6.img
-depot.galaxyproject.org-singularity-bowtie2-2.4.5--py39hd2f7db1_2.img
-depot.galaxyproject.org-singularity-fastp-0.23.4--h5f740d0_0.img
-depot.galaxyproject.org-singularity-fastqc-0.12.1--hdfd78af_0.img
-depot.galaxyproject.org-singularity-fastx_toolkit-0.0.14--hdbdd923_11.img
-depot.galaxyproject.org-singularity-mirdeep2-2.0.1.3--hdfd78af_1.img
-depot.galaxyproject.org-singularity-mirtrace-1.0.1--hdfd78af_1.img
-depot.galaxyproject.org-singularity-mulled-v2-0c13ef770dd7cc5c76c2ce23ba6669234cf03385-63be019f50581cc5dfe4fc0f73ae50f2d4d661f7-0.img
-depot.galaxyproject.org-singularity-mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1-f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0.img
-depot.galaxyproject.org-singularity-mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3-40128b496751b037e2bd85f6789e83d4ff8a4837-0.img
-depot.galaxyproject.org-singularity-multiqc-1.21--pyhdfd78af_0.img
-depot.galaxyproject.org-singularity-pigz-2.3.4.img
-depot.galaxyproject.org-singularity-r-data.table-1.12.2.img
-depot.galaxyproject.org-singularity-samtools-1.19.2--h50ea8bc_0.img
-depot.galaxyproject.org-singularity-seqcluster-1.2.9--pyh5e36f6f_0.img
-depot.galaxyproject.org-singularity-seqkit-2.6.1--h9ee0642_0.img
-depot.galaxyproject.org-singularity-ubuntu-20.04.img
-depot.galaxyproject.org-singularity-umicollapse-1.0.0--hdfd78af_1.img
-depot.galaxyproject.org-singularity-umi_tools-1.1.5--py39hf95cd2a_0.img
-quay.io-singularity-bioconvert-1.1.1--pyhdfd78af_0.img
-quay.io-singularity-blat-36--0.img
-quay.io-singularity-bowtie-1.3.1--py310h7b97f60_6.img
-quay.io-singularity-bowtie2-2.4.5--py39hd2f7db1_2.img
-quay.io-singularity-fastp-0.23.4--h5f740d0_0.img
-quay.io-singularity-fastqc-0.12.1--hdfd78af_0.img
-quay.io-singularity-fastx_toolkit-0.0.14--hdbdd923_11.img
-quay.io-singularity-mirdeep2-2.0.1.3--hdfd78af_1.img
-quay.io-singularity-mirtrace-1.0.1--hdfd78af_1.img
-quay.io-singularity-mulled-v2-0c13ef770dd7cc5c76c2ce23ba6669234cf03385-63be019f50581cc5dfe4fc0f73ae50f2d4d661f7-0.img
-quay.io-singularity-mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1-f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0.img
-quay.io-singularity-mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3-40128b496751b037e2bd85f6789e83d4ff8a4837-0.img
-quay.io-singularity-multiqc-1.21--pyhdfd78af_0.img
-quay.io-singularity-pigz-2.3.4.img
-quay.io-singularity-r-data.table-1.12.2.img
-quay.io-singularity-samtools-1.19.2--h50ea8bc_0.img
-quay.io-singularity-seqcluster-1.2.9--pyh5e36f6f_0.img
-quay.io-singularity-seqkit-2.6.1--h9ee0642_0.img
-quay.io-singularity-ubuntu-20.04.img
-quay.io-singularity-umicollapse-1.0.0--hdfd78af_1.img
-quay.io-singularity-umi_tools-1.1.5--py39hf95cd2a_0.img
-singularity-bioconvert-1.1.1--pyhdfd78af_0.img
-singularity-blat-36--0.img
-singularity-bowtie-1.3.1--py310h7b97f60_6.img
-singularity-bowtie2-2.4.5--py39hd2f7db1_2.img
-singularity-fastp-0.23.4--h5f740d0_0.img
-singularity-fastqc-0.12.1--hdfd78af_0.img
-singularity-fastx_toolkit-0.0.14--hdbdd923_11.img
-singularity-mirdeep2-2.0.1.3--hdfd78af_1.img
-singularity-mirtrace-1.0.1--hdfd78af_1.img
-singularity-mulled-v2-0c13ef770dd7cc5c76c2ce23ba6669234cf03385-63be019f50581cc5dfe4fc0f73ae50f2d4d661f7-0.img
-singularity-mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1-f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0.img
-singularity-mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3-40128b496751b037e2bd85f6789e83d4ff8a4837-0.img
-singularity-multiqc-1.21--pyhdfd78af_0.img
-singularity-pigz-2.3.4.img
-singularity-r-data.table-1.12.2.img
-singularity-samtools-1.19.2--h50ea8bc_0.img
-singularity-seqcluster-1.2.9--pyh5e36f6f_0.img
-singularity-seqkit-2.6.1--h9ee0642_0.img
-singularity-ubuntu-20.04.img
-singularity-umicollapse-1.0.0--hdfd78af_1.img
-singularity-umi_tools-1.1.5--py39hf95cd2a_0.img
+mkdir -p nf-test && cd nf-test
+nf-core download --container-cache-utilisation amend --container-system singularity --compress none -r ${PL_VERSION}  -p 6  ${NFCORE_PL}
 </source>
+</div>
 
-Ce flux de travail télécharge 18 conteneurs pour un total d'environ 4Go et crée le dossier <code>nf-core-${NFCORE_PL}_${PL_VERSION}</code> avec les sous-dossiers <code>X_X_X</code> et <code>config</code>. Le sous-dossier <code>config</code> inclut la [https://github.com/nf-core/configs configuration pour votre établissement], tandis que le flux de travail se trouve dans l'autre sous-dossier.
+<div lang="en" dir="ltr" class="mw-content-ltr">
+Type "Y" when you see <code>Include the nf-core's default institutional configuration files into the download? (Y/n)</code>
+</div>
 
-Un pipeline type nf-code ressemble à ceci&nbsp;:
-<source lang="bash">
-ls nf-core-${NFCORE_PL}_${PL_VERSION}/2_3_1
-assets        CITATIONS.md        docs     modules          nextflow_schema.json  subworkflows
-bin           CODE_OF_CONDUCT.md  LICENSE  modules.json     pyproject.toml        tower.yml
-CHANGELOG.md  conf                main.nf  nextflow.config  README.md             workflows
-</source>
+<div lang="en" dir="ltr" class="mw-content-ltr">
+'''IMPORTANT!''': This workflow downloads two components of  ''<code>rnaseq</code>'':
+</div>
 
-Quand le pipeline est prêt à être lancé, Nextflow examine le fichier <code>nextflow.config</code> dans ce répertoire ainsi que le fichier <code>~/.nextflow/config</code> dans /home  (s'il existe) pour contrôler l'exécution du flux de travail. Les pipelines nf-core ont tous une configuration par défaut, une configuration de test et des configurations de conteneur (singularity, podman, etc.). Vous devrez aussi fournir une configuration personnalisée pour la grappe sur laquelle les pipelines sont exécutés; une configuration simple se trouve dans la section suivante. Les pipelines Nextflow peuvent également être exécutés sur [[Trillium/fr|Trillium]] s'ils ont été conçus expressément pour cette grappe, mais nous vous déconseillons généralement d'exécuter tout pipeline Nextflow sur Trillium.
+<div lang="en" dir="ltr" class="mw-content-ltr">
+# Container image files go into <code>$NXF_SINGULARITY_CACHEDIR</code> 
+# Pipeline files go into <code>~/scratch/nf-test/nf-core-${NFCORE_PL}_${PL_VERSION}</code> folder with the version number <code>X_X_X</code>. In this example the pipeline is stored at <code>~/scratch/nf-test/nf-core-rnaseq_3.21.0/3_21_0</code>. Please note that you have to include this <code>nf-core-rnaseq_3.21.0/3_21_0</code> folder name when calling <code>nextflow run</code> in your job script (see Step 5 below).
+</div>
 
-<span id="A_configuration_for_our_clusters"></span>
-==== Configuration pour nos grappes ====
+<div lang="en" dir="ltr" class="mw-content-ltr">
+When the pipeline is launched, Nextflow will look at the <code>nextflow.config</code> file in the working directory and also at <code>~/.nextflow/config</code> (if it exists) in your home to control how to run the workflow. 
+The nf-core pipelines all have a default configuration, a test configuration, and container configurations (singularity, podman, etc).
+</div>
 
-Vous pouvez obtenir de [https://github.com/nf-core/configs/blob/master/conf/alliance_canada.confignf nf-core] un fichier de configuration pour nos grappes et le placer dans <code>~/.nextflow/config</code>.
-Si vous utilisez ce fichier sur Fir, le profil doit être chargé avec l'indicateur <code>-profile fir</code> pour la commande <code>nextflow</code>. Sur les autres grappes, le profil est sélectionné automatiquement selon le nom de l'hôte.
+<div lang="en" dir="ltr" class="mw-content-ltr">
+==== Step 4. Prepare the input files ====
+</div>
 
-Il faut configurer la variable d'environnement <code>$SLURM_ACCOUNT</code> (semblable à <code>def-pname</code>), ce qui peut se faire dans le fichier <code>~/.bashrc</code>.
+<div lang="en" dir="ltr" class="mw-content-ltr">
+Nextflow uses sequence files and a sample sheet as inputs.  
+To download the sequence files needed for our 'rnaseq' example, run the following:
+</div> 
 
-Cette configuration garantit qu'il n'y a pas plus de 100 tâches dans la file d'attente Slurm et que seul 60 tâches sont soumises par minute. Elle indique que les nœuds de calcul de Rorqual ont 192&nbsp;cœurs et 750GB de RAM avec un temps réel maximum d'exécution d'une semaine (168&nbsp;heures). Ceci est différent sur Trillium puisque les nœuds sont configurés autrement. Comme un seul nœud entier est demandé à la fois, la mémoire et les CPU ne sont pas spécifiés. 
+<div lang="en" dir="ltr" class="mw-content-ltr">
+<syntaxhighlight lang="bash">
+cd ~/scratch/nf-test
+mkdir -p input && cd input
+wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357070_1.fastq.gz
+wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357070_2.fastq.gz
+wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357071_1.fastq.gz
+wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357071_2.fastq.gz
+wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357072_1.fastq.gz
+wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357072_2.fastq.gz
+wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357073_1.fastq.gz
+wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357074_1.fastq.gz
+wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357075_1.fastq.gz
+wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357076_1.fastq.gz
+wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357076_2.fastq.gz
+</syntaxhighlight>
+</div>
 
-La configuration est liée au système sur lequel se fait l'exécution, mais elle est également liée au pipeline lui-même. Par exemple, ici <code>cpu = 1</code> est la valeur par défaut, mais certaines étapes du pipeline peuvent en utiliser plus. Cela peut devenir assez compliqué et les étiquettes dans le fichier <code>nf-core-smrnaseq_2.3.1/2_3_1/conf/base.config</code> sont utilisées par le pipeline à l'interne pour identifier une étape avec une configuration autre que celle par défaut. Nous n'abordons pas ce sujet ici, mais sachez qu'en modifiant ces étiquettes, vous pourriez observer des différences importantes dans le temps de mise en file d'attente et le temps d'exécution du pipeline.
+<div lang="en" dir="ltr" class="mw-content-ltr">
+To prepare a sample sheet, copy and paste the following into <code>~/scratch/nf-test/samplesheet.csv</code>
+and then '''change the username to your own:''':
+</div>
 
-Si les tâches échouent avec les codes de retour 125 (<i>out of memory</i>) ou 139 (<i>omm killed because the process used more memory than what was allowed by cgroup</i>), les lignes <code >process.errorStrategy</code> et <code>process.memory</code> dans la configuration garantissent qu'elles sont automatiquement redémarrées avec 4Go de RAM supplémentaires.
+<div lang="en" dir="ltr" class="mw-content-ltr">
+<syntaxhighlight lang="text">
+sample,fastq_1,fastq_2,strandedness
+WT_REP1,/home/<username>/scratch/nf-test/input/SRR6357070_1.fastq.gz,/home/<username>/scratch/nf-test/input/SRR6357070_2.fastq.gz,reverse
+WT_REP1,/home/<username>/scratch/nf-test/input/SRR6357071_1.fastq.gz,/home/<username>/scratch/nf-test/input/SRR6357071_2.fastq.gz,reverse
+WT_REP2,/home/<username>/scratch/nf-test/input/SRR6357072_1.fastq.gz,/home/<username>/scratch/nf-test/input/SRR6357072_2.fastq.gz,reverse
+RAP1_UNINDUCED_REP1,/home/<username>/scratch/nf-test/input/SRR6357073_1.fastq.gz,,reverse
+RAP1_UNINDUCED_REP2,/home/<username>/scratch/nf-test/input/SRR6357074_1.fastq.gz,,reverse
+RAP1_UNINDUCED_REP2,/home/<username>/scratch/nf-test/input/SRR6357075_1.fastq.gz,,reverse
+RAP1_IAA_30M_REP1,/home/<username>/scratch/nf-test/input/SRR6357076_1.fastq.gz,/home/<username>/scratch/nf-test/input/SRR6357076_2.fastq.gz,reverse
+</syntaxhighlight>
+</div>
 
-<span id="Running_the_pipeline"></span>
+<div lang="en" dir="ltr" class="mw-content-ltr">
+You can of course use your own data if you prefer. 
+Read more [https://nf-co.re/rnaseq/3.2/docs/usage here] about the <code>rnaseq</code> example and sample sheets.
+</div>
+
+<span id="Step_5._Example_job_script"></span>
+<div class="mw-translate-fuzzy">
 ====Exécution du pipeline====
+</div>
 
+<div class="mw-translate-fuzzy">
 Utilisez les deux profils fournis par nf-core (<i>test</i> pour l'ensemble de données de test et <i>singularity</i> pour le conteneur) et le profil que nous venons de créer pour Narval. Notez que Nextflow est principalement écrit en Java et a tendance à utiliser beaucoup de mémoire virtuelle. Sur certaines grappes, ceci peut causer un problème si l'exécution se fait à partir d'un nœud de connexion.
 <source lang="bash">
 nextflow run nf-core-${NFCORE_PL}_${PL_VERSION}/2_3_1/  -profile test,singularity,narval  --outdir ${NFCORE_PL}_OUTPUT
 </source>
-Remarque : Si votre répertoire <code>~/.aws</code> contient une configuration AWS, Nextflow pourrait vous avertir que l'ensemble de données pour le test du pipeline ne peut pas être téléchargé avec vos identifiants par défaut. 
+Remarque : Si votre répertoire <code>~/.aws</code> contient une configuration AWS, Nextflow pourrait vous avertir que l'ensemble de données pour le test du pipeline ne peut pas être téléchargé avec vos identifiants par défaut.
+</div>
 
-Nextflow est maintenant démarré sur le nœud de connexion. Ceci achemine les tâches à l'ordonnanceur Slurm quand elles sont prêtes à être traitées. 
+<div lang="en" dir="ltr" class="mw-content-ltr">
+<source lang="bash">
+#!/bin/bash
+#SBATCH --time=08:00:00
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+</div>
 
+<div lang="en" dir="ltr" class="mw-content-ltr">
+module load python/3.11
+source nf-core-env/bin/activate
+module load apptainer
+module load nextflow
+export NFCORE_PL=rnaseq
+export PL_VERSION=3.21.0
+export FD_VERSION=3_21_0
+export NXF_SINGULARITY_CACHEDIR=/project/<def-group>/NXF_SINGULARITY_CACHEDIR
+export SLURM_ACCOUNT=def-pname
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+nextflow run nf-core-${NFCORE_PL}_${PL_VERSION}/${FD_VERSION}/ \
+ -profile test,singularity,fir \
+ --input ~/scratch/nf-test/input/samplesheet.csv --outdir ~/scratch/nf-test/output
+</source>
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+Save the job script in <code>~/scratch/nf-test/nextflow_test.sh</code>,
+then submit it with <code>sbatch nextflow_test.sh</code> to launch the test run.
+</div> 
+
+<div class="mw-translate-fuzzy">
+Nextflow est maintenant démarré sur le nœud de connexion. Ceci achemine les tâches à l'ordonnanceur Slurm quand elles sont prêtes à être traitées.
+</div> 
+
+<div class="mw-translate-fuzzy">
 Vous pouvez voir la progression du pipeline. Il est aussi possible d'ouvrir une nouvelle session sur la grappe ou de vous détacher de la session tmux pour voir les tâches dans la file d'attente Slurm avec <code>squeue -u $USER</code> ou <code>sq</code>.
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+To learn more about configurations and profiles in Nextflow, see:
+* [https://www.nextflow.io/docs/latest/config.html "Configuration"] 
+* [https://nf-co.re/docs/usage/getting_started/configuration#basic-configuration-profiles "Pipeline configuration"]
+</div>
 
 <span id="Known_issues"></span>
 ==Problèmes connus==
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+Note that Nextflow is mainly written in Java which tends to use a lot of virtual memory. On some clusters, this may be a problem when running from a login node.
+</div>  
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+Be careful if you have an AWS configuration in your <code>~/.aws</code> directory, as Nextflow might complain that it can't download the pipeline test dataset with your default id.
+</div> 
 
 <span id="&quot;unable_to_create_native_thread&quot;"></span>
 ==== Message <i>unable to create native thread</i> ====
@@ -175,4 +286,6 @@ Nous soupçonnons que c'est à cause des problèmes Nextflow suivants&nbsp;:
   * https://github.com/nextflow-io/nextflow/issues/2774
 Le fait de définir la variable d'environnement <code>NXF_OPTS="-Dleveldb.mmap=false"</code> à l'exécution de <code>nextflow</code> semble résoudre le problème.
 
+<div lang="en" dir="ltr" class="mw-content-ltr">
 [[Category:Software]]
+</div>

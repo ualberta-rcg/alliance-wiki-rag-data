@@ -14,7 +14,7 @@ You need to begin by loading an R module; there will typically be several versio
 }}
 You can load a particular R module using a command like 
 {{Command
-|module load gcc/9.3.0 r/4.0.2
+|module load r/4.5.0
 }} 
 For more on this, see [[Utiliser des modules/en|Using modules.]]
 
@@ -23,15 +23,13 @@ Now you can start the R interpreter and type R code inside that environment:
 |lang="R"
 |R
 |result=
-R version 4.0.2 (2020-06-22) -- "Taking Off Again"
-Copyright (C) 2020 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+R version 4.5.0 (2025-04-11) -- "How About a Twenty-Six"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
-
-  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -65,7 +63,7 @@ A simple job script looks like this:
 #SBATCH --account=def-someacct   # replace this with your own account
 #SBATCH --mem-per-cpu=2000M      # memory; default unit is megabytes
 #SBATCH --time=0-00:15           # time (DD-HH:MM)
-module load gcc/9.3.0 r/4.0.2              # Adjust version and add the gcc module used for installing packages.
+module load StdEnv/2023 r/4.5.0  # Adjust version as needed
 
 Rscript computation.R
 }}
@@ -77,7 +75,7 @@ See [[Running jobs]] for more information.
 
 To install packages from [https://cran.r-project.org/ CRAN], you can use <code>install.packages</code> in an interactive R session on a cluster login node. Since the compute nodes on most clusters do not have access to the Internet, installing R packages in a batch or interactive job is not possible. Many R packages are developed using the GNU family of compilers so we recommend that you load a <code>gcc</code> [[Utiliser des modules/en|module]] before trying to install any R packages. Use the same version of the <code>gcc</code> for all packages you install.
 {{Command
-|module load gcc/9.3.0 r/4.0.2
+|module load gcc/12.3.0 r/4.5.0
 }}
 
 ==== Installing for a specific R version ====
@@ -108,11 +106,7 @@ In your submission script, you then have to load the desired R module and set th
 === Dependencies ===
 Some packages depend on external libraries which are already installed on our clusters. If the library you need is listed at [[Available software]], then load the appropriate [[Utiliser des modules/en|module]] before installing the package that requires it.
 
-For example, the package <code>rgdal</code> requires a library called <code>gdal</code>. Running <code>module spider gdal/2.2.1</code> shows that it requires <code>nixpkgs</code> and <code>gcc</code> modules.  If you took the advice above to load <code>gcc</code> then both these should already be loaded. Verify this by running
-
-{{Command
-|module list
-}} 
+For example, the package <code>rgdal</code> requires a library called <code>gdal</code>. Running <code>module spider gdal/3.9.1</code> shows how to load this module.
 
 If any package fails to install, be sure to read the error message carefully as it might give you details concerning additional modules you need to load.  See [[Utiliser des modules/en|Using modules]] for more on the <code>module</code> family of commands.
 
@@ -261,7 +255,8 @@ foreach(var1=var1.v, .combine=rbind) %:% foreach(var2=var2.v, .combine=rbind) %d
 #SBATCH --mail-user=yourname@someplace.com # Send email updates to you or someone else
 #SBATCH --mail-type=ALL          # send an email in all cases (job started, job ended, job aborted)
 
-module load gcc/9.3.0 r/4.0.2
+module load StdEnv/2023 r/4.5.0
+
 export R_LIBS=~/local/R_libs/
 R CMD BATCH --no-save --no-restore test_foreach.R
 
@@ -320,7 +315,7 @@ stopCluster(cl)
 #SBATCH --mem-per-cpu=512M      # memory; default unit is megabytes
 #SBATCH --time=00:05:00         # time (HH:MM:SS)
 
-module load gcc/9.3.0 r/4.0.2
+module load StdEnv/2023 r/4.5.0
 
 # Export the nodes names. 
 # If all processes are allocated on the same node, NODESLIST contains : node1 node1 node1 node1
@@ -338,7 +333,6 @@ to be placed on different nodes, then add the line <code>#SBATCH --ntasks-per-no
 For more information on submitting jobs, see [[Running jobs]].
 
 === Rmpi ===
-Note that the following instructions do not work on [[Cedar]], so any use of Rmpi should be restricted to the other clusters.
 
 ====Installing====
 This next procedure installs [https://cran.r-project.org/web/packages/Rmpi/index.html Rmpi], an interface (wrapper) to MPI routines, which allow R to run in parallel.
@@ -348,16 +342,16 @@ This next procedure installs [https://cran.r-project.org/web/packages/Rmpi/index
 module spider r
 </source>
 
-2.  Select the R version and load the required Open MPI module. This example uses Open MPI version 4.0.3 to spawn the processes correctly.
+2.  Select the R version and load the required OpenMPI module.
  <source lang="bash">
-module load gcc/11.3.0
-module load r/4.2.1
-module load openmpi/4.1.4
+module load gcc/12.3
+module load openmpi/4.1.5
+module load r/4.5.0
 </source>
 
 3. Download [https://cran.r-project.org/web/packages/Rmpi/index.html the latest Rmpi version]; change the version number to whatever is desired.
 <source lang="bash">
-wget https://cran.r-project.org/src/contrib/Rmpi_0.6-9.2.tar.gz
+wget https://cran.r-project.org/src/contrib/Rmpi_0.7-3.3.tar.gz
 </source>
 
 4. Specify the directory where you want to install the package files; you must have write permission for this directory. The directory name can be changed if desired.
@@ -368,7 +362,7 @@ export R_LIBS=~/local/R_libs/
 
 5. Run the install command.
  <source lang="bash">
-R CMD INSTALL --configure-args="--with-Rmpi-include=$EBROOTOPENMPI/include   --with-Rmpi-libpath=$EBROOTOPENMPI/lib --with-Rmpi-type='OPENMPI' " Rmpi_0.6-9.2.tar.gz 
+R CMD INSTALL --configure-args="--with-Rmpi-include=$EBROOTOPENMPI/include   --with-Rmpi-libpath=$EBROOTOPENMPI/lib --with-Rmpi-type='OPENMPI' " Rmpi_0.7-3.3.tar.gz
 </source>
 
 Again, carefully read any error message that comes up when packages fail to install and load the required modules to ensure that all your packages are successfully installed.
@@ -411,9 +405,8 @@ mpi.quit()
 #SBATCH --mem-per-cpu=2048M      # memory; default unit is megabytes
 #SBATCH --time=0-00:15           # time (DD-HH:MM)
 
-module load gcc/11.3.0
-module load r/4.2.1
-module load openmpi/4.1.4
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 r/4.5.0
+
 export R_LIBS=~/local/R_libs/
 mpirun -np 1 R CMD BATCH test.R test.txt
 }}

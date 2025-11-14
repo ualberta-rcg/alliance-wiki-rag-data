@@ -11,14 +11,15 @@ Even though R was not developed for high-performance computing (HPC), its popula
 <!--T:83-->
 User Julie Fortin has written a blog post, [https://medium.com/the-nature-of-food/how-to-run-your-r-script-with-compute-canada-c325c0ab2973 "How to run your R script with Compute Canada"] which you might find useful.
 
-== The R interpreter == <!--T:3-->
+<!--T:3-->
+== The R interpreter ==
 You need to begin by loading an R module; there will typically be several versions available and you can see a list of all of them using the command 
 {{Command
 |module spider r
 }}
 You can load a particular R module using a command like 
 {{Command
-|module load gcc/9.3.0 r/4.0.2
+|module load r/4.5.0
 }} 
 For more on this, see [[Utiliser des modules/en|Using modules.]]
 
@@ -28,24 +29,21 @@ Now you can start the R interpreter and type R code inside that environment:
 |lang="R"
 |R
 |result=
-R version 4.0.2 (2020-06-22) -- "Taking Off Again"
-Copyright (C) 2020 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+R version 4.5.0 (2025-04-11) -- "How About a Twenty-Six"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
 
-<!--T:11-->
+<!--T:93-->
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
 
-  <!--T:12-->
-Natural language support but running in an English locale
-
-<!--T:13-->
+<!--T:94-->
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
 'citation()' on how to cite R or R packages in publications.
 
-<!--T:14-->
+<!--T:95-->
 Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
@@ -81,7 +79,7 @@ A simple job script looks like this:
 #SBATCH --account=def-someacct   # replace this with your own account
 #SBATCH --mem-per-cpu=2000M      # memory; default unit is megabytes
 #SBATCH --time=0-00:15           # time (DD-HH:MM)
-module load gcc/9.3.0 r/4.0.2              # Adjust version and add the gcc module used for installing packages.
+module load StdEnv/2023 r/4.5.0  # Adjust version as needed
 
 Rscript computation.R
 }}
@@ -96,10 +94,11 @@ See [[Running jobs]] for more information.
 <!--T:91-->
 To install packages from [https://cran.r-project.org/ CRAN], you can use <code>install.packages</code> in an interactive R session on a cluster login node. Since the compute nodes on most clusters do not have access to the Internet, installing R packages in a batch or interactive job is not possible. Many R packages are developed using the GNU family of compilers so we recommend that you load a <code>gcc</code> [[Utiliser des modules/en|module]] before trying to install any R packages. Use the same version of the <code>gcc</code> for all packages you install.
 {{Command
-|module load gcc/9.3.0 r/4.0.2
+|module load gcc/12.3.0 r/4.5.0
 }}
 
-==== Installing for a specific R version ==== <!--T:18-->
+<!--T:18-->
+==== Installing for a specific R version ====
 For example, to install the <code>sp</code> package that provides classes and methods for spatial data, use the following command on a login node:
 
 <!--T:19-->
@@ -116,7 +115,8 @@ If the argument <code>repos</code> is not specified, you will be asked to select
 <!--T:21-->
 Some packages require defining the environment variable <code>TMPDIR</code> before installing.
 
-==== Installing for one or many R versions ==== <!--T:79-->
+<!--T:79-->
+==== Installing for one or many R versions ====
 Specify the local installation directory according to the R module that is currently loaded.
 {{Commands
 |mkdir -p ~/.local/R/$EBVERSIONR/
@@ -128,21 +128,18 @@ Install the package.
 <!--T:80-->
 In your submission script, you then have to load the desired R module and set the local library directory with <code>export R_LIBS=~/.local/R/$EBVERSIONR/</code>.
 
-=== Dependencies === <!--T:5-->
+<!--T:5-->
+=== Dependencies ===
 Some packages depend on external libraries which are already installed on our clusters. If the library you need is listed at [[Available software]], then load the appropriate [[Utiliser des modules/en|module]] before installing the package that requires it.
 
 <!--T:70-->
-For example, the package <code>rgdal</code> requires a library called <code>gdal</code>. Running <code>module spider gdal/2.2.1</code> shows that it requires <code>nixpkgs</code> and <code>gcc</code> modules.  If you took the advice above to load <code>gcc</code> then both these should already be loaded. Verify this by running
-
-<!--T:6-->
-{{Command
-|module list
-}} 
+For example, the package <code>rgdal</code> requires a library called <code>gdal</code>. Running <code>module spider gdal/3.9.1</code> shows how to load this module.
 
 <!--T:9-->
 If any package fails to install, be sure to read the error message carefully as it might give you details concerning additional modules you need to load.  See [[Utiliser des modules/en|Using modules]] for more on the <code>module</code> family of commands.
 
-=== Downloaded packages === <!--T:22-->
+<!--T:22-->
+=== Downloaded packages ===
 To install a package that you downloaded (i.e. not using <code>install.packages()</code>), you can install it as follows. Assuming the package is named <code>archive_package.tgz</code>, run the following command in a shell:
 {{Command
 |R CMD INSTALL -l 'path for your local (home) R library' archive_package.tgz
@@ -154,7 +151,8 @@ To install a package that you downloaded (i.e. not using <code>install.packages(
 Using the R command <code>system()</code> you can execute commands in the ambient environment from inside R. On our clusters, this can lead to problems because R will give an incorrect value to the environment variable <code>LD_LIBRARY_PATH</code>. You can avoid this problem by using the syntax <code>system("LD_LIBRARY_PATH=$RSNT_LD_LIBRARY_PATH <my system call>")</code> in your R system calls.
 
 
-== Passing arguments to R scripts == <!--T:84-->
+<!--T:84-->
+== Passing arguments to R scripts ==
 Sometimes it can be useful to pass parameters as arguments to R scripts, to avoid having to either change the R script for every job or having to manage multiple copies of otherwise identical scripts. This can be useful for specifying the names for input- or output files, as well as specifying numerical parameters. For example, instead of specifying the name of an input file and/or a numerical parameter like this
 {{File
   |name=
@@ -233,7 +231,8 @@ collection of such processes. As an example, consider the following quote, "Foll
 of worker processes listening ''via'' sockets for commands from the master is called a 'cluster' of 
 nodes."<ref>Core package "parallel" vignette, https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf</ref>.
 
-=== doParallel and foreach === <!--T:39-->
+<!--T:39-->
+=== doParallel and foreach ===
 ====Usage==== 
 Foreach can be considered as a unified interface for all backends (i.e. doMC, doMPI, doParallel, doRedis, etc.). It works on all platforms, assuming that the backend works. doParallel acts as an interface between foreach and the parallel package and can be loaded alone. There are some [[Scalability|known efficiency issues]] when using foreach to run a very large number of very small tasks. Therefore, keep in mind that the following code is not the best example of an optimized use of the foreach() call but rather that the function chosen was kept at a minimum for demonstration purposes.
 
@@ -308,7 +307,8 @@ foreach(var1=var1.v, .combine=rbind) %:% foreach(var2=var2.v, .combine=rbind) %d
 #SBATCH --mail-user=yourname@someplace.com # Send email updates to you or someone else
 #SBATCH --mail-type=ALL          # send an email in all cases (job started, job ended, job aborted)
 
-module load gcc/9.3.0 r/4.0.2
+module load StdEnv/2023 r/4.5.0
+
 export R_LIBS=~/local/R_libs/
 R CMD BATCH --no-save --no-restore test_foreach.R
 
@@ -324,11 +324,13 @@ R CMD BATCH --no-save --no-restore test_foreach.R
 <!--T:47-->
 For more on submitting jobs, see [[Running jobs]].
 
-=== doParallel and makeCluster === <!--T:56-->
+<!--T:56-->
+=== doParallel and makeCluster ===
 ====Usage====
 You must register the backend by feeding it the nodes name multiplied by the desired number of processes. For instance, with two nodes (node1 and node2) and two processes, we would create a cluster composed of : <code>node1 node1 node2 node2</code> hosts. The ''PSOCK'' cluster type will run commands through SSH connections into the nodes.
 
-====Running==== <!--T:57-->
+<!--T:57-->
+====Running====
 1. Place your R code in a script file, in this case the file is called <code>test_makecluster.R</code>.
 {{File
   |name=test_makecluster.R
@@ -378,7 +380,7 @@ stopCluster(cl)
 #SBATCH --time=00:05:00         # time (HH:MM:SS)
 
 <!--T:63-->
-module load gcc/9.3.0 r/4.0.2
+module load StdEnv/2023 r/4.5.0
 
 <!--T:64-->
 # Export the nodes names. 
@@ -399,9 +401,9 @@ to be placed on different nodes, then add the line <code>#SBATCH --ntasks-per-no
 For more information on submitting jobs, see [[Running jobs]].
 
 === Rmpi === <!--T:23-->
-Note that the following instructions do not work on [[Cedar]], so any use of Rmpi should be restricted to the other clusters.
 
-====Installing==== <!--T:24-->
+<!--T:24-->
+====Installing====
 This next procedure installs [https://cran.r-project.org/web/packages/Rmpi/index.html Rmpi], an interface (wrapper) to MPI routines, which allow R to run in parallel.
 
 <!--T:25-->
@@ -411,17 +413,17 @@ module spider r
 </source>
 
 <!--T:26-->
-2.  Select the R version and load the required Open MPI module. This example uses Open MPI version 4.0.3 to spawn the processes correctly.
+2.  Select the R version and load the required OpenMPI module.
  <source lang="bash">
-module load gcc/11.3.0
-module load r/4.2.1
-module load openmpi/4.1.4
+module load gcc/12.3
+module load openmpi/4.1.5
+module load r/4.5.0
 </source>
 
 <!--T:27-->
 3. Download [https://cran.r-project.org/web/packages/Rmpi/index.html the latest Rmpi version]; change the version number to whatever is desired.
 <source lang="bash">
-wget https://cran.r-project.org/src/contrib/Rmpi_0.6-9.2.tar.gz
+wget https://cran.r-project.org/src/contrib/Rmpi_0.7-3.3.tar.gz
 </source>
 
 <!--T:28-->
@@ -434,7 +436,7 @@ export R_LIBS=~/local/R_libs/
 <!--T:29-->
 5. Run the install command.
  <source lang="bash">
-R CMD INSTALL --configure-args="--with-Rmpi-include=$EBROOTOPENMPI/include   --with-Rmpi-libpath=$EBROOTOPENMPI/lib --with-Rmpi-type='OPENMPI' " Rmpi_0.6-9.2.tar.gz 
+R CMD INSTALL --configure-args="--with-Rmpi-include=$EBROOTOPENMPI/include   --with-Rmpi-libpath=$EBROOTOPENMPI/lib --with-Rmpi-type='OPENMPI' " Rmpi_0.7-3.3.tar.gz
 </source>
 
 <!--T:30-->
@@ -483,9 +485,9 @@ mpi.quit()
 #SBATCH --time=0-00:15           # time (DD-HH:MM)
 
 <!--T:78-->
-module load gcc/11.3.0
-module load r/4.2.1
-module load openmpi/4.1.4
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 r/4.5.0
+
+<!--T:96-->
 export R_LIBS=~/local/R_libs/
 mpirun -np 1 R CMD BATCH test.R test.txt
 }}
