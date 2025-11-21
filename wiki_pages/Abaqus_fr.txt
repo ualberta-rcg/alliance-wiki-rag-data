@@ -17,7 +17,7 @@ Si votre licence n'est pas configurée pour une grappe en particulier, les admin
 * l'adresse IP de votre serveur de licence Abaqus.
 En retour vous recevrez une liste d'adresses IP et votre administrateur de système pourra ouvrir les pare-feu de votre serveur local pour que la grappe puisse se connecter via les deux ports. Une entente spéciale doit habituellement être négociée et signée avec SIMULIA pour qu'une telle licence puisse être utilisée à distance avec notre matériel.
 
-= Soumettre une tâche sur nor grappes=
+= Soumettre une tâche sur nos grappes=
 Vous trouverez ci-dessous des prototypes de scripts Slurm pour soumettre des simulations parallèles sur un ou plusieurs nœuds de calcul en utilisant des fils et MPI. Dans la plupart des cas, il suffira d'utiliser un des scripts du répertoire /project dans une des sections pour un nœud simple. Dans la dernière ligne des scripts, l'argument <code>memory=</code> est optionnel et sert aux tâches qui demandent beaucoup de mémoire ou qui posent problème; la valeur de déplacement de 3072Mo pourrait nécessiter un ajustement. Pour obtenir la liste des arguments en ligne de commande, chargez un module Abaqus et lancez <code>abaqus -help | less</code>.
 
 Pour une tâche sur un nœud simple d'une durée de moins de 24 heures, le <i>script du répertoire /project</i> sous le premier onglet devrait suffire. Pour une tâche de plus longue durée, utilisez un script de redémarrage.
@@ -468,7 +468,7 @@ Une estimation de la mémoire totale pour un nœud  (--mem=) requise par Slurm p
 </source>
 
 Alternativement, l'estimation de la mémoire totale pour un processus avec fils sur un nœud unique peut être obtenue en exécutant la simulation de manière interactive sur un nœud de calcul, puis en surveillant la consommation de mémoire à l'aide des commandes <code>ps</code> ou <code>top</code>. Ce qui suit décrit comment procéder dans le dernier cas&nbsp;:<br>
-1) Connectez-vous à une grappe aevec SSH et obtenez une allocation sur un nœud de calcul (comme gra100) et démarrez votre simulationavec&nbsp;:
+1) Connectez-vous à une grappe avec SSH et obtenez une allocation sur un nœud de calcul (comme gra100) et démarrez votre simulation avec&nbsp;:
 
 {{Commands
 |salloc --time=0:30:00 --cpus-per-task=8 --mem=64G --account=def-piname
@@ -485,14 +485,14 @@ Alternativement, l'estimation de la mémoire totale pour un processus avec fils 
 
 3) observez les colonnes VIRT and RES jusqu'à ce que des valeurs de mémoire maximales stables soient atteintes.
 
-Pour satisfaire complètement la valeur recommandée pour <code>MEMORY TO OPERATIONS REQUIRED MINIMIZE I/O</code> (MRMIO), au moins la même quantité de mémoire physique non échangée (RES) doit être disponible pour Abaqus. Étant donné que la RES sera en général inférieure à la mémoire virtuelle (VIRT) d'une quantité relativement constante pour une simulation donnée, il est nécessaire de surallouer légèrement la mémoire du nœud demandée <code>-mem=</code>. Dans l'exemple de script ci-dessus, cette surallocation a été codée en dur à une valeur prudente de 3072Mo sur la base des tests initiaux du solveur Abaqus standard. Pour éviter les longs temps d'attente associés aux valeurs élevées de MRMIO, il peut être utile d'étudier l'impact sur les performances de simulation associées à la réduction de la mémoire RES mise à disposition d'Abaqus de manière significative en dessous de la MRMIO. Cela peut être fait en diminuant la valeur de <code>-mem=</code> qui à son tour définira une valeur artificiellement basse de <code>memory=</code> dans la commande Abaqus (trouvée dans la dernière ligne du script). En faisant cela, il faut s'asssurer que RES ne descende pas en dessous de <code>MINIMUM MEMORY REQUIRED</code> (MMR) sinon Abaqus fermera à cause d'une mémoire insuffisante (OOM). Par exemple, si votre MRMIO est de 96Go, essayez d'exécuter une série de tâches de test courtes avec <code>#SBATCH --mem=8G, 16G, 32G, 64G</code> jusqu'à ce qu'un impact minimal acceptable sur les performances soit trouvé, en notant que des valeurs plus petites entraîneront un espace /scratch de plus en plus grand pour les fichiers temporaires.
+Pour satisfaire complètement la valeur recommandée pour <code>MEMORY TO OPERATIONS REQUIRED MINIMIZE I/O</code> (MRMIO), au moins la même quantité de mémoire physique non échangée (RES) doit être disponible pour Abaqus. Étant donné que la RES sera en général inférieure à la mémoire virtuelle (VIRT) d'une quantité relativement constante pour une simulation donnée, il est nécessaire de surallouer légèrement la mémoire du nœud demandée <code>-mem=</code>. Dans l'exemple de script ci-dessus, cette surallocation a été codée en dur à une valeur prudente de 3072Mo sur la base des tests initiaux du solveur Abaqus standard. Pour éviter les longs temps d'attente associés aux valeurs élevées de MRMIO, il peut être utile d'étudier l'impact sur les performances de simulation associées à la réduction de la mémoire RES mise à disposition d'Abaqus de manière significative en dessous de la MRMIO. Cela peut être fait en diminuant la valeur de <code>-mem=</code> qui à son tour définira une valeur artificiellement basse de <code>memory=</code> dans la commande Abaqus (trouvée dans la dernière ligne du script). En faisant cela, il faut s'assurer que RES ne descende pas en dessous de <code>MINIMUM MEMORY REQUIRED</code> (MMR) sinon Abaqus fermera à cause d'une mémoire insuffisante (OOM). Par exemple, si votre MRMIO est de 96Go, essayez d'exécuter une série de tâches de test courtes avec <code>#SBATCH --mem=8G, 16G, 32G, 64G</code> jusqu'à ce qu'un impact minimal acceptable sur les performances soit trouvé, en notant que des valeurs plus petites entraîneront un espace /scratch de plus en plus grand pour les fichiers temporaires.
 
 <span id="Multi_process"></span>
 === Processus multiples ===
 
 Pour déterminer la mémoire requise pour les scripts qui utilisent plusieurs nœuds, les estimations de mémoire (par processus de calcul) requises pour minimiser les entrées/sorties sont données dans le fichier de sortie dat pour les tâches terminées. Si <code>mp_host_split</code> n'est pas spécifié (ou est défini comme étant 1), le nombre total de processus de calcul sera égal au nombre de nœuds. La valeur de <code>mem-per-cpu</code> peut alors être déterminée approximativement en multipliant la plus grande estimation de mémoire par le nombre de nœuds, puis en divisant par le nombre de <code>ntasks</code>. Si toutefois la valeur de <code>mp_host_split</code> est spécifiée (supérieure à 1), la valeur de <code>mem-per-cpu</code> peut être déterminée approximativement à partir de la plus grande estimation de mémoire multipliée par le nombre de nœuds, multiplié par la valeur de <code>mp_host_split</code> divisée par le nombre de tâches. Notez que la valeur de <code>mp_host_split</code> doit être inférieure ou égale au nombre de cœurs par nœud attribué par au moment de l'exécution, sinon Abaqus s'arrêtera. Ce scénario peut être contrôlé en supprimant les commentaires pour spécifier une valeur pour les tâches par nœud. L'énoncé définitif suivant est donné dans chaque fichier dat et mentionné ici pour référence.
 
- LE MAXIMUM DE MÉMOIRE POUVANT ÊTRE ALLOUÉ PAR ABAQUS DÉPEND EN GÉNÉRAL DE LA VALEUR DU
+ [traduction libre] LE MAXIMUM DE MÉMOIRE POUVANT ÊTRE ALLOUÉ PAR ABAQUS DÉPEND EN GÉNÉRAL DE LA VALEUR DU
 PARAMÈTRE <CODE>MÉMOIRE</CODE> ET DE LA QUANTITÉ DE MÉMOIRE PHYSIQUE DISPONIBLE SUR LA MACHINE. VEUILLEZ CONSULTER
 LE MANUEL D'UTILISATION D'ABAQUS ANALYSIS POUR PLUS DE DÉTAILS. L'UTILISATION RÉELLE DE LA MÉMOIRE ET DE L'ESPACE
 DISQUE POUR LES DONNÉES DE /SCRATCH DÉPENDRA DE CETTE LIMITE SUPÉRIEURE AINSI QUE DE LA MÉMOIRE REQUISE POUR
@@ -508,9 +508,9 @@ Sur nos grappes, il est maintenant recommandé d'utiliser Open OnDemand ou Jupyt
 1. Dans votre navigateur, connectez-vous à un système OnDemand avec une des adresses suivantes .<br>
 
 [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) NIBI]: <code>https://ondemand.sharcnet.ca</code>
- FIR: <code>https://jupyterhub.fir.alliancecan.ca</code>
- RORQUAL: <code>https://jupyterhub.rorqual.alliancecan.ca</code>
- TRILLIUM: <code>https://ondemand.scinet.utoronto.ca</code>
+FIR: <code>https://jupyterhub.fir.alliancecan.ca</code>
+RORQUAL: <code>https://jupyterhub.rorqual.alliancecan.ca</code>
+TRILLIUM: <code>https://ondemand.scinet.utoronto.ca</code>
 
 2. Ouvrez une nouvelle fenêtre de terminal et chargez 
  module load StdEnv/2020 abaqus/2021 OU
@@ -518,7 +518,7 @@ Sur nos grappes, il est maintenant recommandé d'utiliser Open OnDemand ou Jupyt
 3. Lancez l'application en mode graphique avec<br>
  abaqus cae
 
-Pour lancer Abaqus en mode graphique, il faut au moins une licence CAE non utilisée, selon
+Pour lancer Abaqus en mode graphique, il faut au moins une licence de calcul non utilisée, selon
 
  $ abaqus licensing lmstat -c $ABAQUSLM_LICENSE_FILE -a | grep "Users of cae"
  Users of cae:  (Total of 4 licenses issued;  Total of 3 licenses in use)
@@ -532,9 +532,9 @@ Pour lancer Abaqus en mode graphique, il faut au moins une licence CAE non utili
 3. Lancez l'application avec<br>
  abaqus cae -mesa
 
-= Site-specific use =
-== SHARCNET license == 
-The SHARCNET license has been renewed until 17-jan-2026.  It provides a small but free license consisting of 2 cae and 35 execute tokens where usage limits are imposed 10 tokens/user and 15 tokens/group.  For groups that have purchased dedicated tokens, the free token usage limits are added to their reservation.  The free tokens are available on a first come first serve basis and mainly intended for testing and light usage before deciding whether or not to purchase dedicated tokens.  Costs for dedicated tokens (in 2021) were approximately CAD$110 per compute token and CAD$400 per GUI token: submit a ticket to request an official quote.  The license can be used by any Alliance researcher, but only on SHARCNET hardware.  Groups that purchase dedicated tokens to run on the SHARCNET license server may likewise only use them on SHARCNET hardware including the SHARCNET [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) OOD] system (to run Abaqus in graphical mode) or Nibi/Dusky clusters (for submitting compute batch jobs to the queue).  Before you can use the license, you must contact [[technical support]] and request access.  In your email 1) mention that it is for use on SHARCNET systems and 2) include a copy/paste of the following <code>License Agreement</code> statement with your full name and username entered in the indicated locations.  Please note that every user must do this it cannot be done one time only for a group; this includes PIs who have purchased their own dedicated tokens.
+= Utilisation spécifique au site =
+== Licence SHARCNET ==
+La licence SHARCNET a été renouvelée jusqu'au 17 janvier 2026. Elle offre une licence gratuite limitée comprenant 2 jetons de calcul et 35 jetons d'exécution, avec des limites d'utilisation de 10 jetons par utilisateur et 15 jetons par groupe. Pour les groupes ayant acquis des jetons dédiés, les limites d'utilisation des jetons gratuits sont ajoutées à leur réservation. Les jetons gratuits sont attribués selon le principe du premier arrivé, premier servi et sont principalement destinés aux tests et à une utilisation légère avant de décider d'acheter ou non des jetons dédiés. Le coût des jetons dédiés (en 2021) était d'environ 110&nbsp;$&nbsp;CA par jeton de calcul et 400&nbsp;$&nbsp;CA par jeton d'interface graphique&nbsp;: écrivez au [[Technical support/fr|soutien technique]] pour obtenir un devis officiel. La licence peut être utilisée avec un compte de l'Alliance, mais uniquement sur le matériel SHARCNET. Les groupes qui achètent des jetons dédiés pour le serveur de licences SHARCNET ne peuvent les utiliser que sur le matériel SHARCNET, notamment le système SHARCNET [[Nibi/fr#Accès_via_Open_OnDemand_(OOD) OOD]] (pour le mode graphique) ou les grappes Nibi/Dusky (pour soumettre des tâches de calcul par lots à la file d'attente). Avant d'utiliser la licence, vous devez contacter le [[Technical support/fr|soutien technique]] et demander l'accès. Dans votre courriel, veuillez 1) préciser que la demande est destinée à une utilisation sur les systèmes SHARCNET et 2) copier coller l'accord de licence suivant, en indiquant vos nom et prénom ainsi que votre nom d'utilisateur aux emplacements prévus. Veuillez noter que chaque utilisateur doit effectuer cette démarche; elle ne peut être effectuée une seule fois pour un groupe, y compris pour les chercheuses principales et chercheurs principaux ayant acheté leurs propres jetons dédiés.
 
 ===Entente===
 <pre>----------------------------------------------------------------------------------
@@ -579,7 +579,7 @@ II)  Vérifiez s'il y a des tâches lancées et des tâches dans la queue pour l
 <source lang="bash">
 abaqus licensing lmstat -c $ABAQUSLM_LICENSE_FILE -a | egrep "Users|start|queued|RESERVATION"
 </source>
-III)  Vérifiez si le serveur de licences SHARCNET montre une disponibilité pour le produit cae standard et explicite.
+III)  Vérifiez si le serveur de licences SHARCNET montre une disponibilité explicite pour le produit standard pour le calcul.
 <source lang="bash">
 abaqus licensing lmstat -c $ABAQUSLM_LICENSE_FILE -a | grep "Users of" | egrep "cae|standard|explicit"
 </source>
@@ -605,8 +605,8 @@ The following shows the situation where a user submitted two 6-core jobs (each r
 <!--T:97-->
 To avoid license shortage problems when submitting multiple jobs when working with expensive Abaqus tokens either use a [https://docs.alliancecan.ca/wiki/Running_jobs#Cancellation_of_jobs_with_dependency_conditions_which_cannot_be_met job dependency], [https://docs.alliancecan.ca/wiki/Job_arrays job array] or at the very least set up a slurm [https://docs.alliancecan.ca/wiki/Running_jobs#Email_notification email notification] to know when your job completes before manually submitting another one.
 
-=== Specify job resources ===
-To ensure optimal usage of both your Abaqus tokens and our resources, it's important to carefully specify the required memory and ncpus in your Slurm script.  The values can be determined by submitting a few short test jobs to the queue then checking their utilization.  For <b>completed</b> jobs use <code>seff JobNumber</code> to show the total <i>Memory Utilized</i> and <i>Memory Efficiency</i>. If the <i>Memory Efficiency</i> is less than ~90%, decrease the value of the <code>#SBATCH --mem=</code> setting in your Slurm script accordingly.  Notice that the <code>seff JobNumber</code> command also shows the total <i>CPU (time) Utilized</i> and <i>CPU Efficiency</i>. If the <i>CPU Efficiency</i> is less than ~90%, perform scaling tests to determine the optimal number of CPUs for optimal performance and then update the value of <code>#SBATCH --cpus-per-task=</code> in your Slurm script.  For <b>running</b> jobs, use the <code>srun --jobid=29821580 --pty top -d 5 -u $USER</code> command to watch the %CPU, %MEM and RES for each Abaqus parent process on the compute node. The %CPU and %MEM columns display the percent usage relative to the total available on the node while the RES column shows the per process resident memory size (in human readable format for values over 1GB). Further information regarding how to [[Running jobs#Monitoring_jobs|monitor jobs]] is available on our documentation wiki
+=== Spécifier les ressources de la tâche ===
+Pour garantir une utilisation optimale de vos jetons Abaqus et de nos ressources, il est important de spécifier avec précision la mémoire et le nombre de cœurs (ncpus) requis dans votre script Slurm. Vous pouvez déterminer ces valeurs en soumettant quelques courtes tâches de test à la file d'attente, puis en vérifiant l'utilisation des ressources. Pour les tâches <b>terminées</b>, utilisez <code>seff JobNumber</code> pour afficher la <i>mémoire utilisée</i> et son <i>efficacité</i>. Si l'efficacité de la mémoire est inférieure à environ 90&nbsp;%, diminuez la valeur du paramètre <code>#SBATCH --mem=</code> dans votre script Slurm. Notez que la commande <code>seff JobNumber</code> affiche également le <i>temps CPU utilisé</i> et l'<i>efficacité du CPU</i>. Si l'efficacité du CPU est inférieure à environ 90&nbsp;%, effectuez des testez la scalabilité pour déterminer le nombre optimal de CPU afin d'obtenir de meilleures performances, puis mettez à jour la valeur de <code>#SBATCH --cpus-per-task=</code> dans votre script Slurm. Pour les tâches en cours d'exécution, utilisez la commande <code>srun --jobid=29821580 --pty top -d 5 -u $USER</code> pour surveiller les pourcentages d'utilisation du CPU (%CPU), de la mémoire (%MEM) et de la mémoire résidente (RES) de chaque processus parent Abaqus. Les colonnes %CPU et %MEM affichent le pourcentage d'utilisation par rapport à la mémoire totale disponible du nœud, tandis que la colonne RES indique la taille de la mémoire résidente par CPU (dans un format lisible pour les valeurs supérieures à 1Go). Vous trouverez plus d'information dans [[Running jobs/fr#Suivi_des_tâches|Suivi des tâches]].
 
 <span id="Core_token_mapping"></span>
 === Correspondance cœur-jeton ===

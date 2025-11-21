@@ -62,8 +62,8 @@ export RAY_PORT=$(
 # Craft --multi-prog configuration for Ray
 ray_multiprog_config="$SLURM_TMPDIR/ray-multiprog.conf"
 cat <<EOF >"$ray_multiprog_config"
-0   ray start --block --head --node-ip-address="$HEAD_NODE" --port=$RAY_PORT
-*   ray start --block --address "${HEAD_NODE}:${RAY_PORT}"
+0   ray start --block --head --node-ip-address=$HEAD_NODE --port=$RAY_PORT
+*   ray start --block --address=${HEAD_NODE}:${RAY_PORT}
 EOF
 
 #
@@ -72,22 +72,23 @@ EOF
 # above to add a 10-second delay, using the following alternative lines:
 #
 # cat <<EOF >"$ray_multiprog_config"
-# 0   ray start --block --head --node-ip-address="$HEAD_NODE" --port=$RAY_PORT
-# *   sh -c 'sleep 10; ray start --block --address "${HEAD_NODE}:${RAY_PORT}" "\$@"' sh
+# 0   ray start --block --head --node-ip-address=$HEAD_NODE --port=$RAY_PORT
+# *   sh -c 'sleep 10; exec "\$@"' sh ray start --block --address=${HEAD_NODE}:${RAY_PORT}
 # EOF
 #
 
 
 # Launch head and workers on any/all nodes allocated to the job.
-srun -N $SLURM_NNODES -n $SLURM_NNODES    \
-     --multi-prog "$ray_multiprog_config" \
-     --num-cpus   "${SLURM_CPUS_ON_NODE}" \
-     --num-gpus   "${SLURM_GPUS_ON_NODE}" &
+srun -N $SLURM_NNODES -n $SLURM_NNODES                       \
+     --multi-prog "$ray_multiprog_config"                    \
+     ${SLURM_CPUS_ON_NODE:+--num-cpus} ${SLURM_CPUS_ON_NODE} \
+     ${SLURM_GPUS_ON_NODE:+--num-gpus} ${SLURM_GPUS_ON_NODE} &
 ray_cluster_pid=$!
 
 
 # Run your own script here
 python test_ray.py "$@"
+sleep 10
 
 
 # Shut down Ray worker nodes after the Python script exits.

@@ -51,9 +51,9 @@ Un projet pour lequel la cible est utilisée de façon régulière verra sa vale
 <span id="Whole_nodes_versus_cores"></span>
 === Nœuds entiers ou cœurs ===
 
-Les calculs en parallèle pouvant utiliser de façon efficace 32 cœurs ou plus pourraient être mieux servis avec des nœuds entiers. Une partie de chacune des grappes est réservée pour les tâches nécessitant un ou plusieurs nœuds entiers. Pour plus d'information et des exemples de scripts, voyez la section [[Advanced_MPI_scheduling/fr#N.C5.93uds_entiers|Nœuds entiers]] de la page [[Advanced_MPI_scheduling/fr|Contrôle de l'ordonnancement avec MPI]].
+Les calculs en parallèle pouvant utiliser de façon efficace 64 cœurs ou plus pourraient être mieux servis avec des nœuds entiers. Une partie de chacune des grappes est réservée pour les tâches nécessitant un ou plusieurs nœuds entiers. Pour plus d'information et des exemples de scripts, voyez la section [[Advanced_MPI_scheduling/fr#N.C5.93uds_entiers|Nœuds entiers]] de la page [[Advanced_MPI_scheduling/fr|Contrôle de l'ordonnancement avec MPI]].
 
-Prenez note que le fait de demander un nombre inefficace de processeurs dans le simple but de profiter de tout avantage conféré par l'ordonnancement pour un nœud entier sera interprété comme étant un abus injustifié des ressources. Pour un programme ayant un temps d'exécution semblable sur 16 cœurs et 32 cœurs, la requête devrait être pour <code>--ntasks=16</code> et non pour <code>--nodes=1 --ntasks-per-node=32</code>. Cependant, <code>--ntasks=16</code> est correct si vous voulez que toutes les tâches soient sur le même nœud.  De plus, puisque les nœuds entiers réservent une quantité spécifique de mémoire, la soumission de tâches sur nœud entier qui feraient mauvais usage de la capacité de mémoire serait aussi considérée comme étant inappropriée.
+Prenez note que le fait de demander un nombre inefficace de processeurs dans le simple but de profiter de tout avantage conféré par l'ordonnancement pour un nœud entier sera interprété comme étant un abus injustifié des ressources. Pour un programme ayant un temps d'exécution semblable sur 16 cœurs et 64 cœurs, la requête devrait être de 16 cœurs et non 64 ou 192 cœurs. De plus, puisque les nœuds entiers réservent une quantité spécifique de mémoire, la soumission de tâches sur nœud entier qui feraient mauvais usage de la capacité de mémoire serait aussi considérée comme étant inappropriée.
 
 Si vous avez une grande quantité de tâches en série et que vous pouvez bien utiliser [[GNU Parallel/fr|GNU Parallel]], [[GLOST/fr|GLOST]] ou [https://docs.scinet.utoronto.ca/index.php/Running_Serial_Jobs_on_Niagara d'autres techniques] pour rassembler ces tâches pour un seul nœud, nous vous invitons à le faire.
 
@@ -101,34 +101,34 @@ L'utilitaire <code>partition-stats</code> montre
 Voici un exemple :
 
 <pre>
-[user@gra-login3 ~]$ partition-stats
+[user@login1 ~]$ partition-stats
 
 Node type |                     Max walltime
-          |   3 hr   |  12 hr  |  24 hr  |  72 hr  |  168 hr |  672 hr |
+          |     3 hr   |   12 hr   |   24 hr   |   72 hr   |   168 hr  |
 ----------|-------------------------------------------------------------
        Number of Queued Jobs by partition Type (by node:by core)
 ----------|-------------------------------------------------------------
-Regular   |   12:170 |  69:7066|  70:7335| 386:961 |  59:509 |   5:165 |
-Large Mem |    0:0   |   0:0   |   0:0   |   0:15  |   0:1   |   0:4   |
-GPU       |    5:14  |   3:8   |  21:1   | 177:110 |   1:5   |   1:1   |
+Regular   |    12:170  |   69:7066 |   70:7335 |  386:961  |   59:509  |
+Large Mem |     0:0    |    0:0    |    0:0    |    0:15   |    0:1    |
+GPU       |     5:14   |    3:8    |   21:1    |  177:110  |    1:5    |
 ----------|-------------------------------------------------------------
       Number of Running Jobs by partition Type (by node:by core)
 ----------|-------------------------------------------------------------
-Regular   |    8:32  |  10:854 |  84:10  |  15:65  |   0:674 |   1:26  |
-Large Mem |    0:0   |   0:0   |   0:0   |   0:1   |   0:0   |   0:0   |
-GPU       |    5:0   |   2:13  |  47:20  |  19:18  |   0:3   |   0:0   |
+Regular   |     8:32   |   10:854  |   84:10   |   15:65   |    0:674  |
+Large Mem |     0:0    |    0:0    |    0:0    |    0:1    |    0:0    |
+GPU       |     5:0    |    2:13   |   47:20   |   19:18   |    0:3    |
 ----------|-------------------------------------------------------------
         Number of Idle nodes by partition Type (by node:by core)
 ----------|-------------------------------------------------------------
-Regular   |   16:9   |  15:8   |  15:8   |   7:0   |   2:0   |   0:0   |
-Large Mem |    3:1   |   3:1   |   0:0   |   0:0   |   0:0   |   0:0   |
-GPU       |    0:0   |   0:0   |   0:0   |   0:0   |   0:0   |   0:0   |
+Regular   |    16:9    |   15:8    |   15:8    |    7:0    |    2:0    |
+Large Mem |     3:1    |    3:1    |    0:0    |    0:0    |    0:0    |
+GPU       |     0:0    |    0:0    |    0:0    |    0:0    |    0:0    |
 ----------|-------------------------------------------------------------
        Total Number of nodes by partition Type (by node:by core)
 ----------|-------------------------------------------------------------
-Regular   |  871:431 | 851:411 | 821:391 | 636:276 | 281:164 |  90:50  |
-Large Mem |   27:12  |  27:12  |  24:11  |  20:3   |   4:3   |   3:2   |
-GPU       |  156:78  | 156:78  | 144:72  | 104:52  |  13:12  |  13:12  |
+Regular   |   871:431  |  851:411  |  821:391  |  636:276  |  281:164  |
+Large Mem |    27:12   |   27:12   |   24:11   |   20:3    |    4:3    |
+GPU       |   156:78   |  156:78   |  144:72   |  104:52   |   13:12   |
 ----------|-------------------------------------------------------------
 </pre>
 
@@ -165,6 +165,6 @@ Le fait d'exécuter <code>partition-stats</code> exige beaucoup de l'ordonnanceu
 
 Il est possible qu'une limite soit imposée au nombre de tâches exécutées au même moment.  
 
-Pour [[Graham/fr|Graham]] et [[Béluga]], un compte normal ne peut avoir plus de 1000 tâches en exécution ou en attente au même moment. Dans [[Job arrays/fr|un vecteur de tâches]], chacune compte pour une tâche. Le paramètre Slurm [https://slurm.schedmd.com/sacctmgr.html MaxSubmit] en fixe la limite.
+Pour [[Narval]], [[Nibi/fr|Nibi]] et [[Rorqual]], un compte normal ne peut avoir plus de 1000 tâches en exécution ou en attente au même moment. Dans [[Job arrays/fr|un vecteur de tâches]], chacune compte pour une tâche. Le paramètre Slurm [https://slurm.schedmd.com/sacctmgr.html MaxSubmit] en fixe la limite.
 
 [[Category:SLURM]]

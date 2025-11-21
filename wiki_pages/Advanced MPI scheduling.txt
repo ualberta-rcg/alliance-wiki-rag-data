@@ -21,8 +21,9 @@ You may find this discussion on [https://slurm.schedmd.com/faq.html#cpu_count Wh
 
 === Examples of common MPI scenarios === <!--T:4-->
 
-<!--T:18-->
-==== Few cores, any number of nodes ====
+==== Few cores, any number of nodes ==== <!--T:18-->
+
+<!--T:33-->
 In addition to the time limit needed for <i>any</i> Slurm job, an MPI job requires that you specify how many MPI processes Slurm should start. The simplest way to do this is with <code>--ntasks</code>. Since the default memory allocation of 256MB per core is often insufficient, you may also wish to specify how much memory is needed. Using <code>--ntasks</code> you cannot know in advance how many cores will reside on each node, so you should request memory with <code>--mem-per-cpu</code>. For example:
 
  <!--T:5-->
@@ -40,25 +41,25 @@ This will run 15 MPI processes. The cores could be allocated on one node, on 15 
 ==== Whole nodes ==== <!--T:17-->
 
 <!--T:25-->
-If you have a large parallel job to run, that is, one that can efficiently use 32 cores or more, you should probably request whole nodes. To do so, it helps to know what node types are available at the cluster you are using.
+If you have a large parallel job to run, that is, one that can efficiently use 64 cores or more, you should probably request whole nodes. To do so, it helps to know what node types are available at the cluster you are using.
 
 <!--T:24-->
-Typical nodes in [[Béluga/en|Béluga]], [[Cedar]], [[Graham]], [[Narval/en|Narval]] and [[Niagara]] have the following CPU and memory configuration:
+Typical nodes in [[Fir]], [[Narval/en|Narval]], [[Nibi]], [[Rorqual/en|Rorqual]] and [[Trillium]] have the following CPU and memory configuration:
 
 <!--T:26-->
 {| class="wikitable"
 |-
-! Cluster                 !! cores !! usable memory           !! Notes
+! Cluster                !! cores !! usable memory !! Notes
 |-
-| [[Béluga/en|Béluga]]    || 40    || 186 GiB (~4.6 GiB/core) || Some are reserved for whole node jobs.
+| [[Fir]]                ||  192  ||    750 GiB    || Some are reserved for whole node jobs.
 |-
-| [[Graham]]              || 32    || 125 GiB (~3.9 GiB/core) || Some are reserved for whole node jobs.
+| [[Narval/en|Narval]]   ||   64  ||    249 GiB    || Some are reserved for whole node jobs.
 |-
-| [[Cedar]] (Skylake)     || 48    || 187 GiB (~3.9 GiB/core) || Some are reserved for whole node jobs.
+| [[Nibi]]               ||  192  ||    748 GiB    || No node specifically reserved for whole node jobs.
 |-
-| [[Narval/en|Narval]]    || 64    || 249 GiB (~3.9 GiB/core) || AMD EPYC Rome processors
+| [[Rorqual/en|Rorqual]] ||  192  ||    750 GiB    || Some are reserved for whole node jobs.
 |-
-| [[Niagara]]             || 40    || 188 GiB                 || Only whole-node jobs are possible at Niagara.
+| [[Trillium]]           ||  192  ||    749 GiB    || Only whole-node jobs are possible at Trillium.
 |}
 
 <!--T:27-->
@@ -69,36 +70,14 @@ A job script requesting whole nodes should look like this:
 
 <!--T:29-->
 <tabs>
-<tab name="Béluga">
+<tab name="Fir">
 {{File
-  |name=whole_nodes_beluga.sh
+  |name=whole_nodes_fir.sh
   |lang="sh"
   |contents=
 #!/bin/bash 
 #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=40
-#SBATCH --mem=0
-srun application.exe
-}}</tab>
-<tab name="Cedar">
-{{File
-  |name=whole_nodes_cedar.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash 
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=48
-#SBATCH --mem=0
-srun application.exe
-}}</tab>
-<tab name="Graham">
-{{File
-  |name=whole_nodes_graham.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash 
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=32
+#SBATCH --ntasks-per-node=192
 #SBATCH --mem=0
 srun application.exe
 }}</tab>
@@ -113,14 +92,36 @@ srun application.exe
 #SBATCH --mem=0
 srun application.exe
 }}</tab>
-<tab name="Niagara">
+<tab name="Nibi">
 {{File
-  |name=whole_nodes_niagara.sh
+  |name=whole_nodes_nibi.sh
   |lang="sh"
   |contents=
 #!/bin/bash 
 #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=40  # or 80: Hyper-Threading is enabled
+#SBATCH --ntasks-per-node=192
+#SBATCH --mem=0
+srun application.exe
+}}</tab>
+<tab name="Rorqual">
+{{File
+  |name=whole_nodes_rorqual.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash 
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node=192
+#SBATCH --mem=0
+srun application.exe
+}}</tab>
+<tab name="Trillium">
+{{File
+  |name=whole_nodes_trillium.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash 
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node=192
 #SBATCH --mem=0
 srun application.exe
 }}</tab>
@@ -130,14 +131,15 @@ srun application.exe
 Requesting <code>--mem=0</code> is interpreted by Slurm to mean <i>reserve all the available memory on each node assigned to the job.</i> 
 
 <!--T:30-->
-If you need more memory per node than the smallest node provides (e.g. more than 125 GiB at Graham) then you should not use <code>--mem=0</code>, but request the amount explicitly. Furthermore, some memory on each node is reserved for the operating system.  To find the largest amount your job can request and still qualify for a given node type, see the <i>Available memory</i> column of the <i>Node characteristics</i> table for each cluster.
-* [[Béluga/en#Node_characteristics|Béluga node characteristics]]
-* [[Cedar#Node_characteristics|Cedar node characteristics]]
-* [[Graham#Node_characteristics|Graham node characteristics]]
+If you need more memory per node than the smallest node provides (e.g. more than 748 GiB at Nibi) then you <b>should not</b> use <code>--mem=0</code>, but request the amount explicitly. Furthermore, some memory on each node is reserved for the operating system.  To find the largest amount your job can request and still qualify for a given node type, see the <i>Available memory</i> column of the <i>Node characteristics</i> table for each cluster.
+* [[Fir#Node_characteristics|Fir node characteristics]]
 * [[Narval/en#Node_characteristics|Narval node characteristics]]
+* [[Nibi#Node_characteristics|Nibi node characteristics]]
+* [[Rorqual/en#Node_characteristics|Rorqual node characteristics]]
 
-<!--T:6-->
-==== Few cores, single node ====
+==== Few cores, single node ==== <!--T:6-->
+
+<!--T:34-->
 If you need less than a full node but need all the cores to be on the same node, then you can request, for example,
 {{File
   |name=less_than_whole_node.sh
@@ -151,8 +153,9 @@ srun application.exe
 }}
 In this case, you could also say <code>--mem-per-cpu=3G</code>. The advantage of <code>--mem=45G</code> is that the memory consumed by each individual process doesn't matter, as long as all of them together don’t use more than 45GB. With <code>--mem-per-cpu=3G</code>, the job will be cancelled if any of the processes exceeds 3GB.
 
-<!--T:20-->
-==== Large parallel job, not a multiple of whole nodes ====
+==== Large parallel job, not a multiple of whole nodes ==== <!--T:20-->
+
+<!--T:35-->
 Not every application runs with maximum efficiency on a multiple of 32 (or 40, or 48) cores. Choosing the number of cores to request—and whether or not to request whole nodes—may be a trade-off between <i>running</i> time (or efficient use of the computer) and <i>waiting</i> time (or efficient use of your time). If you want help evaluating these factors, please contact [[Technical support]].
 
 === Hybrid jobs: MPI and OpenMP, or MPI and threads === <!--T:7-->
@@ -193,8 +196,9 @@ Also, as you would expect, <code>srun</code> is fully coupled to Slurm. When you
 <!--T:22-->
 For an example of some differences between <code>srun</code> and <code>mpiexec</code>, see [https://mail-archive.com/users@lists.open-mpi.org/msg31874.html this discussion] on the Open MPI support forum. Better performance might be achievable with <code>mpiexec</code> than with <code>srun</code> under certain circumstances, but using <code>srun</code> minimizes the risk of a mismatch between the resources allocated by Slurm and those used by Open MPI.
 
-<!--T:15-->
-=== External links ===
+=== External links === <!--T:15-->
+
+<!--T:36-->
 * [https://slurm.schedmd.com/sbatch.html sbatch] documentation
 * [https://slurm.schedmd.com/srun.html srun] documentation
 * [https://www.open-mpi.org/faq/?category=slurm Open MPI] and Slurm

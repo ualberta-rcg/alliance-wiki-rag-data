@@ -11,7 +11,9 @@ Dans la foire aux questions Slurm, la réponse à [https://slurm.schedmd.com/faq
 <span id="Examples_of_common_MPI_scenarios"></span>
 === Exemples de scénarios ===
 
+<span id="Few_cores,_any_number_of_nodes"></span>
 ==== Peu de cœurs, nœuds indéterminés ====
+
 En plus de spécifier la durée de <i>toute tâche Slurm</i>, il faut aussi indiquer le nombre de processus MPI que Slurm doit démarrer. Le moyen le plus simple de ce faire est d'utiliser <code>--ntasks</code>. Puisque l'allocation par défaut de 256Mo de mémoire est souvent insuffisante, vous devriez aussi spécifier la quantité de mémoire nécessaire. Avec <code>--ntasks</code>, il est impossible de savoir combien de cœurs seront sur chaque nœud; vous voudrez alors utiliser <code>--mem-per-cpu</code> ainsi
 
  {{File
@@ -28,23 +30,23 @@ Nous avons ici 15 processus MPI. L'allocation des cœurs pourrait se faire sur 1
 <span id="Whole_nodes"></span>
 ====Nœuds entiers ====
 
-Pour une tâche parallèle intensive qui peut utiliser efficacement 32 cœurs ou plus, vous devriez probablement demander des nœuds entiers; il est donc utile de savoir quels types de nœuds sont disponibles sur la grappe que vous utilisez.
+Pour une tâche parallèle intensive qui peut utiliser efficacement 64 cœurs ou plus, vous devriez probablement demander des nœuds entiers; il est donc utile de savoir quels types de nœuds sont disponibles sur la grappe que vous utilisez.
 
-La plupart des nœuds de [[Béluga]], [[Cedar/fr|Cedar]], [[Graham/fr|Graham]], [[Narval]] et [[Niagara/fr|Niagara]] sont configurés comme suit ː
+La plupart des nœuds de [[Fir/fr|Fir]], [[Narval]], [[Nibi/fr|Nibi]], [[Rorqual]] et |[[Trillium/fr|Trillium]] sont configurés comme suit&nbsp;ː
 
 {| class="wikitable"
 |-
-! grappe                 !! cœurs !! mémoire utilisable           !! notes
+! grappe!! cœurs !! mémoire utilisable !! notes
 |-
-| [[Béluga]]    || 40    || 186 GiB (~4.6 GiB/core) || Certains sont réservés pour les tâches sur nœuds entiers.
+| [[Fir/fr|Fir]]                ||  192  ||    750 Gio    || certains sont réservés pour les tâches sur nœud entier
 |-
-| [[Graham/fr|Graham]]              || 32    || 125 GiB (~3.9 GiB/cœur) || Certains sont réservés pour les tâches sur nœuds entiers.
+| [[Narval]]   ||   64  ||    249 Gio    || certains sont réservés pour les tâches sur nœud entier
 |-
-| [[Cedar/fr|Cedar]] (Skylake)     || 48    || 187 GiB (~3.9 GiB/cœur) || Certains sont réservés pour les tâches sur nœuds entiers.
+| [[Nibi/fr|Nibi]]               ||  192  ||    748 Gio    || aucun n'est réservé pour les tâches sur nœud entier
 |-
-| [[Narval]]    || 64    || 249 GiB (~3.9 GiB/cœur) || processeurs AMD EPYC Rome 
+| [[Rorqual]] ||  192  ||    750 Gio    || certains sont réservés pour les tâches sur nœud entier
 |-
-| [[Niagara]]             || 40    || 188 GiB                 || Cette grappe n'accepte que les tâches sur nœuds entiers.
+| [[Trillium/fr|Trillium]]           ||  192  ||    749 Gio    || Trillium permet uniquement des tâches sur nœud entier
 |}
 
 Les tâches sur nœuds entiers peuvent être exécutées sur tous les nœuds. Dans le tableau ci-dessus, la note «&nbsp;Certains sont réservés pour les tâches sur nœuds entiers&nbsp;» signifie que les tâches par cœur sont interdites sur certains nœuds.
@@ -52,36 +54,14 @@ Les tâches sur nœuds entiers peuvent être exécutées sur tous les nœuds. Da
 Voici un exemple d'un script demandant des nœuds entiers.
 
 <tabs>
-<tab name="Béluga">
+<tab name="Fir">
 {{File
-  |name=whole_nodes_beluga.sh
+  |name=whole_nodes_fir.sh
   |lang="sh"
   |contents=
 #!/bin/bash 
 #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=40
-#SBATCH --mem=0
-srun application.exe
-}}</tab>
-<tab name="Cedar">
-{{File
-  |name=whole_nodes_cedar.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash 
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=48
-#SBATCH --mem=0
-srun application.exe
-}}</tab>
-<tab name="Graham">
-{{File
-  |name=whole_nodes_graham.sh
-  |lang="sh"
-  |contents=
-#!/bin/bash 
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=32
+#SBATCH --ntasks-per-node=192
 #SBATCH --mem=0
 srun application.exe
 }}</tab>
@@ -96,14 +76,36 @@ srun application.exe
 #SBATCH --mem=0
 srun application.exe
 }}</tab>
-<tab name="Niagara">
+<tab name="Nibi">
 {{File
-  |name=whole_nodes_niagara.sh
+  |name=whole_nodes_nibi.sh
   |lang="sh"
   |contents=
 #!/bin/bash 
 #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=40  # ou 80 (activation du Hyper-Threading)
+#SBATCH --ntasks-per-node=192
+#SBATCH --mem=0
+srun application.exe
+}}</tab>
+<tab name="Rorqual">
+{{File
+  |name=whole_nodes_rorqual.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash 
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node=192
+#SBATCH --mem=0
+srun application.exe
+}}</tab>
+<tab name="Trillium">
+{{File
+  |name=whole_nodes_trillium.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash 
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node=192
 #SBATCH --mem=0
 srun application.exe
 }}</tab>
@@ -111,14 +113,16 @@ srun application.exe
 
 Le fait de demander <code>--mem=0</code> indique à Slurm qu'il doit <i>réserver toute la mémoire disponible de chacun des nœuds assignés à la tâche</i>. 
 
-Toutefois, si vous avez besoin de plus de mémoire par nœud que ce que le plus petit nœud peut offrir (par exemple plus de 125Gio sur Graham), vous ne devriez pas utiliser <code>--mem=0</code>, mais demander une quantité explicite de mémoire. De plus, une partie de la mémoire de chaque nœud est réservée au système d'exploitation; dans la section <i>Caractéristiques des nœuds</i>, la colonne <i>Mémoire disponible</i> indique la plus grande quantité de mémoire qu'une tâche peut demander ː
-* [[Béluga#Caractéristiques_des_nœuds|Béluga]]	
-* [[Cedar/fr#Caractéristiques_des_nœuds|Cedar]]	
-* [[Graham/fr#Caractéristiques_des_nœuds|Graham]]
+Toutefois, si vous avez besoin de plus de mémoire par nœud que ce que le plus petit nœud peut offrir (par exemple plus de 748Gio sur Nibi), '''vous ne devriez pas utiliser''' <code>--mem=0</code>, mais demander une quantité explicite de mémoire. De plus, une partie de la mémoire de chaque nœud est réservée au système d'exploitation; dans la section <i>Caractéristiques des nœuds</i>, la colonne <i>Mémoire disponible</i> indique la plus grande quantité de mémoire qu'une tâche peut demander ː
+* [[Fir/fr#Caractéristiques_des_nœuds|Fir]]	
 * [[Narval#Caractéristiques_des_nœuds|Narval]]
+* [[Nibi/fr#Caractéristiques_des_nœuds|Nibi]]	
+* [[Rorqual#Caractéristiques_des_nœuds|Rorqual]]
 
-====Peu de cœurs, nœud unique ====
-Si vous avez besoin de moins qu'un nœud entier, mais que tous les cœurs doivent être du même nœud, vous pouvez demander par exemple  
+<span id="Few_cores,_single_node"></span>
+==== Peu de cœurs, nœud unique ====
+
+Si vous avez besoin de moins d'un nœud entier, mais que tous les cœurs doivent être du même nœud, vous pouvez demander par exemple  
 {{File
   |name=less_than_whole_node.sh
   |lang="sh"
@@ -131,7 +135,9 @@ srun application.exe
 }}
 Vous pourriez aussi utiliser <code>--mem-per-cpu=3G</code>, mais la tâche serait annulée si un des processus dépasse 3Go. L'avantage avec <code>--mem=45G</code> est que la mémoire consommée par chaque processus n'importe pas, pourvu que dans l'ensemble ils ne dépassent pas 45Go.
 
-==== Tâche intensive en parallèle, sans multiples de nœuds entiers ==== 
+<span id="Large_parallel_job,_not_a_multiple_of_whole_nodes"></span>
+==== Tâche intensive en parallèle, sans multiples de nœuds entiers ====
+
 Ce ne sont pas toutes les tâches qui sont effectuées de façon optimale sur des cœurs en multiples de 32, 40 ou 48. Le fait d'indiquer ou non un nombre précis de cœurs peut influer sur le <i>temps d'exécution</i> (ou la bonne utilisation de la ressource) ou le <i>temps d'attente</i> (ou la bonne utilisation du temps qui vous est imparti). Pour de l'aide sur comment évaluer ces facteurs, communiquez avec le [[Technical support/fr|soutien technique]].
 
 <span id="Hybrid_jobs:_MPI_and_OpenMP,_or_MPI_and_threads"></span>
@@ -166,9 +172,11 @@ Bien entendu, <code>srun</code> est parfaitement adapté à Slurm&nbsp;: il amor
 
 Pour des exemples de quelques différences entre <code>srun</code> et <code>mpiexec</code>, voyez [https://mail-archive.com/users@lists.open-mpi.org/msg31874.html le forum OpenMPI]. Dans certains cas, <code>mpiexec</code> offrira une meilleure performance que <code>srun</code>, mais <code>srun</code> diminue le risque de conflit entre les ressources allouées par Slurm et celles utilisées par OpenMPI.
 
+<span id="External_links"></span>
 === Références ===
+
 * [https://slurm.schedmd.com/sbatch.html documentation sbatch]
 * [https://slurm.schedmd.com/srun.html documentation srun] 
 * [https://www.open-mpi.org/faq/?category=slurm Open MPI et Slurm]
 
-[[Categorie:SLURM]]
+[[Category:SLURM]]

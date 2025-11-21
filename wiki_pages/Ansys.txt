@@ -223,13 +223,15 @@ NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
 
 <!--T:6784-->
 if [ "$SLURM_NNODES" == 1 ]; then
- #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
+ if [[ "${EBVERSIONANSYS//R*}" -ge 2025 && "$CC_CLUSTER" == nibi ]]; then
+  export I_MPI_HYDRA_BOOTSTRAP=ssh
+ fi
  fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
 else
  if [[ "${CC_CLUSTER}" == nibi ]]; then
-   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
  else
-   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
  fi
 fi
 }}
@@ -282,13 +284,15 @@ NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
 
 <!--T:6787-->
 if [ "$SLURM_NNODES" == 1 ]; then
- #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
+ if [[ "${EBVERSIONANSYS//R*}" -ge 2025 && "$CC_CLUSTER" == nibi ]]; then
+  export I_MPI_HYDRA_BOOTSTRAP=ssh
+ fi
+ fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
 else
  if [[ "${CC_CLUSTER}" == nibi ]]; then
-   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
  else
-   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
  fi
 fi
 }}
@@ -323,16 +327,16 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 
 <!--T:6788-->
 export OPENMPI_ROOT=$EBROOTOPENMPI
-export OMPI_MCA_hwloc_base_binding_policy=core
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/mf-$SLURM_JOB_ID
 for i in `cat /tmp/mf-$SLURM_JOB_ID {{!}} uniq`; do echo "${i}:$(cat /tmp/mf-$SLURM_JOB_ID {{!}} grep $i {{!}} wc -l)" >> /tmp/machinefile-$SLURM_JOB_ID; done
 NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
 
 <!--T:6789-->
 if [ "$SLURM_NNODES" == 1 ]; then
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pshmem -i $MYJOURNALFILE
+ fluent -g $MYVERSION -t $NCORES -mpi=openmpi -pshmem -i $MYJOURNALFILE
 else
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ export FI_PROVIDER=verbs
+ fluent -g $MYVERSION -t $NCORES -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
 fi
 }}
 </tab>
@@ -366,16 +370,16 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 
 <!--T:6790-->
 export OPENMPI_ROOT=$EBROOTOPENMPI
-export OMPI_MCA_hwloc_base_binding_policy=core
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/mf-$SLURM_JOB_ID
 for i in `cat /tmp/mf-$SLURM_JOB_ID {{!}} uniq`; do echo "${i}:$(cat /tmp/mf-$SLURM_JOB_ID {{!}} grep $i {{!}} wc -l)" >> /tmp/machinefile-$SLURM_JOB_ID; done
 NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
 
 <!--T:6791-->
 if [ "$SLURM_NNODES" == 1 ]; then
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pshmem -i $MYJOURNALFILE
+ fluent -g $MYVERSION -t $NCORES -mpi=openmpi -pshmem -i $MYJOURNALFILE
 else
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ export FI_PROVIDER=verbs
+ fluent -g $MYVERSION -t $NCORES -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
 fi
 }}
 </tab>
@@ -441,9 +445,9 @@ else
   mkdir -pv $SCRATCH/.fluentconf
   touch $SCRATCH/.flrecent
   if [ "$SLURM_NNODES" == 1 ]; then
-   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
   else
-   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -ssh -pib -cnf=$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -ssh -pib -cnf=$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
   fi
 fi
 }}
@@ -506,13 +510,15 @@ NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
 
 <!--T:2410-->
 if [ "$SLURM_NNODES" == 1 ]; then
- #export I_MPI_HYDRA_BOOTSTRAP=ssh
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
+ if [[ "${EBVERSIONANSYS//R*}" -ge 2025 && "$CC_CLUSTER" == nibi ]]; then
+  export I_MPI_HYDRA_BOOTSTRAP=ssh
+ fi
+ fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
 else
  if [[ "${CC_CLUSTER}" == nibi ]]; then
-   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
  else
-   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
  fi
 fi
 if [ $? -eq 0 ]; then
@@ -577,13 +583,15 @@ NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
 
 <!--T:2910-->
 if [ "$SLURM_NNODES" == 1 ]; then
- #export I_MPI_HYDRA_BOOTSTRAP=ssh
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
+ if [[ "${EBVERSIONANSYS//R*}" -ge 2025 && "$CC_CLUSTER" == nibi ]]; then
+  export I_MPI_HYDRA_BOOTSTRAP=ssh
+ fi
+ fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
 else
  if [[ "${CC_CLUSTER}" == nibi ]]; then
-   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
  else
-   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
  fi
 fi
 if [ $? -eq 0 ]; then
@@ -657,26 +665,27 @@ slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
 
 <!--T:3408-->
-# Specify 2d, 2ddp, 3d or 3ddp and replace sample with your journal filename …
 if [ "$SLURM_NNODES" == 1 ]; then
-  #export I_MPI_HYDRA_BOOTSTRAP=ssh
+  if [[ "${EBVERSIONANSYS//R*}" -ge 2025 && "$CC_CLUSTER" == nibi ]]; then
+    export I_MPI_HYDRA_BOOTSTRAP=ssh
+  fi
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
-    fluent -g 2ddp -t $NCORES -affinity=0 -i $MYJOUFILE
+    fluent -g 2ddp -t $NCORES -i $MYJOUFILE
   else
-    fluent -g 2ddp -t $NCORES -affinity=0 -i $MYJOUFILERES
+    fluent -g 2ddp -t $NCORES -i $MYJOUFILERES
   fi
 else 
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
    if [[ "${CC_CLUSTER}" == nibi ]]; then
-     fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -ssh -i $MYJOUFILE
+     fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -ssh -i $MYJOUFILE
    else
-     fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -ssh -i $MYJOUFILE
+     fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -ssh -i $MYJOUFILE
    fi
   else
    if [[ "${CC_CLUSTER}" == nibi ]]; then
-     fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -ssh -i $MYJOUFILERES
+     fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -ssh -i $MYJOUFILERES
    else
-     fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -ssh -i $MYJOUFILERES
+     fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -ssh -i $MYJOUFILERES
    fi
   fi
 fi
@@ -751,7 +760,9 @@ NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
 
 <!--T:3910-->
 if [ "$SLURM_NNODES" == 1 ]; then
-  #export I_MPI_HYDRA_BOOTSTRAP=ssh
+ if [[ "${EBVERSIONANSYS//R*}" -ge 2025 && "$CC_CLUSTER" == nibi ]]; then
+  export I_MPI_HYDRA_BOOTSTRAP=ssh
+ fi
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
     fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -I $MYFILEJOU
   else
