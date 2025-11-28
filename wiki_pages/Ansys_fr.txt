@@ -214,32 +214,31 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 
 # ------- do not change any lines below --------
 
-if [[ "${CC_CLUSTER}" == narval ]]; then
- if [ "$EBVERSIONGENTOO" == 2020 ]; then
-   module load intel/2021 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest
-   export HCOLL_RCACHE=^ucs
- elif [ "$EBVERSIONGENTOO" == 2023 ]; then
-   module load intel/2023 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT
- fi
- unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+if [[ "$CC_CLUSTER" == narval ]]; then
+ module load intel/2023 intelmpi
+ export INTELMPI_ROOT=$I_MPI_ROOT
  unset I_MPI_ROOT
 fi
 
-slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
+if [[ ("${EBVERSIONANSYS//R*}" -ge 2025 && "${CC_CLUSTER}" == nibi) || "${CC_CLUSTER}" == narval ]]; then
+ export I_MPI_HYDRA_BOOTSTRAP=ssh
+ unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+fi
 
-<div class="mw-translate-fuzzy">
+slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
+NCORES=$SLURM_NTASKS
+
 if [ "$SLURM_NNODES" == 1 ]; then
- #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
+ fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
 else
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ if [[ "${CC_CLUSTER}" == nibi ]]; then
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ else
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ fi
 fi
 }}
 </tab>
-</div>
 
 <tab name="Plusieurs nœuds (par cœur)">
 {{File
@@ -252,7 +251,7 @@ fi
 #SBATCH --account=def-group   # Specify account
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 ##SBATCH --nodes=1            # Uncomment to specify (narval 1 node max)
-#SBATCH --ntasks=16           # Specify total number of cores
+#SBATCH --ntasks=16           # Specify total number of cores for all nodes
 #SBATCH --mem-per-cpu=4G      # Specify memory per core
 #SBATCH --cpus-per-task=1     # Do not change
 </div>
@@ -267,32 +266,31 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 
 # ------- do not change any lines below --------
 
-if [[ "${CC_CLUSTER}" == narval ]]; then
- if [ "$EBVERSIONGENTOO" == 2020 ]; then
-   module load intel/2021 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest
-   export HCOLL_RCACHE=^ucs
- elif [ "$EBVERSIONGENTOO" == 2023 ]; then
-   module load intel/2023 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT
- fi
- unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+if [[ "$CC_CLUSTER" == narval ]]; then
+ module load intel/2023 intelmpi
+ export INTELMPI_ROOT=$I_MPI_ROOT
  unset I_MPI_ROOT
 fi
 
-slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
+if [[ ("${EBVERSIONANSYS//R*}" -ge 2025 && "${CC_CLUSTER}" == nibi) || "${CC_CLUSTER}" == narval ]]; then
+ export I_MPI_HYDRA_BOOTSTRAP=ssh
+ unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+fi
 
-<div class="mw-translate-fuzzy">
+slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
+NCORES=$SLURM_NTASKS
+
 if [ "$SLURM_NNODES" == 1 ]; then
- #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
+ fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
 else
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ if [[ "${CC_CLUSTER}" == nibi ]]; then
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ else
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ fi
 fi
 }}
 </tab>
-</div>
 
 <tab name="Plusieurs nœuds (par nœud, Narval)">
 {{File
@@ -321,15 +319,15 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 # ------- do not change any lines below --------
 
 export OPENMPI_ROOT=$EBROOTOPENMPI
-export OMPI_MCA_hwloc_base_binding_policy=core
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/mf-$SLURM_JOB_ID
 for i in `cat /tmp/mf-$SLURM_JOB_ID {{!}} uniq`; do echo "${i}:$(cat /tmp/mf-$SLURM_JOB_ID {{!}} grep $i {{!}} wc -l)" >> /tmp/machinefile-$SLURM_JOB_ID; done
-NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
 if [ "$SLURM_NNODES" == 1 ]; then
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pshmem -i $MYJOURNALFILE
+ fluent -g $MYVERSION -t $NCORES -mpi=openmpi -pshmem -i $MYJOURNALFILE
 else
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ export FI_PROVIDER=verbs
+ fluent -g $MYVERSION -t $NCORES -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
 fi
 }}
 </tab>
@@ -361,15 +359,15 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 # ------- do not change any lines below --------
 
 export OPENMPI_ROOT=$EBROOTOPENMPI
-export OMPI_MCA_hwloc_base_binding_policy=core
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/mf-$SLURM_JOB_ID
 for i in `cat /tmp/mf-$SLURM_JOB_ID {{!}} uniq`; do echo "${i}:$(cat /tmp/mf-$SLURM_JOB_ID {{!}} grep $i {{!}} wc -l)" >> /tmp/machinefile-$SLURM_JOB_ID; done
-NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
 if [ "$SLURM_NNODES" == 1 ]; then
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pshmem -i $MYJOURNALFILE
+ fluent -g $MYVERSION -t $NCORES -mpi=openmpi -pshmem -i $MYJOURNALFILE
 else
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ export FI_PROVIDER=verbs
+ fluent -g $MYVERSION -t $NCORES -mpi=openmpi -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
 fi
 }}
 </tab>
@@ -411,17 +409,15 @@ VENDPORT=1793                    # Specify server vendor port
 
 # ------- do not change any lines below --------
 
-<div class="mw-translate-fuzzy">
-ssh nia-gw -fNL $FLEXPORT:$LICSERVER:$FLEXPORT      # Do not change
-ssh nia-gw -fNL $INTEPORT:$LICSERVER:$INTEPORT      # Do not change
-ssh nia-gw -fNL $VENDPORT:$LICSERVER:$VENDPORT      # Do not change
-export ANSYSLMD_LICENSE_FILE=$FLEXPORT@localhost    # Do not change
-export ANSYSLI_SERVERS=$INTEPORT@localhost          # Do not change
-</div>
+ssh tri-gw -fNL $FLEXPORT:$LICSERVER:$FLEXPORT
+ssh tri-gw -fNL $VENDPORT:$LICSERVER:$VENDPORT
+export ANSYSLMD_LICENSE_FILE=$FLEXPORT@localhost
+export ANSYSLI_SERVERS=$INTEPORT@localhost
 
 slurm_hl2hl.py --format ANSYS-FLUENT > $SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
+<div class="mw-translate-fuzzy">
 if [ ! -L "$HOME/.ansys" ]; then
   echo "ERROR: A link to a writable .ansys directory does not exist."
   echo 'Remove ~/.ansys if one exists and then run: ln -s $SCRATCH/.ansys ~/.ansys'
@@ -446,6 +442,7 @@ else
 fi
 }}
 </tab>
+</div>
 
 </tabs>
 
@@ -482,21 +479,19 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 
 # ------- do not change any lines below --------
 
-if [[ "${CC_CLUSTER}" == narval ]]; then
- if [ "$EBVERSIONGENTOO" == 2020 ]; then
-   module load intel/2021 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest
-   export HCOLL_RCACHE=^ucs
- elif [ "$EBVERSIONGENTOO" == 2023 ]; then
-   module load intel/2023 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT
- fi
- unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+if [[ "$CC_CLUSTER" == narval ]]; then
+ module load intel/2023 intelmpi
+ export INTELMPI_ROOT=$I_MPI_ROOT
  unset I_MPI_ROOT
 fi
 
+if [[ ("${EBVERSIONANSYS//R*}" -ge 2025 && "${CC_CLUSTER}" == nibi) || "${CC_CLUSTER}" == narval ]]; then
+ export I_MPI_HYDRA_BOOTSTRAP=ssh
+ unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+fi
+
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
 <div class="mw-translate-fuzzy">
 if [ "$SLURM_NNODES" == 1 ]; then
@@ -545,21 +540,19 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 
 # ------- do not change any lines below --------
 
-if [[ "${CC_CLUSTER}" == narval ]]; then
- if [ "$EBVERSIONGENTOO" == 2020 ]; then
-   module load intel/2021 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest
-   export HCOLL_RCACHE=^ucs
- elif [ "$EBVERSIONGENTOO" == 2023 ]; then
-   module load intel/2023 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT
- fi
- unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+if [[ "$CC_CLUSTER" == narval ]]; then
+ module load intel/2023 intelmpi
+ export INTELMPI_ROOT=$I_MPI_ROOT
  unset I_MPI_ROOT
 fi
 
+if [[ ("${EBVERSIONANSYS//R*}" -ge 2025 && "${CC_CLUSTER}" == nibi) || "${CC_CLUSTER}" == narval ]]; then
+ export I_MPI_HYDRA_BOOTSTRAP=ssh
+ unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+fi
+
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
 <div class="mw-translate-fuzzy">
 if [ "$SLURM_NNODES" == 1 ]; then
@@ -620,21 +613,19 @@ MYDATFILERES=sample-restart.dat.h5  # Specify dat restart filename
 
 # ------- do not change any lines below --------
 
-if [[ "${CC_CLUSTER}" == narval ]]; then
- if [ "$EBVERSIONGENTOO" == 2020 ]; then
-   module load intel/2021 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest
-   export HCOLL_RCACHE=^ucs
- elif [ "$EBVERSIONGENTOO" == 2023 ]; then
-   module load intel/2023 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT
- fi
- unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+if [[ "$CC_CLUSTER" == narval ]]; then
+ module load intel/2023 intelmpi
+ export INTELMPI_ROOT=$I_MPI_ROOT
  unset I_MPI_ROOT
 fi
 
+if [[ ("${EBVERSIONANSYS//R*}" -ge 2025 && "${CC_CLUSTER}" == nibi) || "${CC_CLUSTER}" == narval ]]; then
+ export I_MPI_HYDRA_BOOTSTRAP=ssh
+ unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+fi
+
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
 <div class="mw-translate-fuzzy">
 # Specify 2d, 2ddp, 3d or 3ddp and replace sample with your journal filename …
@@ -701,21 +692,19 @@ MYDATFILERES=sample-restart.dat.h5  # Specify dat restart filename
 
 # ------- do not change any lines below --------
 
-if [[ "${CC_CLUSTER}" == narval ]]; then
- if [ "$EBVERSIONGENTOO" == 2020 ]; then
-   module load intel/2021 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest
-   export HCOLL_RCACHE=^ucs
- elif [ "$EBVERSIONGENTOO" == 2023 ]; then
-   module load intel/2023 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT
- fi
- unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+if [[ "$CC_CLUSTER" == narval ]]; then
+ module load intel/2023 intelmpi
+ export INTELMPI_ROOT=$I_MPI_ROOT
  unset I_MPI_ROOT
 fi
 
+if [[ ("${EBVERSIONANSYS//R*}" -ge 2025 && "${CC_CLUSTER}" == nibi) || "${CC_CLUSTER}" == narval ]]; then
+ export I_MPI_HYDRA_BOOTSTRAP=ssh
+ unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+fi
+
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
 <div class="mw-translate-fuzzy">
 if [ "$SLURM_NNODES" == 1 ]; then
@@ -1308,43 +1297,28 @@ Les programmes Ansys fonctionnent interactivement en mode graphique sur les nœu
 
 Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then a H100 gpu resource should be requested and an OpenGL driver argument added when starting fluent as shown below.
 
-<div class="mw-translate-fuzzy">
 === Fluids ===
-::: <code>module load StdEnv/2020</code>
-::: <code>module load ansys/2021R1</code> (ou versions plus récentes)
-::: <code>fluent -mpi=intel</code>, ou
-::: <code>QTWEBENGINE_DISABLE_SANDBOX=1 cfx5</code>
-</div>
+::: <code>module load StdEnv/2023 ansys/2022R2</code> (ou versions plus récentes)
+::: <code>fluent -mpi=intel -driver opengl|null</code> OU 
+::: <code>cfx5 -graphics ogl|mesa</code>
 
-<div class="mw-translate-fuzzy">
 === Mapdl ===
-::: <code>module load StdEnv/2020</code>
-::: <code>module load ansys/2021R2</code> (ou versions plus récentes)
+::: <code>module load StdEnv/2023 ansys/2022R2</code> (ou versions plus récentes)
 ::: <code>mapdl -g</code>, ou via le démarreur,
 ::: <code>launcher</code> --> cliquer sur le bouton RUN
-</div>
 
-<div class="mw-translate-fuzzy">
 === Workbench ===
-::: <code>module load StdEnv/2020</code>
-::: <code>module load ansys/2021R2</code> (ou versions plus récentes)
+::: <code>module load StdEnv/2023 ansys/2022R2</code> (ou versions plus récentes)
 ::: <code>xfwm4 --replace &</code> (nécessaire seulement si vous utilisez Ansys Mechanical)
 ::: <code>export QTWEBENGINE_DISABLE_SANDBOX=1</code> (nécessaire seulement si vous utilisez CFD-Post)
 ::: <code>runwb2</code>
 ::: <br>
-::: Remarques : Quand vous exécutez en parallèle un programme d'analyse comme  Mechanical or Fluent sur un nœud simple, ne cochez pas la case <i>Distributed</i> et indiquez un nombre de cœurs égal à votre  <b>session salloc, moins 1</b>. Les menus déroulants du Ansys Mechanical Workbench ne répondent pas correctement. Comme solution, lancez <code>xfwm4 --replace</code> sur la ligne de commande avant de démarrer Workbench. Pour avoir xfwm4 par défaut, modifiez <code>$HOME/.vnc/xstartup</code> et remplacez <code>mate-session</code> par <code>xfce4-session</code>. Enfin, Fluent dans ansys/2022R2 ne fonctionne pas en ce moment sur les nœuds de calcul; utilisez une autre version.
-</div>
+::: Remarque : Quand vous exécutez en parallèle un programme d'analyse comme  Mechanical or Fluent sur un nœud simple, ne cochez pas la case <i>Distributed</i> et indiquez un nombre de cœurs égal à votre  <b>session salloc, moins 1</b>. Les menus déroulants du Ansys Mechanical Workbench ne répondent pas correctement. Comme solution, lancez <code>xfwm4 --replace</code> sur la ligne de commande avant de démarrer Workbench. Pour avoir xfwm4 par défaut, modifiez <code>$HOME/.vnc/xstartup</code> et remplacez <code>mate-session</code> par <code>xfce4-session</code>.
 
-<div class="mw-translate-fuzzy">
 === Ensight ===
-::: <code>module load StdEnv/2020 ansys/2022R2; A=222; B=5.12.6</code>, ou
-::: <code>module load StdEnv/2020 ansys/2022R1; A=221; B=5.12.6</code>, ou
-::: <code>module load StdEnv/2020 ansys/2021R2; A=212; B=5.12.6</code>, ou
-::: <code>module load StdEnv/2020 ansys/2021R1; A=211; B=5.12.6</code>, ou
+::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>
 ::: <code>export LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib</code>
 ::: <code>ensight -X</code>
-Remarque : ansys/2022R2 Ensight a été peu testé sur les nœuds de calcul; veuillez nous faire part des problèmes que vous rencontrez.
-</div>
 
 <div class="mw-translate-fuzzy">
 === Rocky ===

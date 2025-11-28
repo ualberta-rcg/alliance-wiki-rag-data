@@ -188,8 +188,8 @@ Most Fluent jobs should use the following <i>by node</i> script to minimize solu
 #SBATCH --account=def-group   # Specify account name
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify number of compute nodes (narval 1 node max)
-#SBATCH --ntasks-per-node=32  # Specify number of cores per node (max all cores of a compute node)
-#SBATCH --mem=0               # Do not change (allocates all memory per compute node)
+#SBATCH --ntasks-per-node=32  # Specify upto maximum number of cores per compute node
+#SBATCH --mem=0               # Specify memory per compute node (0 allocates all memory)
 #SBATCH --cpus-per-task=1     # Do not change
 
 <!--T:2306-->
@@ -203,30 +203,26 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 <!--T:501-->
 # ------- do not change any lines below --------
 
-<!--T:6782-->
-if [[ "${CC_CLUSTER}" == narval ]]; then
- if [ "$EBVERSIONGENTOO" == 2020 ]; then
-   module load intel/2021 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest
-   export HCOLL_RCACHE=^ucs
- elif [ "$EBVERSIONGENTOO" == 2023 ]; then
-   module load intel/2023 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT
- fi
- unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+<!--T:6809-->
+if [[ "$CC_CLUSTER" == narval ]]; then
+ module load intel/2023 intelmpi
+ export INTELMPI_ROOT=$I_MPI_ROOT
  unset I_MPI_ROOT
 fi
 
-<!--T:6783-->
-slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
+<!--T:6810-->
+if [[ ("${EBVERSIONANSYS//R*}" -ge 2025 && "${CC_CLUSTER}" == nibi) || "${CC_CLUSTER}" == narval ]]; then
+ export I_MPI_HYDRA_BOOTSTRAP=ssh
+ unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+fi
 
-<!--T:6784-->
+<!--T:6811-->
+slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
+NCORES=$SLURM_NTASKS
+
+<!--T:6812-->
 if [ "$SLURM_NNODES" == 1 ]; then
- if [[ "${EBVERSIONANSYS//R*}" -ge 2025 && "$CC_CLUSTER" == nibi ]]; then
-  export I_MPI_HYDRA_BOOTSTRAP=ssh
- fi
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
+ fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
 else
  if [[ "${CC_CLUSTER}" == nibi ]]; then
    fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
@@ -249,7 +245,7 @@ fi
 #SBATCH --account=def-group   # Specify account
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 ##SBATCH --nodes=1            # Uncomment to specify (narval 1 node max)
-#SBATCH --ntasks=16           # Specify total number of cores for all nodes
+#SBATCH --ntasks=16           # Specify total number of cores across all nodes
 #SBATCH --mem-per-cpu=4G      # Specify memory per core
 #SBATCH --cpus-per-task=1     # Do not change
 
@@ -264,29 +260,25 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 <!--T:502-->
 # ------- do not change any lines below --------
 
-<!--T:6785-->
-if [[ "${CC_CLUSTER}" == narval ]]; then
- if [ "$EBVERSIONGENTOO" == 2020 ]; then
-   module load intel/2021 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest
-   export HCOLL_RCACHE=^ucs
- elif [ "$EBVERSIONGENTOO" == 2023 ]; then
-   module load intel/2023 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT
- fi
- unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+<!--T:6813-->
+if [[ "$CC_CLUSTER" == narval ]]; then
+ module load intel/2023 intelmpi
+ export INTELMPI_ROOT=$I_MPI_ROOT
  unset I_MPI_ROOT
 fi
 
-<!--T:6786-->
-slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
+<!--T:6814-->
+if [[ ("${EBVERSIONANSYS//R*}" -ge 2025 && "${CC_CLUSTER}" == nibi) || "${CC_CLUSTER}" == narval ]]; then
+ export I_MPI_HYDRA_BOOTSTRAP=ssh
+ unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+fi
 
-<!--T:6787-->
+<!--T:6815-->
+slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
+NCORES=$SLURM_NTASKS
+
+<!--T:6816-->
 if [ "$SLURM_NNODES" == 1 ]; then
- if [[ "${EBVERSIONANSYS//R*}" -ge 2025 && "$CC_CLUSTER" == nibi ]]; then
-  export I_MPI_HYDRA_BOOTSTRAP=ssh
- fi
  fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
 else
  if [[ "${CC_CLUSTER}" == nibi ]]; then
@@ -311,7 +303,7 @@ fi
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify number of compute nodes (1 or more)
 #SBATCH --ntasks-per-node=64  # Specify number of cores per node (narval 64 or less)
-#SBATCH --mem=0               # Do not change (allocates all memory per compute node)
+#SBATCH --mem=0               # Do not change (allocate all memory per compute node)
 #SBATCH --cpus-per-task=1     # Do not change
 
 <!--T:5306-->
@@ -325,13 +317,13 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 <!--T:503-->
 # ------- do not change any lines below --------
 
-<!--T:6788-->
+<!--T:6817-->
 export OPENMPI_ROOT=$EBROOTOPENMPI
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/mf-$SLURM_JOB_ID
 for i in `cat /tmp/mf-$SLURM_JOB_ID {{!}} uniq`; do echo "${i}:$(cat /tmp/mf-$SLURM_JOB_ID {{!}} grep $i {{!}} wc -l)" >> /tmp/machinefile-$SLURM_JOB_ID; done
-NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
-<!--T:6789-->
+<!--T:6818-->
 if [ "$SLURM_NNODES" == 1 ]; then
  fluent -g $MYVERSION -t $NCORES -mpi=openmpi -pshmem -i $MYJOURNALFILE
 else
@@ -368,13 +360,13 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 <!--T:504-->
 # ------- do not change any lines below --------
 
-<!--T:6790-->
+<!--T:6819-->
 export OPENMPI_ROOT=$EBROOTOPENMPI
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/mf-$SLURM_JOB_ID
 for i in `cat /tmp/mf-$SLURM_JOB_ID {{!}} uniq`; do echo "${i}:$(cat /tmp/mf-$SLURM_JOB_ID {{!}} grep $i {{!}} wc -l)" >> /tmp/machinefile-$SLURM_JOB_ID; done
-NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
-<!--T:6791-->
+<!--T:6820-->
 if [ "$SLURM_NNODES" == 1 ]; then
  fluent -g $MYVERSION -t $NCORES -mpi=openmpi -pshmem -i $MYJOURNALFILE
 else
@@ -417,15 +409,15 @@ VENDPORT=1793                         # Specify server vendor port
 <!--T:505-->
 # ------- do not change any lines below --------
 
-<!--T:6792-->
-ssh tri-gw -fNL $FLEXPORT:$LICSERVER:$FLEXPORT      # Do not change
-ssh tri-gw -fNL $VENDPORT:$LICSERVER:$VENDPORT      # Do not change
-export ANSYSLMD_LICENSE_FILE=$FLEXPORT@localhost    # Do not change
-export ANSYSLI_SERVERS=$INTEPORT@localhost          # Do not change
+<!--T:6821-->
+ssh tri-gw -fNL $FLEXPORT:$LICSERVER:$FLEXPORT
+ssh tri-gw -fNL $VENDPORT:$LICSERVER:$VENDPORT
+export ANSYSLMD_LICENSE_FILE=$FLEXPORT@localhost
+export ANSYSLI_SERVERS=$INTEPORT@localhost
 
-<!--T:6793-->
+<!--T:6822-->
 slurm_hl2hl.py --format ANSYS-FLUENT > $SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
 <!--T:6746-->
 if [ ! -L "$HOME/.ansys" ]; then
@@ -447,7 +439,7 @@ else
   if [ "$SLURM_NNODES" == 1 ]; then
    fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
   else
-   fluent -g $MYVERSION -t $NCORES -mpi=intel -ssh -pib -cnf=$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
   fi
 fi
 }}
@@ -474,8 +466,8 @@ The scripts in this section should only be used with Fluent jobs that are known 
 #SBATCH --account=def-group   # Specify account
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify number of compute nodes (narval 1 node max)
-#SBATCH --ntasks-per-node=32  # Specify number of cores per compute node
-#SBATCH --mem=0               # Do not change (allocates all memory per compute node)
+#SBATCH --ntasks-per-node=32  # Specify upto maximum number of cores per compute node
+#SBATCH --mem=0               # Specify memory per compute node (0 allocates all memory)
 #SBATCH --cpus-per-task=1     # Do not change
 #SBATCH --array=1-5%1         # Specify number of requeue attempts (2 or more, 5 is shown)
 
@@ -490,29 +482,25 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 <!--T:506-->
 # ------- do not change any lines below --------
 
-<!--T:4740-->
-if [[ "${CC_CLUSTER}" == narval ]]; then
- if [ "$EBVERSIONGENTOO" == 2020 ]; then
-   module load intel/2021 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest
-   export HCOLL_RCACHE=^ucs
- elif [ "$EBVERSIONGENTOO" == 2023 ]; then
-   module load intel/2023 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT
- fi
- unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+<!--T:6823-->
+if [[ "$CC_CLUSTER" == narval ]]; then
+ module load intel/2023 intelmpi
+ export INTELMPI_ROOT=$I_MPI_ROOT
  unset I_MPI_ROOT
 fi
 
-<!--T:4741-->
+<!--T:6824-->
+if [[ ("${EBVERSIONANSYS//R*}" -ge 2025 && "${CC_CLUSTER}" == nibi) || "${CC_CLUSTER}" == narval ]]; then
+ export I_MPI_HYDRA_BOOTSTRAP=ssh
+ unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+fi
+
+<!--T:6825-->
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
 <!--T:2410-->
 if [ "$SLURM_NNODES" == 1 ]; then
- if [[ "${EBVERSIONANSYS//R*}" -ge 2025 && "$CC_CLUSTER" == nibi ]]; then
-  export I_MPI_HYDRA_BOOTSTRAP=ssh
- fi
  fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
 else
  if [[ "${CC_CLUSTER}" == nibi ]]; then
@@ -563,29 +551,25 @@ MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
 <!--T:507-->
 # ------- do not change any lines below --------
 
-<!--T:4743-->
-if [[ "${CC_CLUSTER}" == narval ]]; then
- if [ "$EBVERSIONGENTOO" == 2020 ]; then
-   module load intel/2021 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest
-   export HCOLL_RCACHE=^ucs
- elif [ "$EBVERSIONGENTOO" == 2023 ]; then
-   module load intel/2023 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT
- fi
- unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+<!--T:6826-->
+if [[ "$CC_CLUSTER" == narval ]]; then
+ module load intel/2023 intelmpi
+ export INTELMPI_ROOT=$I_MPI_ROOT
  unset I_MPI_ROOT
 fi
 
-<!--T:4744-->
+<!--T:6827-->
+if [[ ("${EBVERSIONANSYS//R*}" -ge 2025 && "${CC_CLUSTER}" == nibi) || "${CC_CLUSTER}" == narval ]]; then
+ export I_MPI_HYDRA_BOOTSTRAP=ssh
+ unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+fi
+
+<!--T:6828-->
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
 <!--T:2910-->
 if [ "$SLURM_NNODES" == 1 ]; then
- if [[ "${EBVERSIONANSYS//R*}" -ge 2025 && "$CC_CLUSTER" == nibi ]]; then
-  export I_MPI_HYDRA_BOOTSTRAP=ssh
- fi
  fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
 else
  if [[ "${CC_CLUSTER}" == nibi ]]; then
@@ -627,8 +611,8 @@ The following two scripts are provided to automate restarting very large jobs th
 #SBATCH --account=def-group   # Specify account
 #SBATCH --time=07-00:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify number of compute nodes (narval 1 node max)
-#SBATCH --ntasks-per-node=32  # Specify number of cores per node (max all cores of a compute node)
-#SBATCH --mem=0               # Do not change (allocates all memory per compute node)
+#SBATCH --ntasks-per-node=32  # Specify upto maximum number of cores per compute node
+#SBATCH --mem=0               # Specify memory per compute node (0 allocates all memory)
 #SBATCH --cpus-per-task=1     # Do not change
 #SBATCH --array=1-5%1         # Specify number of solution restarts (2 or more, 5 is shown)
 
@@ -646,33 +630,29 @@ MYDATFILERES=sample-restart.dat.h5  # Specify dat restart filename
 <!--T:508-->
 # ------- do not change any lines below --------
 
-<!--T:4745-->
-if [[ "${CC_CLUSTER}" == narval ]]; then
- if [ "$EBVERSIONGENTOO" == 2020 ]; then
-   module load intel/2021 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest
-   export HCOLL_RCACHE=^ucs
- elif [ "$EBVERSIONGENTOO" == 2023 ]; then
-   module load intel/2023 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT
- fi
- unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+<!--T:6829-->
+if [[ "$CC_CLUSTER" == narval ]]; then
+ module load intel/2023 intelmpi
+ export INTELMPI_ROOT=$I_MPI_ROOT
  unset I_MPI_ROOT
 fi
 
-<!--T:4746-->
+<!--T:6830-->
+if [[ ("${EBVERSIONANSYS//R*}" -ge 2025 && "${CC_CLUSTER}" == nibi) || "${CC_CLUSTER}" == narval ]]; then
+ export I_MPI_HYDRA_BOOTSTRAP=ssh
+ unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+fi
+
+<!--T:6831-->
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NNODES * SLURM_NTASKS_PER_NODE * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
 <!--T:3408-->
 if [ "$SLURM_NNODES" == 1 ]; then
-  if [[ "${EBVERSIONANSYS//R*}" -ge 2025 && "$CC_CLUSTER" == nibi ]]; then
-    export I_MPI_HYDRA_BOOTSTRAP=ssh
-  fi
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
-    fluent -g 2ddp -t $NCORES -i $MYJOUFILE
+    fluent -g 2ddp -t $NCORES -mpi=intel -pshmem -i $MYJOUFILE
   else
-    fluent -g 2ddp -t $NCORES -i $MYJOUFILERES
+    fluent -g 2ddp -t $NCORES -mpi=intel -pshmem -i $MYJOUFILERES
   fi
 else 
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
@@ -740,46 +720,42 @@ MYDATFILERES=sample-restart.dat.h5  # Specify dat restart filename
 <!--T:509-->
 # ------- do not change any lines below --------
 
-<!--T:4748-->
-if [[ "${CC_CLUSTER}" == narval ]]; then
- if [ "$EBVERSIONGENTOO" == 2020 ]; then
-   module load intel/2021 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT/mpi/latest
-   export HCOLL_RCACHE=^ucs
- elif [ "$EBVERSIONGENTOO" == 2023 ]; then
-   module load intel/2023 intelmpi
-   export INTELMPI_ROOT=$I_MPI_ROOT
- fi
- unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+<!--T:6832-->
+if [[ "$CC_CLUSTER" == narval ]]; then
+ module load intel/2023 intelmpi
+ export INTELMPI_ROOT=$I_MPI_ROOT
  unset I_MPI_ROOT
 fi
 
-<!--T:4749-->
+<!--T:6833-->
+if [[ ("${EBVERSIONANSYS//R*}" -ge 2025 && "${CC_CLUSTER}" == nibi) || "${CC_CLUSTER}" == narval ]]; then
+ export I_MPI_HYDRA_BOOTSTRAP=ssh
+ unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
+fi
+
+<!--T:6834-->
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
-NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
+NCORES=$SLURM_NTASKS
 
 <!--T:3910-->
 if [ "$SLURM_NNODES" == 1 ]; then
- if [[ "${EBVERSIONANSYS//R*}" -ge 2025 && "$CC_CLUSTER" == nibi ]]; then
-  export I_MPI_HYDRA_BOOTSTRAP=ssh
- fi
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
-    fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -I $MYFILEJOU
+    fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -I $MYFILEJOU
   else
-    fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -I $MYFILEJOURES
+    fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -I $MYFILEJOURES
   fi
 else 
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
     if [[ "${CC_CLUSTER}" == nibi ]]; then
-      fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILE
+      fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILE
     else
-      fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILE
+      fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILE
     fi
   else
     if [[ "${CC_CLUSTER}" == nibi ]]; then
-      fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILERES
+      fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILERES
     else
-      fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILERES
+      fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOUFILERES
     fi
   fi
 fi

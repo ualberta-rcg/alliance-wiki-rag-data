@@ -89,17 +89,22 @@ Pour transférer des données via Globus, utilisez une des adresses indiquées a
 <span id="CPU_nodes"></span>
 == Nœuds CPU ==
 
+<div class="mw-translate-fuzzy">
 ===Architecture===
 Chaque nœud est composé de  2 processeurs  AMD EPYC 9655 (Zen 5) @ 2.7GHz avec un total de 192 cœurs physiques. L’architecture NUMA est basée sur des puces fragmentées (<i>chiplets</i>), chacune fonctionnant comme un nœud NUMA distinct. La hiérarchie de la mémoire et de la cache est non uniforme et la performance dépend de la localité des données.
+[[File:Fircpulayout.png|thumb|900x900px| Résultat de la commande <code>lstopo</code>]]
+</div>
 
 <span id="Layout"></span>
 ===Configuration===
 
 * 2 sockets avec chacun
 ** 96 cœurs
-** 12 CCDs (<i>chiplets</i>), each with:
-*** 8 cores
-*** 32 MiB shared L3 cache
+** 4 nœuds NUMA avec chacun
+*** 3 CCDs (chiplets) avec chacun
+**** 8 cœurs
+**** cache L3 partagée de 32 MiB
+*** 3 canaux de mémoire
 
 Où chaque cœur a
 *1 MiB de cache L2
@@ -107,7 +112,8 @@ Où chaque cœur a
 * 12 canaux de mémoire DDR5 (partagés via la puce I/O)
 
 Total
-* 24 nœuds NUMA par nœud (12 par socket × 2)
+* 8 nœuds NUMA par nœud (4 par socket × 2)
+* 24 CCD (chiplets) par nœud (12 par socket  × 2)
 * 192 cœurs au total
 * 768 MiB de cache L3 au total
 
@@ -116,15 +122,15 @@ Total
 
 Pour profiter au mieux de l’architecture EPYC 9655&nbsp;:
 
-# Alignez les tâches sur des CCD (domaines NUMA). Chaque CCD contient 8 cœurs intimement liés et une cache L3 partagée. Garder les fils d’exécution dans un CCD élimine la latence entre les puces fragmentées.
+# Alignez les tâches sur des CCD. Chaque CCD contient 8 cœurs intimement liés et une cache L3 partagée. Garder les fils d’exécution dans un CCD élimine la latence entre les puces fragmentées.
 
 Utiliser <code>#SBATCH --cpus-per-task=8</code>
 
 Ceci fait en sorte que les fils pour chaque tâche restent dans un seul CCD.
 
-2. Distribuez les tâches sur des nœuds NUMA.
+2. Distribuez les tâches sur les CCD.
 
-Avec 24 domaines NUMA par nœud, lancez 24 tâches par nœud pour utiliser pleinement tous les CCD sans surcharger les nœuds NUMA simples.
+Avec 24 CCD par nœud, lancez 24 tâches par nœud pour utiliser pleinement tous les CCD sans les surcharger.
 
 Utilisez <code>#SBATCH --ntasks-per-node=24</code>
 
@@ -136,28 +142,20 @@ avec <code>--cpus-per-task=8</code>, pour bien utiliser pleinement le nœud de 1
 ===Architecture===
 Chaque nœud est composé de 1 processeur AMD EPYC 9454 (Zen 4) @ 2.75 GHz avec 48 cœurs physiques. Le processeur utilise l’architecture NUMA basée sur des puces fragmentées et le temps d’accès à la mémoire dépend de la localité des cœurs et de la mémoire. Les nœuds GPU utilisent le mode NPS=4 (NUMA par socket), ce qui divise le socket en 4 nœuds NUMA pour obtenir la meilleure localité pour la mémoire.
 
-<span id="Layout"></span>
+<div class="mw-translate-fuzzy">
 ===Configuration===
+</div>
 
+<div class="mw-translate-fuzzy">
 * 1 socket, configuré 
 ** 6 CCDs (<i>Core Complex Dies</i>)
-
-Chaque CCD contient
-* 8 cœurs
-* 32MiB de cache L3 partagée
+</div>
 
 Où chaque cœur a 
 * 1 MiB de cache L2
 * 32 KiB de cache L1 pour les instructions
 * 32 KiB de cache L1 pour les données
-* 12 canaux de mémoire DDR5
-
-NPS=4 (sur les nœuds GPU)
-* Le socket est divisé en 4 nœuds NUMA
-
-* chaque nœud NUMA a
-** 12 cœurs (1.5 CCD par nœud)
-** 3 canaux de mémoire
+* 12 canaux de mémoire DDR5 (partagés par la puce d'entrée-sortie)
 
 * 2 accélérateurs NVidia H100 80GB 
 ** Les 4 accélérateurs de nœud sont connectés via SXM5.
@@ -169,7 +167,7 @@ Pour profiter au mieux de l’architecture EPYC 9454 CPU et obtenir la localité
 
 1.  Liez les fils à des CCD.
 
-Chaque CCD contient 8 cœurs intimement liés et une cache L3 de 32 MiB. Pour garder les fils dans un CCD utilisez CCD: <code>#SBATCH --cpus-per-task=8</code>
+Chaque CCD contient 6 cœurs intimement liés et une cache L3 de 32 MiB. Pour garder les fils dans un CCD utilisez CCD: <code>#SBATCH --cpus-per-task=6</code>
 
 Les fils restent dans le même CCD, ce qui diminue la latence entre les CCD et améliore l’utilisation de la cache.
 

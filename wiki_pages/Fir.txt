@@ -102,15 +102,18 @@ For transferring data via Globus, use the endpoint specified at the top of this 
 <!--T:19-->
 ===Architecture===
 Each node features 2 × AMD EPYC 9655 (Zen 5) @ 2.7 GHz processors, totaling 192 physical cores. The system is built on a chiplet-based NUMA architecture, where each chiplet (CCD) operates as a separate NUMA node. The memory and cache hierarchy is non-uniform, and performance is sensitive to data locality.
+[[File:Fircpulayout.png|thumb|900x900px|Layout of Fir CPU nodes, as reported by the <code>Istopo</code> command]]
 
 ===Layout=== <!--T:59-->
 
 <!--T:20-->
 * 2 sockets, each with:
 ** 96 cores
-** 12 CCDs (chiplets), each with:
-*** 8 cores
-*** 32 MiB shared L3 cache
+** 4 NUMA nodes, each with:
+*** 3 CCDs (chiplets), each with:
+**** 8 cores
+**** 32 MiB shared L3 cache
+*** 3 memory channels
 
 <!--T:21-->
 Each core with:
@@ -120,7 +123,8 @@ Each core with:
 
 <!--T:22-->
 Total:
-* 24 NUMA nodes per node (12 per socket × 2)
+* 8 NUMA nodes per node (4 per socket × 2)
+* 24 CCDs (chiplets) per node (12 per socket  × 2)
 * 192 cores total
 * 768 MiB L3 cache total
 
@@ -130,7 +134,7 @@ Total:
 To make best use of the EPYC 9655's architecture:
 
 <!--T:24-->
-1. Align tasks to CCDs (NUMA Domains)
+1. Align tasks to CCDs 
 Each CCD contains 8 tightly-coupled cores with shared L3 cache. Keeping threads within a CCD avoids inter-chiplet communication latency.
 
 <!--T:25-->
@@ -140,10 +144,10 @@ Use:<code>#SBATCH --cpus-per-task=8</code>
 This ensures that threads of each task stay within a single CCD.
 
 <!--T:27-->
-2. Distribute tasks across NUMA nodes
+2. Distribute tasks across CCDs
 
 <!--T:28-->
-With 24 NUMA domains per node, launch 24 tasks per node to fully utilize all CCDs without overloading any single NUMA node.
+With 24 CCDs per node, launch 24 tasks per node to fully utilize all CCDs without overloading any single one.
 
 <!--T:29-->
 Use:<code>#SBATCH --ntasks-per-node=24</code>
@@ -157,34 +161,26 @@ Together with <code>--cpus-per-task=8</code>, this fills the full 192-core node 
 ===Architecture===
 Each GPU node contains 1 × AMD EPYC 9454 (Zen 4) @ 2.75 GHz processor with 48 physical cores. This processor uses AMD’s chiplet-based NUMA architecture, with memory access times that vary depending on core and memory locality. GPU nodes use the NPS=4 mode (NUMA Per Socket), dividing the socket into four NUMA nodes for better memory locality.
 
-===Layout=== <!--T:62-->
+<!--T:62-->
+===Layout===
+[[File:Firgpulayout.png.png|thumb|900x900px|Layout of Fir GPU nodes, as reported by the "lstopo" command]]
 
 <!--T:32-->
-* 1 socket, configured as:
-** 6 CCDs (Core Complex Dies)
-
-<!--T:33-->
-Each CCD contains:
-* 8 cores
-* 32 MiB of shared L3 cache
+* 1 socket, configured as NPS=4:
+** 4 NUMA nodes, each with
+*** 2 CCDs (Core Complex Dies), each with
+**** 6 cores
+**** 32 MiB of shared L3 cache
+*** 3 memory channels
 
 <!--T:34-->
 Each core has:
 * 1 MiB L2 cache
 * 32 KiB L1 instruction cache
 * 32 KiB L1 data cache
-* 12 DDR5 memory channels
-
-<!--T:35-->
-NPS=4 (on GPU nodes):
-* Socket is split into 4 NUMA nodes
+* 12 DDR5 memory channels (shared via the I/O die)
 
 <!--T:36-->
-* Each NUMA node has:
-** 12 cores (1.5 CCDs per node)
-** 3 memory channels
-
-<!--T:37-->
 * 2 NVidia H100 80GB accelerators
 ** The 4 node accelerators are interconnected by SXM5.
 
@@ -197,7 +193,7 @@ To fully utilize the architecture of the EPYC 9454 CPU and ensure optimal CPU-GP
 1. Bind threads to CCDs
 
 <!--T:40-->
-Each CCD has 8 closely coupled cores sharing a 32 MiB L3 cache. To keep threads within a CCD: <code>#SBATCH --cpus-per-task=8</code>
+Each CCD has 6 closely coupled cores sharing a 32 MiB L3 cache. To keep threads within a CCD: <code>#SBATCH --cpus-per-task=6</code>
 
 <!--T:41-->
 This confines threads to one CCD, reducing cross-CCD latency and improving cache usage.
