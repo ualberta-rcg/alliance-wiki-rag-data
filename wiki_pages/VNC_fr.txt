@@ -50,9 +50,7 @@ Vous avez maintenant besoin d'un serveur VNC auquel vous connecter. Il peut s'ag
 <span id="Login_nodes"></span>
 == Nœuds de connexion ==
 
-<div class="mw-translate-fuzzy">
 Avec votre ordinateur, vous pouvez utiliser des applications peu exigeantes (qui ne requièrent pas de GPU) sur un bureau VNC distant, sous condition de certaines limites de mémoire et de temps CPU. Pour ce faire, connectez-vous d'abord à un nœud de connexion. Par exemple, sur Nibi,
-</div>
 
  [<b>laptop</b>:~] ssh nibi.alliancecan.ca
 
@@ -74,16 +72,12 @@ Notez que la commande vncserver fournie par StdEnv/2023 est basée sur [https://
  [<b>l4</b>(login node):~] grep -iE "\sport|kill" <span style="Color:green">/home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log</span>
  25/08/2025 15:16:20 Listening for VNC connections on TCP port <span style="Color:blue">5901</span>
 
-<div class="mw-translate-fuzzy">
-Vous pouvez maintenant quitter le nœud de connexion et le vcnserver restera actif jusqu'à ce que la limite de temps définie avec l'option <codfe>-idletimeout</code> soit atteinte.
-</div>
+Vous pouvez maintenant quitter le nœud de connexion. Le vcnserver que vous avez lancé restera actif jusqu'à ce que la limite de temps définie avec l'option <codfe>-idletimeout</code> soit atteinte.
 
  [<b><span style="Color:green">l4</span></b>(login node):~]  exit
  [<b>laptop</b>:~]
 
-<div class="mw-translate-fuzzy">
-Étape 3 : Sur votre bureau, démarrez un tunnel SSH pour transférer un port arbitraire (5905 dans cet exemple) vers le port que votre serveur VNC écoute (5901 selon ce qui précède).
-</div>
+Étape 3 : Sur votre bureau, démarrez un tunnel SSH. Ainsi, un port arbitraire (5905 dans cet exemple) sera transféré au port que votre serveur VNC écoute (5901 selon ce qui précède).
 
  [<b>laptop</b>:~] ssh nibi.computecanada.ca -L <span style="Color:red">5905</span>:<b><span style="Color:green">l4</span></b>:<span style="Color:blue">5901</span>
 
@@ -130,10 +124,8 @@ Ensuite, démarrez un serveur VNC avec <code>vncserver</code> et portez attentio
 
 Lancez la commande <code>grep</code> dans le fichier de journalisation pour identifier le port sur lequel votre serveur VCN écoute.
 
-<div class="mw-translate-fuzzy">
- [<b>c48</b>(compute node):~] grep -iE "\sport|kill" /home/yourusername/.vnc/<b>c48</b>.nibi.sharcnet:1.log
+ [<b>c48</b>(compute node):~] grep -iE "\sport|kill" <span style="Color:green">/home/yourusername/.vnc/<b>c48</b>.nibi.sharcnet:1.log</span>
  26/08/2025 10:43:36 Listening for VNC connections on TCP port <span style="Color:blue">5901</span>
-</div>
 
 <b>2) Établissez un tunnel SSH vers le serveur VNC</b>
 
@@ -154,12 +146,10 @@ Pour toutes les grappes (<b>sauf Nibi</b>), vous pouvez utiliser la forme <code>
 Pour Nibi, une nouvelle forme de la commande doit être utilisée, soit <code>ssh -J username@clustername -L localforwardedport:localhost:remotelisteningport computenode</code>. De plus, une paire de clés SSH doit être créée sur votre ordinateur avec le contenu de la clé publique saisie dans votre fichier <code>~/.ssh/authorized_keys</code> sur <code>nibi</code>. Cette approche fonctionne également sur toute autre grappe et pourrait donc être privilégiée. En reprenant l'exemple précédent, où <b>c48</b> est le nœud de calcul sur lequel vous avez démarré vncserver et <span style="Color:green">5905</span> est le port local de votre ordinateur transféré, la commande pour Nibi serait&nbsp;:
 </div>
 
- <div class="mw-translate-fuzzy">
-[<b>laptop</b>:~] ssh -J username@nibi.alliancecan.ca -L <span style="Color:green">5905</span>:localhost:<span style="Color:blue">5901</span> <b>c48</b>
+ [<b>laptop</b>:~] ssh -J username@nibi.alliancecan.ca -L <span style="Color:red">5905</span>:<span style="Color:orange">localhost</span>:<span style="Color:blue">5901</span> <b><span style="Color:green">c48<span></b>
  Duo two-factor login for username
  Enter a passcode or select one of the following options:
  [c48(compute node):~]
-</div>
 
 Si vous quittez le nœud auquel votre tunnel est connecté, vous ne pourrez plus vous connecter au serveur VNC avec vncviewer. Cependant, comme vncserver continuera de fonctionner, vous pourrez encore y accéder avec un nouveau tunnel. Pour plus d'information, voir [[SSH tunnelling/fr|Tunnels SSH]].
 
@@ -167,8 +157,7 @@ Si vous quittez le nœud auquel votre tunnel est connecté, vous ne pourrez plus
 
 Sous Linux, ouvrez une nouvelle fenêtre de terminal et connectez votre client VNC à <b>localhost:port</b>. Dans le prochain exemple, la commande <code>vncviewer</code> de TigerVNC établit la connexion au serveur VNC actif sur cdr768. Vous devrez entrer le mot de passe que vous avez défini précédemment.
 
-<div class="mw-translate-fuzzy">
- [<b>laptop</b>:~]$ vncviewer localhost:<span style="Color:green">5905</span><br>
+ [<b>laptop</b>:~]$ vncviewer localhost:<span style="Color:red">5905</span><br>
  TigerVNC viewer v1.15.0
  Built on: 2025-02-16 03:59
  Copyright (C) 1999-2025 TigerVNC team and many others (see README.rst)
@@ -184,7 +173,6 @@ Sous Linux, ouvrez une nouvelle fenêtre de terminal et connectez votre client V
  Tue Aug 26 11:00:03 2025
  CConn:       Using pixel format depth 24 (32bpp) little-endian rgb888
  CConnection: Enabling continuous updates
-</div>
 
 Sous macOS ou Windows (mais pas de distribution Linux), plutôt que de lancer <code>vncviewer</code> par la ligne de commande, vous pouvez cliquer sur l'icône de l'application <i>TigerVNC Viewer</i> et entrez l'information sur le <b>localhost:port</b>. [[File:VNCviewerConnect3.png|400px|thumb'''Mac Tiger VNC Viewer Connection Details Dialogue Box''']]
 Notez aussi que le port VNC par défaut utilisé par TigerVNC Viewer est 5900; par conséquent, si vous avez spécifié 5900 comme port local à transférer au démarrage de votre tunnel SSH, vous pourriez simplement spécifier '''localhost'''. Cependant, sous Windows, vous pourriez ne pas pouvoir configurer un tunnel SSH sur le port local 5900.
@@ -246,10 +234,14 @@ Des échecs répétés à établir une nouvelle connexion vncserver/vncviewer po
 Si votre écran de veille VNC s'éteint en raison du délai d'affichage et qu'un mot de passe vous est demandé, entrez le mot de passe de votre compte sur la grappe et non le mot de passe vncserver. 
 Si le bureau MATE est en cours d'exécution et que l'écran de veille ne se déverrouille pas, essayez avec la commande <code>killall -9 .mate-screensaver</code>. Ceci ne devrait plus se produire car l'écran de veille VNC a été désactivé sur nos grappes.
 
-<span id="Cannot_Login"></span>
-== Problème de connexion == 
+<span id="Cannot_log_in"></span>
+<div class="mw-translate-fuzzy">
+== Problème de connexion ==
+</div> 
 
+<div class="mw-translate-fuzzy">
 La connexion à gra-vdi.alliancecan.ca se fait en deux étapes&nbsp;:
+</div>
 
 1)
  username
@@ -258,16 +250,20 @@ La connexion à gra-vdi.alliancecan.ca se fait en deux étapes&nbsp;:
  username
  Entrez votre code de passe pour l'authentification multifacteur.
 
+<div class="mw-translate-fuzzy">
 Si vous entrez un nom d'utilisateur/mot de passe erroné pour l'étape 1, vous aurez quand même à passer l'étape 2. Si vous saisissez ensuite votre nom d'utilisateur/mot de passe, vous recevrez un message indiquant que la connexion est établie et vous reviendrez vers l'écran de connexion de l'étape 1. La solution est de réessayer en vous assurant d'avoir saisi la bonne combinaison nom d'utilisateur/mot de passe. Si vous ne vous souvenez plus de votre mot de passe CCDB, allez sur [https://ccdb.alliancecan.ca/security/forgot here] pour le réinitialiser, à condition que votre compte ne soit pas en attente de renouvellement par la chercheuse principale ou le chercheur principal.
+</div>
 
-<span id="OpenGL_Graphics"></span>
+<span id="OpenGL_graphics"></span>
+<div class="mw-translate-fuzzy">
 == OpenGL ==
+</div>
 
 <div class="mw-translate-fuzzy">
 == NIX ==
 </div>
 
-First, the <code>salloc</code> command must be modified to request a gpu node.  If this is not done the program will fall back to using software-based rendering on cpus which is relatively much slower.  To request the first gpu node that comes available (and in turn  minimize your queue wait time if the cluster has multiple gpu node types) simply specify:
+First, the <code>salloc</code> command must be modified to request a GPU node.  If this is not done, the program will fall back to using software-based rendering on CPUs, which is relatively much slower.  To request the first GPU node that brcomes available (and in turn minimize your queue wait time if the cluster has multiple GPU node types) simply specify:
 
  [<b>l4</b>(login node):~] salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=1 --mem=16000 --account=def-piname
 
@@ -285,8 +281,10 @@ Pour installer un paquet nix dans votre environnement, cliquez sur l'icône du t
 
 Then <code>vglrun</code> sets some extra environment variables to ensure your program will use correct virtualgl libraries.  If however your <code>PROGRAM</code> has already been patched to use the current cvmfs standard environment doing so will not be required. 
 
-<span id="Portal_Alternatives"></span>
+<span id="Portal_alternatives"></span>
+<div class="mw-translate-fuzzy">
 Le moyen le plus simple est avec l'utilitaire <code>patchelf</code> de nix pour ajuster le binaire final; installez l'utilitaire avec <code>nix-env --install --attr nixpkgs.patchelf</code>. Par exemple, si vous construisez une application OpenGL pour utiliser les bibliothèques de système et que vous l'installez comme étant <code>~/.local/bin/myglapp>/code>, vous devez ajouter la bibliothèque VirtualGL du système comme première bibliothèque requise.
+</div>
 
 <div class="mw-translate-fuzzy">
 Si vous rencontrez des problèmes graphiques à l'utilisation de VNC comme décrit ci-dessus, essayez d'utiliser [https://ondemand.sharcnet.ca/ OpenOnDemand] sur <b>nibi</b> ou [https://jupyterhub.rorqual.alliancecan.ca JupyterHub] sur <b>rorqual</b>. Les deux grappes offrent une interface web VDI entièrement automatisée conçue pour une utilisation simplifiée, ainsi que des performances matérielles améliorées et une meilleure prise en charge logicielle.

@@ -12,10 +12,12 @@ S'il n'est pas efficace de récupérer des petits fichiers enregistrés sur ruba
 * les fichiers de plus de 4To devraient être divisés en parts de 1To avec un outil comme [[A_tutorial_on_'tar'/fr#Fractionner_des_fichiers |la commande  <code>split</code>]];
 * NE COPIEZ PAS DE PETITS FICHIERS SUR /NEARLINE, à l'exception des index (voir <i>Créer un index</i> ci-dessous).
 
+<span id="Do_not_compress_your_data"></span>
 === Ne compressez pas vos données ===
 
 Il n'est pas nécessaire de compresser les données sur /nearline puisque le système d'archivage sur ruban effectue automatiquement la compression à l'aide de circuits spécialisés. Si vos données sont déjà compressées, elles peuvent être copiées sur /nearline sans problème.
 
+<span id="Use_tar_or_dar"></span>
 === Choisir entre tar et dar ===
 
 Utilisez [[A tutorial on 'tar'/fr|tar]] ou [[dar/fr|dar]] pour créer un fichier archive.
@@ -37,22 +39,27 @@ Si l'archive vient d'être créée, la commande suivante (avec tar dans cet exem
 
 Même s'il s'agit souvent de petits fichiers, les fichiers d'index peuvent être enregistrés sur /nearline.
 
+<span id="No_access_from_compute_nodes"></span>
 === Pas d'accès à partir des nœuds de calcul ===
 
 Puisque l'obtention de données sur /nearline peut prendre un certain temps (voir la section ''Fonctionnement'' ci-dessous), nous ne permettons pas que les tâches y lisent des données.  /nearline n'est pas monté sur les nœuds de calcul.
 
+<span id="Use_a_data-transfer_node_if_available"></span>
 === Utiliser un nœud de copie, si possible ===
 
 Comme la création de fichiers archive exige beaucoup des ressources, il est préférable d'utiliser un nœud de copie (DTN) plutôt qu'un nœud de connexion si vous pouvez vous connecter à la grappe par un nœud DTN. En l'absence d'un nœud de copie, utilisez un nœud de connexion.
 
+<span id="Use_a_terminal_multiplexer"></span>
 === Utiliser un multiplexeur de terminal ===
 
 L'archivage de collections volumineuses de fichiers peut prendre plusieurs heures, voire même plusieurs jours. Votre session SSH peut être interrompue avant la fin du programme d'archivage, ou vous pouvez vouloir fermer votre session, laisser le programme s'exécuter en arrière-plan et y revenir plus tard. Pour éviter ce genre de problème, exécutez <code>tar</code> ou <code>dar</code> dans [[Prolonging_terminal_sessions/fr#Multiplexeur_de_terminal|un multiplexeur de terminal]] tel que <code>tmux</code>.
 
+<span id="Use_dar_in_non-interactive_mode"></span>
 === Utiliser <code>dar</code> en mode non interactif ===
 
 Dans un terminal, <code>dar</code> est en mode interactif et demande de confirmer certaines opérations. Sans terminal, <code>dar</code> est en mode non interactif et suppose une réponse négative à toutes les questions. Nous recommandons de désactiver explicitement l'interactivité avec <code>dar -Q</code>. Ceci est particulièrement utile lors de l'exécution de <code>dar</code> dans un multiplexeur de terminal sans surveillance. Voir [[Dar/fr|la page Dar]] pour plus d'informations.
 
+<span id="Why_/nearline?"></span>
 == Avantages ==
 
 Les avantages du stockage sur ruban par rapport aux disques et aux SSD (<i>solid-state drives</i>) sont :
@@ -62,6 +69,7 @@ Les avantages du stockage sur ruban par rapport aux disques et aux SSD (<i>solid
 
 Par conséquent, nous pouvons offrir beaucoup plus de capacité de stockage sur /nearline que sur /project. De plus, le fait de ne pas stocker de données inactives sur /project allège la charge et améliore la performance.
 
+<span id="How_it_works"></span>
 == Fonctionnement ==
 
 # À sa création ou quand il est d'abord copié sur /nearline, le fichier existe uniquement sur disque et non sur ruban. 
@@ -71,6 +79,7 @@ Par conséquent, nous pouvons offrir beaucoup plus de capacité de stockage sur 
 
 Quand un fichier est entièrement copié sur ruban (ou <i>virtualisé</i>), il demeure visible dans la liste des fichiers du répertoire. Si une opération de lecture est faite sur le fichier virtuel, le ruban doit être trouvé dans la bibliothèque et la copie doit se faire sur le disque, ce qui prend du temps et bloque le processus qui tente de faire la lecture. Selon la taille du fichier et les demandes au système de stockage sur ruban, ceci peut nécessiter entre moins d'une minute et plus d'une heure.
 
+<span id="Transferring_data_from_/nearline"></span>
 === Transférer des données à partir de /nearline ===
 
 Pendant le [[Transferring_data/fr|transfert de vos données]] avec [[Globus/fr|Globus]] ou tout autrement, les données exclusivement sur ruban seront automatiquement restaurées sur disque à leur simple lecture. Cependant, puisque l'accès aux données sur ruban est relativement lent, chaque restauration de fichier ralentira le transfert de quelques secondes à quelques minutes. Par conséquent, il faut s'attendre à ce que les transferts à partir de /nearline prennent plus de temps.
@@ -106,6 +115,7 @@ $ lfs hsm_state <FILE>
 
 Vous pouvez forcer le rappel d'un fichier sur ruban sans le lire avec la commande <tt>lfs hsm_restore <FILE></tt>.
 
+<span id="Cluster-specific_information"></span>
 === Spécificités de chaque grappe ===
 
 <tabs>
@@ -121,7 +131,7 @@ Lorsque vous supprimez un fichier de <tt>~/nearline</tt> volontairement ou par a
 Le service /nearline est semblable à celui de Béluga.
 </tab>
 
-<tab name="Graham">
+<tab name="Nibi">
 Le service /nearline est semblable à celui de Béluga, sauf que
 # la création de la première copie sur bande des données pourrait prendre plus que 24 heures,
 # la copie sur disque ne sera pas effacée (pour ne laisser que la copie sur bande) avant 60 jours.
@@ -131,15 +141,15 @@ Le service /nearline est semblable à celui de Béluga, sauf que
 Le service /nearline est semblable à celui de Béluga.
 </tab>
 
-<tab name="Niagara">
-HPSS est le service /nearline pour Niagara.<br/>
-Les méthodes d'accès sont :
+<tab name="Trillium">
+HPSS est le service /nearline pour Trillium.<br/>
+Les méthodes d'accès sont
 
 1. Dans une des partitions archive, soumettre une tâche à l’ordonnanceur Slurm avec les commandes HPSS <tt>htar</tt> ou <tt>hsi</tt>; pour des exemples, voyez la [https://docs.scinet.utoronto.ca/index.php/HPSS documentation HPSS]. Travailler avec des scripts offre l’avantage de pouvoir automatiser les transferts; il s’agit de la meilleure méthode si vous utilisez HPSS régulièrement. Vos fichiers HPSS se trouvent dans le répertoire $ARCHIVE, qui est semblable à $PROJECT, mais où ''/project'' est remplacé par ''/archive''. 
 
 2. Utiliser le nœud VFS (''virtual file system'') par la commande <tt>salloc --time=1:00:00 -pvfsshort</tt> quand vous avez peu de fichiers HPSS. Vos fichiers HPSS se trouvent dans le répertoire $ARCHIVE, qui est semblable à $PROJECT, mais où ''/project'' est remplacé par ''/archive''. 
 
-3. Utilisez [[Globus/fr|Globus]] pour transférer vos fichiers HPSS avec le point de chute (''endpoint'') <b>computecanada#hpss</b>. Cette méthode est utile pour un usage occasionnel ou pour les transferts entre HPSS et les autres sites.
+3. Utilisez [[Globus/fr|Globus]] pour transférer vos fichiers HPSS avec le point de chute (''endpoint'') <b>alliancecan#hpss</b>. Cette méthode est utile pour un usage occasionnel ou pour les transferts entre HPSS et les autres sites.
 
 </tab>
 

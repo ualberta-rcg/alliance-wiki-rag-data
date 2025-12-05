@@ -1,21 +1,29 @@
 <languages />
 [[Category:Software]]
-Anaconda est une distribution de Python. Nous demandons à nos utilisateurs de '''ne pas installer Anaconda sur nos grappes'''. On vous recommande d'utiliser des autres pistes comme un environnement virtuel ou bien un conteneur [[Apptainer/fr | Apptainer]], pour les cas les plus compliqués. 
+Anaconda est une distribution de Python. 
 
-== N'installez pas Anaconda sur nos grappes ==
+{{Warning|title=Avant d'utiliser Anaconda
+|content=Nous sommes conscients qu'Anaconda est largement utilisé dans plusieurs domaines étudiés par nos utilisateurs (la science des données, l'IA, la bioinformatique, etc). Anaconda est une solution intéressante pour simplifier la gestion de Python et de librairies sur un ordinateur personnel. Cependant, sur une grappe comme celles maintenues par l'Alliance, la gestion des librairies doit être faite par notre personnel, afin d'assurer une compatibilité et une performance maximales. De plus, l'utilisation d'Anaconda sur une grappe de calcul peut mener à plusieurs problèmes. 
+Avant d'utiliser Anaconda, nous vous demandons de contacter notre [[Technical support/fr|soutien technique]] pour que nos experts puissent explorer les alternatives avec vous. Si vous choisissez d'utiliser Anaconda, notez que notre équipe ne pourra pas vous offrir de soutien si vous rencontrez des problèmes. 
+}}
 
-Nous sommes conscients qu'Anaconda est largement utilisé dans plusieurs domaines étudiés par nos utilisateurs (la science des données, l'IA, la bioinformatique, etc). Anaconda est une solution intéressante pour simplifier la gestion de Python et de librairies sur un ordinateur personnel. Cependant, sur une grappe comme celles maintenues par l'Alliance, la gestion des librairies doit être faite par notre personnel, afin d'assurer une compatibilité et une performance maximales. Voici une liste de raisons:
+= Pourquoi Anaconda n'est pas recommandé sur une grappe de calcul ? =
 
-* Anaconda installe très souvent des logiciels (compilateurs, bibliothèques scientifiques etc.) qui existent déjà sur les grappes de l'Alliance comme modules, avec une configuration qui n'est pas optimale.
-* installe des binaires qui ne sont pas optimisés pour les processeurs de nos grappes.
-* fait de mauvaises suppositions sur l'emplacement de bibliothèques.
-* s'installe dans le <code>$HOME</code> par défaut, où il place une énorme quantité de fichiers. L'installation d'Anaconda seule peut prendre près de la moitié de votre quota sur le nombre de fichiers dans votre espace personnel.  
+Anaconda peut être problématique sur une grappe de calcul pour plusieurs raisons:
+
+* Anaconda installe très souvent des logiciels (compilateurs, bibliothèques scientifiques etc.) qui existent déjà sur les grappes de l'Alliance comme modules, avec une configuration qui n'est pas optimale, et qui peut causer des conflits.
+* installe des binaires qui ne sont pas optimisés pour les processeurs de nos grappes. Vos calculs pourraient donc être plus lents.
+* fait de mauvaises suppositions sur l'emplacement de bibliothèques. Vous pourriez rencontrer des erreurs à l'exécution.
+* s'installe dans le <code>$HOME</code> par défaut, où il place une énorme quantité de fichiers. L'installation d'Anaconda seule peut prendre près de la moitié de votre quota sur le nombre de fichiers dans votre espace personnel. 
 * est plus lent pour installer des paquets
 * modifie <code>$HOME/.bashrc</code>, ce qui peut causer des conflits.
 
-== Comment transitionner de Conda vers virtualenv ==
+= Quelles sont les alternatives ? =
+La première étape que vous devriez faire est de contacter notre [[Technical support/fr|soutien technique]] afin que nos experts explorent avec vous la meilleure alternative pour votre besoin. Si vous préférez tenter par vous-même, deux options principales sont listées ci-dessous.
 
-[[Python#Creating_and_using_a_virtual_environment|Virtualenv]] vous offre toutes les fonctionnalités dont vous avez besoin pour utiliser Python sur nos grappes. Voici comment passer à virtualenv si vous utilisez Anaconda sur votre ordinateur personnel:
+== Transitionner de Conda vers virtualenv ==
+
+[[Python#Creating_and_using_a_virtual_environment|Virtualenv]] vous offre toutes les fonctionnalités dont vous avez besoin pour utiliser Python sur nos grappes. Ceci devrait être le premier choix que vous explorez. Voici comment passer à virtualenv si vous utilisez Anaconda sur votre ordinateur personnel:
 
 # Listez les dépendances (requis) de l'application que vous voulez utiliser. Afin de ce faire, vous pouver :
 ## Exécuter <code>pip show <nom_paquet></code> depuis votre environement virtuel (si le paquet existe sur [https://pypi.org/ PyPI])
@@ -25,11 +33,10 @@ Nous sommes conscients qu'Anaconda est largement utilisé dans plusieurs domaine
 # Retirez de la liste de dépendance tout ce qui n'est pas un paquet Python (par exemple, retirez <code>cudatoolkit</code> et <code>cudnn</code>).
 # Utilisez un [[Python#Creating_and_using_a_virtual_environment|virtualenv]], dans lequel vous installerez ces dépendances.
 
-Votre application devrait fonctionner. Si ce n'est pas le cas, n'hésitez pas à contacter notre soutien technique.
+Votre application devrait fonctionner. Si ce n'est pas le cas, n'hésitez pas à contacter notre [[Technical support/fr|soutien technique]].
 
-==Usage d'Apptainer==
+== Utiliser Apptainer ==
 
 Dans certaines situations, la complexité des dépendances d'un logiciel exige une solution où l'on peut maîtriser entièrement l'environnement. Pour ces situations, on recommande l'outil [[Apptainer/fr#Travailler_avec_Conda | Apptainer]] : notez qu'une image Docker peut être convertie en image Apptainer. Le seul inconvénient de Apptainer, c'est que les images consomment beaucoup d'espace disque, alors si votre groupe de recherche prévoit d'utiliser plusieurs images, il serait sage de les regrouper ensemble dans un seul répertoire de l'espace projet du groupe pour éviter les doublons.
 
-== Exemples spécifiques où Anaconda ne fonctionne pas ==
-;R : Une recette conda force l'installation de R. Cette installation ne performe pas aussi bien que le R disponible par les modules (qui lui utilise Intel MKL). Ce même R fonctionne mal et les tâches meurent, gaspillant ainsi des ressources et votre temps.
+{{:Using Conda in Apptainer/fr}}

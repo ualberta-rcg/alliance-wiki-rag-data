@@ -1210,7 +1210,7 @@ To run Ansys programs in graphical mode click on one of the following OnDemand o
  [https://docs.alliancecan.ca/wiki/Narval NARVAL]:  <code>https://jupyterhub.narval.alliancecan.ca/</code>
  [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart TRILLIUM]: <code>https://ondemand.scinet.utoronto.ca</code>
 
-Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then a H100 gpu resource should be requested and an OpenGL driver argument added when starting fluent as shown below.
+Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then either a whole GPU resource (H100 or T4 at the time of this writing) should be requested.  Since the various ansys applications launched in graphical mode behave differently when different ansys module versions are loaded, recommendations for adding command line argument and exporting environment variables for virtualgl or mesa environments have been documented below depending on whether a GPU has been requested or not and wether a On Demand or Juypter Lab system launcher is being used.
 
 === Fluids ===
 ::: <code>module load StdEnv/2023 ansys/2022R2</code> (or newer versions)
@@ -1223,12 +1223,20 @@ Submit your resource request and then wait.  If you started a Juypter Lab launch
 ::: <code>launcher</code> --> click RUN button
 
 === Workbench ===
-::: <code>module load StdEnv/2023 ansys/2022R2</code> (or newer versions)
-::: <code>xfwm4 --replace &</code> (only needed if using Ansys Mechanical)
-::: <code>export QTWEBENGINE_DISABLE_SANDBOX=1</code> (only needed if using CFD-Post)
+
+<b>Compute Node or Basic Desktop (without a GPU allocated)</b>
+
+::: <code>module load StdEnv/2023 ansys/2025R1</code> (or newer versions)
+::: <code>export I_MPI_HYDRA_BOOTSTRAP=ssh</code>  (only required on nibi)
+::: <code>export HOOPS_PICTURE=opengl2-mesa</code> 
+::: <code>runwb2 -oglmesa </code> 
+
+<b>Compute Node (with at least one GPU allocated)</b>
+
+::: <code>module load StdEnv/2023 ansys/2025R1</code> (or newer versions)
+::: <code>export I_MPI_HYDRA_BOOTSTRAP=ssh</code>  (only required on nibi)
+::: <code>export HOOPS_PICTURE=opengl2</code> 
 ::: <code>runwb2</code>
-::: <br>
-::: NOTE: When running an Analysis Program such as Mechanical or Fluent in parallel on a single node, untick <i>Distributed</i> and specify a value of cores equal to your <b>salloc session setting minus 1</b>. The pulldown menus in the Ansys Mechanical workbench do not respond properly. As a workaround run <code>xfwm4 --replace</code> on the command line before starting workbench as shown. To make xfwm4 your default edit <code>$HOME/.vnc/xstartup</code> and change <code>mate-session</code> to <code>xfce4-session</code>.
 
 === Ensight ===
 ::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>

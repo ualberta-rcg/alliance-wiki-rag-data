@@ -42,12 +42,14 @@ HPC clusters typically use Apptainer. Many users ask about other Linux container
 ** Using Docker on a multiuser cluster creates security risks, therefore we do not make Docker available on our HPC clusters.
 ** You can install and use Docker on your own computer and use it to create an Apptainer image, which can then be uploaded to an HPC cluster as outlined in <b>[[#Creating_an_Apptainer_container_from_a_Dockerfile|this section]]</b> later on this page.
 
-==Other items== <!--T:11-->
+<!--T:11-->
+==Other items==
 ===General===
 * In order to use Apptainer you must have a container <b>image</b>, e.g., a <code>.sif</code> file or a "sandbox" directory created previously. If you don't already have an image or a sandbox, see the section on <b>[[Apptainer#Building_an_Apptainer_image|building an image]]</b> below.
 * While Apptainer is installed and available for use, using Apptainer will require you to install and/or build all software you will need to make use of in your container. In many instances, <b>[[Available_software|we already have such software installed on our clusters]]</b> so there is often no need to create a container with the same installed in it.
 
-===<code>sudo</code>=== <!--T:12-->
+<!--T:12-->
+===<code>sudo</code>===
 Many users ask about <code>sudo</code> since documentation and websites often discuss using <code>sudo</code>. Know the ability to use <code>sudo</code> to obtain superuser/root permissions is not available on our clusters. Should you require using <code>sudo</code>, consider the following options:
 
 <!--T:13-->
@@ -55,14 +57,16 @@ Many users ask about <code>sudo</code> since documentation and websites often di
 * If appropriate, [[Technical Support|submit a ticket]] asking if Alliance staff would be able to help build the image(s) required needing <code>sudo</code>. This may or may not be possible, but feel free to ask in a ticket if what you wish to achieve is beyond your means. Additionally, we may respond with other ways to achieve such which may or may not involve Apptainer.
 * Apptainer version 1.1.x and newer has improved support for users using <code>--fakeroot</code> implicitly and explicitly so some things may be possible that were not with Apptainer version 1.0 and Singularity. This includes being able to build some images from <code>.def</code> definition files and building some images without needing to use <code>sudo</code>. That said, not all images will be able to be built without needing to use <code>sudo</code> or superuser/root.
 
-===Building images or overlays=== <!--T:14-->
+<!--T:14-->
+===Building images or overlays===
 Should you need to build your own container image(s) or overlay(s), be aware of the following:
 * Avoid building a sandbox image using <code>--fakeroot</code> on networked filesystem(s): [https://apptainer.org/docs/admin/main/installation.html#fakeroot-with-uid-gid-mapping-on-network-filesystems link to Apptainer documentation].
 * Explicitly set <code>APPTAINER_CACHEDIR</code> to a non-networked filesystem location before using Apptainer: [https://apptainer.org/docs/admin/main/installation.html#apptainer-cache-atomic-rename link to Apptainer documentation].
 * Explicitly set <code>APPTAINER_TMPDIR</code> to a non-Lustre/GPFS filesystem location before using Apptainer: [https://apptainer.org/docs/admin/main/installation.html#lustre-gpfs link to Apptainer documentation].
 * Avoid using Lustre/GPFS filesystems as they don't have the feature set required to properly support building Apptainer containers (including <code>--fakeroot</code>): [https://apptainer.org/docs/admin/main/installation.html#lustre-gpfs link to Apptainer documentation].
 
-=Loading an Apptainer module= <!--T:15-->
+<!--T:15-->
+=Loading an Apptainer module=
 In order to use the default version of Apptainer available run:
 <source lang="console">$ module load apptainer</source>
 
@@ -407,75 +411,8 @@ Within an account, using a "sandbox" directory will consume significant amounts 
 
 ==Using Conda in Apptainer == <!--T:112-->
 
-<!--T:144-->
-We will preface this tutorial on how to use Conda inside a container with the following '''important notes''':
-
-<!--T:145-->
-* Even inside a container, Conda should be used only as a '''last resort'''. Priority should always be given to using [[Modules|modules]] from our [[Available_software|software stack]], and [[Python|wheels]] from our [[Available_Python_wheels|Python wheelhouse]]. These are optimized for our systems and we are better equipped to provide support if you use them. Please [[Technical  support|contact us]] if you need a module or a Python package that is not currently available on our systems.
-* This tutorial will use the [https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html micromamba] package manager instead of Conda. If you choose to use Conda instead, keep in mind that its use is subject to [https://legal.anaconda.com/policies/en?name=terms-of-service#terms-of-service Anaconda's Terms of Service] and might require a  [https://www.anaconda.com/pricing/terms-of-service-faqs commercial license].
-* This tutorial shows how to create a read-only image, i.e., a one-off <tt>.sif</tt> file containing a Conda environment that has everything you need to run your application. We strongly discourage installing software interactively with Conda inside a container and will not show how to do this here.
-
-<!--T:146-->
-Creating an Apptainer image and using Conda to install software inside it is a 3-step process. The first step is to create a <tt>.yml</tt> file describing the Conda environment we wish to create inside the container. In the example that follows, we create the file <tt>environment.yml</tt> . This file is where we give our environment a name, then give Conda a list of packages that must be installed and the channels where to look for them. For more information [https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#create-env-file-manually see here].
-
-<!--T:147-->
-{{File
-  |name=environment.yml
-  |lang="yaml"
-  |contents=
-name: base
-channels:
-  - conda-forge
-  - bioconda
-  - defaults
-dependencies:
-  - python
-  - pip
-  - star
-  - bwa
-  - multiqc
-}}
-
-<!--T:148-->
-Second, we create an Apptainer [https://apptainer.org/docs/user/main/definition_files.html image definition file]. This file, here called <tt>image.def</tt>, describes what are the steps Apptainer should take to create our image. These steps are:
-#Pull a Docker image from DockerHub that has the micromamba package manager pre-installed.
-#Create a copy of the Conda environment definition file <tt>environment.yml</tt> inside the container
-#Call micromamba and have it configure the environment defined in <tt>environment.yml</tt>.
-
-<!--T:149-->
-{{File
-  |name=image.def
-  |lang="yaml"
-  |contents=
-Bootstrap: docker
-From: mambaorg/micromamba:latest
-
-<!--T:150-->
-%files
-    environment.yml /environment.yml
-
-<!--T:151-->
-%post
-    micromamba install -n base --file environment.yml && \
-        micromamba clean --all --yes
-}}
-
-<!--T:152-->
-The last step is to build the Apptainer image using the definition file above:
-   module load apptainer
-   APPTAINER_BIND=' ' apptainer build image.sif image.def
-
-<!--T:153-->
-You can test that your image provides <code>multiqc</code>, for example, like this:
-{{Command
-|apptainer run image.sif multiqc --help
-|result=
- 
- /// MultiQC 🎃 v1.25.1
- 
- Usage: multiqc [OPTIONS] [ANALYSIS DIRECTORY]
-...
-}}
+<!--T:154-->
+{{:Using Conda in Apptainer}}
 
 ==Using Spack in Apptainer == <!--T:114-->
 

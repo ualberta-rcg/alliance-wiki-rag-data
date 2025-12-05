@@ -1,9 +1,9 @@
 <languages />
 [[Category:Software]]
 
-[https://fenicsproject.org FEniCS] est une plateforme de logiciels libres pour la solution d'équations aux dérivées partielles. 
+[https://fenicsproject.org FEniCS] est une plateforme de logiciels libres pour la résolution d'équations aux dérivées partielles. 
 
-Puisque la plateforme peut être construite avec diverses extensions, vous avez le choix entre
+Puisque la plateforme peut être construite avec diverses extensions, nous n'offrons pas une installation centrale unique, mais vous avez le choix entre
 *l'installation dans un environnement virtuel,
 *l'utilisation d'un conteneur Singularity.
 
@@ -198,7 +198,7 @@ export LD_LIBRARY_PATH=$HOME/software/mshr/lib:$LD_LIBRARY_PATH
 }}
 
 <span id="Using_a_Singularity_container"></span>
-= Utilisation d'un contenant Singularity  =
+= Utilisation d'un conteneur Singularity  =
 
 Le pilote Singularity Recipe télécharge l'image FEniCS Docker, l'installe et télécharge des paquets additionnels comme Python par exemple. Exécutez le pilote sur votre ordinateur où Singularity est installé sous Linux et où vous avez toutes les permissions.
 
@@ -276,25 +276,26 @@ From: quay.io/fenicsproject/stable:latest
 }}
 
 
-= FEniCS Legacy (2019) Installation on Trillium =
+<span id="FEniCS_Legacy_(2019)_Installation_on_Trillium"></span>
+= Installation de FEniCS Legacy (2019) sur Trillium =
 
-Go to your home directory and follow the instructions below to set up and test the container for the legacy FEniCS 2019 version.
+Dans votre répertoire /home, configurez et testez le conteneur pour la version FEniCS Legacy 2019 avec les instructions suivantes.
 
-== 1. Download the Docker image as an Apptainer SIF ==
+== 1. Téléchargez l'image Docker au format Apptainer SIF ==
 <pre>
 apttainer pull fenics-legacy.sif docker://ghcr.io/scientificcomputing/fenics-gmsh:2024-05-30
 </pre>
 
-== 2. Make a writable sandbox directory ==
-Create a writable directory tree (''fenics-legacy.sandbox'') from the SIF file so you can modify or install extra packages:
+== 2.  Créez un bac à sable (<i>sandbox</i>) avec permission d’écriture ==
+Créez l’arborescence <i>fenics-legacy.sandbox</i> à partir du fichier SIF afin de modifier ou installer d’autres paquets.
 <pre>
 apptainer build --sandbox fenics-legacy.sandbox fenics-legacy.sif
 </pre>
 
-'''Note:'''  
-* ''fenics-legacy.sandbox'' is just a directory name the command will create.  
-* You can call it something else (e.g. ''fenics-dev/'' or ''my_rw_image/'').  
-* The ''.sandbox'' suffix is just a convention, not required.  
+'''Remarques :'''  
+* la commande crée le répertoire <i>fenics-legacy.sandbox</i>  
+* Yvous pouvez modifier le nom du répertoire (par exemple <i>fenics-dev/</i> ou <i>my_rw_image/</i>)  
+* le suffixe <i>.sandbox</i> est optionnel  
 
 == 3. Fix pip certificate bundle path ==
 Inside the sandbox, create a certs folder and symlink the CA bundle so pip/SSL trusts HTTPS:
@@ -308,14 +309,14 @@ After modifications, freeze your sandbox into a new read-only image (portable, r
 apptainer build fenics-legacy-updated.sif fenics-legacy.sandbox
 </pre>
 
-== 5. Run quick tests ==
+== 5. Effectuez ces courts tests ==
 <pre>
 apptainer exec --bind $PWD:/root/shared --pwd /root/shared fenics-legacy-updated.sif python3 -c "import ufl_legacy; print('ufl_legacy ok. version:', ufl_legacy.__version__)"
 </pre>
 
-'''Note:'''  
-* <code>--bind $PWD:/root/shared</code> mounts your current host directory in the container.  
-* <code>--pwd</code> sets the working directory there.  
+'''Remarques :'''  
+* <code>--bind $PWD:/root/shared</code> monte le répertoire hôte actif dans le conteneur  
+* <code>--pwd</code> définit le répertoire de travail  
 
 == Important Notes ==
 * FEniCS Legacy (2019.1.x) requires UFL Legacy, already bundled.  
@@ -326,7 +327,7 @@ apptainer exec --bind $PWD:/root/shared --pwd /root/shared fenics-legacy-updated
 == Aliasing ufl_legacy as ufl ==
 Some downstream packages (like Oasis) assume <code>import ufl</code>. To avoid patching them all, you can provide a shim package that re-exports <code>ufl_legacy</code> as <code>ufl</code>.
 
-Create the file <code>/pyshims/ufl/__init__.py</code> with the following contents:
+Créez le fichier  <code>/pyshims/ufl/__init__.py</code> qui contient
 
 <pre>
 import sys
@@ -338,8 +339,8 @@ for key in api:
 del api
 </pre>
 
-== Test the aliasing ==
-Prepend the shim path to PYTHONPATH when launching inside the container:
+== Testez l'alias ==
+Ajoutez le chemin de l’alias (<i>shim</i>) à PYTHONPATH lors de l’utilisation du conteneur.
 <pre>
 APPTAINERENV_PYTHONPATH=<path_to_shim>:$PYTHONPATH apptainer exec --bind /scratch:/scratch ~/fenics-legacy-updated.sif python3 -c "from ufl.tensors import ListTensor; print('UFL tensors ok')"
 </pre>

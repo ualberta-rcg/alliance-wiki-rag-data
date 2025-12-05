@@ -1422,7 +1422,7 @@ To run Ansys programs in graphical mode click on one of the following OnDemand o
  [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart TRILLIUM]: <code>https://ondemand.scinet.utoronto.ca</code>
 
 <!--T:6808-->
-Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then a H100 gpu resource should be requested and an OpenGL driver argument added when starting fluent as shown below.
+Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then either a whole GPU resource (H100 or T4 at the time of this writing) should be requested.  Since the various ansys applications launched in graphical mode behave differently when different ansys module versions are loaded, recommendations for adding command line argument and exporting environment variables for virtualgl or mesa environments have been documented below depending on whether a GPU has been requested or not and wether a On Demand or Juypter Lab system launcher is being used.
 
 <!--T:1670-->
 === Fluids ===
@@ -1436,16 +1436,27 @@ Submit your resource request and then wait.  If you started a Juypter Lab launch
 ::: <code>mapdl -g</code>, or via launcher,
 ::: <code>launcher</code> --> click RUN button
 
-<!--T:1671-->
-=== Workbench ===
-::: <code>module load StdEnv/2023 ansys/2022R2</code> (or newer versions)
-::: <code>xfwm4 --replace &</code> (only needed if using Ansys Mechanical)
-::: <code>export QTWEBENGINE_DISABLE_SANDBOX=1</code> (only needed if using CFD-Post)
-::: <code>runwb2</code>
-::: <br>
-::: NOTE: When running an Analysis Program such as Mechanical or Fluent in parallel on a single node, untick <i>Distributed</i> and specify a value of cores equal to your <b>salloc session setting minus 1</b>. The pulldown menus in the Ansys Mechanical workbench do not respond properly. As a workaround run <code>xfwm4 --replace</code> on the command line before starting workbench as shown. To make xfwm4 your default edit <code>$HOME/.vnc/xstartup</code> and change <code>mate-session</code> to <code>xfce4-session</code>.
+=== Workbench === <!--T:1671-->
 
 <!--T:1673-->
+<b>Compute Node or Basic Desktop (without a GPU allocated)</b>
+
+<!--T:1674-->
+::: <code>module load StdEnv/2023 ansys/2025R1</code> (or newer versions)
+::: <code>export I_MPI_HYDRA_BOOTSTRAP=ssh</code>  (only required on nibi)
+::: <code>export HOOPS_PICTURE=opengl2-mesa</code> 
+::: <code>runwb2 -oglmesa </code> 
+
+<!--T:1675-->
+<b>Compute Node (with at least one GPU allocated)</b>
+
+<!--T:1676-->
+::: <code>module load StdEnv/2023 ansys/2025R1</code> (or newer versions)
+::: <code>export I_MPI_HYDRA_BOOTSTRAP=ssh</code>  (only required on nibi)
+::: <code>export HOOPS_PICTURE=opengl2</code> 
+::: <code>runwb2</code>
+
+<!--T:6835-->
 === Ensight ===
 ::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>
 ::: <code>export LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib</code>
@@ -1460,7 +1471,7 @@ Submit your resource request and then wait.  If you started a Juypter Lab launch
 ::: o The SHARCNET license includes Rocky and is therefore free for all researchers to use
 ::: o Rocky supports GPU-accelerated computing however this capability not been tested or documented yet
 
-<!--T:1674-->
+<!--T:1684-->
 == SSH issues ==
 ::: Some Ansys GUI programs can be run remotely on a cluster compute node by forwarding X over SSH to your local desktop.  Unlike VNC, this approach is untested and unsupported since it relies on a properly setup X display server for your particular operating system OR the selection, installation and configuration of a suitable X client emulator package such as MobaXterm.  Most users will find interactive response times unacceptably slow for basic menu tasks let alone performing more complex tasks such as those involving graphics rendering.  Startup times for GUI programs can also be very slow depending on your Internet connection. For example, in one test it took 40 minutes to fully start the gui up over SSH while starting it with vncviewer required only 34 seconds.  Despite the potential slowness when connecting over SSH to run GUI programs, doing so may still be of interest if your only goal is to open a simulation and perform some basic menu operations or run some calculations. The basic steps are given here as a starting point: 1) ssh -Y username@alliancecan.ca 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task=4 [--gpus-per-node=1] --account=def-mygroup; 3) once connected onto a compute node try running <code>xclock</code>.  If the clock appears on your desktop, proceed to load the desired Ansys module and try running the program.
 

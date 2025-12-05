@@ -1,12 +1,15 @@
 <languages />
+<span id="Forewords"></span>
 =Introduction=
 
+<span id="Official_Apptainer_documentation"></span>
 ==Documentation officielle pour Apptainer==
 
 Cette page ne décrit pas toutes les fonctionnalités et ne remplace pas la [http://apptainer.org/docs documentation officielle d'Apptainer]. Nous décrivons ici l'utilisation de base, abordons certains aspects de l'utilisation sur nos systèmes et présentons des exemples. Nous vous recommandons de lire la documentation officielle sur les fonctionnalités que vous utilisez.
 
 Pour installer Apptainer sur votre ordinateur, [http://apptainer.org/docs/user/main/quick_start.html#quick-installation consultez cette page]. Si vous utilisez une récente version de Windows, [https://learn.microsoft.com/fr-ca/windows/wsl/install installez d'abord WSL] puis installez Apptainer dans le sous-système. Si vous utilisez macOS, installez d'abord une distribution Linux dans une machine virtuelle sur votre ordinateur, puis installez Apptainer dans la machine virtuelle.
 
+<span id="If_you_are_currently_using_Singularity"></span>
 ==Si vous utilisez Singularity==
 
 Nous vous recommandons d'utiliser Apptainer plutôt que Singularity. La Fondation Linux a adopté SingularityCE (jusqu'à v3.9.5) et renommé Apptainer, avec les modifications suivantes&nbsp;:
@@ -23,6 +26,7 @@ Nous vous recommandons d'utiliser Apptainer plutôt que Singularity. La Fondatio
 
 Apptainer version 1 étant compatible avec Singularity, vous pouvez utiliser les mêmes scripts.
 
+<span id="Other_Linux_container_technologies"></span>
 ==Autres technologies de conteneurs Linux==
 
 Les grappes de calcul haute performance utilisent habituellement Apptainer. En réponse à plusieurs qui demandent s'il existe d'autres technologies de conteneurs Linux, voici nos commentaires sur quelques-uns&nbsp;:
@@ -62,8 +66,10 @@ Pour utiliser la version disponible par défaut, lancez
 Pour connaître toutes les versions disponibles, lancez
 <source lang="console">$ module spider apptainer</source>
 
+<span id="Running_programs_within_a_container"></span>
 =Exécuter des programmes dans un conteneur=
 
+<span id="Important_command_line_options"></span>
 ==Options de ligne de commande à retenir==
 
 Les logiciels exécutés dans un conteneur se trouvent dans un environnement qui utilise des bibliothèques et outils différents de ceux installés dans le système hôte. Il est donc important que les programmes exécutés dans un conteneur <b>n’utilisent pas de paramètres de configuration ou de logiciels définis hors du conteneur</b>. Cependant, Apptainer adopte par défaut l’environnement de l’interpréteur de l’hôte, ce qui peut causer des problèmes à l’exécution de certains programmes. Les options suivantes utilisées avec <code>apptainer run</code>, <code>apptainer shell</code>, <code>apptainer exec</code>, et/ou <code>apptainer instance</code> évitent ces problèmes.
@@ -90,6 +96,7 @@ où
 ** Note : Aucun programme intensif (incluant Apptainer) ne doit être exécuté sur les nœuds de connexion. Utilisez plutôt <code>salloc</code>pour démarrer  une tâche interactive.
 * les bind mounts ne fonctionnent pas de la même manière sur toutes nos grappes; consultez [https://docs.alliancecan.ca/wiki/Apptainer/fr#Bind_mounts_et_overlays_persistants Bind mounts et overlays persistants ci-dessous] pour savoir comment accéder à <code>/home</code>, <code>/project</code>, et <code>/scratch</code>.
 
+<span id="Using_GPUs"></span>
 ==Utiliser des GPU==
 
 Tenez compte des points suivants quand votre logiciel dans un conteneur requiert l’utilisation de GPU&nbsp;:
@@ -101,10 +108,12 @@ Tenez compte des points suivants quand votre logiciel dans un conteneur requiert
 
 Voyez l'exemple sous [https://docs.alliancecan.ca/wiki/Apptainer/fr#Travailler_avec_des_GPU_NVIDIA  Travailler avec des GPU NVIDIA ci-dessous].
 
+<span id="Using_MPI_programs"></span>
 ==Lancer des programmes MPI==
 
 Pour lancer des programmes MPI dans un conteneur, il faut ajuster certaines choses dans l’environnement hôte. Voyez un exemple dans  [https://docs.alliancecan.ca/wiki/Apptainer/fr#Travailler_avec_des_programmes_MPI  Travailler avec des programmes MPI ci-dessous]. Vous trouverez plus d’information dans [https://apptainer.org/docs/admin/main/installation.html#lustre-gpfs la documentation officielle d'Apptainer].
 
+<span id="Container-specific_help:_apptainer_run-help"></span>
 ==Aide avec <code>apptainer run-help</code>==
 
 Les conteneurs Apptainer construits à partir de [http://apptainer.org/docs/user/main/definition_files.html fichiers de définition]  ont souvent une fonctionnalité <code>%help</code> appelée comme suit
@@ -129,6 +138,7 @@ Pour obtenir la liste des applications qui se trouvent dans le conteneur, lancez
 où 
 * <code>your-container-name.sif</code> est le nom du conteneur.
 
+<span id="Running_software:_apptainer_run_or_apptainer_exec"></span>
 ==Lancer un logiciel avec <code>apptainer run</code> ou <code>apptainer exec</code>==
 
 La commande <code>apptainer run</code> lance le conteneur, exécute le script <code>%runscript</code> défini pour ce conteneur (s’il y en a un), puis lance la commande spécifiée.
@@ -158,6 +168,7 @@ Pour plus d'information, consultez
 
 Consultez aussi la [http://apptainer.org/docs/user/main/index.html documentation officielle pour Apptainer].
 
+<span id="Interactively_running_software:_apptainer_shell"></span>
 ==Interactivité  avec <code>apptainer shell</code>==
 
 Les commandes <code>apptainer run</code>, <code>apptainer exec</code> et <code>apptainer instance</code> exécutent immédiatement les programmes, ce qui est parfait dans les scripts de tâches pour BASH et Slurm. Il peut parfois être nécessaire de travailler interactivement dans un conteneur; pour ce faire, utilisez la commande <code>apptainer shell</code>.
@@ -185,6 +196,7 @@ Consultez aussi la [http://apptainer.org/docs/user/main/index.html documentation
 
 <b>IMPORTANT :</b> Si vous utilisez une image d’un overlay persistant (dans un fichier SIF ou un fichier distinct) et que vous voulez que cette image reflète les modifications, il faut, en plus des options nommées ci-dessus, passer au conteneur l’option <code>-w</code> ou <code>--writable</code>, autrement les modifications faites dans la session code>apptainer shell</code> ne seront pas sauvegardées.
 
+<span id="Running_daemons:_apptainer_instance"></span>
 ==Utiliser des démons avec <code>apptainer instance</code>==
 
 
@@ -194,6 +206,7 @@ Apptainer est conçu pour exécuter correctement des démons pour des tâches de
 
 <b>Remarque 2 :</b> Les démons ne sont exécutés que lorsque la tâche est en marche. Si l'ordonnanceur annule la tâche, tous les démons qui lui sont rattachés seront aussi annulés. Si vous avez besoin de démons qui restent actifs au-delà du temps d’exécution,vous pouvez à la place les exécuter  dans une machine virtuelle, dans un nuage; contactez alors le [[Technical support/fr|soutien technique]].
 
+<span id="Running_MPI_programs"></span>
 ==Travailler avec des programmes MPI==
 
 L’exécution de programmes MPI sur des nœuds dans un conteneur Apptainer requiert une configuration particulière. La communication entre les nœuds est beaucoup plus efficace avec MPI en raison de sa bonne utilisation du matériel d’interconnexion. Ceci se fait habituellement de façon automatique et ne cause aucun souci, sauf quand le programme utilise plusieurs nœuds dans une grappe.
@@ -202,6 +215,7 @@ L’exécution de programmes MPI sur des nœuds dans un conteneur Apptainer requ
 
 (contenu en préparation)
 
+<span id="Bind_mounts_and_persistent_overlays"></span>
 =Bind mounts et overlays persistants=
 
 Apptainer offre les fonctionnalités suivantes :
@@ -250,10 +264,12 @@ Ceci fait en sorte que les fichiers de configuration et les programmes qui sont 
 
 Enfin, <b>évitez de faire le bind mount de CVMFS dans vos conteneurs</b>.  Les programmes fournis par CVMFS peuvent être incompatibles avec vos conteneurs. L’objectif d’un conteneur est de fournir un environnement complet qui ne dépend pas de logiciels externes. Les programmes exécutés dans un conteneur devraient s’y trouver en entier et ceux qui ne sont pas nécessaires ne devraient pas y être ajoutés.
 
+<span id="Persistent_overlays"></span>
 ==Overlays persistants==
 
 Voir les détails dans [https://apptainer.org/docs/user/main/persistent_overlays.html Persistent Overlays] de la documentation officielle.
 
+<span id="Building_an_Apptainer_image"></span>
 =Construire une image Apptainer=
 
 <b>ATTENTION :</b> Lisez d’abord les  recommandations ci-dessus dans [https://docs.alliancecan.ca/wiki/Apptainer/fr#Construire_des_images_ou_des_overlays Construire des images ou des overlays] ci-dessus.
@@ -286,6 +302,7 @@ Certains conteneurs ne peuvent être créés si vous n’avez pas les permission
 
 Si tout ce dont vous avez besoin est une image Docker telle quelle, vous pourrez souvent la construire et l’exécuter facilement sans les permissions <i>root</i> et sans l’utilisation de <code>--fakeroot</code>.  Si par la suite vous devez modifier l’image, vous devrez peut-être avoir les permissions <i>root</i>, par exemple pour utiliser un gestionnaire de paquets. Pour cette raison, les exemples suivants supposent l’utilisation d'une image Docker telle quelle.
 
+<span id="Building_a_SIF_image"></span>
 ==Construire une image SIF==
 
 <b>ATTENTION :</b> Veuillez tenir compte des recommandations faites dans [https://docs.alliancecan.ca/wiki/Apptainer/fr#Construire_des_images_ou_des_overlays Construire des images ou des overlays] ci-dessus.
@@ -295,6 +312,7 @@ Pour construire l’image d’un fichier SIF avec la plus récente image busybox
 
 Pour des fonctions plus avancées, voir [https://apptainer.org/docs/admin/main/installation.html#lustre-gpfs la documentation officielle d'Apptainer].
 
+<span id="Building_a_sandbox_image"></span>
 ==Construire un bac à sable==
 
 <b>ATTENTION :</b> Veuillez tenir compte des recommandations faites dans [https://docs.alliancecan.ca/wiki/Apptainer/fr#Construire_des_images_ou_des_overlays Construire des images ou des overlays] ci-dessus.
@@ -311,83 +329,30 @@ Rappelons les  différences entre un fichier SIF et un bac à sable&nbsp;:
 
 L’utilisation d’un bac à sable entame significativement vos quotas d’espace disque et de nombre de fichiers. Si vous n’avez pas besoin d’un accès en lecture et en écriture fréquent à l’image du conteneur, il est recommandé d’utiliser un fichier SIF. Ce dernier offre aussi un accès plus rapide.
 
+<span id="Example_use_cases"></span>
 =Cas d'usage=
 
+<span id="Using_Conda_in_Apptainer"></span>
 ==Travailler avec Conda ==
 
-Avant de commencer ce tutoriel, prenez note de quelques points importants&nbsp;:
+{{:Using Conda in Apptainer/fr}}
 
-* Utilisez Conda <b>en dernier recours</b>, même dans un conteneur. Accordez plutôt la priorité aux [[Modules/fr|modules]] de notre [[Available software/fr|pile logicielle]] et aux [[Python/fr|wheels]] parmi [[Available Python wheels/fr|ceux qui sont disponibles]]. Ces modules et wheels sont optimisés en fonction de nos systèmes et nous pouvons fournir une meilleure assistance au besoin. Pour faire ajouter un module ou un paquet, contactez le [[Technical support/fr|soutien technique]].
-* Dans ce tutoriel, nous utilisons le gestionnaire de paquets [https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html micromamba] au lieu de Conda. Si vous voulez utiliser Conda, vous devez tenir compte des  [https://legal.anaconda.com/policies/en?name=terms-of-service#terms-of-service conditions d'utilisation d'Anaconda] et peut-être  [https://www.anaconda.com/pricing/terms-of-service-faqs détenir une licence commerciale].
-* Dans ce tutoriel, nous créons une image pour lecture seule, c'est-à dire un fichier <tt>.sif</tt> qui contient un environnement Conda avec tout ce qu'il faut pour utiliser votre application. Il est fortement recommandé de <b>ne pas installer interactivement un logiciel dans un conteneur avec Conda</b> et aucune information ne sera donnée en ce sens.
-
-La création d'une image Apptainer et l'installation d'un logiciel dans un conteneur avec Conda est un processus en trois étapes.<br>
-Il faut d'abord créer un fichier <tt>.yml</tt> qui décrit l'environnement Conda à créer dans le conteneur; dans l'exemple suivant, il s'agit de <tt>environment.yml</tt>. Ce fichier contient le nom de l'environnement à créer, la liste des paquets à installer et comment les trouver (<i>channel</i>).
-
-{{File
-  |name=environment.yml
-  |lang="yaml"
-  |contents=
-name: base
-channels:
-  - conda-forge
-  - bioconda
-  - defaults
-dependencies:
-  - python
-  - pip
-  - star
-  - bwa
-  - multiqc
-}}
-
-Il faut ensuite créer un  [https://apptainer.org/docs/user/main/definition_files.html fichier de définition pour l'image] (nommé ici <tt>image.def</tt>) qui décrit les étapes pour créer l'image avec Apptainer.
-#Téléchargez une image Docker de DockerHub qui contient le gestionnaire de paquets micromamba préinstallé.
-#Créez dans le conteneur une copie du fichier de définition <tt>environment.yml</tt>.
-#Exécutez micromamba pour configurer l'environnement <tt>environment.yml</tt>.
-
-{{File
-  |name=image.def
-  |lang="yaml"
-  |contents=
-Bootstrap: docker
-From: mambaorg/micromamba:latest
-
-%files
-    environment.yml /environment.yml
-
-%post
-    micromamba install -n base --file environment.yml && \
-        micromamba clean --all --yes
-}}
-
-La dernière étape est de construire l'image Apptainer à l'aide du fichier de définition ci-dessus&nbsp;:
-   module load apptainer
-   APPTAINER_BIND=' ' apptainer build image.sif image.def
-
-Vous pouvez maintenant tester si <code>multiqc</code> est disponible avec, par exemple, la commande
-{{Command
-|apptainer run image.sif multiqc --help
-|result=
- 
- /// MultiQC 🎃 v1.25.1
- 
- Usage: multiqc [OPTIONS] [ANALYSIS DIRECTORY]
-...
-}}
-
+<span id="Using_Spack_in_Apptainer"></span>
 ==Travailler avec Spack ==
 
 (contenu en préparation)
 
+<span id="Using_NVIDIA_GPUs_in_Apptainer"></span>
 ==Travailler avec des GPU NVIDIA ==
 
 (contenu en préparation)
 
+<span id="Using_MPI_in_Apptainer"></span>
 ==Travailler avec MPI==
 
 (contenu en préparation)
 
+<span id="Creating_an_Apptainer_container_from_a_Dockerfile"></span>
 ==Créer un conteneur Apptainer à partir de Dockerfile==
 
 <b>Remarque : Il faut d’abord installer Docker et Apptainer sur un ordinateur où vous disposez des permissions nécessaires. Les commandes présentées ici ne fonctionnent pas sur nos grappes.</b>
@@ -419,8 +384,10 @@ Le fichier SIF résultant est un conteneur Apptainer correspondant aux instructi
 
 puis <code>docker image rm ID</code> (où ID est l’identifiant de l’image obtenue par la commande <code>docker images</code>). Ceci libère l’espace disque occupé par les couches additionnelles.
 
+<span id="Miscellaneous_items"></span>
 =Sujets divers=
 
+<span id="Cleaning_Apptainer&#039;s_cache_directory"></span>
 ==Vider le répertoire cache==
 
 Pour trouver les fichiers du répertoire cache, lancez
@@ -431,6 +398,7 @@ Supprimez les fichiers avec
 
  apptainer cache clean
 
+<span id="Changing_Apptainer&#039;s_default_directories"></span>
 ==Modifier les répertoires par défaut==
 
 Avant de lancer Apptainer, configurez les variables d’environnement suivantes pour utiliser d’autres répertoires temporaires et cache que ceux désignés par défaut.

@@ -1295,7 +1295,7 @@ Les programmes Ansys fonctionnent interactivement en mode graphique sur les nœu
  [https://docs.alliancecan.ca/wiki/Narval NARVAL]:  <code>https://jupyterhub.narval.alliancecan.ca/</code>
  [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart TRILLIUM]: <code>https://ondemand.scinet.utoronto.ca</code>
 
-Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then a H100 gpu resource should be requested and an OpenGL driver argument added when starting fluent as shown below.
+Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then either a whole GPU resource (H100 or T4 at the time of this writing) should be requested.  Since the various ansys applications launched in graphical mode behave differently when different ansys module versions are loaded, recommendations for adding command line argument and exporting environment variables for virtualgl or mesa environments have been documented below depending on whether a GPU has been requested or not and wether a On Demand or Juypter Lab system launcher is being used.
 
 === Fluids ===
 ::: <code>module load StdEnv/2023 ansys/2022R2</code> (ou versions plus récentes)
@@ -1307,6 +1307,8 @@ Submit your resource request and then wait.  If you started a Juypter Lab launch
 ::: <code>mapdl -g</code>, ou via le démarreur,
 ::: <code>launcher</code> --> cliquer sur le bouton RUN
 
+<span id="Workbench"></span>
+<div class="mw-translate-fuzzy">
 === Workbench ===
 ::: <code>module load StdEnv/2023 ansys/2022R2</code> (ou versions plus récentes)
 ::: <code>xfwm4 --replace &</code> (nécessaire seulement si vous utilisez Ansys Mechanical)
@@ -1314,6 +1316,34 @@ Submit your resource request and then wait.  If you started a Juypter Lab launch
 ::: <code>runwb2</code>
 ::: <br>
 ::: Remarque : Quand vous exécutez en parallèle un programme d'analyse comme  Mechanical or Fluent sur un nœud simple, ne cochez pas la case <i>Distributed</i> et indiquez un nombre de cœurs égal à votre  <b>session salloc, moins 1</b>. Les menus déroulants du Ansys Mechanical Workbench ne répondent pas correctement. Comme solution, lancez <code>xfwm4 --replace</code> sur la ligne de commande avant de démarrer Workbench. Pour avoir xfwm4 par défaut, modifiez <code>$HOME/.vnc/xstartup</code> et remplacez <code>mate-session</code> par <code>xfce4-session</code>.
+</div>
+
+<div class="mw-translate-fuzzy">
+=== Ensight ===
+::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>
+::: <code>export LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib</code>
+::: <code>ensight -X</code>
+</div>
+
+<div class="mw-translate-fuzzy">
+== Problèmes avec SSH==
+:::Certains programmes d'interface graphique ANSYS peuvent être exécutés à distance sur un nœud de calcul d'une de nos grappes par redirection X via SSH vers votre ordinateur local. Contrairement à VNC, cette approche n'est ni testée ni prise en charge car elle repose sur un serveur d'affichage X correctement configuré pour votre système d'exploitation particulier OU sur la sélection, l'installation et la configuration d'un paquet d'émulateur client X approprié tel que MobaXterm. La plupart d'entre vous trouverez les temps de réponse interactifs inacceptables pour les tâches de menu de base, sans parler de l'exécution de tâches plus complexes telles que celles nécessitant du rendu graphique. Les temps d'attente pour démarrer des programmes avec interface graphique peuvent également être très longs, dépendant de votre connexion Internet. Dans un test par exemple, il a fallu 40&nbsp;minutes pour obtenir l'interface graphique avec SSH alors que vncviewer n'a pris que 34&nbsp;secondes. Malgré la lenteur potentielle lors de la connexion via SSH pour exécuter des programmes avec interface graphique, cela peut toujours être intéressant si votre seul objectif est d'ouvrir une simulation et d'effectuer des opérations de menu de base ou d'exécuter des calculs. Ces étapes de base sont un point de départ : 1) ssh -Y username@graham.computecanada.ca; 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task =4 [--gpus-per-node=1] --account=def-mygroup; 3) une fois connecté à un nœud de calcul, essayez d'exécuter <code>xclock</code>. Si l'horloge apparaît sur votre bureau, chargez le module Ansys souhaité et essayez d'exécuter le programme.
+</div> 
+
+=== Fluids ===
+::: <code>module load CcEnv StdEnv/2023</code>
+::: <code>module load ansys/2024R2.04</code> (ou versions moins récentes)
+::: <code>unset SESSION_MANAGER</code>
+::: <code>fluent | cfx5 | icemcfd</code>
+::: o La commande <code>unset SESSION_MANAGER</code> permet d'éviter le message d'erreur suivant au lancement de Fluent.
+::: [<span style="Color:#ff7f50">Qt: Session management error: None of the authentication protocols specified are supported</span>]
+::: o Si le message suivant est affiché au lancement de icemcfd ...
+::: [<span style="Color:#ff7f50">Error segmentation violation - exiting after doing an emergency save</span>]
+::: ... ne cliquez pas sur le bouton OK, autrement icemcfd va planter. Faites plutôt ce qui suit (une seule fois)&nbsp;:
+::: sélectionnez <i>Settings Tab -> Display -> tick X11 -> Apply -> OK -> File -> Exit</i>
+::: L'erreur ne devrait pas se produire quand vous démarrez de nouveau icemcfd.
+
+=== Workbench ===
 
 === Ensight ===
 ::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>
@@ -1337,10 +1367,8 @@ Submit your resource request and then wait.  If you started a Juypter Lab launch
 :::   <code>salloc --time=08:00:00 --nodes=1 --cpus-per-task=4 --gres=gpu:v100:1 --mem=32G --account=someaccount</code>
 </div>
 
-<div class="mw-translate-fuzzy">
-== Problèmes avec SSH==
-:::Certains programmes d'interface graphique ANSYS peuvent être exécutés à distance sur un nœud de calcul d'une de nos grappes par redirection X via SSH vers votre ordinateur local. Contrairement à VNC, cette approche n'est ni testée ni prise en charge car elle repose sur un serveur d'affichage X correctement configuré pour votre système d'exploitation particulier OU sur la sélection, l'installation et la configuration d'un paquet d'émulateur client X approprié tel que MobaXterm. La plupart d'entre vous trouverez les temps de réponse interactifs inacceptables pour les tâches de menu de base, sans parler de l'exécution de tâches plus complexes telles que celles nécessitant du rendu graphique. Les temps d'attente pour démarrer des programmes avec interface graphique peuvent également être très longs, dépendant de votre connexion Internet. Dans un test par exemple, il a fallu 40&nbsp;minutes pour obtenir l'interface graphique avec SSH alors que vncviewer n'a pris que 34&nbsp;secondes. Malgré la lenteur potentielle lors de la connexion via SSH pour exécuter des programmes avec interface graphique, cela peut toujours être intéressant si votre seul objectif est d'ouvrir une simulation et d'effectuer des opérations de menu de base ou d'exécuter des calculs. Ces étapes de base sont un point de départ : 1) ssh -Y username@graham.computecanada.ca; 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task =4 [--gpus-per-node=1] --account=def-mygroup; 3) une fois connecté à un nœud de calcul, essayez d'exécuter <code>xclock</code>. Si l'horloge apparaît sur votre bureau, chargez le module Ansys souhaité et essayez d'exécuter le programme.
-</div>
+#module load ansys/2021R1
+module load ansys/2021R2
 
 <span id="Site-specific_usage"></span>
 = Particularités selon le site d'utilisation =
