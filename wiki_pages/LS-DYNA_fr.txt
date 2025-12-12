@@ -52,31 +52,25 @@ où <port> est un nombre entier et <server> est le nom d'hôte ou l'adresse IP d
 
 ==== SHARCNET ==== 
 
-<div class="mw-translate-fuzzy">
-La licence Ansys de SHARCNET prend en charge l'exécution de tâches SMP (<i>Shared Memory Parallel</i>) et MPP (<i>Message Passing Parallel</i>) de LS-DYNA. Elle peut être utilisée librement par n'importe qui (sur une base limitée au nombre de cœurs et de tâches) sur les grappes Graham, Narval ou Cedar en ajoutant les lignes suivantes dans votre script&nbsp;:
+La licence Ansys de SHARCNET prend en charge l'exécution de tâches SMP (<i>Shared Memory Parallel</i>) et MPP (<i>Message Passing Parallel</i>) de LS-DYNA. Elle peut être utilisée librement par n'importe qui (sur une base limitée au nombre de cœurs et de tâches) sur la grappe Nibi en ajoutant les lignes suivantes dans votre script&nbsp;:
  export LSTC_LICENSE=ansys
- export ANSYSLMD_LICENSE_FILE=1055@license3.sharcnet.ca
-</div>
+ export ANSYSLMD_LICENSE_FILE=1055@license1.computecanada.ca
 
 <span id="CMC_license"></span>
 === Licence CMC === 
 
-<div class="mw-translate-fuzzy">
 Si votre licence a été achetée de CMC, définissez les deux variables d'environnement suivantes selon la grappe utilisée&nbsp;:
  export LSTC_LICENSE=ansys
- Beluga:  export ANSYSLMD_LICENSE_FILE=6624@10.20.73.21
- Cedar:   export ANSYSLMD_LICENSE_FILE=6624@172.16.121.25
- Graham:  export ANSYSLMD_LICENSE_FILE=6624@10.25.1.56 <--- nouvelle IP le 21 février 2025
- Narval:  export ANSYSLMD_LICENSE_FILE=6624@10.100.64.10
- Niagara: export ANSYSLMD_LICENSE_FILE=6624@172.16.205.199
-</div>
+ Fir :      export ANSYSLMD_LICENSE_FILE=6624@172.26.0.101
+ Nibi :     export ANSYSLMD_LICENSE_FILE=6624@10.25.1.56
+ Narval :   export ANSYSLMD_LICENSE_FILE=6624@10.100.64.10
+ Rorqual :  export ANSYSLMD_LICENSE_FILE=6624@10.100.64.10
+ Trillium : export ANSYSLMD_LICENSE_FILE=6624@172.16.205.198
 
 où les différentes adresses IP correspondent aux serveurs CADpass respectifs. Aucune modification du pare-feu n'est requise pour utiliser une licence CMC sur une grappe, car elles ont déjà été effectuées. Étant donné que le serveur CMC distant qui héberge les licences LS-DYNA est basé sur Ansys, ces variables ne peuvent pas être définies dans votre fichier <code>~/.licenses/ls-dyna.lic</code>. Le fichier doit cependant exister (même s'il est vide) pour que tout module <code>ls-dyna</code> puisse se charger. Pour vous assurer que c'est le cas, exécutez <code>touch ~/.licenses/ls-dyna.lic</code> en ligne de commande (ou à chaque fois dans vos scripts). Notez que seules les versions de module >= 13.1.1 fonctionneront avec les serveurs de licence Ansys.
 
 <span id="Cluster_job_submission"></span>
-<div class="mw-translate-fuzzy">
-= Soumettre des tâches en lots =
-</div>
+= Soumettre des tâches sur une grappe =
 
 LS-DYNA offre des binaires pour faire exécuter des tâches sur des nœuds uniques (SMP, ''Shared Memory Parallel'' avec OpenMP) ou sur plusieurs nœuds (MPP, ''Message Passing Parallel''  avec MPI).  Vous trouverez ci-dessous des scripts pour chacun des types de tâches.
 
@@ -98,18 +92,14 @@ Pour ce qui est de l’option AUTO de la variable d'environnement LSTC_MEMORY, c
 #SBATCH --mem=16G               # Specify total memory
 #SBATCH --nodes=1               # Do not change
 
-<div class="mw-translate-fuzzy">
 #module load StdEnv/2020        # Versions 12.0, 13.0, 13.1.1
-#export RSNT_ARCH=avx2          # Uncomment on beluga, nibi, rorqual
+#export RSNT_ARCH=avx2
 #module load intel/2020.1.217
 #module load ls-dyna/13.1.1
-</div>
 
-<div class="mw-translate-fuzzy">
-module load StdEnv/2023         # Version 12.2.1 (more versions added on request)
+module load StdEnv/2023         # Version 12.2.1
 module load intel/2023.2.1
 module load ls-dyna/12.2.1
-</div>
 
 #export LSTC_LICENSE=ansys      # Specify an ANSYS License Server
 #export ANSYSLMD_LICENSE_FILE=<port>@<server>
@@ -130,7 +120,6 @@ Plusieurs modules sont installés pour exécuter des tâches sur plusieurs nœud
 <span id="Specify_node_count"></span>
 === Spécifier le nombre de nœuds ===
 
-<div class="mw-translate-fuzzy">
 Le script suivant demande un nombre spécifique de '''nœuds de calcul entiers'''. 
 {{File
 |name=script-mpp-bynode.sh
@@ -139,25 +128,20 @@ Le script suivant demande un nombre spécifique de '''nœuds de calcul entiers''
 #!/bin/bash
 #SBATCH --account=def-account    # Specify
 #SBATCH --time=0-03:00           # D-HH:MM
-#SBATCH --ntasks-per-node=40     # Specify all cores per node (beluga 40, cedar 48, graham 40, beluga 40, narval 64)
-#SBATCH --nodes=2                # Specify number compute nodes (1 or more)
+#SBATCH --ntasks-per-node=192    # Specify all cores per node (narval/nibi/fir/trillium 192)
+#SBATCH --nodes=1                # Specify number compute nodes (1 or more)
 #SBATCH --mem=0                  # Use all memory per compute node (do not change)
 ##SBATCH --constraint=cascade    # Uncomment to specify a cluster specific node type
-</div>
 
-<div class="mw-translate-fuzzy">
 #module load StdEnv/2020         # Versions 12.0, 13.0, 13.1.1
-#export RSNT_ARCH=avx2           # Uncomment on beluga, nibi, rorqual
+#export RSNT_ARCH=avx2
 #module load intel/2020.1.217
 #module load openmpi/4.0.3
-#module load ls-dyna-mpi/13.1.1
-</div> 
+#module load ls-dyna-mpi/13.1.1 
 
-<div class="mw-translate-fuzzy">
-module load StdEnv/2023          # Version 12.2.1 (more versions added on request)
+module load StdEnv/2023          # Version 12.2.1
 module load intel/2023.2.1
 module load ls-dyna-mpi/12.2.1
-</div>
 
 #export LSTC_LICENSE=ansys       # Specify an ANSYS License Server
 #export ANSYSLMD_LICENSE_FILE=<port>@<server>
@@ -220,42 +204,28 @@ où
 <span id="Performance_testing"></span>
 == Test de performance ==
 
-<div class="mw-translate-fuzzy">
-Selon la simulation, LS-DYNA peut ou non être en mesure d'utiliser efficacement de très nombreux cœurs en parallèle. Par conséquent, avant d'exécuter une simulation complète, des tests de mise à l'échelle standard doivent être exécutés pour déterminer le nombre optimal de cœurs pouvant être utilisés avant que le ralentissement de la simulation ne se produise, où la commande <tt>seff jobnumber</tt> peut être utilisée pour déterminer le temps d'horloge du Job Wall, l'efficacité du processeur et l'efficacité de la mémoire des tâches de test terminées avec succès. De plus, des tests récents avec des tâches pour coussins gonflables soumises à la file d'attente sur différentes grappes ont révélé des performances nettement meilleures sur Cedar et Narval que sur Graham. Les tests ont été effectués avec six cœurs sur un seul nœud à l'aide du module ls-dyna/12.2.1 et six cœurs répartis uniformément sur deux nœuds à l'aide du module ls-dyna-mpi/12.2.1. Bien que limités, les résultats indiquent qu'une variation significative des performances peut se produire sur différents systèmes pour une configuration de simulation donnée. Par conséquent, avant d'exécuter des simulations LD-DYNA complètes, il est recommandé de A) effectuer des tests de mise à l'échelle standard sur une grappe donnée et B) exécuter des cas de test identiques sur chaque grappe avant de déterminer une taille de tâche, une version de module et une configuration de grappe optimales.
-</div>
+Selon la simulation, LS-DYNA peut ne pas  pouvoir utiliser efficacement un très grand nombre de cœurs en parallèle. Il est donc conseillé de toujours exécuter des tests de scalabilité avant de soumettre des longues tâches. Ceci aidera à déterminer le nombre maximal de cœurs pouvant être utilisés avant que la performance ne commence à se dégrader. Pour extraire les statistiques des travaux de test telles que le temps d'exécution total, l'efficacité CPU et l'efficacité de la mémoire, on peut utiliser soit la commande <tt>seff jobnumber</tt>, soit un portail tel que [https://portal.nibi.sharcnet.ca celui-ci]. Par le passé, les tests pour le problème standard des coussins gonflables ont montré des caractéristiques de performance très différentes selon la grappe sur laquelle ils étaient exécutés. Cependant, ces tests étaient assez petits, utilisant seulement 6 cœurs sur un seul nœud avec le module ls-dyna/12.2.1 et 6 cœurs répartis uniformément sur deux nœuds avec le module ls-dyna-mpi/12.2.1. Les tests de scalabilité devraient plutôt être effectués en utilisant la simulation réelle et la grappe où les exécutions de production complètes seront réalisées afin d'obtenir des résultats fiables.
 
 <span id="Graphical_use"></span>
-<div class="mw-translate-fuzzy">
-= Visualisation avec LS-PrePost=
-</div>
+= Mode graphique =
 
-<div class="mw-translate-fuzzy">
-Le programme [https://www.lstc.com/products/ls-prepost LS-PrePost] permet le prétraitement et le post-traitement des [https://www.dynaexamples.com/ modèles LS-DYNA] et est disponible via un autre module. Vous n'avez pas besoin de licence et pouvez l'utiliser sur tous les nœuds, incluant les nœuds VDI de Graham.
-</div>
+Le programme [https://www.lstc.com/products/ls-prepost LS-PrePost] permet le prétraitement et le post-traitement des [https://www.dynaexamples.com/ modèles LS-DYNA]. Il est disponible via un autre module et vous n'avez pas besoin de licence. Utilisez Abaqus en mode graphique sur un bureau à distance avec OnDemand (recommandé) ou VncViewer, comme décrit ci-dessous.
 
-<div class="mw-translate-fuzzy">
 == Nœuds VDI ==
-Connectez-vous à gra-vdi avec [[VNC/fr#Connexion|TigerVNC]] et ouvrez une fenêtre de terminal.
- module load CcEnv StdEnv/2020
- 
- module load ls-prepost/4.8
- lsprepost
- 
- module load ls-prepost/4.9
- lsprepost OR lspp49
-</div>
-
-<div class="mw-translate-fuzzy">
-== Nœuds des grappes  ==
-Connectez-vous à un nœud de calcul ou à un nœud de connexion avec [[VNC/fr#Connexion|TigerVNC]] et ouvrez une fenêtre de terminal.
+1. Avec le navigateur de votre ordinateur, connectez-vous à un système OnDemand avec l'une des URL suivantes&nbsp;:<br>
+ [[NIBI/fr#Accès_via_OnDemand|NIBI]] : <code>https://ondemand.sharcnet.ca</code>
+ FIR : <code>https://jupyterhub.fir.alliancecan.ca</code>
+ RORQUAL : <code>https://jupyterhub.rorqual.alliancecan.ca</code>
+ TRILLIUM : <code>https://ondemand.scinet.utoronto.ca</code>
+2. Sur votre ordinateur, ouvrez une nouvelle fenêtre de terminal et lancez
  module load StdEnv/2020
- 
- module load ls-prepost/4.8
- lsprepost
- 
  module load ls-prepost/4.9
  lsprepost OU lspp49
 
- module load ls-prepost
- lsprepost
-</div>
+== VncViewer  ==
+1. Avec un client VncViewer, connectez-vous à un nœud de calcul ou à un nœud de connexion avec [[VNC/fr#Connexion|TigerVNC]].<br>
+ 
+2. Sur votre ordinateur, ouvrez une nouvelle fenêtre de terminal et lancez
+ module load StdEnv/2020
+ module load ls-prepost/4.9
+ lsprepost OR lspp49

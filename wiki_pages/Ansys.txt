@@ -1426,37 +1426,95 @@ Submit your resource request and then wait.  If you started a Juypter Lab launch
 
 <!--T:1670-->
 === Fluids ===
-::: <code>module load StdEnv/2023 ansys/2022R2</code> (or newer versions)
-::: <code>fluent -mpi=intel -driver opengl|null</code>, or,
-::: <code>cfx5 -graphics ogl|mesa</code>
+
+==== Fluent ====
+
+When starting Fluent from a terminal window command line of an On Demand Desktop or the convenience Icon of a Juypter Lab Desktop the following steps should be done including setting the indicated Environment Variables depending on which type of Compute Node the desktop is being started on (with or without a gpu).
+
+::: <code>module load StdEnv/2023 ansys/2025R1</code>
+::: <code>fluent</code>
+
+<!--T:1647-->
+<b>Compute Node (no GPU requested) or Basic Desktop</b>
+
+<!--T:1648-->
+::: In the Fluent Launcher Click the Environment Tab
+::: Copy/paste the following environment variable settings:
+:::: <code>export I_MPI_HYDRA_BOOTSTRAP=ssh</code>     (required on nibi)
+:::: <code>HOOPS_PICTURE=opengl2-mesa</code>           (2025R1 or newer)
+:::: <code>HOOPS_PICTURE=null</code>                   (2024R2 or older)
+::: Click the <code>Start</code> button
+
+<!--T:1649-->
+<b>Compute Node (with GPU requested)</b>
+
+<!--T:1650-->
+::: In the Fluent Launcher Click the Environment Tab
+::: Copy/paste the following environment variable settings:
+:::: <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code>            (required on nibi)
+:::: <code>HOOPS_PICTURE=opengl2</code>                (2025R1 or newer)
+:::: <code>HOOPS_PICTURE=opengl</code>                 (2024R2 or older)
+::: Click the <code>Start</code> button
+
+==== CFX ====
+
+When starting CFX from an On Demand Desktop the following arguments maybe specified on the terminal window command line depending on whether a GPU was requested when the Desktop was started. 
+
+::: <code>module load StdEnv/2023 ansys/2025R1</code>  (or older)
+::: <code>cfx5 -graphics mesa</code>   (no GPU requested)
+::: <code>cfx5 -graphics ogl</code>    (with GPU requested)
 
 <!--T:1680-->
 === Mapdl ===
+
+The following steps for starting the Mechanical APDL gui from the command line of a terminal window should work regardless if you have started your On Demand Desktop on a Compute node with or without a gpu.
+
 ::: <code>module load StdEnv/2023 ansys/2022R2</code> (or newer versions)
-::: <code>mapdl -g</code>, or via launcher,
-::: <code>launcher</code> --> click RUN button
+::: <code>mapdl -g</code>, or,
+::: <code>launcher</code> then click <code>RUN</code> button
 
 === Workbench === <!--T:1671-->
 
-<!--T:1673-->
-<b>Compute Node or Basic Desktop (without a GPU allocated)</b>
+Note that when starting Fluent from within Workbench the same GPU dependent Environment Variable settings should be specified in the Environment Tabl of the Fluent Launcher that are explained in the Fluids section above when starting fluent from a terminal window command line. 
 
-<!--T:1674-->
-::: <code>module load StdEnv/2023 ansys/2025R1</code> (or newer versions)
-::: <code>export I_MPI_HYDRA_BOOTSTRAP=ssh</code>  (only required on nibi)
-::: <code>export HOOPS_PICTURE=opengl2-mesa</code> 
-::: <code>runwb2 -oglmesa </code> 
+==== On Demand Desktop ==== <!--T:1674-->
 
 <!--T:1675-->
-<b>Compute Node (with at least one GPU allocated)</b>
+<b>Compute Node (no GPU requested) or Basic Desktop</b>
 
 <!--T:1676-->
-::: <code>module load StdEnv/2023 ansys/2025R1</code> (or newer versions)
-::: <code>export I_MPI_HYDRA_BOOTSTRAP=ssh</code>  (only required on nibi)
-::: <code>export HOOPS_PICTURE=opengl2</code> 
+::: <code>module load StdEnv/2023 ansys/2025R1</code>
+::: <code>runwb2 -oglmesa </code>
+
+<!--T:1677-->
+<b>Compute Node (with GPU requested)</b>
+
+<!--T:1678-->
+::: <code>module load StdEnv/2023 ansys/2025R1</code>
 ::: <code>runwb2</code>
 
-<!--T:6835-->
+==== Jupyter Lab Desktop ==== <!--T:1682-->
+
+<!--T:1693-->
+<b>Compute Node (no GPU requested)</b>
+
+::: Click to load ansys/2025R1 (or newer version) in the Desktop left hand side menu
+::: Click the "Workbench (VNC)" icon located in the Jupyter Lab desktop center window
+::: Since the default icon is configured for a gpu node, we must customize it so
+::: workbench can be restart in mesa mode.  To proceed, Exit the Workbench desktop,
+::: open a terminal window, and run the following commands on the command line:
+::: cd ~/Desktop; cp -p $(realpath workbench.desktop) workbench-mesa.desktop
+::: then edit workbench-mesa.desktop and change runwb2 -> runwb2 -oglmesa
+::: Save the file then click your newly customized icon to start workbench.
+::: Note the workbench icon that you created will persist for future sessions
+::: until manually deleted with: rm -f ~/Desktop/workbench-mesa.desktop
+
+<!--T:1694-->
+<b>Compute Node (with GPU requested)</b>
+
+::: Click to load ansys/2025R1 (or newer version) in the Desktop left hand side menu
+::: Click the Workbench (VNC) icon located in the Jupyter Lab desktop center window
+
 === Ensight ===
 ::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>
 ::: <code>export LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib</code>
