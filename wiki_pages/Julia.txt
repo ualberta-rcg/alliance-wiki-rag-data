@@ -131,48 +131,20 @@ starts one main Julia process and 100 worker processes on the nodes specified in
 = Running Julia with MPI = <!--T:25-->
 
 <!--T:26-->
-You must make sure Julia's MPI is configured to use our MPI libraries.  If you are using Julia MPI 0.19 or earlier, run the following:
+You must make sure Julia's MPI is configured to use our MPI libraries. Run the following:
 
- <!--T:27-->
-module load StdEnv  julia
- export JULIA_MPI_BINARY=system
- export JULIA_MPI_PATH=$EBROOTOPENMPI
- export JULIA_MPI_LIBRARY=$EBROOTOPENMPI/lib64/libmpi.so
- export JULIA_MPI_ABI=OpenMPI
- export JULIA_MPIEXEC=$EBROOTOPENMPI/bin/mpiexec
+<!--T:27-->
+ module load StdEnv julia
 
 <!--T:28-->
 Then start Julia and inside it run:
 
- <!--T:29-->
-import Pkg;
+<!--T:29-->
+ import Pkg
+ Pkg.add("MPIPreferences")
+ using MPIPreferences
+ MPIPreferences.use_system_binary(;extra_paths=[joinpath(ENV["EBROOTOPENMPI"],"lib64")])
  Pkg.add("MPI")
-
-<!--T:57-->
-If you are using Julia MPI 0.20 or later, run the following.  Note that this will append an <code>[MPIPreferences]</code> section to your <code>.julia/environments/vX.Y/LocalPreferences.toml</code> file.
-If that file already exists and has an <code>[MPIPreferences]</code> section, first edit the file and remove the section.
-
-  <!--T:58-->
-module load julia
- 
-  mkdir -p .julia/environments/v${EBVERSIONJULIA%.*}
- 
-  cat >> .julia/environments/v${EBVERSIONJULIA%.*}/LocalPreferences.toml << EOF
-  [MPIPreferences]
-  _format = "1.0"
-  abi = "OpenMPI"
-  binary = "system"
-  libmpi = "${EBROOTOPENMPI}/lib64/libmpi.so"
-  mpiexec = "${EBROOTOPENMPI}/bin/mpiexec"
-  EOF
-
-<!--T:59-->
-Then start Julia and inside it run:
-
-  <!--T:60-->
-import Pkg
-  Pkg.add("MPIPreferences")
-  Pkg.add("MPI")
 
 <!--T:30-->
 To use afterwards, run (with two processes in this example):
