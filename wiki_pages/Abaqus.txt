@@ -45,24 +45,17 @@ Abaqus solvers support thread-based and mpi-based parallelization.  Scripts for 
   |lang="sh"
   |contents=
 #!/bin/bash
-#SBATCH --account=def-group    # Specify account
-#SBATCH --time=00-06:00        # Specify days-hrs:mins
-#SBATCH --cpus-per-task=4      # Specify number of cores
-#SBATCH --mem=8G               # Specify total memory > 5G
-#SBATCH --nodes=1              # Do not change !
-##SBATCH --constraint=cascade  # Uncomment to specify node (cpu/gpu jobs)
-##SBATCH --gres=gpu:t4:1       # Uncomment to specify gpu
-# or
-##SBATCH --constraint=rome     # Uncomment to specify node (gpu only jobs)
-##SBATCH --gres=gpu:a100:1     # Uncomment to specify gpu
+#SBATCH --account=def-group     # Specify account
+#SBATCH --time=00-06:00         # Specify days-hrs:mins
+#SBATCH --cpus-per-task=4       # Specify number of cores
+#SBATCH --mem=8G                # Specify total memory > 5G
+#SBATCH --nodes=1               # Do not change !
+##SBATCH --constraint=granite   # Uncomment to specify a node type
+##SBATCH --gpus-per-node=h100:1 # Uncomment to specify [type:]number
 
 <!--T:11-->
-module load StdEnv/2020        # Latest installed version
-module load abaqus/2021        # Latest installed version
-
-<!--T:12-->
-#module load StdEnv/2016       # Uncomment to use
-#module load abaqus/2020       # Uncomment to use
+module load StdEnv/2020         # Latest installed version
+module load abaqus/2021         # Latest installed version
 
 <!--T:13-->
 unset SLURM_GTIDS
@@ -72,7 +65,9 @@ echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
 <!--T:14-->
 rm -f testsp1* testsp2*
-abaqus job=testsp1 input=mystd-sim.inp \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testsp1 input=mystd-sim.inp \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
 #  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
@@ -96,20 +91,17 @@ Some simulations may benefit by adding the following to the Abaqus command at th
   |lang="sh"
   |contents=
 #!/bin/bash
-#SBATCH --account=def-group    # Specify account
-#SBATCH --time=00-06:00        # Specify days-hrs:mins
-#SBATCH --cpus-per-task=4      # Specify number of cores
-#SBATCH --mem=8G               # Specify total memory > 5G
-#SBATCH --nodes=1              # Do not change !
-##SBATCH --constraint=cascade  # Uncomment to specify node (44cores)
-##SBATCH --gres=gpu:t4:1       # Uncomment to specify gpu
-# or
-##SBATCH --constraint=rome     # Uncomment to specify node (128cores)
-##SBATCH --gres=gpu:a100:1     # Uncomment to specify gpu
+#SBATCH --account=def-group     # Specify account
+#SBATCH --time=00-06:00         # Specify days-hrs:mins
+#SBATCH --cpus-per-task=4       # Specify number of cores
+#SBATCH --mem=8G                # Specify total memory > 5G
+#SBATCH --nodes=1               # Do not change !
+##SBATCH --constraint=granite   # Uncomment to specify a node type
+##SBATCH --gpus-per-node=h100:1 # Uncomment to specify [type:]number
 
 <!--T:17-->
-module load StdEnv/2020        # Latest installed version
-module load abaqus/2021        # Latest installed version
+module load StdEnv/2020         # Latest installed version
+module load abaqus/2021         # Latest installed version
 
 <!--T:18-->
 unset SLURM_GTIDS
@@ -119,7 +111,9 @@ echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
 <!--T:19-->
 rm -f testsp2* testsp1.lck
-abaqus job=testsp2 oldjob=testsp1 input=mystd-sim-restart.inp \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testsp2 oldjob=testsp1 input=mystd-sim-restart.inp \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
 #  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
@@ -138,20 +132,17 @@ The restart input file should contain:
   |lang="sh"
   |contents=
 #!/bin/bash
-#SBATCH --account=def-group    # Specify account
-#SBATCH --time=00-06:00        # Specify days-hrs:mins
-#SBATCH --cpus-per-task=4      # Specify number of cores
-#SBATCH --mem=8G               # Specify total memory > 5G
-#SBATCH --nodes=1              # Do not change !
-##SBATCH --constraint=cascade  # Uncomment to specify node (cpu/gpu jobs)
-##SBATCH --gres=gpu:t4:1       # Uncomment to specify gpu
-# or
-##SBATCH --constraint=rome     # Uncomment to specify node (gpu only jobs)
-##SBATCH --gres=gpu:a100:1     # Uncomment to specify gpu
+#SBATCH --account=def-group     # Specify account
+#SBATCH --time=00-06:00         # Specify days-hrs:mins
+#SBATCH --cpus-per-task=4       # Specify number of cores
+#SBATCH --mem=8G                # Specify total memory > 5G
+#SBATCH --nodes=1               # Do not change !
+##SBATCH --constraint=granite   # Uncomment to specify a node type
+##SBATCH --gpus-per-node=h100:1 # Uncomment to specify [type:]number
 
 <!--T:22-->
-module load StdEnv/2020        # Latest installed version
-module load abaqus/2021        # Latest installed version
+module load StdEnv/2020         # Latest installed version
+module load abaqus/2021         # Latest installed version
 
 <!--T:23-->
 unset SLURM_GTIDS
@@ -170,7 +161,9 @@ while sleep 6h; do
    cp -fv * $SLURM_SUBMIT_DIR 2>/dev/null
 done &
 WPID=$!
-abaqus job=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim.inp \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim.inp \
    scratch=$SLURM_TMPDIR/scratch cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
 #  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
@@ -194,20 +187,17 @@ To check the completed restart information do:
   |lang="sh"
   |contents=
 #!/bin/bash
-#SBATCH --account=def-group    # Specify account
-#SBATCH --time=00-06:00        # Specify days-hrs:mins
-#SBATCH --cpus-per-task=4      # Specify number of cores
-#SBATCH --mem=8G               # Specify total memory > 5G
-#SBATCH --nodes=1              # Do not change !
-##SBATCH --constraint=cascade  # Uncomment to specify node (44 cores)
-##SBATCH --gres=gpu:t4:1       # Uncomment to specify gpu
-# or
-##SBATCH --constraint=rome     # Uncomment to specify node (128 cores)
-##SBATCH --gres=gpu:a100:1     # Uncomment to specify gpu
+#SBATCH --account=def-group     # Specify account
+#SBATCH --time=00-06:00         # Specify days-hrs:mins
+#SBATCH --cpus-per-task=4       # Specify number of cores
+#SBATCH --mem=8G                # Specify total memory > 5G
+#SBATCH --nodes=1               # Do not change !
+##SBATCH --constraint=granite   # Uncomment to specify a node type
+##SBATCH --gpus-per-node=h100:1 # Uncomment to specify [type:]number
 
 <!--T:27-->
-module load StdEnv/2020        # Latest installed version
-module load abaqus/2021        # Latest installed version
+module load StdEnv/2020         # Latest installed version
+module load abaqus/2021         # Latest installed version
 
 <!--T:28-->
 unset SLURM_GTIDS
@@ -227,7 +217,9 @@ while sleep 6h; do
    cp -fv testst2* $SLURM_SUBMIT_DIR 2>/dev/null
 done &
 WPID=$!
-abaqus job=testst2 oldjob=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim-restart.inp \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testst2 oldjob=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim-restart.inp \
    scratch=$SLURM_TMPDIR/scratch cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
 #  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
@@ -247,7 +239,7 @@ The restart input file should contain:
 === Multiple node computing === <!--T:31-->
 
 <!--T:20923-->
-Users with large memory or compute needs (and correspondingly large licenses) can use the following script to perform mpi-based computing over an arbitrary range of nodes ideally left to the scheduler to  automatically determine.  A companion template script to perform restart of multinode jobs is not provided due to additional limitations when they can be used.
+[[ <span style="color:red">The below script for Multinode computing is no longer usable with abaqus/2021 due to an increased process id range configuration on Alliance clusters. The issue will be resolved once abaqus/2025 is installed sometime during Jan/2026.  In the meantime please use one of the Single node computing slurm scripts provided above.</span> ]] Users with large memory or compute needs (and correspondingly large licenses) can use the following script to perform mpi-based computing over an arbitrary range of nodes ideally left to the scheduler to  automatically determine.  A companion template script to perform restart of multinode jobs is not provided due to additional limitations when they can be used.
 
 <!--T:32-->
 {{File
@@ -291,7 +283,6 @@ abaqus job=testsp1-mpi input=mystd-sim.inp \
   #mp_host_split=1  # number of dmp processes per node >= 1 (uncomment to specify)
 }}
 
-<!--T:38-->
 == Explicit analysis ==
 Abaqus solvers support thread-based and mpi-based parallelization.  Scripts for each type are provided below for running explicit analysis type jobs on single or multiple nodes respectively.  Template scripts to perform multinode job restarts are not currently provided pending further testing.
 
@@ -323,7 +314,9 @@ echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
 <!--T:43-->
 rm -f testep1* testep2*
-abaqus job=testep1 input=myexp-sim.inp \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testep1 input=myexp-sim.inp \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
 }}
@@ -361,7 +354,9 @@ echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 <!--T:48-->
 rm -f testep2* testep1.lck
 for f in testep1*; do [[ -f ${f} ]] && cp -a "$f" "testep2${f#testep1}"; done
-abaqus job=testep2 input=myexp-sim.inp recover \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testep2 input=myexp-sim.inp recover \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
 }}
@@ -402,7 +397,9 @@ while sleep 6h; do
    cp -f * $SLURM_SUBMIT_DIR 2>/dev/null
 done &
 WPID=$!
-abaqus job=testet1 input=$SLURM_SUBMIT_DIR/myexp-sim.inp \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testet1 input=$SLURM_SUBMIT_DIR/myexp-sim.inp \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
 { kill $WPID && wait $WPID; } 2>/dev/null
@@ -449,7 +446,9 @@ while sleep 3h; do
    cp -f * $SLURM_SUBMIT_DIR 2>/dev/null
 done &
 WPID=$!
-abaqus job=testet2 input=$SLURM_SUBMIT_DIR/myexp-sim.inp recover \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testet2 input=$SLURM_SUBMIT_DIR/myexp-sim.inp recover \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
 { kill $WPID && wait $WPID; } 2>/dev/null
@@ -464,6 +463,9 @@ No input file modifications are required to restart the analysis.
 </tabs>
 
 === Multiple node computing === <!--T:61--> 
+
+<!--T:68-->
+[[ <span style="color:red">The below script for Multinode computing is no longer usable with abaqus/2021 due to an increased process id range configuration on Alliance clusters. The issue will be resolved once abaqus/2025 is installed sometime during Jan/2026.  In the meantime please use one of the Single node computing slurm scripts provided above.</span> ]]
 
 <!--T:62-->
 {{File
@@ -528,8 +530,10 @@ An estimate for the total slurm node memory (--mem=) required for a simulation t
 
 <translate>
 <!--T:70-->
-Alternatively the total memory estimate for a single node threaded process could be obtained by running the simulation interactively on a compute node and then monitor the memory consumption using the ps or top commands. The follows described how to do the latter:<br>
-1) ssh into a cluster, obtain an allocation on a compute node (such as gra100), and start your simulation running:
+Alternatively a total memory estimate for a single node threaded process can be obtained by running the simulation interactively on a compute node and then monitoring the memory use with the top (or ps) command as follows:
+
+<!--T:72-->
+1) First obtain an allocation on a compute node and start your simulation running:
 
 <!--T:71-->
 {{Commands
@@ -541,10 +545,10 @@ Alternatively the total memory estimate for a single node threaded process could
 }}
 
 <!--T:72-->
-2) ssh into the cluster again, then ssh into the compute node reserved by salloc and run top i.e.
+2) Next ssh into the compute node (c50 according to the sq command) and then run top i.e.
 
 <!--T:73-->
-{{Commands|ssh gra100
+{{Commands|ssh c50
 |top -u $USER}}
 
 <!--T:74-->
@@ -715,6 +719,9 @@ Each GPU used requires 1 additional TOKEN
 
 <!--T:20938-->
 == Western license ==
+
+[[ <span style="color:red">The <code>abaqus.lic</code> file given below no longer works since the license4 machine has been shutdown and retired.  Therefore all abaqus license checkout requests on dusky cluster from the Western/Robarts abaqus license server currently fail.  A replacement server for license4 is currently be worked on and once its ready for use, the <code>abaqus.lic</code> below will be updated accordingly and this red warning message removed.  In the meantime the SHARCNET License as described above maybe used by following the procedure to request access.</span> ]] 
+
 The Western site license may only be used by Western researchers on hardware located at Western's campus.  Currently, only the Dusky cluster satisfies this condition. Nibi and SHARCNET OOD system are excluded since they are located on Waterloo's campus.  Contact the Western Abaqus license server administrator <jmilner@robarts.ca> to inquire about using the Western Abaqus license.  You will need to provide your username and possibly make arrangements to purchase tokens.  If you are granted access then you may proceed to configure your <code>abaqus.lic</code> file to point to the Western license server:
 
 === Configure license file === <!--T:102-->

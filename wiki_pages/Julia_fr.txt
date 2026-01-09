@@ -105,41 +105,25 @@ démarre un processus Julia principal et 100 processus de travail sur les   nœu
 <span id="Running_Julia_with_MPI"></span>
 = Interface MPI =
 
+<div class="mw-translate-fuzzy">
 Assurez-vous que la MPI de Julia est configurée pour utiliser nos bibliothèques MPI. Si vous utilisez Julia MPI 0.19 et précédentes, employez le code suivant&nbsp;:
+</div>
 
- module load StdEnv  julia
+<div class="mw-translate-fuzzy">
+module load StdEnv  julia
  export JULIA_MPI_BINARY=system
  export JULIA_MPI_PATH=$EBROOTOPENMPI
  export JULIA_MPI_LIBRARY=$EBROOTOPENMPI/lib64/libmpi.so
  export JULIA_MPI_ABI=OpenMPI
  export JULIA_MPIEXEC=$EBROOTOPENMPI/bin/mpiexec
+</div>
 
 Lancez ensuite Julia puis, à partir de Julia, lancez
 
- import Pkg;
+<div class="mw-translate-fuzzy">
+import Pkg;
  Pkg.add("MPI")
-
-Avec Julia MPI 0.20 ou suivantes, utilisez le code suivant qui ajoute la section <code>[MPIPreferences]</code> à votre fichier <code>.julia/environments/vX.Y/LocalPreferences.toml</code>.
-Si ce fichier existe déjà et contient la section <code>[MPIPreferences]</code>, modifiez d'abord le fichier et supprimez la section.
-
-  module load julia
- 
-  mkdir -p .julia/environments/v${EBVERSIONJULIA%.*}
- 
-  cat >> .julia/environments/v${EBVERSIONJULIA%.*}/LocalPreferences.toml << EOF
-  [MPIPreferences]
-  _format = "1.0"
-  abi = "OpenMPI"
-  binary = "system"
-  libmpi = "${EBROOTOPENMPI}/lib64/libmpi.so"
-  mpiexec = "${EBROOTOPENMPI}/bin/mpiexec"
-  EOF
-
-Démarrez ensuite Julia et, de l'intérieur, lancez
-
-  import Pkg
-  Pkg.add("MPIPreferences")
-  Pkg.add("MPI")
+</div>
 
 Pour l'utiliser par la suite, lancez (pour deux processus)
 

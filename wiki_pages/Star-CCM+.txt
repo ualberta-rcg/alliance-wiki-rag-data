@@ -138,27 +138,30 @@ server=$(head -n1 $CDLMD_LICENSE_FILE {{!}} awk '{print $2}')
 port=$(cat $CDLMD_LICENSE_FILE {{!}} grep -Eo '[0-9]+$')
 nmap $server -Pn -p $port {{!}} grep -v '^$'; echo
 
-#export FLEXIBLAS_VERBOSE=1
+export FLEXIBLAS=NETLIB
+STAR_MPI="-mpi openmpi"
 if [ "$RSNT_CPU_VENDOR_ID" == intel ]; then
   export FLEXIBLAS=StarMKL
   STAR_MPI="-mpi intel"
 elif [ "$RSNT_CPU_VENDOR_ID" == amd ]; then
   export FLEXIBLAS=StarAOCL
-  STAR_MPI="-mpi openmpi"
-else
-  export FLEXIBLAS=NETLIB
-  STAR_MPI="-mpi openmpi"
 fi
 echo "FLEXIBLAS=$FLEXIBLAS"
+
+if [ "${EBVERSIONSTARCCM:0:2}" -lt 20 ]; then
+  STAR_FABRIC="-fabric ofi"
+else 
+  STAR_FABRIC="-fabric ucx" 
+fi
 
 <!--T:295-->
 if [ -n "$LM_PROJECT" ]; then
    echo "Siemens PoD license server ..."
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI
+   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_FABRIC
 else
    echo "Institutional license server ..."
    [ $(command -v lmutil) ] && lmutil lmstat -c ~/.licenses/starccm.lic -a {{!}} egrep "license1{{!}}UP{{!}}use{{!}}$USER"; echo
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI
+   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_FABRIC
 fi
 }}
 </tab>

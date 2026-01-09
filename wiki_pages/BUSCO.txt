@@ -9,18 +9,20 @@ BUSCO (<i>Benchmarking sets of Universal Single-Copy Orthologs</i>) is an applic
 <!--T:2-->
 For more information, see the [https://busco.ezlab.org/busco_userguide.html user manual].
 
-== Available versions == <!--T:3-->
+<!--T:3-->
+== Available versions ==
 Recent versions are available as wheels. Older versions are available as a module; please see the [[#Modules|Modules]] section below.
 
 <!--T:28-->
 To see the latest available version, run
-{{Command|avail_wheel busco}}
+{{Command|avail_wheels busco}}
 
-== Python wheel == <!--T:4-->
+<!--T:4-->
+== Python wheel ==
 === Installation ===
 <b>1.</b> Load the necessary modules.
 {{Commands
-|module load StdEnv/2020 gcc/9.3.0 python/3.10 augustus/3.5.0 hmmer/3.3.2 blast+/2.13.0 metaeuk/6 prodigal/2.6.3 r/4.3.1 bbmap/38.86}}
+|module load StdEnv/2023 gcc python/3.11 augustus/3.5.0 hmmer/3.4 blast+/2.15 metaeuk/7 prodigal/2.6.3 r bbmap/39.06}}
 
 <!--T:5-->
 <b>2.</b> Create the virtual environment.
@@ -33,7 +35,7 @@ To see the latest available version, run
 <b>3.</b> Install the wheel and its dependencies.
 {{Command
 |prompt=(busco_env) $
-|pip install --no-index biopython{{=}}{{=}}1.81 pandas{{=}}{{=}}2.1.0 busco{{=}}{{=}}5.5.0
+|pip install --no-index busco{{=}}{{=}}6.0.0
 }}
 
 <!--T:7-->
@@ -50,7 +52,8 @@ To see the latest available version, run
 |pip freeze > ~/busco-requirements.txt
 }}
 
-=== Usage === <!--T:23-->
+<!--T:23-->
+=== Usage ===
 ==== Datasets ====
 <b>6.</b> You must pre-download any datasets from [https://busco-data.ezlab.org/v5/data/ BUSCO data] before submitting your job.
 
@@ -62,7 +65,8 @@ You have <b>two</b> options to download datasets:<br>
 *use the <code>busco</code> command,
 *use the <code>wget</code> command.
 
-===== <b>6.1</b>  Using the <code>busco</code> command ===== <!--T:31-->
+<!--T:31-->
+===== <b>6.1</b>  Using the <code>busco</code> command =====
 This is the preferred option. Type this command in your working directory to download a particular dataset, for example
 {{Command
 |busco --download bacteria_odb10
@@ -125,7 +129,8 @@ All files must be decompressed with <code>tar -xvf file.tar.gz</code>.
 |tar -xvf bacteria_odb10.2020-03-06.tar.gz
 }}
 
-==== Test ==== <!--T:8-->
+<!--T:8-->
+==== Test ====
 <b>7.</b> Download a genome file.
 
 <!--T:51-->
@@ -159,7 +164,8 @@ Specify <code>--in genome.fna</code> for single file analysis.
 <!--T:57-->
 Specify <code>--in genome/</code> for multiple files analysis.
 
-===== Slurm tips ===== <!--T:11-->
+<!--T:11-->
+===== Slurm tips =====
 Specify <code>--offline</code> to avoid using the internet.
 
 <!--T:12-->
@@ -189,7 +195,7 @@ Here you have an example of a submission script. You can submit as so: <code>sba
 #SBATCH --mem=20G                 # adjust this according to the memory you need
 
 # Load modules dependencies.
-module load StdEnv/2020 gcc/9.3.0 python/3.10 augustus/3.5.0 hmmer/3.3.2 blast+/2.13.0 metaeuk/6 prodigal/2.6.3 r/4.3.1 bbmap/38.86
+module load StdEnv/2023 gcc python/3.11 augustus/3.5.0 hmmer/3.4 blast+/2.15 metaeuk/7 prodigal/2.6.3 r bbmap/39.06
 
 # Generate your virtual environment in $SLURM_TMPDIR.
 virtualenv --no-download ${SLURM_TMPDIR}/env
@@ -205,7 +211,8 @@ busco --offline --in genome.fna --out TEST --lineage_dataset bacteria_odb10 --mo
 }}
 <translate>
 
-====Augustus parameters==== <!--T:60-->
+<!--T:60-->
+====Augustus parameters====
 <b>9.</b> Advanced users may want to use Augustus parameters: <code>--augustus_parameters="--yourAugustusParameter"</code>.
 
 <!--T:61-->
@@ -216,7 +223,8 @@ busco --offline --in genome.fna --out TEST --lineage_dataset bacteria_odb10 --mo
 *Make sure to define the <code>AUGUSTUS_CONFIG_PATH</code> environment variable.
 {{Command|export AUGUSTUS_CONFIG_PATH{{=}}$HOME/augustus_config}}
 
-====SEPP parameters==== <!--T:63-->
+<!--T:63-->
+====SEPP parameters====
 <b>10.</b> To use SEPP parameters, you need to install SEPP locally in your virtual environment. This should be done from the login node.
 
 <!--T:64-->
@@ -332,7 +340,8 @@ path = /cvmfs/soft.computecanada.ca/easybuild/software/2017/avx512/Compiler/gcc7
 The <code>run_BUSCO.py</code> command should take less than 60 seconds to complete.
 Production runs which take longer should be submitted to the [[Running jobs|scheduler]].
 
-= Troubleshooting = <!--T:25-->
+<!--T:25-->
+= Troubleshooting =
 == Cannot write to Augustus config path ==
 Make sure you have copied the <i>config</i> directory to a writable location and exported the <code>AUGUSTUS_CONFIG_PATH</code> variable.
 </translate>

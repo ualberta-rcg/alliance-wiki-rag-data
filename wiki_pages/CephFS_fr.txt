@@ -5,9 +5,11 @@ Le système de fichiers CephFS peut être partagé par plusieurs hôtes d'instan
 
 La procédure est plutôt technique et nécessite des compétences Linux de base pour créer et modifier des fichiers, définir des permissions et créer des points de montage. Si vous avez besoin d’assistance, écrivez à [mailto:nuage@tech.alliancecan.ca nuage@tech.alliancecan.ca].
 
+<span id="Procedure"></span>
 =Procédure=
 <b>REMARQUE : Plusieurs chaînes de caractères de l’interface OpenStack ne sont pas traduites en français.</b>
 
+<span id="Request_access_to_shares"></span>
 ==Demander l’accès aux points de partage (<i>shares</i>)==
 
 Si vous ne disposez pas déjà d’un quota pour ce service, écrivez à  [mailto:nauge@tech.alliancecan.ca nuage@tech.alliancecan.ca] et indiquez&nbsp;:
@@ -15,8 +17,10 @@ Si vous ne disposez pas déjà d’un quota pour ce service, écrivez à  [mailt
 * la capacité du quota requis (en Go)
 * le nombre de points de partage requis
 
+<span id="OpenStack_configuration:_Create_a_CephFS_share"></span>
 == Configuration OpenStack : Créer un point de partage CephFS ==
 
+<div class="mw-translate-fuzzy">
 ; Créez un point de partage.
 : Dans <i>Project --> Share --> Shares</i>, cliquez sur <i>+Create Share</i>.
 : <i>Share Name</i> = entrez un nom significatif pour votre projet (par exemple <i>project-name-shareName</i>)
@@ -28,6 +32,7 @@ Si vous ne disposez pas déjà d’un quota pour ce service, écrivez à  [mailt
 : Cliquez sur le bouton <i>Create</i>.
 [[File:Cephfs config.png|450px|thumb|left|Configurer CephFS avec l'interface Horizon]]
 <br clear=all>
+</div>
 
 ; Créez une règle pour générer une clé. 
 : Dans <i>Project --> Share --> Shares --> colonne Actions</i>, sélectionnez <i>Manage Rules</i> du menu déroulant. 
@@ -38,12 +43,15 @@ Si vous ne disposez pas déjà d’un quota pour ce service, écrivez à  [mailt
 [[File:Cephfs created.png|450px|thumb|left||Configuration correcte de CephFS]]
 <br clear=all>
 
+<div class="mw-translate-fuzzy">
 ; Prenez note des détails dont vous aurez besoin.
 : Dans <i>Project --> Share --> Shares</i>, cliquez sur le nom du point de partage.
 : Dans <i>Share Overview</i>, notez <i>Path</i>.
 : Sous <i>Access Rules</i>, notez <i>Access Key</i> (les clés d’accès sont composées de 40 caractères et se terminent par le symbole =. Si vous ne voyez pas de clé d’accès, vous n’avez probablement pas spécifié que la règle d’accès était de type  <i>cephx</i>).
 .
+</div>
 
+<span id="Attach_the_CephFS_network_to_your_VM"></span>
 == Attacher le réseau CephFS à votre instance ==
 
 === Sur Arbutus ===
@@ -84,6 +92,7 @@ $ openstack  server list
 
 Nous remarquons que le réseau CephFS est attaché à la première instance.
 
+<span id="VM_configuration:_install_and_configure_CephFS_client"></span>
 == Configuration d'une instance : installer et configurer un client CephFS ==
 
 === Paquets requis pour la famille Red Hat (RHEL, CentOS, Fedora, Rocky, Alma ) ===
@@ -163,18 +172,20 @@ Le répertoire epel doit être présent.
 Vous pouvez maintenant installer ceph lib, cephfs client aet autres dépendances.
  sudo dnf install -y libcephfs2 python3-cephfs ceph-common python3-ceph-argparse
 
-
+<div class="mw-translate-fuzzy">
 === Paquets requis pour la famille Debian (Debian, Ubuntu, Mint, etc.) ===
 Pour avoir le dépôt de paquets, trouvez le <code>{codename}</code> pour votre distribution avec <code>lsb_release -sc</code>
 <source lang='bash'>
 sudo apt-add-repository 'deb https://download.ceph.com/debian-quincy/ {codename} main'
 </source>
+</div>
 
 Vous pouvez maintenant installer ceph lib, cephfs client et les autres dépendances.
 <source lang='bash'>
  sudo apt-get install -y libcephfs2 python3-cephfs ceph-common python3-ceph-argparse
 </source>
 
+<span id="Configure_ceph_client"></span>
 === Configurer le client ceph ===
 
 Quand le client est installé, créez le fichier <code>ceph.conf</code>.
@@ -216,6 +227,7 @@ Les informations sur le moniteur trouvent dans le champ <i>Path</i> des détails
 
 Entrez le nom du client et le secret dans le fichier <code>ceph.keyring</code>. 
 
+<div class="mw-translate-fuzzy">
 {{File
   |name=/etc/ceph/ceph.keyring
   |lang="ini"
@@ -223,13 +235,16 @@ Entrez le nom du client et le secret dans le fichier <code>ceph.keyring</code>.
 [client.MyCephFS-RW]
     key = <access Key>
 }}
+</div>
 
 Encore une fois, la clé d'accès et le nom du client (ici <i>MyCephFS-RW</i>) se trouvent sous les règles d'accès sur la page Web de votre projet.
 Cliquez sur <i>Project --> Share --> Shares</i>, puis cliquez sur le nom du point de partage.
 
+<div class="mw-translate-fuzzy">
 ; Récupérez les informations de connexion dans la page <i>Share</i> pour votre connexion&nbsp;:
 : Ouvrez les détails en cliquant sur le nom du point de partage dans la page <i>Shares</i>.
 : Copiez le chemin d'accès complet du point de partage pour monter le système de fichiers.
+</div>
 
 ;Montez le système de fichiers
 :Créez un répertoire pour le point de montage quelque part dans votre hôte (ici <code>/cephfs</code>)</li>
@@ -298,6 +313,7 @@ ceph-fuse my_cephfs/ --id=MyCephFS-RW --conf=~/ceph.conf --keyring=~/ceph.keyrin
 </source>
 Notez que le nom du client est ici le <code>--id</code>. Le contenu de <code>ceph.conf</code> et de <code>ceph.keyring</code> est exactement le même que pour le montage du noyau ceph.
 
+<span id="Notes"></span>
 =Remarques=
 
 Un point de partage particulier peut disposer de plusieurs clés utilisateur. Cela permet un accès plus précis au système de fichiers, par exemple si vous avez besoin que certains hôtes accèdent au système de fichiers uniquement en lecture seule. Si vous disposez de plusieurs clés pour un point de partage, vous pouvez ajouter les clés supplémentaires à votre hôte et modifier la procédure de montage ci-dessus. Ce service n'est pas disponible pour les hôtes extérieurs à la grappe OpenStack.
