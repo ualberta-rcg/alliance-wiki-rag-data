@@ -7,14 +7,18 @@ __FORCETOC__
 
 <!--T:2-->
 = Using your own license =
-Abaqus software modules are available on our clusters; however, you must provide your own license. To configure your account on a cluster, log in and create a file named <code>$HOME/.licenses/abaqus.lic</code> containing the following line. Next, replace <code>port@server</code> with the flexlm port number and server IP address (or fully qualified hostname) of your Abaqus license server.  If you want to use legacy version 6.14.1 then replace ABAQUSLM_LICENSE_FILE with LM_LICENSE_FILE.
 
+<!--T:1-->
+[[ <span style="color:red">A module for abaqus/2026 is expected to be available ~Jan15/2026 on all Alliance clusters.  The new version should resolve the *** buffer overflow detected *** errors occurring with abaqus/2021.  A workaround for this issue has been added into the Single node computing slurm scripts below.  To use it copy the two unshare related lines that appear directly before the abaqus command line into your scripts being sure there are no empty lines or spaces after the continuation slashes.  Further testing has shown that simply increasing the value of ABA_SINT_CAP in your local abaqus_v6.env file will not reliably solve this problem afterall.</span> ]]
+
+Abaqus software modules are available on our clusters; however, you must provide your own license. To configure your account on a cluster, log in and create a file named <code>$HOME/.licenses/abaqus.lic</code> containing the following line. Next, replace <code>port@server</code> with the flexlm port number and server IP address (or fully qualified hostname) of your Abaqus license server.  If you want to use legacy version 6.14.1 then replace ABAQUSLM_LICENSE_FILE with LM_LICENSE_FILE.<br>
 <!--T:4-->
 {{File
 |name=abaqus.lic
 |contents=
 prepend_path("ABAQUSLM_LICENSE_FILE","port@server")
 }}
+
 If your license has not been set up for use on an Alliance cluster, some additional configuration changes by the Alliance system administrator and your local system administrator will need to be done. Such changes are necessary to ensure the flexlm and vendor TCP ports of your Abaqus server are reachable from all cluster compute nodes when jobs are run via the queue. For us to help you get this done, write to [[Technical support|technical support]]. Please be sure to include the following three items:
 * flexlm port number
 * static vendor port number
@@ -239,7 +243,7 @@ The restart input file should contain:
 === Multiple node computing === <!--T:31-->
 
 <!--T:20923-->
-[[ <span style="color:red">The below script for Multinode computing is no longer usable with abaqus/2021 due to an increased process id range configuration on Alliance clusters. The issue will be resolved once abaqus/2025 is installed sometime during Jan/2026.  In the meantime please use one of the Single node computing slurm scripts provided above.</span> ]] Users with large memory or compute needs (and correspondingly large licenses) can use the following script to perform mpi-based computing over an arbitrary range of nodes ideally left to the scheduler to  automatically determine.  A companion template script to perform restart of multinode jobs is not provided due to additional limitations when they can be used.
+[[ <span style="color:red">The below script for Multinode computing is no longer usable with abaqus/2021 due to an increased process id range configuration on Alliance clusters. The issue will be resolved once abaqus/2026 is installed ~Jan15/2026.  In the meantime please use one of the Single node computing slurm scripts provided above.</span> ]] Users with large memory or compute needs (and correspondingly large licenses) can use the following script to perform mpi-based computing over an arbitrary range of nodes ideally left to the scheduler to  automatically determine.  A companion template script to perform restart of multinode jobs is not provided due to additional limitations when they can be used.
 
 <!--T:32-->
 {{File
@@ -283,6 +287,7 @@ abaqus job=testsp1-mpi input=mystd-sim.inp \
   #mp_host_split=1  # number of dmp processes per node >= 1 (uncomment to specify)
 }}
 
+<!--T:38-->
 == Explicit analysis ==
 Abaqus solvers support thread-based and mpi-based parallelization.  Scripts for each type are provided below for running explicit analysis type jobs on single or multiple nodes respectively.  Template scripts to perform multinode job restarts are not currently provided pending further testing.
 
@@ -465,7 +470,7 @@ No input file modifications are required to restart the analysis.
 === Multiple node computing === <!--T:61--> 
 
 <!--T:68-->
-[[ <span style="color:red">The below script for Multinode computing is no longer usable with abaqus/2021 due to an increased process id range configuration on Alliance clusters. The issue will be resolved once abaqus/2025 is installed sometime during Jan/2026.  In the meantime please use one of the Single node computing slurm scripts provided above.</span> ]]
+[[ <span style="color:red">The below script for Multinode computing is no longer usable with abaqus/2021 due to an increased process id range configuration on Alliance clusters. The issue will be resolved once abaqus/2026 is installed ~Jan15/2026.  In the meantime please use one of the Single node computing slurm scripts provided above.</span> ]]
 
 <!--T:62-->
 {{File
@@ -720,7 +725,7 @@ Each GPU used requires 1 additional TOKEN
 <!--T:20938-->
 == Western license ==
 
-[[ <span style="color:red">The <code>abaqus.lic</code> file given below no longer works since the license4 machine has been shutdown and retired.  Therefore all abaqus license checkout requests on dusky cluster from the Western/Robarts abaqus license server currently fail.  A replacement server for license4 is currently be worked on and once its ready for use, the <code>abaqus.lic</code> below will be updated accordingly and this red warning message removed.  In the meantime the SHARCNET License as described above maybe used by following the procedure to request access.</span> ]] 
+[[ <span style="color:red">The <code>abaqus.lic</code> file given below no longer works since the license4 machine has been shutdown and retired.  Therefore all abaqus license checkout requests on dusky cluster from the Western/Robarts abaqus license server currently will fail.  A replacement server for license4 is currently be worked on.  Once it is ready for use <code>abaqus.lic</code> will be updated with the new server name and this red warning message removed.  In the meantime the SHARCNET License maybe used instead by following the above procedure to request access.</span> ]] 
 
 The Western site license may only be used by Western researchers on hardware located at Western's campus.  Currently, only the Dusky cluster satisfies this condition. Nibi and SHARCNET OOD system are excluded since they are located on Waterloo's campus.  Contact the Western Abaqus license server administrator <jmilner@robarts.ca> to inquire about using the Western Abaqus license.  You will need to provide your username and possibly make arrangements to purchase tokens.  If you are granted access then you may proceed to configure your <code>abaqus.lic</code> file to point to the Western license server:
 

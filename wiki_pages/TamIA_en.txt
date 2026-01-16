@@ -16,6 +16,7 @@ tamIA is a cluster dedicated to artificial intelligence for the Canadian scienti
 
 tamIA is part of [https://alliancecan.ca/en/services/advanced-research-computing/pan-canadian-ai-compute-environment-paice PAICE, the Pan-Canadian AI Compute Environment].
 
+<div class="mw-translate-fuzzy">
 ==Site-specific policies==
 
 * By policy, tamIA's compute nodes cannot access the internet. If you need an exception to this rule, contact [[Technical_support|technical support]] explaining what you need and why.
@@ -24,6 +25,7 @@ tamIA is part of [https://alliancecan.ca/en/services/advanced-research-computing
 * Each job should be at least one hour long (at least five minutes for test jobs) and you can't have more than 1000 jobs (running and pending) at the same time.
 * The maximum duration of a job is one day (24 hours).
 * Each job must use all 4 GPUs on all nodes it is allocated. Jobs are allocated whole nodes.
+</div>
 
 <div class="mw-translate-fuzzy">
 ==Access==
@@ -54,10 +56,12 @@ The cluster can only be reached from Canada.
 |-
 | SCRATCH <br> Lustre file system ||
 
+<div class="mw-translate-fuzzy">
 * Large space for storing temporary files during computations.
 * No backup system in place. 
 * Large [[Storage_and_file_management#Filesystem_quotas_and_policies|quota]] per user.
 * There is an [[Scratch_purging_policy|automated purge]] of older files in this space.
+</div>
 
 |-
 | PROJECT <br> Lustre file system ||
@@ -69,11 +73,16 @@ The cluster can only be reached from Canada.
 
 For transferring data via [[Globus]], you should use the endpoint specified at the top of this page, while for tools like [[Transferring_data#Rsync|rsync]] and [[Transferring_data#SCP|scp]] you can use a login node.
 
+<div class="mw-translate-fuzzy">
 ==High-performance interconnect==
 The [https://fr.wikipedia.org/wiki/Bus_InfiniBand InfiniBand] [https://www.nvidia.com/en-us/networking/quantum2/ NVIDIA NDR] network links together all of the nodes of the cluster. Each H100 GPU is connected to a single NDR200 port through an NVIDIA ConnectX-7 HCA. Eeach GPU server has 4 NDR200 ports connected to the InfiniBand fabric.
+</div>
 
+<div class="mw-translate-fuzzy">
 The InfiniBand network is non-blocking for compute servers and is composed of two levels of switches in a fat-tree topology. Storage and management nodes are connected via four 400Gb/s connections to the network core.
+</div>
 
+<div class="mw-translate-fuzzy">
 ==Node characteristics==
 {| class="wikitable sortable"
 ! nodes !! cores !! available memory !! CPU !! storage !! GPU
@@ -82,10 +91,27 @@ The InfiniBand network is non-blocking for compute servers and is composed of tw
 |-
 |  4 || 64 || 512GB || 2 x [https://www.intel.com/content/www/us/en/products/sku/232398/intel-xeon-gold-6438m-processor-60m-cache-2-20-ghz/specifications.html Intel Xeon Gold 6438M 2.2G, 32C/64T] || 1 x SSD de 7.68TB || none
 |}
+</div>
 
 ===Software environments===
 [[Standard software environments/fr|<tt>StdEnv/2023</tt>]] is the standard environment on tamIA.
 
+<div lang="fr" dir="ltr" class="mw-content-ltr">
+=== Tâches GPU ===
+Les tâches sont assignées sur les nœuds complets. Utilisez une des options Slurm suivantes :
+</div>
+
+<div lang="fr" dir="ltr" class="mw-content-ltr">
+Pour une tâche sur un nœud avec GPU H100 : <code>--gpus=h100:4</code>
+</div>
+
+<div lang="fr" dir="ltr" class="mw-content-ltr">
+Pour une tâche sur un nœud avec GPU H200 : <code>--gpus=h200:8</code>
+</div>
+
+<div lang="fr" dir="ltr" class="mw-content-ltr">
+Pour les tâches avec plusieurs nœuds, utiliser <code>--gpus-per-nodes=h100:4</code> ou <code>--gpus-per-nodes=h200:8</code>.
+</div>
 
 <span id="Suivi_de_vos_tâches"></span>
 ==Monitoring jobs==

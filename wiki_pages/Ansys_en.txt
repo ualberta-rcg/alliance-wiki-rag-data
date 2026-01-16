@@ -45,7 +45,7 @@ The following table provides established values for the CMC and SHARCNET license
 |-
 | CMC
 | trillium
-| <code>172.16.205.198</code>
+| scinet-cmc
 | <code>6624</code>
 | None
 |-
@@ -1150,11 +1150,11 @@ Ansys allocates 1024 MB total memory and 1024 MB database memory by default for 
 
 == Ansys ROCKY ==
 
-Besides being able to run simulations in gui mode (as discussed in the Graphical usage section below) [https://www.ansys.com/products/fluids/ansys-rocky Ansys Rocky] can also run simulations in non-gui mode.  Both modes support running Rocky with cpus only or with cpus and [https://www.ansys.com/blog/mastering-multi-gpu-ansys-rocky-software-enhancing-its-performance gpus].  In the below section two sample slurm scripts are  provided where each script would be submitted to the graham queue with the sbatch command as per usual.  At the time of this writing neither script has been tested and therefore extensive customization will likely be required.  It's important to note that these scripts are only usable on graham since the rocky module which they both load is only (at the present time) installed on graham (locally).
+Besides being able to run simulations in gui mode (as discussed in the Graphical usage section below) [https://www.ansys.com/products/fluids/ansys-rocky Ansys Rocky] can also run simulations in non-gui mode.  Both modes support running Rocky with cpus only or with cpus and [https://www.ansys.com/blog/mastering-multi-gpu-ansys-rocky-software-enhancing-its-performance gpus].  Use of the ansysrocky/2024R2.0 module locally installed only on nibi and loadable by doing <code>module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04</code> should be discontinued as it is no longer supported and will be removed.  Instead use Rocky included within the <code>ansys/2025R1</code> module (and future versions that will be installed) available on all clusters.
 
 === Slurm scripts ===
 
-To get a full listing of command line options run <code>Rocky -h</code> on the command line after loading any rocky module (currently only ansysrocky/2023R2 is available on Graham).   If Rocky is being run with gpus to solving coupled problems, the number of cpus you should request from slurm (on the same node) should be increased to a maximum until the scalability limit of the coupled application is reached.   If however Rocky is being run with gpus to solve standalone uncoupled problems, then only a minimal number of cpus should be requested that will allow be sufficient for Rocky to still run optimally.  For instance only 2cpus or possibly 3cpus may be required.  When Rocky is run with >= 4 cpus then <I>rocky_hpc</I> licenses will be required which the SHARCNET license does provide.
+To get a full listing of command line options run <code>Rocky -h</code> on the command line after loading any rocky module.  Note that it is currently necessary to set your path to Rocky (as is shown in the scripts below) for the Rocky command to be found. The path will be included in future module version installs and ansys/2025R1 when updated at such time this message will be removed.  If Rocky is being run with gpus to solving coupled problems, the number of cpus you should request from slurm (on the same node) should be increased to a maximum until the scalability limit of the coupled application is reached.   If however Rocky is being run with gpus to solve standalone uncoupled problems, then only a minimal number of cpus should be requested that will allow be sufficient for Rocky to still run optimally.  For instance only 2cpus or possibly 3cpus may be required.  When Rocky is run with >= 4 cpus then <I>rocky_hpc</I> licenses will be required which the SHARCNET license does provide.  The scripts below have not been tested since the clusters were updated across the Alliance in fall 2025 therefore some adjustments maybe required.  
 
 <tabs>
 <tab name="CPU only">
@@ -1170,9 +1170,8 @@ To get a full listing of command line options run <code>Rocky -h</code> on the c
 #SBATCH --cpus-per-task=6      # Specify cores (graham 32 or 44 to use all cores)
 #SBATCH --nodes=1              # Request one node (do not change)
 
-# the rocky2023R2 module on graham was renamed to ansysrocky/2023R2   Apr24/2025
-#module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2       # only avail on graham
-module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04   # only avail on graham
+module load StdEnv/2023 ansys/2025R1       # or newer versions
+export PATH=$EBROOTANSYS/v251/rocky:$PATH
 
 Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use-gpu=0
 }}
@@ -1191,14 +1190,18 @@ Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use
 #SBATCH --gres=gpu:v100:2      # Specify gpu type : gpu quantity
 #SBATCH --nodes=1              # Request one node (do not change)
 
-# the rocky2023R2 module on graham was renamed to ansysrocky/2023R2   Apr24/2025
-#module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2       # only avail on graham
-module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04   # only avail on graham
+module load StdEnv/2023 ansys/2025R1       # or newer versions
+export PATH=$EBROOTANSYS/v251/rocky:$PATH
 
 Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use-gpu=1 --gpu-num=$SLURM_GPUS_ON_NODE
 }}
 </tab>
 </tabs>
+
+== Ansys ELECTRONICS == <!--T:1115->
+
+<!--T:1116->
+Slurm scripts for using AnsysEDT is provided in a separate wiki page [https://docs.alliancecan.ca/wiki/AnsysEDT here].
 
 = Graphical use =
 
@@ -1213,30 +1216,83 @@ To run Ansys programs in graphical mode click on one of the following OnDemand o
 Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then either a whole GPU resource (H100 or T4 at the time of this writing) should be requested.  Since the various ansys applications launched in graphical mode behave differently when different ansys module versions are loaded, recommendations for adding command line argument and exporting environment variables for virtualgl or mesa environments have been documented below depending on whether a GPU has been requested or not and wether a On Demand or Juypter Lab system launcher is being used.
 
 === Fluids ===
-::: <code>module load StdEnv/2023 ansys/2022R2</code> (or newer versions)
-::: <code>fluent -mpi=intel -driver opengl|null</code>, or,
-::: <code>cfx5 -graphics ogl|mesa</code>
+
+==== Fluent ====
+
+When starting Fluent from a terminal window command line of an On Demand Desktop or the convenience Icon of a Juypter Lab Desktop the following steps should be done including setting the indicated Environment Variables depending on which type of Compute Node the desktop is being started on (with or without a gpu).
+
+::: <code>module load StdEnv/2023 ansys/2025R1</code>
+::: <code>fluent</code>
+
+<b>Compute Node (no GPU requested) or Basic Desktop</b>
+
+::: In the Fluent Launcher Click the Environment Tab
+::: Copy/paste the following environment variable settings:
+:::: <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code>     (required on nibi)
+:::: <code>HOOPS_PICTURE=opengl2-mesa</code>           (2025R1 or newer)
+:::: <code>HOOPS_PICTURE=null</code>                   (2024R2 or older)
+::: Click the <code>Start</code> button
+
+<b>Compute Node (with GPU requested)</b>
+
+::: In the Fluent Launcher Click the Environment Tab
+::: Copy/paste the following environment variable settings:
+:::: <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code>            (required on nibi)
+:::: <code>HOOPS_PICTURE=opengl2</code>                (2025R1 or newer)
+:::: <code>HOOPS_PICTURE=opengl</code>                 (2024R2 or older)
+::: Click the <code>Start</code> button
+
+==== CFX ====
+
+When starting CFX from an On Demand Desktop the following arguments maybe specified on the terminal window command line depending on whether a GPU was requested when the Desktop was started. 
+
+::: <code>module load StdEnv/2023 ansys/2025R1</code>  (or older)
+::: <code>cfx5 -graphics mesa</code>   (no GPU requested)
+::: <code>cfx5 -graphics ogl</code>    (with GPU requested)
 
 === Mapdl ===
+
+The following steps for starting the Mechanical APDL gui from the command line of a terminal window should work regardless if you have started your On Demand Desktop on a Compute node with or without a gpu.
+
 ::: <code>module load StdEnv/2023 ansys/2022R2</code> (or newer versions)
-::: <code>mapdl -g</code>, or via launcher,
-::: <code>launcher</code> --> click RUN button
+::: <code>mapdl -g</code>, or,
+::: <code>launcher</code> then click <code>RUN</code> button
 
 === Workbench ===
 
-<b>Compute Node or Basic Desktop (without a GPU allocated)</b>
+Note that when starting Fluent from within Workbench the same GPU dependent Environment Variable settings should be specified in the Environment Tabl of the Fluent Launcher that are explained in the Fluids section above when starting fluent from a terminal window command line. 
 
-::: <code>module load StdEnv/2023 ansys/2025R1</code> (or newer versions)
-::: <code>export I_MPI_HYDRA_BOOTSTRAP=ssh</code>  (only required on nibi)
-::: <code>export HOOPS_PICTURE=opengl2-mesa</code> 
-::: <code>runwb2 -oglmesa </code> 
+==== On Demand Desktop ====
 
-<b>Compute Node (with at least one GPU allocated)</b>
+<b>Compute Node (no GPU requested) or Basic Desktop</b>
 
-::: <code>module load StdEnv/2023 ansys/2025R1</code> (or newer versions)
-::: <code>export I_MPI_HYDRA_BOOTSTRAP=ssh</code>  (only required on nibi)
-::: <code>export HOOPS_PICTURE=opengl2</code> 
+::: <code>module load StdEnv/2023 ansys/2025R1</code>
+::: <code>runwb2 -oglmesa </code>
+
+<b>Compute Node (with GPU requested)</b>
+
+::: <code>module load StdEnv/2023 ansys/2025R1</code>
 ::: <code>runwb2</code>
+
+==== Jupyter Lab Desktop ====
+
+<b>Compute Node (no GPU requested)</b>
+
+::: Click to load ansys/2025R1 (or newer version) in the Desktop left hand side menu
+::: Click the "Workbench (VNC)" icon located in the Jupyter Lab desktop center window
+::: Since the default icon is configured for a gpu node, we must customize it so
+::: workbench can be restart in mesa mode.  To proceed, Exit the Workbench desktop,
+::: open a terminal window, and run the following commands on the command line:
+::: cd ~/Desktop; cp -p $(realpath workbench.desktop) workbench-mesa.desktop
+::: then edit workbench-mesa.desktop and change runwb2 -> runwb2 -oglmesa
+::: Save the file then click your newly customized icon to start workbench.
+::: Note the workbench icon that you created will persist for future sessions
+::: until manually deleted with: rm -f ~/Desktop/workbench-mesa.desktop
+
+<b>Compute Node (with GPU requested)</b>
+
+::: Click to load ansys/2025R1 (or newer version) in the Desktop left hand side menu
+::: Click the Workbench (VNC) icon located in the Jupyter Lab desktop center window
 
 === Ensight ===
 ::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>
@@ -1245,6 +1301,7 @@ Submit your resource request and then wait.  If you started a Juypter Lab launch
 
 === Rocky ===
 ::: <code>module load StdEnv/2023 ansys/2025R1</code> (or newer versions)
+::: <code>export PATH=$EBROOTANSYS/v251/rocky:$PATH</code> (path to be included in future module versions)
 ::: <code>Rocky</code> The ansys module handles reading your ~/licenses/ansys.lic<br>
 ::: <code>RockySolver</code> Run rocky solver directly from command line (add -h for help, untested)
 ::: <code>RockySchedular</code> Start rocky schedular gui to submit/run jobs on present node (untested)

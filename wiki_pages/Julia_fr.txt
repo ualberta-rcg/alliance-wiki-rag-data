@@ -105,25 +105,17 @@ démarre un processus Julia principal et 100 processus de travail sur les   nœu
 <span id="Running_Julia_with_MPI"></span>
 = Interface MPI =
 
-<div class="mw-translate-fuzzy">
-Assurez-vous que la MPI de Julia est configurée pour utiliser nos bibliothèques MPI. Si vous utilisez Julia MPI 0.19 et précédentes, employez le code suivant&nbsp;:
-</div>
+Assurez-vous que la MPI de Julia est configurée pour utiliser nos bibliothèques MPI&nbsp;: lancez
 
-<div class="mw-translate-fuzzy">
-module load StdEnv  julia
- export JULIA_MPI_BINARY=system
- export JULIA_MPI_PATH=$EBROOTOPENMPI
- export JULIA_MPI_LIBRARY=$EBROOTOPENMPI/lib64/libmpi.so
- export JULIA_MPI_ABI=OpenMPI
- export JULIA_MPIEXEC=$EBROOTOPENMPI/bin/mpiexec
-</div>
+ module load StdEnv julia
 
 Lancez ensuite Julia puis, à partir de Julia, lancez
 
-<div class="mw-translate-fuzzy">
-import Pkg;
+ import Pkg
+ Pkg.add("MPIPreferences")
+ using MPIPreferences
+ MPIPreferences.use_system_binary(;extra_paths=[joinpath(ENV["EBROOTOPENMPI"],"lib64")])
  Pkg.add("MPI")
-</div>
 
 Pour l'utiliser par la suite, lancez (pour deux processus)
 
@@ -147,7 +139,7 @@ JULIA_EXCLUSIVE à une valeur autre que zéro. Comme décrit dans la [https://do
 La variable [https://docs.julialang.org/en/v1/manual/environment-variables/#JULIA_THREAD_SLEEP_THRESHOLD JULIA_THREAD_SLEEP_THRESHOLD] contrôle le nombre de nanosecondes après lesquelles un fil qui est en rotation (''spinning'') est programmé pour dormir. Une valeur infinie exprimée par une chaîne de caractères indique que le fil en rotation ne doit jamais dormir.
 Il peut être utile de modifier cette variable quand plusieurs fils se disputent fréquemment une ressource partagée; il serait alors peut-être préférable d'éliminer plus rapidement des fils en rotation. Dans un contexte de forte concurrence, les fils en rotation ne feraient qu'augmenter la charge sur les CPU. De la même manière, quand une ressource est rarement sollicitée,  une basse latence peut se produire si on refuse aux fils de dormir, c'est-à-dire que le seuil est défini comme étant infini. 
 
-Il va sans dire que ces valeurs ne devraient être configurées qu'après avoir profilé les problèmes potentiels de concurrence. Puisque Julia et particulièrement ses <i>Base.Threads</i> évoluent très rapidement, vous devriez toujours consulter la documentation pour vous assurer que le fait de modifier la configuration par défaut aura effectivement le résultat désiré.
+Il va sans dire que ces valeurs ne devraient être configurées qu'après avoir profilé les problèmes potentiels de concurrence. Puisque Julia et particulièrement ses <code>Base.Threads</code> évoluent très rapidement, vous devriez toujours consulter la documentation pour vous assurer que le fait de modifier la configuration par défaut aura effectivement le résultat désiré.
 
 = Utiliser les GPU =
 L'interface de programmation habituelle pour travailler avec les GPU est le paquet CUDA.jl. Vous pouvez l'installer avec le gestionnaire de paquets Julia. Tléchargez d'abord le paquet sur un nœud de connexion.
@@ -162,7 +154,7 @@ L'interface de programmation habituelle pour travailler avec les GPU est le paqu
 
  julia> using CUDA
  julia> CUDA.set_runtime_version!(v"version_of_cuda", local_toolkit=true)
-where version_of_cuda is 12.2 if cuda/12.2 is loaded. 
+où version_of_cuda est 12.2, si cuda/12.2 est chargé. 
 
 Après avoir redémarré Julia, vous pouvez vérifier si la version CUDA est la bonne avec
 

@@ -154,7 +154,7 @@ Most users will likely want to load the latest module version equipped with the 
 The Ansys software suite comes with multiple implementations of MPI to support parallel computation. Unfortunately, none of them support our [[Running jobs|Slurm scheduler]]. For this reason, we need special instructions for each Ansys package on how to start a parallel job. In the sections below, we give examples of submission scripts for some of the packages.  While the slurm scripts should work with on all clusters, Niagara users may need to make some additional changes covered [https://docs.scinet.utoronto.ca/index.php here].
 
 <!--T:30-->
-== Ansys Fluent ==
+== Fluent ==
 Typically, you would use the following procedure to run Fluent on one of our clusters:
 
 <!--T:31-->
@@ -1006,7 +1006,7 @@ where a basic manually created injection steady file format might look like:
   (( 2.90e-02  5.00e-03 0.0 -1.00e-03  0.0  0.0  1.00e-04  2.93e+02  1.00e-06   0.0   0.0        0.0 ) injection-0:1 )
 noting that injection files for DPM simulations are generally setup for either steady or unsteady particle tracking where the format of the former is described in subsection <I>Part III: Solution Mode | Chapter 24: Modeling Discrete Phase | 24.3. Setting Initial Conditions for the Discrete Phase | 24.3.13 Point Properties for File Injections | 24.3.13.1 Steady File Format</I> of the <I>2024R2 Fluent Customization Manual</I>.
 
-== Ansys CFX == <!--T:78-->
+== CFX == <!--T:78-->
 
 === Slurm scripts === <!--T:781-->
 
@@ -1348,15 +1348,15 @@ Ansys allocates 1024 MB total memory and 1024 MB database memory by default for 
  [gra-login2:~/testcase] cat YOURAPDLFILE.inp | grep version
  ! ANSYS input file written by Workbench version 2019 R3
 
-== Ansys ROCKY == <!--T:110-->
+== Rocky == <!--T:110-->
 
 <!--T:1101-->
-Besides being able to run simulations in gui mode (as discussed in the Graphical usage section below) [https://www.ansys.com/products/fluids/ansys-rocky Ansys Rocky] can also run simulations in non-gui mode.  Both modes support running Rocky with cpus only or with cpus and [https://www.ansys.com/blog/mastering-multi-gpu-ansys-rocky-software-enhancing-its-performance gpus].  In the below section two sample slurm scripts are  provided where each script would be submitted to the graham queue with the sbatch command as per usual.  At the time of this writing neither script has been tested and therefore extensive customization will likely be required.  It's important to note that these scripts are only usable on graham since the rocky module which they both load is only (at the present time) installed on graham (locally).
+Besides being able to run simulations in gui mode (as discussed in the Graphical usage section below) [https://www.ansys.com/products/fluids/ansys-rocky Ansys Rocky] can also run simulations in non-gui mode.  Both modes support running Rocky with cpus only or with cpus and [https://www.ansys.com/blog/mastering-multi-gpu-ansys-rocky-software-enhancing-its-performance gpus].  Use of the ansysrocky/2024R2.0 module locally installed only on nibi and loadable by doing <code>module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04</code> should be discontinued as it is no longer supported and will be removed.  Instead use Rocky included within the <code>ansys/2025R1</code> module (and future versions that will be installed) available on all clusters.
 
 === Slurm scripts === <!--T:1102-->
 
 <!--T:1103-->
-To get a full listing of command line options run <code>Rocky -h</code> on the command line after loading any rocky module (currently only ansysrocky/2023R2 is available on Graham).   If Rocky is being run with gpus to solving coupled problems, the number of cpus you should request from slurm (on the same node) should be increased to a maximum until the scalability limit of the coupled application is reached.   If however Rocky is being run with gpus to solve standalone uncoupled problems, then only a minimal number of cpus should be requested that will allow be sufficient for Rocky to still run optimally.  For instance only 2cpus or possibly 3cpus may be required.  When Rocky is run with >= 4 cpus then <I>rocky_hpc</I> licenses will be required which the SHARCNET license does provide.
+To get a full listing of command line options run <code>Rocky -h</code> on the command line after loading any rocky module.  Note that it is currently necessary to set your path to Rocky (as is shown in the scripts below) for the Rocky command to be found. The path will be included in future module version installs and ansys/2025R1 when updated at such time this message will be removed.  If Rocky is being run with gpus to solving coupled problems, the number of cpus you should request from slurm (on the same node) should be increased to a maximum until the scalability limit of the coupled application is reached.   If however Rocky is being run with gpus to solve standalone uncoupled problems, then only a minimal number of cpus should be requested that will allow be sufficient for Rocky to still run optimally.  For instance only 2cpus or possibly 3cpus may be required.  When Rocky is run with >= 4 cpus then <I>rocky_hpc</I> licenses will be required which the SHARCNET license does provide.  The scripts below have not been tested since the clusters were updated across the Alliance in fall 2025 therefore some adjustments maybe required.  
 
 <!--T:1104-->
 <tabs>
@@ -1375,9 +1375,8 @@ To get a full listing of command line options run <code>Rocky -h</code> on the c
 #SBATCH --nodes=1              # Request one node (do not change)
 
 <!--T:1107-->
-# the rocky2023R2 module on graham was renamed to ansysrocky/2023R2   Apr24/2025
-#module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2       # only avail on graham
-module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04   # only avail on graham
+module load StdEnv/2023 ansys/2025R1       # or newer versions
+export PATH=$EBROOTANSYS/v251/rocky:$PATH
 
 <!--T:6778-->
 Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use-gpu=0
@@ -1399,15 +1398,19 @@ Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use
 #SBATCH --nodes=1              # Request one node (do not change)
 
 <!--T:1109-->
-# the rocky2023R2 module on graham was renamed to ansysrocky/2023R2   Apr24/2025
-#module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2       # only avail on graham
-module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04   # only avail on graham
+module load StdEnv/2023 ansys/2025R1       # or newer versions
+export PATH=$EBROOTANSYS/v251/rocky:$PATH
 
 <!--T:6779-->
 Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use-gpu=1 --gpu-num=$SLURM_GPUS_ON_NODE
 }}
 </tab>
 </tabs>
+
+== Electronics == <!--T:1115-->
+
+<!--T:1116-->
+Slurm scripts for using AnsysEDT is provided in a separate wiki page [https://docs.alliancecan.ca/wiki/AnsysEDT here].
 
 = Graphical use = <!--T:94-->
 
@@ -1424,17 +1427,18 @@ To run Ansys programs in graphical mode click on one of the following OnDemand o
 <!--T:6808-->
 Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then either a whole GPU resource (H100 or T4 at the time of this writing) should be requested.  Since the various ansys applications launched in graphical mode behave differently when different ansys module versions are loaded, recommendations for adding command line argument and exporting environment variables for virtualgl or mesa environments have been documented below depending on whether a GPU has been requested or not and wether a On Demand or Juypter Lab system launcher is being used.
 
-<!--T:1670-->
-=== Fluids ===
+=== Fluids === <!--T:1670-->
 
-==== Fluent ====
+==== Fluent ==== <!--T:6838-->
 
+<!--T:6839-->
 When starting Fluent from a terminal window command line of an On Demand Desktop or the convenience Icon of a Juypter Lab Desktop the following steps should be done including setting the indicated Environment Variables depending on which type of Compute Node the desktop is being started on (with or without a gpu).
 
+<!--T:6840-->
 ::: <code>module load StdEnv/2023 ansys/2025R1</code>
 ::: <code>fluent</code>
 
-<!--T:1647-->
+<!--T:1651-->
 <b>Compute Node (no GPU requested) or Basic Desktop</b>
 
 <!--T:1648-->
@@ -1456,25 +1460,29 @@ When starting Fluent from a terminal window command line of an On Demand Desktop
 :::: <code>HOOPS_PICTURE=opengl</code>                 (2024R2 or older)
 ::: Click the <code>Start</code> button
 
-==== CFX ====
+==== CFX ==== <!--T:6841-->
 
+<!--T:6842-->
 When starting CFX from an On Demand Desktop the following arguments maybe specified on the terminal window command line depending on whether a GPU was requested when the Desktop was started. 
 
+<!--T:6843-->
 ::: <code>module load StdEnv/2023 ansys/2025R1</code>  (or older)
 ::: <code>cfx5 -graphics mesa</code>   (no GPU requested)
 ::: <code>cfx5 -graphics ogl</code>    (with GPU requested)
 
-<!--T:1680-->
-=== Mapdl ===
+=== Mapdl === <!--T:1680-->
 
+<!--T:6844-->
 The following steps for starting the Mechanical APDL gui from the command line of a terminal window should work regardless if you have started your On Demand Desktop on a Compute node with or without a gpu.
 
+<!--T:6845-->
 ::: <code>module load StdEnv/2023 ansys/2022R2</code> (or newer versions)
 ::: <code>mapdl -g</code>, or,
 ::: <code>launcher</code> then click <code>RUN</code> button
 
 === Workbench === <!--T:1671-->
 
+<!--T:6846-->
 Note that when starting Fluent from within Workbench the same GPU dependent Environment Variable settings should be specified in the Environment Tabl of the Fluent Launcher that are explained in the Fluids section above when starting fluent from a terminal window command line. 
 
 ==== On Demand Desktop ==== <!--T:1674-->
@@ -1498,6 +1506,7 @@ Note that when starting Fluent from within Workbench the same GPU dependent Envi
 <!--T:1693-->
 <b>Compute Node (no GPU requested)</b>
 
+<!--T:6847-->
 ::: Click to load ansys/2025R1 (or newer version) in the Desktop left hand side menu
 ::: Click the "Workbench (VNC)" icon located in the Jupyter Lab desktop center window
 ::: Since the default icon is configured for a gpu node, we must customize it so
@@ -1512,26 +1521,30 @@ Note that when starting Fluent from within Workbench the same GPU dependent Envi
 <!--T:1694-->
 <b>Compute Node (with GPU requested)</b>
 
+<!--T:6848-->
 ::: Click to load ansys/2025R1 (or newer version) in the Desktop left hand side menu
 ::: Click the Workbench (VNC) icon located in the Jupyter Lab desktop center window
 
+<!--T:6849-->
 === Ensight ===
 ::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>
 ::: <code>export LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib</code>
 ::: <code>ensight -X</code>
 
-<!--T:1682-->
+<!--T:1683-->
 === Rocky ===
 ::: <code>module load StdEnv/2023 ansys/2025R1</code> (or newer versions)
+::: <code>export PATH=$EBROOTANSYS/v251/rocky:$PATH</code> (path to be included in future module versions)
 ::: <code>Rocky</code> The ansys module handles reading your ~/licenses/ansys.lic<br>
 ::: <code>RockySolver</code> Run rocky solver directly from command line (add -h for help, untested)
 ::: <code>RockySchedular</code> Start rocky schedular gui to submit/run jobs on present node (untested)
 ::: o The SHARCNET license includes Rocky and is therefore free for all researchers to use
 ::: o Rocky supports GPU-accelerated computing however this capability not been tested or documented yet
 
-<!--T:1684-->
-== SSH issues ==
-::: Some Ansys GUI programs can be run remotely on a cluster compute node by forwarding X over SSH to your local desktop.  Unlike VNC, this approach is untested and unsupported since it relies on a properly setup X display server for your particular operating system OR the selection, installation and configuration of a suitable X client emulator package such as MobaXterm.  Most users will find interactive response times unacceptably slow for basic menu tasks let alone performing more complex tasks such as those involving graphics rendering.  Startup times for GUI programs can also be very slow depending on your Internet connection. For example, in one test it took 40 minutes to fully start the gui up over SSH while starting it with vncviewer required only 34 seconds.  Despite the potential slowness when connecting over SSH to run GUI programs, doing so may still be of interest if your only goal is to open a simulation and perform some basic menu operations or run some calculations. The basic steps are given here as a starting point: 1) ssh -Y username@alliancecan.ca 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task=4 [--gpus-per-node=1] --account=def-mygroup; 3) once connected onto a compute node try running <code>xclock</code>.  If the clock appears on your desktop, proceed to load the desired Ansys module and try running the program.
+== Electronics == <!--T:1117-->
+
+<!--T:1118-->
+Information describing howto run AnsysEDT in graphical mode maybe found here [https://docs.alliancecan.ca/wiki/AnsysEDT here].
 
 = Site-specific usage = <!--T:86-->
 
@@ -1696,6 +1709,9 @@ After a job completes, its "Job Wall-clock time" can be obtained from <code>seff
 = Help resources = <!--T:8-->
 
 <!--T:6804-->
-Documentation for recent versions Ansys 202[4|5]R[1|2] is fully available [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/main_page.html?lang=en here].  Documentation for older versions such as Ansys 2023R[1|2] however requires [https://ansyshelp.ansys.com/ login].  Developer documentation can be found in the Ansys Developer [https://developer.ansys.com Portal]. Additional learning resources include the Ansys HowTo [https://www.youtube.com/@AnsysHowTo/videos videos], the Ansys Educator [https://innovationspace.ansys.com/educator-hub/ Educator Hub] and the Ansys Webinar [https://www.ansys.com/events/ansys-academic-webinar-series series].
+The official full documentation for recent versions Ansys 202[4|5]R[1|2] is available [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/main_page.html?lang=en here].  Documentation for older versions such as Ansys 2023R[1|2] however requires [https://ansyshelp.ansys.com/ login].  Developer documentation can be found in the Ansys Developer [https://developer.ansys.com Portal]. Additional learning resources include the Ansys HowTo [https://www.youtube.com/@AnsysHowTo/videos videos], the Ansys Educator [https://innovationspace.ansys.com/educator-hub/ Educator Hub] and the Ansys Webinar [https://www.ansys.com/events/ansys-academic-webinar-series series].
+
+<!--T:1684-->
+<b>XoverSSH Legacy Note</b>: Some programs can be run remotely on a cluster compute node by forwarding X over SSH to your local desktop.  Unlike VNC, this approach is untested and unsupported since it relies on a properly setup X display server for your particular operating system OR the selection, installation and configuration of a suitable X client emulator package such as MobaXterm.  Most users will find interactive response times unacceptably slow for basic menu tasks let alone performing more complex tasks such as those involving graphics rendering.  Startup times for GUI programs can also be very slow depending on your Internet connection. For example, in one test it took 40 minutes to fully start the gui up over SSH while starting it with vncviewer required only 34 seconds.  Despite the potential slowness, using this method to connect may still be of interest if your only goal is to open a simulation and perform some basic menu operations or run some calculations and response delays can be tolerated. The basic steps are given here as a starting point: 1) ssh -Y username@alliancecan.ca 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task=4 [--gpus-per-node=1] --account=def-mygroup; 3) once connected onto a compute node try running <code>xclock</code>.  If the clock appears on your desktop, proceed to load the desired Ansys module and try running the program.
 
 </translate>

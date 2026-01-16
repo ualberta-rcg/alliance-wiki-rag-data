@@ -8,11 +8,11 @@ Puisque la plateforme peut être construite avec diverses extensions, nous n'off
 *l'utilisation d'un conteneur Singularity.
 
 = Installation dans un environnement virtuel=
-Les directives suivantes installent la version 2019.1.0 sous StdENv/2020 avec OpenMPI et GCC 9.3.0.
+Les instructions suivantes installent la version 2019.1.0 dans StdENv/2020 avec OpenMPI et GCC 9.3.0.
 
 Vous pouvez exécuter le script ci-dessous en le copiant sur la grappe que vous utilisez et en lançant <b>bash fenics-install.sh</b>.
 
-À l'installation, vous serez averti qu'un nouveau répertoire sera créé pour l'application, ou que le répertoire sera remplacé si l'application s'y trouve déjà et des directives d'utilisation seront affichées quand l'installation sera terminée. Le script peut être modifié pour spécifier un répertoire différent.
+À l'installation, une notification vous informe qu'un nouveau répertoire sera créé pour l'application, ou que le répertoire sera remplacé si l'application s'y trouve déjà. Les directives d'utilisation seront affichées quand l'installation sera terminée. Le script peut être modifié pour spécifier un répertoire différent.
 
 {{File
   |name=fenics-install.sh
@@ -200,7 +200,7 @@ export LD_LIBRARY_PATH=$HOME/software/mshr/lib:$LD_LIBRARY_PATH
 <span id="Using_a_Singularity_container"></span>
 = Utilisation d'un conteneur Singularity  =
 
-Le pilote Singularity Recipe télécharge l'image FEniCS Docker, l'installe et télécharge des paquets additionnels comme Python par exemple. Exécutez le pilote sur votre ordinateur où Singularity est installé sous Linux et où vous avez toutes les permissions.
+Le pilote Singularity Recipe télécharge l'image FEniCS Docker, l'installe et télécharge des paquets additionnels comme Python, par exemple. Exécutez le pilote sur votre ordinateur où Singularity est installé sous Linux et où vous avez toutes les permissions.
 
 Utilisez la commande
   
@@ -297,7 +297,7 @@ apptainer build --sandbox fenics-legacy.sandbox fenics-legacy.sif
 * Yvous pouvez modifier le nom du répertoire (par exemple <i>fenics-dev/</i> ou <i>my_rw_image/</i>)  
 * le suffixe <i>.sandbox</i> est optionnel  
 
-== 3. Fix pip certificate bundle path ==
+== 3. Certificat pip ==
 Inside the sandbox, create a certs folder and symlink the CA bundle so pip/SSL trusts HTTPS:
 <pre>
 apptainer exec --writable fenics-legacy.sandbox sh -c "mkdir -p /etc/pki/tls/certs && ln -s /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt"
@@ -318,14 +318,14 @@ apptainer exec --bind $PWD:/root/shared --pwd /root/shared fenics-legacy-updated
 * <code>--bind $PWD:/root/shared</code> monte le répertoire hôte actif dans le conteneur  
 * <code>--pwd</code> définit le répertoire de travail  
 
-== Important Notes ==
-* FEniCS Legacy (2019.1.x) requires UFL Legacy, already bundled.  
-* The Python package is named <code>ufl_legacy</code>, not <code>ufl</code>.  
-* Compatible UFL version is 2022.3.0 (provided by <code>ufl_legacy</code>).  
-* A plain <code>import ufl</code> should fail, while <code>import ufl_legacy</code> should succeed.  
+== Remarques importantes ==
+* FEniCS Legacy (2019.1.x) nécessite UFL Legacy, already bundled.  
+* Le paquet Python se nomme <code>ufl_legacy</code>, et non <code>ufl</code>.  
+* La version UFL compatible UFL version is 2022.3.0 (provided by <code>ufl_legacy</code>).  
+* L'instruction <code>import ufl</code> devrait échouer, mais non <code>import ufl_legacy</code>.  
 
 == Créez un alias ulf ==
-Certains logiciels (tels que Oasis) assument que le nom du module à charger est <code>ufl</code>. Plutôt que de modifier ces logiciels, vous pouvez créer un <i>shim</i> qui ré-exporte <code>ufl_legacy</code> sous le nom <code>ufl</code>.
+Certains logiciels (tels que Oasis) assument que le nom du module à charger est <code>ufl</code>. Plutôt que de modifier ces logiciels, vous pouvez créer un <i>shim</i> qui réexporte <code>ufl_legacy</code> sous le nom <code>ufl</code>.
 
 Créez le fichier  <code>/pyshims/ufl/__init__.py</code> qui contient
 

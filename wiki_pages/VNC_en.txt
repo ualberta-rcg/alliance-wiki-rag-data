@@ -3,7 +3,7 @@
 {{Warning
   |title=Try [[JupyterLab]] first
   |content=
-This page is for advanced usage of VNC. In many cases, it is much simpler and sufficient to use VNC through your browser, via an interactive job and [[JupyterLab]]. Please consider using this before you try the instructions below.
+This page is for advanced usage of VNC. In many cases, it is much simpler and sufficient to use VNC through your browser, and [[JupyterLab#Desktop|Desktop]]. Please consider using this before you try the instructions below.
 }}
 [[File:Matlab-vnc.png|400px|thumb|MATLAB running via VNC.]]
 
@@ -47,11 +47,11 @@ Now you need a VNC server to connect to, such as a temporary vncserver started o
 
 == Login nodes ==
 
-You may run lightweight applications (that do not require a gpu) within a remote VNC desktop on a cluster login node (memory and cputime limits apply).  To do this, you must first connect to a cluster login node.  Using nibi cluster to demonstrate :
+You may run lightweight applications (that do not require a gpu) within a remote VNC desktop on a cluster login node (memory and cputime limits apply).  To do this, you must first connect to a cluster login node.  Using the Nibi cluster to demonstrate :
 
  [<b>laptop</b>:~] ssh nibi.alliancecan.ca
 
-Next run <code>vncserver -list</code> to check if you have an old unused vncserver(s) still running on whichever nibi login node you get connected to.  If you do then kill them off by running the following pkill command on
+Next run <code>vncserver -list</code> to check if you have an old unused vncserver(s) still running on whichever Nibi login node you get connected to.  If you do then kill them off by running the following pkill command on
 
  [<b>l4</b>(login node):~] <code>pkill Xvnc -u $USER</code>
 
@@ -90,7 +90,7 @@ If your program requires memory and/or cputime limits greater than those provide
 
 <b>1) Start a VNC server</b>
 
-Before starting your VNC server, log into a cluster (such as nibi) and create a compute node allocation using the <code>salloc</code> command (24hr time limit applies). For example, to request an [[Running_jobs#Interactive_jobs|interactive job]] using 4 CPUs and 16GB of memory you could use the command:
+Before starting your VNC server, log into a cluster (such as Nibi) and create a compute node allocation using the <code>salloc</code> command (24hr time limit applies). For example, to request an [[Running_jobs#Interactive_jobs|interactive job]] using 4 CPUs and 16GB of memory you could use the command:
 
  [<b>l4</b>(login node):~] salloc --time=1:00:00 --cpus-per-task=4 --mem=16000 --account=def-piusername
  salloc: Pending job allocation 1149016
@@ -121,14 +121,14 @@ Run the grep command on the log file to determine which port your VNC server is 
 
 Once your VNC server has been started, you must create a secure "bridge" or "tunnel" from your laptop to the compute node where your vncserver is running (as determined in the previous step above).  There are two types of tunnel commands that maybe used depending on which cluster you are using.
 
-For all clusters (<b>except</b> nibi) the previously recommended form of the tunnel command <code>ssh username@clustername -L localforwardedport:<span style="Color:orange">computenode</span>:remotelisteningport</code> may continue to be used.  As an  example, if a vncserver is started on <code>rorqual</code> compute node <b><span style="Color:orange">rc12509</span></b> and the local port on your laptop to be forwarded is again <span style="Color:red">5905</span> the appropriate tunnel command becomes:
+For all clusters (<b>except</b> Nibi) the previously recommended form of the tunnel command <code>ssh username@clustername -L localforwardedport:<span style="Color:orange">computenode</span>:remotelisteningport</code> may continue to be used.  As an  example, if a vncserver is started on <code>rorqual</code> compute node <b><span style="Color:orange">rc12509</span></b> and the local port on your laptop to be forwarded is again <span style="Color:red">5905</span> the appropriate tunnel command becomes:
 
  [<b>laptop</b>:~] ssh username@rorqual.alliancecan.ca -L <span style="Color:red">5905</span>:<b><span style="Color:orange">rc12509</span></b>:<span style="Color:blue">5901</span>
  Duo two-factor login for username
  Enter a passcode or select one of the following options:
  [rc12509(compute node):~] 
 
-For nibi, a new form of the tunnel command <code>ssh -J username@clustername -L localforwardedport:<span style="Color:orange">localhost</span>:remotelisteningport computenode</code> must be used.  In addition a SSH key pair must created on your laptop with the contents of the pub key entered into your <code>~/.ssh/authorized_keys</code> file on <code>nibi</code>.  This approach will also work on any other cluster and so may eventually be preferred.  Continuing with the above example, where <b><span style="Color:green">c48</span></b> is the compute node that you started your vncserver on, and <span style="Color:red">5905</span> is the local port on your laptop being forwarded, the tunnel command would be:
+For Nibi, a new form of the tunnel command <code>ssh -J username@clustername -L localforwardedport:<span style="Color:orange">localhost</span>:remotelisteningport computenode</code> must be used.  In addition a SSH key pair must created on your laptop with the contents of the pub key entered into your <code>~/.ssh/authorized_keys</code> file on <code>nibi</code>.  This approach will also work on any other cluster and so may eventually be preferred.  Continuing with the above example, where <b><span style="Color:green">c48</span></b> is the compute node that you started your vncserver on, and <span style="Color:red">5905</span> is the local port on your laptop being forwarded, the tunnel command would be:
 
  [<b>laptop</b>:~] ssh -J username@nibi.alliancecan.ca -L <span style="Color:red">5905</span>:<span style="Color:orange">localhost</span>:<span style="Color:blue">5901</span> <b><span style="Color:green">c48<span></b>
  Duo two-factor login for username
@@ -243,4 +243,4 @@ Then <code>vglrun</code> sets some extra environment variables to ensure your pr
 
 == Portal alternatives ==
 
-If you experience graphics issues when using VNC as described above, try instead using [https://ondemand.sharcnet.ca/ OpenOnDemand] on the <b>Nibi</b> cluster or [https://jupyterhub.rorqual.alliancecan.ca JupyterHub] on the <b>Rorqual</b> cluster.  Both systems offer an automated modern desktop VDI web interface GUI experience that is designed for ease of use with improved hardware performance and software support.
+If you experience graphics issues when using VNC as described above, try instead using [https://ondemand.sharcnet.ca/ OpenOnDemand] on the Nibi cluster or [https://jupyterhub.rorqual.alliancecan.ca JupyterHub] on the <b>Rorqual</b> cluster.  Both systems offer an automated modern desktop VDI web interface GUI experience that is designed for ease of use with improved hardware performance and software support.

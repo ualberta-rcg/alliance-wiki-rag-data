@@ -1229,14 +1229,16 @@ Par défaut, Ansys alloue aux tâches APDL 1024Mo de mémoire totale et 1024Mo d
 
 == Ansys ROCKY ==
 
+<div class="mw-translate-fuzzy">
 En plus de pouvoir exécuter des simulations en mode graphique (comme indiqué dans la section <i>Mode graphique</i> ci-dessous), [https://www.ansys.com/products/fluids/ansys-rocky Ansys Rocky] peut également exécuter des simulations en mode non graphique. Les deux modes prennent en charge l'exécution de Rocky avec des processeurs uniquement ou avec des processeurs et [https://www.ansys.com/blog/mastering-multi-gpu-ansys-rocky-software-enhancing-its-performance des GPU]. Dans la section ci-dessous, deux exemples de scripts sont fournis où chacun serait soumis à la file d'attente de Graham avec la commande habituelle <code>sbatch</code>. Au moment de la rédaction de cet article, aucun des deux scripts n'a été testé et des modifications seraient probablement nécessaires. Il est important de noter que ces scripts ne sont utilisables que sur Graham puisque le module Rocky qu'ils chargent tous les deux n'est (pour le moment) installé que sur Graham localement.
+</div>
 
 <span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===
 
 <div class="mw-translate-fuzzy">
 Pour obtenir une liste complète des options de ligne de commande, exécutez <code>Rocky -h</code> sur la ligne de commande après avoir chargé un module Rocky (seul ansysrocky/2023R2 est présentement disponible sur Graham). En ce qui concerne l'utilisation de Rocky avec des GPU pour résoudre des problèmes couplés, le nombre de CPU que vous devez demander (sur le même nœud) doit être augmenté au maximum jusqu'à ce que la limite de scalabilité de l'application couplée soit atteinte. D'autre part, si Rocky est exécuté avec des GPU pour résoudre des problèmes découplés autonomes, seul un nombre minimal de CPU doit être demandé, ce qui permettra à Rocky de fonctionner de manière optimale; par exemple, seuls 2 ou éventuellement 3 CPU peuvent être nécessaires. Enfin, lorsque Rocky est exécuté avec 4 ou plus CPU, des licences <I>rocky_hpc</I> seront nécessaires, ce que fournit la licence SHARCNET.
-</div>
+</div>  
 
 <tabs>
 <tab name="CPU seulement">
@@ -1252,9 +1254,11 @@ Pour obtenir une liste complète des options de ligne de commande, exécutez <co
 #SBATCH --cpus-per-task=6      # Specify cores (graham 32 or 44 to use all cores)
 #SBATCH --nodes=1              # Request one node (do not change)
 
+<div class="mw-translate-fuzzy">
 # the rocky2023R2 module on graham was renamed to ansysrocky/2023R2   Apr24/2025
 #module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2       # only avail on graham
 module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04   # only avail on graham
+</div>
 
 Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use-gpu=0
 }}
@@ -1273,14 +1277,21 @@ Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use
 #SBATCH --gres=gpu:v100:2      # Specify gpu type : gpu quantity
 #SBATCH --nodes=1              # Request one node (do not change)
 
+<div class="mw-translate-fuzzy">
 # the rocky2023R2 module on graham was renamed to ansysrocky/2023R2   Apr24/2025
 #module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2       # only avail on graham
 module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04   # only avail on graham
+</div>
 
 Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use-gpu=1 --gpu-num=$SLURM_GPUS_ON_NODE
 }}
 </tab>
 </tabs>
+
+== Ansys ELECTRONICS == <!--T:1115->
+
+<!--T:1116->
+Slurm scripts for using AnsysEDT is provided in a separate wiki page [https://docs.alliancecan.ca/wiki/AnsysEDT here].
 
 <span id="Graphical_use"></span>
 = Mode graphique =
@@ -1297,15 +1308,53 @@ Les programmes Ansys fonctionnent interactivement en mode graphique sur les nœu
 
 Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then either a whole GPU resource (H100 or T4 at the time of this writing) should be requested.  Since the various ansys applications launched in graphical mode behave differently when different ansys module versions are loaded, recommendations for adding command line argument and exporting environment variables for virtualgl or mesa environments have been documented below depending on whether a GPU has been requested or not and wether a On Demand or Juypter Lab system launcher is being used.
 
+<span id="Fluids"></span>
+<div class="mw-translate-fuzzy">
 === Fluids ===
 ::: <code>module load StdEnv/2023 ansys/2022R2</code> (ou versions plus récentes)
 ::: <code>fluent -mpi=intel -driver opengl|null</code> OU 
 ::: <code>cfx5 -graphics ogl|mesa</code>
+</div>
 
+==== Fluent ====
+
+When starting Fluent from a terminal window command line of an On Demand Desktop or the convenience Icon of a Juypter Lab Desktop the following steps should be done including setting the indicated Environment Variables depending on which type of Compute Node the desktop is being started on (with or without a gpu).
+
+::: <code>module load StdEnv/2023 ansys/2025R1</code>
+::: <code>fluent</code>
+
+<b>Compute Node (no GPU requested) or Basic Desktop</b>
+
+module load ansys/2020R1
+
+slurm_hl2hl.py --format ANSYS-FLUENT > machinefile
+NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
+
+fluent 3d -t $NCORES -cnf=machinefile -mpi=intel -affinity=0 -g -i sample.jou
+}}
+</tab>
+
+==== CFX ====
+
+When starting CFX from an On Demand Desktop the following arguments maybe specified on the terminal window command line depending on whether a GPU was requested when the Desktop was started. 
+
+::: <code>module load StdEnv/2023 ansys/2025R1</code>  (or older)
+::: <code>cfx5 -graphics mesa</code>   (no GPU requested)
+::: <code>cfx5 -graphics ogl</code>    (with GPU requested)
+
+<span id="Mapdl"></span>
+<div class="mw-translate-fuzzy">
 === Mapdl ===
 ::: <code>module load StdEnv/2023 ansys/2022R2</code> (ou versions plus récentes)
 ::: <code>mapdl -g</code>, ou via le démarreur,
 ::: <code>launcher</code> --> cliquer sur le bouton RUN
+</div>
+
+The following steps for starting the Mechanical APDL gui from the command line of a terminal window should work regardless if you have started your On Demand Desktop on a Compute node with or without a gpu.
+
+::: <code>module load StdEnv/2023 ansys/2022R2</code> (or newer versions)
+::: <code>mapdl -g</code>, or,
+::: <code>launcher</code> then click <code>RUN</code> button
 
 <span id="Workbench"></span>
 <div class="mw-translate-fuzzy">
@@ -1318,18 +1367,15 @@ Submit your resource request and then wait.  If you started a Juypter Lab launch
 ::: Remarque : Quand vous exécutez en parallèle un programme d'analyse comme  Mechanical or Fluent sur un nœud simple, ne cochez pas la case <i>Distributed</i> et indiquez un nombre de cœurs égal à votre  <b>session salloc, moins 1</b>. Les menus déroulants du Ansys Mechanical Workbench ne répondent pas correctement. Comme solution, lancez <code>xfwm4 --replace</code> sur la ligne de commande avant de démarrer Workbench. Pour avoir xfwm4 par défaut, modifiez <code>$HOME/.vnc/xstartup</code> et remplacez <code>mate-session</code> par <code>xfce4-session</code>.
 </div>
 
-<div class="mw-translate-fuzzy">
-=== Ensight ===
-::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>
-::: <code>export LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib</code>
-::: <code>ensight -X</code>
-</div>
+Note that when starting Fluent from within Workbench the same GPU dependent Environment Variable settings should be specified in the Environment Tabl of the Fluent Launcher that are explained in the Fluids section above when starting fluent from a terminal window command line. 
 
+<span id="On_Demand_Desktop"></span>
 <div class="mw-translate-fuzzy">
 == Problèmes avec SSH==
 :::Certains programmes d'interface graphique ANSYS peuvent être exécutés à distance sur un nœud de calcul d'une de nos grappes par redirection X via SSH vers votre ordinateur local. Contrairement à VNC, cette approche n'est ni testée ni prise en charge car elle repose sur un serveur d'affichage X correctement configuré pour votre système d'exploitation particulier OU sur la sélection, l'installation et la configuration d'un paquet d'émulateur client X approprié tel que MobaXterm. La plupart d'entre vous trouverez les temps de réponse interactifs inacceptables pour les tâches de menu de base, sans parler de l'exécution de tâches plus complexes telles que celles nécessitant du rendu graphique. Les temps d'attente pour démarrer des programmes avec interface graphique peuvent également être très longs, dépendant de votre connexion Internet. Dans un test par exemple, il a fallu 40&nbsp;minutes pour obtenir l'interface graphique avec SSH alors que vncviewer n'a pris que 34&nbsp;secondes. Malgré la lenteur potentielle lors de la connexion via SSH pour exécuter des programmes avec interface graphique, cela peut toujours être intéressant si votre seul objectif est d'ouvrir une simulation et d'effectuer des opérations de menu de base ou d'exécuter des calculs. Ces étapes de base sont un point de départ : 1) ssh -Y username@graham.computecanada.ca; 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task =4 [--gpus-per-node=1] --account=def-mygroup; 3) une fois connecté à un nœud de calcul, essayez d'exécuter <code>xclock</code>. Si l'horloge apparaît sur votre bureau, chargez le module Ansys souhaité et essayez d'exécuter le programme.
-</div> 
+</div>
 
+<div class="mw-translate-fuzzy">
 === Fluids ===
 ::: <code>module load CcEnv StdEnv/2023</code>
 ::: <code>module load ansys/2024R2.04</code> (ou versions moins récentes)
@@ -1342,14 +1388,42 @@ Submit your resource request and then wait.  If you started a Juypter Lab launch
 ::: ... ne cliquez pas sur le bouton OK, autrement icemcfd va planter. Faites plutôt ce qui suit (une seule fois)&nbsp;:
 ::: sélectionnez <i>Settings Tab -> Display -> tick X11 -> Apply -> OK -> File -> Exit</i>
 ::: L'erreur ne devrait pas se produire quand vous démarrez de nouveau icemcfd.
+</div>
 
+<div class="mw-translate-fuzzy">
 === Workbench ===
+</div>
+
+=== Ansys EDT ===
+::: Ouvrez une fenêtre de terminal et chargez le module avec
+:::: <code>module load SnEnv ansysedt/2023R2</code>, ou
+:::: <code>module load SnEnv ansysedt/2021R2</code>
+::: Dans le terminal, entrez <code>ansysedt</code> et attendez que l'interface s'affiche.
+::: Ceci doit être fait une seule fois :
+:::: sélectionnez <i>Tools -> Options -> HPC and Analysis Options -> Options</i>
+:::: dans le menu déroulant, changez <i>HPC License</i> pour <i><b>Pool</b></i> (pour utiliser plus de 4 cœurs)
+:::: cliquez sur <i>OK</i>
+::: ----------   EXEMPLES  ----------
+::: Pour copier dans votre compte les exemples Antennas de 2023R2 :
+:::: connectez-vous à une grappe (par exemple Graham)
+:::: <code>module load ansysedt/2023R2</code>
+:::: <code>mkdir -p ~/Ansoft/$EBVERSIONANSYSEDT; cd ~/Ansoft/$EBVERSIONANSYSEDT; rm -rf Antennas</code>
+:::: <code>cp -a $EBROOTANSYSEDT/v232/Linux64/Examples/HFSS/Antennas ~/Ansoft/$EBVERSIONANSYSEDT</code>
+::: Pour faire exécuter un exemple :
+:::: ouvrez un fichier .aedt et cliquez sur <i>HFSS -> Validation Check</i>
+:::: (si la validation produit une erreur, fermez et ouvrez de nouveau la simulation autant de fois que nécessaire)
+:::: pour lancer la simulation, cliquez sur <i>Project -> Analyze All</i>
+:::: pour quitter sans sauvegarder la solution, cliquez sur <i>File -> Close -> No </i>
+::: si le programme plante et ne repart pas, essayez les commandes suivantes :
+:::: <code>pkill -9 -u $USER -f "ansys*|mono|mwrpcss|apip-standalone-service"</code>
+:::: <code>rm -rf ~/.mw</code> (au lancement, ansysedt utilisera la configuration initiale)
 
 === Ensight ===
-::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>
-::: <code>export LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib</code>
-::: <code>ensight -X</code>
+::: <code>module load SnEnv</code>
+::: <code>ansys/2024R2.04</code> (or older versions back to 2021R2)
+::: <code>ensight</code><br>
 
+<span id="Jupyter_Lab_Desktop"></span>
 <div class="mw-translate-fuzzy">
 === Rocky ===
 ::: <code>module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2</code>
@@ -1366,6 +1440,31 @@ Submit your resource request and then wait.  If you started a Juypter Lab launch
 ::: o Pour demander un nœud de calcul sur Graham pour utilisation interactive avec 4 CPU et 1 GPU pour un maximum de 8 heures, lancez
 :::   <code>salloc --time=08:00:00 --nodes=1 --cpus-per-task=4 --gres=gpu:v100:1 --mem=32G --account=someaccount</code>
 </div>
+
+<b>Compute Node (no GPU requested)</b>
+
+::: Click to load ansys/2025R1 (or newer version) in the Desktop left hand side menu
+::: Click the "Workbench (VNC)" icon located in the Jupyter Lab desktop center window
+::: Since the default icon is configured for a gpu node, we must customize it so
+::: workbench can be restart in mesa mode.  To proceed, Exit the Workbench desktop,
+::: open a terminal window, and run the following commands on the command line:
+::: cd ~/Desktop; cp -p $(realpath workbench.desktop) workbench-mesa.desktop
+::: then edit workbench-mesa.desktop and change runwb2 -> runwb2 -oglmesa
+::: Save the file then click your newly customized icon to start workbench.
+::: Note the workbench icon that you created will persist for future sessions
+::: until manually deleted with: rm -f ~/Desktop/workbench-mesa.desktop
+
+<b>Compute Node (with GPU requested)</b>
+
+::: Click to load ansys/2025R1 (or newer version) in the Desktop left hand side menu
+::: Click the Workbench (VNC) icon located in the Jupyter Lab desktop center window
+
+=== Ensight ===
+::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>
+::: <code>export LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib</code>
+::: <code>ensight -X</code>
+
+module load StdEnv/2020
 
 #module load ansys/2021R1
 module load ansys/2021R2

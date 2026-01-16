@@ -1,8 +1,11 @@
 <languages/>
 
-<div class="mw-translate-fuzzy">
+{{Warning
+  |title=Essayez d'abord [[JupyterLab#fr|JupyterLab]]
+  |content=
+Cette page présente des fonctions avancées de VNC. Dans plusieurs cas, il est plus simple d'utiliser VNC dans votre navigateur et [[JupyterLab#fr/Desktop|Desktop]]. Employez cette méthode avant d'utiliser les intructions fournies ci-desssous.
+}}
 [[File:Matlab-vnc.png|400px|thumb|MATLAB exécuté dans VNC]]
-</div>
 
 <div class="mw-translate-fuzzy">
 Pour certains paquets complexes (par exemple [[MATLAB/fr|MATLAB]]), il est parfois utile de démarrer à distance l'interface utilisateur graphique. Pour ce faire, on utilise généralement [[SSH/fr|SSH]] avec redirection X11, mais la performance est souvent trop lente, tout comme avec [[Connecting_with_MobaXTerm/fr| MobaXTerm]] ou [[Connecting_with_PuTTY/fr|Putty]]. Une meilleure option est d'utiliser [https://fr.wikipedia.org/wiki/Virtual_Network_Computing VNC] pour se connecter à un ordinateur à distance.
@@ -131,20 +134,14 @@ Lancez la commande <code>grep</code> dans le fichier de journalisation pour iden
 
 Une fois le serveur VNC démarré, il faut créer un tunnel sécurisé entre votre ordinateur et le nœud de calcul sur lequel vncserver est exécuté (voir l'étape précédente). Deux types de commandes peuvent être utilisées selon la grappe utilisée.
 
-<div class="mw-translate-fuzzy">
-Pour toutes les grappes (<b>sauf Nibi</b>), vous pouvez utiliser la forme <code>ssh username@clustername -L localforwardedport:computnode:remotelisteningport</code> recommandée précédemment. Par exemple, si un vncserver est démarré sur le nœud de calcul  <b>rc12509</b> de <code>rorqual</code> et que le port local de votre ordinateur portable à transférer est <span style="Color:green">5905</span>, la commande appropriée serait&nbsp;:
-</div>
+Pour toutes les grappes (<b>sauf Nibi</b>), vous pouvez utiliser la forme <code>ssh username@clustername -L localforwardedport:<span style="Color:orange">computenode</span>:remotelisteningport</code> recommandée précédemment. Par exemple, si un vncserver est démarré sur le nœud de calcul  b><span style="Color:orange">rc12509</span></b> de <code>rorqual</code> et que le port local de votre ordinateur portable à transférer est <span style="Color:red">5905</span>, la commande appropriée est&nbsp;:
 
- <div class="mw-translate-fuzzy">
-[<b>laptop</b>:~] ssh username@rorqual.alliancecan.ca -L <span style="Color:green">5905</span>:<b>rc12509</b>:<span style="Color:blue">5901</span>
+ [<b>laptop</b>:~] ssh username@rorqual.alliancecan.ca -L <span style="Color:red">5905</span>:<b><span style="Color:orange">rc12509</span></b>:<span style="Color:blue">5901</span>
  Duo two-factor login for username
  Enter a passcode or select one of the following options:
- [rc12509(compute node):~]
-</div> 
+ [rc12509(compute node):~] 
 
-<div class="mw-translate-fuzzy">
-Pour Nibi, une nouvelle forme de la commande doit être utilisée, soit <code>ssh -J username@clustername -L localforwardedport:localhost:remotelisteningport computenode</code>. De plus, une paire de clés SSH doit être créée sur votre ordinateur avec le contenu de la clé publique saisie dans votre fichier <code>~/.ssh/authorized_keys</code> sur <code>nibi</code>. Cette approche fonctionne également sur toute autre grappe et pourrait donc être privilégiée. En reprenant l'exemple précédent, où <b>c48</b> est le nœud de calcul sur lequel vous avez démarré vncserver et <span style="Color:green">5905</span> est le port local de votre ordinateur transféré, la commande pour Nibi serait&nbsp;:
-</div>
+Pour Nibi, une nouvelle forme de la commande doit être utilisée, soit <code>ssh -J username@clustername -L localforwardedport:<span style="Color:orange">localhost</span>:remotelisteningport computenode</code>. De plus, une paire de clés SSH doit être créée sur votre ordinateur avec le contenu de la clé publique saisie dans votre fichier <code>~/.ssh/authorized_keys</code> sur <code>nibi</code>. Cette approche fonctionne également sur toute autre grappe et pourrait donc être privilégiée. En reprenant l'exemple précédent, où <b>c48</b> est le nœud de calcul sur lequel vous avez démarré vncserver et <span style="Color:red">5905</span> est le port local de votre ordinateur transféré, la commande pour Nibi est&nbsp;:
 
  [<b>laptop</b>:~] ssh -J username@nibi.alliancecan.ca -L <span style="Color:red">5905</span>:<span style="Color:orange">localhost</span>:<span style="Color:blue">5901</span> <b><span style="Color:green">c48<span></b>
  Duo two-factor login for username
@@ -235,9 +232,7 @@ Si votre écran de veille VNC s'éteint en raison du délai d'affichage et qu'un
 Si le bureau MATE est en cours d'exécution et que l'écran de veille ne se déverrouille pas, essayez avec la commande <code>killall -9 .mate-screensaver</code>. Ceci ne devrait plus se produire car l'écran de veille VNC a été désactivé sur nos grappes.
 
 <span id="Cannot_log_in"></span>
-<div class="mw-translate-fuzzy">
-== Problème de connexion ==
-</div> 
+== Problème de connexion == 
 
 <div class="mw-translate-fuzzy">
 La connexion à gra-vdi.alliancecan.ca se fait en deux étapes&nbsp;:
@@ -250,14 +245,10 @@ La connexion à gra-vdi.alliancecan.ca se fait en deux étapes&nbsp;:
  username
  Entrez votre code de passe pour l'authentification multifacteur.
 
-<div class="mw-translate-fuzzy">
 Si vous entrez un nom d'utilisateur/mot de passe erroné pour l'étape 1, vous aurez quand même à passer l'étape 2. Si vous saisissez ensuite votre nom d'utilisateur/mot de passe, vous recevrez un message indiquant que la connexion est établie et vous reviendrez vers l'écran de connexion de l'étape 1. La solution est de réessayer en vous assurant d'avoir saisi la bonne combinaison nom d'utilisateur/mot de passe. Si vous ne vous souvenez plus de votre mot de passe CCDB, allez sur [https://ccdb.alliancecan.ca/security/forgot here] pour le réinitialiser, à condition que votre compte ne soit pas en attente de renouvellement par la chercheuse principale ou le chercheur principal.
-</div>
 
 <span id="OpenGL_graphics"></span>
-<div class="mw-translate-fuzzy">
 == OpenGL ==
-</div>
 
 <div class="mw-translate-fuzzy">
 == NIX ==
@@ -286,6 +277,4 @@ Then <code>vglrun</code> sets some extra environment variables to ensure your pr
 Le moyen le plus simple est avec l'utilitaire <code>patchelf</code> de nix pour ajuster le binaire final; installez l'utilitaire avec <code>nix-env --install --attr nixpkgs.patchelf</code>. Par exemple, si vous construisez une application OpenGL pour utiliser les bibliothèques de système et que vous l'installez comme étant <code>~/.local/bin/myglapp>/code>, vous devez ajouter la bibliothèque VirtualGL du système comme première bibliothèque requise.
 </div>
 
-<div class="mw-translate-fuzzy">
-Si vous rencontrez des problèmes graphiques à l'utilisation de VNC comme décrit ci-dessus, essayez d'utiliser [https://ondemand.sharcnet.ca/ OpenOnDemand] sur <b>nibi</b> ou [https://jupyterhub.rorqual.alliancecan.ca JupyterHub] sur <b>rorqual</b>. Les deux grappes offrent une interface web VDI entièrement automatisée conçue pour une utilisation simplifiée, ainsi que des performances matérielles améliorées et une meilleure prise en charge logicielle.
-</div>
+Si vous rencontrez des problèmes graphiques à l'utilisation de VNC comme décrit ci-dessus, essayez d'utiliser [https://ondemand.sharcnet.ca/ OpenOnDemand] sur <b>nibi</b> ou [https://jupyterhub.rorqual.alliancecan.ca JupyterHub] sur <b>rorqual</b>. Les deux grappes offrent une interface web VDI automatisée avec un bureau moderne qui est conçue pour une utilisation simplifiée, ainsi que des performances matérielles améliorées et une meilleure prise en charge logicielle.

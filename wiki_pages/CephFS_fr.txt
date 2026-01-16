@@ -20,19 +20,17 @@ Si vous ne disposez pas déjà d’un quota pour ce service, écrivez à  [mailt
 <span id="OpenStack_configuration:_Create_a_CephFS_share"></span>
 == Configuration OpenStack : Créer un point de partage CephFS ==
 
-<div class="mw-translate-fuzzy">
 ; Créez un point de partage.
 : Dans <i>Project --> Share --> Shares</i>, cliquez sur <i>+Create Share</i>.
 : <i>Share Name</i> = entrez un nom significatif pour votre projet (par exemple <i>project-name-shareName</i>)
 : <i>Share Protocol</i> = CephFS
 : <i>Taille</i> = taille requise pour le point de partage
-: <i>Share Type</i> = cephfs
+: <i>Share Type</i> = cephfs (ou cephfs-ec42 pour SD4H/Juno)
 : <i>Zone de disponibilité</i> = nova
-: Ne sélectionnez pas <i>Make visible for all</i>, autrement le point de partage sera accessible par tous les utilisateurs dans tous les projets.
+: Ne sélectionnez pas <i>Make visible for all</i> ou <i>Make visible to users from all projects</i> pour SD4H/Juno, autrement le point de partage sera accessible par tous les utilisateurs dans tous les projets.
 : Cliquez sur le bouton <i>Create</i>.
 [[File:Cephfs config.png|450px|thumb|left|Configurer CephFS avec l'interface Horizon]]
 <br clear=all>
-</div>
 
 ; Créez une règle pour générer une clé. 
 : Dans <i>Project --> Share --> Shares --> colonne Actions</i>, sélectionnez <i>Manage Rules</i> du menu déroulant. 
@@ -43,13 +41,10 @@ Si vous ne disposez pas déjà d’un quota pour ce service, écrivez à  [mailt
 [[File:Cephfs created.png|450px|thumb|left||Configuration correcte de CephFS]]
 <br clear=all>
 
-<div class="mw-translate-fuzzy">
 ; Prenez note des détails dont vous aurez besoin.
 : Dans <i>Project --> Share --> Shares</i>, cliquez sur le nom du point de partage.
-: Dans <i>Share Overview</i>, notez <i>Path</i>.
-: Sous <i>Access Rules</i>, notez <i>Access Key</i> (les clés d’accès sont composées de 40 caractères et se terminent par le symbole =. Si vous ne voyez pas de clé d’accès, vous n’avez probablement pas spécifié que la règle d’accès était de type  <i>cephx</i>).
-.
-</div>
+: Dans <i>Share Overview</i>, notez les trois éléments encerclés en rouge dans l'image ci-dessus&nbsp;:
+<i>Path</i> qui servira à la commande <code>mount</code> pour l'instance; <i>Access to</i> quij sera le nom du client; et <i>Access Key</i> qui permettra à l'instance client de se connecter.
 
 <span id="Attach_the_CephFS_network_to_your_VM"></span>
 == Attacher le réseau CephFS à votre instance ==
@@ -61,7 +56,7 @@ Le réseau CephFS est déjà disponible pour vos instances et donc vous n'avez r
 Vous devez attacher le réseau CephFS à l'instance.
 
 ;Sur le web
-Pour chaque instances, sélectionnez <i>Instance --> Action --> Attach interface --> CephFS-Network</i>. Ne cochez pas la case <i>Fixed IP Address</i>.
+Pour chaque instance, sélectionnez <i>Instance --> Action --> Attach interface --> CephFS-Network</i>. Ne cochez pas la case <i>Fixed IP Address</i>.
 [[File:Select CephFS Network.png|750px|thumb|left|]]
 <br clear=all>
 ;Avec le [[OpenStack_command_line_clients|client OpenStack]]
@@ -169,16 +164,17 @@ gpgkey=https://download.ceph.com/keys/release.asc
 Le répertoire epel doit être présent.
  sudo dnf install epel-release
 
-Vous pouvez maintenant installer ceph lib, cephfs client aet autres dépendances.
+Vous pouvez maintenant installer ceph lib, cephfs client et autres dépendances.
  sudo dnf install -y libcephfs2 python3-cephfs ceph-common python3-ceph-argparse
 
-<div class="mw-translate-fuzzy">
 === Paquets requis pour la famille Debian (Debian, Ubuntu, Mint, etc.) ===
-Pour avoir le dépôt de paquets, trouvez le <code>{codename}</code> pour votre distribution avec <code>lsb_release -sc</code>
+Pour avoir le dépôt de paquets, trouvez-le <code>{codename}</code> pour votre distribution avec <code>lsb_release -sc</code>
 <source lang='bash'>
-sudo apt-add-repository 'deb https://download.ceph.com/debian-quincy/ {codename} main'
+sudo apt-add-repository 'deb https://download.ceph.com/debian-quincy/ {codename} main'</source>
+Si la commande précédente produit une erreur, utilisez plutôt la commande suivante, puis passez à la prochaine étape.
+<source lang='bash'>
+sudo add-apt-repository -r 'deb https://download.ceph.com/debian-quincy/ {codename} main'
 </source>
-</div>
 
 Vous pouvez maintenant installer ceph lib, cephfs client et les autres dépendances.
 <source lang='bash'>
@@ -227,24 +223,20 @@ Les informations sur le moniteur trouvent dans le champ <i>Path</i> des détails
 
 Entrez le nom du client et le secret dans le fichier <code>ceph.keyring</code>. 
 
-<div class="mw-translate-fuzzy">
 {{File
   |name=/etc/ceph/ceph.keyring
   |lang="ini"
   |contents=
 [client.MyCephFS-RW]
-    key = <access Key>
+    key = <Access Key>
 }}
-</div>
 
 Encore une fois, la clé d'accès et le nom du client (ici <i>MyCephFS-RW</i>) se trouvent sous les règles d'accès sur la page Web de votre projet.
 Cliquez sur <i>Project --> Share --> Shares</i>, puis cliquez sur le nom du point de partage.
 
-<div class="mw-translate-fuzzy">
 ; Récupérez les informations de connexion dans la page <i>Share</i> pour votre connexion&nbsp;:
 : Ouvrez les détails en cliquant sur le nom du point de partage dans la page <i>Shares</i>.
-: Copiez le chemin d'accès complet du point de partage pour monter le système de fichiers.
-</div>
+: De la page, copiez la partie de <i>Path</i> qui contient <code>:</code> que nous allons utiliser pour monter le système de fichiers (par exemple ici, <code>:/volumes/_nogroup/f6cb8f06-f0a4-4b88-b261-f8bd6b03582c</code>).
 
 ;Montez le système de fichiers
 :Créez un répertoire pour le point de montage quelque part dans votre hôte (ici <code>/cephfs</code>)</li>
