@@ -1103,6 +1103,56 @@ Run the program:
 <!--T:58-->
 To test an application with CUDA, request an [[Running_jobs#Interactive_jobs|interactive job]] with a [[Using_GPUs_with_Slurm|GPU]].
 
+= rTorch = <!--T:691-->
+
+<!--T:692-->
+In order to install <tt>rTorch</tt>, from a login node:
+
+<!--T:693-->
+1. Load required modules:
+{{Command|module load r/4.5 cuda/12.6 cudnn}}
+
+<!--T:694-->
+2. Create your installation directory following [[R#Installing_for_one_or_many_R_versions|installing R packages]]:
+{{Commands
+|mkdir -p ~/.local/R/$EBVERSIONR/
+|export R_LIBS{{=}}~/.local/R/$EBVERSIONR/
+}}
+
+<!--T:695-->
+3. Install the latest rtorch available
+{{Command|R -e 'install.packages("torch", repos{{=}}"https://cloud.r-project.org/")'}}
+
+<!--T:696-->
+4. Install dependencies
+{{Command|R -e 'torch::install_torch()'}}
+
+<!--T:698-->
+5. Patch the downloaded shared library (lantern):
+{{Command|setrpaths.sh --path $R_LIBS/torch/lib/liblantern.so --add_path $EBROOTCUDACORE/lib --any_interpreter}}
+
+<!--T:699-->
+6. Run a quick CPU test
+{{Command
+|R -e 'torch::torch_tensor(1)'
+|result=
+> torch::torch_tensor(1)
+torch_tensor
+ 1
+[ CPUFloatType{1} ]
+}}
+
+<!--T:700-->
+7. Run a quick GPU test
+{{Command
+|srun --mem{{=}}3500M --gpus{{=}}h100_1g.10gb:1 -- R -e 'torch::torch_tensor(1)$cuda()'
+|result=
+> torch::torch_tensor(1)$cuda()
+torch_tensor
+ 1
+[ CUDAFloatType{1} ]
+}}
+
 = Resources = <!--T:59-->
 
 <!--T:60-->

@@ -3,76 +3,114 @@
 
 = Introduction = <!--T:56-->
 
-<!--T:57-->
-To request one or more GPUs for a Slurm job, use this form:
-  --gpus-per-node=[type:]number
+<!--T:78-->
+To request one or more GPUs for a [[Running jobs|Slurm]] job, use this form:
+  --gpus-per-node=<type>:<number>
 
-<!--T:58-->
-The square-bracket notation means that you must specify the number of GPUs, and you may optionally specify the GPU type.  Valid types are listed in the <i>Available GPUs</i> table below, in the column headed "Slurm type specifier".  Here are two examples:
-  --gpus-per-node=2
-  --gpus-per-node=v100:1
+<!--T:79-->
+For example:
+  --gpus-per-node=a100:1
 
-<!--T:59-->
-The first line requests two GPUs per node, of any type available on the cluster.  The second line requests one GPU per node, with the GPU being of the V100 type.
+<!--T:80-->
+This requests a single A100 GPU (unless you also use <code>--nodes</code> to specify more than a single node).
+See the following section, <i>Available GPUs,</i> for valid types.
 
-<!--T:60-->
+<!--T:81-->
 The following form can also be used:
-  --gres=gpu[[:type]:number]
-This is older, and we expect it will no longer be supported in some future release of Slurm.  We recommend that you replace it in your scripts with the above <code>--gpus-per-node</code> form.
+  --gres=gpu:<type>:<number>
+This form may not be supported in the future.  We recommend that you replace it in your scripts with <code>--gpus-per-node</code>.
 
 <!--T:61-->
-There are a variety of other directives that you can use to request GPU resources: <code>--gpus</code>, <code>--gpus-per-socket</code>, <code>--gpus-per-task</code>, <code>--mem-per-gpu</code>, and <code>--ntasks-per-gpu</code>.  Please see the Slurm documentation for [https://slurm.schedmd.com/sbatch.html sbatch] for more about these.  Our staff did not test all the combinations; if you don't get the result you expect, [[Technical support|contact technical support]].
+Slurm supports a variety of other directives that you can use to request GPU resources: <code>--gpus</code>, <code>--gpus-per-socket</code>, <code>--gpus-per-task</code>, <code>--mem-per-gpu</code>, and <code>--ntasks-per-gpu</code>.  Please see the Slurm documentation for [https://slurm.schedmd.com/sbatch.html sbatch] for more about these.  Our staff do not test all of these; if you try one but don't get the result you expect, [[Technical support|contact technical support]].
 
 <!--T:15-->
 For general advice on job scheduling, see [[Running jobs]].
 
-<!--T:1-->
+<!--T:82-->
 = Available GPUs =
-These are the GPUs currently available:
+The following table summarizes the available GPU types:
 
 <!--T:2-->
 {| class="wikitable"
 |-
-! Cluster !! Specifications !! Slurm type<br>specifier !! GPU model  !! Compute<br>Capability(*) !! Notes
+! Cluster !! GPU model !! Slurm type<br>specifiers !! Notes
 |- 
-| Fir   || [[Fir#Node_characteristics|<b>Details</b>]] || [[Multi-Instance_GPU#Available_configurations|<b>Options</b>]]
-|| H100-80gb    || 90   || Two GPUs per CPU socket; all GPUs connected via NVLink
-|-
-| Narval           || [[Narval/en#Node_characteristics|<b>Details</b>]]
-|| [[Narval/en#GPU_instances|<b>Options</b>]] || A100-40gb || 80 || Two GPUs per CPU socket; all GPUs connected via NVLink 
+| rowspan=4|[[Fir#Node_characteristics|Fir]] || rowspan=4|H100-80gb || h100 || 
 |- 
-| rowspan=2|Nibi   || rowspan=2|[[Nibi#Node_characteristics|<b>Details</b>]] || rowspan=2|[[Multi-Instance_GPU#Available_configurations|<b>Options</b>]]
-|| H100-80gb    || 90   || Two GPUs per CPU socket; all GPUs connected via NVLink
-|-
-|| MI300A-128gb || N.A. || Unified memory between CPU and GPU
+|   nvidia_h100_80gb_hbm3_1g.10gb || MIG
 |- 
-| Rorqual          || [[Rorqual/en#Node_characteristics|<b>Details</b>]]
-|| [[Rorqual/en#GPU_instances|<b>Options</b>]] || H100-80gb || 90 || Two GPUs per CPU socket; all GPUs connected via NVLink
+|   nvidia_h100_80gb_hbm3_2g.20gb || MIG
+|- 
+|   nvidia_h100_80gb_hbm3_3g.40gb || MIG
 |-
-| Trillium          || [[Trillium#Node_characteristics|<b>Details</b>]]
-|| [[Trillium#GPU_instances|<b>Options</b>]] || H100-80gb || 90 || Two GPUs per CPU socket; all GPUs connected via NVLink
+| rowspan=5|[[Narval/en#Node_characteristics|Narval]] || rowspan=5|A100-40gb || a100 || 
 |-
-| Arbutus || colspan=4|Cloud resources are not schedulable via Slurm. See [[Cloud resources]] for details of available hardware.
+|  a100_1g.5gb  || MIG 
+|-
+|  a100_2g.10gb || MIG 
+|-
+|  a100_3g.20gb || MIG 
+|-
+|  a100_4g.20gb || MIG 
+|- 
+| rowspan=5|[[Nibi#Node_characteristics|Nibi]] || rowspan=4|H100-80gb || h100 || 
+|-
+|   nvidia_h100_80gb_hbm3_1g.10gb || MIG
+|- 
+|   nvidia_h100_80gb_hbm3_2g.20gb || MIG
+|- 
+|   nvidia_h100_80gb_hbm3_3g.40gb || MIG
+|-
+| MI300A-128gb  || (none; see [[Nibi#Node_characteristics|Nibi]]) || 
+|- 
+| rowspan=4|[[Rorqual/en#Node_characteristics|Rorqual]] || rowspan=4|H100-80gb || h100 || 
+|-
+|   nvidia_h100_80gb_hbm3_1g.10gb || MIG; synonyms h100_1g.10gb, h100_1.10, h100_10gb
+|- 
+|   nvidia_h100_80gb_hbm3_2g.20gb || MIG; synonyms h100_2g.20gb, h100_2.20, h100_20gb
+|- 
+|   nvidia_h100_80gb_hbm3_3g.40gb || MIG; synonyms h100_3g.40gb, h100_3.40, h100_40gb
+|-
+| [[Trillium#GPU_instances|Trillium]] || H100-80gb || h100 || 
+|-
+| rowspan=2|[[Killarney]] || H100-80gb || h100 || &nbsp; 
+|-
+|  L40S-48gb || l40s || &nbsp; 
+|-
+| rowspan=2|[[tamIA]] || H100-80gb || h100 || &nbsp; 
+|-
+|  H200 || h200 || &nbsp; 
+|-
+| rowspan=2|[[Vulcan]] || L40S-48gb || l40s || &nbsp; 
 |}
 
-<!--T:55-->
-(*) <b>Compute Capability</b> is a technical term created by NVIDIA as a compact way to describe what hardware functions are available on some models of GPU and not on others. 
-It is not a measure of performance and is relevant only if you are compiling your own GPU programs.  See the page on [[CUDA#.22Compute_Capability.22|CUDA programming]] for more.
+<!--T:83-->
+GPU types (including MIG types) available on any given cluster can be obtained from Slurm with the following command.
+This may be useful if the table above has not been updated with the latest changes.
 
+<!--T:84-->
+{{Command|sinfo -o "%G"{{!}}grep gpu{{!}}sed 's/gpu://g'{{!}}sed 's/),/\n/g'{{!}}cut -d: -f1{{!}}sort{{!}}uniq}}
+
+<!--T:85-->
+There are short synonyms available for some of the MIG types at certain sites; this command will not provide those synonyms.
+Also, the presence of a GPU type does not guarantee that you will be able to use that type in your jobs; there may be 
+further restrictions on what types are available based on (for example) which research group you are in.
+For further information see the site-specific page by clicking on the cluster name in the above table, or [[Technical support|contact support]].
+
+<!--T:86-->
+If you do not supply a type specifier your job may be rejected or it may be sent to an arbitrary GPU type.
+There are very few programs which can use an arbitrary GPU efficiently,
+so we strongly recommend that you always request a specific GPU type. 
+
+<!--T:87-->
+There are GPUs available at Arbutus, but like other cloud resources they cannot be scheduled via Slurm.
+See [[Cloud resources]] for more details.
 
 <!--T:71-->
 == Multi-Instance GPUs (MIGs) ==
-MIG, a technology that allows to partition a GPU into multiple instances. Please see [[Multi-Instance_GPU]].
-
-= Selecting the type of GPU to use = <!--T:16-->
-
-<!--T:37-->
-Some clusters have more than one GPU type available, and some clusters only have GPUs on certain nodes. 
-
-<!--T:40-->
-If you do not supply a type specifier, Slurm may send your job to a node equipped with any type of GPU.  
-For certain workflows this may be undesirable; for example, molecular dynamics code requires high double-precision performance, for which T4 GPUs are not appropriate.
-In such a case, make sure you include a type specifier.
+MIG is a technology that partitions a GPU into multiple instances.
+Your jobs might be able to use a MIG instance instead of a whole GPU.
+Please see [[Multi-Instance_GPU]] for more about this.
 
 = Requesting CPU cores and system memory = <!--T:75-->
 
@@ -90,7 +128,7 @@ If you need only a single CPU core and one GPU:
   |contents=
 #!/bin/bash
 #SBATCH --account=def-someuser
-#SBATCH --gpus-per-node=1
+#SBATCH --gpus-per-node=a100:1
 #SBATCH --mem=4000M               # memory per node
 #SBATCH --time=0-03:00
 ./program                         # you can use 'nvidia-smi' for a test
@@ -105,8 +143,8 @@ For a GPU job which needs multiple CPUs in a single node:
   |contents=
 #!/bin/bash
 #SBATCH --account=def-someuser
-#SBATCH --gpus-per-node=1         # Number of GPU(s) per node
-#SBATCH --cpus-per-task=6         # CPU cores/threads
+#SBATCH --gpus-per-node=a100:1 
+#SBATCH --cpus-per-task=6         # CPU cores or threads
 #SBATCH --mem=4000M               # memory per node
 #SBATCH --time=0-03:00
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
@@ -179,6 +217,12 @@ Then, in your interactive job, wait until DCGM is disabled on the node:
 
 <!--T:74-->
 Finally, launch your profiler. For more details on profilers, see [[Debugging and profiling]].
+
+<!--T:88-->
+= See also =
+[[CUDA]]<br>
+[[Multi-Instance GPU]]<br>
+[[Running jobs]]
 
 <!--T:54-->
 [[Category:SLURM]]

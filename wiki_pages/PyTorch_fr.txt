@@ -1025,6 +1025,56 @@ Lancez le programme avec
 
 Pour tester une application avec CUDA, demandez une [[Running_jobs/fr#Tâches_interactives|tâche interactive]] avec [[Using_GPUs_with_Slurm/fr|GPU]].
 
+= rTorch =
+
+Pour installer <tt>rTorch</tt> à partir d'un nœud de connexion%nbsp;:
+
+1. Chargez les modules requis.
+{{Command|module load r/4.5 cuda/12.6 cudnn}}
+
+2. Créez votre répertoire d'installation avec les instructions dans [[R/fr#Installation_pour_une_ou_plusieurs_versions_de_R|Installation pour une ou plusieurs versions de R]]&nbsp;:
+{{Commands
+|mkdir -p ~/.local/R/$EBVERSIONR/
+|export R_LIBS{{=}}~/.local/R/$EBVERSIONR/
+}}
+
+3. Installez la plus récente version disponible de rtorch.
+{{Command|R -e 'install.packages("torch", repos{{=}}"https://cloud.r-project.org/")'}}
+
+<div class="mw-translate-fuzzy">
+4. Lancez un interpréteur R interactif. (<strong>important</strong>)
+{{Command|R}}
+</div>
+
+<div class="mw-translate-fuzzy">
+6. Corrigez la bibliothèque partagée qui a été téléchargée (''lantern'').
+{{Command|setrpaths.sh --path $R_LIBS/torch/lib/liblantern.so --add_path $EBROOTCUDACORE/lib --any_interpreter}}
+</div>
+
+<div class="mw-translate-fuzzy">
+7. Effectuez un test rapide de CPU.
+{{Command
+|R -e 'library(torch); torch::torch_tensor(1);'
+|result=
+> library(torch); torch::torch_tensor(1);
+torch_tensor
+ 1
+[ CPUFloatType{1} ]
+}}
+</div>
+
+<div class="mw-translate-fuzzy">
+8. Effectuez un test de GPU.
+{{Command
+|srun --mem{{=}}3500M --gpus-per-node{{=}}h100_10gb:1 -- R -e 'library(torch); torch::torch_tensor(1)$cuda();'
+|result=
+> library(torch); torch::torch_tensor(1)$cuda();
+torch_tensor
+ 1
+[ CUDAFloatType{1} ]
+}}
+</div>
+
 <span id="Resources"></span>
 = Ressources =
 

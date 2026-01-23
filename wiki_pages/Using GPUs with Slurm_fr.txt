@@ -2,26 +2,27 @@
 
 = Introduction =
 
-Pour demander un ou plusieurs GPU pour une tâche, lancez
-  --gpus-per-node=[type:]number
+Pour demander un ou plusieurs GPU pour une tâche [[Running jobs/fr|Slurm]], utilisez
+  --gpus-per-node=<type>:<number>
 
-À l'intérieur des crochets, vous pouvez indiquer la quantité et en option, le type de GPU. Les types valides sont listés dans la colonne <i>Type de GPU</i> du tableau <i>GPU disponibles</i> ci-dessous. Voici deux exemples&nbsp;:
-  --gpus-per-node=2
-  --gpus-per-node=v100:1
+Par exemple
+  --gpus-per-node=a100:1
 
-Sur la première ligne, on demande deux GPU par nœud, peu importe le type de GPU. Sur la deuxième ligne, on demande 1 GPU par nœud, de type V100.
+Ceci est pour un seul GPU A100, à moins que vous ajoutiez <code>--nodes</code> pour demander plusieurs nœuds.
+Pour les types valides, voir [[Using GPUs with Slurm/fr|GPU disponibles</i>]].
 
-La forme suivante peut aussi être utilisée
-  --gres=gpu[[:type]:number]
-Cette forme est cependant moins récente et ne sera probablement plus prise en charge dans les versions de Slurm à venir. Nous vous recommandons  de la remplacer dans vos scripts par <code>--gpus-per-node</code>.
+Vous pouvez aussi utiliser
+  --gres=gpu:<type>:<number>
+Cependant, il est possible que ce format ne soit plus pris en charge. Nous vous recommandons de le remplacer par  <code>--gpus-per-node</code>.
 
-Il y a plusieurs autres directives que vous pouvez utiliser pour demander des GPU, par exemple <code>--gpus</code>, <code>--gpus-per-socket</code>, <code>--gpus-per-task</code>, <code>--mem-per-gpu</code> et <code>--ntasks-per-gpu</code>. Voyez la documentation de Slurm sur [https://slurm.schedmd.com/sbatch.html sbatch].  Notre équipe n'a pas testé toutes les combinaisons; si vous n'obtenez pas le résultat voulu, contactez le [[Technical support/fr|soutien technique]].
+Slurm prend en charge plusieurs autres directives que vous pouvez utiliser pour demander des GPU, par exemple <code>--gpus</code>, <code>--gpus-per-socket</code>, <code>--gpus-per-task</code>, <code>--mem-per-gpu</code> et <code>--ntasks-per-gpu</code>. Voyez la documentation de Slurm sur [https://slurm.schedmd.com/sbatch.html sbatch].  Notre équipe ne teste pas toutes les combinaisons; si vous n'obtenez pas le résultat voulu, contactez le [[Technical support/fr|soutien technique]].
 
 Pour l'information générale sur l'ordonnancement des tâches, consultez [[Running jobs/fr|Exécuter des tâches]].
 
 = GPU disponibles =
-Le tableau suivant liste les GPU qui sont présentement disponibles.
+The following table summarizes the available GPU types:
 
+<div class="mw-translate-fuzzy">
 {| class="wikitable"
 |-
 ! Grappe !! Caractéristiques !! Type <br>de GPU !! Modèle  !! Compute<br>Capability(*) !! Remarques
@@ -46,19 +47,26 @@ Le tableau suivant liste les GPU qui sont présentement disponibles.
 |-
 | Arbutus || colspan=4|Les ressources infonuagiques ne sont pas ordonnancées. Voir [[Cloud resources/fr|Ressources infonuagiques]] pour l'information sur le matériel.
 |}
+</div>
 
-(*) Le terme <i>Compute Capability</i> est utilisé par NVIDIA pour indiquer les fonctionnalités matérielles spécifiques à un GPU particulier et n'a aucun rapport avec la performance des dispositifs. Cet attribut n'est utile que si vous compilez vos propres programmes GPU. Pour plus d'information, voir [[CUDA/fr#Attribut_.22compute_capability.22|la page CUDA]].
+La commande ci-dessous présente les types de GPU (et MIG) disponibles sur chacune des grappes. Cette commande est utile si le tableau plus haut n'a pas été mis à jour récemment.
 
+{{Command|sinfo -o "%G"{{!}}grep gpu{{!}}sed 's/gpu://g'{{!}}sed 's/),/\n/g'{{!}}cut -d: -f1{{!}}sort{{!}}uniq}}
+
+There are short synonyms available for some of the MIG types at certain sites; this command will not provide those synonyms.
+Also, the presence of a GPU type does not guarantee that you will be able to use that type in your jobs; there may be 
+further restrictions on what types are available based on (for example) which research group you are in.
+For further information see the site-specific page by clicking on the cluster name in the above table, or [[Technical support|contact support]].
+
+If you do not supply a type specifier your job may be rejected or it may be sent to an arbitrary GPU type.
+There are very few programs which can use an arbitrary GPU efficiently,
+so we strongly recommend that you always request a specific GPU type. 
+
+There are GPUs available at Arbutus, but like other cloud resources they cannot be scheduled via Slurm.
+See [[Cloud resources]] for more details.
 
 == GPU multi-instances (MIG) ==
-La technologie MIG permet de partitionner un GPU en plusieurs instances. Pour plus d'information, voir [[Multi-Instance_GPU/fr|GPU multi-instances]].
-
-<span id="Selecting_the_type_of_GPU_to_use"></span>
-= Indiquer le type de GPU à utiliser =
-
-Certaines grappes possèdent plus d'un type de GPU et sur d'autres, les GPU sont uniquement disponibles sur certains nœuds. 
-
-Si le type de GPU n'est pas spécifié, Slurm pourrait acheminer aléatoirement votre tâche vers un nœud équipé avec n'importe quel type de GPU. Dans certains cas, ceci pourrait ne pas être souhaitable. Assurez-vous donc de spécifier le type de GPU.
+La technologie MIG permet de partitionner un GPU en plusieurs instances. Vos tâches pourraient utiliser un MIG plutôt qu'un GPU entier. Pour plus d'information, voir [[Multi-Instance_GPU/fr|GPU multi-instances]].
 
 <span id="Requesting_CPU_cores_and_system_memory"></span>
 = Demander des cœurs CPU et la mémoire système =
@@ -76,7 +84,7 @@ Pour une tâche qui nécessite un seul cœur CPU et un GPU,
   |contents=
 #!/bin/bash
 #SBATCH --account=def-someuser
-#SBATCH --gpus-per-node=1
+#SBATCH --gpus-per-node=a100:1
 #SBATCH --mem=4000M               # mémoire par nœud
 #SBATCH --time=0-03:00
 ./program                         # pour tester, utilisez nvidia-smi
@@ -90,8 +98,8 @@ Pour une tâche GPU qui nécessite plusieurs CPU dans un seul nœud,
   |contents=
 #!/bin/bash
 #SBATCH --account=def-someuser
-#SBATCH --gpus-per-node=1         # nombre de GPU par nœud
-#SBATCH --cpus-per-task=6         # cœurs/fils CPU
+#SBATCH --gpus-per-node=a100:1         # nombre de GPU par nœud
+#SBATCH --cpus-per-task=6         # cœurs ou fils CPU
 #SBATCH --mem=4000M               # mémoire par nœud
 #SBATCH --time=0-03:00
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
@@ -157,5 +165,10 @@ Ensuite, dans votre tâche interactive, attendez que DCGM soit désactivé sur l
 {{Command|while [ ! -z "$(dcgmi -v {{!}} grep 'Hostengine build info:')" ]; do  sleep 5; done}}
 
 Enfin, lancez le profileur (voir [[Debugging and profiling/fr|débogage et profilage]] pour les détails).
+
+= Voir aussi =
+[[CUDA/fr|Cuda]]<br>
+[[Multi-Instance GPU/fr|GPU multi-instances]]<br>
+[[Running jobs/fr|Exécuter des tâches]]
 
 [[Category:SLURM]]

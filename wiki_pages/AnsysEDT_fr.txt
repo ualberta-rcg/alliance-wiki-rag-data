@@ -19,7 +19,9 @@ Ansys EDT peut être exécuté de manière interactive en mode <i>batch</i> (san
 <span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===
 
-Les tâches peuvent être soumises à la file d'attente d'une grappe avec la commande <code>sbatch script-name.sh</code> en utilisant l'un des scripts Slurm pour nœud simple ci-dessous. En date de janvier 2023, ces scripts n'ont été testés que sur Graham et pourraient donc être mis à jour à l'avenir si nécessaire pour fonctionner avec d'autres grappes. Avant de les utiliser, spécifiez le temps de simulation, la mémoire, le nombre de cœurs et remplacez YOUR_AEDT_FILE par le nom de votre fichier d'entrée. Une liste complète des options de ligne de commande peut être obtenue en démarrant AnsysEDT [[Ansys/fr#Mode_graphique|en mode graphique]] avec les commandes <code>ansysedt -help</code> ou <code>ansysedt -Batchoptionhelp</code> pour obtenir des fenêtres graphiques contextuelles déroulantes.  
+<div class="mw-translate-fuzzy">
+Les tâches peuvent être soumises à la file d'attente d'une grappe avec la commande <code>sbatch script-name.sh</code> en utilisant l'un des scripts Slurm pour nœud simple ci-dessous. En date de janvier 2023, ces scripts n'ont été testés que sur Graham et pourraient donc être mis à jour à l'avenir si nécessaire pour fonctionner avec d'autres grappes. Avant de les utiliser, spécifiez le temps de simulation, la mémoire, le nombre de cœurs et remplacez YOUR_AEDT_FILE par le nom de votre fichier d'entrée. Une liste complète des options de ligne de commande peut être obtenue en démarrant AnsysEDT [[Ansys/fr#Mode_graphique|en mode graphique]] avec les commandes <code>ansysedt -help</code> ou <code>ansysedt -Batchoptionhelp</code> pour obtenir des fenêtres graphiques contextuelles déroulantes.
+</div>  
 
 <tabs>
 <tab name="Nœud simple (ligne de commande)">
@@ -29,20 +31,23 @@ Les tâches peuvent être soumises à la file d'attente d'une grappe avec la com
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=account      # Specify your account (def or rrg)
 #SBATCH --time=00-01:00        # Specify time (DD-HH:MM)
 #SBATCH --mem=16G              # Specify memory (set to 0 to use all compute node memory)
 #SBATCH --ntasks=8             # Specify cores (beluga 40, cedar 32 or 48, graham 32 or 44, narval 64)
 #SBATCH --nodes=1              # Request one node (Do Not Change)
+</div>
 
-#module load StdEnv/2020
-#module load ansysedt/2021R2
-
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023
 module load ansysedt/2023R2    # ou plus récente
+</div>
 
+<div class="mw-translate-fuzzy">
 # Uncomment next line to run a test example:
 cp -f $EBROOTANSYSEDT/AnsysEM21.2/Linux64/Examples/HFSS/Antennas/TransientGeoRadar.aedt .
+</div>
 
 # Specify input file such as:
 YOUR_AEDT_FILE="TransientGeoRadar.aedt"
@@ -68,20 +73,23 @@ ansysedt -monitor -UseElectronicsPPE -ng -distributed -machinelist list=localhos
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=account      # Specify your account (def or rrg)
 #SBATCH --time=00-01:00        # Specify time (DD-HH:MM)
 #SBATCH --mem=16G              # Specify memory (set to 0 to allocate all compute node memory)
 #SBATCH --ntasks=8             # Specify cores (beluga 40, cedar 32 or 48, graham 32 or 44, narval 64)
 #SBATCH --nodes=1              # Request one node (Do Not Change)
+</div>
 
-#module load StdEnv/2020
-#module load ansysedt/2021R2
-
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023
 module load ansysedt/2023R2    # ou plus récente
+</div>
 
+<div class="mw-translate-fuzzy">
 # Uncomment next line to run a test example:
 cp -f $EBROOTANSYSEDT/AnsysEM21.2/Linux64/Examples/HFSS/Antennas/TransientGeoRadar.aedt .
+</div>
 
 # Specify input filename such as:
 YOUR_AEDT_FILE="TransientGeoRadar.aedt"
@@ -119,13 +127,16 @@ ansysedt -monitor -UseElectronicsPPE -ng -distributed -machinelist list=localhos
 <span id="Graphical_use"></span>
 = Mode graphique =
 
+<div class="mw-translate-fuzzy">
 Les programmes Ansys fonctionnent interactivement en mode graphique sur les nœuds de calcul des grappes ou sur les nœuds VDI de Graham.
+</div>
 
 <span id="Compute_nodes"></span>
 == Nœuds de calcul == 
 
 Ansys peut être exécuté interactivement sur un nœud de calcul simple pour une durée pouvant aller jusqu'à 24 heures. C'est l'approche idéale pour tester des simulations intensives puisque tous les cœurs et la mémoire peuvent être demandés avec salloc comme décrit dans [[VNC/fr#Nœuds _de_calcul|TigerVNC]]. Une fois la connexion faite avec vncviewer, toutes les versions suivantes peuvent être lancées après que les modules requis ont été chargés.
 
+<div class="mw-translate-fuzzy">
 ::: Lancez une session interactive avec la commande salloc (pour indiquer les cœurs et la mémoire).
 ::: <code>salloc --time=3:00:00 --nodes=1 --cores=8 --mem=16G --account=def-group</code>
 ::: <code>xfwm4 --replace &</code> (appuyez 2 fois sur enter)
@@ -138,38 +149,44 @@ Ansys peut être exécuté interactivement sur un nœud de calcul simple pour un
 :::: 1) supprimez la coche pour Use Automatic Settings (une fois seulement)
 :::: 2) sous l'onglet Machines, ne modifiez pas Cores (détecté par Slurm)
 ::: o Pour lancer une analyse interactive, cliquez sur <code>Project -> Analyze All</code>
+</div>
 
-<span id="VDI_nodes"></span>
+<span id="OnDemand"></span>
+<div class="mw-translate-fuzzy">
 == Nœuds VDI ==
+</div>
 
+<div class="mw-translate-fuzzy">
 Les programmes Ansys peuvent être exécutés jusqu'à 7 jours sur les nœuds Graham VDI (gra-vdi.alliancecan.ca) en utilisant un maximum de 8 cœurs (maximum de 16 cœurs) et 128GB de mémoire. Le système VDI fournit une accélération GPU OpenGL, ce qui est idéal pour les graphiques à haute performance. On peut utiliser VDI pour créer ou modifier des fichiers d'entrée de simulation, post-traiter des données ou visualiser des résultats de simulation. Connectez-vous d'abord avec [[VNC/fr#Nœuds_VDI|TigerVNC]] puis ouvrez une nouvelle fenêtre de terminal et démarrez l'une des versions de programme prises en charge montrées ci-dessous. La barre verticale | est utilisée pour séparer les commandes. La taille maximale d'une tâche parallèle exécutée sur gra-vdi doit être limitée à 16 cœurs pour éviter de surcharger les serveurs et de nuire aux autres utilisateurs. Pour exécuter deux tâches simultanées (16 cœurs maximum chacune), utilisez deux sessions VCN distinctes. Pour la première session, connectez-vous avec VNC à gra-vdi3.sharcnet.ca. Pour la deuxième session, connectez-vous à gra-vdi4.sharecnet.ca aussi avec VNC. Dans chacune des sessions, démarrez Ansys en mode graphique et faites exécuter la simulation. Notez que les simulations simultanées doivent en général être exécutées dans des répertoires différents pour éviter les conflits de fichiers. Contrairement aux connexions VNC des nœuds de calcul (qui imposent des limites Slurm via salloc), il n'y a pas de contrainte de limite de temps sur gra-vdi à l'exécution des simulations.
+</div>
 
-::: Ouvrez une fenêtre de terminal et chargez un module.
-::: <code>module load SnEnv</code>
-::: <code>module load ansysedt/2023R2</code> (ou version moins récente), ou
-::: <code>module load SnEnv</code>
-::: <code>module load ansys/2024R2[.04]</code>, ou
-::: <code>module load CcEnv StdEnv/2023</code>
-::: <code>module load ansys/2025R1[.02]</code> (ou version plus récente, en test)
-::: Dans le terminal, entrez <code>ansysedt</code> et attendez que l'interface graphique s'affiche
-::: Faites ce qui suit une fois seulement
-:::: cliquez sur <code>Tools -> Options -> HPC and Analysis Options -> Options</code>
-:::: changez <code>HPC License</code> pour <b>Pool</b> (permet d'utiliser > 4 cœurs)
-:::: cliquez sur<code>OK</code>
-::: ----------   EXEMPLES  ----------
-::: Pour copier le répertoire d'exemples 2023R2 Antennas;
-:::: connectez-vous à une grappe, par exemple graham
-:::: <code>module load ansysedt/2023R2</code>
+<div lang="en" dir="ltr" class="mw-content-ltr">
+1. Connect to an OnDemand system using one of the following URLs in your laptop browser :<br>
+ [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) NIBI]: <code>https://ondemand.sharcnet.ca</code>
+ FIR: <code>https://jupyterhub.fir.alliancecan.ca</code>
+ RORQUAL: <code>https://jupyterhub.rorqual.alliancecan.ca</code>
+ TRILLIUM: <code>https://ondemand.scinet.utoronto.ca</code>
+2. Open a new terminal window in your desktop and run:
+::: <code>module load StdEnv/2023</code>  (default)
+::: <code>module load ansysedt/2024R2.1</code> **OR** <code>ansysedt/2023R2</code>
+::: Type <code>ansysedt</code> in the terminal and wait for the gui to start
+::: The following only needs to be done once:
+:::: click <code>Tools -> Options -> HPC and Analysis Options -> Options</code>
+:::: change <code>HPC License</code> pulldown to <b>Pool</b> (allows > 4 cores to be used)
+:::: click <code>OK</code>
+3.  To run the 2024R2.1 Antennas example copy the corresponding version into your account:
+:::: <code>module load ansysedt/2024R2.1</code>
 :::: <code>mkdir -p ~/Ansoft/$EBVERSIONANSYSEDT; cd ~/Ansoft/$EBVERSIONANSYSEDT; rm -rf Antennas</code>
-:::: <code>cp -a $EBROOTANSYSEDT/v232/Linux64/Examples/HFSS/Antennas ~/Ansoft/$EBVERSIONANSYSEDT</code>
-::: Pour exécuter un exemple
-:::: ouvrez un fichier de simulation .aedt et cliquez sur <code>HFSS -> Validation Check</code>
-:::: (si des erreurs de validation surviennent, fermez et ouvrez la simulation de nouveau autant de fois que nécessaire)
-::::  pour exécuter la simulation cliquez sur <code>Project -> Analyze All</code>
-:::: pour quitter sans sauvegarder, cliquez sur <code>File -> Close -> No </code>
-::: Si le programme plante et ne veut pas redémarrer, essayez de lancer les commandes 
+:::: <code>cp -a $EBROOTANSYSEDT/v242/Linux64/Examples/HFSS/Antennas ~/Ansoft/$EBVERSIONANSYSEDT</code>
+4. Now to run the example:
+:::: open a simulation .aedt file then click <code>HFSS -> Validation Check</code>
+:::: (if errors are reported by the validation check, close then reopen the simulation and repeat as required)
+::::  to run simulation click <code>Project -> Analyze All</code>
+:::: to quit without saving the converged solution click <code>File -> Close -> No </code>
+::: If the program crashes and won't restart try running the following commands:
 :::: <code>pkill -9 -u $USER -f "ansys*|mono|mwrpcss|apip-standalone-service"</code>
-:::: <code>rm -rf ~/.mw</code> (ansysedt réutilisera la configuration initiale)
+:::: <code>rm -rf ~/.mw</code> (ansysedt will re-run first-time configuration on startup)
+</div>
 
 <span id="Site-Specific"></span>
 = Particularités selon le site =
@@ -188,25 +205,3 @@ La licence Ansys de SHARCNET peut être utilisée sans frais avec les modules An
 setenv("ANSYSLMD_LICENSE_FILE", "1055@license3.sharcnet.ca")
 setenv("ANSYSLI_SERVERS", "2325@license3.sharcnet.ca")
 </source>
-
-<span id="Local_modules"></span>
-== Modules locaux ==
-
-Les modules locaux sur gra-vdi ou sur Graham peuvent être intéressants, mais ils ne sont pas encore installés soit parce qu'ils sont trop récents, soit parce qu'ils présentent des problèmes techniques. Lors du démarrage de programmes à partir de modules locaux sur gra-vdi, vous pouvez sélectionner le serveur de licences CMC ou accepter le serveur de licences SHARCNET par défaut puisqu'ils sont fournis avec une enveloppe qui lit votre fichier <code>~/.licenses/ansysedt.lic</code>. L'utilisation appropriée de AnsysEDT sur gra-vdi comprend&nbsp;: l'exécution interactive d'une seule tâche de test avec jusqu'à 8 cœurs et/ou 128G de RAM; la création ou la modification de fichiers d'entrée pour la simulation; le post-traitement; ou la visualisation de données. Un module local ansysedt peut aussi être chargé sur Graham, mais la procédure est quelque peu différente, comme décrit ci-dessous.
-
-<span id="Use_on_gra-vdi"></span>
-=== Utilisation sur gra-vdi ===
-
-Si vous utilisez gra-vdi, vous pouvez choisir de charger les modules Ansys à partir de notre environnement global (après avoir chargé CcEnv) ou de charger les modules Ansys installés localement sur la grappe (après avoir chargé SnEnv). Pour charger un module local ansysedt sur gra-vdi et utiliser le programme en mode graphique&nbsp;:
-# Connectez-vous à gra-vdi.computecanada.ca avec [[VNC/fr#Nœuds_VDI|TigerVNC]].
-# Ouvrez une fenêtre de terminal et chargez le module.
-#; <code>module load SnEnv</code>
-#; <code>module load ansysedt/2024R2.1</code> (ou version moins récente)
-# Lancez Ansys Electromagnetics Desktop avec la commande <code>ansysedt</code>.
-# Appuyez sur <code>y</code> et <code>Enter</code> pour accepter les conditions. 
-# Appuyez sur <code>Enter</code> pour accepter l'option <code>n</code> et utiliser le serveur SHARCNET par défaut (en présence de <i>~/.licenses/ansysedt.lic</i>, ceci sera utilisé, autrement ANSYSLI_SERVERS et ANSYSLMD_LICENSE_FILE seront utilisés si définis dans votre environnement, par exemple pour un autre serveur distant). Si vous changez <code>n</code> pour <code>y</code> et appuyez sur enter, le serveur CMC sera utilisé.
-
-<span id="Use_on_Graham"></span>
-=== Utilisation sur Graham ===
-
-Pour charger un module local sur Graham et utiliser le programme en mode graphique, les étapes sont (en préparation)&nbsp;:

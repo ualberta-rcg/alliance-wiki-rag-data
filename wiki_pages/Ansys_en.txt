@@ -132,7 +132,7 @@ Most users will likely want to load the latest module version equipped with the 
 = Cluster batch job submission =
 The Ansys software suite comes with multiple implementations of MPI to support parallel computation. Unfortunately, none of them support our [[Running jobs|Slurm scheduler]]. For this reason, we need special instructions for each Ansys package on how to start a parallel job. In the sections below, we give examples of submission scripts for some of the packages.  While the slurm scripts should work with on all clusters, Niagara users may need to make some additional changes covered [https://docs.scinet.utoronto.ca/index.php here].
 
-== Ansys Fluent ==
+== Fluent ==
 Typically, you would use the following procedure to run Fluent on one of our clusters:
 
 # Prepare your Fluent job using Fluent from the Ansys Workbench on your desktop machine up to the point where you would run the calculation.
@@ -853,7 +853,7 @@ where a basic manually created injection steady file format might look like:
   (( 2.90e-02  5.00e-03 0.0 -1.00e-03  0.0  0.0  1.00e-04  2.93e+02  1.00e-06   0.0   0.0        0.0 ) injection-0:1 )
 noting that injection files for DPM simulations are generally setup for either steady or unsteady particle tracking where the format of the former is described in subsection <I>Part III: Solution Mode | Chapter 24: Modeling Discrete Phase | 24.3. Setting Initial Conditions for the Discrete Phase | 24.3.13 Point Properties for File Injections | 24.3.13.1 Steady File Format</I> of the <I>2024R2 Fluent Customization Manual</I>.
 
-== Ansys CFX ==
+== CFX ==
 
 === Slurm scripts ===
 
@@ -1148,7 +1148,7 @@ Ansys allocates 1024 MB total memory and 1024 MB database memory by default for 
   [gra-login2:~/testcase] cat YOURAPDLFILE.inp | grep version
  ! ANSYS input file written by Workbench version 2019 R3
 
-== Ansys ROCKY ==
+== Rocky ==
 
 Besides being able to run simulations in gui mode (as discussed in the Graphical usage section below) [https://www.ansys.com/products/fluids/ansys-rocky Ansys Rocky] can also run simulations in non-gui mode.  Both modes support running Rocky with cpus only or with cpus and [https://www.ansys.com/blog/mastering-multi-gpu-ansys-rocky-software-enhancing-its-performance gpus].  Use of the ansysrocky/2024R2.0 module locally installed only on nibi and loadable by doing <code>module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04</code> should be discontinued as it is no longer supported and will be removed.  Instead use Rocky included within the <code>ansys/2025R1</code> module (and future versions that will be installed) available on all clusters.
 
@@ -1198,9 +1198,8 @@ Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use
 </tab>
 </tabs>
 
-== Ansys ELECTRONICS == <!--T:1115->
+== Electronics ==
 
-<!--T:1116->
 Slurm scripts for using AnsysEDT is provided in a separate wiki page [https://docs.alliancecan.ca/wiki/AnsysEDT here].
 
 = Graphical use =
@@ -1308,8 +1307,9 @@ Note that when starting Fluent from within Workbench the same GPU dependent Envi
 ::: o The SHARCNET license includes Rocky and is therefore free for all researchers to use
 ::: o Rocky supports GPU-accelerated computing however this capability not been tested or documented yet
 
-== SSH issues ==
-::: Some Ansys GUI programs can be run remotely on a cluster compute node by forwarding X over SSH to your local desktop.  Unlike VNC, this approach is untested and unsupported since it relies on a properly setup X display server for your particular operating system OR the selection, installation and configuration of a suitable X client emulator package such as MobaXterm.  Most users will find interactive response times unacceptably slow for basic menu tasks let alone performing more complex tasks such as those involving graphics rendering.  Startup times for GUI programs can also be very slow depending on your Internet connection. For example, in one test it took 40 minutes to fully start the gui up over SSH while starting it with vncviewer required only 34 seconds.  Despite the potential slowness when connecting over SSH to run GUI programs, doing so may still be of interest if your only goal is to open a simulation and perform some basic menu operations or run some calculations. The basic steps are given here as a starting point: 1) ssh -Y username@alliancecan.ca 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task=4 [--gpus-per-node=1] --account=def-mygroup; 3) once connected onto a compute node try running <code>xclock</code>.  If the clock appears on your desktop, proceed to load the desired Ansys module and try running the program.
+== Electronics ==
+
+Information describing howto run AnsysEDT in graphical mode maybe found here [https://docs.alliancecan.ca/wiki/AnsysEDT here].
 
 = Site-specific usage =
 
@@ -1442,4 +1442,6 @@ After a job completes, its "Job Wall-clock time" can be obtained from <code>seff
 
 = Help resources =
 
-Documentation for recent versions Ansys 202[4|5]R[1|2] is fully available [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/main_page.html?lang=en here].  Documentation for older versions such as Ansys 2023R[1|2] however requires [https://ansyshelp.ansys.com/ login].  Developer documentation can be found in the Ansys Developer [https://developer.ansys.com Portal]. Additional learning resources include the Ansys HowTo [https://www.youtube.com/@AnsysHowTo/videos videos], the Ansys Educator [https://innovationspace.ansys.com/educator-hub/ Educator Hub] and the Ansys Webinar [https://www.ansys.com/events/ansys-academic-webinar-series series].
+The official full documentation for recent versions Ansys 202[4|5]R[1|2] is available [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/main_page.html?lang=en here].  Documentation for older versions such as Ansys 2023R[1|2] however requires [https://ansyshelp.ansys.com/ login].  Developer documentation can be found in the Ansys Developer [https://developer.ansys.com Portal]. Additional learning resources include the Ansys HowTo [https://www.youtube.com/@AnsysHowTo/videos videos], the Ansys Educator [https://innovationspace.ansys.com/educator-hub/ Educator Hub] and the Ansys Webinar [https://www.ansys.com/events/ansys-academic-webinar-series series].
+
+<b>XoverSSH Legacy Note</b>: Some programs can be run remotely on a cluster compute node by forwarding X over SSH to your local desktop.  Unlike VNC, this approach is untested and unsupported since it relies on a properly setup X display server for your particular operating system OR the selection, installation and configuration of a suitable X client emulator package such as MobaXterm.  Most users will find interactive response times unacceptably slow for basic menu tasks let alone performing more complex tasks such as those involving graphics rendering.  Startup times for GUI programs can also be very slow depending on your Internet connection. For example, in one test it took 40 minutes to fully start the gui up over SSH while starting it with vncviewer required only 34 seconds.  Despite the potential slowness, using this method to connect may still be of interest if your only goal is to open a simulation and perform some basic menu operations or run some calculations and response delays can be tolerated. The basic steps are given here as a starting point: 1) ssh -Y username@alliancecan.ca 2) salloc --x11 --time=1:00:00 --mem=16G --cpus-per-task=4 [--gpus-per-node=1] --account=def-mygroup; 3) once connected onto a compute node try running <code>xclock</code>.  If the clock appears on your desktop, proceed to load the desired Ansys module and try running the program.

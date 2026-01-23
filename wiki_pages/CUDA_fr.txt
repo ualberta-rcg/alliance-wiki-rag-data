@@ -5,6 +5,7 @@
 
 On peut voir CUDA comme étant un ensemble de bibliothèques et de compilateurs C, C++ et Fortran qui permettent de créer des programmes pour les GPU. Pour d'autres outils de programmation pour GPU, consultez le [[OpenACC Tutorial/fr|Tutoriel OpenACC]].
 
+<span id="Quick_start_guide"></span>
 == Un exemple simple ==
 
 ===Compilation===
@@ -95,13 +96,17 @@ nvcc -lcublas -Xlinker=-rpath,$CUDA_PATH/lib64
 
 Voyez le [[CUDA tutorial/fr|Tutoriel CUDA]] pour plus de détails sur cet exemple et pour savoir comment utiliser le parallélisme avec les GPU.
 
+<span id="Troubleshooting"></span>
 == Dépannage ==
 
+<span id="Compute_capability"></span>
 === Attribut <i>compute capability</i> ===
 
 NVIDIA utilise le terme <i>compute capability</i> pour désigner un des attributs des dispositifs GPU.
 
-Parfois nommé <i>SM version</i> (SM pour <i>Streaming Multiprocessor</i>), il s'agit d'un numéro de version qui identifie certaines fonctionnalités d'un GPU. Cet attribut est utilisé à l'exécution d'une application pour déterminer les caractéristiques matérielles et/ou les instructions disponibles pour un GPU particulier; pour plus d'information, voir [https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#compute-capability CUDA Toolkit Documentation, section 2.6].
+Nvidia a créé ce terme technique qui indique les fonctionnalités prises en charge par ce GPU et spécifie certains paramètres matériels de ce dernier.
+
+Pour plus de détails, consultez [https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/cuda-platform.html#cuda-platform-compute-capability-sm-version Compute Capability and Streaming Multiprocessor Versions].
 
 Les messages d’erreur suivants sont causés par un problème en rapport avec cet attribut.
 
@@ -125,9 +130,10 @@ Si vous utilisez <code>cmake</code>, l'indicateur serait
 cmake .. -DCMAKE_CUDA_ARCHITECTURES=XX
 </pre>
 
-où XX est la valeur de <i>compute capability</i> pour le GPU NVIDIA qui sera utilisé pour exécuter votre application. Pour connaître ces valeurs, voyez le [[Using GPUs with Slurm/fr#GPU_disponibles | tableau GPU disponibles]].
+où XX est la valeur de <i>compute capability</i> pour le GPU NVIDIA qui sera utilisé pour exécuter votre application. Pour connaître ces valeurs, voir [https://developer.nvidia.com/cuda/gpus CUDA GPU Compute Capability] et omettez le point décimal.
 
-<b>Par exemple</b>, si votre code sera exécuté sur un nœud A100 de Narval, <i>compute capability</i> a la valeur de 80 et l'indicateur à utiliser lors de la compilation avec <code>nvcc</code> est
+<b>Par exemple</b>, si votre code sera exécuté sur un nœud A100 de Narval, le tableau de NVdia mentionne que sa <i>compute capability</i> a la valeur de ''8.0''.
+L'indicateur à utiliser lors de la compilation avec <code>nvcc</code> est
 
 <pre>
 -gencode arch=compute_80,code=[sm_80,compute_80]
