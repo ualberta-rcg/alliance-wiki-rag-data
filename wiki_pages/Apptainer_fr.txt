@@ -31,12 +31,13 @@ Apptainer version 1 étant compatible avec Singularity, vous pouvez utiliser les
 
 Les grappes de calcul haute performance utilisent habituellement Apptainer. En réponse à plusieurs qui demandent s'il existe d'autres technologies de conteneurs Linux, voici nos commentaires sur quelques-uns&nbsp;:
 * [https://podman.io/ Podman] 
-** comme Apptainer, supporte l'utilisation des conteneurs normaux (<i>rootless</i>),
+** comme Apptainer, supporte l'utilisation des conteneurs normaux (<i>rootless</i>);
 ** est disponible sous forme de paquet pour les distributions Linux qui supportent RPM, et pour quelques autres;
 ** même si c’est une technologie de conteneurs Linux, [https://github.com/containers/podman/blob/main/docs/tutorials/mac_win_client.md Podman peut être installé sur des ordinateurs Windows et macOS];
 ** Podman version 4 supporte les fichiers Apptainer .SIF.
 * [https://www.docker.com/ Docker]
 ** Docker ne peut être utilisé sécuritairement sur les systèmes multi-utilisateurs. Il n’est donc pas offert sur nos grappes;
+** dans plusieurs cas, vous pouvez construire une image Apptainer à partir d'une image Docker (voir [[apptainer/fr#Construire_une_image_SIF|Construire une_image SIF]] ci-dessous);
 ** vous pouvez installer Docker sur votre ordinateur et créer une image Apptainer qui sera ensuite téléversée sur une grappe de calcul haute performance [https://docs.alliancecan.ca/wiki/Apptainer/fr#Créer_un_conteneur_Apptainer_à_partir_de_Dockerfile comme décrit ci-dessous].
 <b></b>.
 
@@ -46,7 +47,7 @@ Les grappes de calcul haute performance utilisent habituellement Apptainer. En r
 *En plus d’avoir installé Apptainer, vous avez aussi besoin d’installer ou de construire tous les logiciels nécessaires pour travailler dans le conteneur. [[Available software/fr|Plusieurs logiciels sont déjà installés sur nos grappes]] et vous pouvez les utiliser sans créer de conteneur.
 
 ===<code>sudo</code>===
-Les sites web et la documentation font souvent référence à <code>sudo</code> pour l’obtention de permissions de superutilisateur (<i>root</i>), mais ceci n’est pas possible sur nor grappes. Si vous devez utiliser <code>sudo</code>, vos options sont&nbsp;:
+Les sites web et la documentation font souvent référence à <code>sudo</code> pour l’obtention de permissions de superutilisateur (<i>root</i>), mais ceci n’est pas possible sur nos grappes. Si vous devez utiliser <code>sudo</code>, vos options sont&nbsp;:
 
 * Installez Linux, Apptainer et <code>sudo</code> dans une machine virtuelle sur un ordinateur que vous contrôlez, ce qui vous donnera un accès <code>sudo</code>. Construisez votre ou vos images dans cette machine et téléversez-les sur une de nos grappes.
 * Au besoin, demandez l’assistance du [[Technical support|soutien technique]] pour construire votre image. S’il n’est pas possible de le faire pour vous avec <code>sudo</code>, nous pourrons peut-être vous proposer d’autres solutions.
@@ -204,7 +205,7 @@ Apptainer est conçu pour exécuter correctement des démons pour des tâches de
 
 <b>Remarque 1 :</b> N’exécutez pas manuellement un démon sans utiliser <code>apptainer instance</code> et les autres commandes reliées. Apptainer fonctionne bien avec d’autres outils comme l’ordonnanceur Slurm employé sur nos grappes. Quand une tâche plante, est annulée ou se termine de toute autre façon, les démons lancés avec <code>apptainer instance</code> ne seront pas bloqués et ne laisseront pas de processus défunts. Aussi, la commande <code>apptainer instance</code> vous permet de contrôler les démons et les programmes qui sont exécutés dans un même conteneur.
 
-<b>Remarque 2 :</b> Les démons ne sont exécutés que lorsque la tâche est en marche. Si l'ordonnanceur annule la tâche, tous les démons qui lui sont rattachés seront aussi annulés. Si vous avez besoin de démons qui restent actifs au-delà du temps d’exécution,vous pouvez à la place les exécuter  dans une machine virtuelle, dans un nuage; contactez alors le [[Technical support/fr|soutien technique]].
+<b>Remarque 2 :</b> Les démons ne sont exécutés que lorsque la tâche est en marche. Si l'ordonnanceur annule la tâche, tous les démons qui lui sont rattachés seront aussi annulés. Si vous avez besoin de démons qui restent actifs au-delà du temps d’exécution, vous pouvez à la place les exécuter  dans une machine virtuelle, dans un nuage; contactez alors le [[Technical support/fr|soutien technique]].
 
 <span id="Running_MPI_programs"></span>
 ==Travailler avec des programmes MPI==
@@ -292,7 +293,7 @@ Apptainer> exit
 $ apptainer build newimage.sif mynewimage.dir
 $ rm -rf mynewimage.dir</source>
 
-L’utilisation d’un fichier <code>SIF</code> est recommandée car la performance à partir de l’image du conteneur est plus rapide que lorsque chaque fichier  est stocké séparément dans les systèmes de fichiers de nos grappes, qui sont optimisés pour traiter des fichiers de grande taille et pour les opérations parallèles de lecture et d’écriture. Aussi, contrairement à une image SIF, un bac à sable aura un impact important sur le nombre de fichiers que vous stocker, alors que ce nombre est limité par un quota. (Certaines images peuvent contenir des milliers de fichiers et de répertoires.)
+L’utilisation d’un fichier <code>SIF</code> est recommandée car la performance à partir de l’image du conteneur est plus rapide que lorsque chaque fichier  est stocké séparément dans les systèmes de fichiers de nos grappes, qui sont optimisés pour traiter des fichiers de grande taille et pour les opérations parallèles de lecture et d’écriture. Aussi, contrairement à une image SIF, un bac à sable aura un impact important sur le nombre de fichiers que vous stockez, alors que ce nombre est limité par un quota. (Certaines images peuvent contenir des milliers de fichiers et de répertoires.)
 
 Les permissions <i>root</i> sont requises pour l’utilisation des gestionnaires de paquets des distributions Linux; un simple utilisateur ne peut donc pas construire des images sur nos grappes de calcul avec Apptainer 1.0.x et les versions Singularity précédentes. Au besoin, écrivez au [[Technical support/fr|soutien technique]] pour de l’assistance dans la création de votre image ou utilisez un ordinateur où Apptainer est installé et où vous avez les permissions <i>root</i>.
 
@@ -302,7 +303,7 @@ Certains conteneurs ne peuvent être créés si vous n’avez pas les permission
 
 Si tout ce dont vous avez besoin est une image Docker telle quelle, vous pourrez souvent la construire et l’exécuter facilement sans les permissions <i>root</i> et sans l’utilisation de <code>--fakeroot</code>.  Si par la suite vous devez modifier l’image, vous devrez peut-être avoir les permissions <i>root</i>, par exemple pour utiliser un gestionnaire de paquets. Pour cette raison, les exemples suivants supposent l’utilisation d'une image Docker telle quelle.
 
-<span id="Building_a_SIF_image"></span>
+<span id="Building_an_SIF_image"></span>
 ==Construire une image SIF==
 
 <b>ATTENTION :</b> Veuillez tenir compte des recommandations faites dans [https://docs.alliancecan.ca/wiki/Apptainer/fr#Construire_des_images_ou_des_overlays Construire des images ou des overlays] ci-dessus.

@@ -3,9 +3,20 @@
 __FORCETOC__
 [https://www.3ds.com/products-services/simulia/products/abaqus/ Abaqus FEA] est un progiciel commercial pour l'analyse d'éléments finis et l'ingénierie assistée par ordinateur.
 
+<span id="Using_your_own_license"></span>
+<div class="mw-translate-fuzzy">
 = Votre licence =
 Des modules Abaqus sont disponibles sur nos grappes, mais vous devez posséder votre propre licence. Pour configurer votre compte sur les grappes que vous voulez utiliser, connectez-vous et créez sur chacune un fichier <code>$HOME/.licenses/abaqus.lic</code> qui contient la ligne suivante. Remplacez ensuite <code>port@server</code> par le numéro du port flexlm et l'adresse IP (ou le nom complet du domaine) de votre serveur de licence Abaqus. Si vous voulez utiliser la version 6.14.1, remplacez ABAQUSLM_LICENSE_FILE par LM_LICENSE_FILE.
+</div>
 
+{{File
+|name=abaqus.lic
+|contents=
+prepend_path("ABAQUSLM_LICENSE_FILE","port@server")
+prepend_path("LM_LICENSE_FILE","port@server")
+}}
+
+<div class="mw-translate-fuzzy">
 {{File
 |name=abaqus.lic
 |contents=
@@ -16,6 +27,13 @@ Si votre licence n'est pas configurée pour une grappe en particulier, les admin
 * le numéro du port statique
 * l'adresse IP de votre serveur de licence Abaqus.
 En retour vous recevrez une liste d'adresses IP et votre administrateur de système pourra ouvrir les pare-feu de votre serveur local pour que la grappe puisse se connecter via les deux ports. Une entente spéciale doit habituellement être négociée et signée avec SIMULIA pour qu'une telle licence puisse être utilisée à distance avec notre matériel.
+</div>
+
+If your license has not been set up for use on an Alliance cluster, some additional configuration changes by the Alliance system administrator and your local system administrator will need to be done. Such changes are necessary to ensure the flexlm and vendor TCP ports of your Abaqus server are reachable from all cluster compute nodes when jobs are run via the queue. For us to help you get this done, write to [[Technical support|technical support]]. Please be sure to include the following three items:
+* flexlm port number
+* static vendor port number
+* IP address of your Abaqus license server
+You will then be sent a list of cluster IP addresses so that your administrator can open the local server firewall to allow connections from the cluster on both ports. Please note that a special license agreement must generally be negotiated and signed by SIMULIA and your institution before a local  license may be used remotely on Alliance hardware.
 
 = Soumettre une tâche sur nos grappes=
 Vous trouverez ci-dessous des prototypes de scripts Slurm pour soumettre des simulations parallèles sur un ou plusieurs nœuds de calcul en utilisant des fils et MPI. Dans la plupart des cas, il suffira d'utiliser un des scripts du répertoire /project dans une des sections pour un nœud simple. Dans la dernière ligne des scripts, l'argument <code>memory=</code> est optionnel et sert aux tâches qui demandent beaucoup de mémoire ou qui posent problème; la valeur de déplacement de 3072Mo pourrait nécessiter un ajustement. Pour obtenir la liste des arguments en ligne de commande, chargez un module Abaqus et lancez <code>abaqus -help | less</code>.
@@ -33,7 +51,7 @@ Les solveurs prennent en charge la parallélisation avec fils et avec MPI. Des s
 === Scripts pour un nœud simple === 
 
 <tabs>
-<tab name="script du répertoire /project">
+<tab name="script pour le répertoire /project">
 {{File
   |name="scriptsp1.txt"
   |lang="sh"
@@ -50,11 +68,8 @@ Les solveurs prennent en charge la parallélisation avec fils et avec MPI. Des s
 ##SBATCH --constraint=rome     # Uncomment to specify node (gpu only jobs)
 ##SBATCH --gres=gpu:a100:1     # Uncomment to specify gpu
 
-module load StdEnv/2020        # Latest installed version
-module load abaqus/2021        # Latest installed version
-
-#module load StdEnv/2016       # Uncomment to use
-#module load abaqus/2020       # Uncomment to use
+module load StdEnv/2020         # Latest installed version
+module load abaqus/2021         # Latest installed version
 
 unset SLURM_GTIDS
 export MPI_IC_ORDER='tcp'
@@ -62,7 +77,9 @@ echo "LM_LICENSE_FILE=$LM_LICENSE_FILE"
 echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
 rm -f testsp1* testsp2*
-abaqus job=testsp1 input=mystd-sim.inp \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testsp1 input=mystd-sim.inp \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
 #  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
@@ -77,6 +94,7 @@ Pour vérifier l'information complète sur le redémarrage
 Certaines simulations peuvent être améliorées en ajoutant au bas du script la commande Abaqus
  order_parallel=OFF
 
+<div class="mw-translate-fuzzy">
 </tab>
 <tab name="script de redémarrage pour le répertoire /project">
 {{File
@@ -94,9 +112,10 @@ Certaines simulations peuvent être améliorées en ajoutant au bas du script la
 # or
 ##SBATCH --constraint=rome     # Uncomment to specify node (128cores)
 ##SBATCH --gres=gpu:a100:1     # Uncomment to specify gpu
+</div>
 
-module load StdEnv/2020        # Latest installed version
-module load abaqus/2021        # Latest installed version
+module load StdEnv/2020         # Latest installed version
+module load abaqus/2021         # Latest installed version
 
 unset SLURM_GTIDS
 export MPI_IC_ORDER='tcp'
@@ -104,7 +123,9 @@ echo "LM_LICENSE_FILE=$LM_LICENSE_FILE"
 echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
 rm -f testsp2* testsp1.lck
-abaqus job=testsp2 oldjob=testsp1 input=mystd-sim-restart.inp \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testsp2 oldjob=testsp1 input=mystd-sim-restart.inp \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
 #  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
@@ -114,6 +135,7 @@ Le fichier en entrée pour le redémarrage doit contenir
  *HEADING
  *RESTART, READ
 
+<div class="mw-translate-fuzzy">
 </tab>
 <tab name="script pour répertoire temporaire">
 {{File
@@ -131,9 +153,10 @@ Le fichier en entrée pour le redémarrage doit contenir
 # or
 ##SBATCH --constraint=rome     # Uncomment to specify node (gpu only jobs)
 ##SBATCH --gres=gpu:a100:1     # Uncomment to specify gpu
+</div>
 
-module load StdEnv/2020        # Latest installed version
-module load abaqus/2021        # Latest installed version
+module load StdEnv/2020         # Latest installed version
+module load abaqus/2021         # Latest installed version
 
 unset SLURM_GTIDS
 export MPI_IC_ORDER='tcp'
@@ -150,7 +173,9 @@ while sleep 6h; do
    cp -fv * $SLURM_SUBMIT_DIR 2>/dev/null
 done &
 WPID=$!
-abaqus job=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim.inp \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim.inp \
    scratch=$SLURM_TMPDIR/scratch cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
 #  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
@@ -165,6 +190,7 @@ Pour écrire les données de redémarrage pour un total de 12 incréments, entre
 Pour vérifier l'information complète sur le redémarrage
  egrep -i "step|start" testst*.com testst*.msg testst*.sta
 
+<div class="mw-translate-fuzzy">
 </tab>
 <tab name="script de redémarrage pour le répertoire temporaire">
 {{File
@@ -182,9 +208,10 @@ Pour vérifier l'information complète sur le redémarrage
 # or
 ##SBATCH --constraint=rome     # Uncomment to specify node (128 cores)
 ##SBATCH --gres=gpu:a100:1     # Uncomment to specify gpu
+</div>
 
-module load StdEnv/2020        # Latest installed version
-module load abaqus/2021        # Latest installed version
+module load StdEnv/2020         # Latest installed version
+module load abaqus/2021         # Latest installed version
 
 unset SLURM_GTIDS
 export MPI_IC_ORDER='tcp'
@@ -202,7 +229,9 @@ while sleep 6h; do
    cp -fv testst2* $SLURM_SUBMIT_DIR 2>/dev/null
 done &
 WPID=$!
-abaqus job=testst2 oldjob=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim-restart.inp \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testst2 oldjob=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim-restart.inp \
    scratch=$SLURM_TMPDIR/scratch cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
 #  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
@@ -220,7 +249,9 @@ Le fichier en entrée pour le redémarrage doit contenir
 <span id="Multiple_node_computing"></span>
 === Script pour nœuds multiples ===
 
+<div class="mw-translate-fuzzy">
 Si vous disposez d'une licence qui vous permet d'exécuter des tâches nécessitant beaucoup de mémoire et de calcul, le script suivant pourra effectuer le calcul avec MPI en utilisant un ensemble de nœuds arbitraires idéalement déterminé automatiquement par l'ordonnanceur. Un script modèle pour redémarrer des tâches sur nœuds multiples n'est pas fourni car son utilisation présente des limitations supplémentaires.
+</div>
 
 {{File
   |name="scriptsp1-mpi.txt"
@@ -286,7 +317,9 @@ echo "LM_LICENSE_FILE=$LM_LICENSE_FILE"
 echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
 rm -f testep1* testep2*
-abaqus job=testep1 input=myexp-sim.inp \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testep1 input=myexp-sim.inp \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
 }}
@@ -319,7 +352,9 @@ echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
 rm -f testep2* testep1.lck
 for f in testep1*; do [[ -f ${f} ]] && cp -a "$f" "testep2${f#testep1}"; done
-abaqus job=testep2 input=myexp-sim.inp recover \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testep2 input=myexp-sim.inp recover \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
 }}
@@ -355,7 +390,9 @@ while sleep 6h; do
    cp -f * $SLURM_SUBMIT_DIR 2>/dev/null
 done &
 WPID=$!
-abaqus job=testet1 input=$SLURM_SUBMIT_DIR/myexp-sim.inp \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testet1 input=$SLURM_SUBMIT_DIR/myexp-sim.inp \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
 { kill $WPID && wait $WPID; } 2>/dev/null
@@ -397,7 +434,9 @@ while sleep 3h; do
    cp -f * $SLURM_SUBMIT_DIR 2>/dev/null
 done &
 WPID=$!
-abaqus job=testet2 input=$SLURM_SUBMIT_DIR/myexp-sim.inp recover \
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testet2 input=$SLURM_SUBMIT_DIR/myexp-sim.inp recover \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
 { kill $WPID && wait $WPID; } 2>/dev/null
@@ -411,6 +450,8 @@ Le fichier en entrée ne requiert aucune modification pour le redémarrage de l'
 
 <span id="Multiple_node_computing"></span>
 === Script pour nœuds multiples === 
+
+[[ <span style="color:red">The below script for Multinode computing is no longer usable with abaqus/2021 due to an increased process id range configuration on Alliance clusters. The issue will be resolved once abaqus/2026 is installed.  In the meantime please use one of the Single node computing slurm scripts provided above.</span> ]]
 
 {{File
   |name="scriptep1-mpi.txt"
@@ -467,8 +508,10 @@ Une estimation de la mémoire totale pour un nœud  (--mem=) requise par Slurm p
      1          1.89E+14             3612              96345
 </source>
 
+<div class="mw-translate-fuzzy">
 Alternativement, l'estimation de la mémoire totale pour un processus avec fils sur un nœud unique peut être obtenue en exécutant la simulation de manière interactive sur un nœud de calcul, puis en surveillant la consommation de mémoire à l'aide des commandes <code>ps</code> ou <code>top</code>. Ce qui suit décrit comment procéder dans le dernier cas&nbsp;:<br>
 1) Connectez-vous à une grappe avec SSH et obtenez une allocation sur un nœud de calcul (comme gra100) et démarrez votre simulation avec&nbsp;:
+</div>
 
 {{Commands
 |salloc --time=0:30:00 --cpus-per-task=8 --mem=64G --account=def-piname
@@ -478,9 +521,11 @@ Alternativement, l'estimation de la mémoire totale pour un processus avec fils 
 |abaqus job=test input=Sample.inp scratch=$SLURM_TMPDIR cpus=8 mp_mode=threads interactive
 }}
 
+<div class="mw-translate-fuzzy">
 2) via SSH, connectez-vous de nouveau à la grappe réservée par salloc puis au nœud de calcul et lancez top.
+</div>
 
-{{Commands|ssh gra100
+{{Commands|ssh c50
 |top -u $USER}}
 
 3) observez les colonnes VIRT and RES jusqu'à ce que des valeurs de mémoire maximales stables soient atteintes.
@@ -533,7 +578,8 @@ Pour lancer Abaqus en mode graphique, il faut au moins une licence de calcul non
  abaqus cae -mesa
 
 = Utilisation spécifique au site =
-== Licence SHARCNET ==
+== Licence SHARCNET == 
+
 La licence SHARCNET a été renouvelée jusqu'au 17 janvier 2026. Elle offre une licence gratuite limitée comprenant 2 jetons de calcul et 35 jetons d'exécution, avec des limites d'utilisation de 10 jetons par utilisateur et 15 jetons par groupe. Pour les groupes ayant acquis des jetons dédiés, les limites d'utilisation des jetons gratuits sont ajoutées à leur réservation. Les jetons gratuits sont attribués selon le principe du premier arrivé, premier servi et sont principalement destinés aux tests et à une utilisation légère avant de décider d'acheter ou non des jetons dédiés. Le coût des jetons dédiés (en 2021) était d'environ 110&nbsp;$&nbsp;CA par jeton de calcul et 400&nbsp;$&nbsp;CA par jeton d'interface graphique&nbsp;: écrivez au [[Technical support/fr|soutien technique]] pour obtenir un devis officiel. La licence peut être utilisée avec un compte de l'Alliance, mais uniquement sur le matériel SHARCNET. Les groupes qui achètent des jetons dédiés pour le serveur de licences SHARCNET ne peuvent les utiliser que sur le matériel SHARCNET, notamment le système SHARCNET [[Nibi/fr#Accès_via_Open_OnDemand_(OOD) OOD]] (pour le mode graphique) ou les grappes Nibi/Dusky (pour soumettre des tâches de calcul par lots à la file d'attente). Avant d'utiliser la licence, vous devez contacter le [[Technical support/fr|soutien technique]] et demander l'accès. Dans votre courriel, veuillez 1) préciser que la demande est destinée à une utilisation sur les systèmes SHARCNET et 2) copier coller l'accord de licence suivant, en indiquant vos nom et prénom ainsi que votre nom d'utilisateur aux emplacements prévus. Veuillez noter que chaque utilisateur doit effectuer cette démarche; elle ne peut être effectuée une seule fois pour un groupe, y compris pour les chercheuses principales et chercheurs principaux ayant acheté leurs propres jetons dédiés.
 
 ===Entente===
@@ -553,11 +599,13 @@ for the following purposes:
    facts, up to the point of proof-of-concept in a laboratory    
 -----------------------------------------------------------------------------------</pre>
 
+<div class="mw-translate-fuzzy">
 === Configurer le fichier de licence ===
-Configurez votre fichier de licence comme suit (uniquement sur les systèmes SHARCNET comme les grappes Nibi et Dusky ou sur le système de bureau OOD de SHARCNET).  
+Configurez votre fichier de licence comme suit (uniquement sur les systèmes SHARCNET comme les grappes Nibi et Dusky ou sur le système de bureau OOD de SHARCNET).
+</div>
 <source lang="bash">
 [l2 (nibi login node):~] cat ~/.licenses/abaqus.lic
-prepend_path("ABAQUSLM_LICENSE_FILE","27050@license3.sharcnet.ca")
+prepend_path("ABAQUSLM_LICENSE_FILE","27050@license1.computecanada.ca")
 </source>
 
 Si votre tâche se termine anormalement avec le message d'erreur ''*** ABAQUS/eliT_CheckLicense rank 0 terminated by signal 11 (Segmentation fault)'', vérifiez si votre fichier  <code>abaqus.lic</code> contient  ''ABAQUSLM_LICENSE_FILE'' pour Abaqus/202X. 
@@ -619,8 +667,20 @@ où TOKENS = floor[5 X CORES^0.422]
 
 Chaque GPU nécessite un jeton additionnel.
 
-== Licence Western ==
-La licence du site Western est réservée aux chercheuses et chercheurs de Western et ne peut être utilisée que sur du matériel situé sur le campus. Actuellement, seul la grappe Dusky remplit cette condition. Nibi et le système SHARCNET OOD sont exclus, car ils sont situés sur le campus de Waterloo. Pour toute question concernant l'utilisation de la licence Abaqus de Western, veuillez contacter l'administrateur à l'adresse <jmilner@robarts.ca>. Vous devrez fournir votre nom d'utilisateur et possiblement prévoir l'achat de jetons. Si votre demande est acceptée, vous pourrez configurer votre fichier <code>abaqus.lic</code> pour qu'il pointe vers le serveur de licences de Western.
+<span id="Western_license"></span>
+Préparation de votre compte
+# [[VNC/fr#Nœuds_VDI|Connectez-vous à <b>gra-vdi.com</b> avec TigerVNC]].
+# Sur gra-vdi, ouvrez une fenêtre de terminal et entrez <code>firefox</code> (appuyez sur Entrée).
+# Dans la barre d'adresse, entrez <code>about:config</code> (appuyez sur Entrée) -> cliquez sur le bouton <i>I accept the risk</i>.
+# Dans la barre de recherche, entrez <code>unique</code> et double-cliquez sur <code>privacy.file_unique_origin</code> pour changer <i>true'</i> en <i>false</i>.
+
+[[ <span style="color:red">The <code>abaqus.lic</code> file given below no longer works since the license4 machine has been shutdown and retired.  Therefore all abaqus license checkout requests on dusky cluster from the Western/Robarts abaqus license server currently will fail.  A replacement server for license4 is currently be worked on.  Once it is ready for use <code>abaqus.lic</code> will be updated with the new server name and this red warning message removed.  In the meantime the SHARCNET License maybe used instead by following the above procedure to request access.</span> ]] 
+
+Afficher la documentation
+# [[VNC/fr#Nœuds_VDI|Connectez-vous à <b>gra-vdi.com</b> avec TigerVNC]].
+# Sur gra-vdi, ouvrez une fenêtre de terminal et entrez <code>firefox</code> (appuyez sur Entrée).
+# Dans la barre de recherche, copiez-collez un des énoncés suivants&nbsp;: <br><code>file:///opt/sharcnet/abaqus/2020/doc/English/DSSIMULIA_Established.htm</code>, ou<br><code>file:///opt/sharcnet/abaqus/2021/doc/English/DSSIMULIA_Established.htm</code>
+# Cliquez sur un sujet, par exemple <i>Abaqus -> Analysis -> Analysis Techniques -> Analysis Continuation Techniques</i>.
 
 <span id="Configure_license_file"></span>
 ===Configurer le fichier de licences===

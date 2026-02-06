@@ -1,5 +1,3 @@
-{{Outdated}}
-
 <languages />
 [[Category:Software]]
 
@@ -70,17 +68,17 @@ Sample submission script to run a COMSOL job with eight cores on a single comput
 #!/bin/bash
 #SBATCH --time=0-03:00             # Specify (d-hh:mm)
 #SBATCH --account=def-group        # Specify (some account)
-#SBATCH --mem=32G                  # Specify (set to 0 to use all memory on each node)
-#SBATCH --cpus-per-task=8          # Specify (set to 32or44 graham, 32or48 cedar, 40 beluga, 48or64 narval to use all cores)
+#SBATCH --mem=32G                  # Specify (0 to use all memory on each node)
+#SBATCH --cpus-per-task=8          # Specify (max value of all cores on a node)
 #SBATCH --nodes=1                  # Do not change
 #SBATCH --ntasks-per-node=1        # Do not change
 
 INPUTFILE="ModelToSolve.mph"       # Specify input filename
 OUTPUTFILE="SolvedModel.mph"       # Specify output filename
 
-# module load StdEnv/2020          # Versions < 6.2
-module load StdEnv/2023
-module load comsol/6.2
+# module load StdEnv/2020          # Versions <= 6.1
+module load StdEnv/2023            # Versions >= 6.2
+module load comsol/6.4
 
 comsol batch -inputfile ${INPUTFILE} -outputfile ${OUTPUTFILE} -np $SLURM_CPUS_ON_NODE
 }}
@@ -98,17 +96,17 @@ Sample submission script to run a COMSOL job with eight cores distributed evenly
 #!/bin/bash
 #SBATCH --time=0-03:00             # Specify (d-hh:mm)
 #SBATCH --account=def-account      # Specify (some account)
-#SBATCH --mem=16G                  # Specify (set to 0 to use all memory on each node)
-#SBATCH --cpus-per-task=4          # Specify (set to 32or44 graham, 32or48 cedar, 40 beluga, 48or64 narval to use all cores)
+#SBATCH --mem=16G                  # Specify (0 to use all memory on each node)
+#SBATCH --cpus-per-task=4          # Specify (max value of all cores on a node)
 #SBATCH --nodes=2                  # Specify (the number of compute nodes to use for the job)
 #SBATCH --ntasks-per-node=1        # Do not change
 
 INPUTFILE="ModelToSolve.mph"       # Specify input filename
 OUTPUTFILE="SolvedModel.mph"       # Specify output filename
 
-# module load StdEnv/2020          # Versions < 6.2
-module load StdEnv/2023
-module load comsol/6.2
+# module load StdEnv/2020          # Versions <= 6.1
+module load StdEnv/2023            # Versions >= 6.2
+module load comsol/6.4
 
 RECOVERYDIR=$SCRATCH/comsol/recoverydir
 mkdir -p $RECOVERYDIR
@@ -128,57 +126,28 @@ Note 1: If your multiple node job crashes on startup with a java segmentation fa
  sed -i 's/-Xmx2g/-Xmx4g/g' comsolbatch.ini
  sed -i 's/-Xmx768m/-Xmx4g/g' java.opts
 
-Note 2:  On Narval, jobs may run slow when submitted with comsol/6.0.0.405 to multiple nodes using the above Slurm script.  If this occurs, use comsol/6.0 instead and open a ticket to report the problem. The latest comsol/6.1.X modules have not been tested on Narval yet.
-
-Note 3:  On Graham, there is a small chance jobs will run slow or hang during startup when submitted to a single node with the above <i>script-smp.sh</i> script.  If this occurs, use the multiple node <i>script-dis.sh</i> script instead adding <code>#SBATCH --nodes=1</code> and then open a ticket to report the problem.
+Note: If a job runs slow or hangs during startup when submitted to a single node with the above <i>script-smp.sh</i> script, try using the above multiple node <i>script-dis.sh</i> script instead with <code>#SBATCH --nodes=1</code> and then please open a ticket to report the problem including the job number and cluster name.
 
 = Graphical use =
 
-COMSOL can be run interactively in full graphical mode using either of the following methods.
+To run comsol in graphical mode open a remote desktop on an [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) OnDemand] or JupyterLab system.  The old approach of using a [[VNC|TigerVNC]] client/server pair should still work but is no longer recommended or supported.  For either approach  <code>~/.licenses/comsol.lic</code> must first be configured.  Note that running command <code>module avail comsol</code> will display which comsol versions are available within the StdEnv version that you currently have loaded ie) StdEnv/2023 .  Alternatively, running <code>module spider starccm-mixed</code> will show all available comsol module versions available within all StdEnv module versions.   If you find the upper menu items are greyed out and not clickable after starting COMSOL in GUI mode then your <i>~/.comsol</i> maybe corrupted so try deleting it.
 
-== On cluster nodes ==
-
-Suitable to interactively run computationally intensive test jobs using ALL available cores and memory reserved by <code>salloc</code> on a single cluster compute node:
-
-: 1) Connect to a compute node (3-hour time limit) with [[VNC#Compute_nodes|TigerVNC]].
-: 2) Open a terminal window in vncviewer and run: 
-::;  <code>export XDG_RUNTIME_DIR=${SLURM_TMPDIR}</code> 
-: 3) Start COMSOL Multiphysics 6.2 (or newer versions).
-::; <code>module load StdEnv/2023</code> 
-::; <code>module load comsol/6.3</code>
-::; <code>comsol</code> 
-: 4) Start COMSOL Multiphysics 5.6 (or newer versions).
-::; <code>module load StdEnv/2020</code> 
-::; <code>module load comsol/5.6</code>
-::; <code>comsol</code>
-: 5) Start COMSOL Multiphysics 5.5 (or older versions).
-::; <code>module load StdEnv/2016</code>
-::; <code>module load comsol/5.5</code>
-::; <code>comsol</code>
-
-== On VDI nodes ==
-
-Suitable interactive use on gra-vdi includes: running compute calculations with a maximum of 12 cores and 128GB memory, creating or modifying simulation input files, performing post-processing or data visualization tasks.  If you need more cores or memory when working in graphical mode, use COMSOL on a cluster compute node (as shown above) where you can reserve up to all available cores and/or memory on the node.
-
-: 1) Connect to gra-vdi (no time limit) with [[VNC#Compute_nodes|TigerVNC]].
-: 2) Open a terminal window in vncviewer.
-: 3) Start COMSOL Multiphysics 6.2 (or newer versions).
-::; <code>module load CcEnv StdEnv/2023</code>
-::; <code>module avail comsol</code> 
-::; <code>module load comsol/6.3</code>
-::; <code>comsol -np 12 -Dosgi.locking=none</code>
-: 4) Start COMSOL Multiphysics 6.2 (or older versions).
-::; <code>module load CcEnv StdEnv/2020</code>
-::; <code>module avail comsol</code> 
-::; <code>module load comsol/5.6</code>
-::; <code>comsol -np 12 -Dosgi.locking=none</code>
-: 5) Start COMSOL Multiphysics 5.5 (or older versions).
-::; <code>module load CcEnv StdEnv/2016</code>
-::; <code>module avail comsol</code>
-::; <code>module load comsol/5.5</code>
-::; <code>comsol -np 12 -Dosgi.locking=none</code>
-
-Note: If all the upper menu items are greyed out immediately after COMSOL starts in GUI mode, and are therefore not clickable, your <i>~/.comsol</i> maybe corrupted.  To fix the problem rename or remove it by running <code>rm -rf ~/.comsol</code> and try starting COMSOL again.  This may occur if you previously loaded a COMSOL module from the SnEnv on gra-vdi.
+== OnDemand ==
+1. Connect to an OnDemand system using one of the following URLs in your laptop browser :<br>
+ [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) NIBI]: <code>https://ondemand.sharcnet.ca</code>
+ FIR: <code>https://jupyterhub.fir.alliancecan.ca</code>
+ NARVAL: <code> https://portail.narval.calculquebec.ca/</code>
+ RORQUAL: <code>https://jupyterhub.rorqual.alliancecan.ca</code>
+ TRILLIUM: <code>https://ondemand.scinet.utoronto.ca</code>
+2. Open a new terminal window in your desktop and run one of:
+: <b>COMSOL 6.2 (or newer versions)</b>
+:: <code>module load StdEnv/2023</code>  (default)
+:: <code>module load comsol/6.4</code>
+:: comsol
+: <b>COMSOL 6.1 (or older versions)</b>
+:: <code>module load StdEnv/2020</code>  (default)
+:: <code>module load comsol/6.1</code>
+:: comsol
 
 =Parameter sweeps=
 

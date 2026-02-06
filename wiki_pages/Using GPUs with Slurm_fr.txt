@@ -3,16 +3,16 @@
 = Introduction =
 
 Pour demander un ou plusieurs GPU pour une tâche [[Running jobs/fr|Slurm]], utilisez
-  --gpus-per-node=<type>:<number>
+  --gpus-per-node=<model_specifier>:<number>
 
 Par exemple
   --gpus-per-node=a100:1
 
 Ceci est pour un seul GPU A100, à moins que vous ajoutiez <code>--nodes</code> pour demander plusieurs nœuds.
-Pour les types valides, voir [[Using GPUs with Slurm/fr|GPU disponibles</i>]].
+Pour les modèles valides, voir la section <i>[[Using GPUs with Slurm/fr|GPU disponibles</i>]] ci-dessous.
 
 Vous pouvez aussi utiliser
-  --gres=gpu:<type>:<number>
+  --gres=gpu:<model_specifier>:<number>
 Cependant, il est possible que ce format ne soit plus pris en charge. Nous vous recommandons de le remplacer par  <code>--gpus-per-node</code>.
 
 Slurm prend en charge plusieurs autres directives que vous pouvez utiliser pour demander des GPU, par exemple <code>--gpus</code>, <code>--gpus-per-socket</code>, <code>--gpus-per-task</code>, <code>--mem-per-gpu</code> et <code>--ntasks-per-gpu</code>. Voyez la documentation de Slurm sur [https://slurm.schedmd.com/sbatch.html sbatch].  Notre équipe ne teste pas toutes les combinaisons; si vous n'obtenez pas le résultat voulu, contactez le [[Technical support/fr|soutien technique]].
@@ -20,50 +20,76 @@ Slurm prend en charge plusieurs autres directives que vous pouvez utiliser pour 
 Pour l'information générale sur l'ordonnancement des tâches, consultez [[Running jobs/fr|Exécuter des tâches]].
 
 = GPU disponibles =
-The following table summarizes the available GPU types:
 
-<div class="mw-translate-fuzzy">
 {| class="wikitable"
 |-
-! Grappe !! Caractéristiques !! Type <br>de GPU !! Modèle  !! Compute<br>Capability(*) !! Remarques
+! Grappe !!Modèle de GPU !! Identifiant de modèle<br>pour Slurm!! Remarques
 |- 
-| Fir   || [[Fir/fr#Caractéristiques_des_nœuds|<b>Détails</b>]] || [[Multi-Instance_GPU/fr#Configurations_disponibles|Configurations disponibles|<b>options</b>]]
-|| H100-80gb    || 90   ||deux GPU connectés par socket CPU; tous les GPU sont connectés via NVLink
-|-
-
-| Narval           || [[Narval#Caractéristiques_des_nœuds|<b>Détails</b>]]
-|| [[Narval/en#GPU_instances|<b>options</b>]] || A100-40gb || 80 || deux GPU connectés par socket CPU; tous les GPU sont connectés via NVLink
+| rowspan=4|[[Fir/fr#Caractéristiques_des_nœuds|Fir]] || rowspan=4|H100-80gb || h100 || 
 |- 
-| rowspan=2|Nibi   || rowspan=2|[[Nibi/fr#Caractéristiques_des_nœuds|<b>Détails</b>]] || rowspan=2|[[Multi-Instance GPU/fr#Configurations_disponibles|<b>Options</b>]]
-|| H100-80gb    || 90   || deux GPU connectés par socket CPU; tous les GPU sont connectés via NVLink
-|-
-|| MI300A-128gb || s.o. || mémoire unifiée entre CPU et GPU
+|   nvidia_h100_80gb_hbm3_1g.10gb || MIG
 |- 
-| Rorqual          || [[Rorqual#Caractéristiques_des_nœuds|<b>Détails</b>]]
-|| [[Rorqual#Instances_GPU|<b>options</b>]] || H100-80gb || 90 || deux GPU connectés par socket CPU; tous les GPU sont connectés via NVLink
+|   nvidia_h100_80gb_hbm3_2g.20gb || MIG
+|- 
+|   nvidia_h100_80gb_hbm3_3g.40gb || MIG
 |-
-| Trillium          || [[Trillium/fr#Caractéristiques_des_nœuds|<b>détails</b>]]
-|| [[Trillium/fr#Instances_GPU|Instances GPU|<b>options</b>]] || H100-80gb || 90 || deux GPU connectés par socket CPU; tous les GPU sont connectés via NVLink
+| rowspan=5|[[Narval#Caractéristiques_des_nœuds| Narval]] || rowspan=5|A100-40gb || a100 || 
 |-
-| Arbutus || colspan=4|Les ressources infonuagiques ne sont pas ordonnancées. Voir [[Cloud resources/fr|Ressources infonuagiques]] pour l'information sur le matériel.
+|  a100_1g.5gb  || MIG 
+|-
+|  a100_2g.10gb || MIG 
+|-
+|  a100_3g.20gb || MIG 
+|-
+|  a100_4g.20gb || MIG 
+|-
+| rowspan=5|[[Nibi/fr#Caractéristiques_des_nœuds|Nibi]] || rowspan=4|H100-80gb || h100 || 
+|-
+|   nvidia_h100_80gb_hbm3_1g.10gb || MIG
+|- 
+|   nvidia_h100_80gb_hbm3_2g.20gb || MIG
+|- 
+|   nvidia_h100_80gb_hbm3_3g.40gb || MIG
+|-
+| MI300A-128gb  || (aucun; voir [[Nibi/fr#Caractéristiques_des_nœuds|Nibi]]) || 
+|- 
+| rowspan=4|[[Rorqual#Caractéristiques_des_nœuds|Rorqual]] || rowspan=4|H100-80gb || h100 || 
+|-
+|   nvidia_h100_80gb_hbm3_1g.10gb || MIG; synonymes h100_1g.10gb, h100_1.10, h100_10gb
+|- 
+|   nvidia_h100_80gb_hbm3_2g.20gb || MIG; synonymes h100_2g.20gb, h100_2.20, h100_20gb
+|- 
+|   nvidia_h100_80gb_hbm3_3g.40gb || MIG; synonymes h100_3g.40gb, h100_3.40, h100_40gb
+|-
+| [[Trillium/fr#Caractéristiques_des_nœuds|Trillium]] || H100-80gb || h100 || 
+|-
+| rowspan=2|[[Killarney/fr#Matériel|Killarney]] || H100-80gb || h100 || &nbsp; 
+|-
+|  L40S-48gb || l40s || &nbsp; 
+|-
+| rowspan=2|[[TamIA#Caractéristiques_des_nœuds|tamIA]] || H100-80gb || h100 || &nbsp;
+|-
+| H200 || h200 || &nbsp;
+|-
+| rowspan=2|[[Vulcan/fr#Matériel|Vulcan]] || L40S-48gb || l40s || &nbsp; 
 |}
-</div>
 
-La commande ci-dessous présente les types de GPU (et MIG) disponibles sur chacune des grappes. Cette commande est utile si le tableau plus haut n'a pas été mis à jour récemment.
+La commande ci-dessous présente les identifiants de GPU (et MIG) disponibles sur chacune des grappes. Cette commande est utile si le tableau plus haut n'a pas été mis à jour récemment.
 
 {{Command|sinfo -o "%G"{{!}}grep gpu{{!}}sed 's/gpu://g'{{!}}sed 's/),/\n/g'{{!}}cut -d: -f1{{!}}sort{{!}}uniq}}
 
-There are short synonyms available for some of the MIG types at certain sites; this command will not provide those synonyms.
-Also, the presence of a GPU type does not guarantee that you will be able to use that type in your jobs; there may be 
-further restrictions on what types are available based on (for example) which research group you are in.
-For further information see the site-specific page by clicking on the cluster name in the above table, or [[Technical support|contact support]].
+Sur certaines grappes, il existe des identifiants courts pour quelques modèles de MIG; cette commande ne les fournit pas.
 
-If you do not supply a type specifier your job may be rejected or it may be sent to an arbitrary GPU type.
-There are very few programs which can use an arbitrary GPU efficiently,
-so we strongly recommend that you always request a specific GPU type. 
+De plus, la présence d'un modèle de GPU ne garantit pas que vous pouvez utiliser un identifiant de modèle correspondant; des restrictions supplémentaires peuvent s'appliquer, dépendant notamment de votre groupe de recherche.
 
-There are GPUs available at Arbutus, but like other cloud resources they cannot be scheduled via Slurm.
-See [[Cloud resources]] for more details.
+Pour plus d'information, cliquez sur le nom de la grappe dans le tableau ci-dessus, ou contactez [[Technical support/fr|le soutien technique]].
+
+Si vous ne spécifiez pas de modèle, votre tâche risque d'être rejetée ou acheminée vers une instance de GPU arbitraire.
+
+Très peu de programmes sont capables d'utiliser efficacement un modèle arbitraire, c'est pourquoi nous recommandons vivement de toujours spécifier un identifiant de modèle dans vos scripts de tâches. 
+
+Des GPU sont disponibles sur Arbutus, mais comme c'est le cas pour les autres ressources infonuagiques, il n'est pas possible de soumettre des tâches via Slurm.
+Pour plus d'information, voir [[Cloud resources/fr|Ressources infonuagiques]].
 
 == GPU multi-instances (MIG) ==
 La technologie MIG permet de partitionner un GPU en plusieurs instances. Vos tâches pourraient utiliser un MIG plutôt qu'un GPU entier. Pour plus d'information, voir [[Multi-Instance_GPU/fr|GPU multi-instances]].
@@ -71,7 +97,7 @@ La technologie MIG permet de partitionner un GPU en plusieurs instances. Vos tâ
 <span id="Requesting_CPU_cores_and_system_memory"></span>
 = Demander des cœurs CPU et la mémoire système =
 
-Avec chaque instance GPU, une tâche doit avoir un nombre de cœurs CPU (<code>1</code> par défaut) et une certaine quantité de mémoire système. Pour le maximum de coeurs CPU et de mémoire système, voir [[Allocations_and_compute_scheduling/fr#Ratios_dans_les_bundles|le tableau des ratios]].
+Avec chaque instance GPU, une tâche doit avoir un nombre de cœurs CPU (<code>1</code> par défaut) et une certaine quantité de mémoire système. Pour le maximum de cœurs CPU et de mémoire système, voir [[Allocations_and_compute_scheduling/fr#Ratios_dans_les_bundles|le tableau des ratios]].
 
 <span id="Examples"></span>
 = Exemples =
@@ -119,7 +145,7 @@ Pour chaque GPU demandé, nous recommandons
   |contents=
 #!/bin/bash
 #SBATCH --account=def-someuser
-#SBATCH --gpus=8                  # nombre total de GPU
+#SBATCH --gpus=a100:8             # nombre total de GPU
 #SBATCH --ntasks-per-gpu=1        # 8 processus MPI au total
 #SBATCH --cpus-per-task=6         # cœurs CPU par processus MPI
 #SBATCH --mem-per-cpu=5G          # mémoire hôte par cœur CPU
@@ -157,19 +183,17 @@ Sur [[Narval]] et [[Rorqual]] le profilage est possible, mais
 [https://developer.nvidia.com/dcgm DCGM (NVIDIA Data Center GPU Manager)]
 doit être désactivé. Ceci doit se faire lorsque vous soumettez la tâche en configurant la variable d'environnement <code>DISABLE_DCGM</code>.
 
-{{Command|DISABLE_DCGM{{=}}1 salloc --account{{=}}def-someuser --gpus-per-node{{=}}1 --mem{{=}}4000M --time{{=}}03:00}}
+{{Command|DISABLE_DCGM{{=}}1 salloc --account{{=}}def-someuser --gpus-per-node{{=}}a100:1 --mem{{=}}4000M --time{{=}}03:00}}
 
 Ensuite, dans votre tâche interactive, attendez que DCGM soit désactivé sur le nœud. 
 {{Command|while [ ! -z "$(dcgmi -v {{!}} grep 'Hostengine build info:')" ]; do  sleep 5; done}}
 
 Enfin, lancez le profileur (voir [[Debugging and profiling/fr|débogage et profilage]] pour les détails).
 
-<div class="mw-translate-fuzzy">
-Sur Fir et Nibi, le profilage n'est pas disponible parce que les compteurs de performance ne sont pas accessibles.
-</div>
+Sur Fir et Nibi, le profilage de GPU décrit ci-dessus n'est pas encore disponible.
 
 = Voir aussi =
-[[CUDA/fr|Cuda]]<br>
+[[CUDA/fr|CUDA]]<br>
 [[Multi-Instance GPU/fr|GPU multi-instances]]<br>
 [[Running jobs/fr|Exécuter des tâches]]
 

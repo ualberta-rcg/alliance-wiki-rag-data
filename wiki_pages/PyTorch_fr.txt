@@ -1041,39 +1041,31 @@ Pour installer <tt>rTorch</tt> à partir d'un nœud de connexion%nbsp;:
 3. Installez la plus récente version disponible de rtorch.
 {{Command|R -e 'install.packages("torch", repos{{=}}"https://cloud.r-project.org/")'}}
 
-<div class="mw-translate-fuzzy">
-4. Lancez un interpréteur R interactif. (<strong>important</strong>)
-{{Command|R}}
-</div>
+4. Installez les dépendances. 
+{{Command|R -e 'torch::install_torch()'}}
 
-<div class="mw-translate-fuzzy">
-6. Corrigez la bibliothèque partagée qui a été téléchargée (''lantern'').
+5. Corrigez la bibliothèque partagée qui a été téléchargée (''lantern'').
 {{Command|setrpaths.sh --path $R_LIBS/torch/lib/liblantern.so --add_path $EBROOTCUDACORE/lib --any_interpreter}}
-</div>
 
-<div class="mw-translate-fuzzy">
-7. Effectuez un test rapide de CPU.
+6. Effectuez un test rapide de CPU.
 {{Command
-|R -e 'library(torch); torch::torch_tensor(1);'
+|R -e 'torch::torch_tensor(1);'
 |result=
-> library(torch); torch::torch_tensor(1);
+> torch::torch_tensor(1);
 torch_tensor
  1
 [ CPUFloatType{1} ]
 }}
-</div>
 
-<div class="mw-translate-fuzzy">
-8. Effectuez un test de GPU.
-{{Command
-|srun --mem{{=}}3500M --gpus-per-node{{=}}h100_10gb:1 -- R -e 'library(torch); torch::torch_tensor(1)$cuda();'
+7. Effectuez un test de GPU.
+{{Command	
+|srun --mem{{=}}3500M --gpus{{=}}h100_1g.10gb:1 -- R -e 'torch::torch_tensor(1)$cuda()'
 |result=
-> library(torch); torch::torch_tensor(1)$cuda();
+> torch::torch_tensor(1)$cuda();
 torch_tensor
  1
 [ CUDAFloatType{1} ]
 }}
-</div>
 
 <span id="Resources"></span>
 = Ressources =

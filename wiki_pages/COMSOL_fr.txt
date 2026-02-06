@@ -1,5 +1,3 @@
-{{Outdated}}
-
 <languages />
 [[Category:Software]]
 
@@ -75,19 +73,19 @@ Le script suivant utilise huit cœurs sur un seul nœud.
 |lang="bash"
 |contents=
 #!/bin/bash
-#SBATCH --time=0-03:00             # indiquer la limite de temps (jj-hh:mm)
-#SBATCH --account=def-group        # indiquer le nom du compte
-#SBATCH --mem=32G                  # indiquer 0 pour utiliser toute la mémoire sur chacun des nœuds
-#SBATCH --cpus-per-task=8          # pour utiliser tous les cœurs, indiquer 32ou44 sur Graham, 32ou48 sur Cedar, 40 sur Béluga, 48ou64 sur Narval
-#SBATCH --nodes=1                  # ne pas modifier
-#SBATCH --ntasks-per-node=1        # ne pas modifier
+#SBATCH --time=0-03:00             # Specify (d-hh:mm)
+#SBATCH --account=def-group        # Specify (some account)
+#SBATCH --mem=32G                  # Specify (0 to use all memory on each node)
+#SBATCH --cpus-per-task=8          # Specify (max value of all cores on a node)
+#SBATCH --nodes=1                  # Do not change
+#SBATCH --ntasks-per-node=1        # Do not change
 
 INPUTFILE="ModelToSolve.mph"       # indiquer le nom du fichier en entrée
 OUTPUTFILE="SolvedModel.mph"       # indiquer le nom du fichier en sortie
 
-# module load StdEnv/2020          # Versions < 6.2
-module load StdEnv/2023
-module load comsol/6.2
+# module load StdEnv/2020          # Versions <= 6.1
+module load StdEnv/2023            # Versions >= 6.2
+module load comsol/6.4
 
 comsol batch -inputfile ${INPUTFILE} -outputfile ${OUTPUTFILE} -np $SLURM_CPUS_ON_NODE
 }}
@@ -104,19 +102,19 @@ Le script suivant utilise 8 cœurs distribués également sur 2 nœuds. Ce scrip
 |lang="bash"
 |contents=
 #!/bin/bash
-#SBATCH --time=0-03:00             # indiquer la limite de temps (jj-hh:mm)
-#SBATCH --account=def-account      # indiquer le nom du compte
-#SBATCH --mem=16G                  # indiquer 0 pour utiliser toute la mémoire sur chacun des nœuds
-#SBATCH --cpus-per-task=4          # pour utiliser tous les cœurs, indiquer 32ou44 sur Graham, 32ou48 sur Cedar, 40 sur Béluga, 48ou64 sur Narval
-#SBATCH --nodes=2                  # indiquer le nombre de nœuds de calcul à utiliser pour la tâche
-#SBATCH --ntasks-per-node=1        # ne pas modifier
+#SBATCH --time=0-03:00             # Specify (d-hh:mm)
+#SBATCH --account=def-account      # Specify (some account)
+#SBATCH --mem=16G                  # Specify (0 to use all memory on each node)
+#SBATCH --cpus-per-task=4          # Specify (max value of all cores on a node)
+#SBATCH --nodes=2                  # Specify (the number of compute nodes to use for the job)
+#SBATCH --ntasks-per-node=1        # Do not change
 
 INPUTFILE="ModelToSolve.mph"       # indiquer le nom du fichier en entrée
 sortie
 
-# module load StdEnv/2020          # Versions < 6.2
-module load StdEnv/2023
-module load comsol/6.2
+# module load StdEnv/2020          # Versions <= 6.1
+module load StdEnv/2023            # Versions >= 6.2
+module load comsol/6.4
 
 RECOVERYDIR=$SCRATCH/comsol/recoverydir
 mkdir -p $RECOVERYDIR
@@ -137,60 +135,29 @@ Pour plus d'information, voir [https://www.comsol.ch/support/knowledgebase/1243 
  sed -i 's/-Xmx2g/-Xmx4g/g' comsolbatch.ini
  sed -i 's/-Xmx768m/-Xmx4g/g' java.opts
 
-Remarque 2 : Sur Narval, le module comsol/6.0.0.405 installé récemment pourrait ne pas performer de manière optimale  à l'exécution sur plusieurs nœuds du script ci-dessus. Jusqu'à ce que plus de tests soient faits, nous recommandons d'utiliser plutôt le module original comsol/6.0 et créez un billet d'assistance pour rapporter le problème. Les modules comsol/6.1.x n'ont pas encore été testés.
-
-Remarque 3 : Sur Graham, il arrive que certaines tâches soient lentes ou qu'elles gèlent au lancement quand <i>script-smp.sh</i> est exécuté sur un seul nœud. Si c'est le cas, utilisez plutôt <i>script-dis.sh</i> en y ajoutant <code>#SBATCH --nodes=1</code> et créez un billet d'assistance pour rapporter le problème.
+Remarque 3 : Il arrive que certaines tâches soient lentes ou qu'elles gèlent au lancement quand <i>script-smp.sh</i> est exécuté sur un seul nœud. Si c'est le cas, utilisez plutôt le script pour nœuds multiples <i>script-dis.sh</i> ci-dessus, en y ajoutant <code>#SBATCH --nodes=1</code> et créez ensuite un billet d'assistance pour rapporter le problème en indiquant le numéro de la tâche et le nom de la grappe.
 
 <span id="Graphical_use"></span>
 = Mode graphique =
 
-Le mode graphique peut être utilisé interactivement en mode graphique complet sur une grappe ou sur gra-vdi.
+Pour exécuter COMSOL en mode graphique, ouvrez un bureau distant sur un système [[Nibi/fr#Accès_via_Open_OnDemand_(OOD)|OnDemand]] ou JupyterLab. L'ancienne méthode utilisant un client/serveur [[VNC/fr|TigerVNC]] devrait toujours fonctionner, mais elle n'est plus recommandée ni prise en charge. Quelle que soit la méthode utilisée, le fichier <code>~/.licenses/comsol.lic</code> doit être configuré au préalable. Notez que la commande <code>module avail comsol</code> affichera les versions de COMSOL disponibles dans la version de StdEnv actuellement chargée (par exemple, StdEnv/2023). De même, la commande <code>module spider starccm-mixed</code> affichera toutes les versions de modules COMSOL disponibles dans toutes les versions de modules StdEnv. Si vous constatez que les éléments du menu supérieur sont grisés et non cliquables après avoir démarré COMSOL en mode GUI, alors votre fichier <i>~/.comsol</i> est peut-être corrompu; essayez donc de le supprimer.
 
-<span id="On_cluster_nodes"></span>
-== Sur les nœuds des grappes ==
-
-Convient surtout pour exécuter de manière interactive des tâches intensives de test avec TOUS les cœurs et la mémoire réservée par <code>salloc</code> sur un nœud de calcul.
-
-: 1) Connectez-vous à un nœud de calcul (pour 3 heures maximum) avec [[VNC/fr#Nœuds_de_calcul|TigerVNC]].
-: 2) Ouvrez une fenêtre de terminal dans vncviewer et lancez 
-::;  <code>export XDG_RUNTIME_DIR=${SLURM_TMPDIR}</code>     
-: 3) Lancez COMSOL Multiphysics 6.2 (ou version plus récente).
-::; <code>module load StdEnv/2023</code> 
-::; <code>module load comsol/6.3</code>
-::; <code>comsol</code>   
-: 4) Lancez COMSOL Multiphysics 5.6 (ou version plus récente).
-::; <code>module load StdEnv/2020</code> 
-::; <code>module load comsol/5.6</code>
-::; <code>comsol</code>
-: 5) Lancez COMSOL Multiphysics 5.5 (ou version moins récente).
-::; <code>module load StdEnv/2016</code>
-::; <code>module load comsol/5.5</code>
-::; <code>comsol</code>
-
-<span id="On_VDI_nodes"></span>
-== Sur les nœuds gra-vdi ==
-
-Certaines utilisations valides de gra-vdi en mode interactif sont le lancement d'une tâche de test avec un maximum de 8 cœurs et 128Go de mémoire, la création ou la modification des fichiers d'entrée pour une simulation, le post-traitement ou la visualisation des données. Si vous avez besoin de plus de cœurs ou de mémoire quand vous travaillez en mode graphique, utilisez plutôt COMSOL sur un nœud de grappe où vous pouvez réserver tous les cœurs et la mémoire du nœud et/ou la mémoire du nœud.
-
-: 1) Connectez-vous à gra-vdi (aucune limite de temps) avec [[VNC/fr#Nœuds_de_calcul|TigerVNC]].
-: 2) Ouvrez une fenêtre de terminal dans vncviewer.
-: 3) Lancez COMSOL Multiphysics 6.2 (ou version plus récente).
-::; <code>module load CcEnv StdEnv/2023</code>
-::; <code>module avail comsol</code> 
-::; <code>module load comsol/6.3</code>
-::; <code>comsol -np 12 -Dosgi.locking=none</code>
-: 4) Lancez COMSOL Multiphysics 6.2 (ou version moins récente).
-::; <code>module load CcEnv StdEnv/2020</code>
-::; <code>module avail comsol</code> 
-::; <code>module load comsol/5.6</code>
-::; <code>comsol -np 12 -Dosgi.locking=none</code>
-: 5) Lancez COMSOL Multiphysics 5.5 (ou version moins récente)
-::; <code>module load CcEnv StdEnv/2016</code>
-::; <code>module avail comsol</code>
-::; <code>module load comsol/5.5</code>
-::; <code>comsol -np 12 -Dosgi.locking=none</code>
-
-Remarque :  Si toutes les options du menu du haut sont désactivées quand COMSOL démarre en mode graphique, il est possible que votre <i>~/.comsol</i> soit corrompu.  Pour réparer ceci, renommez ou supprimez tout le répertoire avec la commande <code>rm -rf ~/.comsol</code> et redémarrez COMSOL. Ceci pourrait s'être produit si vous avez précédemment chargé un module COMSOL de l'environnement local SnEnv de gra-vdi.
+== OnDemand ==
+1. Sur votre ordinateur, connectez-vous à un système OnDemand avec une des adresses URL suivantes&nbsp;:<br>
+ [[Nibi/fr#Accès_via_Open_OnDemand_(OOD)|Nibi]] : <code>https://ondemand.sharcnet.ca</code>
+ FIR : <code>https://jupyterhub.fir.alliancecan.ca</code>
+ NARVAL : <code> https://portail.narval.calculquebec.ca/</code>
+ RORQUAL : <code>https://jupyterhub.rorqual.alliancecan.ca</code>
+ TRILLIUM : <code>https://ondemand.scinet.utoronto.ca</code>
+2. Sur le bureau, ouvrez une nouvelle fenêtre de terminal et lancez les commandes correspondantes pour&nbsp;:
+: <b>COMSOL 6.2 (ou versions plus récentes)</b>
+:: <code>module load StdEnv/2023</code>  (par défaut)
+:: <code>module load comsol/6.4</code>
+:: comsol
+: <b>COMSOL 6.1 (ou versions moins récentes)</b>
+:: <code>module load StdEnv/2020</code>  (par défaut)
+:: <code>module load comsol/6.1</code>
+:: comsol
 
 <span id="Parameter_sweeps"></span>
 =Exploration des paramètres=

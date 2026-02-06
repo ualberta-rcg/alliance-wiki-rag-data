@@ -26,6 +26,7 @@ Quand vous soumettez des tâches sur une grappe pour la première fois, vous dev
 <span id="Slurm_scripts"></span>
 == Scripts pour l'ordonnanceur ==
 
+<div class="mw-translate-fuzzy">
 <tabs>
 <tab name="Fir/Rorqual/Nibi" >
 {{File
@@ -33,18 +34,23 @@ Quand vous soumettez des tâches sur une grappe pour la première fois, vous dev
 |lang="bash"
 |contents=
 #!/bin/bash
+</div>
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify some account
 #SBATCH --time=00-01:00       # Time limit: dd-hh:mm
 #SBATCH --nodes=1             # Specify 1 or more nodes
 #SBATCH --cpus-per-task=192   # Request all cores per node (32 or 48)
 #SBATCH --mem=0               # Request all memory per node
 #SBATCH --ntasks-per-node=1   # Do not change this value
+</div>
 
 module load StdEnv/2023
 
+<div class="mw-translate-fuzzy">
 #module load starccm/20.04.007-R8
 module load starccm-mixed/20.04.007
+</div>
 
 SIM_FILE='mysample.sim'       # Specify your input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
@@ -54,14 +60,17 @@ mkdir -p "$STARCCM_TMP"
 
 slurm_hl2hl.py --format STAR-CCM+ > machinefile-$SLURM_JOB_ID
 
-echo "Checking $CDLMD_LICENSE_FILE ..."
-server=$(head -n1 $CDLMD_LICENSE_FILE {{!}} awk '{print $2}')
-port=$(cat $CDLMD_LICENSE_FILE {{!}} grep -Eo '[0-9]+$')
-nmap $server -Pn -p $port {{!}} grep -v '^$'; echo
-
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
 NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
 
+NCORE=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
+
+export FLEXIBLAS=StarMKL
+echo "FLEXIBLAS=$FLEXIBLAS"
+STAR_MPI="-mpi intel"
+STAR_FABRIC="-fabric tcp"
+
+<div class="mw-translate-fuzzy">
 if [ -n "$LM_PROJECT" ]; then
    # Siemens PoD license server
    starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi intel -fabric psm2
@@ -77,18 +86,23 @@ fi
 |lang="bash"
 |contents=
 #!/bin/bash
+</div>
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # indiquez le nom du compte
 #SBATCH --time=00-01:00       # indiquez la limite de temps (jj-hh:mm)
 #SBATCH --nodes=1             # indiquez 1 ou plusieurs nœuds
 #SBATCH --cpus-per-task=64    # demandez tous les cœurs par nœud
 #SBATCH --mem=0               # demandez toute la mémoire par nœud
 #SBATCH --ntasks-per-node=1   # ne pas modifier
+</div>
 
 module load StdEnv/2023
 
+<div class="mw-translate-fuzzy">
 #module load starccm/20.04.007-R8
 module load starccm-mixed/20.04.007
+</div>
 
 SIM_FILE='mysample.sim'       # Specify your input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
@@ -101,6 +115,28 @@ LM_PROJECT='my22digitpodkey'  # Specify your Siemens Power on Demand (PoD) Key
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
 NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
 
+echo "Checking $CDLMD_LICENSE_FILE ..."
+server=$(head -n1 $CDLMD_LICENSE_FILE {{!}} awk '{print $2}')
+port=$(cat $CDLMD_LICENSE_FILE {{!}} grep -Eo '[0-9]+$')
+nmap $server -Pn -p $port {{!}} grep -v '^$'; echo
+
+export FLEXIBLAS=NETLIB
+STAR_MPI="-mpi openmpi"
+if [ "$RSNT_CPU_VENDOR_ID" == intel ]; then
+  export FLEXIBLAS=StarMKL
+  STAR_MPI="-mpi intel"
+elif [ "$RSNT_CPU_VENDOR_ID" == amd ]; then
+  export FLEXIBLAS=StarAOCL
+fi
+echo "FLEXIBLAS=$FLEXIBLAS"
+
+if [ "${EBVERSIONSTARCCM:0:2}" -lt 20 ]; then
+  STAR_FABRIC="-fabric ofi"
+else 
+  STAR_FABRIC="-fabric ucx" 
+fi
+
+<div class="mw-translate-fuzzy">
 if [ -n "$LM_PROJECT" ]; then
    # Siemens PoD license server
    starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi openmpi
@@ -116,18 +152,23 @@ fi
 |lang="bash"
 |contents=
 #!/bin/bash
+</div>
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify some account
 #SBATCH --time=00-01:00       # Time limit: dd-hh:mm
 #SBATCH --nodes=1             # Specify 1 or more nodes
 #SBATCH --cpus-per-task=192   # Request all cores per node
 #SBATCH --mem=0               # Request all memory per node
 #SBATCH --ntasks-per-node=1   # Do not change this value
+</div>
 
 module load StdEnv/2023
 
+<div class="mw-translate-fuzzy">
 #module load starccm/20.04.007-R8
 module load starccm-mixed/20.04.007
+</div>
 
 SIM_FILE='mysample.sim'       # Specify input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
@@ -146,6 +187,7 @@ LICSERVER=flex.cd-adapco.com     # Specify license server hostname
 export CDLMD_LICENSE_FILE="$FLEXPORT@127.0.0.1"
 ssh tri-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f
 
+<div class="mw-translate-fuzzy">
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
 NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
  
@@ -162,6 +204,33 @@ while [ $i -le 5 ] && [ $RET -ne 0 ]; do
         else
           # Institutional license server
           starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE
+        fi
+        RET=$?
+        i=$((i+1))
+done
+exit $RET
+}}
+</tab>
+</tabs>
+</div>
+
+export FLEXIBLAS=StarAOCL
+echo "FLEXIBLAS=$FLEXIBLAS"
+STAR_MPI="-mpi openmpi"
+ 
+# Workaround for license failures: 
+# until the exit status is equal to 0, we try to get Star-CCM+ to start (here, for at least 5 times).
+i=1
+RET=-1
+while [ $i -le 5 ] && [ $RET -ne 0 ]; do
+        [ $i -eq 1 ] {{!}}{{!}} sleep 5
+          echo "Attempt number: "$I
+          if [ -n "$LM_PROJECT" ]; then
+          echo "Siemens PoD license server ..."
+          starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI
+        else
+          echo "Institutional license server ..."
+          starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI
         fi
         RET=$?
         i=$((i+1))
