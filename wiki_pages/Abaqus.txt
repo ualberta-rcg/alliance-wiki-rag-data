@@ -5,10 +5,9 @@ __FORCETOC__
 <!--T:1-->
 [https://www.3ds.com/products-services/simulia/products/abaqus/ Abaqus FEA] is a software suite for finite element analysis and computer-aided engineering.
 
-= Using your own license = <!--T:2-->
+= Licensing = <!--T:1-->
 
-<!--T:3-->
-[[ <span style="color:red">A module for abaqus/2026 will not be available on Alliance clusters until ~Jan25 (delayed).  The new version should resolve the *** buffer overflow detected *** errors occurring with abaqus/2021.  A workaround for this issue has been added into the Single node computing slurm scripts below.  To use it copy the two unshare related lines that appear directly before the abaqus command line into your scripts being sure there are no empty lines or spaces after the continuation slashes.  Further testing has shown that simply increasing the value of ABA_SINT_CAP in your local abaqus_v6.env file will not reliably solve this problem afterall.</span> ]]
+== Using your license file== <!--T:2-->
 
 <!--T:4-->
 Abaqus software modules are available on our clusters; however, you must provide your own license. To configure your account on a cluster, log in and create a file named <code>$HOME/.licenses/abaqus.lic</code> containing the following line. Next, replace <code>port@server</code> with the flexlm port number and server IP address (or fully qualified hostname) of your Abaqus license server.  If you want to use legacy version 6.14.1 then replace ABAQUSLM_LICENSE_FILE with LM_LICENSE_FILE.<br>
@@ -25,8 +24,27 @@ If your license has not been set up for use on an Alliance cluster, some additio
 * IP address of your Abaqus license server
 You will then be sent a list of cluster IP addresses so that your administrator can open the local server firewall to allow connections from the cluster on both ports. Please note that a special license agreement must generally be negotiated and signed by SIMULIA and your institution before a local  license may be used remotely on Alliance hardware.
 
-<!--T:20931-->
-= Cluster job submission =
+== FLEXnet/DSLS Servers == <!--T:5-->
+
+Similar to previously installed modules the abaqus/2026 module is configured by default to work with Simulia <code>FLEXnet</code> license server such as the free SHARCNET license server.  To use a local <code>DSLS</code> based institutional license server two small text files <code>abaqus_v6.env</code> and <code>DSLicSrv.txt</code> should be created in your simulation submit directory as follows.  These will be read automatically when abaqus starts running to reconfigure itself accordingly.
+
+ [l2 (login node):~/mysimdir] cat abaqus_v6.env
+ license_server_type=DSLS
+ dsls_license_config="DSLicSrv.txt" 
+
+ [l2 (login node):~/mysimdir] DSLicSrv.txt
+ YOUR-SERVER-HOSTNAME:PORT-NUMBER
+
+= Version compatibility = <!--T:4-->
+
+== Module Changes == <!--T:5-->
+
+<!--T:3-->
+<span style="color:red">A new module for abaqus/2026 is now installed into the default StdEnv/2023 environment.</span>  This new version resolves the *** buffer overflow detected *** error with abaqus/2021 on all recent clusters.  Note that each slurm script on this wiki page has been updated to work with both abaqus/2026 and abaqus/2021 where possible therefore all personal slurm scripts should likewise be updated by researchers.  The abaqus/2026 module contains the initial <i>Abaqus 2026 Golden</i> release.  Another module named abaqus/2026.2606 containing <i>Abaqus 2026 FP.CFA.2606</i> level updates will be installed next.
+
+= Cluster job submission = <!--T:20931-->
+
+<!--T:5-->
 Below are prototype Slurm scripts for submitting thread and mpi-based parallel simulations to single or multiple compute nodes.  Most users will find it sufficient to use one of the <b>project directory scripts</b> provided in the <i>Single node computing</i> sections. The optional <code>memory=</code> argument found in the last line of the scripts is intended for larger memory or problematic jobs where 3072MB offset value may require tuning.  A listing of all Abaqus command line arguments can be obtained by loading an Abaqus module and running: <code>abaqus -help | less</code>.
 
 <!--T:6-->
@@ -58,8 +76,9 @@ Abaqus solvers support thread-based and mpi-based parallelization.  Scripts for 
 ##SBATCH --gpus-per-node=h100:1 # Uncomment to specify [type:]number
 
 <!--T:11-->
-module load StdEnv/2020         # Latest installed version
-module load abaqus/2021         # Latest installed version
+module load abaqus/2026         # Latest version
+#module load StdEnv/2020        # Legacy version
+#module load abaqus/2021        # Discontinue use
 
 <!--T:13-->
 unset SLURM_GTIDS
@@ -67,14 +86,21 @@ export MPI_IC_ORDER='tcp'
 echo "LM_LICENSE_FILE=$LM_LICENSE_FILE"
 echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
-<!--T:14-->
 rm -f testsp1* testsp2*
-/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+
+if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
+   /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
    abaqus job=testsp1 input=mystd-sim.inp \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
-#  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+   #gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+elif [[ $EBVERSIONABAQUS -ge 2026 ]]; then
+   abaqus job=testsp1 input=mystd-sim.inp \
+   scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
+   mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
+   #gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+fi
 }}
 
 <!--T:15-->
@@ -104,8 +130,9 @@ Some simulations may benefit by adding the following to the Abaqus command at th
 ##SBATCH --gpus-per-node=h100:1 # Uncomment to specify [type:]number
 
 <!--T:17-->
-module load StdEnv/2020         # Latest installed version
-module load abaqus/2021         # Latest installed version
+module load abaqus/2026         # Latest version
+#module load StdEnv/2020        # Legacy version
+#module load abaqus/2021        # Discontinue use
 
 <!--T:18-->
 unset SLURM_GTIDS
@@ -113,14 +140,21 @@ export MPI_IC_ORDER='tcp'
 echo "LM_LICENSE_FILE=$LM_LICENSE_FILE"
 echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
-<!--T:19-->
 rm -f testsp2* testsp1.lck
-/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+
+if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
+   /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
    abaqus job=testsp2 oldjob=testsp1 input=mystd-sim-restart.inp \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
-#  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+   #gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+elif [[ $EBVERSIONABAQUS -ge 2026 ]]; then
+   abaqus job=testsp2 oldjob=testsp1 input=mystd-sim-restart.inp \
+   scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
+   mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
+   #gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+fi
 }}
 
 <!--T:20-->
@@ -144,9 +178,10 @@ The restart input file should contain:
 ##SBATCH --constraint=granite   # Uncomment to specify a node type
 ##SBATCH --gpus-per-node=h100:1 # Uncomment to specify [type:]number
 
-<!--T:22-->
-module load StdEnv/2020         # Latest installed version
-module load abaqus/2021         # Latest installed version
+<!--T:21-->
+module load abaqus/2026         # Latest version
+#module load StdEnv/2020        # Legacy version
+#module load abaqus/2021        # Discontinue use
 
 <!--T:23-->
 unset SLURM_GTIDS
@@ -158,6 +193,7 @@ echo "SLURM_TMPDIR = " $SLURM_TMPDIR
 
 <!--T:24-->
 rm -f testst1* testst2*
+
 mkdir $SLURM_TMPDIR/scratch
 cd $SLURM_TMPDIR
 while sleep 6h; do
@@ -165,12 +201,21 @@ while sleep 6h; do
    cp -fv * $SLURM_SUBMIT_DIR 2>/dev/null
 done &
 WPID=$!
-/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+
+if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
+   /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
    abaqus job=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim.inp \
    scratch=$SLURM_TMPDIR/scratch cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
-#  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+   #gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+elif [[ $EBVERSIONABAQUS -ge 2026 ]]; then
+   abaqus job=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim.inp \
+   scratch=$SLURM_TMPDIR/scratch cpus=$SLURM_CPUS_ON_NODE interactive \
+   mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
+   #gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+fi
+
 { kill $WPID && wait $WPID; } 2>/dev/null
 cp -fv * $SLURM_SUBMIT_DIR
 }}
@@ -200,8 +245,9 @@ To check the completed restart information do:
 ##SBATCH --gpus-per-node=h100:1 # Uncomment to specify [type:]number
 
 <!--T:27-->
-module load StdEnv/2020         # Latest installed version
-module load abaqus/2021         # Latest installed version
+module load abaqus/2026         # Latest version
+#module load StdEnv/2020        # Legacy version
+#module load abaqus/2021        # Discontinue use
 
 <!--T:28-->
 unset SLURM_GTIDS
@@ -221,12 +267,21 @@ while sleep 6h; do
    cp -fv testst2* $SLURM_SUBMIT_DIR 2>/dev/null
 done &
 WPID=$!
-/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+
+if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
+   /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
    abaqus job=testst2 oldjob=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim-restart.inp \
    scratch=$SLURM_TMPDIR/scratch cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
-#  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+   #gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+elif [[ $EBVERSIONABAQUS -ge 2026 ]]; then
+   abaqus job=testst2 oldjob=testst1 input=$SLURM_SUBMIT_DIR/mystd-sim-restart.inp \
+   scratch=$SLURM_TMPDIR/scratch cpus=$SLURM_CPUS_ON_NODE interactive \
+   mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
+   #gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+fi
+
 { kill $WPID && wait $WPID; } 2>/dev/null
 cp -fv testst2* $SLURM_SUBMIT_DIR
 }}
@@ -242,8 +297,8 @@ The restart input file should contain:
 
 === Multiple node computing === <!--T:31-->
 
-<!--T:20923-->
-[[ <span style="color:red">The below script for Multinode computing is no longer usable with abaqus/2021 due to an increased process id range configuration on Alliance clusters. The issue will be resolved once abaqus/2026 is installed.  In the meantime please use one of the Single node computing slurm scripts provided above.</span> ]] Users with large memory or compute needs (and correspondingly large licenses) can use the following script to perform mpi-based computing over an arbitrary range of nodes ideally left to the scheduler to  automatically determine.  A companion template script to perform restart of multinode jobs is not provided due to additional limitations when they can be used.
+<!--T:20925-->
+Users with large memory or compute needs (and correspondingly access to a large licenses) can use the following script to perform mpi-based computing over an arbitrary range of nodes ideally left to the scheduler to  automatically determine.  A companion template script to perform restart of multinode jobs is not provided due to additional limitations when they can be used.  Only abaqus/2026 or newer maybe used with this script.
 
 <!--T:32-->
 {{File
@@ -260,8 +315,7 @@ The restart input file should contain:
 #SBATCH --cpus-per-task=1      # Do not change !
 
 <!--T:33-->
-module load StdEnv/2020        # Latest installed version
-module load abaqus/2021        # Latest installed version
+module load abaqus/2026         # Latest version
 
 <!--T:34-->
 unset SLURM_GTIDS
@@ -283,12 +337,13 @@ echo "$mphostlist" > abaqus_v6.env
 
 <!--T:37-->
 abaqus job=testsp1-mpi input=mystd-sim.inp \
-  scratch=$SLURM_TMPDIR cpus=$SLURM_NTASKS interactive mp_mode=mpi \
-  #mp_host_split=1  # number of dmp processes per node >= 1 (uncomment to specify)
+scratch=$SLURM_TMPDIR cpus=$SLURM_NTASKS interactive mp_mode=mpi \
+#mp_host_split=1  # number of dmp processes per node >= 1 (uncomment to specify)
 }}
 
-<!--T:38-->
-== Explicit analysis ==
+== Explicit analysis == <!--T:38-->
+
+<!--T:381-->
 Abaqus solvers support thread-based and mpi-based parallelization.  Scripts for each type are provided below for running explicit analysis type jobs on single or multiple nodes respectively.  Template scripts to perform multinode job restarts are not currently provided pending further testing.
 
 === Single node computing === <!--T:39--> 
@@ -308,8 +363,9 @@ Abaqus solvers support thread-based and mpi-based parallelization.  Scripts for 
 #SBATCH --nodes=1              # do not change
 
 <!--T:41-->
-module load StdEnv/2020
-module load abaqus/2021
+module load abaqus/2026         # Latest version
+#module load StdEnv/2020        # Legacy version
+#module load abaqus/2021        # Discontinue use
 
 <!--T:42-->
 unset SLURM_GTIDS
@@ -319,11 +375,18 @@ echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
 <!--T:43-->
 rm -f testep1* testep2*
-/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+
+if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
+   /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
    abaqus job=testep1 input=myexp-sim.inp \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
+elif [[ $EBVERSIONABAQUS -ge 2026 ]]; then
+   abaqus job=testep1 input=myexp-sim.inp \
+   scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
+   mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
+fi
 }}
 
 <!--T:44-->
@@ -347,8 +410,9 @@ Check for completed restart information in relevant output files:
 #SBATCH --nodes=1              # do not change
 
 <!--T:46-->
-module load StdEnv/2020
-module load abaqus/2021
+module load abaqus/2026         # Latest version
+#module load StdEnv/2020        # Legacy version
+#module load abaqus/2021        # Discontinue use
 
 <!--T:47-->
 unset SLURM_GTIDS
@@ -359,11 +423,18 @@ echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 <!--T:48-->
 rm -f testep2* testep1.lck
 for f in testep1*; do [[ -f ${f} ]] && cp -a "$f" "testep2${f#testep1}"; done
-/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+
+if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
+   /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
    abaqus job=testep2 input=myexp-sim.inp recover \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
+elif [[ $EBVERSIONABAQUS -ge 2026 ]]; then
+   abaqus job=testep2 input=myexp-sim.inp recover \
+   scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
+   mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
+fi
 }}
 
 <!--T:49-->
@@ -384,8 +455,9 @@ No input file modifications are required to restart the analysis.
 #SBATCH --nodes=1              # do not change
 
 <!--T:51-->
-module load StdEnv/2020
-module load abaqus/2021
+module load abaqus/2026         # Latest version
+#module load StdEnv/2020        # Legacy version
+#module load abaqus/2021        # Discontinue use
 
 <!--T:52-->
 unset SLURM_GTIDS
@@ -402,11 +474,19 @@ while sleep 6h; do
    cp -f * $SLURM_SUBMIT_DIR 2>/dev/null
 done &
 WPID=$!
-/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+
+if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
+   /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
    abaqus job=testet1 input=$SLURM_SUBMIT_DIR/myexp-sim.inp \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
+elif [[ $EBVERSIONABAQUS -ge 2026 ]]; then
+   abaqus job=testet1 input=$SLURM_SUBMIT_DIR/myexp-sim.inp \
+   scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
+   mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
+fi
+
 { kill $WPID && wait $WPID; } 2>/dev/null
 cp -f * $SLURM_SUBMIT_DIR
 }}
@@ -432,8 +512,9 @@ Check for completed restart information in relevant output files:
 #SBATCH --nodes=1              # do not change
 
 <!--T:56-->
-module load StdEnv/2020
-module load abaqus/2021
+module load abaqus/2026         # Latest version
+#module load StdEnv/2020        # Legacy version
+#module load abaqus/2021        # Discontinue use
 
 <!--T:57-->
 unset SLURM_GTIDS
@@ -451,11 +532,19 @@ while sleep 3h; do
    cp -f * $SLURM_SUBMIT_DIR 2>/dev/null
 done &
 WPID=$!
-/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+
+if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
+   /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
    abaqus job=testet2 input=$SLURM_SUBMIT_DIR/myexp-sim.inp recover \
    scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
+elif [[ $EBVERSIONABAQUS -ge 2026 ]]; then
+   abaqus job=testet2 input=$SLURM_SUBMIT_DIR/myexp-sim.inp recover \
+   scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
+   mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
+fi
+
 { kill $WPID && wait $WPID; } 2>/dev/null
 cp -f  * $SLURM_SUBMIT_DIR
 }}
@@ -469,8 +558,8 @@ No input file modifications are required to restart the analysis.
 
 === Multiple node computing === <!--T:61--> 
 
-<!--T:20943-->
-[[ <span style="color:red">The below script for Multinode computing is no longer usable with abaqus/2021 due to an increased process id range configuration on Alliance clusters. The issue will be resolved once abaqus/2026 is installed.  In the meantime please use one of the Single node computing slurm scripts provided above.</span> ]]
+<!--T:20946-->
+Users with large memory or compute needs (and correspondingly access to a large licenses) can use the following script to perform mpi-based computing over an arbitrary range of nodes ideally left to the scheduler to  automatically determine.  A companion template script to perform restart of multinode jobs is not provided due to additional limitations how they can be used.  Only abaqus/2026 or newer maybe used with this script.
 
 <!--T:62-->
 {{File
@@ -486,14 +575,12 @@ No input file modifications are required to restart the analysis.
 #SBATCH --cpus-per-task=1      # Do not change !
 
 <!--T:63-->
-module load StdEnv/2020        # Latest installed version
-module load abaqus/2021        # Latest installed version
+module load abaqus/2026        # Latest version
 
 <!--T:64-->
 unset SLURM_GTIDS
 export MPI_IC_ORDER='tcp'
-# uncomment next line when using abaqus/2021
-export I_MPI_HYDRA_TOPOLIB=ipl
+#export I_MPI_HYDRA_TOPOLIB=ipl
 echo "LM_LICENSE_FILE=$LM_LICENSE_FILE"
 echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
@@ -511,8 +598,8 @@ echo "$mphostlist" > abaqus_v6.env
 
 <!--T:67-->
 abaqus job=testep1-mpi input=myexp-sim.inp \
-  scratch=$SLURM_TMPDIR cpus=$SLURM_NTASKS interactive mp_mode=mpi \
-  #mp_host_split=1  # number of dmp processes per node >= 1 (uncomment to specify)
+scratch=$SLURM_TMPDIR cpus=$SLURM_NTASKS interactive mp_mode=mpi \
+#mp_host_split=1  # number of dmp processes per node >= 1 (uncomment to specify)
 }}
 
 == Memory estimates == <!--T:68-->
@@ -562,10 +649,10 @@ To completely satisfy the recommended "MEMORY TO OPERATIONS REQUIRED MINIMIZE I/
 
 === Multi process === <!--T:76-->
 
-<!--T:20925-->
+<!--T:77-->
 To determine the required slurm memory for multi-node slurm scripts, memory estimates (per compute process) required to minimize I/O are given in the output dat file of completed jobs.  If mp_host_split is not specified (or is set to 1) then the total number of compute processes will equal the number of nodes.  The mem-per-cpu value can then be roughly determined by multiplying the largest memory estimate by the number of nodes and then dividing by the number or ntasks.  If however a value for mp_host_split is specified (greater than 1) than the mem-per-cpu value can be roughly determined from the largest memory estimate times the number of nodes times the value of mp_host_split divided by the number of tasks.  Note that mp_host_split must be less than or equal to the number of cores per node assigned by slurm at runtime otherwise Abaqus will terminate.  This scenario can be controlled by uncommenting to specify a value for tasks-per-node.  The following definitive statement is given in every output dat file and mentioned here for reference:
 
- <!--T:77-->
+ <!--T:78-->
  THE UPPER LIMIT OF MEMORY THAT CAN BE ALLOCATED BY ABAQUS WILL IN GENERAL DEPEND ON THE VALUE OF
  THE "MEMORY" PARAMETER AND THE AMOUNT OF PHYSICAL MEMORY AVAILABLE ON THE MACHINE. PLEASE SEE
  THE "ABAQUS ANALYSIS USER'S MANUAL" FOR MORE DETAILS. THE ACTUAL USAGE OF MEMORY AND OF DISK
@@ -577,42 +664,58 @@ To determine the required slurm memory for multi-node slurm scripts, memory esti
  BETWEEN THE ESTIMATED "MEMORY TO MINIMIZE I/O" AND THE MEMORY UPPER LIMIT. HOWEVER ACCURATE
  ESTIMATE OF THE SCRATCH DISK SPACE IS NOT POSSIBLE.
 
-<!--T:78-->
-= Graphical use =
-It is now recommended to use OpenOnDemand or JupyterLab to run graphical applications at the Alliance. 
+= Graphical use = <!--T:79-->
+
+<!--T:83-->
+It is recommended to use an OpenOnDemand or JupyterLab to run graphical applications at the Alliance. 
 
 == OnDemand == <!--T:80-->
 
 <!--T:188-->
-1. Connect to an OnDemand system using one of the following URLs in your laptop browser :<br>
+1. Start an OnDemand desktop session by clicking one of the following OnDemand links:<br>
  [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) NIBI]: <code>https://ondemand.sharcnet.ca</code>
- FIR: <code>https://jupyterhub.fir.alliancecan.ca</code>
- RORQUAL: <code>https://jupyterhub.rorqual.alliancecan.ca</code>
- TRILLIUM: <code>https://ondemand.scinet.utoronto.ca</code>
-2. Open a new terminal window within your desktop and load one of :
- module load StdEnv/2020 abaqus/2021, or
- module load StdEnv/2023 abaqus/2025 <- coming soon
-3. Start the application in graphical mode:<br>
+ TRILLIUM: https://ondemand.scinet.utoronto.ca
+
+<!--T:189-->
+2. Open a new terminal window within your desktop and load :
+ module load abaqus/2026
+
+<!--T:190-->
+3. Start the application in graphical mode using the cae option.  If you are on either: 1) a node without a GPU or 2) a node with a GPU but without VirtualGL support, then append to use the mesa option:
+ abaqus cae -mesa
+
+4. If you require better graphical performance and are on a node with a GPU and VirtualGL support then start abaqus without the -mesa option.  When using the nibi OnDemand desktop a full h100 (80GB) GPU from the GPU pulldown must be selected.
  abaqus cae
 
 <!--T:81-->
-To start Abaqus in gui mode there must be at least <b>one</b> unused cae license according to :
+5. To start Abaqus in gui mode there must be at least <b>one</b> unused cae license according to :
 
 <!--T:82-->
  $ abaqus licensing lmstat -c $ABAQUSLM_LICENSE_FILE -a | grep "Users of cae"
  Users of cae:  (Total of 4 licenses issued;  Total of 3 licenses in use)
 
+== JupyterLab == <!--T:80-->
+
+1. Start a JupyterHub desktop session by clicking one of the following JupyterHub links<br>
+ FIR: https://jupyterhub.fir.alliancecan.ca
+ NARVAL:  https://portail.narval.calculquebec.ca/
+ RORQUAL: https://jupyterhub.rorqual.alliancecan.ca
+2. Highlight an abaqus module such as <code>abaqus/2026</code> in the left hand side Available Module section<br>
+3. Click Load for the highlighted module and a <code>Abaqus (VNC)</code> Icon will appear in desktop<br>
+4. Click the Icon and abaqus should automatically be started in a remote Juypter desktop
+
 == VncViewer == <!--T:79-->
 
+<!--T:20941-->
+This approach is considered obsolete please use the above OnDemand/JuypterHub desktop instead.
+
 <!--T:20933-->
-1. Connect with a VncViewer client to a login or compute node by following [[VNC|TigerVNC]]<br>
+1. Connect with a VncViewer client to a login or compute node without a GPU by following [[VNC|TigerVNC]]<br>
 2. Open a new terminal window and enter the following<br>
- module load StdEnv/2020 abaqus/2021, or
- module load StdEnv/2023 abaqus/2025 <- coming soon
+ module load abaqus/2026
 3. Start the application with<br>
  abaqus cae -mesa
 
-<!--T:20941-->
 = Site-specific use =
 == SHARCNET license == 
 

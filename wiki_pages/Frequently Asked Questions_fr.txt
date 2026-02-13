@@ -17,6 +17,7 @@ Les systèmes d'exploitation ont des conventions différentes pour signaler la f
 *créer et éditer les fichiers texte sur la grappe en utilisant un éditeur standard Linux comme emacs, vim ou nano;
 *avec des fichiers texte Windows, lancer la commande <tt>dos2unix <filename></tt> sur un nœud de connexion pour convertir les caractères de fin de ligne au format approprié. 
 
+<span id="Saving_files_is_slow_in_my_editor"></span>
 == Lenteur de sauvegarde avec mon éditeur  ==
 
 === Emacs ===
@@ -27,114 +28,7 @@ Pour sauvegarder les fichiers, Emacs utilise l'appel système <tt>fsync</tt> pou
 
 Pour plus d'information, voir [https://www.gnu.org/savannah-checkouts/gnu/emacs/manual/html_node/emacs/Customize-Save.html Customize save in Emacs]
 
-==  Transferts entre les systèmes de fichiers /scratch, /home et /project ==
-Sur nos grappes d'usage général, les quotas pour /scratch et /home sont par utilisateur, alors qu'ils sont par projet pour le système de fichiers [[Project layout/fr|/project]]. Comme les quotas pour le système de fichiers [http://lustre.org/ Lustre] sont présentement basés sur le groupe propriétaire des fichiers, il faut s'assurer que les fichiers soient associés au bon groupe.
-*Pour /scratch et /home, le bon groupe est typiquement le groupe qui possède le même nom que votre nom d'utilisateur.
-*Pour /project, le nom du groupe a la forme <tt>prefix-piusername</tt>, où <tt>prefix</tt> est un de <tt>def</tt>, <tt>rrg</tt> ou <tt>rpp</tt>.
-
-=== De /scratch vers /home===
-Puisque les quotas de ces systèmes de fichiers sont basés sur votre groupe personnel, vous devriez pouvoir effectuer les transferts avec 
-{{Command|mv $HOME/scratch/some_file $HOME/some_file}}
-
-=== De /scratch ou /home vers /project ===
-De /scratch ou /home vers /project, '''n'utilisez pas''' la commande <tt>mv</tt>. Utilisez plutôt les commandes <tt>cp</tt> ou <tt>rsync</tt>.
-
-Il est très important que <tt>cp</tt> et <tt>rsync</tt> s'exécutent correctement pour que les fichiers copiés dans l'espace /project possèdent la propriété de groupe correcte.
-*Avec <tt>cp</tt>, n'utilisez pas l'option d'archivage <tt>-a</tt>.
-*Avec <tt>rsync</tt>, assurez-vous d'utiliser les options <tt>--no-g --no-p</tt> ainsi&nbsp;:
-
-{{Command|rsync -axvH --no-g --no-p  $HOME/scratch/some_directory $HOME/projects/<project>/some_other_directory}}
-
-Une fois les fichiers copiés correctement, ils peuvent être supprimés de votre espace ''scratch''.
-
-=== De /project à /scratch ou /home ===
-Évitez la commande <tt>mv</tt> : nous recommandons plutôt <tt>cp</tt>, ou <tt>rsync</tt>.
-
-Il est très important que ces commandes s'effectuent correctement pour que les fichiers conservent la même propriété de groupe qu'avec /project.
-* avec <tt>cp</tt>, n'utilisez pas l'option d'archivage <tt>-a</tt> 
-* avec <tt>rsync</tt>, entrez les options comme suit&nbsp;:
-
-{{Command|rsync -axvH --no-g --no-p  $HOME/projects/<project>/some_other_directory $HOME/scratch/some_directory}}
-
-=== De /project à /project ===
-N'utilisez jamais la commande <tt>mv</tt>; nous vous recommandons plutôt <tt>cp</tt> ou <tt>rsync</tt>.
-
-Il est très important de faire exécuter correctement <tt>cp</tt> ou <tt>rsync</tt> pour faire en sorte que la propriété de groupe des fichiers copiés soit correcte.
-*Avec <tt>cp</tt>, n'utilisez pas l'option d'archivage <tt>-a</tt>.
-*Avec <tt>rsync</tt>, spécifiez les options <tt>--no-g --no-p</tt> comme suit&nbsp;:
-
-{{Command|rsync -axvH --no-g --no-p  $HOME/projects/<project>/some_other_directory $HOME/projects/<project2>/some_directory}}
-
-'''Quand vos données auront été copiées, n'oubliez pas de supprimer celles de la source.'''
-
-== Message ''Disk quota exceeded'' ==
-:''Voir aussi la page [[Project layout/fr|Espace projet]]''
-Certains reçoivent ce message d'erreur ou un autre message similaire au sujet du quota en rapport avec leurs répertoires de [[Project layout/fr|l'espace /project]]. Des difficultés ont aussi été rapportées lors du transfert de fichiers vers leur répertoire /project à partir d'une autre grappe. Plusieurs de ces cas sont dus à des problèmes de propriété des fichiers.
-
-Pour savoir si vous avez atteint ou dépassé le quota, utilisez <code>diskusage_report</code>.
-<source lang="bash">
-[ymartin@cedar5 ~]$ diskusage_report
-                             Description                Space           # of files
-                     Home (user ymartin)             345M/50G            9518/500k
-                  Scratch (user ymartin)              93M/20T           6532/1000k
-                 Project (group ymartin)          5472k/2048k            158/5000k
-            Project (group def-zrichard)            20k/1000G              4/5000k
-</source>
-
-Cet exemple illustre un problème fréquent&nbsp;: l'espace projet de l'utilisateur <code>ymartin</code> contient trop de données dans des fichiers qui appartiennent au groupe <code>ymartin</code>. Ces données devraient se trouver dans des fichiers appartenant à <code>def-zrichard</code>. Pour connaître les groupes de projets que vous pouvez utiliser, lancez la commande
- stat -c %G $HOME/projects/*/
-
-En ce qui a trait aux deux dernières lignes, 
-*<code>Project (group ymartin)</code> décrit les fichiers qui appartiennent au groupe <code>ymartin</code>; notez que le nom du groupe est le même que celui de l’utilisateur. Ce dernier est le seul membre du groupe et le quota de 2048Ko pour son groupe est très bas.
-*<code>Project (group def-zrichard)</code> décrit les fichiers qui appartiennent au '''groupe du projet'''. Il est possible que votre compte soit associé à plusieurs groupes de projet, dont les noms sont sous la forme <code>def-zrichard</code>, <code>rrg-someprof-ab</code>, ou <code>rpp-someprof</code>. 
-
-Dans cet exemple, les fichiers ont été associés au propriétaire du groupe <code>ymartin</code> plutôt qu’au propriétaire du groupe <code>def-zrichard</code>, ce qui est inattendu et non souhaitable.  
-
-Les nouveaux fichiers et répertoires créés dans /project sont automatiquement associés à un groupe du projet. Les raisons les plus fréquentes pour lesquelles cette association est fautive sont que
-*les fichiers et répertoires sont déplacés d’un espace /home à un espace /project en utilisant la commande <code>mv</code>; pour éviter ceci, voyez ci-dessus la section ''De /scratch vers /home'';
-* les fichiers sont transférés à partir d’une autre grappe à l’aide de [[Transferring_data#Rsync|rsync]] ou de [[Transferring_data#SCP|scp]] avec une option forçant de conserver les mêmes caractéristiques de propriété; vérifiez donc les options que vous avez sélectionnées dans votre application de transfert de données;
-* le bit <tt>setgid</tt> n'est pas activé pour vos répertoires /project.
-
-=== Solution ===
-Si votre répertoire /project contient des données qui appartiennent au mauvais groupe, utilisez <code>find</code> pour afficher les fichiers.
- lfs find ~/projects/*/ -group $USER
-
-Changez ensuite la propriété de $USER au groupe de projet, par exemple
- chown -h -R $USER:def-professor -- ~/projects/def-professor/$USER/
-
-[[Sharing data/fr#Bit_pour_l'ID_du_groupe|Activez le bit <code>setgid</code> pour tous les répertoires]] pour que les nouveaux fichiers héritent de l'appartenance au groupe du répertoire, par exemple
- lfs find ~/projects/def-professor/$USER -type d -print0 | xargs -0 chmod g+s
-
-Enfin, assurez-vous que les permissions des répertoires de l'espace projet sont correctes avec
- chmod 2770 ~/projects/def-professor/
- chmod 2700 ~/projects/def-professor/$USER
-
-=== Autre explication ===
-Chaque fichier sous Linux appartient à la fois à un utilisateur et à un groupe.
-Par défaut, tout fichier que vous créez vous appartient (''username'') et votre groupe porte le même nom. Le propriétaire est donc '''username:username'''. Votre groupe a été créé au même moment où votre compte a été créé et vous êtes le seul utilisateur dans ce groupe. 
-
-La propriété du fichier vaut pour votre répertoire /home et pour l'espace /scratch, comme ici 
-
-<pre>
-                              Description                Space           # of files
-                      Home (user username)              15G/53G             74k/500k
-                   Scratch (user username)           1522G/100T            65k/1000k
-                  Project (group username)            34G/2048k             330/2048
-             Project (group def-professor)            28k/1000G               9/500k
-</pre>
-
-Les quotas pour /home et /scratch sont établis sur la base du '''username'''.
-
-Les deux autres lignes sont pour les groupes '''username''' et '''def-professor''' dans l'espace /project. Il n'est pas important que les utilisateurs soient propriétaires des fichiers dans cet espace; par contre le groupe propriétaire des fichiers déterminera la limite du quota. 
-
-Vous remarquez que vos fichiers occupent déjà 34Go dans l'espace /project et que la limite pour le groupe '''username''' est fixée à 2Mo, ce qui est très peu. Pour cette raison, vous ne pouvez y enregistrer plus de données parce que le groupe propriétaire n'a pas reçu une allocation pour plus d'espace.
-
-Par contre, l'allocation pour le groupe '''def-professor''' (le groupe de votre professeur) n'utilise presque pas d'espace, mais dispose en fait de 1To. Les fichiers ici devraient appartenir à '''username:def-professor'''. 
-
-Dépendant du logiciel et de la méthode de copie des fichiers, le logiciel respectera la propriété du répertoire et désignera le bon groupe ou il conservera la propriété du fichier source; ce dernier comportement n'est pas souhaitable.
-
-Vos données initiales appartiennent probablement à '''username:username'''; en les déplaçant, elles devraient appartenir à '''username:def-professor''', mais le logiciel insiste pour ne pas changer la propriété, ce qui est un problème.
-
+<span id="sbatch:_error:_Batch_job_submission_failed:_Socket_timed_out_on_send/recv_operation"></span>
 ==Message d'erreur ''sbatch: error: Batch job submission failed: Socket timed out on send/recv operation'' ==
 
 Vous pourriez recevoir ce message d'erreur si l'ordonnanceur est surchargé (voir la page [[Running jobs/fr|Exécuter des tâches]]). Nous tentons toujours d'augmenter la tolérance de Slurm à cet effet et d'éliminer les sources de surcharge ponctuelle, mais ceci est un projet de longue haleine. Notre recommandation est d'attendre environ une minute, puis d'utiliser <code>squeue -u $USER</code> pour voir si la tâche soumise paraît. Si la tâche n'est pas listée, soumettez-la de nouveau.
@@ -148,6 +42,7 @@ La colonne <tt>(REASON)</tt> contient <tt>Resources</tt> ou <tt>Priority</tt>.
 * <tt>Resources</tt>&nbsp;: la grappe est très occupée; vous pouvez soit attendre, soit soumettre une tâche qui exige moins de ressources en termes de CPU/nœud, GPU, mémoire ou temps d’exécution
 * <tt>Priority</tt>&nbsp;: la tâche est en attente en raison de sa basse priorité, ce qui survient lorsque vous et les autres membres du groupe avez utilisé plus que votre juste part des ressources récemment; vous pouvez faire le suivi de votre utilisation des ressources avec la commande <tt>sshare</tt> (voir [[Job scheduling policies/fr|Politique d’ordonnancement des tâches]]).
 
+<span id="Why_do_my_jobs_show_&quot;Nodes_required_for_job_are_DOWN,_DRAINED_or_RESERVED_for_jobs_in_higher_priority_partitions&quot;_or_&quot;ReqNodeNotAvailable&quot;?"></span>
 == Messages ''Nodes required for job are DOWN, DRAINED or RESERVED for jobs in higher priority partitions'' ou ''ReqNodeNotAvailable''==
 
 Il est possible qu'un de ces messages s’affiche dans le champ ''Reason'' du fichier de résultat de <tt>squeue</tt> pour une tâche en attente; ceci se produit avec Slurm 19.05 et signifie qu'un ou plusieurs des nœuds que Slurm pouvait utiliser sont en panne, ont été mis hors service, ou encore sont réservés pour d’autres tâches. Ces cas sont fréquents avec les grappes de grande capacité qui connaissent un fort achalandage. Ces messages signifient effectivement la même chose que la raison ''Ressources'' de la version Slurm 17.11. Ce ne sont pas des messages d'erreur; les tâches sont dans la queue et seront éventuellement traitées. 
@@ -169,6 +64,7 @@ Pour la plupart des tâches en attente, la valeur de START_TIME est N/A (''not a
 
 Pour les tâches qui sont en cours, la valeur de START_TIME obtenue par <tt>squeue</tt> est précise.
 
+<span id="What_are_the_.core_files_that_I_find_in_my_directory?"></span>
 ==Fichiers .core==
 
 Dans certains cas, un fichier binaire avec l'extension ''.core'' est créé quand un programme se termine anormalement; il contient un instantané de l'état du programme au moment où il s'est terminé. Ce fichier est utile pour le débogage, mais n'est d'aucun intérêt pour les utilisateurs; il n'est qu'un signe d'un problème dans le déroulement du programme, ce qui est généralement indiqué dans le résultat en sortie de la tâche. Les fichiers ''.core'' peuvent être supprimés; ajoutez la ligne <tt>ulimit -c 0</tt> à la fin du fichier $HOME/.bashrc pour que ces fichiers ne soient plus créés.
@@ -176,6 +72,7 @@ Dans certains cas, un fichier binaire avec l'extension ''.core'' est créé quan
 ==Bibliothèque introuvable==
 À l'exécution, les paquets binaires précompilés qui sont installés dans votre répertoire <code>$HOME</code> peuvent produire une erreur semblable à <tt>/lib64/libc.so.6: version 'GLIBC_2.18' not found</tt>. Pour la solution, voir [[Installing software in your home directory/fr#Installer_des_paquets_binaires | Installer des paquets binaires]].
 
+<span id="How_do_you_handle_sensitive_research_data?"></span>
 == Quelles sont vos mesures pour la gestion des données sensibles? ==
 
 Nos grappes ne sont pas spécifiquement conçues pour garantir la sécurité des données personnelles, privées ou sensibles.

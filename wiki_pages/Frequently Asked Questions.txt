@@ -2,10 +2,12 @@
 __TOC__
 
 <translate>
-== Forgot my password == <!--T:19-->
+<!--T:19-->
+== Forgot my password ==
 To reset your password for any Alliance national cluster, visit https://ccdb.computecanada.ca/security/forgot. Please note that you will not be able to reset your password until your first role gets approved by our staff.
 
-== Copy and paste == <!--T:69-->
+<!--T:69-->
+== Copy and paste ==
 In the Linux terminal, you can't use [Ctrl]+C to copy text, 
 because [Ctrl]+C means "Cancel" or "Interrupt" and stops the running program.
 
@@ -19,7 +21,8 @@ Depending on which terminal software you are using, you simply need to select
 the text to copy it into the clipboard, and you can paste from the clipboard
 by using either the right-click or middle-click (the default setting can vary).
 
-==Text file line endings == <!--T:46-->
+<!--T:46-->
+==Text file line endings ==
 For historical reasons, Windows and most other operating systems, including Linux and OS X, disagree on the convention that is used to denote the end of a line in a plain text ASCII file. Text files prepared in a Windows environment will therefore have an additional invisible "carriage return" character at the end of each line and this can cause certain problems when reading this file in a Linux environment. For this reason you should either consider creating and editing your text files on the cluster itself using standard Linux text editors like emacs, vim and nano or, if you prefer Windows, to then use the command <tt>dos2unix <filename></tt> on the cluster login node to convert the line endings of your file to the appropriate convention. 
 
 == Saving files is slow in my editor == <!--T:72-->
@@ -35,136 +38,13 @@ Emacs uses the fsync system call when saving files to reduce the risk of losing 
 <!--T:76-->
 More about this setting here: [https://www.gnu.org/savannah-checkouts/gnu/emacs/manual/html_node/emacs/Customize-Save.html Customize save in Emacs]
 
-== Moving files across the project, scratch and home filesystems == <!--T:40-->
-On our general purpose clusters, the scratch and home filesystems have quotas that are per-user, while the [[Project layout|project filesystem]] has quotas that are per-project. Because the underlying implementation of quotas on the [http://lustre.org/ Lustre] filesystem 
-is currently based on group ownership of files, it is important to ensure that the files have the right group. On the scratch and home filesystems, the correct group is typically the group with the same name as your username. On the project filesystem, group name should follow the pattern <tt>prefix-piusername</tt> where <tt>prefix</tt> is typically one of <tt>def</tt>, <tt>rrg</tt>, <tt>rpp</tt>.
-
-=== Moving files between scratch and home filesystems === <!--T:41-->
-Since the quotas of these two filesystems are based on your personal group, you should be able to move files across the two using 
-{{Command|mv $HOME/scratch/some_file $HOME/some_file}}
-
-=== Moving files from scratch or home filesystems to project === <!--T:42-->
-If you want to move files from your scratch or home space into a project space, you '''should not''' use the <tt>mv</tt> command. Instead, we recommend using the regular <tt>cp</tt>, or the <tt>rsync</tt> command.
-
-<!--T:47-->
-It is very important to run <tt>cp</tt> and <tt>rsync</tt> correctly to ensure that the files copied over to the project space have the correct group ownership. With <tt>cp</tt>, do not use the archive <tt>-a</tt> option. And when using <tt>rsync</tt>, make sure you specify the <tt>--no-g --no-p</tt> options, like so:
-
-<!--T:43-->
-{{Command|rsync -axvH --no-g --no-p  $HOME/scratch/some_directory $HOME/projects/<project>/some_other_directory}}
-
-<!--T:45-->
-Once the files are copied, you can then delete them from your scratch space.
-
-=== Moving files from project to scratch or home filesystems === <!--T:55-->
-If you want to move files from your project into your scratch or home space, you '''should not''' use the <tt>mv</tt> command. Instead, we recommend using the regular <tt>cp</tt>, or the <tt>rsync</tt> command.
-
-<!--T:56-->
-It is very important to run <tt>cp</tt> and <tt>rsync</tt> correctly to ensure that the files copied over to the project space have the correct group ownership. With <tt>cp</tt>, do not use the archive <tt>-a</tt> option. And when using <tt>rsync</tt>, make sure you specify the <tt>--no-g --no-p</tt> options, like so:
-
-<!--T:57-->
-{{Command|rsync -axvH --no-g --no-p  $HOME/projects/<project>/some_other_directory $HOME/scratch/some_directory}}
-
-=== Moving files between two project spaces === <!--T:60-->
-If you want to move files between two project spaces, you '''should not''' use the <tt>mv</tt> command. Instead, we recommend using the regular <tt>cp</tt>, or the <tt>rsync</tt> command.
-
-<!--T:61-->
-It is very important to run <tt>cp</tt> or <tt>rsync</tt> correctly to ensure that the files copied over have the correct group ownership. With <tt>cp</tt>, do not use the archive <tt>-a</tt> option. And when using <tt>rsync</tt>, make sure you specify the <tt>--no-g --no-p</tt> options, like so:
-
-<!--T:62-->
-{{Command|rsync -axvH --no-g --no-p  $HOME/projects/<project>/some_other_directory $HOME/projects/<project2>/some_directory}}
-
-<!--T:63-->
-'''Once you have copied your data over, please delete the old data.'''
-
-== ''Disk quota exceeded'' error on /project filesystems == <!--T:12-->
-:''Also see: [[Project layout]]''
-Some users have seen this message or some similar quota error on their [[Project layout|/project]] folders. Other users have reported obscure failures while transferring files into their /project folder from another cluster. Many of the problems reported are due to bad file ownership.
-
-<!--T:5-->
-Use <code>diskusage_report</code> to see if you are at or over your quota:
-<source lang="bash">
-[ymartin@cedar5 ~]$ diskusage_report
-                             Description                Space           # of files
-                     Home (user ymartin)             345M/50G            9518/500k
-                  Scratch (user ymartin)              93M/20T           6532/1000k
-                 Project (group ymartin)          5472k/2048k            158/5000k
-            Project (group def-zrichard)            20k/1000G              4/5000k
-</source>
-
-<!--T:6-->
-The example above illustrates a frequent problem: <code>/project</code> for user <code>ymartin</code> contains too much data in files belonging to group <code>ymartin</code>. The data should instead be in files belonging to <code>def-zrichard</code>. To see the project groups you may use, run the following command:
- stat -c %G $HOME/projects/*/
-
-<!--T:8-->
-Note the two lines labelled <code>Project</code>.
-*<code>Project (group ymartin)</code> describes files belonging to group <code>ymartin</code>, which has the same name as the user. This user is the only member of this group, which has a very small quota (2048k). 
-*<code>Project (group def-zrichard)</code> describes files belonging to a '''project group'''. Your account may be associated with one or more project groups, and they will typically have names like <code>def-zrichard</code>, <code>rrg-someprof-ab</code>, or <code>rpp-someprof</code>. 
-
-<!--T:9-->
-In this example, files have somehow been created belonging to group <code>ymartin</code> instead of group <code>def-zrichard</code>. This is neither the desired nor the expected behaviour.  
-
-<!--T:2-->
-By design, new files and directories in <code>/project</code> will normally be created belonging to a project group. The main reasons why files may be associated with the wrong group are
-* files were moved from <code>/home</code> to <code>/project</code> with the <code>mv</code>command; to avoid this, see [[#Moving files between scratch and home filesystems | advice above]];
-* files were transferred from another cluster using [[Transferring_data#Rsync|rsync]] or [[Transferring_data#SCP|scp]] with an option to preserve the original group ownership. If you have a recurring problem with ownership, check the options you are using with your file transfer program;
-* you have no <tt>setgid</tt> bit set on your Project folders.
-
-=== How to fix the problem === <!--T:48-->
-If you already have data in your <code>/project</code> directory with the wrong group ownership, you can use the <code>find</code> to display those files:
- lfs find ~/projects/*/ -group $USER
-
-<!--T:49-->
-Next, change ownership from $USER to the project group, for example:
- chown -h -R $USER:def-professor -- ~/projects/def-professor/$USER/
-
-<!--T:50-->
-Then, set the <code>setgid</code> bit on all directories (for more information, see [[Sharing_data#Set_Group_ID_bit|Group ID]]) to ensure that newly created files will inherit the directory's group membership, for example:
- lfs find ~/projects/def-professor/$USER -type d -print0 | xargs -0 chmod g+s
-
-<!--T:51-->
-Finally, verify that project space directories have correct permissions set
- chmod 2770 ~/projects/def-professor/
- chmod 2700 ~/projects/def-professor/$USER
-
-=== Another explanation === <!--T:23-->
-Each file in Linux belongs to a person and a group at the same time. By default, a file you create belongs to you, user '''username''', and your group, named the same '''username'''. That is it is owned by '''username:username'''. Your group is created at the same time your account was created and you are the only user in that group. 
-
-<!--T:24-->
-This file ownership is good for your home directory and the scratch space, as shown hereː 
-
-<!--T:39-->
-<pre>
-                              Description                Space           # of files
-                      Home (user username)              15G/53G             74k/500k
-                   Scratch (user username)           1522G/100T            65k/1000k
-                  Project (group username)            34G/2048k             330/2048
-             Project (group def-professor)            28k/1000G               9/500k
-</pre>
-
-<!--T:26-->
-The quota is set for these for a user '''username'''.
-
-<!--T:27-->
-The other two lines are set for groups '''username''' and '''def-professor''' in Project space. It is not important what users own the files in that space, but the group the files belong to determines the quota limit. 
-
-<!--T:28-->
-You see that files that are owned by '''username''' group (your default group) have very small limit in the project space, only 2MB, and you already have 34 GB of data that is owned by your group (your files). This is why you cannot write more data there. Because you are trying to place data there owned by a group that has very little allocation there.
-
-<!--T:29-->
-On the other hand, the allocation for the group '''def-professor''', your professor's group, does not use almost any space and has 1 TB limit. The files that can be put there should have '''username:def-professor''' ownership. 
-
-<!--T:30-->
-Now, depending on how you copy your files, what software you use, that software either will respect the ownership of the directory and apply the correct group, or it may insist on retaining the ownership of the source data. In the latter case, you will have a problem like you have now.
-
-<!--T:31-->
-Most probably your original data belongs to '''username:username''', properly, upon moving it, it should belong to '''username:def-professor''', but your software probably insists on keeping the original ownership and this causes the problem.
-
 == ''sbatch: error: Batch job submission failed: Socket timed out on send/recv operation'' == <!--T:10-->
 
 <!--T:11-->
 You may see this message when the load on the [[Running jobs|Slurm]] manager or scheduler process is too high. We are working both to improve Slurm's tolerance of that and to identify and eliminate the sources of load spikes, but that is a long-term project. The best advice we have currently is to wait a minute or so. Then run <code>squeue -u $USER</code> and see if the job you were trying to submit appears: in some cases the error message is delivered even though the job was accepted by Slurm. If it doesn't appear, simply submit it again.
 
-== Why are my jobs taking so long to start? == <!--T:20-->
+<!--T:20-->
+== Why are my jobs taking so long to start? ==
 You can see why your jobs are in the <tt>PD</tt> (pending) state by running the <tt>squeue -u <username></tt> command on the cluster.<br><br>
 The <tt>(REASON)</tt> column typically has the values <tt>Resources</tt> or <tt>Priority</tt>.
 * <tt>Resources</tt>ː The cluster is simply very busy and you will have to be patient or perhaps consider if you can submit a job that asks for fewer resources (e.g. CPUs/nodes, GPUs, memory, time).
@@ -179,7 +59,8 @@ or are being reserved for other jobs.  On a large busy cluster, there will almos
 effectively the same thing as the reason "Resources" that appeared in Slurm version 17.11.  However, these are not
 error messages; jobs submitted are actually in the queue and will eventually be processed. 
 
-== How accurate is START_TIME in <tt>squeue</tt> output? == <!--T:33-->
+<!--T:33-->
+== How accurate is START_TIME in <tt>squeue</tt> output? ==
 We don't show the start time by default with <tt>squeue</tt>, but it can be printed with an option.  The start times Slurm forecasts depend on rapidly changing conditions, and are therefore not very useful.
 
 <!--T:34-->
@@ -207,7 +88,8 @@ For jobs which are already running, the start time reported by <tt>squeue</tt> i
 <!--T:53-->
 In some instances a program which crashes or otherwise exits abnormally will leave behind a binary file, called a core file, containing a snapshot of the program's state at the moment that it crashed, typically with the extension ".core". While such files can be useful for programmers who are debugging the software in question, they are normally of no interest for regular users beyond the indication that something went wrong with the execution of the software, something already indicated by the job's output normally. You can therefore delete these files if you wish and add the line <tt>ulimit -c 0</tt> to the end of your $HOME/.bashrc file to ensure that they are no longer created.
 
-==How to fix library not found error== <!--T:54-->
+<!--T:54-->
+==How to fix library not found error==
 When installing precompiled binary packages in your <code>$HOME</code>, they may fail with an error such as <tt>/lib64/libc.so.6: version 'GLIBC_2.18' not found</tt> at runtime. See [[Installing_software_in_your_home_directory#Installing_binary_packages|Installing binary packages]] for how to fix this kind of issue.
 
 == How do you handle sensitive research data? == <!--T:64-->
