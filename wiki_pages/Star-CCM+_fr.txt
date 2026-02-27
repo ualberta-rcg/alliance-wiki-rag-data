@@ -17,6 +17,8 @@ où <code>server</code> et <code>port</code> sont remplacés respectivement par 
 === Fichier pour une licence POD ===
 
 Si vous avez acheté une licence POD de [https://www.plm.automation.siemens.com/global/en/buy/ Siemens] votre variable d'environnement <code>LM_PROJECT</code> doit être manuellement configurée comme étant égale à <I>YOUR CD-ADAPCO PROJECT ID</i> dans votre script slurm. De plus, le fichier <code>~/.licenses/starccm.lic</code> doit être configuré comme suit sur toutes les grappes.
+{{File|name=starccm.lic|contents=SERVER flex.cd-adapco.com ANY 1999
+USE_SERVER}}
 
 <span id="Cluster_batch_job_submission"></span>
 = Soumettre des tâches en lot sur nos grappes = 
@@ -26,31 +28,28 @@ Quand vous soumettez des tâches sur une grappe pour la première fois, vous dev
 <span id="Slurm_scripts"></span>
 == Scripts pour l'ordonnanceur ==
 
-<div class="mw-translate-fuzzy">
 <tabs>
-<tab name="Fir/Rorqual/Nibi" >
+<tab name="Nibi" >
 {{File
-|name=starccm_job.sh
+|name=starccm_job-nibi-nogpu.sh
 |lang="bash"
 |contents=
 #!/bin/bash
-</div>
 
-<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify some account
 #SBATCH --time=00-01:00       # Time limit: dd-hh:mm
 #SBATCH --nodes=1             # Specify 1 or more nodes
-#SBATCH --cpus-per-task=192   # Request all cores per node (32 or 48)
-#SBATCH --mem=0               # Request all memory per node
+#SBATCH --cpus-per-task=16    # Specify cores per node (192 max)
+#SBATCH --mem=64G             # Specify memory per node (0 max)
 #SBATCH --ntasks-per-node=1   # Do not change this value
-</div>
+#SBATCH --constraint=granite  # Use intel compute nodes (no gpu)
+#SBATCH --switches=1          # Use 1 network switch (optional)
 
 module load StdEnv/2023
 
-<div class="mw-translate-fuzzy">
-#module load starccm/20.04.007-R8
-module load starccm-mixed/20.04.007
-</div>
+#module load starccm/20.04.007-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
+module load starccm-mixed/20.04.007  # 19.06.009, 20.02.008, 20.04.007 or newer
+module list
 
 SIM_FILE='mysample.sim'       # Specify your input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
@@ -70,39 +69,36 @@ echo "FLEXIBLAS=$FLEXIBLAS"
 STAR_MPI="-mpi intel"
 STAR_FABRIC="-fabric tcp"
 
-<div class="mw-translate-fuzzy">
 if [ -n "$LM_PROJECT" ]; then
-   # Siemens PoD license server
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi intel -fabric psm2
+   echo "Siemens PoD license server ..."
+   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_FABRIC
 else
-   # Institutional license server
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi intel -fabric psm2
+   echo "Institutional license server ..."
+   [ $(command -v lmutil) ] && lmutil lmstat -c ~/.licenses/starccm.lic -a {{!}} egrep "license1{{!}}UP{{!}}use{{!}}$USER"; echo
+   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_FABRIC
 fi
 }}
 </tab>
-<tab name="Narval" >
+<tab name="Fir/Narval/Rorqual" >
 {{File
-|name=starccm_job.sh
+|name=starccm_job-fnr-nogpu.sh
 |lang="bash"
 |contents=
 #!/bin/bash
-</div>
 
-<div class="mw-translate-fuzzy">
-#SBATCH --account=def-group   # indiquez le nom du compte
-#SBATCH --time=00-01:00       # indiquez la limite de temps (jj-hh:mm)
-#SBATCH --nodes=1             # indiquez 1 ou plusieurs nœuds
-#SBATCH --cpus-per-task=64    # demandez tous les cœurs par nœud
-#SBATCH --mem=0               # demandez toute la mémoire par nœud
-#SBATCH --ntasks-per-node=1   # ne pas modifier
-</div>
+#SBATCH --account=def-group   # Specify some account
+#SBATCH --time=00-01:00       # Time limit: dd-hh:mm
+#SBATCH --nodes=1             # Specify 1 or more nodes
+#SBATCH --cpus-per-task=16    # Specify cores per node (192 max)
+#SBATCH --mem=64G             # Specify memory per node (0 max)
+#SBATCH --ntasks-per-node=1   # Do not change this value
+##SBATCH --constraint=genoa   # Uncomment on rorqual (optional)
 
 module load StdEnv/2023
 
-<div class="mw-translate-fuzzy">
-#module load starccm/20.04.007-R8
-module load starccm-mixed/20.04.007
-</div>
+#module load starccm/20.04.007-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
+module load starccm-mixed/20.04.007  # 19.06.009, 20.02.008, 20.04.007 or newer
+module list
 
 SIM_FILE='mysample.sim'       # Specify your input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
@@ -136,39 +132,35 @@ else
   STAR_FABRIC="-fabric ucx" 
 fi
 
-<div class="mw-translate-fuzzy">
 if [ -n "$LM_PROJECT" ]; then
-   # Siemens PoD license server
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi openmpi
+   echo "Siemens PoD license server ..."
+   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_FABRIC
 else
-   # Institutional license server
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE -mpi openmpi
+   echo "Institutional license server ..."
+   [ $(command -v lmutil) ] && lmutil lmstat -c ~/.licenses/starccm.lic -a {{!}} egrep "license1{{!}}UP{{!}}use{{!}}$USER"; echo
+   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_FABRIC
 fi
 }}
 </tab>
 <tab name="Trillium" >
 {{File
-|name=starccm_job.sh
+|name=starccm_job-trillium-nogpu.sh
 |lang="bash"
 |contents=
 #!/bin/bash
-</div>
 
-<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify some account
 #SBATCH --time=00-01:00       # Time limit: dd-hh:mm
 #SBATCH --nodes=1             # Specify 1 or more nodes
-#SBATCH --cpus-per-task=192   # Request all cores per node
-#SBATCH --mem=0               # Request all memory per node
+#SBATCH --cpus-per-task=192   # Specify cores per node (192 max)
+#SBATCH --mem=0               # Specify memory per node (0 max)
 #SBATCH --ntasks-per-node=1   # Do not change this value
-</div>
 
 module load StdEnv/2023
 
-<div class="mw-translate-fuzzy">
-#module load starccm/20.04.007-R8
-module load starccm-mixed/20.04.007
-</div>
+#module load starccm/20.04.007-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
+module load starccm-mixed/20.04.007  # 19.06.009, 20.02.008, 20.04.007 or newer
+module list
 
 SIM_FILE='mysample.sim'       # Specify input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
@@ -187,32 +179,8 @@ LICSERVER=flex.cd-adapco.com     # Specify license server hostname
 export CDLMD_LICENSE_FILE="$FLEXPORT@127.0.0.1"
 ssh tri-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f
 
-<div class="mw-translate-fuzzy">
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
 NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
- 
-# Workaround for license failures: 
-# until the exit status is equal to 0, we try to get Star-CCM+ to start (here, for at least 5 times).
-i=1
-RET=-1
-while [ $i -le 5 ] && [ $RET -ne 0 ]; do
-        [ $i -eq 1 ] {{!}}{{!}} sleep 5
-          echo "Attempt number: "$I
-          if [ -n "$LM_PROJECT" ]; then
-          # Siemens PoD license server
-          starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE
-        else
-          # Institutional license server
-          starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE
-        fi
-        RET=$?
-        i=$((i+1))
-done
-exit $RET
-}}
-</tab>
-</tabs>
-</div>
 
 export FLEXIBLAS=StarAOCL
 echo "FLEXIBLAS=$FLEXIBLAS"
@@ -243,38 +211,24 @@ exit $RET
 <span id="Graphical_use"></span>
 = Mode graphique =
 
-Connectez-vous à gra-vdi avec [[VNC/fr#Nœuds_VDI|TigerVNC]] et connectez-vous. Quand le bureau distant est affiché, cliquez sur
-ouvrez une fenêtre de terminal (<i>Applications-->Systems Tools-->Mate Terminal</i>) pour ouvrir une fenêtre de terminal et indiquez la version de Star-CCM que vous voulez charger (voir ci-dessous). Si vous avez déjà chargé un StdEnv, vous pouvez faire afficher les versions disponibles avec la commande <code>module avail starccm-mixed</code>. Présentement, seulement l'implémentation MESA de OpenGL peut être utilisée sur gra-vdi avec starccm en raison de problèmes avec virtualgl qui offre l'accélération des GPU locaux pour les graphiques OpenGL.
-: <b>STAR-CCM+ 18.04.008 (ou versions plus récentes)</b>
-:: <code>module load CcEnv StdEnv/2023</code>
-:: <code>module load starccm-mixed/18.04.008</code> **OU** <code>starccm/18.04.008-R8</code>
-:: starccm+ -rr server
-: <b>STAR-CCM+ 15.04.010</b> --> <b>18.02.008 (de version X jusqu'à  version Y)</b>
-:: <code>module load CcEnv StdEnv/2020</code>
-:: <code>module load starccm-mixed/15.04.010</code> **OU** <code>starccm/15.04.010-R8</code>
-:: starccm+ -mesa
-: <b>STAR-CCM+ 13.06.012 (ou versions moins récentes)</b>
-:: <code>module load CcEnv StdEnv/2016</code>
-:: <code>module load starccm-mixed/13.06.012 </code> **OU** <code>starccm/13.06.012-R8</code>
-::  starccm+ -mesa  
+Pour travailler en mode graphique, nous recommandons d'utiliser un système [[Nibi/fr#Accès_via_Open_OnDemand_(OOD)|OnDemand]] ou JupyterLab pour démarrer un bureau distant. En plus de configurer <code>~/.licenses/starccm.lic</code>, les groupes qui possèdent une licence POD devraient aussi exécuter <code>export LM_PROJECT='CD-ADAPCO PROJECT ID'</code> avant <code>starccm+</code>, comme dans les exemples ci-dessous; selon le type de licence, il faut aussi ajouter d'autres options comme <b>-power</b>.  La commande <code>module avail starccm-mixed</code> affiche les versions de starccm qui sont disponibles dans l'environnement standard (StdEnv) que vous avez chargé. Autrement, la commande <code>module spider starccm-mixed</code> affiche toutes les versions de modules qui sont disponibles dans toutes les versions de modules StdEnv.  
 
-<div class="mw-translate-fuzzy">
 == OnDemand ==
 1. Sur votre ordinateur, connectez-vous à un système OnDemand en entrant une des adresses URL dans le navigateur&nbsp;:<br>
  [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) NIBI]: <code>https://ondemand.sharcnet.ca</code>
- FIR: <code>https://jupyterhub.fir.alliancecan.ca</code>
+  FIR: <code>https://jupyterhub.fir.alliancecan.ca</code>
+ NARVAL: <code> https://portail.narval.calculquebec.ca/</code>
  RORQUAL: <code>https://jupyterhub.rorqual.alliancecan.ca</code>
  TRILLIUM: <code>https://ondemand.scinet.utoronto.ca</code>
 2. Sur votre ordinateur, ouvrez une fenêtre de terminal avec une des commandes suivantes&nbsp;:
 : <b>STAR-CCM+ 18.04.008 (ou versions plus récentes)</b>
-:: <code>module load StdEnv/2023</code>  (par déault)
+:: <code>module load StdEnv/2023</code>  (par défault)
 :: <code>module load starccm-mixed/20.04.007</code> **OU** <code>starccm/20.04.007-R8</code>
 :: starccm+ -rr server
 : <b>STAR-CCM+ 15.04.010</b> --> <b>18.02.008 (plages de versions)</b>
 :: <code>module load StdEnv/2020</code> (non pris en charge)
 :: <code>module load starccm-mixed/15.04.010</code> **OU** <code>starccm/15.04.010-R8</code>
 :: starccm+ -mesa
-</div>
 
 == VncViewer ==
 

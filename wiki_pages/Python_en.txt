@@ -1,6 +1,11 @@
 <languages />
 [[Category:Software]]
 
+{{TrainingOpportunities
+  |title=Training opportunities
+  |content=[https://explora.alliancecan.ca/events?q=Python Learn about upcoming Python training opportunities on Explora]
+}}
+
 == Description ==
 [http://www.python.org/ Python] is an interpreted programming language with a design philosophy stressing the readability of code. Its syntax is simple and expressive. Python has an extensive, easy-to-use standard library.
 
@@ -218,7 +223,7 @@ EOF
 #SBATCH --ntasks=2
 #SBATCH --mem-per-cpu=2000M
 
-module load StdEnv/2023 python/3.11 mpi4py
+module load StdEnv/2023 python/3.11 mpi4py/4.0.3
 
 # create the virtual environment on each node : 
 srun --ntasks $SLURM_NNODES --tasks-per-node=1 bash << EOF
@@ -353,6 +358,27 @@ Here is how to pre-download a package called <code>tensorboardX</code> on a logi
 # Run <code>pip download --no-deps tensorboardX</code>. This will download the package as <code>tensorboardX-1.9-py2.py3-none-any.whl</code> (or similar) in the working directory. The syntax of <code>pip download</code> is the same as <code>pip install</code>.
 # If the filename does not end with <code>none-any</code>, and ends with something like <code>linux_x86_64</code> or <code>manylinux*_x86_64</code>, the wheel might not function correctly. You should contact [[Technical support]] so that we compile the wheel and make it available on our systems.
 # Then, when installing, use the path for file <code>pip install tensorboardX-1.9-py2.py3-none-any.whl</code>.
+
+=== Installing from a remote repository (Github) ===
+
+In some cases the source package is not available on the python package index (PyPI), but it is available from a remote repository.
+That remote repository may be Git, Subversion, Bazaar or Mercurial based but we'll focus on Git-based below.
+
+Using the URL to the remote repository, you can specify:
+* a branch name (<tt>the-best-feature</tt>)
+* a tag (<tt>v1.0.1</tt>)
+* a short or full commit identifier (<tt>da39a3ee5e6b4b0d3255bfef95601890afd80709</tt>)
+* a reference, like to a pull request (<tt>refs/pull/123/head</tt>)
+
+With an activated virtual environment:
+{{Command|prompt=(ENV) [name@server ~]|pip install git+https://git.example.com/MyProject.git@v1.0}}
+
+It is '''important''' to use a tag (version) or commit id in order to have a reproducible installation.
+If you use the <tt>HEAD</tt> of the repository, it may (or may not) work today, but tomorrow may bring issues, as the authors have made some changes.
+
+On Github, you can find the tags or releases under the Releases section on the right panel.
+
+For more information on installing from a version control system (VCS), see [https://pip.pypa.io/en/stable/topics/vcs-support/#vcs-support vcs-support]
 
 == Parallel programming with the Python <code>multiprocessing</code> module ==
 
@@ -529,6 +555,13 @@ Useful commands:
 Typically, one would use <tt>w</tt>, <tt>s</tt>, <tt>l</tt>, <tt>p</tt>, <tt>n</tt> to debug a file.
 
 For more information, see [https://docs.python.org/3/library/pdb.html the Python Debugger].
+
+== Attaching to a running process ==
+With '''Python 3.14 and higher''', one can attach to a running process and start PDB at the current step. 
+In a different terminal, execute:
+{{Command
+|python -m pdb --pid <process id>
+}}
 
 == Troubleshooting ==
 

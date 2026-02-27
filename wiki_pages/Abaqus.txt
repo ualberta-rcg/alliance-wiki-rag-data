@@ -5,7 +5,7 @@ __FORCETOC__
 <!--T:1-->
 [https://www.3ds.com/products-services/simulia/products/abaqus/ Abaqus FEA] is a software suite for finite element analysis and computer-aided engineering.
 
-= Licensing = <!--T:1-->
+= Licensing = <!--T:20947-->
 
 == Using your license file== <!--T:2-->
 
@@ -24,20 +24,23 @@ If your license has not been set up for use on an Alliance cluster, some additio
 * IP address of your Abaqus license server
 You will then be sent a list of cluster IP addresses so that your administrator can open the local server firewall to allow connections from the cluster on both ports. Please note that a special license agreement must generally be negotiated and signed by SIMULIA and your institution before a local  license may be used remotely on Alliance hardware.
 
-== FLEXnet/DSLS Servers == <!--T:5-->
+== FLEXnet/DSLS Servers == <!--T:20948--> 
 
+<!--T:20949-->
 Similar to previously installed modules the abaqus/2026 module is configured by default to work with Simulia <code>FLEXnet</code> license server such as the free SHARCNET license server.  To use a local <code>DSLS</code> based institutional license server two small text files <code>abaqus_v6.env</code> and <code>DSLicSrv.txt</code> should be created in your simulation submit directory as follows.  These will be read automatically when abaqus starts running to reconfigure itself accordingly.
 
- [l2 (login node):~/mysimdir] cat abaqus_v6.env
+ <!--T:20950-->
+[l2 (login node):~/mysimdir] cat abaqus_v6.env
  license_server_type=DSLS
  dsls_license_config="DSLicSrv.txt" 
 
- [l2 (login node):~/mysimdir] DSLicSrv.txt
+ <!--T:20951-->
+[l2 (login node):~/mysimdir] DSLicSrv.txt
  YOUR-SERVER-HOSTNAME:PORT-NUMBER
 
-= Version compatibility = <!--T:4-->
+= Version compatibility = <!--T:20952--> 
 
-== Module Changes == <!--T:5-->
+== Module Changes == <!--T:20953--> 
 
 <!--T:3-->
 <span style="color:red">A new module for abaqus/2026 is now installed into the default StdEnv/2023 environment.</span>  This new version resolves the *** buffer overflow detected *** error with abaqus/2021 on all recent clusters.  Note that each slurm script on this wiki page has been updated to work with both abaqus/2026 and abaqus/2021 where possible therefore all personal slurm scripts should likewise be updated by researchers.  The abaqus/2026 module contains the initial <i>Abaqus 2026 Golden</i> release.  Another module named abaqus/2026.2606 containing <i>Abaqus 2026 FP.CFA.2606</i> level updates will be installed next.
@@ -86,8 +89,10 @@ export MPI_IC_ORDER='tcp'
 echo "LM_LICENSE_FILE=$LM_LICENSE_FILE"
 echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
+<!--T:20954-->
 rm -f testsp1* testsp2*
 
+<!--T:20955-->
 if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
    /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
@@ -140,8 +145,10 @@ export MPI_IC_ORDER='tcp'
 echo "LM_LICENSE_FILE=$LM_LICENSE_FILE"
 echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 
+<!--T:20956-->
 rm -f testsp2* testsp1.lck
 
+<!--T:20957-->
 if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
    /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
@@ -178,7 +185,8 @@ The restart input file should contain:
 ##SBATCH --constraint=granite   # Uncomment to specify a node type
 ##SBATCH --gpus-per-node=h100:1 # Uncomment to specify [type:]number
 
-<!--T:21-->
+
+<!--T:20958-->
 module load abaqus/2026         # Latest version
 #module load StdEnv/2020        # Legacy version
 #module load abaqus/2021        # Discontinue use
@@ -194,6 +202,7 @@ echo "SLURM_TMPDIR = " $SLURM_TMPDIR
 <!--T:24-->
 rm -f testst1* testst2*
 
+<!--T:20959-->
 mkdir $SLURM_TMPDIR/scratch
 cd $SLURM_TMPDIR
 while sleep 6h; do
@@ -202,6 +211,7 @@ while sleep 6h; do
 done &
 WPID=$!
 
+<!--T:20960-->
 if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
    /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
@@ -216,6 +226,7 @@ elif [[ $EBVERSIONABAQUS -ge 2026 ]]; then
    #gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
 fi
 
+<!--T:20961-->
 { kill $WPID && wait $WPID; } 2>/dev/null
 cp -fv * $SLURM_SUBMIT_DIR
 }}
@@ -268,6 +279,7 @@ while sleep 6h; do
 done &
 WPID=$!
 
+<!--T:20962-->
 if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
    /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
@@ -282,6 +294,7 @@ elif [[ $EBVERSIONABAQUS -ge 2026 ]]; then
    #gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
 fi
 
+<!--T:20963-->
 { kill $WPID && wait $WPID; } 2>/dev/null
 cp -fv testst2* $SLURM_SUBMIT_DIR
 }}
@@ -298,7 +311,7 @@ The restart input file should contain:
 === Multiple node computing === <!--T:31-->
 
 <!--T:20925-->
-Users with large memory or compute needs (and correspondingly access to a large licenses) can use the following script to perform mpi-based computing over an arbitrary range of nodes ideally left to the scheduler to  automatically determine.  A companion template script to perform restart of multinode jobs is not provided due to additional limitations when they can be used.  Only abaqus/2026 or newer maybe used with this script.
+Users with large memory or compute needs (and correspondingly access to a large licenses) can use the following script to perform mpi-based computing over an arbitrary range of nodes ideally left to the scheduler to  automatically determine.  A companion template script to perform restart of multinode jobs is not provided due to additional limitations when they can be used.  Only abaqus/2026 or newer may be used with this script.
 
 <!--T:32-->
 {{File
@@ -376,6 +389,7 @@ echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 <!--T:43-->
 rm -f testep1* testep2*
 
+<!--T:20964-->
 if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
    /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
@@ -424,6 +438,7 @@ echo "ABAQUSLM_LICENSE_FILE=$ABAQUSLM_LICENSE_FILE"
 rm -f testep2* testep1.lck
 for f in testep1*; do [[ -f ${f} ]] && cp -a "$f" "testep2${f#testep1}"; done
 
+<!--T:20965-->
 if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
    /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
@@ -475,6 +490,7 @@ while sleep 6h; do
 done &
 WPID=$!
 
+<!--T:20966-->
 if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
    /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
@@ -487,6 +503,7 @@ elif [[ $EBVERSIONABAQUS -ge 2026 ]]; then
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
 fi
 
+<!--T:20967-->
 { kill $WPID && wait $WPID; } 2>/dev/null
 cp -f * $SLURM_SUBMIT_DIR
 }}
@@ -533,6 +550,7 @@ while sleep 3h; do
 done &
 WPID=$!
 
+<!--T:20968-->
 if [[ $EBVERSIONABAQUS -eq 2021 ]]; then
    /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
    --fork --pid --mount-proc --user --map-user $USER \
@@ -545,6 +563,7 @@ elif [[ $EBVERSIONABAQUS -ge 2026 ]]; then
    mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB"
 fi
 
+<!--T:20969-->
 { kill $WPID && wait $WPID; } 2>/dev/null
 cp -f  * $SLURM_SUBMIT_DIR
 }}
@@ -559,7 +578,7 @@ No input file modifications are required to restart the analysis.
 === Multiple node computing === <!--T:61--> 
 
 <!--T:20946-->
-Users with large memory or compute needs (and correspondingly access to a large licenses) can use the following script to perform mpi-based computing over an arbitrary range of nodes ideally left to the scheduler to  automatically determine.  A companion template script to perform restart of multinode jobs is not provided due to additional limitations how they can be used.  Only abaqus/2026 or newer maybe used with this script.
+Users with large memory or compute needs (and correspondingly access to a large licenses) can use the following script to perform mpi-based computing over an arbitrary range of nodes ideally left to the scheduler to  automatically determine.  A companion template script to perform restart of multinode jobs is not provided due to additional limitations how they can be used.  Only abaqus/2026 or newer may be used with this script.
 
 <!--T:62-->
 {{File
@@ -664,12 +683,12 @@ To determine the required slurm memory for multi-node slurm scripts, memory esti
  BETWEEN THE ESTIMATED "MEMORY TO MINIMIZE I/O" AND THE MEMORY UPPER LIMIT. HOWEVER ACCURATE
  ESTIMATE OF THE SCRATCH DISK SPACE IS NOT POSSIBLE.
 
-= Graphical use = <!--T:79-->
+= Graphical use = <!--T:20970--> 
 
 <!--T:83-->
 It is recommended to use an OpenOnDemand or JupyterLab to run graphical applications at the Alliance. 
 
-== OnDemand == <!--T:80-->
+== OnDemand == <!--T:20971--> 
 
 <!--T:188-->
 1. Start an OnDemand desktop session by clicking one of the following OnDemand links:<br>
@@ -684,6 +703,7 @@ It is recommended to use an OpenOnDemand or JupyterLab to run graphical applicat
 3. Start the application in graphical mode using the cae option.  If you are on either: 1) a node without a GPU or 2) a node with a GPU but without VirtualGL support, then append to use the mesa option:
  abaqus cae -mesa
 
+<!--T:20972-->
 4. If you require better graphical performance and are on a node with a GPU and VirtualGL support then start abaqus without the -mesa option.  When using the nibi OnDemand desktop a full h100 (80GB) GPU from the GPU pulldown must be selected.
  abaqus cae
 
@@ -696,6 +716,7 @@ It is recommended to use an OpenOnDemand or JupyterLab to run graphical applicat
 
 == JupyterLab == <!--T:80-->
 
+<!--T:20973-->
 1. Start a JupyterHub desktop session by clicking one of the following JupyterHub links<br>
  FIR: https://jupyterhub.fir.alliancecan.ca
  NARVAL:  https://portail.narval.calculquebec.ca/
@@ -716,6 +737,7 @@ This approach is considered obsolete please use the above OnDemand/JuypterHub de
 3. Start the application with<br>
  abaqus cae -mesa
 
+<!--T:20974-->
 = Site-specific use =
 == SHARCNET license == 
 
@@ -828,7 +850,7 @@ Each GPU used requires 1 additional TOKEN
 == Western license == <!--T:105-->
 
 <!--T:20945-->
-[[ <span style="color:red">The <code>abaqus.lic</code> file given below no longer works since the license4 machine has been shutdown and retired.  Therefore all abaqus license checkout requests on dusky cluster from the Western/Robarts abaqus license server currently will fail.  A replacement server for license4 is currently be worked on.  Once it is ready for use <code>abaqus.lic</code> will be updated with the new server name and this red warning message removed.  In the meantime the SHARCNET License maybe used instead by following the above procedure to request access.</span> ]] 
+[[ <span style="color:red">The <code>abaqus.lic</code> file given below no longer works since the license4 machine has been shutdown and retired.  Therefore all abaqus license checkout requests on dusky cluster from the Western/Robarts abaqus license server currently will fail.  A replacement server for license4 is currently being worked on.  Once it is ready for use <code>abaqus.lic</code> will be updated with the new server name and this red warning message removed.  In the meantime the SHARCNET License may be used instead by following the above procedure to request access.</span> ]] 
 
 <!--T:106-->
 The Western site license may only be used by Western researchers on hardware located at Western's campus.  Currently, only the Dusky cluster satisfies this condition. Nibi and SHARCNET OOD system are excluded since they are located on Waterloo's campus.  Contact the Western Abaqus license server administrator <jmilner@robarts.ca> to inquire about using the Western Abaqus license.  You will need to provide your username and possibly make arrangements to purchase tokens.  If you are granted access then you may proceed to configure your <code>abaqus.lic</code> file to point to the Western license server:

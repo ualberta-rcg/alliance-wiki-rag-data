@@ -947,19 +947,24 @@ Le résumé des options de ligne de commande peut être affiché avec <b>cfx5sol
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account name
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify single compute node (do not change)
 #SBATCH --ntasks-per-node=4   # Specify number cores (maximum: graham 44, cedar 32 or 48, beluga 40, narval 64)
 #SBATCH --mem=16G             # Specify node memory (optionally set to 0 to allocate all node memory)
 #SBATCH --cpus-per-task=1     # Do not change
+</div>
 
 #module load StdEnv/2020      # Uncomment to use (deprecated)     
 #module load 2021R2           # Specify 2021R2 only
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023
 module load ansys/2023R2      # Specify 2022R2 or newer module versions
+</div>
 
+<div class="mw-translate-fuzzy">
 # append additional cfx5solve command line options as required
 if [[ "$CC_CLUSTER" = narval ]]; then
   cfx5solve -def YOURFILE.def -start-method "Open MPI Local Parallel" -part $SLURM_CPUS_ON_NODE
@@ -967,6 +972,7 @@ else
   cfx5solve -def YOURFILE.def -start-method "Intel MPI Local Parallel" -part $SLURM_CPUS_ON_NODE
 fi
 }}</tab>
+</div>
 
 <tab name="Plusieurs nœuds">
 {{File
@@ -975,21 +981,26 @@ fi
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account name
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=2             # Specify multiple compute nodes (2 or more)
 #SBATCH --ntasks-per-node=64  # Specify all cores per node (maximum: graham 44, 48, beluga 40, narval 64)
 #SBATCH --mem=0               # Use all memory per compute node (do not change)
 #SBATCH --cpus-per-task=1     # Do not change
+</div>
 
 #module load StdEnv/2020      # Uncomment to use (deprecated)     
 #module load 2021R2           # Specify 2021R2 only
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023
 module load ansys/2023R2      # Specify 2022R2 or newer module versions
+</div>
 
 NNODES=$(slurm_hl2hl.py --format ANSYS-CFX)
 
+<div class="mw-translate-fuzzy">
 # append additional cfx5solve command line options as required
 if [[ "$CC_CLUSTER" = narval ]]; then
   cfx5solve -def YOURFILE.def -start-method "Open MPI Distributed Parallel" -par-dist $NNODES
@@ -998,6 +1009,7 @@ else
   unset I_MPI_HYDRA_BOOTSTRAP_EXEC_EXTRA_ARGS
   cfx5solve -def YOURFILE.def -start-method "Intel MPI Distributed Parallel" -par-dist $NNODES
 fi
+</div>
 
 }}</tab>
 
@@ -1029,6 +1041,7 @@ Pour soumettre un fichier de projet à la queue, personnaliser les scripts suiva
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-account
 #SBATCH --time=00-03:00                # Time (DD-HH:MM)
 #SBATCH --mem=16G                      # Total Memory (set to 0 for all node memory)
@@ -1036,6 +1049,7 @@ Pour soumettre un fichier de projet à la queue, personnaliser les scripts suiva
 #SBATCH --nodes=1                      # Do not change (multi-node not supported)
 ##SBATCH --exclusive                   # Uncomment for scaling testing
 ##SBATCH --constraint=broadwell        # Applicable to graham or cedar
+</div>
 
 module load StdEnv/2023 ansys/2023R2   # OR newer Ansys module versions (untested)
 
@@ -1065,6 +1079,7 @@ runwb2 -B -E "Update()" -F YOURPROJECT.wbpj
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-account
 #SBATCH --time=00-03:00                # Time (DD-HH:MM)
 #SBATCH --mem=16G                      # Total Memory (set to 0 for all node memory)
@@ -1072,8 +1087,11 @@ runwb2 -B -E "Update()" -F YOURPROJECT.wbpj
 #SBATCH --nodes=1                      # Do not change (multi-node not supported)
 ##SBATCH --exclusive                   # Uncomment for scaling testing (optional)
 ##SBATCH --constraint=broadwell        # Uncomment on graham or cedar (optional)
+</div>
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2020 ansys/2021R2   # OR newer Ansys module versions
+</div>
 
 if [ "$SLURM_NNODES" == 1 ]; then
   MEMPAR=0                             # Set to 0 for SMP (shared memory parallel)
@@ -1256,11 +1274,13 @@ Pour obtenir une liste complète des options de ligne de commande, exécutez <co
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=account      # Specify your account (def or rrg)
 #SBATCH --time=00-02:00        # Specify time (DD-HH:MM)
 #SBATCH --mem=24G              # Specify memory (set to 0 to use all node memory)
 #SBATCH --cpus-per-task=6      # Specify cores (graham 32 or 44 to use all cores)
 #SBATCH --nodes=1              # Request one node (do not change)
+</div>
 
 <div class="mw-translate-fuzzy">
 # the rocky2023R2 module on graham was renamed to ansysrocky/2023R2   Apr24/2025
@@ -1278,12 +1298,14 @@ Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=account      # Specify your account (def or reg)
 #SBATCH --time=00-01:00        # Specify time (DD-HH:MM)
 #SBATCH --mem=24G              # Specify memory (set to 0 to use all node memory)
 #SBATCH --cpus-per-task=6      # Specify cores (graham 32 or 44 to use all cores)
 #SBATCH --gres=gpu:v100:2      # Specify gpu type : gpu quantity
 #SBATCH --nodes=1              # Request one node (do not change)
+</div>
 
 <div class="mw-translate-fuzzy">
 # the rocky2023R2 module on graham was renamed to ansysrocky/2023R2   Apr24/2025
@@ -1313,7 +1335,7 @@ Les programmes Ansys fonctionnent interactivement en mode graphique sur les nœu
  [https://docs.alliancecan.ca/wiki/Narval NARVAL]:  <code>https://jupyterhub.narval.alliancecan.ca/</code>
  [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart TRILLIUM]: <code>https://ondemand.scinet.utoronto.ca</code>
 
-Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window and manually load an ansys module and run one of the following programs from the command line.  For this later case, if your work requires accelerated graphics then either a whole GPU resource (H100 or T4 at the time of this writing) should be requested.  Since the various ansys applications launched in graphical mode behave differently when different ansys module versions are loaded, recommendations for adding command line argument and exporting environment variables for virtualgl or mesa environments have been documented below depending on whether a GPU has been requested or not and wether a On Demand or Juypter Lab system launcher is being used.
+Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window, manually load an ansys module and then type the program name to start it command line.  For this later case, if the application requires accelerated graphics to run properly (for instance for fluent to support 3d rendering) then either a whole GPU resource (H100 or T4 at the time of this writing) should be requested.  Since the various ansys applications launched in graphical mode behave differently when different ansys module versions are loaded, recommendations for adding command line argument and exporting environment variables for virtualgl or mesa environments are suggested below depending on whether a GPU has been requested or not and whether a On Demand or Juypter Lab desktop is being used.
 
 <span id="Fluids"></span>
 <div class="mw-translate-fuzzy">
@@ -1323,23 +1345,38 @@ Submit your resource request and then wait.  If you started a Juypter Lab launch
 ::: <code>cfx5 -graphics ogl|mesa</code>
 </div>
 
+This section shows howto start Ansys Fluid applications from the command line of an On Demand Desktop or the convenience Icon's of a Juypter Lab Desktop.
+
 ==== Fluent ====
 
-When starting Fluent from a terminal window command line of an On Demand Desktop or the convenience Icon of a Juypter Lab Desktop the following steps should be done including setting the indicated Environment Variables depending on which type of Compute Node the desktop is being started on (with or without a gpu).
+To start fluent the following steps should be done including setting the indicated Environment Variables depending on which type of Compute Node the desktop is being started on (with or without a gpu).
 
 ::: <code>module load StdEnv/2023 ansys/2025R1</code>
 ::: <code>fluent</code>
 
+In the following steps, when the Fluent Launcher popup selector panel appears, click the Environment Tab and copy/paste the following environment variable settings. Do NOT include the text between the round brackets, these are comments. Also do NOT put the word export in front of the variable names.
+
 <b>Compute Node (no GPU requested) or Basic Desktop</b>
 
+<div class="mw-translate-fuzzy">
 module load ansys/2020R1
+</div>
 
 slurm_hl2hl.py --format ANSYS-FLUENT > machinefile
 NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
 
+<div class="mw-translate-fuzzy">
 fluent 3d -t $NCORES -cnf=machinefile -mpi=intel -affinity=0 -g -i sample.jou
 }}
 </tab>
+</div>
+
+If <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code> is not set properly on nibi when fluent is started from within OOD Compute Desktop sessions and  intelmpi is used then fluent will crash on startup producing the following error output.  Should this occur completely exit fluent, shutdown workbench and start over again.
+ [mpiexec@g4.nibi.sharcnet] Error: Unable to run bstrap_proxy on g4.nibi.sharcnet (pid 2251587, exit code 256)
+ [mpiexec@g4.nibi.sharcnet] poll_for_event (../../../../../src/pm/i_hydra/libhydra/demux/hydra_demux_poll.c:157): check exit codes error
+ [mpiexec@g4.nibi.sharcnet] HYD_dmx_poll_wait_for_proxy_event (../../../../../src/pm/i_hydra/libhydra/demux/hydra_demux_poll.c:206): poll for  event error
+ [mpiexec@g4.nibi.sharcnet] HYD_bstrap_setup (../../../../../src/pm/i_hydra/libhydra/bstrap/src/intel/i_hydra_bstrap.c:1063): error waiting for event
+ [mpiexec@g4.nibi.sharcnet] Error setting up the bootstrap proxies
 
 ==== CFX ====
 
@@ -1374,7 +1411,7 @@ The following steps for starting the Mechanical APDL gui from the command line o
 ::: Remarque : Quand vous exécutez en parallèle un programme d'analyse comme  Mechanical or Fluent sur un nœud simple, ne cochez pas la case <i>Distributed</i> et indiquez un nombre de cœurs égal à votre  <b>session salloc, moins 1</b>. Les menus déroulants du Ansys Mechanical Workbench ne répondent pas correctement. Comme solution, lancez <code>xfwm4 --replace</code> sur la ligne de commande avant de démarrer Workbench. Pour avoir xfwm4 par défaut, modifiez <code>$HOME/.vnc/xstartup</code> et remplacez <code>mate-session</code> par <code>xfce4-session</code>.
 </div>
 
-Note that when starting Fluent from within Workbench the same GPU dependent Environment Variable settings should be specified in the Environment Tabl of the Fluent Launcher that are explained in the Fluids section above when starting fluent from a terminal window command line. 
+This sections shows howto start workbench (and optionally fluent) on either an On Demand Desktop or Jupyter Lab Desktop.
 
 <span id="On_Demand_Desktop"></span>
 <div class="mw-translate-fuzzy">
@@ -1401,6 +1438,21 @@ Note that when starting Fluent from within Workbench the same GPU dependent Envi
 === Workbench ===
 </div>
 
+=== Rocky ===
+::: <code>module load clumod ansysrocky/2023R2 CcEnv StdEnv/2020 ansys/2023R2</code>, ou
+::: <code>module load clumod ansysrocky/2024R2.0 CcEnv StdEnv/2023 ansys/2024R2.04</code>, ou
+::: <code>module load CcEnv StdEnv/2023 ansys/2025R1</code>
+::: <code>Rocky</code> Le module Ansys lit ~/licenses/ansys.lic<br>
+::: <code>Rocky-gui</code> Fournit par les modules ansysrocky locaux la sélection des serveurs CMC ou SHARCNET<br>
+::: <code>RockySolver</code> Exécute le solveur rocky à partir de la ligne de commande  (l'ajout de -h pour <i>help</i> n'est pas testé)
+::: <code>RockySchedular</code> Lance l'interface graphique pour soumettre et exécuter des tâches sur le nœud courant (non testé)
+::: o Rocky pour 2024R2 et moins récentes est disponible uniquement sur gra-vdi et Graham clusters; l'installation sur toutes les grappes est prévue pour juin
+::: o Rocky pour 2025R1 et plus récentes est fourni sur toutes les grappes par le module ansys (pas pris en charge par le serveur de licence SHARCNET)
+::: o Rocky ne peut utiliser que des CPU sur gra-vdi puisqu'il n'y a présentement qu'un seul GPU dédié aux graphiques
+::: o La licence SHARCNET inclut maintenant Rocky dont l'utilisation est sans frais pour la recherche
+::: o Voir la page [https://innovationspace.ansys.com/ais-rocky/ https://innovationspace.ansys.com/ais-rocky/ Rocky Innovation Space]
+::: o Pour des détails voir  [https://innovationspace.ansys.com/knowledge/forums/topic/ansys-rocky-2024-r2-release-highlights/ Ansys Rocky 2024 R2 Release Highlights] et [https://innovationspace.ansys.com/knowledge/forums/topic/ansys-rocky-2025-r1-release-highlights/ Ansys Rocky 2025 R1 Release Highlights]
+
 === Ansys EDT ===
 ::: Ouvrez une fenêtre de terminal et chargez le module avec
 :::: <code>module load SnEnv ansysedt/2023R2</code>, ou
@@ -1425,10 +1477,25 @@ Note that when starting Fluent from within Workbench the same GPU dependent Envi
 :::: <code>pkill -9 -u $USER -f "ansys*|mono|mwrpcss|apip-standalone-service"</code>
 :::: <code>rm -rf ~/.mw</code> (au lancement, ansysedt utilisera la configuration initiale)
 
+<div class="mw-translate-fuzzy">
 === Ensight ===
 ::: <code>module load SnEnv</code>
 ::: <code>ansys/2024R2.04</code> (or older versions back to 2021R2)
 ::: <code>ensight</code><br>
+</div>
+
+=== Mapdl ===
+::: <code>module load CcEnv StdEnv/2023</code>
+::: <code>ansys/2024R2.04</code> (or older versions)
+::: <code>mapdl -g</code> (to start the gui directly), or,
+::: <code>unset SESSION_MANAGER; launcher -> click RUN button</code>
+
+If <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code> is not set properly on nibi when fluent is started from within OOD Compute Desktop sessions and  intelmpi is used then fluent will crash on startup produce the following error output.  If this occurs completely exit fluent, shutdown workbench then start again.
+ [mpiexec@g4.nibi.sharcnet] Error: Unable to run bstrap_proxy on g4.nibi.sharcnet (pid 2251587, exit code 256)
+ [mpiexec@g4.nibi.sharcnet] poll_for_event (../../../../../src/pm/i_hydra/libhydra/demux/hydra_demux_poll.c:157): check exit codes error
+ [mpiexec@g4.nibi.sharcnet] HYD_dmx_poll_wait_for_proxy_event (../../../../../src/pm/i_hydra/libhydra/demux/hydra_demux_poll.c:206): poll for  event error
+ [mpiexec@g4.nibi.sharcnet] HYD_bstrap_setup (../../../../../src/pm/i_hydra/libhydra/bstrap/src/intel/i_hydra_bstrap.c:1063): error waiting for event
+ [mpiexec@g4.nibi.sharcnet] Error setting up the bootstrap proxies
 
 <span id="Jupyter_Lab_Desktop"></span>
 <div class="mw-translate-fuzzy">
@@ -1504,56 +1571,31 @@ Il existe cependant une limitation potentiellement sérieuse à prendre en compt
 <span id="License_file"></span>
 ==== Fichier du serveur de licence ====
 
+<div class="mw-translate-fuzzy">
 Pour utiliser la licence de SHARCNET sur nos grappes, configurez votre fichier <code>ansys.lic</code> comme suit :
 <source lang="bash">
 [username@cluster:~] cat ~/.licenses/ansys.lic
 setenv("ANSYSLMD_LICENSE_FILE", "1055@license3.sharcnet.ca")
 setenv("ANSYSLI_SERVERS", "2325@license3.sharcnet.ca")
 </source>
+</div>
 
 <span id="License_query"></span>
 ==== Licence  ====
 
 Pour connaître le nombre de licences utilisées qui sont associées à votre nom d'utilisateur et le nombre de licences utilisées par tous les utilisateurs, lancez
 
+<div class="mw-translate-fuzzy">
 <source lang="bash">
 ssh graham.computecanada.ca
 module load ansys
 lmutil lmstat -c $ANSYSLMD_LICENSE_FILE -a | grep "Users of\|$USER"
 </source>
+</div>
 
+<div class="mw-translate-fuzzy">
 Si vous remarquez que des licences sont utilisées sans justification avec votre nom d'utilisateur (ce qui peut se produire si Ansys n'a pas été correctement fermé sur gra-vdi), connectez-vous au nœud en cause, ouvrez une fenêtre de terminal et mettez fin au processus avec <code>pkill -9 -e -u $USER -f "ansys"</code> pour libérer vos licences.  Prenez note que gra-vdi possède deux nœuds (gra-vdi3 et gra-vdi4) qui vous sont assignés au hasard quand vous vous connectez avec tigervnc; ainsi, avant de lancer <tt>pkill</tt>, il est nécessaire d'indiquer le nom complet de l'hôte (gra-vdi3.sharcnet.ca ou grav-vdi4.sharcnet.ca) quand vous vous connectez.
-
-<span id="Local_modules"></span>
-=== Modules locaux ===
-
-<div class="mw-translate-fuzzy">
-Lors de l'utilisation de gra-vdi, vous avez le choix de charger des modules Ansys à partir de notre environnement global (après avoir chargé CcEnv) ou de charger des modules Ansys installés localement sur la machine elle-même (après avoir chargé SnEnv). Les modules locaux peuvent être intéressants, car ils incluent certains programmes et versions d'Ansys non encore pris en charge par notre environnement standard. Lors du démarrage de programmes à partir de modules Ansys locaux, vous pouvez sélectionner le serveur de licences CMC ou accepter le serveur de licences SHARCNET par défaut. Les paramètres de <code>~/.licenses/ansys.lic</code> ne sont présentement pas utilisés par les modules Ansys locaux, sauf lors du démarrage de <code>runwb2</code> où ils remplacent les paramètres par défaut du serveur de licences SHARCNET. L'utilisation appropriée des programmes Ansys sur gra-vdi comprend&nbsp;: l'exécution interactive d'une seule tâche de test avec jusqu'à 8 cœurs et/ou 128Go de RAM; la création ou la modification de fichiers d'entrée pour la simulation; le post-traitement; ou la visualisation de données.
 </div>
-
-<div class="mw-translate-fuzzy">
-# Connectez-vous à gra-vdi.computecanada.ca avec [[VNC/fr#Nœuds_VDI|TigerVNC]].
-# Ouvrez une fenêtre de terminal et chargez le module &nbsp;:
-#; <code>module load SnEnv ansys/2021R2</code>, ou
-#; <code>module load SnEnv ansys/2021R1</code>, ou
-#; <code>module load SnEnv ansys/2020R2</code>, ou
-#; <code>module load SnEnv ansys/2020R1</code>, ou
-#; <code>module load SnEnv ansys/2019R3</code>
-# Lancez un programme Ansys avec une des commandes suivantes&nbsp;:
-#; <code>runwb2|fluent|<b>cfx5</b>|icemcfd|apdl</code>
-# Appuyez sur <code>y</code> et <code>Enter</code> pour accepter les conditions.
-# Appuyez sur <code>Enter</code> pour accepter l'option <code>n</code> et utilisez le serveur de licence par défaut SHARCNET (dans le cas de runwb2, <i>~/.licenses/ansysedt.lic</i> sera utilisé si trouvé, autrement ANSYSLI_SERVERS et ANSYSLMD_LICENSE_FILE seront utilisés s'ils sont configurés dans votre environnement, pour un autre serveur de licences distant, par exemple).   Pour utiliser le serveur de licence de CMC, changez <code>n</code> pour <code>y</code> et appuyez sur <code>Enter</code>.
-</div>
-
-<div class="mw-translate-fuzzy">
-où <code><b>cfx5</b></code> de l'étape 3 ci-dessus donne l'option de démarrer les composantes suivantes&nbsp;:
-    1) CFX-Launcher  (cfx5 -> cfx5launch)
-    2) CFX-Pre       (cfx5pre)
-    3) CFD-Post      (cfdpost -> cfx5post)
-    4) CFX-Solver    (cfx5solve)
-</div>
-
-Les préférences des fonctionnalités de licence précédemment configurées avec <i>anslic_admin</i> ne sont plus prises en charge depuis le 9&nbsp;septembre 2021. Si un problème de licence survient, essayez de supprimer le répertoire <code>~/.ansys</code> de votre compte /home pour effacer les paramètres. Si les problèmes persistent, veuillez contacter notre [[Technical support/fr|soutien technique]] et fournir le contenu de votre fichier <code>~/.licenses/ansys.lic</code>.
 
 <span id="Additive_Manufacturing"></span>
 = Additive Manufacturing  =
