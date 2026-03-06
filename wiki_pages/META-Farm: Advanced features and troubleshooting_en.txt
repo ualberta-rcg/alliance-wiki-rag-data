@@ -14,7 +14,9 @@ This can be used in either SIMPLE or META mode. If your original <code>submit.ru
 When you add <code>-auto</code>, <code>(re)submit.run</code> submits one more (serial) job, in addition to the farm jobs. The purpose of this job is to run the <code>resubmit.run</code> command automatically right after the current farm finishes running. The job script for this additional job is <code>resubmit_script.sh</code>, which should be present in the farm directory; a sample file is automatically copied there when you run <code>farm_init.run</code>. The only customization you need to do to this file is to correct the account name in the <code>#SBATCH -A</code> line.
 
 If you are using <code>-auto</code>, the value of the <code>NJOBS_MAX</code> parameter defined in the <code>config.h</code> file should be at least one smaller than the largest number of jobs you can submit on the cluster.
-E.g. if the largest number of jobs one can submit on the cluster is 999 and you intend to use <code>-auto</code>, set <code>NJOBS_MAX</code> to 998.
+E.g. if the largest number of jobs one can submit on the cluster is 999 and you intend to use <code>-auto</code>, set <code>NJOBS_MAX</code> to 998. To find out the maximum number of submitted jobs limit (MaxSubmit) associated with your account on a specific cluster, run the following command:
+
+ $ sacctmgr list user $USER withassoc
 
 When using <code>-auto</code>, if at some point the only cases left to be processed are the ones which failed earlier, auto-resubmission will stop, and farm computations will end. This is to avoid an infinite loop on badly-formed cases which will always fail. If this happens, you will have to address the reasons for these cases failing before attempting to resubmit the farm.  You can see the relevant messages in the file <code>farm.log</code> created in the farm directory.
 

@@ -84,14 +84,20 @@ where the <servername> can be found in the first line of the license file with f
 
 == Checking license ==
 
-To test if your <code>ansys.lic</code> is configured and working properly copy/paste the following sequence of commands on the cluster you are submitting jobs to.  The only required change would be to specify YOURUSERID.  If the software on a remote license server has not been updated then a failure can occur if the latest module version of ansys is loaded to test with.  Therefore to be certain the license checkouts will work when jobs are run in the queue, the same ansys module version that you load in your slurm scripts should be specified below.
- [login-node:~] cd /tmp
- [login-node:~] salloc --time{{=}}1:0:0 --mem{{=}}1000M --account{{=}}def-YOURUSERID
- [login-node:~] module load StdEnv/2023; module load ansys/2023R2
- [login-node:~] $EBROOTANSYS/v$(echo ${EBVERSIONANSYS:2:2}${EBVERSIONANSYS:5:1})/licensingclient/linx64/lmutil lmstat -c $ANSYSLMD_LICENSE_FILE | grep "ansyslmd: UP" 1> /dev/null && echo Success {{!}}{{!}} echo Fail
+To test if your <code>ansys.lic</code> is configured and working properly with your license server, run the following sequence of commands on the same cluster that you will be submitting jobs to:
 
-If <code>Success</code> is output license checkouts should work when jobs are submitted to the queue.<br>
-If <code>Fail</code> is output then jobs will likely fail requiring a problem ticket to be submitted to resolve.<br>
+ [login-node:~] cd /tmp
+ [login-node:/tmp] salloc --time{{=}}1:0:0 --mem{{=}}1000M --account{{=}}def-YOURUSERID
+ [compute-node/tmp] module load StdEnv/2023; module load ansys/2025R2.04
+ [compute-node:/tmp] $EBROOTANSYS/v$(echo ${EBVERSIONANSYS:2:2}${EBVERSIONANSYS:5:1})/licensingclient/linx64/lmutil lmstat -c $ANSYSLMD_LICENSE_FILE | grep "ansyslmd: UP" 1> /dev/null && echo Success {{!}}{{!}} echo Fail
+<code>Success</code> output indicates license checkouts should work when jobs are submitted to the queue.<br>
+<code>Fail</code> output indicates a problem with the licensing setup somewhere and jobs will likely fail.<br>
+
+If there is an Ansys license server checkout problem, then the following message will appear in slurm output files when fluent jobs are started by slurm scripts in the queue *OR* when fluent is start interactively simply by doing the following:
+
+ [compute-node:/tmp] fluent -g 2d -n 2
+ Connected License Server List:	<Shared_Web_License_Server>
+ Hit return to exit.
 
 = Version compatibility =
 
@@ -913,16 +919,18 @@ fi
 
 == Workbench ==
 
-Before submitting a project file to the queue on a cluster (for the first time) follow these steps to initialize it.<br>
-# Connect to the cluster with [[VNC#Compute_nodes|TigerVNC]].
-# Switch to the directory where the project file is located (YOURPROJECT.wbpj) and [[Ansys#Workbench_3|start Workbench]] with the same Ansys module you used to create your project.
-# In Workbench, open the project with <I>File -> Open</I>.
-# In the main window, right-click on <i>Setup</i> and select <I>Clear All Generated Data</I>.
-# In the top menu bar pulldown, select <I>File -> Exit</I> to exit Workbench.
+Before submitting a Workbench job to the queue with a slurm script, you must initialize it once as described in the following steps.<br>
+# On the cluster where you will submit workbench jobs (Nibi for example) open an [https://ondemand.sharcnet.ca OnDemand] desktop.  Choosing either a Compute node (without a GPU) or a Basic Desktop resource will be sufficient.
+# In the desktop open a terminal window and cd into the directory where your project directory is located that contains your <code>YOURPROJECT.wbpj</code> file. 
+# Remove the old project cache directory by running <code>rm -rf _ProjectScratch</code> as this can be very large from previous runs.
+# Open a terminal window and load the module version that you will be using in your slurm script for example <code>module load ansys/2025R2.04</code>
+# Open the Workbench gui with your project file.  This can be done by issuing <code>runwb2 -f YOURPROJECT.wbpj</code> directly from the command line.  If and when a popup appears asking "Do you want to recover the project before opening ? (Any changes made since the last save will be lost.)" answer <b>No</b>.
+# In the context menu popup that should appear in the center Project Schematic window, right-click on <i>Model</i> and select <I>Reset</I>.  When Ansys Workbench pops up a warning that "This operation will delete the operations local and generated data" click <b>Ok</b> to accept and proceed.
+# In the top menu bar pulldown, select <I>File -> Save</I> then <i>File -> Exit</i> to shutdown Workbench.
 # In the Ansys Workbench popup, when asked <I>The current project has been modified. Do you want to save it?</I>, click on the <i>No</i> button.
 # Quit Workbench and submit your job using one of the Slurm scripts shown below.
 
-To avoid writing the solution when a running job successfully completes remove <code>;Save(Overwrite=True)</code> from within the last line of your script.  Doing this will make it easier to run multiple test jobs (for scaling purposes when changing ntasks), since the initialized solution will not be overwritten each time.  Alternatively, keep a copy of the initialized YOURPROJECT.wbpj file and YOURPROJECT_files subdirectory and restore them after the solution is written.
+ Since a Compute Node with upto 96cores, 768GB memory and 8hours runtime can now be reserved for an OnDemand desktop session, consider running your Workbench simulations directly from within the Workbench native gui when possible as a more intuitive option compared to submitting the job to the queue with a slurm script.
 
 === Slurm scripts ===
 
@@ -944,7 +952,7 @@ A project file can be submitted to the queue by customizing one of the following
 ##SBATCH --exclusive                   # Uncomment ONLY for scaling testing
 ##SBATCH --constraint=broadwell        # Uncomment to specify an available node type
 
-module load StdEnv/2023 ansys/2023R2   # OR newer Ansys module versions (untested)
+module load StdEnv/2023 ansys/2023R2   # OR newer Ansys module versions
 
 if [ "$SLURM_NNODES" == 1 ]; then
   MEMPAR=0                             # Set to 0 for SMP (shared memory parallel)
@@ -961,8 +969,7 @@ sed -i "s!UserConfigured=\"0\"!UserConfigured=\"1\"!g" "$MWFILE"
 export KMP_AFFINITY=disabled
 export I_MPI_HYDRA_BOOTSTRAP=ssh
 
-runwb2 -B -E "Update()" -F YOURPROJECT.wbpj
-#runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
+runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 }}
 </tab>
 <tab name="Single node (StdEnv/2020)">
@@ -997,10 +1004,11 @@ sed -i "s!UserConfigured=\"0\"!UserConfigured=\"1\"!g" "$MWFILE"
 export KMP_AFFINITY=disabled
 export I_MPI_HYDRA_BOOTSTRAP=ssh
 
-runwb2 -B -E "Update()" -F YOURPROJECT.wbpj
-#runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
+runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 }}
-</tab>
+</tab> 
+
+To avoid writing the solution when a running job successfully completes change <code>Save(Overwrite=True)</code> to <code>Save(Overwrite=False)</code> in the last line of the above slurm script.  Doing this will make it easier to determine how well the simulation scales when #SBATCH --ntasks is increased since the initialized solution will not be overwritten by each test job.
 </tabs>
 
 == Mechanical ==
@@ -1202,20 +1210,16 @@ To run Ansys programs in graphical mode click on one of the following OnDemand o
 
 Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window, manually load an ansys module and then type the program name to start it command line.  For this later case, if the application requires accelerated graphics to run properly (for instance for fluent to support 3d rendering) then either a whole GPU resource (H100 or T4 at the time of this writing) should be requested.  Since the various ansys applications launched in graphical mode behave differently when different ansys module versions are loaded, recommendations for adding command line argument and exporting environment variables for virtualgl or mesa environments are suggested below depending on whether a GPU has been requested or not and whether a On Demand or Juypter Lab desktop is being used.
 
-=== Fluids ===
+=== Fluent ===
 
-This section shows howto start Ansys Fluid applications from the command line of an On Demand Desktop or the convenience Icon's of a Juypter Lab Desktop.
-
-==== Fluent ====
-
-To start fluent the following steps should be done including setting the indicated Environment Variables depending on which type of Compute Node the desktop is being started on (with or without a gpu).
+To start Ansys Fuent from the command line of an On Demand Desktop, open a terminal window and run the commands:
 
 ::: <code>module load StdEnv/2023 ansys/2025R1</code>
 ::: <code>fluent</code>
 
-In the following steps, when the Fluent Launcher popup selector panel appears, click the Environment Tab and copy/paste the following environment variable settings. Do NOT include the text between the round brackets, these are comments. Also do NOT put the word export in front of the variable names.
+When the Fluent Launcher popup selector panel appears, click the Environment Tab and copy/paste the following environment variable settings, depending on whether you started your On Demand session with a GPU for graphical acceleration. Do not include the text between the round brackets (as these are comments) and do not put export in front of any variable names.
 
-<b>Compute Node (no GPU requested) or Basic Desktop</b>
+<b>Compute Node (no GPU requested)</b>
 
 :::: <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code>            (required on nibi)
 :::: <code>HOOPS_PICTURE=opengl2-mesa</code>           (version 2025R1 or newer)
@@ -1237,7 +1241,7 @@ If <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code> is not set properly on nibi when fluen
  [mpiexec@g4.nibi.sharcnet] HYD_bstrap_setup (../../../../../src/pm/i_hydra/libhydra/bstrap/src/intel/i_hydra_bstrap.c:1063): error waiting for event
  [mpiexec@g4.nibi.sharcnet] Error setting up the bootstrap proxies
 
-==== CFX ====
+=== CFX ===
 
 When starting CFX from an On Demand Desktop the following arguments maybe specified on the terminal window command line depending on whether a GPU was requested when the Desktop was started. 
 

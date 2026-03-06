@@ -8,52 +8,41 @@ Chargez le module Nextflow avec <code>module load nextflow</code>.
 
 Bien que vous puissiez créer votre propre flux de travail, vous pouvez également utiliser les pipelines  [https://nf-co.re/ nf-core] qui sont publiés. Nous décrivons ici une configuration simple qui vous permettra d'exécuter des pipelines nf-core sur nos systèmes et vous aidera à configurer correctement Nextflow pour vos propres pipelines.
 
-Dans notre exemple, nous utilisons le pipeline <code>nf-core/rnaseq</code> pour les 5 étapes. 
+Dans notre exemple, nous utilisons le pipeline <code>nf-core/rnaseq</code> dans les 5 étapes. 
 
 * Étape 1, Préparer le fichier de configuration
 * Étape 2, Installer nf-core
-* Étape 3, Download the container image and pipeline
+* Étape 3, Télécharger les images du conteneur et le pipeline
 * Étape 4, Préparer les données en entrée
 * Étape 5, Créer un script pour la tâche
 
 <span id="Step_1:_Set_up_the_configuration_file"></span>
 ==== Étape 1, Préparer le fichier de configuration ====
 
-<div class="mw-translate-fuzzy">
-Vous pouvez obtenir de [https://github.com/nf-core/configs/blob/master/conf/alliance_canada.confignf nf-core] un fichier de configuration pour nos grappes et le placer dans <code>~/.nextflow/config</code>.
-Si vous utilisez ce fichier sur Fir, le profil doit être chargé avec l'indicateur <code>-profile fir</code> pour la commande <code>nextflow</code>. Sur les autres grappes, le profil est sélectionné automatiquement selon le nom de l'hôte.
-</div>
+Vous pouvez obtenir de [https://github.com/nf-core/configs/blob/master/conf/alliance_canada.config nf-core] un fichier de configuration pour nos grappes et le placer dans <code>~/.nextflow/config</code> comme suit
 
 <syntaxhighlight lang="bash">
 curl -o ~/.nextflow/config https://raw.githubusercontent.com/nf-core/configs/refs/heads/master/conf/alliance_canada.config
 </syntaxhighlight>
 
-<div class="mw-translate-fuzzy">
-Il faut configurer la variable d'environnement <code>$SLURM_ACCOUNT</code> (semblable à <code>def-pname</code>), ce qui peut se faire dans le fichier <code>~/.bashrc</code>.
-</div>
+Configurez la variable d'environnement <code>$SLURM_ACCOUNT</code> pour un  nom de compte que vous pouvez utiliser; ceci devrait ressembler à <code>def-pname</code> et se faire dans le fichier <code>~/.bashrc</code>.
 
 <syntaxhighlight lang="bash">
 export SLURM_ACCOUNT=def-pname
 </syntaxhighlight>
 
-<div class="mw-translate-fuzzy">
-Cette configuration garantit qu'il n'y a pas plus de 100 tâches dans la file d'attente Slurm et que seul 60 tâches sont soumises par minute. Elle indique que les nœuds de calcul de Rorqual ont 192&nbsp;cœurs et 750GB de RAM avec un temps réel maximum d'exécution d'une semaine (168&nbsp;heures). Ceci est différent sur Trillium puisque les nœuds sont configurés autrement. Comme un seul nœud entier est demandé à la fois, la mémoire et les CPU ne sont pas spécifiés.
-</div> 
+Cette configuration contient des profils pour Fir, Narval, Nibi, Rorqual et Trillium. Si vous utilisez ce fichier de configuration sur Fir, vous devez charger le profil avec l'indicateur <code>-profile fir</code> de la commande <code>nextflow</code>.
+Sur les autres sites, le profil approprié est sélectionné automatiquement en fonction du nom de l'hôte. Il garantit qu'il n'y a pas plus de 100&nbsp;tâches dans la file d'attente Slurm et que 60&nbsp;tâches maximum sont soumises par minute. Il contient des informations spécifiques à la grappe qui sont nécessaires à Nextflow, par exemple que les machines Rorqual disposent de 192&nbsp;cœurs et de 750GB&nbsp;de RAM, avec une durée maximale d'une semaine (168&nbsp;heures). 
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-'''We discourage you from running nf-core pipelines or any other generic Nextflow pipeline on Trillium.''' We recommend running a pipeline on [[Trillium]] only if it was designed specifically for Trillium.
-</div>
+'''Il n'est pas recommmandé d’exécuter des pipelines nf-core ou tout autre pipeline Nextflow générique sur Trillium. Ceux-ci devraient être exécutés sur [[Trillium/fr|Trillium]] uniquement s’ils ont été conçus spécifiquement pour Trillium.'''
 
-<div class="mw-translate-fuzzy">
-La configuration est liée au système sur lequel se fait l'exécution, mais elle est également liée au pipeline lui-même. Par exemple, ici <code>cpu = 1</code> est la valeur par défaut, mais certaines étapes du pipeline peuvent en utiliser plus. Cela peut devenir assez compliqué et les étiquettes dans le fichier <code>nf-core-smrnaseq_2.3.1/2_3_1/conf/base.config</code> sont utilisées par le pipeline à l'interne pour identifier une étape avec une configuration autre que celle par défaut. Nous n'abordons pas ce sujet ici, mais sachez qu'en modifiant ces étiquettes, vous pourriez observer des différences importantes dans le temps de mise en file d'attente et le temps d'exécution du pipeline.
-</div>
+La configuration est liée au système sur lequel se fait l'exécution, mais elle est également liée au pipeline lui-même. Dans cet exemple rnaseq, <code>cpu = 1</code> est la valeur par défaut, mais certaines étapes du pipeline peuvent en utiliser plus. Cela peut devenir assez compliqué et les étiquettes dans le fichier <code>nf-core-rnaseq_3.21.0/3_21_0/conf/base.config</code> sont utilisées par le pipeline à l'interne pour identifier une étape avec une configuration autre que celle par défaut. Nous n'abordons pas ce sujet ici, mais sachez qu'en modifiant ces étiquettes, vous pourriez observer des différences importantes dans le temps de mise en file d'attente et le temps d'exécution du pipeline.
 
 <span id="Step_2._Install_nf-core"></span>
 ==== Étape 2, Installer nf-core ====
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-To use nf-core pipelines on an Alliance cluster, the pipelines must be downloaded on a login node because some clusters do not allow internet access from the compute nodes.
-Run the following on a '''login node''' to install <code>nf-core</code>. 
+Pour utiliser les pipelines nf-core sur une de nos grappes, il est nécessaire de les télécharger sur un nœud de connexion, car certaines grappes ne permettent pas l'accès à Internet à partir des nœuds de calcul.
+Exécutez la commande suivante '''sur un nœud de connexion''' pour installer <code>nf-core</code>.
 <source lang="bash">
 module purge 
 module load python/3.11
@@ -63,18 +52,13 @@ python -m venv nf-core-env
 source nf-core-env/bin/activate
 python -m pip install nf_core==2.13
 </source>
-</div>
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-We use <code>pip</code> to install a [[Python]] package to help with the setup. The nf-core tools can be slow to install; this step may take several minutes.
-</div>
+Pour faciliter la configuration, nous utilisons <code>pip</code> pour installer un paquet [[Python/fr|Python]]. L'installation des outils nf-core peut être longue; cette étape peut prendre plusieurs minutes.
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-==== Step 3. Download the container images and the pipeline ====
-Set the name of the pipeline to be tested, and load Nextflow and the container utility [[Apptainer]]. 
-Nextflow integrates well with Apptainer. 
-As noted above, we are using hte <code>rna-seq</code> pipeline as an example.
-</div> 
+==== Étape 3, Télécharger les images du conteneur et le pipeline ====
+Définissez le nom du pipeline à tester, puis chargez Nextflow et l'utilitaire [[Apptainer/fr|Apptainer]].
+Nextflow s'intègre parfaitement à Apptainer.
+Comme indiqué précédemment, nous utilisons le pipeline <code>rna-seq</code> à titre d'exemple. 
 
 <source lang="bash">
 export NFCORE_PL=rnaseq
@@ -90,19 +74,14 @@ mkdir /project/<def-group>/NXF_SINGULARITY_CACHEDIR
 export NXF_SINGULARITY_CACHEDIR=/project/<def-group>/NXF_SINGULARITY_CACHEDIR
 </source>
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-Nextflow will store container images in the directory pointed to by <code>$NXF_SINGULARITY_CACHEDIR</code>. 
-"Singularity" was a predecessor to "Apptainer" so the name of the variable still reflects that.
-Workflow images tend to be big, so do not store them in your $HOME space because it has a small quota. 
-Instead, store them in <code>/project</code> space.
-</div> 
+Nextflow stockera les images dans le répertoire indiqué par <code>$NXF_SINGULARITY_CACHEDIR</code>; comme  Apptainer est dérivé de Singularity, le nom de la variable n'a pas changé.
+Les images de flux de travail étant généralement volumineuses, ne les stockez pas dans votre espace personnel ($HOME) en raison de sa capacité limitée.
+Stockez-les plutôt dans <code>/project</code>. 
 
 Partagez ce dossier avec les membres de votre groupe qui utiliseront Nextflow avec Apptainer, afin de réduire la duplication et utiliser moins d'espace.
 De plus, vous pouvez ajouter la commande <code>export</code> à votre <code>~/.bashrc</code> pour plus de commodité.
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-Run the following command to download the <code>rnaseq</code> pipeline and container images.
-</div>
+Pour télécharger le pipeline  <code>rnaseq</code> et les images du conteneur, lancez
 
 <source lang="bash">
 cd ~/scratch
@@ -110,31 +89,21 @@ mkdir -p nf-test && cd nf-test
 nf-core download --container-cache-utilisation amend --container-system singularity --compress none -l docker.io -r ${PL_VERSION}  -p 6  ${NFCORE_PL}
 </source>
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-Type "Y" when you see <code>Include the nf-core's default institutional configuration files into the download? (Y/n)</code>
-</div>
+À la question ''Include the nf-core's default institutional configuration files into the download? (Y/n)'', répondez Y.
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-'''IMPORTANT!''': This workflow downloads two components of  ''<code>rnaseq</code>'':
-</div>
+'''IMPORTANT!''' : Ceci télécharge deux composantes de ''<code>rnaseq</code>''&nbsp;:
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-# Container image files go into <code>$NXF_SINGULARITY_CACHEDIR</code> 
-# Pipeline files go into <code>~/scratch/nf-test/nf-core-${NFCORE_PL}_${PL_VERSION}</code> folder with the version number <code>X_X_X</code>. In this example the pipeline is stored at <code>~/scratch/nf-test/nf-core-rnaseq_3.21.0/3_21_0</code>. Please note that you have to include this <code>nf-core-rnaseq_3.21.0/3_21_0</code> folder name when calling <code>nextflow run</code> in your job script (see Step 5 below).
-</div>
+# Les fichiers des images du conteneur vont dans <code>$NXF_SINGULARITY_CACHEDIR</code>.
+# Les fichiers de pipelines vont dans le répertoire  <code>~/scratch/nf-test/nf-core-${NFCORE_PL}_${PL_VERSION}</code> avec le numéro de version <code>X_X_X</code>. Dans notre exemple, le pipeline est stocké dans <code>~/scratch/nf-test/nf-core-rnaseq_3.21.0/3_21_0</code>. Notez que le nom de répertoire <code>nf-core-rnaseq_3.21.0/3_21_0</code> doit être inclus quand <code>nextflow run</code> est appellé dans le script de la tâche (voir l'étape 5 ci-dessous).
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-When the pipeline is launched, Nextflow will look at the <code>nextflow.config</code> file in the working directory and also at <code>~/.nextflow/config</code> (if it exists) in your home to control how to run the workflow. 
-The nf-core pipelines all have a default configuration, a test configuration, and container configurations (singularity, podman, etc).
-</div>
+Au lancement du pipeline, Nextflow tiendra compte du fichier ''nextflow.config'' dans le répertoire de travail ainsi que du fichier ''~/.nextflow/config'' (s'il existe) dans votre répertoire personnel afin de contrôler l'exécution du flux.
+Les pipelines nf-core ont tous une configuration par défaut, une configuration de test et des configurations de conteneurs (Singularity, Podman, etc.).
 
 <span id="Step_4._Prepare_the_input_files"></span>
-==== Préparer les fichiers d'entrée ====
+==== Étape 4, Préparer les fichiers d'entrée ====
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-Nextflow uses sequence files and a sample sheet as inputs.  
-To download the sequence files needed for our 'rnaseq' example, run the following:
-</div> 
+Nextflow utilise en entrée des fichiers de séquences et une feuille d'échantillons (''sample sheet'').
+Pour télécharger les fichiers de séquences nécessaires à notre exemple rnaseq, exécutez 
 
 <syntaxhighlight lang="bash">
 cd ~/scratch/nf-test
@@ -152,10 +121,7 @@ wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE
 wget https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/GSE110004/SRR6357076_2.fastq.gz
 </syntaxhighlight>
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-To prepare a sample sheet, copy and paste the following into <code>~/scratch/nf-test/samplesheet.csv</code>
-and then '''change the username to your own:''':
-</div>
+Pour préparer un exemple de feuille, copiez et collez le code suivant dans <code>~/scratch/nf-test/samplesheet.csv</code>, puis remplacez le nom de l'utilisateur par le vôtre.
 
 <syntaxhighlight lang="text">
 sample,fastq_1,fastq_2,strandedness
@@ -168,21 +134,19 @@ RAP1_UNINDUCED_REP2,/home/<username>/scratch/nf-test/input/SRR6357075_1.fastq.gz
 RAP1_IAA_30M_REP1,/home/<username>/scratch/nf-test/input/SRR6357076_1.fastq.gz,/home/<username>/scratch/nf-test/input/SRR6357076_2.fastq.gz,reverse
 </syntaxhighlight>
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-You can of course use your own data if you prefer. 
-Read more [https://nf-co.re/rnaseq/3.2/docs/usage here] about the <code>rnaseq</code> example and sample sheets.
-</div>
+Vous pouvez bien sûr utiliser vos propres données.
+Pour en savoir plus sur l'exemple et les feuilles <code>rnaseq</code>, voir [https://nf-co.re/rnaseq/3.2/docs/usage la documentation].
 
 <span id="Step_5._Create_a_job_script"></span>
 ====Étape 5. Créer un script de tâche ====
 
-<div class="mw-translate-fuzzy">
-Utilisez les deux profils fournis par nf-core (<i>test</i> pour l'ensemble de données de test et <i>singularity</i> pour le conteneur) et le profil que nous venons de créer pour Narval. Notez que Nextflow est principalement écrit en Java et a tendance à utiliser beaucoup de mémoire virtuelle. Sur certaines grappes, ceci peut causer un problème si l'exécution se fait à partir d'un nœud de connexion.
-<source lang="bash">
-nextflow run nf-core-${NFCORE_PL}_${PL_VERSION}/2_3_1/  -profile test,singularity,narval  --outdir ${NFCORE_PL}_OUTPUT
-</source>
-Remarque : Si votre répertoire <code>~/.aws</code> contient une configuration AWS, Nextflow pourrait vous avertir que l'ensemble de données pour le test du pipeline ne peut pas être téléchargé avec vos identifiants par défaut.
-</div>
+Voici un exemple de script à utiliser sur Fir.
+Adaptez=le pour utiliser les éléments suivants&nbsp;:
+* pipeline (<code>NFCORE_PL</code>) et version (<code>PL_VERSION, FD_VERSION</code>)
+* chemin de la cache Apptainer (<code>NXF_SINGULARITY_CACHEDIR</code>)
+* compte Slurm (<code>SLURM_ACCOUNT</code>)
+* grappe (<code>-profile ...,fir</code>)
+* chemins pour <code>--input</code> et <code>--output</code>
 
 <source lang="bash">
 #!/bin/bash
@@ -205,31 +169,22 @@ nextflow run nf-core-${NFCORE_PL}_${PL_VERSION}/${FD_VERSION}/ \
  --input ~/scratch/nf-test/input/samplesheet.csv --outdir ~/scratch/nf-test/output
 </source>
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-Save the job script in <code>~/scratch/nf-test/nextflow_test.sh</code>,
-then submit it with <code>sbatch nextflow_test.sh</code> to launch the test run.
-</div> 
+Enregistrez le script de tâche dans <code>~/scratch/nf-test/nextflow_test.sh</code>, puis soumettez-le avec <code>sbatch nextflow_test.sh</code> pour lancer l'exécution du test. 
 
 Nextflow est maintenant démarré sur le nœud de calcul. Ceci achemine les tâches à l'ordonnanceur Slurm quand elles sont prêtes à être traitées. 
 
-<div class="mw-translate-fuzzy">
-Vous pouvez voir la progression du pipeline. Il est aussi possible d'ouvrir une nouvelle session sur la grappe ou de vous détacher de la session tmux pour voir les tâches dans la file d'attente Slurm avec <code>squeue -u $USER</code> ou <code>sq</code>.
-</div>
+Vous pouvez suivre la progression du pipeline dans le fichier journal <code>nextflow_test.<job_ID>.out</code>. Vous pouvez également examiner les tâches dans la file d'attente Slurm avec <code>sq</code> ou <code>squeue -u $USER</code>.
 
-TPour plus d'information sur les configurations et les profils, voir
-* [https://www.nextflow.io/docs/latest/config.html "Configuration"] 
-* [https://nf-co.re/docs/usage/getting_started/configuration#basic-configuration-profiles "Pipeline configuration"]
+Pour plus d'information sur les configurations et les profils, voir
+* [https://www.nextflow.io/docs/latest/config.html Configuration] 
+* [https://nf-co.re/docs/usage/getting_started/configuration#basic-configuration-profiles Pipeline configuration]
 
 <span id="Known_issues"></span>
 ==Problèmes connus==
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-Note that Nextflow is mainly written in Java which tends to use a lot of virtual memory. On some clusters, this may be a problem when running from a login node.
-</div>  
+Notez que Nextflow est principalement écrit en Java, un langage qui consomme beaucoup de mémoire virtuelle. Sur certaines grappes, cela peut poser problème lors de l'exécution à partir d'un nœud de connexion.  
 
-<div lang="en" dir="ltr" class="mw-content-ltr">
-Be careful if you have an AWS configuration in your <code>~/.aws</code> directory, as Nextflow might complain that it can't download the pipeline test dataset with your default id.
-</div> 
+Prenez garde si vous avez une configuration AWS dans votre répertoire <code>~/.aws</code>, car Nextflow pourrait signaler qu'il ne peut pas télécharger l'ensemble de données de test du pipeline avec votre identifiant par défaut. 
 
 <span id="&quot;unable_to_create_native_thread&quot;"></span>
 ==== Message <i>unable to create native thread</i> ====

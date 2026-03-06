@@ -124,10 +124,21 @@ Pour vérifier si <code>ansys.lic</code> est bien configuré et fonctionne corre
  [gra-login:~] $EBROOTANSYS/v$(echo ${EBVERSIONANSYS:2:2}${EBVERSIONANSYS:5:1})/licensingclient/linx64/lmutil lmstat -c $ANSYSLMD_LICENSE_FILE 1> /dev/null && echo Success {{!}}{{!}} echo Fail
 </div>
 
-<div class="mw-translate-fuzzy">
+ <div class="mw-translate-fuzzy">
 Si le résultat est <code>Success</code>, la licence devrait fonctionner quand des tâches sont soumises. <br>
 Par contre si le résultat est <code>Fail</code>, écrivez au [[technical support/fr|soutien technique]].
 </div>
+
+<div class="mw-translate-fuzzy">
+::: REMARQUE 1 : Pour les modules Ansys installés localement, la commande <code>runwb2</code> de <code>SnEnv</code> utilise par défaut le serveur de licence SHARCNET, tel que défini dans le fichier du module Ansys que vous chargez. Pour utiliser un serveur distant, lancez plutôt Workbench avec <code>runwb2-gui</code>, car ce script enveloppant (<i>wrapper</i>) lira votre fichier <code>~/.licenses/ansys.lic</code> comme les modules disponibles sous <code>StdEnv/2023</code>. De plus, l'option interactive d'utilisation du serveur CMC (acheminé via le serveur SHARCNET CMC CadPASS) sera proposée, éliminant ainsi la nécessité de le configurer dans votre fichier ansys.lic.
+::: REMARQUE 2 : Lorsque vous démarrez Fluent à partir de Workbench avec la version 2025R1, avant de cliquer sur le bouton ''Start'', cliquez sur l'onglet <i>Environment</i> du panneau de lancement de <i>Fluent Launcher</i> et copiez/collez HOOPS_PICTURE=opengl dans le champ de saisie vide. Vous pouvez aussi définir <code>export HOOPS_PICTURE=opengl</code> dans votre environnement avant de démarrer Workbench. L'une ou l'autre de ces actions empêchera le message suivant, qui apparaîtrait dans les messages de démarrage de l'interface utilisateur : [<span style="Color:#ff7f50">Warning: Software rasterizer found, hardware acceleration will be disabled.</span>]
+::: REMARQUE 3 : Lorsque vous exécutez Mechanical dans Workbench sur gra-vdi, assurez-vous de cocher <i>Distributed</I> dans le panneau <i>Solver</i> du ruban supérieur et de spécifier une valeur maximale de <b>24&nbsp;cœurs</b>. Lorsque vous exécutez Fluent sur gra-vdi, ne cochez pas <i>Distributed</I> et spécifiez une valeur maximale de <b>12&nbsp;cœurs</b>. N'essayez pas d'utiliser plus de 128Go de mémoire, sinon Ansys atteindra la limite et sera arrêté. Si vous avez besoin de plus de cœurs ou de mémoire, utilisez un nœud de calcul sur une grappe pour exécuter votre session graphique (comme décrit dans la section <i>Nœuds de calcul</i> ci-dessus). Lorsque vous effectuez une ancienne tâche de prétraitement ou de post-traitement avec Ansys sur gra-vdi et que vous n'exécutez pas de calcul, utilisez uniquement <b>4&nbsp;cœurs</b>, sinon les licences HPC seront extraites inutilement.
+::: REMARQUE 4 : Dans de très rares cas, l'interface graphique de Workbench ou de certains programmes qu'il exécute se bloquent ou ne démarrent pas correctement, notamment si vnsviewer se déconnecte avant que Ansys soit fermé correctement. En général, si Ansys ne fonctionne pas correctement, ouvrez une nouvelle fenêtre de terminal sur gra-vdi et exécutez <code>pkill -9 -e -u $USER -f "ansys|fluent|mwrpcss|mwfwrapper|ENGINE|mono"</code> pour arrêter complètement tous les processus Ansys. Si le problème persiste et que vous utilisiez l'interface graphique sur des nœuds de calcul avant de travailler sur gra-vdi, essayez d'exécuter <code>rm -rf .ansys</code>. Si le problème concerne /home, /project ou /scratch (la commande df bloque), il est fort probable qu'Ansys recommence à fonctionner normalement une fois le problème de stockage résolu.
+</div>
+
+ [compute-node:/tmp] fluent -g 2d -n 2
+ Connected License Server List:	<Shared_Web_License_Server>
+ Hit return to exit.
 
 <span id="Version_compatibility"></span>
 = Compatibilité des versions =
@@ -1017,6 +1028,7 @@ fi
 
 == Workbench ==
 
+<div class="mw-translate-fuzzy">
 Initialisez le fichier de projet avant de le soumettre pour la première fois.<br>
 # Connectez-vous à la grappe avec [[VNC/fr#Nœuds_de_calcul|TigerVNC]].
 # Dans le même répertoire où se trouve le fichier de projet (YOURPROJECT.wbpj), [[Ansys/fr#Workbench_3|lancez Workbench]] avec la même version du module Ansys qui a servi à créer le projet. 
@@ -1025,8 +1037,9 @@ Initialisez le fichier de projet avant de le soumettre pour la première fois.<b
 # Dans la liste déroulante de la barre de menus du haut, cliquez sur <I>File -> Exit</I> pour sortir de Workbench.
 # Dans la fenêtre contextuelle Ansys Workbench qui affiche <I>The current project has been modified. Do you want to save it ?</I> cliquez sur le bouton <i>No</i>. 
 # Quittez Workbench et soumettez la tâche avec un des scripts ci-dessous.
+</div>
 
-Pour ne pas écrire la solution quand une tâche en cours se termine avec succès sur une grappe,  enlevez <code>;Save(Overwrite=True)</code> de la dernière ligne du script Slurm. Il sera ainsi plus facile d'effectuer plusieurs tâches de test (pour une mise à l'échelle quand vous changez ntasks) puisque la solution initialisée ne sera pas écrasée à chaque fois et donc n'aura pas besoin d'être réinitialisée entre les tâches. Ou encore, vous pouvez sauvegarder une copie du fichier initialisé YOURPROJECT.wbpj et du sous-répertoire YOURPROJECT_files avant que chaque tâche soit soumise et les restaurer ensuite une fois que la solution est écrite.
+ Since a Compute Node with upto 96cores, 768GB memory and 8hours runtime can now be reserved for an OnDemand desktop session, consider running your Workbench simulations directly from within the Workbench native gui when possible as a more intuitive option compared to submitting the job to the queue with a slurm script.
 
 <span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===
@@ -1051,7 +1064,9 @@ Pour soumettre un fichier de projet à la queue, personnaliser les scripts suiva
 ##SBATCH --constraint=broadwell        # Applicable to graham or cedar
 </div>
 
+<div class="mw-translate-fuzzy">
 module load StdEnv/2023 ansys/2023R2   # OR newer Ansys module versions (untested)
+</div>
 
 if [ "$SLURM_NNODES" == 1 ]; then
   MEMPAR=0                             # Set to 0 for SMP (shared memory parallel)
@@ -1068,6 +1083,7 @@ sed -i "s!UserConfigured=\"0\"!UserConfigured=\"1\"!g" "$MWFILE"
 export KMP_AFFINITY=disabled
 export I_MPI_HYDRA_BOOTSTRAP=ssh
 
+<div class="mw-translate-fuzzy">
 runwb2 -B -E "Update()" -F YOURPROJECT.wbpj
 #runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 }}
@@ -1078,6 +1094,7 @@ runwb2 -B -E "Update()" -F YOURPROJECT.wbpj
 |lang="bash"
 |contents=
 #!/bin/bash
+</div>
 
 <div class="mw-translate-fuzzy">
 #SBATCH --account=def-account
@@ -1108,10 +1125,15 @@ sed -i "s!UserConfigured=\"0\"!UserConfigured=\"1\"!g" "$MWFILE"
 export KMP_AFFINITY=disabled
 export I_MPI_HYDRA_BOOTSTRAP=ssh
 
+<div class="mw-translate-fuzzy">
 runwb2 -B -E "Update()" -F YOURPROJECT.wbpj
 #runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 }}
 </tab>
+</tabs>
+</div> 
+
+To avoid writing the solution when a running job successfully completes change <code>Save(Overwrite=True)</code> to <code>Save(Overwrite=False)</code> in the last line of the above slurm script.  Doing this will make it easier to determine how well the simulation scales when #SBATCH --ntasks is increased since the initialized solution will not be overwritten by each test job.
 </tabs>
 
 == Mechanical ==
@@ -1337,26 +1359,16 @@ Les programmes Ansys fonctionnent interactivement en mode graphique sur les nœu
 
 Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window, manually load an ansys module and then type the program name to start it command line.  For this later case, if the application requires accelerated graphics to run properly (for instance for fluent to support 3d rendering) then either a whole GPU resource (H100 or T4 at the time of this writing) should be requested.  Since the various ansys applications launched in graphical mode behave differently when different ansys module versions are loaded, recommendations for adding command line argument and exporting environment variables for virtualgl or mesa environments are suggested below depending on whether a GPU has been requested or not and whether a On Demand or Juypter Lab desktop is being used.
 
-<span id="Fluids"></span>
-<div class="mw-translate-fuzzy">
-=== Fluids ===
-::: <code>module load StdEnv/2023 ansys/2022R2</code> (ou versions plus récentes)
-::: <code>fluent -mpi=intel -driver opengl|null</code> OU 
-::: <code>cfx5 -graphics ogl|mesa</code>
-</div>
+=== Fluent ===
 
-This section shows howto start Ansys Fluid applications from the command line of an On Demand Desktop or the convenience Icon's of a Juypter Lab Desktop.
-
-==== Fluent ====
-
-To start fluent the following steps should be done including setting the indicated Environment Variables depending on which type of Compute Node the desktop is being started on (with or without a gpu).
+To start Ansys Fuent from the command line of an On Demand Desktop, open a terminal window and run the commands:
 
 ::: <code>module load StdEnv/2023 ansys/2025R1</code>
 ::: <code>fluent</code>
 
-In the following steps, when the Fluent Launcher popup selector panel appears, click the Environment Tab and copy/paste the following environment variable settings. Do NOT include the text between the round brackets, these are comments. Also do NOT put the word export in front of the variable names.
+When the Fluent Launcher popup selector panel appears, click the Environment Tab and copy/paste the following environment variable settings, depending on whether you started your On Demand session with a GPU for graphical acceleration. Do not include the text between the round brackets (as these are comments) and do not put export in front of any variable names.
 
-<b>Compute Node (no GPU requested) or Basic Desktop</b>
+<b>Compute Node (no GPU requested)</b>
 
 <div class="mw-translate-fuzzy">
 module load ansys/2020R1
@@ -1378,7 +1390,7 @@ If <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code> is not set properly on nibi when fluen
  [mpiexec@g4.nibi.sharcnet] HYD_bstrap_setup (../../../../../src/pm/i_hydra/libhydra/bstrap/src/intel/i_hydra_bstrap.c:1063): error waiting for event
  [mpiexec@g4.nibi.sharcnet] Error setting up the bootstrap proxies
 
-==== CFX ====
+=== CFX ===
 
 When starting CFX from an On Demand Desktop the following arguments maybe specified on the terminal window command line depending on whether a GPU was requested when the Desktop was started. 
 

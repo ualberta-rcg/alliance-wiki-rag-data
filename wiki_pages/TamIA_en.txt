@@ -18,7 +18,6 @@ tamIA is a cluster dedicated to artificial intelligence for the Canadian scienti
 
 tamIA is part of [https://alliancecan.ca/en/services/advanced-research-computing/pan-canadian-ai-compute-environment-paice PAICE, the Pan-Canadian AI Compute Environment].
 
-<div class="mw-translate-fuzzy">
 ==Site-specific policies==
 
 * By policy, tamIA's compute nodes cannot access the internet. If you need an exception to this rule, contact [[Technical_support|technical support]] explaining what you need and why.
@@ -26,13 +25,10 @@ tamIA is part of [https://alliancecan.ca/en/services/advanced-research-computing
 * Please note that the '''[https://code.visualstudio.com/ VSCode IDE]''' is <b>forbidden</b> on the <b>login nodes</b> due to its heavy footprint. It is still authorized on the compute nodes.
 * Each job should be at least one hour long (at least five minutes for test jobs) and you can't have more than 1000 jobs (running and pending) at the same time.
 * The maximum duration of a job is one day (24 hours).
-* Each job must use all 4 GPUs on all nodes it is allocated. Jobs are allocated whole nodes.
-</div>
+* Each job must use all 4 GPUs of the servers allocated, i.e. 4 with H100 and 8 with H200.
 
-<div class="mw-translate-fuzzy">
 ==Access==
-To access the cluster, each researcher must complete [https://ccdb.alliancecan.ca/me/access_services an access request in the CCDB]. Access to the cluster may take up to one hour after completing the access request is sent.
-</div>
+To access the cluster, each researcher must complete [https://ccdb.alliancecan.ca/me/access_services an access request in the CCDB]. Access to the cluster may take up to one hour after completing the access request is sent. You must then submit the [https://ccdb.alliancecan.ca/paice/general_access_to_paice_systems General Access to PAICE Systems] declaration form.
 
 Eligible principal investigators are members of an AIP-type RAP (prefix <code>aip-</code>).
 
@@ -50,22 +46,18 @@ The cluster can only be reached from Canada.
 |-
 | HOME <br> Lustre file system ||
 
-<div class="mw-translate-fuzzy">
 * Location of home directories, each of which has a small fixed quota.
 * You should use the <code>project</code> space for larger storage needs.
 * Small per user [[Storage_and_file_management#Filesystem_quotas_and_policies|quota]].
-* There is currently no backup of the home directories. (ETA Summer 2025)
-</div>
+* There is currently no backup of the home directories. (ETA Spring 2026)
 
 |-
 | SCRATCH <br> Lustre file system ||
 
-<div class="mw-translate-fuzzy">
-* Large space for storing temporary files during computations.
-* No backup system in place. 
-* Large [[Storage_and_file_management#Filesystem_quotas_and_policies|quota]] per user.
+* Large space for storing temporary files during computations
+* No backup system in place
+* Large [[Storage_and_file_management#Filesystem_quotas_and_policies|quota]] per user
 * There is an [[Scratch_purging_policy|automated purge]] of older files in this space.
-</div>
 
 |-
 | PROJECT <br> Lustre file system ||
@@ -77,45 +69,38 @@ The cluster can only be reached from Canada.
 
 For transferring data via [[Globus]], you should use the endpoint specified at the top of this page, while for tools like [[Transferring_data#Rsync|rsync]] and [[Transferring_data#SCP|scp]] you can use a login node.
 
-<div class="mw-translate-fuzzy">
 ==High-performance interconnect==
-The [https://fr.wikipedia.org/wiki/Bus_InfiniBand InfiniBand] [https://www.nvidia.com/en-us/networking/quantum2/ NVIDIA NDR] network links together all of the nodes of the cluster. Each H100 GPU is connected to a single NDR200 port through an NVIDIA ConnectX-7 HCA. Eeach GPU server has 4 NDR200 ports connected to the InfiniBand fabric.
-</div>
+The [https://fr.wikipedia.org/wiki/Bus_InfiniBand InfiniBand] [https://www.nvidia.com/en-us/networking/quantum2/ NVIDIA NDR] network links together all of the nodes of the cluster. Each GPU is connected to a single NDR200 port through an NVIDIA ConnectX-7 HCA. Eeach GPU server has 4 or 8 NDR200 ports connected to the InfiniBand fabric.
 
-<div class="mw-translate-fuzzy">
-The InfiniBand network is non-blocking for compute servers and is composed of two levels of switches in a fat-tree topology. Storage and management nodes are connected via four 400Gb/s connections to the network core.
-</div>
+The InfiniBand network is non-blocking for compute servers and is composed of two levels of switches in a fat-tree topology. Storage and compute nodes are connected via 4 or 8 400Gb/s connections to the network core.
 
-<div class="mw-translate-fuzzy">
 ==Node characteristics==
 {| class="wikitable sortable"
 ! nodes !! cores !! available memory !! CPU !! storage !! GPU
 |-
-|  42 || 48 || 512GB || 2 x [https://www.intel.com/content/www/us/en/products/sku/232380/intel-xeon-gold-6442y-processor-60m-cache-2-60-ghz/specifications.html Intel Xeon Gold 6442Y 2,6 GHz, 24C] || 1 x SSD de 7.68TB || 4 x NVIDIA HGX H100 SXM 80GB HBM3 700W, connected via NVLink
+|12
+|64
+|1024GB
+|2 x [https://www.intel.com/content/www/us/en/products/sku/232384/intel-xeon-gold-6448y-processor-60m-cache-2-10-ghz/specifications.html Intel Xeon Gold 6448Y 2,1 GHz, 32C]
+|1 x 7.68TB SSD
+|8 x [https://www.nvidia.com/en-us/data-center/h200/ NVIDIA HGX H200] SXM 141GB HBM3 700W, connected via NVLink
 |-
-|  4 || 64 || 512GB || 2 x [https://www.intel.com/content/www/us/en/products/sku/232398/intel-xeon-gold-6438m-processor-60m-cache-2-20-ghz/specifications.html Intel Xeon Gold 6438M 2.2G, 32C/64T] || 1 x SSD de 7.68TB || none
+|  53 || 48 || 512GB || 2 x [https://www.intel.com/content/www/us/en/products/sku/232380/intel-xeon-gold-6442y-processor-60m-cache-2-60-ghz/specifications.html Intel Xeon Gold 6442Y 2,6 GHz, 24C]|| 1 x 7.68TB SSD || 4 x [https://www.nvidia.com/en-us/data-center/h100/ NVIDIA HGX H100] SXM 80GB HBM3 700W, connected via NVLink
+|-
+|  8 || 64 || 512GB || 2 x [https://www.intel.com/content/www/us/en/products/sku/232398/intel-xeon-gold-6438m-processor-60m-cache-2-20-ghz/specifications.html Intel Xeon Gold 6438M 2.2G, 32C/64T] || 1 x 7.68TB SSD || none
 |}
-</div>
 
 ===Software environments===
 [[Standard software environments/fr|<tt>StdEnv/2023</tt>]] is the standard environment on tamIA.
 
-<div lang="fr" dir="ltr" class="mw-content-ltr">
-=== Tâches GPU ===
-Les tâches sont assignées sur les nœuds complets. Utilisez une des options Slurm suivantes :
-</div>
+=== GPU jobs ===
+Jobs are assigned on whole nodes with one of the following options:
 
-<div lang="fr" dir="ltr" class="mw-content-ltr">
-Pour une tâche sur un nœud avec GPU H100 : <code>--gpus=h100:4</code>
-</div>
+For jobs on a node with an H100 GPU: <code>--gpus=h100:4</code>
 
-<div lang="fr" dir="ltr" class="mw-content-ltr">
-Pour une tâche sur un nœud avec GPU H200 : <code>--gpus=h200:8</code>
-</div>
+For jobs on a node with an H200 GPU: <code>--gpus=h200:8</code>
 
-<div lang="fr" dir="ltr" class="mw-content-ltr">
-Pour les tâches avec plusieurs nœuds, utiliser <code>--gpus-per-nodes=h100:4</code> ou <code>--gpus-per-nodes=h200:8</code>.
-</div>
+For jobs using several GPUs, options are <code>--gpus-per-nodes=h100:4</code> or <code>--gpus-per-nodes=h200:8</code>.
 
 <span id="Suivi_de_vos_tâches"></span>
 ==Monitoring jobs==
