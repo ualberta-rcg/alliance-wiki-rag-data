@@ -6,24 +6,31 @@
 <!--T:7-->
 BLAST ("Basic Local Alignment Search Tool") finds regions of similarity between biological sequences. The program compares nucleotide or protein sequences to sequence databases and calculates the statistical significance.
 
-== User manual == <!--T:8-->
+<!--T:8-->
+== User manual ==
 You can find more information on its arguments in the [https://www.ncbi.nlm.nih.gov/books/NBK279684/ user manual] 
 or with
 {{Command|blastn -help}}
 
-== Databases == <!--T:9-->
-Some frequently used sequence databases are installed on the clusters in <code>/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2022_03_23/</code>.
-Examine that directory and its subdirectories, e.g. with
+<!--T:9-->
+== Databases ==
+NCBI non-redundant protein (<code>nr</code>) and non-redundant nucleotide databases (<code>nt</code>) are installed on the clusters in <code>/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs</code>. 
 
-<!--T:38-->
-{{Command|ls /cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2022_03_23/}}
+<!--T:41-->
+The latest version of databases are stored at:
 
+<!--T:42-->
+For <code>nr</code> database: <code>/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2025_06_21/nr/nr</code>
 
+<!--T:43-->
+For <code>nt</code> database: <code>/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2025_06_21/nt/nt</code>
 
-== Accelerating the search == <!--T:10-->
+<!--T:10-->
+== Accelerating the search ==
 For the examples below, the file <tt>ref.fa</tt> will be used as the reference database in FASTA format, and <tt>seq.fa</tt> as the queries.
 
-=== <tt>makeblastdb</tt> === <!--T:11-->
+<!--T:11-->
+=== <tt>makeblastdb</tt> ===
 Before running a search, we must build the database. This can be a preprocessing job, where the other jobs are dependent on the completion of the <tt>makeblastdb</tt> job.
 Here is an example of a submission script:
 {{File
@@ -46,10 +53,12 @@ module load gcc/7.3.0 blast+/2.9.0
 makeblastdb -in ref.fa -title reference -dbtype nucl -out ref.fa
 }}
 
-=== Task array === <!--T:15-->
+<!--T:15-->
+=== Task array ===
 BLAST search can greatly benefit from data parallelism by splitting the query file into multiples queries and running these queries against the database.
 
-==== Preprocessing ==== <!--T:16-->
+<!--T:16-->
+==== Preprocessing ====
 In order to accelerate the search, the <tt>seq.fa</tt> file must be split into smaller chunks. These should be at least <tt>1MB</tt> or greater, but '''not smaller''' as it may hurt the parallel filesystem.
 
 <!--T:18-->
@@ -58,7 +67,8 @@ Using the <tt>faSplit</tt> utility:
 {{Command|faSplit sequence seqs.fa 10 seq}}
 will create 10 files named <tt>seqN.fa</tt> where <tt>N</tt> is in the range of <tt>[0..9]</tt> for 10 queries (sequences).
 
-==== Job submission ==== <!--T:19-->
+<!--T:19-->
+==== Job submission ====
 Once our queries are split, we can create a task for each <tt>seq.fa.N</tt> file using a job array. The task id from the array will map to the file name containing the query to run.
 
 <!--T:20-->
@@ -94,7 +104,8 @@ Once all the tasks from the array are done, the results can be concatenated usin
 where the 10 files will be concatenated into <tt>seq.ref</tt> file.
 This could be done from the login node or as a dependent job upon completion of all the tasks from the array.
 
-=== GNU Parallel === <!--T:26-->
+<!--T:26-->
+=== GNU Parallel ===
 <tt>GNU Parallel</tt> is a great tool to pack many small jobs into a single job, and parallelize it.
 This solution helps alleviate the issue of too many small files in a parallel filesystem by querying fixed size chunks from <tt>seq.fa</tt> and running on one node and multiple cores.
 
@@ -104,7 +115,8 @@ As an example, if your <tt>seq.fa</tt> file is <tt>3MB</tt>, you could read bloc
 <!--T:36-->
 See also [[GNU Parallel#Handling_large_files|Handling large files]] in the GNU Parallel page.
 
-==== Running with multiple cores on one node==== <!--T:34-->
+<!--T:34-->
+==== Running with multiple cores on one node====
 {{File
   |name=blastn_gnu.sh
   |lang="bash"
@@ -139,12 +151,14 @@ parallel --jobs $SLURM_CPUS_PER_TASK --keep-order --block -1 --recstart '>' --pi
 <!--T:33-->
 Note: The file must not be compressed.
 
-===== Job submission ===== <!--T:31-->
+<!--T:31-->
+===== Job submission =====
 With the above submission script, we can submit our search and it will run after the database has been created.
 {{Command|sbatch --dependency{{=}}afterok:$(sbatch makeblastdb.sh) blastn_gnu.sh}}
 
 
-=== Additional tips === <!--T:32-->
+<!--T:32-->
+=== Additional tips ===
 * If it fits into the node's local storage, copy your FASTA database to the local scratch space (<tt>$SLURM_TMPDIR</tt>).
 * Reduce the number of hits returned (<code>-max_target_seqs, -max_hsps</code> can help), if it is reasonable for your research.
 * Limit your hit list to nearly identical hits using <code>-evalue</code> filters, if it is reasonable for your research.

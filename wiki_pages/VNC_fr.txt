@@ -3,13 +3,11 @@
 {{Warning
   |title=Essayez d'abord [[JupyterLab#fr|JupyterLab]]
   |content=
-Cette page présente des fonctions avancées de VNC. Dans plusieurs cas, il est plus simple d'utiliser VNC dans votre navigateur et [[JupyterLab#fr/Desktop|Desktop]]. Employez cette méthode avant d'utiliser les intructions fournies ci-desssous.
+Cette page présente des fonctions avancées de VNC. Dans plusieurs cas, il est plus simple d'utiliser VNC dans votre navigateur et [[JupyterLab#fr/Desktop|Desktop]]. Employez cette méthode avant d'utiliser les intructions données ci-desssous.
 }}
 [[File:Matlab-vnc.png|400px|thumb|MATLAB exécuté dans VNC]]
 
-<div class="mw-translate-fuzzy">
-Pour certains paquets complexes (par exemple [[MATLAB/fr|MATLAB]]), il est parfois utile de démarrer à distance l'interface utilisateur graphique. Pour ce faire, on utilise généralement [[SSH/fr|SSH]] avec redirection X11, mais la performance est souvent trop lente, tout comme avec [[Connecting_with_MobaXTerm/fr| MobaXTerm]] ou [[Connecting_with_PuTTY/fr|Putty]]. Une meilleure option est d'utiliser [https://fr.wikipedia.org/wiki/Virtual_Network_Computing VNC] pour se connecter à un ordinateur à distance.
-</div>
+Pour démarrer à distance l'interface graphique d'un programme, on utilise généralement le protocole X11 via SSH. Cependant, les performances de cette méthode sont souvent insuffisantes pour effectuer des rotations graphiques complexes et fluides. Une meilleure option est d'utiliser [https://fr.wikipedia.org/wiki/Virtual_Network_Computing VNC] pour se connecter à un ordinateur à distance.
 
 <span id="Setup"></span>
 = Configuration =
@@ -75,7 +73,7 @@ Notez que la commande vncserver fournie par StdEnv/2023 est basée sur [https://
  [<b>l4</b>(login node):~] grep -iE "\sport|kill" <span style="Color:green">/home/yourusername/.vnc/<b>l4</b>.nibi.sharcnet:1.log</span>
  25/08/2025 15:16:20 Listening for VNC connections on TCP port <span style="Color:blue">5901</span>
 
-Vous pouvez maintenant quitter le nœud de connexion. Le vcnserver que vous avez lancé restera actif jusqu'à ce que la limite de temps définie avec l'option <codfe>-idletimeout</code> soit atteinte.
+Vous pouvez maintenant quitter le nœud de connexion. Le vcnserver que vous avez lancé restera actif jusqu'à ce que la limite de temps définie avec l'option <code>-idletimeout</code> soit atteinte.
 
  [<b><span style="Color:green">l4</span></b>(login node):~]  exit
  [<b>laptop</b>:~]
@@ -84,22 +82,16 @@ Vous pouvez maintenant quitter le nœud de connexion. Le vcnserver que vous avez
 
  [<b>laptop</b>:~] ssh nibi.computecanada.ca -L <span style="Color:red">5905</span>:<b><span style="Color:green">l4</span></b>:<span style="Color:blue">5901</span>
 
-<div class="mw-translate-fuzzy">
-4) Sur la ligne de commande dans votre ordinateur, entrez ce qui suit pour vous connecter à vncviewer via le port qui vous a été donné.
-</div>
+4) Ensuite, sur votre bureau, cliquez sur l'icône de l'application <i>TigerVNC Viewer</i> et entrez <code>localhost:5905</code> dans la boîte de dialogue <i>VNC Viewer: Connexion détails</i> qui s'affiche. ** OU ** ouvrez une autre fenêtre de terminal et entrez la commande suivante, puis appuyez sur la touche Retour (''Enter''). Dans les deux cas, une fenêtre contextuelle vous demandera le mot de passe d'authentification VNC que vous avez configuré précédemment. Une fois le mot de passe saisi, votre bureau distant devrait immédiatement s'afficher.
 
  [<b>laptop</b>:~] vncviewer localhost:<span style="Color:red">5905</span>
 
-<div class="mw-translate-fuzzy">
-Sous macOS ou Windows, vous pouvez aussi cliquer sur l'icône de l'application <i>TigerVNC Viewer</i> qui se trouve sur votre ordinateur et entrer '''localhost:<span style="Color:red">5905</span>''' dans <i>Connection Details</i>. Tenez compte des limites imposées sur les nœuds de connexion en termes d'utilisation de la mémoire et du temps de CPU. Sur Graham, ces limites sont de 8Go de mémoire et de 1&nbsp;heure d'utilisation de CPU par processus, selon <code>ulimit -t -v</code>; ceci peut varier en fonction de la grappe. Si vous avez besoin de plus de ressources, lancez votre serveur VNC sur un nœud de calcul plutôt que d'utiliser la méthode décrite plus loin.
-</div>
+Bien qu'il n'y ait pas de limite de temps pour les processus sur les nœuds de connexion, les applications exécutées sur votre bureau distant sont soumises à des limites de mémoire et de temps CPU. Si vous avez besoin de plus de mémoire, de ressources CPU ou d'accès GPU pour vos applications ou pour l'accélération graphique, suivez la procédure ci-dessous pour démarrer votre serveur VNC sur un nœud de calcul et demandez les ressources nécessaires à l'aide de la commande <code>salloc</code>.
 
 <span id="Compute_nodes"></span>
 == Nœuds de calcul ==
 
-<div class="mw-translate-fuzzy">
-Si aucun nœud VDI n'est disponible, vous pouvez démarrer un serveur VNC dans un nœud de calcul puis vous y connecter à partir de votre ordinateur par redirection de port. Vous obtenez ainsi un accès dédié au serveur sans toutefois bénéficier de toutes les fonctionnalités graphiques ou de OpenGL accéléré.
-</div>
+Si votre programme requiert des limites de mémoire et/ou de temps processeur supérieures à celles offertes par un ou plusieurs nœuds de connexion, connectez-vous à un nœud de calcul à l'aide de la commande <code>salloc</code>, démarrez un serveur VNC, puis établissez un tunnel sécurisé vers ce serveur (avec la redirection de port appropriée) et connectez-vous depuis votre ordinateur avec un client VNC. Cette méthode vous permettra d'accéder à votre serveur VNC sur un nœud de calcul avec un environnement graphique complet; toutefois, par défaut, l'accélération matérielle OpenGL ne sera pas possible.
 
 <b>1) Démarrez un serveur VNC</b>
 
@@ -234,9 +226,7 @@ Si le bureau MATE est en cours d'exécution et que l'écran de veille ne se dév
 <span id="Cannot_log_in"></span>
 == Problème de connexion == 
 
-<div class="mw-translate-fuzzy">
 La connexion à gra-vdi.alliancecan.ca se fait en deux étapes&nbsp;:
-</div>
 
 1)
  username
@@ -250,31 +240,23 @@ Si vous entrez un nom d'utilisateur/mot de passe erroné pour l'étape 1, vous a
 <span id="OpenGL_graphics"></span>
 == OpenGL ==
 
-<div class="mw-translate-fuzzy">
-== NIX ==
-</div>
+Pour exécuter un programme graphique utilisant OpenGL accéléré par le matériel, quelques modifications seront nécessaires dans la section <i>Nœuds de calcul</i> ci-dessus.
 
-First, the <code>salloc</code> command must be modified to request a GPU node.  If this is not done, the program will fall back to using software-based rendering on CPUs, which is relatively much slower.  To request the first GPU node that brcomes available (and in turn minimize your queue wait time if the cluster has multiple GPU node types) simply specify:
+Tout d'abord, la commande <code>salloc</code> doit être modifiée pour demander un nœud GPU. À défaut, le programme utilisera le rendu logiciel sur les CPU, ce qui est beaucoup plus lent. Pour demander le premier nœud GPU disponible (et ainsi minimiser le temps d'attente au cas où la grappe comporte plusieurs types de nœuds GPU), il suffit de spécifier
 
  [<b>l4</b>(login node):~] salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=1 --mem=16000 --account=def-piname
 
-<div class="mw-translate-fuzzy">
-Les commandes nix et nix-env seront alors dans votre chemin pour gérer les paquets logiciels via nix dans votre environnement nix personnel.
-</div>
+Toutefois, si la grappe que vous utilisez comporte plusieurs types de nœuds, dont l'un est reconnu pour offrir une bonne accélération graphique, par exemple un nœud équipé d'un GPU <b>t4</b>, alors utilisez
 
  [<b>l4</b>(login node):~] salloc --time=1:00:00 --cpus-per-task=4 --gpus-per-node=t4:1 --mem=16000 --account=def-piname
 
-<div class="mw-translate-fuzzy">
-Pour installer un paquet nix dans votre environnement, cliquez sur l'icône du terminal dans la barre de menu supérieure ou sélectionnez <i>Applications -> System Tools -> Terminal</i>. Vous pouvez maintenant chercher des programmes avec la commande <code>nix search <regexp></code> et les installer avec  <code>nix-env --install --attr <attribute></code>. Par exemple, pour installer [https://qgis.org QGIS], utilisez
-</div>
+Deuxièmement, il faudra probablement ajouter <code>vglrun</code> juste avant le nom du <code>PROGRAM</code>` sur la ligne de commande de votre terminal VNC. Par exemple
 
   [<b>c48</b>(compute node):~] vglrun -d egl PROGRAM
 
-Then <code>vglrun</code> sets some extra environment variables to ensure your program will use correct virtualgl libraries.  If however your <code>PROGRAM</code> has already been patched to use the current cvmfs standard environment doing so will not be required. 
+Ensuite, la fonction <code>vglrun</code> configure des variables d'environnement supplémentaires pour garantir que votre programme utilise les bibliothèques VirtualGL appropriées. Toutefois, si votre programme a déjà été modifié pour utiliser l'environnement standard cvmfs actuel, cette étape est inutile. 
 
 <span id="Portal_alternatives"></span>
-<div class="mw-translate-fuzzy">
-Le moyen le plus simple est avec l'utilitaire <code>patchelf</code> de nix pour ajuster le binaire final; installez l'utilitaire avec <code>nix-env --install --attr nixpkgs.patchelf</code>. Par exemple, si vous construisez une application OpenGL pour utiliser les bibliothèques de système et que vous l'installez comme étant <code>~/.local/bin/myglapp>/code>, vous devez ajouter la bibliothèque VirtualGL du système comme première bibliothèque requise.
-</div>
+== Autres options ==
 
 Si vous rencontrez des problèmes graphiques à l'utilisation de VNC comme décrit ci-dessus, essayez d'utiliser [https://ondemand.sharcnet.ca/ OpenOnDemand] sur <b>nibi</b> ou [https://jupyterhub.rorqual.alliancecan.ca JupyterHub] sur <b>rorqual</b>. Les deux grappes offrent une interface web VDI automatisée avec un bureau moderne qui est conçue pour une utilisation simplifiée, ainsi que des performances matérielles améliorées et une meilleure prise en charge logicielle.

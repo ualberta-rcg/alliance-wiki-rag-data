@@ -390,7 +390,7 @@ fi
 
 <!--T:6752-->
 module load StdEnv/2023          # Do not change
-module load ansys/2023R2         # or newer versions
+module load ansys/2025R2.04      # only 2025R2 or newer works on trillium
 
 <!--T:6751-->
 MYJOURNALFILE=sample.jou         # Specify your journal file name
@@ -1090,8 +1090,8 @@ fi
 
 <!--T:2801-->
 Before submitting a Workbench job to the queue with a slurm script, you must initialize it once as described in the following steps.<br>
-# On the cluster where you will submit workbench jobs (Nibi for example) open an [https://ondemand.sharcnet.ca OnDemand] desktop.  Choosing either a Compute node (without a GPU) or a Basic Desktop resource will be sufficient.
-# In the desktop open a terminal window and cd into the directory where your project directory is located that contains your <code>YOURPROJECT.wbpj</code> file. 
+# On the cluster where you will submit workbench jobs (Nibi for example) open an [https://ondemand.sharcnet.ca OnDemand] desktop.  For the purpose of this section it will be sufficient and fastest to select either a Compute Desktop (without a GPU) or a Basic Desktop resource.
+# Once the desktop appears, open a terminal window and cd into your directory containiong your <code>YOURPROJECT.wbpj</code> file. 
 # Remove the old project cache directory by running <code>rm -rf _ProjectScratch</code> as this can be very large from previous runs.
 # Open a terminal window and load the module version that you will be using in your slurm script for example <code>module load ansys/2025R2.04</code>
 # Open the Workbench gui with your project file.  This can be done by issuing <code>runwb2 -f YOURPROJECT.wbpj</code> directly from the command line.  If and when a popup appears asking "Do you want to recover the project before opening ? (Any changes made since the last save will be lost.)" answer <b>No</b>.
@@ -1414,7 +1414,7 @@ Slurm scripts for using AnsysEDT is provided in a separate wiki page [https://do
 = Graphical use = <!--T:94-->
 
 <!--T:941-->
-To run Ansys programs in graphical mode click on one of the following OnDemand or Jupyterhub links.  A job submission web page to configure the resources for an interactive session should appear in your browser : 
+To run Ansys programs in graphical mode click on one of the following OnDemand or Jupyterhub desktop links :
 
  <!--T:6807-->
 [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) NIBI]: <code>https://ondemand.sharcnet.ca</code>
@@ -1424,12 +1424,12 @@ To run Ansys programs in graphical mode click on one of the following OnDemand o
  [https://docs.scinet.utoronto.ca/index.php/Open_OnDemand_Quickstart TRILLIUM]: <code>https://ondemand.scinet.utoronto.ca</code>
 
 <!--T:6808-->
-Submit your resource request and then wait.  If you started a Juypter Lab launcher interface then you can simply load an ansys software module from the left side menu and then click one of the ansys icons to start cfx, fluent mapdl or workbench.  Otherwise if you started a Compute/Basic Desktop from the Nibi OnDemand system then you will need to open a terminal window, manually load an ansys module and then type the program name to start it command line.  For this later case, if the application requires accelerated graphics to run properly (for instance for fluent to support 3d rendering) then either a whole GPU resource (H100 or T4 at the time of this writing) should be requested.  Since the various ansys applications launched in graphical mode behave differently when different ansys module versions are loaded, recommendations for adding command line argument and exporting environment variables for virtualgl or mesa environments are suggested below depending on whether a GPU has been requested or not and whether a On Demand or Juypter Lab desktop is being used.
+A job submission web page should appear in your browser.  Configure the resources required for your interactive desktop session and click Launch or Start.  If either accelerated graphics or computations will be conducted from within your desktop session then be sure to specify a GPU resource.  Once the desktop load an ansys module.  If you started a Juypter Lab powered desktop then this can be done by clicking the left hand menu, or if you started an OnDemand desktop manually type module load ansys/version on the command line.  To start one the common Ansys programs such as fluent, cfx, workbench and so forth refer to the following section which provides advice for setting environment variables and arguments required by virtualgl or mesa based graphical environments depending on whether a node with a GPU resource was specified or not.  
 
 === Fluent === <!--T:6838-->
 
 <!--T:6839-->
-To start Ansys Fuent from the command line of an On Demand Desktop, open a terminal window and run the commands:
+To start Ansys Fluent from the command line of an On Demand Desktop, open a terminal window and run the commands:
 
 <!--T:6840-->
 ::: <code>module load StdEnv/2023 ansys/2025R1</code>
@@ -1510,24 +1510,26 @@ This sections shows howto start workbench (and optionally fluent) on either an O
 <b>Compute Node (with GPU requested)</b>
 
 <!--T:1678-->
-For this option to work on nibi, as mentioned in the first paragraph of this section, a full h100(80GB) GPU must be selected from the GPU pulldown when starting the OnDemand desktop session.  This particular GPU selection is required since it the only one (currently) on nibi that will ensure the VirtualGL environment variables required to enable accelerated OpenGL graphics calls are setup in the Deskop environment.  Once your desktop appears, open a terminal window and start workbench as follows :
+For this option to work on nibi for the purpose of accelerating graphics choose <b>t4 (15GB)</b> from the GPU selector pulldown list when configuring the resources for your OnDemand desktop session.  This particular setting will ensure the environment variables used by VirtualGL to enable accelerated OpenGL graphics calls are automatically setup in your Deskop environment when it starts.  Once your desktop appears, open a terminal window and start workbench as follows :
 ::: <code>module load StdEnv/2023 ansys/2025R1</code>
 ::: <code>runwb2</code>
 
 <!--T:1681-->
-To optionally start fluent from within workbench click <code>Fluid Flow (Fluent)</code> in the left hand Analysis Menu, then click <code>Setup</code> in the center canvas <code>Fluid Flow (Fluent)</code> popup.  Once the <code>Fluent Launcher</code> selector panel popup appears, click the Environment Tab and copy/paste the following environment variable settings.
-::: <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code>            (required on nibi only)
-::: <code>HOOPS_PICTURE=opengl2</code>           (version 2025R1 or newer)
-::: <code>HOOPS_PICTURE=null</code>                   (version 2024R2 or older)
-:: Click the <code>Start</code> button
+::: To start fluent from within workbench click <code>Fluid Flow (Fluent)</code> in the left hand Analysis Menu, then click <code>Setup</code> in the center canvas <code>Fluid Flow (Fluent)</code> popup.  Once the <code>Fluent Launcher</code> selector panel popup appears, click the Environment Tab and copy/paste the following environment variable settings.
+:::: <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code>            (required on nibi only)
+:::: <code>HOOPS_PICTURE=opengl2</code>           (version 2025R1 or newer)
+:::: <code>HOOPS_PICTURE=null</code>                   (version 2024R2 or older)
+::: Click the <code>Start</code> button
 
+<div style="background-color: #000000; color: #ffffff; padding: 20px;">
 <!--T:6853-->
-If <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code> is not set properly on nibi when fluent is started from within OOD Compute Desktop sessions and  intelmpi is used then fluent will crash on startup produce the following error output.  If this occurs completely exit fluent, shutdown workbench then start again.
+If <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code> is not set on nibi when fluent is started from within an OOD Compute Desktop session and intelmpi is used, then fluent will crash on startup produce the following error output.  If this occurs completely exit fluent, cleanly shutdown workbench and start over.
  [mpiexec@g4.nibi.sharcnet] Error: Unable to run bstrap_proxy on g4.nibi.sharcnet (pid 2251587, exit code 256)
  [mpiexec@g4.nibi.sharcnet] poll_for_event (../../../../../src/pm/i_hydra/libhydra/demux/hydra_demux_poll.c:157): check exit codes error
  [mpiexec@g4.nibi.sharcnet] HYD_dmx_poll_wait_for_proxy_event (../../../../../src/pm/i_hydra/libhydra/demux/hydra_demux_poll.c:206): poll for  event error
  [mpiexec@g4.nibi.sharcnet] HYD_bstrap_setup (../../../../../src/pm/i_hydra/libhydra/bstrap/src/intel/i_hydra_bstrap.c:1063): error waiting for event
  [mpiexec@g4.nibi.sharcnet] Error setting up the bootstrap proxies
+</div>
 
 ==== Jupyter Lab Desktop ==== <!--T:1682-->
 
@@ -1599,17 +1601,54 @@ setenv("ANSYSLMD_LICENSE_FILE", "1055@license1.computecanada.ca")
 ==== License query  ==== <!--T:95-->
 
 <!--T:930-->
-To show the number of licenses in use by your username and the total in use by all users, run:
+To show the number of ansys licenses in use by your username and the total in use by all users, run:
 
 <!--T:1645-->
 <source lang="bash">
 ssh nibi.alliancecan.ca
 module load ansys
-$EBROOTANSYS/v$(echo ${EBVERSIONANSYS:2:2}${EBVERSIONANSYS:5:1})/licensingclient/linx64/lmutil lmstat -c $ANSYSLMD_LICENSE_FILE -a | grep "Users of\|$USER"
+$EBROOTANSYS/v$(echo ${EBVERSIONANSYS:2:2}${EBVERSIONANSYS:5:1})/licensingclient/linx64/lmutil \
+lmstat -c $ANSYSLMD_LICENSE_FILE -a | grep "Users of\|$USER" | grep -v " Total of 0 licenses in use"
 </source>
 
+==== Example  ==== <!--T:96-->
+
+<!--T:1646-->
+Consider the case where a user submits a 8core fluent job and 32core fluent job.  Once both jobs start running, the user runs the lmutil queuery command and the output shown below is generated.  Here it can be seen that a total of (8-4) + (32-4) = 32 <code>ansyshpc</code> licenses are used by the two jobs.  As a result the total number of <code>ansyhpc</code> licenses increases from 1568 to 1600 so that only (1986-1600) = 386 <code>ansyshpc</code> licenses remain available for additional jobs submitted by all users.  Therefore if a 400 core parallel job attempts to start at this moment, it will fail to start since (400-4) = 396 anshpc licenses would be required.   The user has two options, wait for a sufficient number of  <code>ansyshpc</code> licenses to come available OR reduce the job size to 390 cores or less and resubmit immediately.  This example focuses on the <code>ansyshpc</code> feature since it is most generously overcommitted to allow any user to submit the largest job possible, but it also shows that the actual number of <code>ansyshpc</code> licenses available per user may be on some ocassions far less than the current 512 per user <code>ansyshpc</code> limit.  
+
+<div style="font-size:75%; line-height: 1.2em;">
+ [l2(nibi):~] sq
+            JOBID     USER        ACCOUNT           NAME  ST  TIME_LEFT NODES CPUS MIN_MEM NODELIST (REASON) 
+         10161023  roberpj   cc-debug_cpu script-flu-int   R    2:57:19     4    8     N/A      4G c[630-633] (None) 
+         10161033  roberpj   cc-debug_cpu script-flu-int   R    2:58:25    16   32     N/A      4G c[627-628,630-633,637,642,645,655,657,662,665,667,669,682] (None) 
+ [l2(nibi):~]
+ [l2(nibi):~] module load ansys
+ [l2(nibi):~]
+ [l2(nibi):~] $EBROOTANSYS/v$(echo ${EBVERSIONANSYS:2:2}${EBVERSIONANSYS:5:1})/licensingclient/linx64/lmutil  \
+              lmstat -c $ANSYSLMD_LICENSE_FILE -a | grep "Users of\|$USER" | grep -v " Total of 0 licenses in use"
+ Users of anshpc:  (Total of 1986 licenses issued;  Total of 1600 licenses in use)
+    roberpj c630 c630.nibi.sharcnet 1238925 (v2025.0506) (license1.computecanada.ca/1055 2579), start Wed 3/11 16:46, 4 licenses, PID: 1239140 
+    roberpj c627 c627.nibi.sharcnet 509821 (v2025.0506) (license1.computecanada.ca/1055 5716), start Wed 3/11 16:48, 28 licenses, PID: 510058 
+ Users of cfd_base:  (Total of 275 licenses issued;  Total of 19 licenses in use)
+    roberpj c630 c630.nibi.sharcnet 1238925 (v2025.0506) (license1.computecanada.ca/1055 10327), start Wed 3/11 16:46, PID: 1239140 
+    roberpj c627 c627.nibi.sharcnet 509821 (v2025.0506) (license1.computecanada.ca/1055 7171), start Wed 3/11 16:47, PID: 510058 
+ Users of cfd_preppost:  (Total of 275 licenses issued;  Total of 1 license in use)
+ Users of cfd_preppost_pro:  (Total of 275 licenses issued;  Total of 1 license in use)
+ Users of cfd_solve_level1:  (Total of 275 licenses issued;  Total of 18 licenses in use)
+    roberpj c630 c630.nibi.sharcnet 1238925 (v2025.0506) (license1.computecanada.ca/1055 7994), start Wed 3/11 16:46, PID: 1239140 
+    roberpj c627 c627.nibi.sharcnet 509821 (v2025.0506) (license1.computecanada.ca/1055 6200), start Wed 3/11 16:47, PID: 510058 
+ Users of cfd_solve_level2:  (Total of 275 licenses issued;  Total of 18 licenses in use)
+    roberpj c630 c630.nibi.sharcnet 1238925 (v2025.0506) (license1.computecanada.ca/1055 10520), start Wed 3/11 16:46, PID: 1239140 
+    roberpj c627 c627.nibi.sharcnet 509821 (v2025.0506) (license1.computecanada.ca/1055 375), start Wed 3/11 16:47, PID: 510058 
+ Users of elec_solve_hfss:  (Total of 275 licenses issued;  Total of 1 license in use)
+ Users of elec_solve_level1:  (Total of 275 licenses issued;  Total of 1 license in use)
+ Users of elec_solve_level2:  (Total of 275 licenses issued;  Total of 1 license in use)
+</div>
+
 <!--T:933-->
-If you discover any licenses unexpectedly in use by your username (due to ansys not exiting cleanly), connect to the node where it's running, open a terminal window and run the following command to terminate the rogue processes <code>pkill -9 -e -u $USER -f "ansys"</code> after which your licenses should be freed.
+<div style="font-size:85%; background-color: #E0FFFF; color: #000000; padding: 10px;">
+A rare situation can occur where the output from the License query command reveals there are some Ansys licenses unexpectedly still in use by your username on some desktop or compute node.  For instance if an ansys gui program run on a remote desktop node was not shutdown cleanly leaving some ansys processes still running.  Or an ansys program crashes on a cluster compute node inside an salloc session that was being run interactively from the command line, once again leaving some rogue ansys processes still running.  To kill all potentially responsible ansys rogue processes either close the desktop, scancel the salloc session, or simply open a terminal window on the effected node and issue the  command <code>pkill -9 -e -u $USER -f "ansys"</code>.  Any ansys licenses that were being held open should immediately be returned to the SHARCNET license server and become available for use again by yourself or other researchers.
+</div>
 
 = Additive Manufacturing = <!--T:96-->
 

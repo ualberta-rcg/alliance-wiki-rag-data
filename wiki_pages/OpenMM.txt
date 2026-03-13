@@ -1,56 +1,165 @@
 <languages />
 [[Category:Software]][[Category:BiomolecularSimulation]]
 <translate>
-=Introduction= <!--T:1-->
-OpenMM<ref name="OpenMM_home">OpenMM home page: https://openmm.org/</ref> is a toolkit for molecular simulation. It can be used either as a standalone application for running simulations or as a library you call from your own code. It provides a combination of extreme flexibility (through custom forces and integrators), openness, and high performance (especially on recent GPUs) that make it unique among MD simulation packages.
+<!--T:1-->
+=Introduction=
+OpenMM<ref name="OpenMM_home">OpenMM home page: https://openmm.org/</ref> is an open-source molecular dynamics toolkit designed for flexibility and programmability. It is used via Python, offering both application-level classes for running simulations and a lower-level API that allows users to integrate OpenMM directly into their own code for custom workflows. OpenMM can natively read and simulate systems prepared with AMBER, GROMACS, and CHARMM, enabling seamless reuse of existing biomolecular setups. Its plugin architecture supports integration with machine-learning potentials, including TorchMD-Net, MACE, TorchANI, AIMNet2, and DeepMD for general-purpose or hybrid ML/MM simulations.
 
-= Running a simulation with AMBER topology and restart files = <!--T:2-->
+<!--T:14-->
+== Strengths ==
+* Flexible Python interface with both high-level classes and low-level API access for custom workflows.
+* High-level plugin framework for ML-driven potentials and hybrid simulations.
+* Efficient execution on CPUs and GPUs, suitable for HPC platforms.
+* Native support for major biomolecular formats (AMBER, GROMACS, CHARMM).
+* Open-source with an active ecosystem of plugins for ML and advanced force fields.
 
-== Preparing the Python virtual environment == <!--T:3-->
+<!--T:15-->
+== Weak points ==
+* Slower than highly optimized classical MM engines (GROMACS, AMBER) for large-scale production runs.
+* Flexibility can add complexity for hybrid ML/MM simulations.
+* Specialized trajectory analysis may require external tools.
 
-<!--T:4-->
-This example is for the openmm/7.7.0 module.
+=  Environment modules = <!--T:2-->
 
-<!--T:5-->
-1. Create and activate the Python virtual environment. 
-{{Commands|prompt=[name@server ~]
-| module load python
-| virtualenv $HOME/env-parmed
-| source $HOME/env-parmed/bin/activate
-}}
+ <!--T:16-->
+$ <code>module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 openmm/8.4.0 ambertools/25.0</code>
 
-<!--T:6-->
-2. Install ParmEd and netCDF4 Python modules.
-{{Commands|prompt=(env-parmed)[name@server ~]
-| pip install --no-index parmed{{=}}{{=}}3.4.3 netCDF4
-}}
+<!--T:17-->
+Note: The ambertools module is optional and required only if you plan to simulate AMBER-prepared systems.
 
-== Job submission == <!--T:7-->
+<!--T:18-->
+Optionally, create a Python virtual environment if you want to install extra packages (e.g., ML potentials).
+
+= Preparing Input Files = <!--T:19-->
+
+<!--T:20-->
+OpenMM can directly read Amber topology and coordinate/restart files if simulating AMBER systems.
+
+<!--T:21-->
+Ensure your system is equilibrated and minimized in Amber or another package before transferring files to HPC.
+
+<!--T:22-->
+For GROMACS or CHARMM systems, OpenMM can read their respective formats without AmberTools.
+
+<!--T:7-->
+= Job submission =
 Below is a job script for a simulation using one GPU.
-</translate>
 
+<!--T:23-->
 {{File
   |name=submit_openmm.cuda.sh
   |lang="sh"
   |contents=
 #!/bin/bash
 #SBATCH --cpus-per-task=1 
-#SBATCH --gpus=1
-#SBATCH --mem-per-cpu=4000M
+#SBATCH --gpus=h100:1
+#SBATCH --mem-per-cpu=4000
 #SBATCH --time=0-01:00:00
-# Usage: sbatch $0
 
+<!--T:24-->
 module purge
-module load StdEnv/2020 gcc/9.3.0 cuda/11.4 openmpi/4.0.3 
-module load python/3.8.10 openmm/7.7.0 netcdf/4.7.4 hdf5/1.10.6 mpi4py/3.0.3
-source $HOME/env-parmed/bin/activate
+module load StdEnv/2023 gcc/12.3 openmpi/4.1.5 cuda/12.6 openmm/8.4.0 ambertools/25.0
 
+<!--T:25-->
 python openmm_input.py
 }}
 
-<translate>
+
 <!--T:10-->
-Here <code>openmm_input.py</code> is a Python script loading Amber files, creating the OpenMM simulation system, setting up the integration, and running dynamics. An example is available [https://mdbench.ace-net.ca/mdbench/idbenchmark/?q=129 here].
+= Python simulation script =
+The example Python script below loads Amber parameter and restart files, builds the OpenMM simulation system, sets up the integrator, and runs the dynamics.
+
+<!--T:26-->
+{{File
+  |name=openmm_input.py
+  |lang="python"
+  |contents=
+import os, sys, time
+import openmm.app as app
+from openmm import app, unit, Platform, LangevinMiddleIntegrator, MonteCarloBarostat
+from parmed import load_file
+from parmed.openmm import RestartReporter, NetCDFReporter
+
+<!--T:27-->
+# Simulation parameters
+nsteps = 6000
+dt = 2.0 * unit.femtoseconds
+temperature = 310 * unit.kelvin
+pressure = 1 * unit.atmosphere
+cutoff = 8.0 * unit.angstroms
+
+<!--T:28-->
+# Load AMBER topology and restart (only for AMBER systems)
+amber_sys=load_file("prmtop.parm7", "restart.rst7")
+ncrst=app.amberinpcrdfile.AmberInpcrdFile("restart.rst7")
+
+<!--T:29-->
+# Create OpenMM system
+system=amber_sys.createSystem(
+            nonbondedMethod=app.PME,
+            ewaldErrorTolerance=0.0005,
+            nonbondedCutoff=cutoff,
+            constraints=app.HBonds,
+            removeCMMotion = True,
+)
+
+<!--T:30-->
+# Langevin integrator
+integrator = LangevinMiddleIntegrator(temperature, 1.0/unit.picoseconds, dt)
+
+<!--T:31-->
+# Monte Carlo barostat
+barostat = MonteCarloBarostat(pressure, temperature, 50)
+system.addForce(barostat)
+
+<!--T:32-->
+# CUDA platform properties
+platform = Platform.getPlatformByName("CUDA")
+
+<!--T:33-->
+prop = dict(
+    CudaPrecision="mixed",
+    UseCpuPme='false',
+    DeterministicForces="false",
+    DeviceIndex=os.environ["CUDA_VISIBLE_DEVICES"],
+   )
+
+<!--T:34-->
+# Create simulation object
+sim = app.Simulation(amber_sys.topology, system, integrator, platform, prop)
+sim.context.setPositions(amber_sys.positions)
+sim.context.setVelocities(ncrst.velocities)
+
+<!--T:35-->
+# Reporters
+sim.reporters.append(
+        app.StateDataReporter(
+            sys.stdout,
+            1000,
+            step=True,
+            time=False,
+            potentialEnergy=True,
+            kineticEnergy=True,
+            temperature=True,
+            volume=True
+        )
+)
+
+<!--T:36-->
+sim.reporters.append(NetCDFReporter("trajectory.nc", 50000, crds=True))
+sim.reporters.append(RestartReporter("restart.nc", 50000, netcdf=True))
+
+<!--T:37-->
+# Run dynamics
+print("Running dynamics")
+start = time.time()
+sim.step(nsteps)
+elapsed=time.time() - start
+simulated_ns = (nsteps * dt).value_in_unit(unit.nanoseconds)
+ns_per_day = simulated_ns / (elapsed / 86400)
+print(f"Elapsed time: {elapsed} sec\nBenchmark time: {ns_per_day} ns/day ")
+ 
+}}
 
 = Performance and benchmarking = <!--T:12-->
 

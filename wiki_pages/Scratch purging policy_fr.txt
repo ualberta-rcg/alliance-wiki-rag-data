@@ -5,12 +5,14 @@
 
 Sur nos grappes, le système de fichiers /scratch sert au stockage rapide et temporaire des données utilisées en cours d'exécution. Pour leur part, les données qui doivent être stockées à long terme et les données de référence sont enregistrées dans [[Project layout/fr|l'espace <code>/project</code>]] ou dans une des zones d'archivage. Pour toujours garder suffisamment d'espace /scratch, les fichiers de plus de 60 jours sont supprimés périodiquement en fonction de leur âge. Notez que c'est l'âge d'un fichier qui détermine s'il sera purgé et non l'endroit où il se trouve dans /scratch; règle générale, le fait de déplacer un fichier dans un autre répertoire de /scratch ne l'empêchera pas d'être supprimé.
 
+<div class="mw-translate-fuzzy">
 '''Remarque : le système de fichiers /scratch de Graham et Nibi n'expire pas comme tel, mais utilise plutôt un quota pour forcer l'utilisation temporaire.'''
 * Si vous utilisez moins de 1To, vous n'avez rien à faire (pas d'expiration, etc.).
 * Lorsque vous dépassez cette <i>limite souple</i>, une condition de dépassement de quota est déclenchée, qui inclut un délai de grâce de 60 jours.
 * À l'expiration de ce délai, la procédure de dépassement de quota s'applique et interdit toute nouvelle allocation. (Ceci fait que vos fichiers sont toujours accessibles à ce stade, mais l'ajout ou l'augmentation de la taille des fichiers échouera et générera une erreur.)
 * Pour résoudre ce problème, votre utilisation doit être modifiée et être sous la limite souple (ce qui <i>remet le compteur à zéro</i>).
 * Il existe également un quota fixe de 20 To.
+</div>
 
 L'avantage de ce mécanisme basé sur les quotas est de vous laisser le plein contrôle et d'empêcher que certains fichiers particuliers d'une collection disparaissent en raison d'un âge quelque peu différent.
 
@@ -27,10 +29,12 @@ Prenez note que le fait de copier un fichier ou d'utiliser la commande  <code>rs
 <span id="How/where_to_check_which_files_are_slated_for_purging"></span>
 ==Fichiers à être purgés==
 
+<div class="mw-translate-fuzzy">
 * Sur Cedar, Béluga et Narval, allez à '''/scratch/to_delete/''' et localisez le fichier à votre nom. 
 * Sur Niagara, allez à '''/scratch/t/to_delete/''' ou établissez un lien symbolique (<tt>symlink</tt>) vers '''/scratch/t/todelete/current'''.
 </pre>
-S'il y a un fichier à votre nom, certains de vos fichiers sont susceptibles d'être purgés. Ce fichier contient la liste des noms de fichiers avec le chemin complet et possiblement d'autres renseignements comme la taille, atime, ctime, size, etc. Ce fichier est seulement mis à jour le 1er et le 12e jour de chaque mois. 
+S'il y a un fichier à votre nom, certains de vos fichiers sont susceptibles d'être purgés. Ce fichier contient la liste des noms de fichiers avec le chemin complet et possiblement d'autres renseignements comme la taille, atime, ctime, size, etc. Ce fichier est seulement mis à jour le 1er et le 12e jour de chaque mois.
+</div> 
 
 Si vous accédez à un ou plusieurs fichiers ou les lisez, les déplacez ou les supprimez entre le 1er et le 11 du mois, aucune modification ne sera faite à la liste avant le 12. 
 
@@ -38,15 +42,15 @@ Si un fichier avec votre nom existe avant le 11 mais pas le 12, aucun de vos fic
 
 Si vous accédez à un ou plusieurs fichiers ou les lisez, les déplacez ou les supprimez après le 12 du mois, vous devrez confirmer que les fichiers peuvent ou non être purgés le 15 (voir ci-dessous).
 
-== Connaître l'âge d'un fichier ==
-L'âge d'un fichier est déterminé par :
-* <code>atime</code>, le moment du dernier accès et 
-* <code>ctime</code>, le moment de la dernière modification.
-Pour trouver <code>ctime</code> utilisez 
+==How do I check the age of a file?==
+We define a file's age as the most recent of:
+* the access time (<code>atime</code>) and 
+* the change time (<code>ctime</code>).
+You can find the <code>ctime</code> of a file using 
 {{Command|ls -lc <filename>}} 
-Pour trouver <code>atime</code> utilisez
+while the <code>atime</code> can be obtained with the command 
 {{Command|ls -lu <filename>}} 
-Le paramètre (<code>mtime</code>) n'est pas utilisé parce que sa valeur peut être modifiée par l'utilisateur ou par un autre programme pour afficher une fausse information. 
+We do not use the modify time (<code>mtime</code>) of the file because it can be modified by the user or by other programs to display incorrect information. 
 
 Il serait suffisant de n'utiliser que <code>atime</code> étant donné que sa valeur est mise à jour par le système en synchronisation avec <code>ctime</code>. Par contre, les programmes à l'intérieur de l'espace d'un utilisateur peuvent potentiellement modifier <code>atime</code> pour situer sa valeur dans le passé. Le fait d'utiliser aussi <code>ctime</code> ajoute un deuxième niveau de contrôle.
 

@@ -12,15 +12,11 @@ Notre module Ansys cherche l'information sur la licence à différents endroits,
 Pour indiquer votre propre serveur de licence, créez un fichier nommé <code>$HOME/.licenses/ansys.lic</code> qui contient les deux lignes ci-dessous, où vous remplacez FLEXPORT, INTEPORT et LICSERVER par les valeurs de votre serveur.
 </div> 
 
-<div class="mw-translate-fuzzy">
 {| class="wikitable" style="text-align:left; border:1px solid #BBB; background-color:#F9F9F9; width:50%;"
-|+ style="text-align:left; background-color:#F2F2F2; font-size:110%" | FICHIER : ansys.lic
+|+ style="text-align:left; background-color:#F2F2F2; font-size:110%" | FILE: ansys.lic
 |-
 | style="border-style: none none none none; font-size: 100%; padding-left:10%; padding-bottom:0;" | setenv("ANSYSLMD_LICENSE_FILE", "<b>FLEXPORT</span>@LICSERVER</b>")
-|-
-| style="border-style: none none none none; font-size: 100%; padding-left:10%; padding-top:0;" | setenv("ANSYSLI_SERVERS", "<b>INTEPORT@LICSERVER</b>") 
 |}
-</div>
 
 Les valeurs correspondant aux serveurs de licence CMC et SHARCNET se trouvent dans le tableau ci-dessous. Pour utiliser un différent serveur, voir [[Ansys/fr#Serveurs_de_licence_locaux|Serveurs de licence locaux]] ci-dessous.
 
@@ -124,10 +120,12 @@ Pour vérifier si <code>ansys.lic</code> est bien configuré et fonctionne corre
  [gra-login:~] $EBROOTANSYS/v$(echo ${EBVERSIONANSYS:2:2}${EBVERSIONANSYS:5:1})/licensingclient/linx64/lmutil lmstat -c $ANSYSLMD_LICENSE_FILE 1> /dev/null && echo Success {{!}}{{!}} echo Fail
 </div>
 
- <div class="mw-translate-fuzzy">
-Si le résultat est <code>Success</code>, la licence devrait fonctionner quand des tâches sont soumises. <br>
-Par contre si le résultat est <code>Fail</code>, écrivez au [[technical support/fr|soutien technique]].
-</div>
+ [login-node:~] cd /tmp
+ [login-node:/tmp] salloc --time{{=}}1:0:0 --mem{{=}}1000M --account{{=}}def-YOURUSERID
+ [compute-node/tmp] module load StdEnv/2023; module load ansys/2025R2.04
+ [compute-node:/tmp] $EBROOTANSYS/v$(echo ${EBVERSIONANSYS:2:2}${EBVERSIONANSYS:5:1})/licensingclient/linx64/lmutil lmstat -c $ANSYSLMD_LICENSE_FILE | grep "ansyslmd: UP" 1> /dev/null && echo Success {{!}}{{!}} echo Fail
+<code>Success</code> output indicates license checkouts should work when jobs are submitted to the queue.<br>
+<code>Fail</code> output indicates a problem with the licensing setup somewhere and jobs will likely fail.<br>
 
 <div class="mw-translate-fuzzy">
 ::: REMARQUE 1 : Pour les modules Ansys installés localement, la commande <code>runwb2</code> de <code>SnEnv</code> utilise par défaut le serveur de licence SHARCNET, tel que défini dans le fichier du module Ansys que vous chargez. Pour utiliser un serveur distant, lancez plutôt Workbench avec <code>runwb2-gui</code>, car ce script enveloppant (<i>wrapper</i>) lira votre fichier <code>~/.licenses/ansys.lic</code> comme les modules disponibles sous <code>StdEnv/2023</code>. De plus, l'option interactive d'utilisation du serveur CMC (acheminé via le serveur SHARCNET CMC CadPASS) sera proposée, éliminant ainsi la nécessité de le configurer dans votre fichier ansys.lic.
@@ -208,19 +206,15 @@ Les deux onglets pour Narval peuvent fournir une alternative plus robuste si Flu
 |contents=
 #!/bin/bash
 
-<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account name
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify number of compute nodes (narval 1 node max)
-#SBATCH --ntasks-per-node=32  # Specify number of cores per node (graham 32 or 44, cedar 48, beluga 40, narval 64, or less)
-#SBATCH --mem=0               # Do not change (allocates all memory per compute node)
+#SBATCH --ntasks-per-node=32  # Specify upto maximum number of cores per compute node
+#SBATCH --mem=0               # Specify memory per compute node (0 allocates all memory)
 #SBATCH --cpus-per-task=1     # Do not change
-</div>
 
-<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
-module load ansys/2023R2      # or newer versions (beluga, cedar, graham, narval)
-</div>
+module load ansys/2023R2      # or newer versions
 
 MYJOURNALFILE=sample.jou      # Specify your journal file name
 MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
@@ -260,19 +254,15 @@ fi
 |contents=
 #!/bin/bash
 
-<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 ##SBATCH --nodes=1            # Uncomment to specify (narval 1 node max)
-#SBATCH --ntasks=16           # Specify total number of cores for all nodes
+#SBATCH --ntasks=16           # Specify total number of cores across all nodes
 #SBATCH --mem-per-cpu=4G      # Specify memory per core
 #SBATCH --cpus-per-task=1     # Do not change
-</div>
 
-<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
-module load ansys/2023R2      # or newer versions (beluga, cedar, graham, narval)
-</div>
+module load ansys/2023R2      # or newer versions
 
 MYJOURNALFILE=sample.jou      # Specify your journal file name
 MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
@@ -312,19 +302,15 @@ fi
 |contents=
 #!/bin/bash
 
-<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account name
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
-#SBATCH --nodes=1             # Specify number of compute nodes
+#SBATCH --nodes=1             # Specify number of compute nodes (1 or more)
 #SBATCH --ntasks-per-node=64  # Specify number of cores per node (narval 64 or less)
-#SBATCH --mem=0               # Do not change (allocates all memory per compute node)
+#SBATCH --mem=0               # Do not change (allocate all memory per compute node)
 #SBATCH --cpus-per-task=1     # Do not change
-</div>
 
-<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
-module load ansys/2023R2      # or newer versions (narval only)
-</div>
+module load ansys/2023R2      # or newer versions
 
 MYJOURNALFILE=sample.jou      # Specify your journal file name
 MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
@@ -352,19 +338,15 @@ fi
 |contents=
 #!/bin/bash
 
-<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account name
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
-##SBATCH --nodes=1            # Uncomment to specify number of compute nodes (optional)
-#SBATCH --ntasks=16           # Specify total number of cores
+##SBATCH --nodes=1            # Uncomment to specify number of compute nodes (1 or more)
+#SBATCH --ntasks=16           # Specify total number of cores across all nodes
 #SBATCH --mem-per-cpu=4G      # Specify memory per core
 #SBATCH --cpus-per-task=1     # Do not change
-</div>
 
-<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change     
-module load ansys/2023R2      # or newer versions (narval only)
-</div>
+module load ansys/2023R2      # or newer versions
 
 MYJOURNALFILE=sample.jou      # Specify your journal file name
 MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
@@ -385,40 +367,30 @@ fi
 }}
 </tab>
 
-<div class="mw-translate-fuzzy">
-<tab name="Plusieurs nœuds (par nœud, Niagara)">
+<tab name="Plusieurs nœuds (par nœud, Trillium)">
 {{File
-|name=script-flu-bynode-intel-nia.sh
+|name=script-flu-bynode-intel-tri.sh
 |lang="bash"
 |contents=
 #!/bin/bash
-</div>
 
-<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group      # Specify account name
 #SBATCH --time=00-03:00          # Specify time limit dd-hh:mm
-#SBATCH --nodes=2                # Specify number of compute nodes
-#SBATCH --ntasks-per-node=80     # Specify number cores per node (niagara 80 or less)
-#SBATCH --mem=0                  # Do not change (allocate all memory per compute node)
+#SBATCH --nodes=1                # Specify number of compute nodes (1 or more)
+#SBATCH --ntasks-per-node=16     # Specify number cores per node (max 192 on trillium)
+##SBATCH --mem=0                 # Do not uncomment (be default trillium uses all memory per node)
 #SBATCH --cpus-per-task=1        # Do not change (required parameter)
-</div>
 
-<div class="mw-translate-fuzzy">
-module load CCEnv StdEnv/2023    # Do not change
-module load arch/avx512
-module load ansys/2023R2         # or newer versions (niagara only)
-</div>
+module load StdEnv/2023          # Do not change
+module load ansys/2025R2.04      # only 2025R2 or newer works on trillium
 
 MYJOURNALFILE=sample.jou         # Specify your journal file name
 MYVERSION=3d                     # Specify 2d, 2ddp, 3d or 3ddp
 
-<div class="mw-translate-fuzzy">
 # These settings are used instead of your ~/.licenses/ansys.lic
-LICSERVER=license3.sharcnet.ca   # Specify license server hostname
-FLEXPORT=1055                    # Specify server flex port
-INTEPORT=2325                    # Specify server interconnect port
-VENDPORT=1793                    # Specify server vendor port
-</div>
+LICSERVER=license1.computecanada.ca   # Specify license server hostname
+FLEXPORT=1055                         # Specify server flex port
+VENDPORT=1793                         # Specify server vendor port
 
 # ------- do not change any lines below --------
 
@@ -430,7 +402,6 @@ export ANSYSLI_SERVERS=$INTEPORT@localhost
 slurm_hl2hl.py --format ANSYS-FLUENT > $SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID
 NCORES=$SLURM_NTASKS
 
-<div class="mw-translate-fuzzy">
 if [ ! -L "$HOME/.ansys" ]; then
   echo "ERROR: A link to a writable .ansys directory does not exist."
   echo 'Remove ~/.ansys if one exists and then run: ln -s $SCRATCH/.ansys ~/.ansys'
@@ -448,14 +419,13 @@ else
   mkdir -pv $SCRATCH/.fluentconf
   touch $SCRATCH/.flrecent
   if [ "$SLURM_NNODES" == 1 ]; then
-   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
   else
-   fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -ssh -pib -cnf=$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=$SLURM_SUBMIT_DIR/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
   fi
 fi
 }}
 </tab>
-</div>
 
 </tabs>
 
@@ -472,20 +442,16 @@ Les scripts suivants ne doivent être utilisés qu'avec des tâches Fluent qui s
 |contents=
 #!/bin/bash
 
-<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account
 #SBATCH --time=00-03:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify number of compute nodes (narval 1 node max)
-#SBATCH --ntasks-per-node=32  # Specify number of cores per node (graham 32 or 44, cedar 48, beluga 40, or less)
-#SBATCH --mem=0               # Do not change (allocates all memory per compute node)
+#SBATCH --ntasks-per-node=32  # Specify upto maximum number of cores per compute node
+#SBATCH --mem=0               # Specify memory per compute node (0 allocates all memory)
 #SBATCH --cpus-per-task=1     # Do not change
 #SBATCH --array=1-5%1         # Specify number of requeue attempts (2 or more, 5 is shown)
-</div>
 
-<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
-module load ansys/2023R2      # Specify version (beluga, cedar, graham, narval)
-</div>
+module load ansys/2023R2      # Specify version (or newer)
 
 MYJOURNALFILE=sample.jou      # Specify your journal file name
 MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
@@ -506,12 +472,14 @@ fi
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$SLURM_NTASKS
 
-<div class="mw-translate-fuzzy">
 if [ "$SLURM_NNODES" == 1 ]; then
- #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
+ fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
 else
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ if [[ "${CC_CLUSTER}" == nibi ]]; then
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ else
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ fi
 fi
 if [ $? -eq 0 ]; then
     echo "Job completed successfully! Exiting now."
@@ -526,7 +494,6 @@ else
 fi
 }}
 </tab>
-</div>
 
 <tab name="Plusieurs nœuds (par cœur + remise en attente)">
 {{File
@@ -543,10 +510,8 @@ fi
 #SBATCH --cpus-per-task=1     # Do not change
 #SBATCH --array=1-5%1         # Specify number of requeue attempts (2 or more, 5 is shown)
 
-<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
-module load ansys/2023R2      # Specify version (beluga, cedar, graham, narval)
-</div>
+module load ansys/2023R2      # Specify version (or newer)
 
 MYJOURNALFILE=sample.jou      # Specify your journal file name
 MYVERSION=3d                  # Specify 2d, 2ddp, 3d or 3ddp
@@ -567,12 +532,14 @@ fi
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$SLURM_NTASKS
 
-<div class="mw-translate-fuzzy">
 if [ "$SLURM_NNODES" == 1 ]; then
- #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pshmem -i $MYJOURNALFILE
+ fluent -g $MYVERSION -t $NCORES -mpi=intel -pshmem -i $MYJOURNALFILE
 else
- fluent -g $MYVERSION -t $NCORES -affinity=0 -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ if [[ "${CC_CLUSTER}" == nibi ]]; then
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ else
+   fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -i $MYJOURNALFILE
+ fi
 fi
 if [ $? -eq 0 ]; then
     echo "Job completed successfully! Exiting now."
@@ -588,7 +555,6 @@ fi
 }}
 </tab>
 </tabs>
-</div>
 
 <span id="Solution_restart"></span>
 ==== Redémarrage ====
@@ -603,20 +569,16 @@ Les deux scripts suivants automatisent le redémarrage de tâches intensives qui
 |contents=
 #!/bin/bash
 
-<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify account
 #SBATCH --time=07-00:00       # Specify time limit dd-hh:mm
 #SBATCH --nodes=1             # Specify number of compute nodes (narval 1 node max)
-#SBATCH --ntasks-per-node=32  # Specify number of cores per node (graham 32 or 44, cedar 48, beluga 40, narval 64, or less)
-#SBATCH --mem=0               # Do not change (allocates all memory per compute node)
+#SBATCH --ntasks-per-node=32  # Specify upto maximum number of cores per compute node
+#SBATCH --mem=0               # Specify memory per compute node (0 allocates all memory)
 #SBATCH --cpus-per-task=1     # Do not change
 #SBATCH --array=1-5%1         # Specify number of solution restarts (2 or more, 5 is shown)
-</div>
 
-<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
-module load ansys/2023R2      # Specify version (beluga, cedar, graham, narval)
-</div>
+module load ansys/2023R2      # Specify version (or newer)
 
 MYVERSION=3d                        # Specify 2d, 2ddp, 3d or 3ddp
 MYJOUFILE=sample.jou                # Specify your journal filename
@@ -640,20 +602,25 @@ fi
 slurm_hl2hl.py --format ANSYS-FLUENT > /tmp/machinefile-$SLURM_JOB_ID
 NCORES=$SLURM_NTASKS
 
-<div class="mw-translate-fuzzy">
-# Specify 2d, 2ddp, 3d or 3ddp and replace sample with your journal filename …
 if [ "$SLURM_NNODES" == 1 ]; then
-  #export I_MPI_HYDRA_BOOTSTRAP=ssh    # uncomment on beluga or cedar
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
-    fluent -g 2ddp -t $NCORES -affinity=0 -i $MYJOUFILE
+    fluent -g 2ddp -t $NCORES -mpi=intel -pshmem -i $MYJOUFILE
   else
-    fluent -g 2ddp -t $NCORES -affinity=0 -i $MYJOUFILERES
+    fluent -g 2ddp -t $NCORES -mpi=intel -pshmem -i $MYJOUFILERES
   fi
 else 
   if [ "$SLURM_ARRAY_TASK_ID" == 1 ]; then
-    fluent -g 2ddp -t $NCORES -affinity=0 -cnf=/tmp/machinefile-$SLURM_JOB_ID -mpi=intel -ssh -i $MYJOUFILE
+   if [[ "${CC_CLUSTER}" == nibi ]]; then
+     fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -ssh -i $MYJOUFILE
+   else
+     fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -ssh -i $MYJOUFILE
+   fi
   else
-    fluent -g 2ddp -t $NCORES -affinity=0 -cnf=/tmp/machinefile-$SLURM_JOB_ID -mpi=intel -ssh -i $MYJOUFILERES
+   if [[ "${CC_CLUSTER}" == nibi ]]; then
+     fluent -g $MYVERSION -t $NCORES -mpi=intel -peth -cnf=/tmp/machinefile-$SLURM_JOB_ID -ssh -i $MYJOUFILERES
+   else
+     fluent -g $MYVERSION -t $NCORES -mpi=intel -pib -cnf=/tmp/machinefile-$SLURM_JOB_ID -ssh -i $MYJOUFILERES
+   fi
   fi
 fi
 if [ $? -eq 0 ]; then
@@ -675,7 +642,6 @@ else
 fi
 }}
 </tab>
-</div>
 
 <tab name="Plusieurs nœuds (par cœur + redémarrage)">
 {{File
@@ -692,10 +658,8 @@ fi
 #SBATCH --cpus-per-task=1     # Do not change
 #SBATCH --array=1-5%1         # Specify number of restart aka time steps (2 or more, 5 is shown)
 
-<div class="mw-translate-fuzzy">
 module load StdEnv/2023       # Do not change
-module load ansys/2023R2      # Specify version (beluga, cedar, graham, narval)
-</div>
+module load ansys/2023R2      # Specify version (or newer)
 
 MYVERSION=3d                        # Specify 2d, 2ddp, 3d or 3ddp
 MYJOUFILE=sample.jou                # Specify your journal filename
@@ -940,10 +904,7 @@ $ cat zinjection01.inj
 (( 2.90e-02 5.00e-03 0.0 -1,00e-03 0,0 0,0 1,00e-04 2,93e+02 1,00e-06 0,0 0,0 0,0 ) injection-0:1 )
 notant que les fichiers d'injection pour les simulations DPM sont généralement configurés pour un suivi stationnaire ou instable de particules, le format du premier étant décrit dans <I>2024R2 Fluent Customization Manual, Part III: Solution Mode | Chapter 24: Modeling Discrete Phase | 24.3. Setting Initial Conditions for the Discrete Phase | 24.3.13 Point Properties for File Injections | 24.3.13.1 Steady File Format</I>.
 
-<span id="CFX"></span>
-<div class="mw-translate-fuzzy">
-== Ansys CFX ==
-</div>
+== CFX ==
 
 <span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===
@@ -970,10 +931,8 @@ Le résumé des options de ligne de commande peut être affiché avec <b>cfx5sol
 #module load StdEnv/2020      # Uncomment to use (deprecated)     
 #module load 2021R2           # Specify 2021R2 only
 
-<div class="mw-translate-fuzzy">
 module load StdEnv/2023
-module load ansys/2023R2      # Specify 2022R2 or newer module versions
-</div>
+module load ansys/2023R2      # Or newer module versions
 
 <div class="mw-translate-fuzzy">
 # append additional cfx5solve command line options as required
@@ -1064,9 +1023,7 @@ Pour soumettre un fichier de projet à la queue, personnaliser les scripts suiva
 ##SBATCH --constraint=broadwell        # Applicable to graham or cedar
 </div>
 
-<div class="mw-translate-fuzzy">
-module load StdEnv/2023 ansys/2023R2   # OR newer Ansys module versions (untested)
-</div>
+module load StdEnv/2023 ansys/2023R2   # OR newer Ansys module versions
 
 if [ "$SLURM_NNODES" == 1 ]; then
   MEMPAR=0                             # Set to 0 for SMP (shared memory parallel)
@@ -1083,7 +1040,6 @@ sed -i "s!UserConfigured=\"0\"!UserConfigured=\"1\"!g" "$MWFILE"
 export KMP_AFFINITY=disabled
 export I_MPI_HYDRA_BOOTSTRAP=ssh
 
-<div class="mw-translate-fuzzy">
 runwb2 -B -E "Update()" -F YOURPROJECT.wbpj
 #runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 }}
@@ -1094,21 +1050,16 @@ runwb2 -B -E "Update()" -F YOURPROJECT.wbpj
 |lang="bash"
 |contents=
 #!/bin/bash
-</div>
 
-<div class="mw-translate-fuzzy">
 #SBATCH --account=def-account
 #SBATCH --time=00-03:00                # Time (DD-HH:MM)
-#SBATCH --mem=16G                      # Total Memory (set to 0 for all node memory)
-#SBATCH --ntasks=4                     # Number of cores
+#SBATCH --mem=16G                      # Specify total memory
+#SBATCH --ntasks=4                     # Specify number of cores
 #SBATCH --nodes=1                      # Do not change (multi-node not supported)
-##SBATCH --exclusive                   # Uncomment for scaling testing (optional)
-##SBATCH --constraint=broadwell        # Uncomment on graham or cedar (optional)
-</div>
+##SBATCH --exclusive                   # Uncomment ONLY for scaling testing
+##SBATCH --constraint=broadwell        # Uncomment to specify an available node type
 
-<div class="mw-translate-fuzzy">
 module load StdEnv/2020 ansys/2021R2   # OR newer Ansys module versions
-</div>
 
 if [ "$SLURM_NNODES" == 1 ]; then
   MEMPAR=0                             # Set to 0 for SMP (shared memory parallel)
@@ -1272,10 +1223,7 @@ Par défaut, Ansys alloue aux tâches APDL 1024Mo de mémoire totale et 1024Mo d
   [gra-login2:~/testcase] cat YOURAPDLFILE.inp | grep version
  ! ANSYS input file written by Workbench version 2019 R3
 
-<span id="Rocky"></span>
-<div class="mw-translate-fuzzy">
-== Ansys ROCKY ==
-</div>
+== Rocky ==
 
 <div class="mw-translate-fuzzy">
 En plus de pouvoir exécuter des simulations en mode graphique (comme indiqué dans la section <i>Mode graphique</i> ci-dessous), [https://www.ansys.com/products/fluids/ansys-rocky Ansys Rocky] peut également exécuter des simulations en mode non graphique. Les deux modes prennent en charge l'exécution de Rocky avec des processeurs uniquement ou avec des processeurs et [https://www.ansys.com/blog/mastering-multi-gpu-ansys-rocky-software-enhancing-its-performance des GPU]. Dans la section ci-dessous, deux exemples de scripts sont fournis où chacun serait soumis à la file d'attente de Graham avec la commande habituelle <code>sbatch</code>. Au moment de la rédaction de cet article, aucun des deux scripts n'a été testé et des modifications seraient probablement nécessaires. Il est important de noter que ces scripts ne sont utilisables que sur Graham puisque le module Rocky qu'ils chargent tous les deux n'est (pour le moment) installé que sur Graham localement.
@@ -1296,19 +1244,14 @@ Pour obtenir une liste complète des options de ligne de commande, exécutez <co
 |contents=
 #!/bin/bash
 
-<div class="mw-translate-fuzzy">
 #SBATCH --account=account      # Specify your account (def or rrg)
 #SBATCH --time=00-02:00        # Specify time (DD-HH:MM)
-#SBATCH --mem=24G              # Specify memory (set to 0 to use all node memory)
-#SBATCH --cpus-per-task=6      # Specify cores (graham 32 or 44 to use all cores)
+#SBATCH --mem=24G              # Specify total memory for cores
+#SBATCH --cpus-per-task=6      # Specify number of cores to use
 #SBATCH --nodes=1              # Request one node (do not change)
-</div>
 
-<div class="mw-translate-fuzzy">
-# the rocky2023R2 module on graham was renamed to ansysrocky/2023R2   Apr24/2025
-#module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2       # only avail on graham
-module load ansysrocky/2024R2.0 StdEnv/2023 ansys/2024R2.04   # only avail on graham
-</div>
+module load StdEnv/2023 ansys/2025R1       # or newer versions
+export PATH=$EBROOTANSYS/v251/rocky:$PATH
 
 Rocky --simulate “mysim.rocky” --resume=1 --ncpus=$SLURM_CPUS_PER_TASK --use-gpu=0
 }}
@@ -1370,9 +1313,10 @@ When the Fluent Launcher popup selector panel appears, click the Environment Tab
 
 <b>Compute Node (no GPU requested)</b>
 
-<div class="mw-translate-fuzzy">
-module load ansys/2020R1
-</div>
+:::: <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code>            (required on nibi)
+:::: <code>HOOPS_PICTURE=opengl2-mesa</code>           (version 2025R1 or newer)
+:::: <code>HOOPS_PICTURE=null</code>                   (version 2024R2 or older)
+::: Click the <code>Start</code> button
 
 slurm_hl2hl.py --format ANSYS-FLUENT > machinefile
 NCORES=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
@@ -1562,10 +1506,8 @@ Information describing howto run AnsysEDT in graphical mode maybe found here [ht
 <span id="SHARCNET_license"></span>
 == Licence SHARCNET ==
 
-<div class="mw-translate-fuzzy">
-La licence Ansys de SHARCNET est gratuite pour une utilisation académique par les chercheurs et chercheuses de l'Alliance sur les systèmes de l'Alliance. Le logiciel installé n'a pas de limites de solveur ou de géométrie. La licence SHARCNET peut  <b>uniquement</b> être utilisée à des fins de <b><i>recherche universitaire publiable</i></b>; la production de résultats à des fins commerciales privées est strictement interdite, comme stipulé par la licence. La licence Ansys a été mise à niveau selon la Multiphysics Campus Solution en mai 2020 et inclut les produits suivants&nbsp;: HF, EM, Electronics HPC, Mechanical et CFD  [https://www.ansys.com/academic/educator-tools/academic-product-portfolio comme décrit ici]. 
-Rocky et LS-DYNA sont aussi maintenant inclus dans la licence SHARCNET. Lumerical acquis par ANSYS en 2020 n'est pas disponible en ce moment, mais est installé avec les modules Ansys récents et peut donc être utilisé  avec d'autres serveurs Ansys configurés en conséquence.  SpaceClaim sous Linux n'est pas installé sur nos systèmes, mais peut techniquement être utilisé avec la licence SHARCNET]. Un groupe de licences anshpc de 1986 est inclus dans la licence SHARCNET pour prendre en charge les grandes tâches parallèles avec la plupart des produits Ansys.  Avant d'exécuter de longues tâches, il est préférable d'effectuer des tests de scalabilité. Les tâches parallèles qui utilisent moins de 50% en CPU seront probablement signalées par le système et examinées par notre équipe technique.
-</div>
+La licence Ansys de SHARCNET est gratuite pour une utilisation académique par les chercheurs et chercheuses de l'Alliance sur les systèmes de l'Alliance. Le logiciel installé n'a pas de limites de solveur ou de géométrie. La licence SHARCNET peut <b>uniquement</b> être utilisée à des fins de <b><i>recherche universitaire publiable</i></b>; la production de résultats à des fins commerciales privées est strictement interdite, comme stipulé par la licence. La licence Ansys a été mise à niveau selon la Multiphysics Campus Solution en mai 2020 et inclut les produits suivants&nbsp;: HF, EM, Electronics HPC, Mechanical et CFD  [https://www.ansys.com/academic/educator-tools/academic-product-portfolio comme décrit ici]. 
+Rocky et LS-DYNA sont aussi maintenant inclus dans la licence SHARCNET. Lumerical acquis par ANSYS en 2020 n'est pas disponible en ce moment, mais est installé avec les modules Ansys récents et peut donc être utilisé  avec d'autres serveurs Ansys configurés en conséquence.  SpaceClaim sous Linux n'est pas installé sur nos systèmes, mais peut techniquement être utilisé avec la licence SHARCNET. Un groupe de licences anshpc de 1986 est inclus dans la licence SHARCNET pour prendre en charge les grandes tâches parallèles avec la plupart des produits Ansys.  Avant d'exécuter de longues tâches, il est préférable d'effectuer des tests de scalabilité. Les tâches parallèles qui utilisent moins de 50% en CPU seront probablement signalées par le système et examinées par notre équipe technique.
 
 <div class="mw-translate-fuzzy">
 Depuis décembre 2022, chaque utilisateur peut exécuter 4 travaux en utilisant un total de 252 anshpc (plus 4 anshpc par tâche). Ainsi, les combinaisons de taille de tâches uniformes suivantes sont possibles : une tâche de 256 cœurs, deux tâches de 130 cœurs, trois tâches de 88 cœurs ou quatre tâches de 67 cœurs selon ( (252 + 4* nombre de tâches) / nombre de tâches). MISE À JOUR%nbsp;: En octobre 2024, la limite a été portée à 8 tâches et 512 cœurs HPC par utilisateur (collectivement sur toutes les grappes pour toutes les applications) pour une période de test afin de permettre plus de flexibilité pour l'exploration de paramètres et l'exécution de problèmes de plus grande envergure. Comme la licence sera beaucoup moins utilisée, certains cas d'échec de tâche au démarrage pourront rarement se produire, mais les tâches devront être soumises à nouveau. Néanmoins, en supposant que la plupart continuent à exécuter une ou deux tâches en utilisant 128 cœurs en moyenne au total, cela ne devrait pas poser de problème. Cela dit, il sera utile de fermer les applications Ansys immédiatement après l'achèvement de toute tâche liée à l'interface graphique afin de libérer toutes les licences qui peuvent être consommées pendant que l'application est inactive, pour que d'autres puissent les utiliser.
