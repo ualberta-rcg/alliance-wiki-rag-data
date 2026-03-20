@@ -5,19 +5,17 @@
 BLAST (pour ''Basic Local Alignment Search Tool'') permet de trouver les régions similaires entre deux ou plusieurs séquences de nucléotides ou d'acides aminés, et de réaliser un alignement de ces régions homologues.
 
 == Manuel de l'utilisateur ==
-Vous trouverez plus d'information sur les arguments dans le  [https://www.ncbi.nlm.nih.gov/books/NBK279684/ manuel de l'utilisateur] ou en lançant la commande. 
+Vous trouverez plus d'information sur les arguments dans le  [https://www.ncbi.nlm.nih.gov/books/NBK279684/ manuel de l'utilisateur] ou en lançant la commande 
 {{Command|blastn -help}}
 
-<div class="mw-translate-fuzzy">
 == Bases de données ==
-Certaines bases de données de séquences fréquemment utilisées se trouvent sur nos grappes dans <code>/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2022_03_23/</code>. Voyez le contenu de ce répertoire et de ses sous-répertoires avec, par exemple,
-</div> 
+Certaines bases de données de séquences fréquemment utilisées se trouvent sur nos grappes dans <code>/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2022_03_23/</code>. 
 
-The latest version of databases are stored at:
+Les plus récentes versions des bases de données se trouvent
 
-For <code>nr</code> database: <code>/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2025_06_21/nr/nr</code>
+* pour <code>nr</code> (''NCBI non-redundant protein''), dans <code>/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2025_06_21/nr/nr</code>
 
-For <code>nt</code> database: <code>/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2025_06_21/nt/nt</code>
+*pour <code>nt</code> ('' non-redundant nucleotide ''), dans  <code>/cvmfs/bio.data.computecanada.ca/content/databases/Core/blast_dbs/2025_06_21/nt/nt</code>
 
 == Accélérer la recherche ==
 Dans les exemples qui suivent, le fichier <tt>ref.fa</tt> est utilisé comme base de référence au format FASTA et le fichier <tt>seq.fa</tt> pour les requêtes à faire.
@@ -43,18 +41,18 @@ makeblastdb -in ref.fa -title reference -dbtype nucl -out ref.fa
 }}
 
 === Vecteur de tâches ===
-Le parallélisme des données peut grandement améliorer la recherche; il s'agit de diviser le fichier de requêtes en plusieurs requêtes qui se feront à la base de données.
+Le parallélisme des données peut grandement améliorer la recherche; il s'agit de diviser le fichier de requêtes en plusieurs requêtes à la base de données.
 
 ==== Prétraitement ====
-Pour accélérer la recherche, le fichier <tt>seq.fa</tt> doit être divisé en plusieurs petites parts. Ces parts devraient être d'au moins <tt>1Mo</tt>; des parts plus petites pourraient nuire au système de fichiers parallèles.
+Pour accélérer la recherche, le fichier <tt>seq.fa</tt> doit être divisé en plusieurs petites parts. Ces parts devraient être d'au moins <tt>1Mo</tt>; des parts plus petites pourraient nuire au système de fichiers parallèle.
 
-Avec l'utilitaire <tt>faSplit</tt>, la commande
+Avec l'utilitaire <tt>faSplit</tt>, 
 {{Command|module load kentutils/20180716}}
 {{Command|faSplit sequence seqs.fa 10 seq}}
-crée 10 fichiers nommés <tt>seqN.fa</tt> où <tt>N</tt> représente <tt>[0..9]</tt> pour 10 requêtes (séquences).
+créent 10 fichiers nommés <tt>seqN.fa</tt> où <tt>N</tt> représente <tt>[0..9]</tt> pour 10 requêtes (séquences).
 
 ==== Soumettre une tâche ====
-Une fois que les requêtes sont séparées vous pouvez créer une tâche pour chaque fichier <tt>seq.fa.N</tt> avec un vecteur de tâches. L'identifiant de la tâche contenu dans le vecteur correspondra au nom du fichier où se trouvent les requêtes à exécuter.
+Une fois que les requêtes sont séparées, vous pouvez créer une tâche pour chaque fichier <tt>seq.fa.N</tt> avec un vecteur de tâches. L'identifiant de la tâche contenu dans le vecteur correspondra au nom du fichier où se trouvent les requêtes à exécuter.
 
 Avec cette solution, l'ordonnanceur peut utiliser les ressources de la grappe qui sont disponibles pour exécuter les plus petites tâches. 
 {{File
@@ -81,10 +79,10 @@ Avec le script ci-dessus, vous pouvez soumettre votre requête BLAST et elle ser
 Quand toutes les tâches du vecteur sont terminées, concaténez les résultats avec
 {{Command|cat seq.ref.{0..9} > seq.ref}}
 où les 10 fichiers sont concaténés dans <tt>seq.ref</tt>.
-Ceci peut s'effectuer à partir du nœud de connexion ou comme tâche indépendante une fois que toutes les tâches du vecteur sont complétées.
+Ceci peut s'effectuer à partir du nœud de connexion ou comme tâche indépendante une fois que toutes les tâches du vecteur sont terminées.
 
 === GNU Parallel ===
-<tt>GNU Parallel</tt> est un bon outil pour grouper plusieurs petites tâches en une et la paralléliser. Cette solution réduit les problèmes qui se produisent avec plusieurs petits fichiers dans un système de fichiers parallèles avec des requêtes sur des blocs de taille fixe dans <tt>seq.fa</tt> avec un cœur et plusieurs nœuds.
+<tt>GNU Parallel</tt> est un bon outil pour grouper plusieurs petites tâches en une et la paralléliser. Cette solution réduit les problèmes qui se produisent avec plusieurs petits fichiers dans un système de fichiers parallèle avec des requêtes sur des blocs de taille fixe dans <tt>seq.fa</tt> avec un cœur et plusieurs nœuds.
 
 Par exemple, pour le fichier <tt>seq.fa</tt> de <tt>100Mo</tt>, vous pourriez lire des blocs de <tt>10Mo</tt> et GNU Parallel créerait 3 tâches, utilisant ainsi 3 cœurs; en demandant 10 cœurs, ce sont 7 cœurs qui auraient été gaspillés. '''La taille des blocs est donc importante.''' On peut aussi laisser GNU Parallel décider, comme dans l'exemple ci-dessous.
 

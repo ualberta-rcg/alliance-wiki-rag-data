@@ -69,12 +69,17 @@ Il est possible de se connecter à un nœud sur lequel une tâche est en cours e
 
 L'utilitaire [https://developer.nvidia.com/nvidia-system-management-interface <code>nvidia-smi</code>] est employé pour surveiller l'utilisation d'un GPU sur un nœud où une tâche est en cours d'exécution. L'exemple suivant exécute <code>watch</code> sur le nœud qui à son tour lance <code>nvidia-smi</code> toutes les 30 secondes et affiche le résultat au terminal.
 
- $ srun --jobid 123456 --pty watch -n 30 nvidia-smi
+ $ srun --jobid 123456 --overlap --pty watch -n 30 nvidia-smi
 
 Plusieurs commandes peuvent être lancées avec [https://fr.wikipedia.org/wiki/Tmux <code>tmux</code>]. L'exemple suivant exécute <code>htop</code> et <code>nvidia-smi</code> dans des fenêtres distinctes pour faire le suivi de l'activité sur le nœud où la tâche est exécutée.
 
- $ srun --jobid 123456 --pty tmux new-session -d 'htop -u $USER' \; split-window -h 'watch nvidia-smi' \; attach
+ $ srun --jobid 123456 --overlap --pty tmux new-session -d 'htop -u $USER' \; split-window -h 'watch nvidia-smi' \; attach
 
 Les processus lancés avec <code>srun</code> partagent les ressources utilisées par la tâche en question. Il faut donc éviter de lancer des processus qui utiliseraient les ressources au détriment de la tâche. Dans les cas où les processus utilisent trop de ressources, la tâche pourrait être arrêtée; le fait d'utiliser trop de cycles CPU ralentit une tâche.
 
 <b>Note ː</b> Dans les exemples précédents, <code>srun</code> fonctionne uniquement sur des tâches soumises avec <code>sbatch</code>. Pour faire le suivi d'une tâche interactive, ouvrez plusieurs fenêtres avec <code>tmux</code> et démarrez les processus dans des fenêtres distinctes.
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+== Monitoring a GPU job ==
+See [[NVTOP#Monitor_GPU_usage|Monitor GPU usage]]
+</div>
