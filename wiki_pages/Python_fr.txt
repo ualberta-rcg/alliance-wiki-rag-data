@@ -364,7 +364,7 @@ tabulate   0.8.10     py3       generic
 La procédure suivante prétélécharge le paquet <code>tensorboardX</code> sur un nœud de connexion et l'installe sur un nœud de calcul :
 
 # Lancez <code>pip download --no-deps tensorboardX</code> pour télécharger le paquet <code>tensorboardX-1.9-py2.py3-none-any.whl</code> (ou semblable) dans le répertoire de travail. La syntaxe pour <code>pip download</code> est la même que celle pour <code>pip install</code>.
-# Si le nom du fichier ne se termine pas par <code>none-any</code>, mais par <code>linux_x86_64</code> ou <code>manylinux*_x86_64</code>, il est possible que le wheel ne fonctionnera pas correctement. Contactez le [[Technical support/fr|soutien technique]] pour que nous le compilions et qu'il soit rendu disponible sur nos superordinateurs.
+# Si le nom du fichier ne se termine pas par <code>none-any</code>, mais par <code>linux_x86_64</code> ou <code>manylinux*_x86_64</code>, il est possible que le wheel ne fonctionne pas correctement. Contactez le [[Technical support/fr|soutien technique]] pour que nous le compilions et qu'il soit rendu disponible sur nos superordinateurs.
 # À l'installation, utilisez le chemin du fichier <code>pip install tensorboardX-1.9-py2.py3-none-any.whl</code>.
 
 <span id="Installing_from_a_remote_repository_(Github)"></span>
@@ -388,6 +388,46 @@ Si vous utilisez le <tt>HEAD</tt> du dépôt, cela pourrait fonctionner mais vou
 Sur Github, les <i>tags</i> ou versions se trouvent dans la section <i>Releases</i> dans le panneau de gauche.
 
 Pour plus d'information sur l'installation à partir d'un système de contrôle de versions (VCS), voir  [https://pip.pypa.io/en/stable/topics/vcs-support/#vcs-support vcs-support].
+
+<span id="Creating_a_local_wheel"></span>
+=== Créer un wheel local ===
+
+Dans certains contextes,
+* certains paquets ne sont disponibles que depuis un dépôt distant (par exemple GitHub) sans indication de version, d’étiquette ni de mise en production;
+* ou bien, vous devez modifier le code source.
+Dans ce cas, vous pouvez créer un wheel local pour pouvoir reproduire vos tâches.
+
+En vous basant sur [[Python/fr#Installer_à_partir_d'un_dépôt_à_distance_(Github)|Installer à partir d'un dépôt à distance (Github)]], vous pouvez créer un wheel local à partir d'un dépôt distant, avec un environnement virtuel activé :
+{{Command|prompt=(ENV) [name@server ~]|pip wheel --no-deps -w $HOME git+https://git.example.com/MyProject.git@<commit id>}}
+Cette commande clone et extrait le dépôt à l'emplacement indiqué (tag, identifiant de commit, etc.), puis pip crée un wheel dans le répertoire wheel (<tt>$HOME</tt>).
+
+Pour modifier les fichiers source, clônez d'abord le dépôt.
+{{Commands|prompt=(ENV) [name@server ~]
+	|git clone https://git.example.com/MyProject.git
+	|cd MyProject
+	|git checkout <commit id>
+	|... # make any edits
+}}
+Créez ensuite le wheel local.
+{{Command|prompt=(ENV) [name@server ~]|pip wheel --no-deps -w $HOME .}}
+
+Enfin, avec le wheel local, vous pouvez l'installer dans votre environnement virtuel.
+{{Command|prompt=(ENV) [name@server ~]|pip install $HOME/MyProject-1.0.0-py3-none.whl}}
+Ou encore, l'ajouter au fichier des requis.
+{{File
+  |name=requirements.txt
+  |lang="txt"
+  |contents=
+~/MyProject-1.0.0-py3-none.whl
+torch-2.11.0+computecanada-cp314-cp314-linux_x86_64.whl
+}}
+
+Pour créer un fichier de requis, utilisez <tt>--no-index</tt> et ''gelez'' l'état de votre environnement virtuel.
+{{Commands|prompt=(ENV) [name@server ~]
+|pip install --no-index $HOME/MyProject-1.0.0-py3-none.whl
+|pip freeze --local > ~/requirements.txt
+}}
+Voir aussi [[Python/fr#Créer_un_environnement_virtuel_dans_vos_tâches|Créer un environnement virtuel dans vos tâches]].
 
 <span id="Parallel_programming_with_the_Python_multiprocessing_module"></span>
 == Programmation parallèle avec le module <code>multiprocessing</code> ==
@@ -584,7 +624,7 @@ Avec le module [https://docs.python.org/3.8/library/faulthandler.html faulthandl
 Vous pouvez aussi inspecter un processus Python pendant l'exécution d'une tâche sans avoir à le modifier au préalable avec [https://pythonrepo.com/repo/benfred-py-spy-python-debugging-tools py-spy]&nbsp;:
 
 # Installez py-spy dans un environnement virtuel de votre répertoire /home.
-# Connectez-vous à une tâche en cours avec <code>srun --pty --jobid JOBID bash</code>.
+# Connectez-vous à une tâche en cours avec <code>srun --overlap --pty --jobid JOBID bash</code>.
 # Trouvez l'ID de la tâche du script Python avec <code>htop -u $USER</code>.
 # Activez l'environnement virtuel où py-spy est installé.
 # Lancez <code>py-spy top --pid PID</code> pour visionner en direct les endroits où le code utilise beaucoup de temps.
@@ -701,7 +741,7 @@ Une installation locale peut se produire de manière inattendue (si une erreur s
 
 Une installation locale est essentiellement le transfert des dépendances dans un espace partagé, ce qui n'est pas du tout souhaitable. Cela crée des problèmes d'importation ou d'exécution étranges avec vos paquets Python, ou encore des conflits de versions pouvant engendrer un véritable ''enfer de dépendances''.
 
-Il est préférable d'utiliser un  [[Python/fr#Créer_et_utiliser_un_environnement_virtuel_Python|environnement virtuel]] pour isoler, reproduire et gérer les diffférentes versions dans vos projets.
+Il est préférable d'utiliser un  [[Python/fr#Créer_et_utiliser_un_environnement_virtuel_Python|environnement virtuel]] pour isoler, reproduire et gérer les différentes versions dans vos projets.
 
 ==== Supprimer une installation locale ====
 Pour bien supprimer une installation locale, lancez

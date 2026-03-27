@@ -3,9 +3,11 @@
 [[Category:Software]]
 [https://mdx.plm.automation.siemens.com/star-ccm-plus STAR-CCM+] est une suite logicielle de simulation utilisée dans plusieurs spécialités de génie. Elle permet la modélisation dans des domaines variés dont l'acoustique, la dynamique des fluides, le transfert thermique, la rhéologie, l'écoulement polyphasique, le flux de particules, la mécanique des solides, les fluides réactifs, l'électrochimie et l'électromagnétisme.
 
+<div class="mw-translate-fuzzy">
 = Limites de la licence = 
 Les binaires STAR-CCM+ sont installés sur nos serveurs, mais nous n'avons pas de licence pour utilisation générale; vous devez donc posséder votre propre licence.
 Vous pouvez acheter une licence POD (<i>Power On Demand</i>) directement de [https://www.plm.automation.siemens.com/global/en/buy/ Siemens]. Autrement, vous pouvez utiliser une licence locale hébergée par votre établissement pourvu que le pare-feu permette à la grappe où les tâches seront exécutées d'y accéder.
+</div>
 
 == Configurer votre compte ==
 Afin de configurer votre compte pour utiliser un serveur de licence avec le module Star-CCM+, créez le fichier  <code>$HOME/.licenses/starccm.lic</code> comme suit&nbsp;: 
@@ -16,14 +18,18 @@ où <code>server</code> et <code>port</code> sont remplacés respectivement par 
 <span id="POD_license_file"></span>
 === Fichier pour une licence POD ===
 
+<div class="mw-translate-fuzzy">
 Si vous avez acheté une licence POD de [https://www.plm.automation.siemens.com/global/en/buy/ Siemens] votre variable d'environnement <code>LM_PROJECT</code> doit être manuellement configurée comme étant égale à <I>YOUR CD-ADAPCO PROJECT ID</i> dans votre script slurm. De plus, le fichier <code>~/.licenses/starccm.lic</code> doit être configuré comme suit sur toutes les grappes.
 {{File|name=starccm.lic|contents=SERVER flex.cd-adapco.com ANY 1999
 USE_SERVER}}
+</div>
 
 <span id="Cluster_batch_job_submission"></span>
 = Soumettre des tâches en lot sur nos grappes = 
 
+<div class="mw-translate-fuzzy">
 Quand vous soumettez des tâches sur une grappe pour la première fois, vous devrez configurer votre environnement pour l’utilisation de votre licence. Si vous utilisez le serveur de licences distant <i>pay-on-usage</i> de Siemens, créez le fichier <code>~/.licenses/starccm.lic</code>  comme décrit ci-dessus dans <i>Fichier pour une licence POD</i>; ceci devrait fonctionner immédiatement. Par contre, si vous utilisez un serveur de licence de votre établissement, créez d'abord le fichier <code>~/.licenses/starccm.lic</code> et soumettez une demande d'assistance au [[Technical support/fr|soutien technique]].  Nous vous aiderons à coordonner les modifications du pare-feu réseau nécessaires pour y accéder (en supposant que le serveur n'a jamais été configuré pour communiquer via la grappe de l'Alliance que vous voulez utiliser). Si vous rencontrez toujours des problèmes pour faire fonctionner la licence, essayez de supprimer ou de renommer le fichier <code>~/.flexlmrc</code> car les chemins de recherche et/ou les paramètres précédents du serveur de licence pourraient y être stockés. Notez que des fichiers de sortie de tâches déjà exécutées peuvent s'accumuler dans des répertoires cachés nommés <code>.star-version_number</code> et consommer ainsi votre quota. Ceux-ci peuvent être supprimés périodiquement en exécutant périodiquement <code>rm -ri ~/.starccm*</code> et en répondant <i>oui</i> à l'affichage de l'invite.
+</div>
 
 <span id="Slurm_scripts"></span>
 == Scripts pour l'ordonnanceur ==
@@ -47,15 +53,21 @@ Quand vous soumettez des tâches sur une grappe pour la première fois, vous dev
 
 module load StdEnv/2023
 
+<div class="mw-translate-fuzzy">
 #module load starccm/20.04.007-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
 module load starccm-mixed/20.04.007  # 19.06.009, 20.02.008, 20.04.007 or newer
 module list
+</div>
 
+<div class="mw-translate-fuzzy">
 SIM_FILE='mysample.sim'       # Specify your input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
+</div>
 
+<div class="mw-translate-fuzzy">
 export STARCCM_TMP="${SCRATCH}/.starccm-${EBVERSIONSTARCCM}"
 mkdir -p "$STARCCM_TMP"
+</div>
 
 slurm_hl2hl.py --format STAR-CCM+ > machinefile-$SLURM_JOB_ID
 
@@ -69,6 +81,7 @@ echo "FLEXIBLAS=$FLEXIBLAS"
 STAR_MPI="-mpi intel"
 STAR_FABRIC="-fabric tcp"
 
+<div class="mw-translate-fuzzy">
 if [ -n "$LM_PROJECT" ]; then
    echo "Siemens PoD license server ..."
    starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_FABRIC
@@ -85,6 +98,7 @@ fi
 |lang="bash"
 |contents=
 #!/bin/bash
+</div>
 
 #SBATCH --account=def-group   # Specify some account
 #SBATCH --time=00-01:00       # Time limit: dd-hh:mm
@@ -96,15 +110,21 @@ fi
 
 module load StdEnv/2023
 
+<div class="mw-translate-fuzzy">
 #module load starccm/20.04.007-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
 module load starccm-mixed/20.04.007  # 19.06.009, 20.02.008, 20.04.007 or newer
 module list
+</div>
 
+<div class="mw-translate-fuzzy">
 SIM_FILE='mysample.sim'       # Specify your input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
+</div>
 
+<div class="mw-translate-fuzzy">
 # Comment the next line when using an institutional license server
 LM_PROJECT='my22digitpodkey'  # Specify your Siemens Power on Demand (PoD) Key
+</div>
 
 # ------- no changes required below this line --------
 
@@ -132,6 +152,7 @@ else
   STAR_FABRIC="-fabric ucx" 
 fi
 
+<div class="mw-translate-fuzzy">
 if [ -n "$LM_PROJECT" ]; then
    echo "Siemens PoD license server ..."
    starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_FABRIC
@@ -148,6 +169,7 @@ fi
 |lang="bash"
 |contents=
 #!/bin/bash
+</div>
 
 #SBATCH --account=def-group   # Specify some account
 #SBATCH --time=00-01:00       # Time limit: dd-hh:mm
@@ -158,15 +180,21 @@ fi
 
 module load StdEnv/2023
 
+<div class="mw-translate-fuzzy">
 #module load starccm/20.04.007-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
 module load starccm-mixed/20.04.007  # 19.06.009, 20.02.008, 20.04.007 or newer
 module list
+</div>
 
+<div class="mw-translate-fuzzy">
 SIM_FILE='mysample.sim'       # Specify input sim filename
 #JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
+</div>
 
+<div class="mw-translate-fuzzy">
 # Comment the next line when using an institutional license server
 LM_PROJECT='my22digitpodkey'  # Specify your Siemens Power on Demand (PoD) Key
+</div>
 
 # These settings are used instead of your ~/.licenses/starccm.lic
 # (settings shown will use the cd-adapco pod license server)
@@ -182,6 +210,7 @@ ssh tri-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
 NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
 
+<div class="mw-translate-fuzzy">
 export FLEXIBLAS=StarAOCL
 echo "FLEXIBLAS=$FLEXIBLAS"
 STAR_MPI="-mpi openmpi"
@@ -207,6 +236,7 @@ exit $RET
 }}
 </tab>
 </tabs>
+</div>
 
 <span id="Graphical_use"></span>
 = Mode graphique =

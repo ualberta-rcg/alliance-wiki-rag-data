@@ -7,7 +7,7 @@
 
 <!--T:2-->
 = License limitations =
-We have the authorization to host STAR-CCM+ binaries on our servers, but we don't provide licenses. You will need to have your own license in order to use this software. A remote POD license can be purchased directly from [https://www.plm.automation.siemens.com/global/en/buy/ Siemens]. Alternatively, a local license hosted at your institution can be used, providing it can be accessed through the firewall from the cluster where jobs are to be run.
+The Alliance has the authorization to host STAR-CCM+ binaries on the clusters. However will need to purchase a license from [https://www.plm.automation.siemens.com/global/en/buy/ Siemens] in order to use this software. There are two [https://community.sw.siemens.com/s/article/How-faculty-members-in-academic-institutions-can-get-access-to-Simcenter-STAR-CCM options].  Most research groups purchase a remotely hosted [https://community.sw.siemens.com/s/question/0D54O00006FKu39SAD/licensing-how-power-on-demand-pod-licensing-for-starccm-works Power-on-Demand (PoD)] license since it simply requires a license key to use.  Alternatively a locally hosted license server can be setup and managed at your institution provided it can be accessed through the firewall from the cluster where jobs will be run.
 
 <!--T:7-->
 == Configuring your account ==
@@ -19,14 +19,14 @@ where <code><server></code> and <code><port></code> should be changed to specify
 === POD license file === <!--T:261-->
 
 <!--T:262-->
-Researchers with a POD license purchased from [https://www.plm.automation.siemens.com/global/en/buy/ Siemens] must manually set the <code>LM_PROJECT</code> environment variable equal to <I>YOUR CD-ADAPCO PROJECT ID</i> in your slurm script.  Also the <code>~/.licenses/starccm.lic</code> file should be configured as follows on each cluster:
+To run jobs researchers with a Power-on-Demand (PoD) license must manually set the <code>LM_PROJECT</code> environment variable to your <i>22digit-PoD-License-Key</i> as shown in the sample slurm scripts below.  Also a <code>~/.licenses/starccm.lic</code> file should be configured on each cluster where jobs are to be run as follows :
 {{File|name=starccm.lic|contents=SERVER flex.cd-adapco.com ANY 1999
 USE_SERVER}}
 
 = Cluster batch job submission = <!--T:3--> 
 
 <!--T:5-->
-When submitting jobs on a cluster for the first time, you must set up the environment to use your license. If you are using Siemans remote <i>pay-on-usage</i> license server then create a <code>~/.licenses/starccm.lic</code> file as shown in the <b>Configuring your account- POD license file</b> section above and license checkouts should immediately work.  If however you are using an institutional license server, then after creating your <code>~/.licenses/starccm.lic</code> file you must also submit a problem ticket to [[technical support]] so we can help co-ordinate the necessary one time network firewall changes required to access it (assuming the server has never been setup to be accessed from the Alliance cluster you will be using).   If you still have problems getting the licensing to work then try removing or renaming file <code>~/.flexlmrc</code> since previous search paths and/or license server settings maybe stored in it.  Note that temporary output files from starccm jobs runs may accumulate in hidden directories named <code>~/.star-version_number</code> consuming valuable quota space.  These can be removed by periodically running <code>rm -ri ~/.starccm*</code> and replying yes when prompted.
+Before submitting jobs on a cluster, you must set up a <code>~/.licenses/starccm.lic</code> file on each cluster where you will run jobs.  If you have a PoD license then the required firewall changes have already been done on all of the Alliance clusters.  If however you will be using a local institutional license server then you will need to submit a problem ticket to [[technical support]] to request the one time network firewall changes be made between the cluster(s) and your local license server.   If you have problems getting the licensing to work then try removing or renaming file <code>~/.flexlmrc</code> since previous search paths and/or license server settings maybe stored in it.  Note that temporary output files from starccm jobs runs may accumulate in hidden directories named <code>~/.star-version_number</code> consuming valuable quota space.  These can be removed by periodically running <code>rm -ri ~/.starccm*</code> and replying yes when prompted.
 
 == Slurm scripts == <!--T:8-->
 
@@ -53,17 +53,17 @@ When submitting jobs on a cluster for the first time, you must set up the enviro
 module load StdEnv/2023
 
 <!--T:311-->
-#module load starccm/20.04.007-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
-module load starccm-mixed/20.04.007  # 19.06.009, 20.02.008, 20.04.007 or newer
+#module load starccm/20.06.010-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
+module load starccm-mixed/20.06.010  # 19.06.009, 20.02.008, 20.04.007 or newer
 module list
 
 <!--T:274-->
-SIM_FILE='mysample.sim'       # Specify your input sim filename
-#JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
+SIM_FILE='mySample.sim'        # Specify your input sim filename
+#BATCH_CMD='myMacro.java,run'  # Uncomment to specify java macros, mesh, run, step
 
 <!--T:275-->
 # Comment the next line when using an institutional license server
-LM_PROJECT='my22digitpodkey'  # Specify your Siemens Power on Demand (PoD) Key
+LM_PROJECT='22digit-PoD-License-Key'  # Specify your Siemens PoD Key here
 
 <!--T:276-->
 # ------- no changes required below this line --------
@@ -87,11 +87,11 @@ STAR_FABRIC="-fabric tcp"
 <!--T:278-->
 if [ -n "$LM_PROJECT" ]; then
    echo "Siemens PoD license server ..."
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_FABRIC
+   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
 else
    echo "Institutional license server ..."
    [ $(command -v lmutil) ] && lmutil lmstat -c ~/.licenses/starccm.lic -a {{!}} egrep "license1{{!}}UP{{!}}use{{!}}$USER"; echo
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_FABRIC
+   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
 fi
 }}
 </tab>
@@ -115,17 +115,17 @@ fi
 module load StdEnv/2023
 
 <!--T:315-->
-#module load starccm/20.04.007-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
-module load starccm-mixed/20.04.007  # 19.06.009, 20.02.008, 20.04.007 or newer
+#module load starccm/20.06.010-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
+module load starccm-mixed/20.06.010  # 19.06.009, 20.02.008, 20.04.007 or newer
 module list
 
 <!--T:291-->
-SIM_FILE='mysample.sim'       # Specify your input sim filename
-#JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
+SIM_FILE='mySample.sim'        # Specify your input sim filename
+#BATCH_CMD='myMacro.java,run'  # Uncomment to specify java macros, mesh, run, step
 
 <!--T:292-->
 # Comment the next line when using an institutional license server
-LM_PROJECT='my22digitpodkey'  # Specify your Siemens Power on Demand (PoD) Key
+LM_PROJECT='22digit-PoD-License-Key'  # Specify your Siemens PoD Key here
 
 <!--T:293-->
 # ------- no changes required below this line --------
@@ -161,11 +161,11 @@ fi
 <!--T:295-->
 if [ -n "$LM_PROJECT" ]; then
    echo "Siemens PoD license server ..."
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_FABRIC
+   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
 else
    echo "Institutional license server ..."
    [ $(command -v lmutil) ] && lmutil lmstat -c ~/.licenses/starccm.lic -a {{!}} egrep "license1{{!}}UP{{!}}use{{!}}$USER"; echo
-   starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_FABRIC
+   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
 fi
 }}
 </tab>
@@ -188,17 +188,17 @@ fi
 module load StdEnv/2023
 
 <!--T:316-->
-#module load starccm/20.04.007-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
-module load starccm-mixed/20.04.007  # 19.06.009, 20.02.008, 20.04.007 or newer
+#module load starccm/20.06.010-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
+module load starccm-mixed/20.06.010  # 19.06.009, 20.02.008, 20.04.007 or newer
 module list
 
 <!--T:317-->
-SIM_FILE='mysample.sim'       # Specify input sim filename
-#JAVA_FILE='mymacros.java'    # Uncomment to specify an input java filename
+SIM_FILE='mySample.sim'        # Specify your input sim filename
+#BATCH_CMD='myMacro.java,run'  # Uncomment to specify java macros, mesh, run, step
 
 <!--T:321-->
 # Comment the next line when using an institutional license server
-LM_PROJECT='my22digitpodkey'  # Specify your Siemens Power on Demand (PoD) Key
+LM_PROJECT='22digit-PoD-License-Key'  # Specify your Siemens PoD Key here
 
 <!--T:322-->
 # These settings are used instead of your ~/.licenses/starccm.lic
@@ -232,10 +232,10 @@ while [ $i -le 5 ] && [ $RET -ne 0 ]; do
           echo "Attempt number: "$I
           if [ -n "$LM_PROJECT" ]; then
           echo "Siemens PoD license server ..."
-          starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI
+          starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
         else
           echo "Institutional license server ..."
-          starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI
+          starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
         fi
         RET=$?
         i=$((i+1))
@@ -248,7 +248,7 @@ exit $RET
 = Graphical use = <!--T:25-->
 
 <!--T:30-->
-To run starccm+ in graphical mode it is recommended to use an  [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) OnDemand] or JupyterLab system to start a remote desktop.  In addition to configuring <code>~/.licenses/starccm.lic</code>, research groups with a POD license should also run <code>export LM_PROJECT='CD-ADAPCO PROJECT ID'</code> before starting <code>starccm+</code> as shown below.  Additional command line options such as <b>-power</b> may also need to be appended depending on your license type.  Note that running <code>module avail starccm</code> will display all <i>mixed</i> and <i>R8</i> versions that are available to load within the StdEnv/version you currently have loaded ie) 2020 or 2023.  Alternatively running <code>module spider starccm</code> will show all <i>mixed</i> and <i>R8</i> module versions available to load within both StdEnv module versions that could be loaded ie) 2020 and 2023.  
+To run starccm+ in graphical mode it is recommended to use an  [https://docs.alliancecan.ca/wiki/Nibi#Access_through_Open_OnDemand_(OOD) OnDemand] or JupyterLab system to start a remote desktop.  In addition to configuring <code>~/.licenses/starccm.lic</code>, research groups with a POD license should also run <code>export LM_PROJECT='22digit-PoD-License-Key'</code> before starting <code>starccm+</code> as shown below.  Additional command line options such as <b>-power</b> may also need to be appended depending on your license type.  Note that running <code>module avail starccm</code> will display all <i>mixed</i> and <i>R8</i> versions that are available to load within the StdEnv/version you currently have loaded ie) 2020 or 2023.  Alternatively running <code>module spider starccm</code> will show all <i>mixed</i> and <i>R8</i> module versions available to load within both StdEnv module versions that could be loaded ie) 2020 and 2023.  
 
 <!--T:29-->
 == OnDemand ==
