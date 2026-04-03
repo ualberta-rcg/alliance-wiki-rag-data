@@ -126,18 +126,16 @@ fi
 echo "FLEXIBLAS=$FLEXIBLAS"
 
 if [ "${EBVERSIONSTARCCM:0:2}" -lt 20 ]; then
-  STAR_FABRIC="-fabric ofi"
-else 
-  STAR_FABRIC="-fabric ucx" 
+  STAR_UCX="-xsystemucx"
 fi
 
 if [ -n "$LM_PROJECT" ]; then
    echo "Siemens PoD license server ..."
-   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
+   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_UCX
 else
    echo "Institutional license server ..."
    [ $(command -v lmutil) ] && lmutil lmstat -c ~/.licenses/starccm.lic -a {{!}} egrep "license1{{!}}UP{{!}}use{{!}}$USER"; echo
-   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
+   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_UCX
 fi
 }}
 </tab>
@@ -184,6 +182,10 @@ NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
 export FLEXIBLAS=StarAOCL
 echo "FLEXIBLAS=$FLEXIBLAS"
 STAR_MPI="-mpi openmpi"
+
+if [ "${EBVERSIONSTARCCM:0:2}" -lt 20 ]; then
+  STAR_UCX="-xsystemucx"
+fi
  
 # Workaround for license failures: 
 # until the exit status is equal to 0, we try to get Star-CCM+ to start (here, for at least 5 times).
@@ -194,10 +196,10 @@ while [ $i -le 5 ] && [ $RET -ne 0 ]; do
           echo "Attempt number: "$I
           if [ -n "$LM_PROJECT" ]; then
           echo "Siemens PoD license server ..."
-          starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
+          starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_UCX
         else
           echo "Institutional license server ..."
-          starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
+          starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_UCX
         fi
         RET=$?
         i=$((i+1))

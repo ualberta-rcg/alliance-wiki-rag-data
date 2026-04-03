@@ -144,4 +144,29 @@ You will see JupyterLab is opened in the web browser on the Desktop with your $H
 <!--T:35-->
 ==Support for VDI via OOD==
 Nibi no longer offers Virtual Desktop Infrastructure (VDI). Instead, it provides a remote desktop environment through the [https://ondemand.sharcnet.ca/ portal] of Open OnDemand (OOD), offering improved hardware performance and software support.
+
+<!--T:40-->
+==Oops, I accidentally deleted my files, what should I do?==
+A backup mechanism on Nibi takes a snapshot of your files on <code>/home</code> and <code>/project</code> every 30 minutes and saves the snapshots for two weeks.  If you accidentally delete a file, you may be able to retrieve it from these snapshots, providing the file was deleted less than two weeks ago.  However, if one makes changes to a file after the most recent snapshot then deletes it, the changes cannot be recovered.
+
+<!--T:41-->
+To find a deleted file, use the <code>oops</code> command to check the current directory, or give an optional directory name to check there instead. To recover a file, copy it from the path returned by <code>oops</code> using standard tools like <code>cp</code>. Snapshots are read-only; you cannot delete or change files in snapshots, you must copy them first. Do not refer to files in snapshots in your job scripts.
+
+</translate>
+{{Commands2
+|prompt=[username@<node>.nibi]$
+|ls
+dont_delete_me.txt
+|rm dont_delete_me.txt
+|ls
+|oops
+Deleted files found in snapshots:
+./.snapshot/backup_2026-04-01_18_00_00_UTC/dont_delete_me.txt
+Files created less than 9 min ago (2026-04-01 14:00:00-04:00) are not yet backed up
+Files deleted more than 0 days ago (2026-04-01 13:30:00-04:00) please submit a help ticket
+|cp ./.snapshot/backup_2026-04-01_18_00_00_UTC/dont_delete_me.txt .
+|ls
+dont_delete_me.txt
+}}
+<translate>
 </translate>

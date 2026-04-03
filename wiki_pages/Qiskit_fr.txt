@@ -47,20 +47,87 @@ pip install --no-index --requirement ~/qiskit_requirements.txt
 python qiskit_example.py
 }}
 Vous pouvez ensuite [[Running jobs/fr|soumettre votre tâche à l'ordonnanceur]]. 
-== Utiliser Qiskit avec MonarQ (à venir)==
-<!-- Il est possible d'importer un projet Qiskit dans PennyLane afin de l'exécuter sur [[MonarQ]]. 
-1. Installez PennyLane dans votre environnement virtuel si ce n’est pas déjà fait
-{{Command|pip install --no-index pennylane}}
+== Utiliser Qiskit avec MonarQ ==
 
-2. Installez le plugiciel pennylane-qiskit
-{{Command|pip install --no-index pennylane-qiskit}}
+Il est possible d’utiliser directement [[MonarQ]] avec Qiskit via le plugiciel qiskit-calculquebec. Ce plugiciel permet de développer et d'exécuter des circuits Qiskit sur l’infrastructure de Calcul Québec.
 
-3. Installez le plugiciel pennylane-snowflurry 
-{{Command|pip install pennylane-snowflurry}}
+=== Installation des dépendances ===
 
-Pour utiliser un circuit Qiskit en PennyLane, suivez les instructions dans la [https://docs.pennylane.ai/en/stable/introduction/importing_workflows.html documentation]. Vous pouvez ensuite exécuter votre circuit sur MonarQ en suivant les instructions dans la documentation [https://github.com/calculquebec/pennylane-snowflurry pennylane-snowflurry].
--->
+* Étape 1 : Installer les dépendances
+{{Commands
+ | module load python/3.11
+ | virtualenv --no-download --clear ~/ENV && source ~/ENV/bin/activate
+ | pip install --no-index --upgrade pip
+ | pip install --no-index qiskit-calculquebec
+ | pip install --no-index qiskit-ibm-runtime
+ | python -c "import qiskit; import qiskit_calculquebec"
+}}
 
+* Note : '''qiskit-calculquebec''' installe automatiquement Qiskit.
+
+=== Initialisation du backend MonarQ ===
+
+* Étape 2 : Configurer vos identifiants et le backend
+** Créez un client avec vos identifiants. Votre jeton est disponible via le portail Thunderhead.
+** Le <i>host</i> est '''<nowiki>https://monarq.calculquebec.ca</nowiki>.'''
+** Initialisez ensuite le backend MonarQ.
+
+{{Fichier
+  |name=qiskit_example.py
+  |lang="python"
+  |contents=
+import qiskit
+from qiskit import QuantumCircuit
+from qiskit_calculquebec.API.client import CalculQuebecClient
+from qiskit_calculquebec.backends import MonarQBackend
+
+# Identifiants
+user = "username"
+access_token = "token"
+host = "https://monarq.calculquebec.ca"
+project_id = "project_id"
+
+# Création du client et du backend
+my_client = CalculQuebecClient(host, user, access_token, project_id=project_id)
+backend = MonarQBackend("monarq", my_client)
+
+# Circuit simple
+qc = QuantumCircuit(2)
+qc.h(0)
+qc.cx(0, 1)
+qc.measure_all()
+}}
+
+=== Exécution du circuit ===
+
+* Étape 3 : Transpiler et exécuter le circuit
+
+{{Fichier
+  |name=qiskit_example.py
+  |lang="python"
+  |contents=
+from qiskit_ibm_runtime import SamplerV2 as Sampler
+from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
+
+# Transpilation adaptée au backend
+pm = generate_preset_pass_manager(optimization_level=3, backend=backend)
+transpiled_qc = pm.run(qc)
+
+# Exécution
+sampler = Sampler(mode=backend)
+job = sampler.run([transpiled_qc], shots=1000)
+
+result = job.result()
+print(result[0].data.meas.get_counts())
+}}
+
+=== Notes ===
+
+* La transpilation est nécessaire pour adapter le circuit à la connectivité et aux portes natives de MonarQ.
+* Le nombre de <i>shots</i> peut être ajusté selon les besoins (maximum : 1024).
+* L’utilisation de '''SamplerV2''' est recommandée pour l’exécution de circuits avec mesures.
+
+<!--
 == Exemple d'utilisation : États de Bell ==
 Nous allons créer le premier état de Bell sur [[Narval]] en simulation. Il faut d'abord importer les modules nécessaires. 
     from qiskit_aer import AerSimulator
@@ -83,3 +150,5 @@ Nous affichons un histogramme des résultats avec la commande
     plot_histogram(counts)
 
 [[File:Qiskit counts.png|thumb|Histogramme des résultats de 1000 mesures sur le premier état de Bell]]
+
+-->

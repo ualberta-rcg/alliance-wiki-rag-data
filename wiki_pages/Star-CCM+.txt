@@ -46,14 +46,14 @@ Before submitting jobs on a cluster, you must set up a <code>~/.licenses/starccm
 #SBATCH --cpus-per-task=16    # Specify cores per node (192 max)
 #SBATCH --mem=64G             # Specify memory per node (0 max)
 #SBATCH --ntasks-per-node=1   # Do not change this value
-#SBATCH --constraint=granite  # Use intel compute nodes (no gpu)
+#SBATCH --constraint=granite  # Use intel cpu only base nodes
 #SBATCH --switches=1          # Use 1 network switch (optional)
 
 <!--T:272-->
 module load StdEnv/2023
 
 <!--T:311-->
-#module load starccm/20.06.010-R8    # Specify 18.04.009, 18.06.007, 19.04.009,
+#module load starccm/20.06.010-R8    # Load 18.04.009, 18.06.007, 19.04.009,
 module load starccm-mixed/20.06.010  # 19.06.009, 20.02.008, 20.04.007 or newer
 module list
 
@@ -62,11 +62,14 @@ SIM_FILE='mySample.sim'        # Specify your input sim filename
 #BATCH_CMD='myMacro.java,run'  # Uncomment to specify java macros, mesh, run, step
 
 <!--T:275-->
-# Comment the next line when using an institutional license server
+# Comment the next line when using a local institutional license server
 LM_PROJECT='22digit-PoD-License-Key'  # Specify your Siemens PoD Key here
 
 <!--T:276-->
 # ------- no changes required below this line --------
+
+# Redirect from ~/.star-VERSION# to $SLURM_TMPDIR
+export STARCCM_TMP="$SLURM_TMPDIR"
 
 <!--T:323-->
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
@@ -79,19 +82,36 @@ port=$(cat $CDLMD_LICENSE_FILE {{!}} grep -Eo '[0-9]+$')
 nmap $server -Pn -p $port {{!}} grep -v '^$'; echo
 
 <!--T:324-->
-export FLEXIBLAS=StarMKL
-echo "FLEXIBLAS=$FLEXIBLAS"
-STAR_MPI="-mpi intel"
-STAR_FABRIC="-fabric tcp"
+CPU_VENDOR=$(lscpu {{|}} awk '/Vendor ID/{print $3}')
+echo "CPU_VENDOR= $CPU_VENDOR"
+if [ "$CPU_VENDOR" == GenuineIntel ]; then
+  if [ "${EBVERSIONSTARCCM:0:2}" -lt 20 ]; then
+    STAR_UCX="-xsystemucx"
+    export FLEXIBLAS=StarMKL
+  else
+    STAR_FLEXIBLAS="-flexiblaslib MKL"
+  fi
+  STAR_MPI="-mpi intel"
+  STAR_FABRIC="-fabric tcp"
+elif [ "$CPU_VENDOR" == AuthenticAMD ]; then
+  if [ "${EBVERSIONSTARCCM:0:2}" -lt 20 ]; then
+    STAR_UCX="-xsystemucx"
+    export FLEXIBLAS=StarAOCL
+  else
+    STAR_FLEXIBLAS="-flexiblaslib AOCL" 
+    STAR_PRELOAD="-ldpreload /usr/lib64/libdrm_amdgpu.so.1" 
+  fi
+  STAR_MPI="-mpi openmpi40"
+fi
 
 <!--T:278-->
 if [ -n "$LM_PROJECT" ]; then
    echo "Siemens PoD license server ..."
-   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
+   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_UCX $STAR_FABRIC $STAR_FLEXIBLAS $STAR_PRELOAD
 else
    echo "Institutional license server ..."
    [ $(command -v lmutil) ] && lmutil lmstat -c ~/.licenses/starccm.lic -a {{!}} egrep "license1{{!}}UP{{!}}use{{!}}$USER"; echo
-   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
+   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI $STAR_UCX $STAR_FABRIC $STAR_FLEXIBLAS $STAR_PRELOAD
 fi
 }}
 </tab>
@@ -109,7 +129,6 @@ fi
 #SBATCH --cpus-per-task=16    # Specify cores per node (192 max)
 #SBATCH --mem=64G             # Specify memory per node (0 max)
 #SBATCH --ntasks-per-node=1   # Do not change this value
-##SBATCH --constraint=genoa   # Uncomment on rorqual (optional)
 
 <!--T:289-->
 module load StdEnv/2023
@@ -129,6 +148,9 @@ LM_PROJECT='22digit-PoD-License-Key'  # Specify your Siemens PoD Key here
 
 <!--T:293-->
 # ------- no changes required below this line --------
+
+# Redirect from ~/.star-VERSION# to $SLURM_TMPDIR
+export STARCCM_TMP="$SLURM_TMPDIR"
 
 <!--T:294-->
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
@@ -151,21 +173,19 @@ elif [ "$RSNT_CPU_VENDOR_ID" == amd ]; then
 fi
 echo "FLEXIBLAS=$FLEXIBLAS"
 
-<!--T:326-->
+<!--T:328-->
 if [ "${EBVERSIONSTARCCM:0:2}" -lt 20 ]; then
-  STAR_FABRIC="-fabric ofi"
-else 
-  STAR_FABRIC="-fabric ucx" 
+  STAR_UCX="-xsystemucx"
 fi
 
 <!--T:295-->
 if [ -n "$LM_PROJECT" ]; then
    echo "Siemens PoD license server ..."
-   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
+   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_UCX
 else
    echo "Institutional license server ..."
    [ $(command -v lmutil) ] && lmutil lmstat -c ~/.licenses/starccm.lic -a {{!}} egrep "license1{{!}}UP{{!}}use{{!}}$USER"; echo
-   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
+   starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_UCX
 fi
 }}
 </tab>
@@ -210,6 +230,9 @@ LICSERVER=flex.cd-adapco.com     # Specify license server hostname
 <!--T:319-->
 # ------- no changes required below this line --------
 
+# Redirect from ~/.star-VERSION# to $SLURM_TMPDIR
+export STARCCM_TMP="$SLURM_TMPDIR"
+
 <!--T:318-->
 export CDLMD_LICENSE_FILE="$FLEXPORT@127.0.0.1"
 ssh tri-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f
@@ -218,10 +241,15 @@ ssh tri-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
 NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
 
-<!--T:327-->
+<!--T:329-->
 export FLEXIBLAS=StarAOCL
 echo "FLEXIBLAS=$FLEXIBLAS"
 STAR_MPI="-mpi openmpi"
+
+<!--T:330-->
+if [ "${EBVERSIONSTARCCM:0:2}" -lt 20 ]; then
+  STAR_UCX="-xsystemucx"
+fi
  
 # Workaround for license failures: 
 # until the exit status is equal to 0, we try to get Star-CCM+ to start (here, for at least 5 times).
@@ -232,10 +260,10 @@ while [ $i -le 5 ] && [ $RET -ne 0 ]; do
           echo "Attempt number: "$I
           if [ -n "$LM_PROJECT" ]; then
           echo "Siemens PoD license server ..."
-          starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
+          starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_UCX
         else
           echo "Institutional license server ..."
-          starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_FABRIC
+          starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_UCX
         fi
         RET=$?
         i=$((i+1))

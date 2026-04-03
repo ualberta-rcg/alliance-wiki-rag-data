@@ -15,352 +15,127 @@ If you choose to install the toolkit directly from NVIDIA, please ensure that th
 To use a vGPU within a VM, the instance needs to be deployed on one of the flavors listed below. The vGPU will be available to the operating system via the PCI bus.
 
 <!--T:4-->
-* g1-8gb-c4-22gb
-* g1-16gb-c8-40gb
+* g1-12gb-c3-35gb-125
+* g1-24gb-c6-70gb-250
 
-== Preparation of a VM running AlmaLinux 9 == <!--T:86--> 
+== Preparation of a VM == <!--T:86--> 
 
 <!--T:87-->
 Once the VM is available, make sure to update the OS to the latest available software, including the kernel.
-Then, reboot the VM to have the latest kernel running.
+
+'''Reboot the VM to have the latest kernel running.'''
 
 <!--T:88-->
-To have access to the [https://en.wikipedia.org/wiki/Dynamic_Kernel_Module_Support DKMS package], the [https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm EPEL repository] is required.
+It is recommended to install [https://en.wikipedia.org/wiki/Dynamic_Kernel_Module_Support DKMS package], which is available via default repositories for all major distributions.
+If the dkms package doesn't install the kernel-header package automatically, it needs to be installed manually via the package manager of your distribution.
 
 <!--T:89-->
-AlmaLinux 9 has by default a faulty <code>nouveau</code> driver which crashes the kernel as soon as the <code>nvidia</code> driver is mounted. 
-The VM needs a few extra steps to prevent the loading of the nouveau driver when the system boots.
+Download the 2 files listed below to your system.
+
+1. '''NVIDIA-Linux-x86_64-580.105.08-grid.run'''
+
+2. '''kalpa-prod.tok'''
 
 </translate>
+
 <pre>
-[root@almalinux9]# echo -e "blacklist nouveau\noptions nouveau modeset=0" >/etc/modprobe.d/blacklist-nouveau.conf
-[root@almalinux9]# dracut -fv --omit-drivers nouveau
-[root@almalinux9]# dnf -y update && dnf -y install epel-release && reboot
+wget https://object-arbutus.alliancecan.ca/swift/v1/6c87c15eb7d2468daf3d2bd0c58bbfce/vgpu/NVIDIA-Linux-x86_64-580.105.08-grid.run
+wget https://object-arbutus.alliancecan.ca/swift/v1/6c87c15eb7d2468daf3d2bd0c58bbfce/vgpu/kalpa-prod.tok
 </pre>
 <translate>
 
 <!--T:90-->
-After the reboot of the VM, the Arbutus vGPU Cloud repository needs to be installed. 
+Install the Nvidia vGPU driver, by executing NVIDIA-Linux-x86_64-580.105.08-grid.run.
 
 </translate>
 <pre>
-[root@almalinux9]# dnf install http://repo.arbutus.cloud.computecanada.ca/pulp/repos/alma9/Packages/a/arbutus-cloud-vgpu-repo-1.0-1.el9.noarch.rpm</pre>
+root@vgpudoc:/home/debian# chmod 755 NVIDIA-Linux-x86_64-580.105.08-grid.run && ./NVIDIA-Linux-x86_64-580.105.08-grid.run
+</pre>
+
 <translate>
 
 <!--T:91-->
-The next step is to install the vGPU packages to install the required driver.
-
+It is recommended to use the '''NVIDIA Proprietary''' option and '''DKMS''', when the installer prompts for these options.
 </translate>
 <pre>
 [root@almalinux9]# dnf -y install nvidia-vgpu-gridd.x86_64 nvidia-vgpu-tools.x86_64 nvidia-vgpu-kmod.x86_64
+[...]
+
 </pre>
 <translate>
 
 <!--T:92-->
-After a successful  installation, <code>nvidia-smi</code> can be used to verify the proper functionality.
+After a successful  installation, reboot the system and verify via <code>nvidia-smi</code> that the OS has now proper access to the vGPU.
 
 </translate>
 <pre>
-[root@almalinux9]# nvidia-smi 
-Tue Apr 23 16:37:31 2024       
+root@vgpudoc:/home/debian# nvidia-smi 
+Thu Apr  2 19:06:00 2026       
 +-----------------------------------------------------------------------------------------+
-| NVIDIA-SMI 550.54.15              Driver Version: 550.54.15      CUDA Version: 12.4     |
-|-----------------------------------------+------------------------+----------------------+
+| NVIDIA-SMI 580.105.08             Driver Version: 580.105.08     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
 | GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
 | Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
 |                                         |                        |               MIG M. |
 |=========================================+========================+======================|
-|   0  GRID V100D-8C                  On  |   00000000:00:06.0 Off |                    0 |
-| N/A   N/A    P0             N/A /  N/A  |       0MiB /   8192MiB |      0%      Default |
-|                                         |                        |                  N/A |
+|   0  NVIDIA H100L-1-12C             On  |   00000000:00:06.0 Off |                   On |
+| N/A   N/A    P0            N/A  /  N/A  |       1MiB /  12288MiB |     N/A      Default |
+|                                         |                        |              Enabled |
 +-----------------------------------------+------------------------+----------------------+
-                                                                                         
+
++-----------------------------------------------------------------------------------------+
+| MIG devices:                                                                            |
++------------------+----------------------------------+-----------+-----------------------+
+| GPU  GI  CI  MIG |              Shared Memory-Usage |        Vol|        Shared         |
+|      ID  ID  Dev |                Shared BAR1-Usage | SM     Unc| CE ENC  DEC  OFA  JPG |
+|                  |                                  |        ECC|                       |
+|==================+==================================+===========+=======================|
+|  0    0   0   0  |               1MiB / 10565MiB    | 16      0 |  1   0    1    0    1 |
+|                  |               0MiB /  4096MiB    |           |                       |
++------------------+----------------------------------+-----------+-----------------------+
+
 +-----------------------------------------------------------------------------------------+
 | Processes:                                                                              |
-|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
 |        ID   ID                                                               Usage      |
 |=========================================================================================|
 |  No running processes found                                                             |
 +-----------------------------------------------------------------------------------------+
 </pre>
-<translate>
 
-== Preparation of a VM running AlmaLinux 8 == <!--T:93--> 
+The vGPU is now accessible and needs to be licensed. Copy the token ''kalpa-prod.tok'' to ''/etc/nvidia/ClientConfigToken/''.
 
-<!--T:94-->
-Once the VM is available, make sure to update the OS to the latest available software, including the kernel. Then, reboot the VM to have the latest kernel running.
-To have access to the [https://en.wikipedia.org/wiki/Dynamic_Kernel_Module_Support DKMS package], the [https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm EPEL repository] is required.
+Configure nvidia-gridd, via the command below.
 
-</translate>
+'''echo "FeatureType=4" >/etc/nvidia/gridd.conf'''
+
+Enable nvidia-gridd and verify it's status.
 <pre>
-[root@vgpu almalinux]# dnf -y update && dnf -y install epel-release && reboot
-</pre>
-<translate>
+systemctl enable --now nvidia-gridd
 
-<!--T:95-->
-After the reboot of the VM, the Arbutus vGPU Cloud repository needs to be installed.
 
-</translate>
-<pre>
-[root@almalinux8]# dnf install http://repo.arbutus.cloud.computecanada.ca/pulp/repos/alma8/Packages/a/arbutus-cloud-vgpu-repo-1.0-1.el8.noarch.rpm
-</pre>
-<translate>
+nvidia-gridd.service - NVIDIA Grid Daemon
+     Loaded: loaded (/usr/lib/systemd/system/nvidia-gridd.service; enabled; preset: enabled)
+     Active: active (running) since Thu 2026-04-02 19:11:13 UTC; 19s ago
+ Invocation: 11dbb0370aee4ceeb1603481991037ec
+    Process: 836 ExecStart=/usr/bin/nvidia-gridd (code=exited, status=0/SUCCESS)
+   Main PID: 837 (nvidia-gridd)
+      Tasks: 4 (limit: 42042)
+     Memory: 2M (peak: 2.7M)
+        CPU: 307ms
+     CGroup: /system.slice/nvidia-gridd.service
+             ââ837 /usr/bin/nvidia-gridd
 
-<!--T:96-->
-The next step is to install the vGPU packages to install the required driver.
-</translate>
-<pre>
-[root@vgpu almalinux]# dnf -y install nvidia-vgpu-gridd.x86_64 nvidia-vgpu-tools.x86_64 nvidia-vgpu-kmod.x86_64
-</pre>
-<translate>
-
-<!--T:97-->
-After a successful  installation, <code>nvidia-smi</code> can be used to verify the proper functionality.
-
-</translate>
-<pre>
-[root@almalinux8]# nvidia-smi 
-+-----------------------------------------------------------------------------------------+
-| NVIDIA-SMI 550.54.15              Driver Version: 550.54.15      CUDA Version: 12.4     |
-|-----------------------------------------+------------------------+----------------------+
-| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
-|                                         |                        |               MIG M. |
-|=========================================+========================+======================|
-|   0  GRID V100D-8C                  On  |   00000000:00:06.0 Off |                    0 |
-| N/A   N/A    P0             N/A /  N/A  |       0MiB /   8192MiB |      0%      Default |
-|                                         |                        |                  N/A |
-+-----------------------------------------+------------------------+----------------------+
-                                                                                         
-+-----------------------------------------------------------------------------------------+
-| Processes:                                                                              |
-|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
-|        ID   ID                                                               Usage      |
-|=========================================================================================|
-|  No running processes found                                                             |
-+-----------------------------------------------------------------------------------------+
-</pre>
-<translate>
-
-== Preparation of a VM running Debian 11 == <!--T:98-->
-Ensure that the latest packages are installed and the system has been booted with the latest stable kernel, as <b>DKMS</b> will request the latest one available from the Debian repositories.
-
-</translate>
-<pre>
-root@debian11:~# apt-get update && apt-get -y dist-upgrade && reboot
-</pre>
-<translate>
-
-<!--T:99-->
-After a successful reboot, the system should have the latest available kernel running and the repository can be installed, by installing the <code>arbutus-cloud-repo</code> package.
-This package also contains the gpg key all packages are signed with.
-
-</translate>
-<pre>
-root@debian11:~# wget http://repo.arbutus.cloud.computecanada.ca/pulp/deb/deb11/pool/main/arbutus-cloud-repo_0.1_all.deb
-root@debian11:~# apt-get install -y ./arbutus-cloud-repo_0.1_all.deb
-</pre>
-<translate>
-
-<!--T:100-->
-Update the local apt cache and install the vGPU packages:
-
-</translate>
-<pre>
-root@debian11:~# apt-get update && apt-get -y install nvidia-vgpu-kmod nvidia-vgpu-tools nvidia-vgpu-gridd
+Apr 02 19:11:13 vgpudoc systemd[1]: Starting nvidia-gridd.service - NVIDIA Grid Daemon...
+Apr 02 19:11:13 vgpudoc nvidia-gridd[837]: Started (837)
+Apr 02 19:11:13 vgpudoc systemd[1]: Started nvidia-gridd.service - NVIDIA Grid Daemon.
+Apr 02 19:11:13 vgpudoc nvidia-gridd[837]: vGPU Software package (0)
+Apr 02 19:11:13 vgpudoc nvidia-gridd[837]: Ignore service provider and node-locked licensing
+Apr 02 19:11:13 vgpudoc nvidia-gridd[837]: NLS initialized
+Apr 02 19:11:14 vgpudoc nvidia-gridd[837]: Acquiring license. (Info: api.cls.licensing.nvidia.com; NVIDIA Virtual Compute Server)
+Apr 02 19:11:16 vgpudoc nvidia-gridd[837]: License acquired successfully. (Info: api.cls.licensing.nvidia.com, NVIDIA Virtual Compute Server; Expiry: 2026-4-3 19:11:16 GMT)
 </pre>
 
-<pre>
-root@debian11:~# nvidia-smi
-Tue Apr 23 18:55:18 2024       
-+-----------------------------------------------------------------------------------------+
-| NVIDIA-SMI 550.54.15              Driver Version: 550.54.15      CUDA Version: 12.4     |
-|-----------------------------------------+------------------------+----------------------+
-| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
-|                                         |                        |               MIG M. |
-|=========================================+========================+======================|
-|   0  GRID V100D-8C                  On  |   00000000:00:06.0 Off |                    0 |
-| N/A   N/A    P0             N/A /  N/A  |       0MiB /   8192MiB |      0%      Default |
-|                                         |                        |                  N/A |
-+-----------------------------------------+------------------------+----------------------+
-                                                                                         
-+-----------------------------------------------------------------------------------------+
-| Processes:                                                                              |
-|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
-|        ID   ID                                                               Usage      |
-|=========================================================================================|
-|  No running processes found                                                             |
-+-----------------------------------------------------------------------------------------+
-</pre>
-<translate>
-
-== Preparation of a VM running Debian 12 == <!--T:101-->
-Ensure that the latest packages are installed and the system has been booted with the latest stable kernel, as <b>DKMS</b> will request the latest one available from the Debian repositories.
-
-</translate>
-<pre>
-root@debian12:~# apt-get update && apt-get -y dist-upgrade && reboot
-</pre> 
-<translate>
-
-<!--T:102-->
-After a successful reboot, the system should have the latest available kernel running and the repository can be installed, by installing the <code>arbutus-cloud-repo</code> package.
-This package also contains the gpg key all packages are signed with.
-
-</translate>
-<pre>
-root@debian12:~# wget http://repo.arbutus.cloud.computecanada.ca/pulp/deb/deb12/pool/main/arbutus-cloud-repo_0.1+deb12_all.deb
-root@debian12:~# apt-get install -y ./arbutus-cloud-repo_0.1+deb12_all.deb
-</pre>
-<translate>
-
-<!--T:103-->
-Update the local apt cache and install the vGPU packages:
-
-</translate>
-<pre>
-root@debian12:~# apt-get update && apt-get -y install nvidia-vgpu-kmod nvidia-vgpu-tools nvidia-vgpu-gridd
-</pre>
-
-<pre>
-root@debian12:~# nvidia-smi
-Tue Apr 23 18:55:18 2024       
-+-----------------------------------------------------------------------------------------+
-| NVIDIA-SMI 550.54.15              Driver Version: 550.54.15      CUDA Version: 12.4     |
-|-----------------------------------------+------------------------+----------------------+
-| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
-|                                         |                        |               MIG M. |
-|=========================================+========================+======================|
-|   0  GRID V100D-8C                  On  |   00000000:00:06.0 Off |                    0 |
-| N/A   N/A    P0             N/A /  N/A  |       0MiB /   8192MiB |      0%      Default |
-|                                         |                        |                  N/A |
-+-----------------------------------------+------------------------+----------------------+
-                                                                                         
-+-----------------------------------------------------------------------------------------+
-| Processes:                                                                              |
-|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
-|        ID   ID                                                               Usage      |
-|=========================================================================================|
-|  No running processes found                                                             |
-+-----------------------------------------------------------------------------------------+
-</pre>
-<translate>
-
-== Preparation of a VM running Ubuntu 22 == <!--T:104-->
-Ensure that the OS is up to date, that all the latest patches are installed, and that the latest stable kernel is running.
-
-</translate>
-<pre>
-root@ubuntu22:~# apt-get update && apt-get -y dist-upgrade && reboot
-</pre>
-<translate>
-
-<!--T:105-->
-After a successful reboot, the system should have the latest available kernel running. 
-Now the repository can be installed by installing the <code>arbutus-cloud-repo</code> package.
-This package also contains the gpg key all packages are signed with.
-
-</translate>
-<pre>
-root@ubuntu22:~# wget http://repo.arbutus.cloud.computecanada.ca/pulp/deb/ubnt22/pool/main/arbutus-cloud-repo_0.1_all.deb
-root@ubuntu22:~# apt-get install ./arbutus-cloud-repo_0.1_all.deb
-</pre>
-<translate>
-
-<!--T:106-->
-Update the local apt cache and install the vGPU packages:
-</translate>
-<pre>
-root@ubuntu22:~# apt-get update && apt-get -y install nvidia-vgpu-kmod nvidia-vgpu-tools nvidia-vgpu-gridd
-</pre>
-<translate>
-
-<!--T:107-->
-If your installation was successful, the vGPU will be accessible and licensed.
-
-</translate>
-<pre>
-root@ubuntu22:~# nvidia-smi 
-Wed Apr 24 14:37:52 2024       
-+-----------------------------------------------------------------------------------------+
-| NVIDIA-SMI 550.54.15              Driver Version: 550.54.15      CUDA Version: 12.4     |
-|-----------------------------------------+------------------------+----------------------+
-| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
-|                                         |                        |               MIG M. |
-|=========================================+========================+======================|
-|   0  GRID V100D-8C                  On  |   00000000:00:06.0 Off |                    0 |
-| N/A   N/A    P0             N/A /  N/A  |       0MiB /   8192MiB |      0%      Default |
-|                                         |                        |                  N/A |
-+-----------------------------------------+------------------------+----------------------+
-                                                                                         
-+-----------------------------------------------------------------------------------------+
-| Processes:                                                                              |
-|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
-|        ID   ID                                                               Usage      |
-|=========================================================================================|
-|  No running processes found                                                             |
-+-----------------------------------------------------------------------------------------+
-</pre>
-<translate>
-
-== Preparation of a VM running Ubuntu 20 == <!--T:108-->
-Ensure that the OS is up to date, that all the latest patches are installed, and that the latest stable kernel is running.
-
-</translate>
-<pre>
-root@ubuntu20:~# apt-get update && apt-get -y dist-upgrade && reboot
-</pre>
-<translate>
-
-<!--T:109-->
-After a successful reboot, the system should have the latest available kernel running. 
-Now the repository can be installed by installing the <code>arbutus-cloud-repo</code> package.
-This package also contains the gpg key all packages are signed with.
-
-</translate>
-<pre>
-root@ubuntu20:~# wget http://repo.arbutus.cloud.computecanada.ca/pulp/deb/ubnt20/pool/main/arbutus-cloud-repo_0.1ubuntu20_all.deb
-root@ubuntu20:~# apt-get install ./arbutus-cloud-repo_0.1ubuntu20_all.deb
-</pre>
-<translate>
-
-<!--T:110-->
-Update the local apt cache and install the vGPU packages:
-</translate>
-<pre>
-root@ubuntu20:~# apt-get update && apt-get -y install nvidia-vgpu-kmod nvidia-vgpu-tools nvidia-vgpu-gridd
-</pre>
-<translate>
-
-<!--T:111-->
-If your installation was successful, the vGPU will be accessible and licensed.
-
-</translate>
-<pre>
-root@ubuntu20:~# nvidia-smi 
-Wed Apr 24 14:37:52 2024       
-+-----------------------------------------------------------------------------------------+
-| NVIDIA-SMI 550.54.15              Driver Version: 550.54.15      CUDA Version: 12.4     |
-|-----------------------------------------+------------------------+----------------------+
-| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
-|                                         |                        |               MIG M. |
-|=========================================+========================+======================|
-|   0  GRID V100D-8C                  On  |   00000000:00:06.0 Off |                    0 |
-| N/A   N/A    P0             N/A /  N/A  |       0MiB /   8192MiB |      0%      Default |
-|                                         |                        |                  N/A |
-+-----------------------------------------+------------------------+----------------------+
-                                                                                         
-+-----------------------------------------------------------------------------------------+
-| Processes:                                                                              |
-|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
-|        ID   ID                                                               Usage      |
-|=========================================================================================|
-|  No running processes found                                                             |
-+-----------------------------------------------------------------------------------------+
-</pre>
+Once gridd has received a valid license, all features of the vGPU can be used. The licenses renewal is handled via nvidia-gridd automatically.
 
 [[Category:Cloud]]

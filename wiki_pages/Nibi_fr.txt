@@ -113,3 +113,24 @@ JupyterLab s'ouvre dans le navigateur sur le bureau et le contenu de votre espac
 
 ==Prise en charge de VDI via OOD==
 Nibi n'offre plus d'infrastructure de bureau virtuel (VDI), mais fournit un environnement de bureau à distance via le [https://ondemand.sharcnet.ca/ portail Open OnDemand (OOD)] avec des performances matérielles et une prise en charge logicielle améliorées.
+
+==Récupérer des fichiers supprimés==
+Nibi dispose d'un système de sauvegarde qui crée un instantané de vos fichiers dans /home et /project toutes les 30 minutes; ces instantanés sont sauvegardés pour une période de deux semaines. Si vous supprimez accidentellement un fichier, vous pourrez peut-être le récupérer à partir de ces instantanés, à condition qu'il ait été supprimé il y a moins de deux semaines. Cependant, si vous modifiez un fichier après la dernière sauvegarde, pour ensuite le supprimer, il ne pourra pas être récupéré.
+
+Pour localiser un fichier supprimé, utilisez la commande <code>oops</code> pour vérifier le répertoire courant, ou spécifiez un autre répertoire où faire la recherche. Pour récupérer un fichier, copiez-le depuis le chemin retourné par la commande <code>oops</code> à l'aide d'un outil standard comme <code>cp</code>. Les instantanés sont en lecture seule; vous ne pouvez donc ni supprimer ni modifier les fichiers qu'ils contiennent, vous devez d'abord les copier. Ne faites pas référence aux fichiers des instantanés dans vos scripts de soumission de tâches.
+
+{{Commands2
+|prompt=[username@<node>.nibi]$
+|ls
+dont_delete_me.txt
+|rm dont_delete_me.txt
+|ls
+|oops
+Deleted files found in snapshots:
+./.snapshot/backup_2026-04-01_18_00_00_UTC/dont_delete_me.txt
+Files created less than 9 min ago (2026-04-01 14:00:00-04:00) are not yet backed up
+Files deleted more than 0 days ago (2026-04-01 13:30:00-04:00) please submit a help ticket
+|cp ./.snapshot/backup_2026-04-01_18_00_00_UTC/dont_delete_me.txt .
+|ls
+dont_delete_me.txt
+}}

@@ -147,9 +147,7 @@ fi
 echo "FLEXIBLAS=$FLEXIBLAS"
 
 if [ "${EBVERSIONSTARCCM:0:2}" -lt 20 ]; then
-  STAR_FABRIC="-fabric ofi"
-else 
-  STAR_FABRIC="-fabric ucx" 
+  STAR_UCX="-xsystemucx"
 fi
 
 <div class="mw-translate-fuzzy">
@@ -210,10 +208,13 @@ ssh tri-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
 NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
 
-<div class="mw-translate-fuzzy">
 export FLEXIBLAS=StarAOCL
 echo "FLEXIBLAS=$FLEXIBLAS"
 STAR_MPI="-mpi openmpi"
+
+if [ "${EBVERSIONSTARCCM:0:2}" -lt 20 ]; then
+  STAR_UCX="-xsystemucx"
+fi
  
 # Workaround for license failures: 
 # until the exit status is equal to 0, we try to get Star-CCM+ to start (here, for at least 5 times).
@@ -224,10 +225,10 @@ while [ $i -le 5 ] && [ $RET -ne 0 ]; do
           echo "Attempt number: "$I
           if [ -n "$LM_PROJECT" ]; then
           echo "Siemens PoD license server ..."
-          starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI
+          starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_UCX
         else
           echo "Institutional license server ..."
-          starccm+ -jvmargs -Xmx4G -jvmargs -Djava.io.tmpdir=$SLURM_TMPDIR -batch -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $JAVA_FILE $SIM_FILE $STAR_MPI
+          starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_UCX
         fi
         RET=$?
         i=$((i+1))
@@ -236,7 +237,6 @@ exit $RET
 }}
 </tab>
 </tabs>
-</div>
 
 <span id="Graphical_use"></span>
 = Mode graphique =

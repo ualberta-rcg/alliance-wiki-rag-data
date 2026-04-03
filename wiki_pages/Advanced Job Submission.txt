@@ -3,18 +3,18 @@
 == Submitting numerous compute tasks == <!--T:1-->
 
 <!--T:2-->
-In case you have multiple data files to process with many different combinations of parameters, you may use at least one of the following tools to better manage numerous similar calculation cases:
+The following tools are helpful when you need to process multiple files with or without different parameter combinations (''parameter sweep''):
 
 <!--T:3-->
-* <b>[[Job_arrays|Job Arrays]]</b>: they allow using a single script to submit many similar jobs at once. This method is ideal when each individual job is at least one hour long and the total number of jobs is at most one thousand.
-* <b>[[GNU_Parallel|GNU Parallel]]</b>: when the serial or small parallel jobs are too short individually or too numerous, GNU Parallel can run and manage numerous calculation cases, including parameter sweeps, on a single node reserved via a parallel job. Thanks to that, the number of jobs submitted to the scheduler is considerably reduced.
-* <b>[[GLOST]]</b>: the <i>Greedy Launcher Of Small Tasks</i> uses [[MPI]] and a manager-worker architecture to progressively run a long list of serial tasks on the CPU cores reserved for a parallel job.
+* <b>[[Job_arrays|Job Arrays]]</b>: to submit several similar jobs in one single script, an ideal method when each job exceeds one hour and the number of jobs is under one thousand;
+* <b>[[GNU_Parallel|GNU Parallel]]</b>: to run and manage several short calculations, including parameter sweeps, on a single node reserved via a parallel job;
+* <b>[[GLOST]]</b>: the <i>Greedy Launcher Of Small Tasks</i> uses [[MPI]] and a manager-worker architecture to progressively run a long list of serial jobs on the CPU cores reserved via a parallel job;
 * <b>[[META-Farm|META]]</b>: a suite of scripts designed in SHARCNET to automate high-throughput computing (running a large number of related serial, parallel, or GPU calculations).
 
 == Inter-job dependencies == <!--T:4-->
 
 <!--T:5-->
-While Slurm jobs are the building-blocks of compute pipelines, inter-job dependencies are the links and relationships between the steps of a pipeline. For example, if two different jobs need to run one after the other, the second job ''depends'' on the first one. The dependency could be by the start time, the end time or the final status of the first job. Typically, we want the second job to be started only once the first job has succeeded. For example:
+While Slurm jobs are the building blocks for compute pipelines, inter-job dependencies are the links and relationships between the steps of a pipeline. For example, if two different jobs need to run one after the other, the second job ''depends'' on the first one. The second could depend on the start time, the end time or the final status of the first job. Typically, we want the second job to be started only once the first job has succeeded. For example:
 
 <!--T:6-->
 {{Commands
