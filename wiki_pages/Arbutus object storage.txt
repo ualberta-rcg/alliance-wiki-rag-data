@@ -35,14 +35,15 @@ In order to manage your Arbutus Object Store, you will need your own storage acc
 <!--T:14-->
 <code>openstack ec2 credentials create</code>
 
-= Accessing your Arbutus Object Store = <!--T:35-->
+<!--T:35-->
+= Accessing your Arbutus Object Store =
 Setting access policies cannot be done via a web browser but must be done with a [[Arbutus object storage clients|SWIFT or S3-compatible client]].  There are several ways to access your data containers:
 
 <!--T:21-->
 # You can use an [[Arbutus_object_storage_clients|S3-compatible client]] (e.g. s3cmd).
 # You can use [[Globus#Object_storage_on_Arbutus|Globus]].
 # If your object storage policies are set to public (not default), you can use a browser via an HTTPS endpoint:
-<code>https://object-arbutus.cloud.computecanada.ca:443/DATA_CONTAINER/FILENAME</code>
+<code>https://object-arbutus.alliancecan.ca/PROJECT_ID:DATA_CONTAINER/FILENAME</code>
 
 == Managing your Arbutus Object Store == <!--T:36-->
 
@@ -68,19 +69,17 @@ If you create a new container as <b>Public</b>, anyone on the internet can read 
 
 <!--T:41-->
 <code>
-<nowiki>https://object-arbutus.cloud.computecanada.ca/<YOUR CONTAINER NAME HERE>/<YOUR OBJECT NAME HERE></nowiki>
+<nowiki>https://object-arbutus.alliancecan.ca/<OPENSTACK PROJECT ID>:<YOUR CONTAINER NAME HERE>/<YOUR OBJECT NAME HERE></nowiki>
 </code>
 
 <!--T:42-->
 with your container and object names inserted in place.
 
-<!--T:43-->
-{{quote|It's important to keep in mind that each data container on the <b>Arbutus Object Store</b> must have a <b>unique name across all users</b>. To ensure uniqueness, we may want to prefix our data container names with our project name to avoid conflicts with other users. One useful rule of thumb is to refrain from using generic names like <code>test</code> for data containers. Instead, consider using more specific and unique names like <code>def-myname-test</code>.}}
-
 <!--T:44-->
 To make a data container accessible to the public, we can change its policy to allow public access. This can come in handy if we need to share files to a wider audience. We can manage container policies using JSON files, allowing us to specify various access controls for our containers and objects.
 
-=== Managing data container (bucket) policies for your Arbutus Object Store === <!--T:31-->
+<!--T:31-->
+=== Managing data container (bucket) policies for your Arbutus Object Store ===
 <br>
 {{Warning|title=Attention|content=Be careful with policies because an ill-conceived policy can lock you out of your data container.}}
 
@@ -130,56 +129,76 @@ This example denies access except from the specified source IP address ranges in
 Currently, we support only the following actions:
 
 <!--T:49-->
-* s3:AbortMultipartUpload
-* s3:CreateBucket
-* s3:DeleteBucketPolicy
-* s3:DeleteBucket
-* s3:DeleteBucketWebsite
+* s3:GetObject
+* s3:GetObjectVersion
+* s3:PutObject
+* s3:GetObjectAcl
+* s3:GetObjectVersionAcl
+* s3:PutObjectAcl
+* s3:PutObjectVersionAcl
 * s3:DeleteObject
 * s3:DeleteObjectVersion
-* s3:DeleteReplicationConfiguration
-* s3:GetAccelerateConfiguration
-* s3:GetBucketAcl
-* s3:GetBucketCORS
-* s3:GetBucketLocation
-* s3:GetBucketLogging
-* s3:GetBucketNotification
-* s3:GetBucketPolicy
-* s3:GetBucketRequestPayment
-* s3:GetBucketTagging
-* s3:GetBucketVersioning
-* s3:GetBucketWebsite
-* s3:GetLifecycleConfiguration
-* s3:GetObjectAcl
-* s3:GetObject
+* s3:ListMultipartUploadParts
+* s3:AbortMultipartUpload
 * s3:GetObjectTorrent
-* s3:GetObjectVersionAcl
-* s3:GetObjectVersion
 * s3:GetObjectVersionTorrent
-* s3:GetReplicationConfiguration
-* s3:IPAddress
-* s3:NotIpAddress
-* s3:ListAllMyBuckets
-* s3:ListBucketMultipartUploads
+* s3:RestoreObject
+* s3:CreateBucket
+* s3:DeleteBucket
 * s3:ListBucket
 * s3:ListBucketVersions
-* s3:ListMultipartUploadParts
+* s3:ListAllMyBuckets
+* s3:ListBucketMultipartUploads
+* s3:GetAccelerateConfiguration
 * s3:PutAccelerateConfiguration
+* s3:GetBucketAcl
 * s3:PutBucketAcl
+* s3:GetBucketCORS
 * s3:PutBucketCORS
-* s3:PutBucketLogging
-* s3:PutBucketNotification
-* s3:PutBucketPolicy
-* s3:PutBucketRequestPayment
-* s3:PutBucketTagging
+* s3:GetBucketVersioning
 * s3:PutBucketVersioning
+* s3:GetBucketRequestPayment
+* s3:PutBucketRequestPayment
+* s3:GetBucketLocation
+* s3:GetBucketPolicy
+* s3:DeleteBucketPolicy
+* s3:PutBucketPolicy
+* s3:GetBucketNotification
+* s3:PutBucketNotification
+* s3:GetBucketLogging
+* s3:PutBucketLogging
+* s3:GetBucketTagging
+* s3:PutBucketTagging
+* s3:GetBucketWebsite
 * s3:PutBucketWebsite
+* s3:DeleteBucketWebsite
+* s3:GetLifecycleConfiguration
 * s3:PutLifecycleConfiguration
-* s3:PutObjectAcl
-* s3:PutObject
-* s3:PutObjectVersionAcl
 * s3:PutReplicationConfiguration
-* s3:RestoreObject
+* s3:GetReplicationConfiguration
+* s3:DeleteReplicationConfiguration
+* s3:GetObjectTagging
+* s3:PutObjectTagging
+* s3:DeleteObjectTagging
+* s3:GetObjectVersionTagging
+* s3:PutObjectVersionTagging
+* s3:DeleteObjectVersionTagging
+* s3:PutBucketObjectLockConfiguration
+* s3:GetBucketObjectLockConfiguration
+* s3:PutObjectRetention
+* s3:GetObjectRetention
+* s3:PutObjectLegalHold
+* s3:GetObjectLegalHold
+* s3:BypassGovernanceRetention
+* s3:GetBucketPolicyStatus
+* s3:PutPublicAccessBlock
+* s3:GetPublicAccessBlock
+* s3:DeletePublicAccessBlock
+* s3:GetBucketPublicAccessBlock
+* s3:PutBucketPublicAccessBlock
+* s3:DeleteBucketPublicAccessBlock
+* s3:GetBucketEncryption
+* s3:PutBucketEncryption
 
 <!--T:51-->
 [[Category:Cloud]]

@@ -1,49 +1,54 @@
 <languages />
 
 <div class="mw-translate-fuzzy">
-Vous trouverez ici l'information sur la migration d'instances virtuelles (ou VM pour ''virtual machines'') à partir du nuage Ouest vers le nouveau nuage Arbutus.
-Nous vous invitons à gérer vous-mêmes la migration vers Arbutus en fonction des logiciels que vous utilisez et de votre disponibilité.
+Vous trouverez ici l'information sur la migration d'instances virtuelles (ou VM pour ''virtual machines'') à partir du nuage Arbutus de la génération précédente vers le nuage Arbutus amélioré de la nouvelle génération. Puisque vous connaissez bien votre travail, nous vous recommandons de gérer vous-mêmes la migration vers le nouveau nuage selon les logiciels que vous utilisez et votre disponibilité.
 </div>   
 
-Migration is necessary for all cloud resources (e.g. instances, storage volumes, object storage containers, networks, keys, etc.) on the legacy Arbutus Cloud because the legacy Arbutus Cloud will be decommissioned in 2026.  The deadline for both RAS and RAC Projects to migrate between Legacy Arbutus and New Arbutus is August 31, 2026. 
+<div class="mw-translate-fuzzy">
+Il est important de migrer toutes vos ressources infonuagiques (instances, volumes de stockage, conteneurs de stockage objet, réseaux, clés, etc.) vers le nouveau nuage Arbutus puisque le système précédent deviendra hors service au cours de 2026. <b>La date limite pour migrer vos ressources est le 31 août 2026</b>. Ceci s'applique autant aux ressources allouées par concours qu'à celles qui ont été obtenues par le service d'accès rapide.
+</div> 
 
-This document contains multiple methods for migrating.  You and your research team need to select the migration approach(es) appropriate for your research project.  These approaches and how to choose which method is appropriate for your circumstances are described below. 
+<div class="mw-translate-fuzzy">
+Nous décrivons ici quelques méthodes de migration. Avec votre équipe de recherche, vous devez identifier la ou les approches en fonction de votre projet.
+</div> 
 
-Once you have read this document, you may have questions or you may wish to review your migration plan with an Arbutus Cloud team member. If so, please contact cloud@tech.alliancecan.ca. 
+Cette information peut susciter des questions ou encore, vous voudrez peut-être discuter avec notre équipe technique de la meilleure approche dans votre cas particulier. Vous pouvez alors écrire à cloud@tech.alliancecan.ca. 
 
 <span id="Planning_your_cloud_migration"></span>
 <div class="mw-translate-fuzzy">
-== Avant de commencer ==
+= Planifier la migration =
 </div>
 
-To plan your migration, you need to be able to answer the following questions about your resources on legacy Arbutus Cloud: 
-
-# Which resources in your legacy Arbutus cloud project need migration?  Not all resources may require migration.  For example, if any volume or an instance is no longer needed, it could be decommissioned instead of being migrated.  Create a list of all resources which require migration. 
-# Are your instances ephemeral or volume-backed?  Volume-backed instances boot from a volume (i.e. /dev/vda) and additionally may have other volumes (e.g. /dev/vdb etc.) attached.  Ephemeral instances do not boot from a volume.  Add to your migration list which instances are volume-backed and which are ephemeral. 
-# Are your volumes under 150 GB?  Volumes larger than 150 GB should be migrated using Globus.  Identify any volumes over 150 GB on your migration list. 
-# Have you used an automated deployment system (e.g. Terraform, Ansible) on legacy Arbutus Cloud?  If you have used automation, your automation tools should be used in the process of migration. 
-# Are you using any custom DNS entries?  Custom DNS entries will need to be updated because your IP addresses will change as the new Arbutus Cloud uses different floating IP address ranges than the legacy Arbutus Cloud. 
-# Do you use the OpenStack Dashboard (i.e. the Horizon Web UI) or do you use the OpenStack Command Line Interface (CLI) to manage your Arbutus Cloud resources?  Simple migrations can be completed via the Web UI.  More complex migrations may require CLI access. 
-# Do you have an OpenStack account for anyone who needs access?  Please note that account sharing is strictly forbidden.  Any person who requires an account should apply here: https://www.alliancecan.ca/en/our-services/advanced-research-computing/account-management/apply-account  
-# How will your project manage the outage needed to migrate?  Depending on the scope of what needs to be migrated, an outage could range from a couple of hours to a couple of days.  Who needs to be informed? When can your project manage an outage? 
-# Do you have a RAS project? You will need to submit a request to migrate your project to cloud@tech.alliancecan.ca
-# Once you have completed your migration please also submit a ticket to request your project on Legacy Arbutus be decommissioned. 
-
-Once you have answered these questions, you will be ready to plan your cloud migration.
+Les questions suivantes vous aideront à planifier la migration. 
 
 <div class="mw-translate-fuzzy">
-Utilisez les adresses URL suivantes pour obtenir l'interface Horizon ː
-</div>
+* Quelles sont les ressources qui doivent être migrées vers le nouveau nuage Arbutus? Il n'est pas obligatoire de migrer toutes les ressources; par exemple, des volumes ou des instances qui ne sont plus nécessaires peuvent être supprimés. '''Créez une liste de toutes les ressources qui doivent être migrées.'''
+* Vos instances sont-elles éphémères ou sont-elles basées sur des volumes? Les instances basées sur des volumes démarrent à partir d'un volume (par exemple, /dev/vda) et peuvent également avoir d'autres volumes (par exemple, /dev/vdb). Les instances éphémères ne démarrent pas à partir d'un volume. '''Listez les instances basées sur des volumes séparément des instances éphémères.'''
+* Vos volumes font-ils plus de 150Go? Si c'est le cas, ils doivent être migrés à l'aide de Globus. '''Identifiez les volumes de plus de 150Go.'''
+* Avez-vous utilisé un système de déploiement automatisé (par exemple, Terraform, Ansible) sur le nuage Arbutus de la génération précédente? '''Si c'est le cas, les mêmes outils d'automatisation doivent être utilisés pour la migration.'''
+* Utilisez-vous des entrées DNS personnalisées? Ces entrées devront être mises à jour, car le nouveau nuage Arbutus utilise des plages d’adresses IP flottantes différentes de celles du système précédent.
+* Pour gérer vos ressources infonuagiques, utilisez-vous le tableau de bord OpenStack (interface web Horizon) ou l’interface en ligne de commande (CLI) OpenStack? '''Les migrations simples peuvent être effectuées via l’interface web; par contre, les migrations plus complexes peuvent nécessiter un accès à l'interface en ligne de commande.'''
+* Les membres de votre équipe ont-ils tout un compte OpenStack? Veuillez noter que le partage de compte est strictement interdit. '''Toute personne ayant besoin d’un compte doit en [[Apply for a CCDB account/fr|faire la demande ici sur CCDB]].'''
+* Comment gérerez-vous les interruptions de service requises pour la migration? Selon l’étendue des éléments à migrer, '''l’interruption peut durer de quelques heures à quelques jours. Qui doit en être informé? Quand votre projet est-il en mesure de gérer une interruption de service?'''
+* Vos ressources ont-elles été allouées via le service d'accès rapide? Si c'est le cas, '''vous devrez soumettre une demande de migration à cloud@tech.alliancecan.ca.'''
+# Une fois la migration terminée, '''veuillez soumettre un billet d'assistance pour demander le retrait de votre projet sur l'ancien système Arbutus.'''
+</div> 
+
+Avec les réponses à ces questions, vous pourrez élaborer un plan de migration.
 
 <div class="mw-translate-fuzzy">
-'''Nuage Ouest :''' [https://west.cloud.calculcanada.ca https://west.cloud.calculcanada.ca]
+= Information de base =
+Utilisez les adresses URL suivantes pour obtenir l'interface web Horizon&nbsp;:
 </div>
+
+'''Génération précédente''' [https://arbutus.cloud.computecanada.ca https://arbutus.cloud.computecanada.ca]
+
+'''Nouveau nuage Arbutus :'''
+[https://arbutus.alliancecan.ca https://arbutus.alliancecan.ca/]
 
 <div class="mw-translate-fuzzy">
-'''Nuage Arbutus :''' [https://arbutus.cloud.calculcanada.ca https://arbutus.cloud.calculcanada.ca]
+Vous pouvez utiliser les navigateurs Firefox et Chrome; Safari et Edge pourraient fonctionner, mais ils n'ont pas été testés.
 </div>
-
-Vous pouvez utiliser les fureteurs Firefox et Chrome. Les fureteurs Safari et Edge n'ont pas été testés.
 
 <div class="mw-translate-fuzzy">
 Votre projet, votre réseau et votre routeur auront été créés sur Arbutus et vous aurez accès aux mêmes projets que sur le nuage Ouest.
@@ -93,14 +98,14 @@ export OS_PROTOCOL=openid
 export OS_PROJECT_DOMAIN_NAME=default
 </source>
 
-And removing the lines containing:  
+Supprimez les lignes qui contiennent  
 
 <source>
 export OS_USER_DOMAIN_NAME="atmosphere" 
 if [ -z "$OS_USER_DOMAIN_NAME" ]; then unset OS_USER_DOMAIN_NAME; fi
 </source>
 
-And remove
+Supprimez aussi
 
 <source>
 echo "Please enter your OpenStack Password for project $OS_PROJECT_NAME as user $OS_USERNAME: " 
@@ -138,7 +143,7 @@ There are three general migration scenarios to consider.
 * [[#Manual or orchestrated migration|Manual or orchestrated migration]]
 * [[#Migrating volume-backed instances|Migrating volume-backed instances]]
 * [[#Migrating ephemeral instances|Migrating ephemeral instances]]
-Depending on your current setup, you may use any or all of these scenarios to migrate from the West Cloud to the Arbutus Cloud.
+Depending on your current setup, you may use any or all of these scenarios to migrate from Legacy Arbutus to New Arbutus.
 
 <span id="Manual_or_orchestrated_migration"></span>
 == Migration manuelle ou orchestrée ==
@@ -169,7 +174,7 @@ Le présent document ne traite pas de ces outils; cependant, si vous les utilise
 Comme leur nom l’indique, chacune de ces instances est associée à un volume persistant qui contient le système d’exploitation et les données nécessaires. Une bonne pratique est de créer des volumes distincts pour le système d’exploitation et pour les données.
 
 <span id="Migration_using_Glance_images"></span>
-=== Avec des images Glance ===
+=== Migration avec des images Glance ===
 
 Ce scénario est recommandé dans le cas de volumes de moins de 150Go. Pour les volumes plus grands, la [[#Migration_manuelle_ou_orchestrée|migration manuelle ou orchestrée]] est préférable.
 
@@ -247,9 +252,7 @@ Une instance éphémère n'est associée à aucun volume.
 <span id="Migration_using_Glance_images_and_volume_snapshots"></span>
 === Avec images et instantanés de volume Glance ===
 
-<div class="mw-translate-fuzzy">
-Ce scénario est recommandé dans le cas de volumes de moins de 150Go. Pour les volumes plus grands, la [[#Migration_manuelle_ou_orchestrée|migration manuelle ou orchestrée]] est préférable.
-</div>  
+Voir ci-dessus la section  [[#Migration_avec_des_images_Glance|Migration avec des images Glance]].  
 
 <span id="Alternative_method:_Migrating_an_ephemeral_instance_using_Linux_&#039;dd&#039;"></span>
 === Autre option avec Linux 'dd' ===
@@ -305,7 +308,7 @@ En cas de difficulté, contactez le [[Technical support|soutien technique]] (glo
 Pour les plus petits volumes, rsync+ssh offre de bonnes vitesses de transfert et, comme Globus, travaille de manière incrémentale. Un cas type serait :
 </div>  
 
-A typical use case would be:
+Voici un exemple de cas type&nbsp;:
 
 <div class="mw-translate-fuzzy">
 # Connectez-vous avec SSH à l’instance sur le nuage Ouest qui possède le volume principal. Prenez note du chemin absolu que vous voulez copier dans l’instance sur Arbutus.
@@ -316,7 +319,8 @@ A typical use case would be:
 
 Vous pouvez aussi déplacer vos données par une autre méthode que vous connaissez bien.
 
-== Post-transfer Activities ==
+<span id="Post-transfer_Activities"></span>
+== Configuration post-migration ==
 
 Once you have transferred your data to the new instance, there may be some post-transfer configurations required.  These activities could include: 
 
@@ -327,9 +331,10 @@ Once you have transferred your data to the new instance, there may be some post-
 # Renewing Let’s Encrypt Transport Layer Security (TLS) certificates using certbot or other utilities for example if there are IP addresses in the certificate’s Subject Alternate Name (SAM) 
 # Testing the configuration 
 
-Once you have finished testing, you should inform your research team and users that the migration has been completed. 
+Quand les tests auront été faits, informez les membres de votre équipe que la migration est terminée. 
 
-== Migrating CephFS Shared Filesystem ==
+<span id="Migrating_CephFS_Shared_Filesystem"></span>
+== Migration d'un système de fichiers partagé CephFS ==
 
 New Arbutus Cloud CephFS Shared Filesystem is a distinct and separate service, and any desired data must be intentionally migrated. 
 
@@ -356,7 +361,8 @@ Once both shares are mounted, use rsync to transfer the data. The a, v, and P fl
 
 Keep in mind that depending on the size of your share this may take a long time. It is advised to use a tool such as “screen” or “tmux” to keep the session alive in case of a dropped connection. 
 
-== Migrating Object Storage ==
+<span id="Migrating_Object_Storage"></span>
+== Migration de stockage objet ==
 
 New Arbutus Cloud Object Storage is a distinct and separate service from legacy, and any desired data must be intentionally migrated. 
 
@@ -364,8 +370,9 @@ The management for legacy buckets and objects, including operations for creation
 
 Migrating data to new Arbutus Cloud Object Storage can be done using a variety of methods and tools. If you are familiar with the options, feel free to use whichever method works best for your data. 
  
-New Arbutus Cloud Object Storage Endpoint: https://object-arbutus.alliancecan.ca 
-Legacy Arbutus Cloud Object Storage Endpoint: https://object-arbutus.cloud.computecanada.ca 
+'''New Arbutus Cloud Object Storage Endpoint:''' https://object-arbutus.alliancecan.ca 
+
+'''Legacy Arbutus Cloud Object Storage Endpoint:''' https://object-arbutus.cloud.computecanada.ca 
 
 Be cautious if you’re using bucket ACLs that either the tool you use copies them correctly, or you recreate them in the new environment. Most tools do not preserve bucket ACLs. Keep in mind that if you reference any user or project UUIDs they will be different in new Arbutus Cloud. 
 

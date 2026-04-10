@@ -68,6 +68,7 @@ LM_PROJECT='22digit-PoD-License-Key'  # Specify your Siemens PoD Key here
 <!--T:276-->
 # ------- no changes required below this line --------
 
+<!--T:331-->
 # Redirect from ~/.star-VERSION# to $SLURM_TMPDIR
 export STARCCM_TMP="$SLURM_TMPDIR"
 
@@ -82,7 +83,7 @@ port=$(cat $CDLMD_LICENSE_FILE {{!}} grep -Eo '[0-9]+$')
 nmap $server -Pn -p $port {{!}} grep -v '^$'; echo
 
 <!--T:324-->
-CPU_VENDOR=$(lscpu {{|}} awk '/Vendor ID/{print $3}')
+CPU_VENDOR=$(lscpu {{!}} awk '/Vendor ID/{print $3}')
 echo "CPU_VENDOR= $CPU_VENDOR"
 if [ "$CPU_VENDOR" == GenuineIntel ]; then
   if [ "${EBVERSIONSTARCCM:0:2}" -lt 20 ]; then
@@ -149,6 +150,7 @@ LM_PROJECT='22digit-PoD-License-Key'  # Specify your Siemens PoD Key here
 <!--T:293-->
 # ------- no changes required below this line --------
 
+<!--T:332-->
 # Redirect from ~/.star-VERSION# to $SLURM_TMPDIR
 export STARCCM_TMP="$SLURM_TMPDIR"
 
@@ -203,6 +205,10 @@ fi
 #SBATCH --cpus-per-task=192   # Specify cores per node (192 max)
 #SBATCH --mem=0               # Specify memory per node (0 max)
 #SBATCH --ntasks-per-node=1   # Do not change this value
+#SBATCH --output=slurm-%j.out # Writes to slurm-$SLURM_JOB_ID.out
+
+<!--T:296-->
+cd $SLURM_SUBMIT_DIR          # Submit from $SCRATCH/some/dir
 
 <!--T:290-->
 module load StdEnv/2023
@@ -230,6 +236,7 @@ LICSERVER=flex.cd-adapco.com     # Specify license server hostname
 <!--T:319-->
 # ------- no changes required below this line --------
 
+<!--T:333-->
 # Redirect from ~/.star-VERSION# to $SLURM_TMPDIR
 export STARCCM_TMP="$SLURM_TMPDIR"
 
@@ -257,7 +264,7 @@ i=1
 RET=-1
 while [ $i -le 5 ] && [ $RET -ne 0 ]; do
         [ $i -eq 1 ] {{!}}{{!}} sleep 5
-          echo "Attempt number: "$I
+          echo "Attempt number: "$i
           if [ -n "$LM_PROJECT" ]; then
           echo "Siemens PoD license server ..."
           starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_UCX

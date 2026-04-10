@@ -50,14 +50,66 @@ Pour améliorer la performance des tâches multi-nœuds fortement couplées, vou
 {| class="wikitable sortable"
 ! nœuds !! cœurs !! mémoire disponible !! stockage local au nœud || CPU !! GPU
 |-
-| 700 || 192 || 748G ou 766000M || 3&nbsp;T || 2 x Intel 6972P @ 2.4&nbsp;GHz, cache L3 384&nbsp;Mo ||
+| 700 || 192 || 748G ou 766000M || 3T || 2 x Intel 6972P @ 2.4GHz, cache L3 de 384Mo||
 |-
-|  10 || 192 || 6000G ou 6144000M || 3&nbsp;T || 2 x Intel 6972P @ 2.4&nbsp;GHz, cache L3 384&nbsp;Mo ||
+|  10 || 192 || 6000G ou 6144000M || 3T || 2 x Intel 6972P @ 2.4GHz, cache L3 de 384Mo ||
 |-
-|  36 || 112 || 2000G ou 2048000M || 11&nbsp;T || 2 x Intel 8570 @ 2.1&nbsp;GHz, cache L3 300&nbsp;Mo || 8 x Nvidia H100 SXM (mémoire de 80&nbsp;Go), connexion via NVLink
+|  36 || 112 || 2000G ou 2048000M || 11T || 2 x Intel 8570 @ 2.1GHz, cache L3 de 300Mo || 8 x Nvidia H100 SXM (80Go), connexion via NVLink
 |-
-|   6 ||  96 || 495G ou 507000M || 3&nbsp;T || 4 x AMD MI300A @ 2.1&nbsp;GHz (Zen4+CDNA3) ||  Les cœurs CPU et les GPU de l'architecture CDNA3 sont dans le même socket et partagent la même mémoire à ultra-haute performance.
+|   6 ||  96 || 495G ou 507000M || 3T || 4 x AMD MI300A @ 2.1GHz (Zen4+CDNA3) || Les cœurs CPU et les GPU de l'architecture CDNA3 sont dans le même socket et partagent la même mémoire unifiée.
 |}
+== Instances GPU ==
+'''Noms des instances GPU disponibles'''
+{| class="wikitable"
+! colspan="2" | modèle ou instance !! nom court !! sans l'unité  !! par mémoire!! nom long
+|-
+| <b>GPU</b>
+|| <b>H100-80gb</b>
+|| <code>h100</code>
+|| <code>h100</code>
+|| <code>h100_80gb</code>
+|| <code>nvidia_h100_80gb_hbm3</code>
+|-
+| rowspan="3" | <b>MIG</b>
+|| <b>H100-1g.10gb</b>
+|| <code>h100_1g.10gb</code>
+|| <code>h100_1.10</code>
+|| <code>h100_10gb</code>
+|| <code>nvidia_h100_80gb_hbm3_1g.10gb</code>
+|-
+| <b>H100-2g.20gb</b>
+|| <code>h100_2g.20gb</code>
+|| <code>h100_2.20</code>
+|| <code>h100_20gb</code>
+|| <code>nvidia_h100_80gb_hbm3_2g.20gb</code>
+|-
+| <b>H100-3g.40gb</b>
+|| <code>h100_3g.40gb</code>
+|| <code>h100_3.40</code>
+|| <code>h100_40gb</code>
+|| <code>nvidia_h100_80gb_hbm3_3g.40gb</code>
+|}
+
+Pour demander un ou plusieurs GPU H100 complets, utilisez une des options Slurm suivantes&nbsp;:
+
+* <b>un H100-80gb</b> : <code>--gpus=h100:1</code> ou <code>--gpus=h100_80gb:1</code>
+* <b>plusieurs H100-80gb</b> par nœud  :
+** <code>--gpus-per-node=h100:2</code>
+** <code>--gpus-per-node=h100:3</code>
+** <code>--gpus-per-node=h100:4</code>
+* <b>plusieurs GPU H100 complets</b> distribués arbitrairement : <code>--gpus=h100:n</code> (remplacer n par le nombre de GPUs que vous voulez)
+
+Environ la moitié des nœuds GPU utilisent [[Multi-Instance_GPU/fr|la technologie MIG]]. Trois tailles d'instances sont disponibles&nbsp;:
+
+* <b>H100-1g.10gb</b>: 1/8<sup>e</sup> de la puissance de calcul, mémoire GPU de 10Go
+* <b>H100-2g.20gb</b>: 2/8<sup>e</sup> de la puissance de calcul, mémoire GPU de 20Go
+* <b>H100-3g.40gb</b>: 3/8<sup>e</sup> de la puissance de calcul, mémoire GPU de 40Go
+Pour demander <b>une et une seule instance GPU</b> pour une tâche de calcul, utilsez l'option correspondante.
+
+* <b>H100-1g.10gb</b> : <code>--gpus=h100_1g.10gb:1</code>
+* <b>H100-2g.20gb</b> : <code>--gpus=h100_2g.20gb:1</code>
+* <b>H100-3g.40gb</b> : <code>--gpus=h100_3g.40gb:1</code>
+Pour le nombre maximum de cœurs CPU et le maximum de mémoire recommandés par instance GPU, voir [[Allocations_and_compute_scheduling/fr#Ratios_dans_les_bundles|Ratios dans les  bundles]].
 
 =Particularités=
 ==Accès à l'internet==

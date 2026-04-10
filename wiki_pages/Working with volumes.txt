@@ -2,7 +2,7 @@
 <translate>
 
 <!--T:1-->
-A volume provides storage which is not destroyed when a VM is terminated. On our clouds, volumes use [https://en.wikipedia.org/wiki/Ceph_(software) Ceph] storage with either a 3-fold replication factor or [https://en.wikipedia.org/wiki/Erasure_code erasure codes] to provide safety against hardware failure. On [[Cloud_resources|Arbutus]], the <i>Default</i> volume type uses erasure codes to provide data safety while reducing the extra storage costs of 3-fold replication while the <i>OS or Database</i> volume type still uses the 3-fold replication factor. More documentation about OpenStack volumes can be found [https://docs.openstack.org/cinder/latest/cli/cli-manage-volumes.html here].
+A volume provides storage which is not destroyed when a VM is terminated. On our clouds, volumes use [https://en.wikipedia.org/wiki/Ceph_(software) Ceph] storage with either a 3-fold replication factor or [https://en.wikipedia.org/wiki/Erasure_code erasure codes] to provide safety against hardware failure. On [[Cloud_resources|Arbutus]], the <i>rbd1</i> volume type is stored on spinning disk hard drives and uses erasure codes to provide data safety while reducing the extra storage costs of 3-fold replication. The <i>high_performance</i> volume type is stored on solid state NVMe drives and uses the less storage efficient but higher performance 3-fold replication factor. More documentation about OpenStack volumes can be found [https://docs.openstack.org/cinder/latest/cli/cli-manage-volumes.html here].
 
 =Creating a volume= <!--T:2-->
 
@@ -23,7 +23,8 @@ To create a volume click on [[File:Create-Volume-Button.png]] and fill in the fo
 <!--T:6-->
 Finally, click on the blue <i>Create Volume</i> button at the bottom.
 
-=Mounting a volume on a VM= <!--T:7-->
+<!--T:7-->
+=Mounting a volume on a VM=
 ==Attaching a volume==
 [[File:Manage_attachments_EN.png|400px|thumb| Managing attachments command in the Actions menu (Click for larger image)]]
 * <b>Attaching</b> is the process of associating a volume with a VM. This is analogous to inserting a USB key or plugging an external drive into your personal computer.
@@ -39,7 +40,8 @@ Attaching should complete in a few seconds. Then the volumes page will show the 
 * Before a newly created and attached volume can be used, it must be formatted.
 * See instructions for doing this on a [[Using a new empty volume on a Linux VM|Linux]] or [[Using a new empty volume on a Windows VM|Windows]] VM.
 
-==Mounting a volume== <!--T:23-->
+<!--T:23-->
+==Mounting a volume==
 * '''Mounting''' is the process of mapping the volume's directory and file structure logically within the VM's directory and file structure.
 * To mount the volume, use a command similar to <code>[name@server ~]$ sudo mount /dev/vdb1 /mnt</code> depending on the device name, disk layout, and the desired mount point in your filesystem.
 This command makes the volume's directory and file structure available under the VM's /mnt directory. However, when the virtual machine reboots, the volume will need to be re-mounted using the same <code>mount</code> command.
@@ -63,7 +65,8 @@ Where 'anananan-anan-anana-anan-ananananana' is substituted with UUID of the dev
 <!--T:29-->
 For more details about how to edit this file see this [https://help.ubuntu.com/community/Fstab Ubuntu community help page].
 
-=Booting from a volume= <!--T:8-->
+<!--T:8-->
+=Booting from a volume=
 If you want to run a persistent machine, it is safest to boot from a volume. When you boot a VM from an image rather than a volume, the VM is stored on the local disk of the actual machine running the VM. If something goes wrong with that machine or its disk, the VM may be lost. Volume storage has redundancy, which protects the VM from hardware failure. Typically when booting from a volume VM flavors starting with the letter p are used (see [[Virtual machine flavors]]).
 
 <!--T:9-->
@@ -78,7 +81,8 @@ If you have not done this before, then the first one is your only option. The ot
 <!--T:11-->
 If creating a volume as part of the process of launching the VM, select <i>Boot from image (creates a new volume)</i>, select the image to use, and the size of the volume. If this volume is something you would like to remain longer than the VM, ensure that the <i>Delete on Terminate</i> box is not checked. If you are unsure about this option, it is better to leave this box unchecked. You can manually delete the volume later.
 
-=Creating an image from a volume= <!--T:12-->
+<!--T:12-->
+=Creating an image from a volume=
 [[File:Upload_volume_from_image_EN.png|400px|thumb| Upload to Image form (Click for larger image)]]<!--Note to translator: there is a FR version of this screen shot at [[File:Os-upload-volume-to-image-fr.png]]-->
 Creating an image from a volume allows you to download the image. Do this if you want to save it as a backup, or to spin up a VM on a different cloud, e.g., with [https://www.virtualbox.org/ VirtualBox]. If you want to copy a volume to a new volume within the same cloud see [[#Cloning a Volume|cloning a volume]] instead. 
 
@@ -88,14 +92,16 @@ To create an image of a volume, it must first be detached from a VM. If it is a 
 <!--T:22-->
 Large images (more than 10-20GB) may be very slow to create, upload, and otherwise manage. You may want to consider [[Backing_up_your_VM#An_example_backup_strategy | separating data]] if possible.
 
-==Using the dashboard== <!--T:13-->
+<!--T:13-->
+==Using the dashboard==
 # Click on the <i>Volumes</i> left-hand menu.
 # Under the volume you wish to create an image of click on the drop-down <i>Actions</i> menu and select <i>Upload to Image</i>.
 # Choose a name for your new image.
 # Choose a disk format. QCOW2 is recommended for using within the OpenStack cloud as it is relatively compact compared to <i>Raw</i> and works well with OpenStack. If you wish to use the image with Virtualbox, the <i>vmdk</i> or <i>vdi</i> image formats might be better suited.
 # Finally, click on <i>Upload</i>.
 
-==Using the command line client== <!--T:14-->
+<!--T:14-->
+==Using the command line client==
 The [[OpenStack command line clients|command line client]] can do this:
 {{Command|openstack image create --disk-format <format> --volume <volume_name> <image_name>}}
 where 
@@ -104,11 +110,13 @@ where
 * <image_name> is a name you choose for the image.
 You can then [[Working_with_images#Downloading_an_Image|download the image]]. 
 
-=Cloning a volume= <!--T:15-->
+<!--T:15-->
+=Cloning a volume=
 Cloning is the recommended method for copying volumes. While it is possible to make an image of an existing volume and use it to create a new volume, cloning is much faster and requires less movement of data behind the scenes. This method is handy if you have a persistent VM and you want to test out something before doing it on your production site. It is highly recommended to shut down your VM before creating a clone of the volume as the newly created volume may be left in an inconsistent state if there was writing to the source volume during the time the clone was created. To create a clone you must use the [[OpenStack command line clients|command line client]] with this command
 {{Command|openstack volume create --source <source-volume-id> --size <size-of-new-volume> <name-of-new-volume>}}
 
-=Detaching a volume= <!--T:16-->
+<!--T:16-->
+=Detaching a volume=
 Before detaching a volume, it is important to make sure that the operating system and other programs running on your VM are not accessing files on this volume. If so, the detached volume can be left in a corrupted state or the programs could show unexpected behaviours. To avoid this, you can either shut down the VM before you detach the volume or [[Using_a_new_empty_volume_on_a_Linux_VM#Unmounting_a_volume_or_device|unmount the volume]].
 
 <!--T:17-->

@@ -17,53 +17,103 @@ To use a vGPU within a VM, the instance needs to be deployed on one of the flavo
 == Preparation of a VM == 
 
 Once the VM is available, make sure to update the OS to the latest available software, including the kernel.
-Then, reboot the VM to have the latest kernel running.
 
-To have the nvidia driver available in updated kernel, it is recommended to install [https://en.wikipedia.org/wiki/Dynamic_Kernel_Module_Support DKMS package], which is available via default repositories for all major distributions.
+'''Reboot the VM to have the latest kernel running.'''
 
-AlmaLinux 9 has by default a faulty <code>nouveau</code> driver which crashes the kernel as soon as the <code>nvidia</code> driver is mounted. 
-The VM needs a few extra steps to prevent the loading of the nouveau driver when the system boots.
+It is recommended to install [https://en.wikipedia.org/wiki/Dynamic_Kernel_Module_Support DKMS package], which is available via default repositories for all major distributions.
+If the dkms package doesn't install the kernel-header package automatically, it needs to be installed manually via the package manager of your distribution.
+
+Download the 2 files listed below to your system.
+
+1. '''NVIDIA-Linux-x86_64-580.105.08-grid.run'''
+
+2. '''kalpa-prod.tok'''
+
 
 <pre>
-[root@almalinux9]# echo -e "blacklist nouveau\noptions nouveau modeset=0" >/etc/modprobe.d/blacklist-nouveau.conf
-[root@almalinux9]# dracut -fv --omit-drivers nouveau
-[root@almalinux9]# dnf -y update && dnf -y install epel-release && reboot
+wget https://object-arbutus.alliancecan.ca/swift/v1/6c87c15eb7d2468daf3d2bd0c58bbfce/vgpu/NVIDIA-Linux-x86_64-580.105.08-grid.run
+wget https://object-arbutus.alliancecan.ca/swift/v1/6c87c15eb7d2468daf3d2bd0c58bbfce/vgpu/kalpa-prod.tok
 </pre>
 
-After the reboot of the VM, the Arbutus vGPU Cloud repository needs to be installed. 
+Install the Nvidia vGPU driver with
 
 <pre>
-[root@almalinux9]# dnf install http://repo.arbutus.cloud.computecanada.ca/pulp/repos/alma9/Packages/a/arbutus-cloud-vgpu-repo-1.0-1.el9.noarch.rpm</pre>
-
-The next step is to install the vGPU packages to install the required driver.
-
-<pre>
-[root@almalinux9]# dnf -y install nvidia-vgpu-gridd.x86_64 nvidia-vgpu-tools.x86_64 nvidia-vgpu-kmod.x86_64
+root@vgpudoc:/home/debian# chmod 755 NVIDIA-Linux-x86_64-580.105.08-grid.run && ./NVIDIA-Linux-x86_64-580.105.08-grid.run
 </pre>
 
-After a successful  installation, <code>nvidia-smi</code> can be used to verify the proper functionality.
+
+Options ''NVIDIA Proprietary'' and ''DKMS'', are recommended.
+
+After a successful  installation, reboot the system and verify via <code>nvidia-smi</code> that the OS has now proper access to the vGPU.
 
 <pre>
-[root@almalinux9]# nvidia-smi 
-Tue Apr 23 16:37:31 2024       
+root@vgpudoc:/home/debian# nvidia-smi 
+Thu Apr  2 19:06:00 2026       
 +-----------------------------------------------------------------------------------------+
-| NVIDIA-SMI 550.54.15              Driver Version: 550.54.15      CUDA Version: 12.4     |
-|-----------------------------------------+------------------------+----------------------+
+| NVIDIA-SMI 580.105.08             Driver Version: 580.105.08     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
 | GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
 | Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
 |                                         |                        |               MIG M. |
 |=========================================+========================+======================|
-|   0  GRID V100D-8C                  On  |   00000000:00:06.0 Off |                    0 |
-| N/A   N/A    P0             N/A /  N/A  |       0MiB /   8192MiB |      0%      Default |
-|                                         |                        |                  N/A |
+|   0  NVIDIA H100L-1-12C             On  |   00000000:00:06.0 Off |                   On |
+| N/A   N/A    P0            N/A  /  N/A  |       1MiB /  12288MiB |     N/A      Default |
+|                                         |                        |              Enabled |
 +-----------------------------------------+------------------------+----------------------+
-                                                                                         
+
++-----------------------------------------------------------------------------------------+
+| MIG devices:                                                                            |
++------------------+----------------------------------+-----------+-----------------------+
+| GPU  GI  CI  MIG |              Shared Memory-Usage |        Vol|        Shared         |
+|      ID  ID  Dev |                Shared BAR1-Usage | SM     Unc| CE ENC  DEC  OFA  JPG |
+|                  |                                  |        ECC|                       |
+|==================+==================================+===========+=======================|
+|  0    0   0   0  |               1MiB / 10565MiB    | 16      0 |  1   0    1    0    1 |
+|                  |               0MiB /  4096MiB    |           |                       |
++------------------+----------------------------------+-----------+-----------------------+
+
 +-----------------------------------------------------------------------------------------+
 | Processes:                                                                              |
-|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
 |        ID   ID                                                               Usage      |
 |=========================================================================================|
 |  No running processes found                                                             |
 +-----------------------------------------------------------------------------------------+
 </pre>
+
+The vGPU is now accessible and needs to be licensed. Copy the token ''kalpa-prod.tok'' to ''/etc/nvidia/ClientConfigToken/''.
+
+Configure nvidia-gridd, via the command below.
+
+'''echo "FeatureType=4" >/etc/nvidia/gridd.conf'''
+
+Enable nvidia-gridd and verify it's status.
+<pre>
+systemctl enable --now nvidia-gridd
+
+
+nvidia-gridd.service - NVIDIA Grid Daemon
+     Loaded: loaded (/usr/lib/systemd/system/nvidia-gridd.service; enabled; preset: enabled)
+     Active: active (running) since Thu 2026-04-02 19:11:13 UTC; 19s ago
+ Invocation: 11dbb0370aee4ceeb1603481991037ec
+    Process: 836 ExecStart=/usr/bin/nvidia-gridd (code=exited, status=0/SUCCESS)
+   Main PID: 837 (nvidia-gridd)
+      Tasks: 4 (limit: 42042)
+     Memory: 2M (peak: 2.7M)
+        CPU: 307ms
+     CGroup: /system.slice/nvidia-gridd.service
+             ââ837 /usr/bin/nvidia-gridd
+
+Apr 02 19:11:13 vgpudoc systemd[1]: Starting nvidia-gridd.service - NVIDIA Grid Daemon...
+Apr 02 19:11:13 vgpudoc nvidia-gridd[837]: Started (837)
+Apr 02 19:11:13 vgpudoc systemd[1]: Started nvidia-gridd.service - NVIDIA Grid Daemon.
+Apr 02 19:11:13 vgpudoc nvidia-gridd[837]: vGPU Software package (0)
+Apr 02 19:11:13 vgpudoc nvidia-gridd[837]: Ignore service provider and node-locked licensing
+Apr 02 19:11:13 vgpudoc nvidia-gridd[837]: NLS initialized
+Apr 02 19:11:14 vgpudoc nvidia-gridd[837]: Acquiring license. (Info: api.cls.licensing.nvidia.com; NVIDIA Virtual Compute Server)
+Apr 02 19:11:16 vgpudoc nvidia-gridd[837]: License acquired successfully. (Info: api.cls.licensing.nvidia.com, NVIDIA Virtual Compute Server; Expiry: 2026-4-3 19:11:16 GMT)
+</pre>
+
+Once gridd has received a valid license, all features of the vGPU can be used. The licenses renewal is handled via nvidia-gridd automatically.
+
 [[Category:Cloud]]

@@ -16,8 +16,9 @@ Nous offrons deux protocoles différents pour accéder à Object Store dans Open
 
 Ces protocoles se ressemblent beaucoup et sont interchangeables dans la plupart des cas. Il n’est pas nécessaire de vous en tenir toujours au même protocole puisque les conteneurs ou compartiments (<i>buckets</i>) et les objets sont accessibles par les protocoles Swift et S3. Certaines différences existent toutefois dans le contexte du stockage objet sur Arbutus.
 
-Swift est le protocole par défaut et est le plus simple à utiliser; vous n’avez pas à gérer les identifiants puisque l’accès se fait avec votre compte Arbutus. Par contre, Swift n’offre pas toutes les fonctionnalités de S3. Le principal cas d'usage est que vous devez utiliser S3 pour gérer vos conteneurs avec des politiques d'accès parce que Swift ne prend pas en charge ces politiques. De plus, S3 vous permet de créer et de gérer vos propres clés, ce qui peut être nécessaire si par exemple vous voulez créer un compte en lecture seule pour une application en particulier. Consultez la [https://docs.openstack.org/swift/latest/s3_compat.html the OpenStack S3/Swift liste des compatibilités].
+Swift est le protocole par défaut et est le plus simple à utiliser; vous n’avez pas à gérer les identifiants puisque l’accès se fait avec votre compte Arbutus. Par contre, Swift n’offre pas toutes les fonctionnalités de S3. Le principal cas d'usage est que vous devez utiliser S3 pour gérer vos conteneurs avec des politiques d'accès parce que Swift ne prend pas en charge ces politiques. De plus, S3 vous permet de créer et de gérer vos propres clés, ce qui peut être nécessaire si par exemple vous voulez créer un compte en lecture seule pour une application en particulier. Consultez la [https://docs.openstack.org/swift/latest/s3_compat.html liste des compatibilités dans S3/Swift REST API Comparison Matrix].
 
+<span id="Establishing_access_to_your_Arbutus_Object_Store"></span>
 ==Accès et gestion du Object Store==
 
 Pour gérer le Object Store vous avez besoin de votre propre identifiant ainsi que de la clé secrète pour accéder au stockage.  Générez-les avec le  votre ID d'accès S3 et la clé secrète pour le protocole avec le [https://docs.alliancecan.ca/wiki/OpenStack_command_line_clients/fr client de ligne de commande OpenStack].
@@ -30,8 +31,9 @@ Les politiques d'accès ne peuvent pas se faire via un navigateur web, mais par 
 # [[Arbutus_object_storage_clients/fr|via un client compatible avec S3]] (par exemple s3cmd);
 # [[Globus/fr#Stockage_objet_sur_Arbutus|via Globus]];
 # via un point HTTPS dans un navigateur, pourvu que vos politiques soient configurés comme étant publiques et non par défaut.
-<code>https://object-arbutus.cloud.computecanada.ca:443/DATA_CONTAINER/FILENAME</code>
+<code>https://object-arbutus.alliancecan.ca/PROJECT_ID:DATA_CONTAINER/FILENAME</code>
 
+<span id="Managing_your_Arbutus_Object_Store"></span>
 == Gestion du stockage objet sur Arbutus ==
 
 La manière recommandée de gérer les conteneurs et les objets dans le <b>Stockage d'Objet</b> d'Arbutus est d'utiliser l'outil <code>s3cmd</code>, qui est disponible sous Linux.
@@ -49,18 +51,16 @@ En utilisant le tableau de bord, nous pouvons créer de nouveaux conteneurs de d
 Si vous créez un nouveau conteneur <b>public</b>, n'importe qui sur internet peut lire son contenu en naviguant simplement à l'adresse suivante 
 
 <code>
-<nowiki>https://object-arbutus.cloud.computecanada.ca/<NOM DE VOTRE CONTENEUR>/<NOM DE VOTRE OBJET></nowiki>
+<nowiki>https://object-arbutus.alliancecan.ca/<OPENSTACK PROJECT ID>:<NOM DE VOTRE CONTENEUR>/<NOM DE VOTRE OBJET></nowiki>
 </code>
 
-avec vos noms de conteneurs et d'objets insérés à la place.
-
-{{quote|Il est important de garder à l'esprit que chaque conteneur de données dans le [https://arbutus.cloud.computecanada.ca/project/containers Stockage d'Objet] d'Arbutus doit avoir un <b>nom unique vis-à-vis des autres utilisateurs</b>. Pour garantir cette singularité, nous pourrions vouloir préfixer nos noms de conteneurs de données avec le nom de notre projet afin d'éviter les conflits avec d'autres utilisateurs. Une règle utile à la louche est d'éviter d'utiliser des noms génériques comme <code>test</code> pour les conteneurs de données. Il est préférable d'utiliser des noms plus spécifiques et uniques comme <code>def-myname-test</code>.}}
+avec vos noms de conteneurs et d'objets insérés au bon endroit.
 
 Pour rendre un conteneur de données accessible au public, nous pouvons modifier sa politique pour autoriser l'accès public. Cela peut s'avérer pratique si nous avons à partager des fichiers avec une audience élargie. Nous pouvons gérer les politiques de conteneur avec des fichiers JSON, nous permettant de spécifier divers contrôles d'accès pour nos conteneurs et objets.
 
 === Gestion des politiques de conteneurs de données (bucket) pour le stockage objet sur Arbutus ===
 <br/>
-{{Warning|title=Attention|content=Faites attention aux politiques, car une politique mal conçue peut vous empêcher d'accéder à votre conteneur de données.}}
+{{Warning|title=Attention|content=Faites bien attention aux politiques, car une politique mal conçue peut vous empêcher d'accéder à votre conteneur de données.}}
 
 Présentement, le [https://arbutus.cloud.computecanada.ca/project/containers Stockage d'Objet] d'Arbutus implémente seulement un sous-ensemble de la spécification AWS pour les [https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-iam-policies.html politiques de conteneurs de données]. L'exemple suivant montre comment créer, appliquer et visualiser une politique. La première étape consiste à créer un fichier JSON de politique.
 
@@ -99,59 +99,80 @@ Pour voir la politique, vous pouvez utiliser la commande suivante
 
 <code>s3cmd info s3://testbucket</code>
 
+<span id="Policy_subset"></span>
 === Sous-ensemble ===
 
 En date de septembre 2023, nous supportons les actions suivantes&nbsp;:
 
-* s3:AbortMultipartUpload
-* s3:CreateBucket
-* s3:DeleteBucketPolicy
-* s3:DeleteBucket
-* s3:DeleteBucketWebsite
+* s3:GetObject
+* s3:GetObjectVersion
+* s3:PutObject
+* s3:GetObjectAcl
+* s3:GetObjectVersionAcl
+* s3:PutObjectAcl
+* s3:PutObjectVersionAcl
 * s3:DeleteObject
 * s3:DeleteObjectVersion
-* s3:DeleteReplicationConfiguration
-* s3:GetAccelerateConfiguration
-* s3:GetBucketAcl
-* s3:GetBucketCORS
-* s3:GetBucketLocation
-* s3:GetBucketLogging
-* s3:GetBucketNotification
-* s3:GetBucketPolicy
-* s3:GetBucketRequestPayment
-* s3:GetBucketTagging
-* s3:GetBucketVersioning
-* s3:GetBucketWebsite
-* s3:GetLifecycleConfiguration
-* s3:GetObjectAcl
-* s3:GetObject
+* s3:ListMultipartUploadParts
+* s3:AbortMultipartUpload
 * s3:GetObjectTorrent
-* s3:GetObjectVersionAcl
-* s3:GetObjectVersion
 * s3:GetObjectVersionTorrent
-* s3:GetReplicationConfiguration
-* s3:IPAddress
-* s3:NotIpAddress
-* s3:ListAllMyBuckets
-* s3:ListBucketMultipartUploads
+* s3:RestoreObject
+* s3:CreateBucket
+* s3:DeleteBucket
 * s3:ListBucket
 * s3:ListBucketVersions
-* s3:ListMultipartUploadParts
+* s3:ListAllMyBuckets
+* s3:ListBucketMultipartUploads
+* s3:GetAccelerateConfiguration
 * s3:PutAccelerateConfiguration
+* s3:GetBucketAcl
 * s3:PutBucketAcl
+* s3:GetBucketCORS
 * s3:PutBucketCORS
-* s3:PutBucketLogging
-* s3:PutBucketNotification
-* s3:PutBucketPolicy
-* s3:PutBucketRequestPayment
-* s3:PutBucketTagging
+* s3:GetBucketVersioning
 * s3:PutBucketVersioning
+* s3:GetBucketRequestPayment
+* s3:PutBucketRequestPayment
+* s3:GetBucketLocation
+* s3:GetBucketPolicy
+* s3:DeleteBucketPolicy
+* s3:PutBucketPolicy
+* s3:GetBucketNotification
+* s3:PutBucketNotification
+* s3:GetBucketLogging
+* s3:PutBucketLogging
+* s3:GetBucketTagging
+* s3:PutBucketTagging
+* s3:GetBucketWebsite
 * s3:PutBucketWebsite
+* s3:DeleteBucketWebsite
+* s3:GetLifecycleConfiguration
 * s3:PutLifecycleConfiguration
-* s3:PutObjectAcl
-* s3:PutObject
-* s3:PutObjectVersionAcl
 * s3:PutReplicationConfiguration
-* s3:RestoreObject
+* s3:GetReplicationConfiguration
+* s3:DeleteReplicationConfiguration
+* s3:GetObjectTagging
+* s3:PutObjectTagging
+* s3:DeleteObjectTagging
+* s3:GetObjectVersionTagging
+* s3:PutObjectVersionTagging
+* s3:DeleteObjectVersionTagging
+* s3:PutBucketObjectLockConfiguration
+* s3:GetBucketObjectLockConfiguration
+* s3:PutObjectRetention
+* s3:GetObjectRetention
+* s3:PutObjectLegalHold
+* s3:GetObjectLegalHold
+* s3:BypassGovernanceRetention
+* s3:GetBucketPolicyStatus
+* s3:PutPublicAccessBlock
+* s3:GetPublicAccessBlock
+* s3:DeletePublicAccessBlock
+* s3:GetBucketPublicAccessBlock
+* s3:PutBucketPublicAccessBlock
+* s3:DeleteBucketPublicAccessBlock
+* s3:GetBucketEncryption
+* s3:PutBucketEncryption
 
 [[Category:Cloud]]

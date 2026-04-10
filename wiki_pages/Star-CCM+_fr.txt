@@ -42,6 +42,7 @@ Quand vous soumettez des tâches sur une grappe pour la première fois, vous dev
 |contents=
 #!/bin/bash
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify some account
 #SBATCH --time=00-01:00       # Time limit: dd-hh:mm
 #SBATCH --nodes=1             # Specify 1 or more nodes
@@ -50,6 +51,7 @@ Quand vous soumettez des tâches sur une grappe pour la première fois, vous dev
 #SBATCH --ntasks-per-node=1   # Do not change this value
 #SBATCH --constraint=granite  # Use intel compute nodes (no gpu)
 #SBATCH --switches=1          # Use 1 network switch (optional)
+</div>
 
 module load StdEnv/2023
 
@@ -71,15 +73,20 @@ mkdir -p "$STARCCM_TMP"
 
 slurm_hl2hl.py --format STAR-CCM+ > machinefile-$SLURM_JOB_ID
 
+# Redirect from ~/.star-VERSION# to $SLURM_TMPDIR
+export STARCCM_TMP="$SLURM_TMPDIR"
+
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
 NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
 
 NCORE=$((SLURM_NTASKS * SLURM_CPUS_PER_TASK))
 
+<div class="mw-translate-fuzzy">
 export FLEXIBLAS=StarMKL
 echo "FLEXIBLAS=$FLEXIBLAS"
 STAR_MPI="-mpi intel"
 STAR_FABRIC="-fabric tcp"
+</div>
 
 <div class="mw-translate-fuzzy">
 if [ -n "$LM_PROJECT" ]; then
@@ -100,6 +107,7 @@ fi
 #!/bin/bash
 </div>
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify some account
 #SBATCH --time=00-01:00       # Time limit: dd-hh:mm
 #SBATCH --nodes=1             # Specify 1 or more nodes
@@ -107,6 +115,7 @@ fi
 #SBATCH --mem=64G             # Specify memory per node (0 max)
 #SBATCH --ntasks-per-node=1   # Do not change this value
 ##SBATCH --constraint=genoa   # Uncomment on rorqual (optional)
+</div>
 
 module load StdEnv/2023
 
@@ -127,6 +136,9 @@ LM_PROJECT='my22digitpodkey'  # Specify your Siemens Power on Demand (PoD) Key
 </div>
 
 # ------- no changes required below this line --------
+
+# Redirect from ~/.star-VERSION# to $SLURM_TMPDIR
+export STARCCM_TMP="$SLURM_TMPDIR"
 
 slurm_hl2hl.py --format STAR-CCM+ > $SLURM_TMPDIR/machinefile
 NCORE=$((SLURM_NNODES * SLURM_CPUS_PER_TASK * SLURM_NTASKS_PER_NODE))
@@ -169,12 +181,23 @@ fi
 #!/bin/bash
 </div>
 
+<div class="mw-translate-fuzzy">
 #SBATCH --account=def-group   # Specify some account
 #SBATCH --time=00-01:00       # Time limit: dd-hh:mm
 #SBATCH --nodes=1             # Specify 1 or more nodes
 #SBATCH --cpus-per-task=192   # Specify cores per node (192 max)
 #SBATCH --mem=0               # Specify memory per node (0 max)
 #SBATCH --ntasks-per-node=1   # Do not change this value
+</div>
+
+}}
+</tab>
+<tab name="Niagara" >
+{{File
+|name=starccm_job.sh
+|lang="bash"
+|contents=
+#!/bin/bash
 
 module load StdEnv/2023
 
@@ -202,6 +225,9 @@ LICSERVER=flex.cd-adapco.com     # Specify license server hostname
 
 # ------- no changes required below this line --------
 
+# Redirect from ~/.star-VERSION# to $SLURM_TMPDIR
+export STARCCM_TMP="$SLURM_TMPDIR"
+
 export CDLMD_LICENSE_FILE="$FLEXPORT@127.0.0.1"
 ssh tri-gw -L $FLEXPORT:$LICSERVER:$FLEXPORT -L $VENDPORT:$LICSERVER:$VENDPORT -N -f
 
@@ -222,7 +248,7 @@ i=1
 RET=-1
 while [ $i -le 5 ] && [ $RET -ne 0 ]; do
         [ $i -eq 1 ] {{!}}{{!}} sleep 5
-          echo "Attempt number: "$I
+          echo "Attempt number: "$i
           if [ -n "$LM_PROJECT" ]; then
           echo "Siemens PoD license server ..."
           starccm+ -jvmargs "-Xmx4G -Djava.io.tmpdir=$SLURM_TMPDIR" -batch $BATCH_CMD -power -podkey $LM_PROJECT -np $NCORE -nbuserdir $SLURM_TMPDIR -machinefile $SLURM_TMPDIR/machinefile $SIM_FILE $STAR_MPI $STAR_UCX
