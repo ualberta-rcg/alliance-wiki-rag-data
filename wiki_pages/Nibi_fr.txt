@@ -46,6 +46,7 @@ Pour améliorer la performance des tâches multi-nœuds fortement couplées, vou
 
  #SBATCH --switches=1
 
+<div class="mw-translate-fuzzy">
 = Caractéristiques des nœuds =
 {| class="wikitable sortable"
 ! nœuds !! cœurs !! mémoire disponible !! stockage local au nœud || CPU !! GPU
@@ -89,6 +90,7 @@ Pour améliorer la performance des tâches multi-nœuds fortement couplées, vou
 || <code>h100_40gb</code>
 || <code>nvidia_h100_80gb_hbm3_3g.40gb</code>
 |}
+</div>
 
 Pour demander un ou plusieurs GPU H100 complets, utilisez une des options Slurm suivantes&nbsp;:
 
@@ -165,6 +167,45 @@ JupyterLab s'ouvre dans le navigateur sur le bureau et le contenu de votre espac
 
 ==Prise en charge de VDI via OOD==
 Nibi n'offre plus d'infrastructure de bureau virtuel (VDI), mais fournit un environnement de bureau à distance via le [https://ondemand.sharcnet.ca/ portail Open OnDemand (OOD)] avec des performances matérielles et une prise en charge logicielle améliorées.
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+==AMD MI300A nodes==
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+These should be currently scheduled as full nodes.  It is the user's responsibility to make sure the processes inside the job run with correct core and memory binding.  Here is a representative job script that uses 4 processes.
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+{{File
+  |name=simple_job.sh
+  |lang="sh"
+  |contents=
+#!/bin/bash
+#SBATCH --account=def-someuser
+#SBATCH --nodes=1
+#SBATCH --ntasks=4
+#SBATCH --cpus-per-task=24
+#SBATCH --gpus=mi300a:4
+#SBATCH --mem=100g
+#SBATCH --time=00:02:00
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+# verify GPUS are available (optional)
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+rocm-smi
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+# run program compiled with ROCm support for MI300A
+</div>
+
+<div lang="en" dir="ltr" class="mw-content-ltr">
+}}
+</div>
 
 ==Récupérer des fichiers supprimés==
 Nibi dispose d'un système de sauvegarde qui crée un instantané de vos fichiers dans /home et /project toutes les 30 minutes; ces instantanés sont sauvegardés pour une période de deux semaines. Si vous supprimez accidentellement un fichier, vous pourrez peut-être le récupérer à partir de ces instantanés, à condition qu'il ait été supprimé il y a moins de deux semaines. Cependant, si vous modifiez un fichier après la dernière sauvegarde, pour ensuite le supprimer, il ne pourra pas être récupéré.
