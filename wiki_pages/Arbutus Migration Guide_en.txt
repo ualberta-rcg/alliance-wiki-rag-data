@@ -1,6 +1,6 @@
 <languages />
 
-This document describes how to migrate virtual machine (VM) instances from the legacy Arbutus Cloud to the new Arbutus Cloud. Because you know your workload best, we recommend that you migrate your instances yourself, according to your own application requirements and schedule.   
+This document describes how to migrate virtual machine (VM) instances from the legacy (that is, old) Arbutus Cloud to the new Arbutus Cloud. Because you know your workload best, we recommend that you migrate your instances yourself, according to your own application requirements and schedule.   
 
 Migration is necessary for all cloud resources (e.g., instances, storage volumes, object storage containers, networks, keys, etc.) currently on the legacy Arbutus Cloud because it will be decommissioned in 2026. '''The deadline for both RAS and RAC projects to migrate to the new Arbutus Cloud is August 31, 2026.''' 
 
@@ -192,7 +192,7 @@ dnf install screen
 ## Create an empty volume of the same size on the new cloud and mark it as bootable if it's a boot volume.  
 ## Attach the above volume to the temporary instance on the new cloud.  
 ## Attach the volume you want to copy from the legacy cloud to the temporary legacy instance. Note: you may need to delete the instance it is currently attached to. Do NOT delete the volume. 
-# On the temporary legacy instance, execute the commands below. This assumes that the source volume on the legacy cloud is attached to the temporary legacy instance as /dev/vdb, the volume size is 96G, the SSH key being used to log into the temporary instance is key.pem, and the destination volume on Arbutus Cloud is attached to the temporary Arbutus Cloud instance as /dev/vdb. Also, replace ''xxx.xx.xx.xx'' by the actual IP address of the Arbutus instance you will be connecting to. The screen command is used in case you get disconnected from your SSH session.  
+# On the temporary legacy instance, execute the commands below. This assumes that the source volume on the legacy cloud is attached to the temporary legacy instance as /dev/vdb, the volume size is 96G, the SSH key being used to log into the temporary instance is key.pem, and the destination volume on Arbutus Cloud is attached to the temporary Arbutus Cloud instance as /dev/vdb. Also, replace ''xxx.xx.xx.xx'' by the actual IP address of the Arbutus instance you will be connecting to. The <code>screen</code> command is used in case you get disconnected from your SSH session.  
 <source>
 screen 		 
 sudo dd bs=16M if=/dev/vdb | pv -s 96G | ssh -i key.pem user@xxx.xx.xx.xx "sudo dd bs=16M of=/dev/vdb"
@@ -228,13 +228,13 @@ There are several steps that need to be taken in order to make this work. The si
 ## Install Globus Connect Personal on each instance, using the proper guide. The guide for Linux is [https://docs.globus.org/how-to/globus-connect-personal-linux/ https://docs.globus.org/how-to/globus-connect-personal-linux/].
 ## Adjust instances’ configuration to enable communication with the Globus Service:
 ### Ensure each VM has an external IP address.
-### Ensure firewall rules on your VMs permit communication on the [https://docs.globus.org/how-to/configure-firewall-gcp/ necessary ports].  See also [[Managing_your_cloud_resources_with_OpenStack#Security_Groups]].
+### Ensure firewall rules on your VMs permit communication on the [https://docs.globus.org/how-to/configure-firewall-gcp/ necessary ports].  See also [[Managing your cloud resources with OpenStack#Security_Groups|Security groups]].
 ### The user running Globus Connect Personal must have access to data on the instances’ storage systems.
 ## Run Globus Connect Personal as a background process in the user space.
 ## As a Globus Connect Personal Plus subscriber (enabled in step 1), create a shared endpoint on one or both VMs.
 # '''Using any Globus Interface (globus.org, globus.computecanada.ca) access both endpoints just created and transfer data:'''
 ## Read data transfer manual here [https://docs.globus.org/how-to/get-started/ https://docs.globus.org/how-to/get-started/].
-## Additional instructions here [https://docs.alliancecan.ca/wiki/Globus#Transfer_between_two_personal_endpoints https://docs.alliancecan.ca/wiki/Globus#Transfer_between_two_personal_endpoints].
+## Additional instructions here [[Globus#Transfer_between_two_personal_endpoints|Transfer between two personal endpoints]].
 
 For more on configuration details, see: [https://computecanada.github.io/DHSI-cloud-course/globus/ https://computecanada.github.io/DHSI-cloud-course/globus/]
 
@@ -254,11 +254,11 @@ A typical use case would be:
 
 Once your data is transferred to the new instance, there may be some post-transfer configurations required, for example: 
 
-# updating firewall rules to use any new IP addresses and networks if a host-based firewall (e.g. iptables, firewalld, etc.) is used;
-# working with your DNS provider to update DNS entries for any custom domains (e.g., www.myarbutusproject.ca); 
-# updating IP addresses in configuration files (e.g., /etc/hosts, /etc/resolv.conf, /etc/haproxy/haproxy.cfg, /var/www/ /var/lib/pgsql/data/pg_hba.conf);
-# altering usernames (e.g., 'root'@'192.168.65.%) in MySQL;
-# renewing Let’s Encrypt Transport Layer Security (TLS) certificates using certbot or other utilities if, for example, there are IP addresses in the certificate’s Subject Alternate Name (SAM).
+* updating firewall rules to use any new IP addresses and networks if a host-based firewall (e.g. iptables, firewalld, etc.) is used;
+* working with your DNS provider to update DNS entries for any custom domains (e.g., www.myarbutusproject.ca); 
+* updating IP addresses in configuration files (e.g., /etc/hosts, /etc/resolv.conf, /etc/haproxy/haproxy.cfg, /var/www/ /var/lib/pgsql/data/pg_hba.conf);
+* altering usernames (e.g., 'root'@'192.168.65.%) in MySQL;
+* renewing Let’s Encrypt Transport Layer Security (TLS) certificates using certbot or other utilities if, for example, there are IP addresses in the certificate’s Subject Alternate Name (SAM).
 
 Make sure you test the configuration before informing your research team and users that the migration has been completed.
 
@@ -280,7 +280,7 @@ Creating the equivalent share in the new Arbutus cloud follows a similar procedu
 # You must create a separate ceph.conf file, with a distinct name such as ''ceph-new.conf''.
 # The <code>mon_host</code> config value will need to be updated for the new share only, in the ''ceph-new.conf'' file:
 ## Legacy value: <code>“10.30.201.3:6789,10.30.202.3:6789,10.30.203.3:6789”</code>
-## New value: <code>“134.87.15.61:6789,134.87.15.62:6789,134.87.15.63:6789”</code>
+## New value: <code>“[v2:134.87.15.61:3300/0,v1:134.87.15.61:6789/0] [v2:134.87.15.62:3300/0,v1:134.87.15.62:6789/0] [v2:134.87.15.63:3300/0,v1:134.87.15.63:6789/0]”</code>
 # When mounting the new share, an extra value in the mount command is required after the <code>-o</code> to specify the new configuration file ''conf=/etc/ceph/ceph-new.conf''.
 
 Once both shares are mounted, use rsync to transfer the data. The a, v, and P flags for rsync are recommended. 
