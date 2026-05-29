@@ -6,36 +6,70 @@ __FORCETOC__
 <span id="Licensing"></span>
 = Licence =
 
-<span id="Using_your_license_file"></span>
-== Utiliser votre licence ==
+Abaqus software modules are available on the Alliance clusters, however you must provide your own license.  There are two types of license servers each with different setup procedures is shown next :
 
+<span id="FLEXnet_Servers"></span>
+<div class="mw-translate-fuzzy">
+== Utiliser votre licence ==
+</div>
+
+<div class="mw-translate-fuzzy">
 Des modules Abaqus sont disponibles sur nos grappes, mais vous devez posséder votre propre licence. Pour configurer votre compte sur les grappes que vous voulez utiliser, connectez-vous et créez sur chacune un fichier <code>$HOME/.licenses/abaqus.lic</code> qui contient la ligne ci-dessous. Remplacez ensuite <code>port@server</code> par le numéro du port flexlm et l'adresse IP (ou le nom complet du domaine) de votre serveur de licence Abaqus. Si vous voulez utiliser la version 6.14.1, remplacez ABAQUSLM_LICENSE_FILE par LM_LICENSE_FILE.
 {{File
 |name=abaqus.lic
 |contents=
 prepend_path("ABAQUSLM_LICENSE_FILE","port@server")
 }}
+</div>
 
+ [l2 (login node):~/.licenses] cat abaqus.lic
+ prepend_path("ABAQUSLM_LICENSE_FILE","LMGRD-PORT-NUMBER@FLEXnet-SERVER-HOSTNAME")
+
+rm -f testsp1* testsp2*
+/cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/unshare \
+   --fork --pid --mount-proc --user --map-user $USER \
+   abaqus job=testsp1 input=mystd-sim.inp \
+   scratch=$SLURM_TMPDIR cpus=$SLURM_CPUS_ON_NODE interactive \
+   mp_mode=threads memory="$((${SLURM_MEM_PER_NODE}-3072))MB" \
+#  gpus=$SLURM_GPUS_ON_NODE  # uncomment this line to use gpu
+}}
+
+<span id="DSLS_Servers"></span>
+<div class="mw-translate-fuzzy">
+== Serveurs FLEXnet et DSLS ==
+</div> 
+
+<div class="mw-translate-fuzzy">
+Comme c'était le cas avec les modules déjà installés, <code>abaqus/2026</code> est configuré pour fonctionner avec le serveur de licence Simulia <code>FLEXnet</code> par défaut, tout comme le serveur de licence gratuit de SHARCNET. Pour utiliser un serveur de licence <code>DSLS</code> de votre établissement, vous devez créer les fichiers texte <code>abaqus_v6.env</code> et <code>DSLicSrv.txt</code> dans le répertoire utilisé pour soumettre votre simulation (voir le code ci-dessous). Ils seront lus automatiquement au lancement d'Abaqus et la reconfiguration se fera en conséquence.
+</div>
+
+ [l2 (login node):~ ] cat abaqus_v6.env
+ license_server_type=DSLS
+ dsls_license_config="DSLicSrv.txt" 
+
+  [l2 (login node):~ ] cat DSLicSrv.txt
+  DSLS-SERVER-HOSTNAME:LICENSING-CLIENT-PORT-NUMBER
+
+<span id="New_Servers"></span>
+<div class="mw-translate-fuzzy">
 Si votre licence n'est pas configurée pour une grappe en particulier, les administrateurs de systèmes des deux parties devront effectuer certaines modifications. Ceci est nécessaire pour que les ports flexlm et TCP de votre serveur Abaqus puissent être rejoints par tous les nœuds de calcul quand vos tâches dans la queue seront exécutées. Pour que nous puissions vous assister dans cette tâche, écrivez au [[Technical support/fr|soutien technique]] en indiquant
 * le numéro du port flexlm
 * le numéro du port statique
 * l'adresse IP de votre serveur de licence Abaqus.
 En retour vous recevrez une liste d'adresses IP et votre administrateur de système pourra ouvrir les pare-feu de votre serveur local pour que la grappe puisse se connecter via les deux ports. Une entente spéciale doit habituellement être négociée et signée avec SIMULIA pour qu'une telle licence puisse être utilisée à distance avec notre matériel.
+</div>
 
-<span id="FLEXnet/DSLS_Servers"></span>
-== Serveurs FLEXnet et DSLS == 
+If your license server was never set up for use on an Alliance cluster, some additional configuration changes by the Alliance system   administrator and your local system administrator will need to be done.  Such changes are necessary to ensure the required TCP ports of your Abaqus server are reachable from all cluster compute nodes.  For help please write to [[Technical support|technical support]] and be sure to include the following three items:
+* flexlm port number & static vendor port number (FLEXnet server)
+* administrative port number & licensing client port number (DSLS server)
+* fully qualified domain name or IPV4 address of your new Abaqus server
+You will then be sent a list of cluster IP addresses (known as NAT nodes) so that your administrator can open the local server firewall to allow connections from the cluster on both ports. Please note that a special license agreement must generally be negotiated and signed by both SIMULIA and your institution before a campus license may be legally used on Alliance hardware located remotely at another institution.
 
-Comme c'était le cas avec les modules déjà installés, <code>abaqus/2026</code> est configuré pour fonctionner avec le serveur de licence Simulia <code>FLEXnet</code> par défaut, tout comme le serveur de licence gratuit de SHARCNET. Pour utiliser un serveur de licence <code>DSLS</code> de votre établissement, vous devez créer les fichiers texte <code>abaqus_v6.env</code> et <code>DSLicSrv.txt</code> dans le répertoire utilisé pour soumettre votre simulation (voir le code ci-dessous). Ils seront lus automatiquement au lancement d'Abaqus et la reconfiguration se fera en conséquence.
+<div class="mw-translate-fuzzy">
+= Compatibilité des versions =
+</div>
 
- [l2 (login node):~/mysimdir] cat abaqus_v6.env
- license_server_type=DSLS
- dsls_license_config="DSLicSrv.txt" 
-
- [l2 (login node):~/mysimdir] DSLicSrv.txt
- YOUR-SERVER-HOSTNAME:PORT-NUMBER
-
-<span id="Version_compatibility"></span>
-= Compatibilité des versions = 
+= Version compatibility = 
 
 <span id="Module_change"></span>
 == Nouveau module == 
@@ -714,10 +748,59 @@ L'exemple suivant illustre la situation où un utilisateur soumet successivement
     roberpj c107 /dev/tty (v62.6) (license3.sharcnet.ca/27050 1042), start Mon 11/25 17:15, 10 licenses
     roberpj c292 /dev/tty (v62.6) (license3.sharcnet.ca/27050 125) queued for 10 licenses
 
+<div class="mw-translate-fuzzy">
 Pour éviter les problèmes de pénurie de licences lors de la soumission de plusieurs tâches avec des jetons Abaqus coûteux, utilisez soit  [[Running_jobs/fr#Annulation_de_tâches_dont_les_conditions_de_dépendance_ne_sont_pas_satisfaites|une dépendance]], [[Job_arrays/fr|un vecteur]], soit au moins configurez [[Monitoring_jobs/fr#Notification_par_courriel|une notification par courriel Slurm]] pour savoir quand votre tâche est terminée avant d'en soumettre une autre manuellement.
+</div>
 
-=== Spécifier les ressources de la tâche ===
-Pour garantir une utilisation optimale de vos jetons Abaqus et de nos ressources, il est important de spécifier avec précision la mémoire et le nombre de cœurs (ncpus) requis dans votre script Slurm. Vous pouvez déterminer ces valeurs en soumettant quelques courtes tâches de test à la file d'attente, puis en vérifiant l'utilisation des ressources. Pour les tâches <b>terminées</b>, utilisez <code>seff JobNumber</code> pour afficher la <i>mémoire utilisée</i> et son <i>efficacité</i>. Si l'efficacité de la mémoire est inférieure à environ 90&nbsp;%, diminuez la valeur du paramètre <code>#SBATCH --mem=</code> dans votre script Slurm. Notez que la commande <code>seff JobNumber</code> affiche également le <i>temps CPU utilisé</i> et l'<i>efficacité du CPU</i>. Si l'efficacité du CPU est inférieure à environ 90&nbsp;%, effectuez des testez la scalabilité pour déterminer le nombre optimal de CPU afin d'obtenir de meilleures performances, puis mettez à jour la valeur de <code>#SBATCH --cpus-per-task=</code> dans votre script Slurm. Pour les tâches en cours d'exécution, utilisez la commande <code>srun --overlap --jobid=29821580 --pty top -d 5 -u $USER</code> pour surveiller les pourcentages d'utilisation du CPU (%CPU), de la mémoire (%MEM) et de la mémoire résidente (RES) de chaque processus parent Abaqus. Les colonnes %CPU et %MEM affichent le pourcentage d'utilisation par rapport à la mémoire totale disponible du nœud, tandis que la colonne RES indique la taille de la mémoire résidente par CPU (dans un format lisible pour les valeurs supérieures à 1Go). Vous trouverez plus d'information dans [[Monitoring jobs/fr#Suivi_des_tâches|Suivi des tâches]].
+Option 1)
+
+Disable non-interactive (analysis) jobs from starting on a cluster compute node after being submitted to the queue and then becoming idle (when not enough tokens are unavailable  the default bahaviour) create a text file in your submit directory (before submitting the job) with the following one line contents and the job will instead terminate immediately :
+
+ [l2 (nibi login node):~/submitdirectory] cat abaqus_v6.env
+ lmlicensequeuing=OFF
+
+When a job immediately terminates (without entering a QUEUED state to wait for a license) the end of the corresponding slurm output file will contain messages such as :
+
+ Abaqus 2026   
+ Checkout exceeds MAX specified in options file.
+ FlexNet Licensing error:-87,147
+ Number of requested licenses: 14
+ Number of total licenses:     78
+ Number of licenses in use:    14
+ Number of available licenses: 64
+ This may be due to insufficient licenses.
+ ValueError: not enough values to unpack (expected 2, got 1)
+ During handling of the above exception, another exception occurred:
+ Exception: DriverLM: can't parse host/port from umbrella
+ Abaqus Error: Error checking out Abaqus license.
+ Abaqus/Analysis exited with errors
+
+Option 2)
+
+Specify a setting in minutes so that a started job will enter a QUEUED state to wait for a license before being automatically DEQUEUED and terminating if a license does not become available in time :
+
+ [l2 (nibi login node):~/submitdirectory] cat abaqus_v6.env
+  lmhanglimit=1 
+
+When a job terminates this way, after being queued and no license comes available in the specified time according to the lmhanlimit value (1minute in this example) the messages at the end of the slurm output file will instead appear as :
+
+ Abaqus 2026
+ "standard" license request queued for the License Server on license1.computecanada.ca. 
+ Total time in queue: 0 seconds.
+ "standard" license request queued for the License Server on license1.computecanada.ca. 
+ Total time in queue: 30 seconds.
+ "standard" license request queued for the License Server on license1.computecanada.ca. 
+ Total time in queue: 60 seconds.
+ Time limit of in queue has been exceeded. Exiting.
+ This may be due to insufficient licenses.
+ ValueError: not enough values to unpack (expected 2, got 1)
+ During handling of the above exception, another exception occurred:
+ Exception: DriverLM: can't parse host/port from umbrella
+ Abaqus Error: Error checking out Abaqus license.
+ Abaqus/Analysis exited with errors
+
+=== Specify job resources ===
+To ensure optimal usage of both your Abaqus tokens and our resources, it's important to carefully specify the required memory and ncpus in your Slurm script.  The values can be determined by submitting a few short test jobs to the queue then checking their utilization.  For <b>completed</b> jobs use <code>seff JobNumber</code> to show the total <i>Memory Utilized</i> and <i>Memory Efficiency</i>. If the <i>Memory Efficiency</i> is less than ~90%, decrease the value of the <code>#SBATCH --mem=</code> setting in your Slurm script accordingly.  Notice that the <code>seff JobNumber</code> command also shows the total <i>CPU (time) Utilized</i> and <i>CPU Efficiency</i>. If the <i>CPU Efficiency</i> is less than ~90%, perform scaling tests to determine the optimal number of CPUs for optimal performance and then update the value of <code>#SBATCH --cpus-per-task=</code> in your Slurm script.  For <b>running</b> jobs, use the <code>srun --overlap --jobid=29821580 --pty top -d 5 -u $USER</code> command to watch the %CPU, %MEM and RES for each Abaqus parent process on the compute node. The %CPU and %MEM columns display the percent usage relative to the total available on the node while the RES column shows the per process resident memory size (in human readable format for values over 1GB). Further information regarding how to [[Monitoring jobs|monitor jobs]] is available on our documentation wiki
 
 <span id="Core_token_mapping"></span>
 === Correspondance cœur-jeton ===
