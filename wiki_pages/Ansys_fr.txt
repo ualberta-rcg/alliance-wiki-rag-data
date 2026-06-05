@@ -1,15 +1,20 @@
 <languages />
 [[Category:Software]]
 
-<div class="mw-translate-fuzzy">
-[http://www.ansys.com/ Ansys] est une suite logicielle pour la conception 3D et la simulation. La suite comprend des applications comme [http://www.ansys.com/Products/Fluids/ANSYS-Fluent Ansys Fluent] et [http://www.ansys.com/products/fluids/ansys-cfx Ansys CFX].
-</div>
 
+<b><u>NDLT, JUIN 2026 : Cette page est présentement en cours de révision.</u></b>
+<br><br>
+[http://www.ansys.com/ Ansys] est une suite logicielle pour la conception 3D et la simulation. La suite comprend des applications comme [http://www.ansys.com/Products/Fluids/ANSYS-Fluent Ansys Fluent] et [http://www.ansys.com/products/fluids/ansys-cfx Ansys CFX].
+
+<div class="mw-translate-fuzzy">
 = Licence=
 La suite Ansys est hébergée sur nos grappes, mais nous n'avons pas une licence qui permet un accès généralisé. Toutefois, plusieurs établissements, facultés et départements possèdent des licences qui peuvent être utilisées sur nos grappes; vérifiez l'aspect légal de son utilisation. En ce qui a trait à l'aspect technique, nos nœuds de calcul doivent pouvoir communiquer avec votre serveur de licence. Si ce n'est pas déjà fait, notre équipe technique coordonnera ceci avec votre gestionnaire de licence. Quand tout sera en place, vous pourrez charger le module Ansys qui localisera de lui-même la licence. En cas de difficulté, communiquez avec le [[Technical support/fr| soutien technique]].
+</div>
 
+<div class="mw-translate-fuzzy">
 == Configurez votre propre fichier de licence ==
-Notre module Ansys cherche l'information sur la licence à différents endroits, dont votre répertoire /home. Pour indiquer votre propre serveur de licence, créez un fichier nommé <code>$HOME/.licenses/ansys.lic</code> qui contient les deux lignes ci-dessous, où vous remplacez FLEXPORT et LICSERVER par les valeurs réelles de votre serveur. 
+Notre module Ansys cherche l'information sur la licence à différents endroits, dont votre répertoire /home. Pour indiquer votre propre serveur de licence, créez un fichier nommé <code>$HOME/.licenses/ansys.lic</code> qui contient les deux lignes ci-dessous, où vous remplacez FLEXPORT et LICSERVER par les valeurs réelles de votre serveur.
+</div> 
 
 {| class="wikitable" style="text-align:left; border:1px solid #BBB; background-color:#F9F9F9; width:50%;"
 |+ style="text-align:left; background-color:#F2F2F2; font-size:110%" | FILE: ansys.lic
@@ -19,6 +24,7 @@ Notre module Ansys cherche l'information sur la licence à différents endroits,
 
 Les valeurs correspondant aux serveurs de licence CMC et SHARCNET se trouvent dans le tableau ci-dessous. Pour utiliser un différent serveur, voir [[Ansys/fr#Serveurs_de_licence_locaux|Serveurs de licence locaux]] ci-dessous.
 
+<div class="mw-translate-fuzzy">
 {| class="wikitable"
 |+ style="text-align:left; background-color:#F2F2F2; font-size:110%" | Serveurs de licences préconfigurés
 ! Licence
@@ -57,21 +63,26 @@ Les valeurs correspondant aux serveurs de licence CMC et SHARCNET se trouvent da
 | <code>1055</code>
 | 
 |}
+</div>
 
 <span id="Local_license_servers"></span>
 === Serveurs de licence locaux ===
 
+<div class="mw-translate-fuzzy">
 Avant que le serveur de licence de votre établissement puisse être utilisé avec nos grappes, les coupe-feu des deux parties doivent être configurés. Dans plusieurs cas, ce travail est déjà fait; suivez les directives dans le paragraphe [[Ansys#Prêt_à_utiliser|Prêt à utiliser]]  ci-dessous. Autrement, référez-vous au paragraphe [[Ansys/fr#Configuration_requise|Configuration requise]].
+</div>
 
 <span id="Ready_to_use"></span>
 ==== Prêt à utiliser ====
 
+<div class="mw-translate-fuzzy">
 Pour utiliser un serveur de licences Ansys 
 local de votre établissement dont les connexions réseau/pare-feu sont déjà configurées pour nos grappes, contactez votre administrateur de serveur de licence ANSYS et obtenez les deux renseignements suivants&nbsp;:
 1) le numéro de port flexible Ansys configuré (FLEXPORT), généralement 1055,
 2) le nom d'hôte complet (LICSERVER) du serveur de licence.
 <br>
 Configurez ensuite votre fichier ''~/.licenses/ansys.lic'' en y insérant les valeurs de FLEXPORT et LICSERVER dans le modèle ''FILE: ansys.lic'' ci-dessus.
+</div>
 
 <span id="Setup_required"></span>
 ==== Configuration requise ====
@@ -91,12 +102,14 @@ Pour utiliser un serveur de licence Ansys local n'ayant jamais été configuré 
 Pour vérifier si <code>ansys.lic</code> est bien configuré et fonctionne correctement avec votre serveur de licence, exécutez la séquence de commandes suivantes sur la grappe où vous voulez soumettre des tâches.
 </div>
 
- [login-node:~] cd /tmp
+ <div class="mw-translate-fuzzy">
+[login-node:~] cd /tmp
  [login-node:/tmp] salloc --time{{=}}1:0:0 --mem{{=}}1000M --account{{=}}def-YOURUSERID
  [compute-node/tmp] module load StdEnv/2023; module load ansys/2025R2.04
  [compute-node:/tmp] $EBROOTANSYS/v$(echo ${EBVERSIONANSYS:2:2}${EBVERSIONANSYS:5:1})/licensingclient/linx64/lmutil lmstat -c $ANSYSLMD_LICENSE_FILE | grep "ansyslmd: UP" 1> /dev/null && echo Success {{!}}{{!}} echo Fail
 <code>Success</code> output indicates license checkouts should work when jobs are submitted to the queue.<br>
 <code>Fail</code> output indicates a problem with the licensing setup somewhere and jobs will likely fail.<br>
+</div>
 
 <div class="mw-translate-fuzzy">
 En cas de problème d'obtention de licence auprès du serveur Ansys, le message suivant apparaîtra dans les fichiers de sortie Slurm lorsque des tâches Fluent sont lancées par des scripts Slurm en file d'attente *OU* lorsque Fluent est lancé de manière interactive, en procédant comme suit&nbsp;:
@@ -406,7 +419,9 @@ fi
 <span id="License_requeue"></span>
 ==== Remise en file d'attente pour obtenir la licence ====
 
+<div class="mw-translate-fuzzy">
 Les scripts suivants ne doivent être utilisés qu'avec des tâches Fluent qui sont connues pour se terminer normalement sans générer d'erreurs en sortie, mais qui nécessitent généralement plusieurs tentatives de remise en file d'attente pour obtenir les licences. Ils ne sont pas recommandés pour les tâches Fluent qui peuvent 1) s'exécuter pendant une longue période avant de planter 2) s'exécuter jusqu'à la fin mais contenir des avertissements de journalisation; dans les deux cas, les simulations seront répétées depuis le début jusqu'à ce que le nombre maximal de tentatives de remise en file d'attente spécifié par la valeur <code>array</code> soit atteint. Pour ces types de tâches, les scripts à usage général (ci-dessus) doivent être utilisés.
+</div>
 
 <tabs>
 <tab name="Plusieurs nœuds (par nœud + remise en attente)">
@@ -1224,7 +1239,7 @@ Par défaut, Ansys alloue aux tâches APDL 1024Mo de mémoire totale et 1024Mo d
 
 == Rocky ==
 
-This section provides sample Slurm scripts to solve standalone non-coupled Rocky simulations in a cluster queue. Both scripts are configured with <code>RESUME=0</code> so simulations are solved from the beginning by default.  To restart a partially completed simulation set <code>RESUME=1</code> and resubmit the script to the queue.  To get a full listing of command line options run <code>Rocky -h</code> on the command line after loading the Ansys module.  Since a lock file is generated every time a simulation is started, only one job should be submitted at a time from the same directory. Regarding which script to use, while all simulations should be tested independently, for a basic test case the GPU only script was found to outperform the CPU only script by a factor of 3.5x. Further increases in resources beyond 6cpus (for the CPU only script) or 2cpu + 1g (1/7 of a H100 GPU for the GPU based script) provided no further speedup based on scaling testing for either script.   Given these results, it appears likely that the GPU based script will provide significantly faster solution times compared to just using CPUs for other standalone Rocky simulations.  As shown in on each cluster wiki page or as summarized under [[Allocations and compute scheduling#Ratios_in_bundles|Ratios in bundles]], all clusters but Narval have H100 GPUs.  Therefore, when using the GPU script on Narval, the <code>--gpus</code> Slurm option should be changed to request an a100 GPYU instead.  Note that as of May 2026, only Rocky with the <code>ansys/2025R2|2.04</code> modules have been tested but not the <code>ansys/2025R1|1.02</code> modules yet.
+This section provides sample Slurm scripts to solve standalone non-coupled Rocky simulations in a cluster queue. Both scripts are configured with <code>RESUME=0</code> so simulations are solved from the beginning by default.  To restart a partially completed simulation, set <code>RESUME=1</code> and resubmit the script to the queue.  To get a full listing of command line options, run <code>Rocky -h</code> on the command line after loading the Ansys module.  Since a lock file is generated every time a simulation is started, only one job should be submitted at a time from the same directory. Regarding which script to use, while all simulations should be tested independently, for a basic test case the GPU only script was found to outperform the CPU only script by a factor of 3.5x. Further increases in resources beyond 6cpus (for the CPU only script) or 2cpu + 1g (1/7 of a H100 GPU for the GPU based script) provided no further speedup based on scaling testing for either script.   Given these results, it appears likely that the GPU-based script will provide significantly faster solution times compared to just using CPUs for other standalone Rocky simulations.  As shown in on each cluster wiki page or as summarized under [[Allocations and compute scheduling#Ratios_in_bundles|Ratios in bundles]], all clusters but Narval have H100 GPUs.  Therefore, when using the GPU script on Narval, the <code>--gpus</code> Slurm option should be changed to request an a100 GPYU instead.  Note that as of May 2026, only Rocky with the <code>ansys/2025R2|2.04</code> modules have been tested but not the <code>ansys/2025R1|1.02</code> modules yet.
 
 <span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===
@@ -1248,6 +1263,7 @@ module load StdEnv/2023 ansys/2025R2.04   # Specify 2025R1 or newer versions
 INPUTFILE="mySim.rocky"                   # Specify input filename
 rm -f $INPUTFILE.lock                     # Removes old lock files
 
+<div class="mw-translate-fuzzy">
 RESUME=0                                  # Specify 0 or 1
 if [ $RESUME -eq 0 ]; then
   rm -rf $INPUTFILE.files/simulation      # Removes previous results
@@ -1263,6 +1279,7 @@ fi
 |lang="bash"
 |contents=
 #!/bin/bash
+</div>
 
 #SBATCH --account=account      # Specify account (def or rrg)
 #SBATCH --time=00-01:00        # Specify time (DD-HH:MM)
@@ -1289,7 +1306,7 @@ fi
 
 == Electronics ==
 
-Slurm scripts for using AnsysEDT is provided in [[AnsysEDT|this specific page]].
+Slurm scripts for using AnsysEDT are provided in [[AnsysEDT|this specific page]].
 
 <span id="Graphical_use"></span>
 = Mode graphique =
@@ -1304,7 +1321,7 @@ Les programmes Ansys fonctionnent interactivement en mode graphique sur les nœu
  [[NARVAL/en|Narval]]:  <code>https://jupyterhub.narval.alliancecan.ca/</code>
  [[Open OnDemand Quickstart|TRILLIUM]]: <code>https://ondemand.scinet.utoronto.ca</code>
 
-A job submission web page should appear in your browser.  Configure the resources required for your interactive desktop session and click on ''Launch'' or ''Start''.  If either accelerated graphics or computations will be conducted from within your desktop session, be sure to specify a GPU resource.  Load an Ansys module on the desktop.  If you started a JuypterLab powered desktop, this can be done by clicking on the left hand menu, or if you started an OnDemand desktop manually, type <code>module load ansys/version</code> on the command line.  To start one of the common Ansys programs such as Fluent, CFX, Workbench, and so forth, refer to the following section which provides advice for setting environment variables and arguments required by VirtualGL or Mesa based graphical environments, depending on whether a node with a GPU resource was specified or not.  
+A job submission web page should appear in your browser.  Configure the resources required for your interactive desktop session and click on ''Launch'' or ''Start''.  If either accelerated graphics or computations will be conducted from within your desktop session, be sure to specify a GPU resource.  Load an Ansys module on the desktop.  If you started a JuypterLab powered desktop, this can be done by clicking on the left-hand menu, or if you started an OnDemand desktop manually, type <code>module load ansys/version</code> on the command line.  To start one of the common Ansys programs such as Fluent, CFX, Workbench, and so forth, refer to the following section which provides advice for setting environment variables and arguments required by VirtualGL or Mesa-based graphical environments, depending on whether a node with a GPU resource was specified or not.  
 
 === Fluent ===
 
@@ -1313,7 +1330,7 @@ To start Ansys Fluent from the command line on an OnDemand desktop, open a termi
 ::: <code>module load StdEnv/2023 ansys/2025R2.04</code>
 ::: <code>fluent</code>
 
-When the Fluent Launcher popup selector panel appears, click on the ''Environment'' tab and copy/paste the following environment variable settings, depending on whether you started your OnDemand session with a GPU for graphical acceleration. Do not include the text in parentheses as these are comments, and do not put ''export'' in front of any variable name.  If the graphics console window becomes corrupted when starting the GUI, restart Fluent setting <code>HOOPS_PICTURE=null</code> to disable the creation of the graphics panel. 
+When the Fluent Launcher popup selector panel appears, click on the ''Environment'' tab and copy/paste the following environment variable settings, depending on whether you started your OnDemand session with a GPU for graphical acceleration. Do not include the text in parentheses as these are comments, and do not put <code>export</code> in front of any variable name.  If the graphics console window becomes corrupted when starting the GUI, restart Fluent setting <code>HOOPS_PICTURE=null</code> to disable the creation of the graphics panel. 
 
 <div class="mw-translate-fuzzy">
 <b>Compute Node (sans GPU)</b>
@@ -1337,7 +1354,7 @@ fluent 3d -t $NCORES -cnf=machinefile -mpi=intel -affinity=0 -g -i sample.jou
 </tab>
 </div>
 
-NOTE: When running Fluent on Nibi, the environment variable <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code> must be manually set; otherwise, Fluent will crash when started inside OOD Compute Desktop sessions when intelmpi is used.  Error output such as the following will be created.  Should this occur, completely exit Fluent, cleanly shut down Workbench and start over again.
+NOTE: When running Fluent on Nibi, the environment variable <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code> must be manually set; otherwise, Fluent will crash when started inside OOD Compute Desktop sessions when intelmpi is used.  Error output such as the following will be created.  Should this occur, completely exit Fluent, cleanly shut down Workbench and start over.
  [mpiexec@g4.nibi.sharcnet] Error: Unable to run bstrap_proxy on g4.nibi.sharcnet (pid 2251587, exit code 256)
  [mpiexec@g4.nibi.sharcnet] poll_for_event (../../../../../src/pm/i_hydra/libhydra/demux/hydra_demux_poll.c:157): check exit codes error
  [mpiexec@g4.nibi.sharcnet] HYD_dmx_poll_wait_for_proxy_event (../../../../../src/pm/i_hydra/libhydra/demux/hydra_demux_poll.c:206): poll for  event error
@@ -1364,7 +1381,7 @@ The following steps for starting the Mechanical APDL GUI from the command line o
 
 === Workbench ===
 
-This sections shows how to start Workbench (and optionally Fluent) on either an OnDemand desktop or JupyterLab desktop.
+This section shows how to start Workbench (and optionally Fluent) on either an OnDemand desktop or a JupyterLab desktop.
 
 <span id="OnDemand_desktop"></span>
 <div class="mw-translate-fuzzy">
@@ -1396,6 +1413,7 @@ This sections shows how to start Workbench (and optionally Fluent) on either an 
 ::: o Pour des détails voir  [https://innovationspace.ansys.com/knowledge/forums/topic/ansys-rocky-2024-r2-release-highlights/ Ansys Rocky 2024 R2 Release Highlights] et [https://innovationspace.ansys.com/knowledge/forums/topic/ansys-rocky-2025-r1-release-highlights/ Ansys Rocky 2025 R1 Release Highlights]
 </div>
 
+<div class="mw-translate-fuzzy">
 === Ansys EDT ===
 ::: Ouvrez une fenêtre de terminal et chargez le module avec
 :::: <code>module load SnEnv ansysedt/2023R2</code>, ou
@@ -1419,6 +1437,7 @@ This sections shows how to start Workbench (and optionally Fluent) on either an 
 ::: si le programme plante et ne repart pas, essayez les commandes suivantes :
 :::: <code>pkill -9 -u $USER -f "ansys*|mono|mwrpcss|apip-standalone-service"</code>
 :::: <code>rm -rf ~/.mw</code> (au lancement, ansysedt utilisera la configuration initiale)
+</div>
 
 <div class="mw-translate-fuzzy">
 === Ensight ===
@@ -1444,7 +1463,7 @@ If <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code> is not set properly on nibi when fluen
  [mpiexec@g4.nibi.sharcnet] Error setting up the bootstrap proxies
 </div>
 
-<span id="Jupyterhub_Desktop"></span>
+<span id="Jupyterhub_desktop"></span>
 <div class="mw-translate-fuzzy">
 === Rocky ===
 ::: <code>module load ansysrocky/2023R2 StdEnv/2020 ansys/2023R2</code>
@@ -1462,38 +1481,44 @@ If <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code> is not set properly on nibi when fluen
 :::   <code>salloc --time=08:00:00 --nodes=1 --cpus-per-task=4 --gres=gpu:v100:1 --mem=32G --account=someaccount</code>
 </div>
 
+<div class="mw-translate-fuzzy">
 <b>Nœud de calcul(sans GPU)</b>
+</div>
 
 ::: Click to load ansys/2025R1 (or newer version) in the Desktop left hand side menu
-::: Click the "Workbench (VNC)" icon located in the Jupyter Lab desktop center window.
-:::: If the graphics of any application (such as fluent) started within workbench
-:::: appear unusable due to corrupted graphics then try carrying out the following
-:::: steps.  They will create a custom <code>runwb2</code> desktop icon so that workbench
-:::: can be started mesa mode.  If the one of the applications that you will be starting 
-:::: in workbench is fluent then when the Fluent launcher starts you may also try setting
+::: Click on the ''Workbench (VNC)'' icon located in the JupyterLab desktop centre window.
+:::: If the graphics of any application (such as Fluent) started within Workbench
+:::: appear unusable because they seem corrupted, try carrying out the following
+:::: steps.  They will create a custom runwb2 desktop icon so that Workbench
+:::: can be started in Mesa mode.  If one of the applications that you will be starting 
+:::: in Workbench is Fluent, you may also try setting
+:::: <code>HOOPS_PICTURE=opengl2-mesa</code> variable in the Fluent Launcher window when the Fluent launcher starts.
 :::: <code>HOOPS_PICTURE=opengl2-mesa</code> variable in the Fluent Launcher window.
-::: To proceed, exit Workbench and then open a terminal window.  Copy paste the following
-::: command into the Remote Clipboard located in the top right corner of your jupyter desktop. 
-::: Now the commands can be pasted into terminal ie)
+::: To proceed, exit Workbench and open a terminal window.  Copy/paste the following
+::: command into the ''Remote Clipboard'' located in the top right corner of your Jupyter desktop. 
+::: Now the commands can be pasted into the terminal i.e.
 ::: <code>cd ~/Desktop; cp -p $(realpath workbench.desktop) workbench-mesa.desktop</code>
 ::: Open the newly created file in a text editor such as nano by doing the following:
 ::: <code>nano ~/Desktop/workbench-mesa.desktop</code>.  Change all instances of <code>runwb2</code>
-::: to  <code>runwb2 -oglmesa</code> and then exit the editor saving the changes.  Now REFRESH
+::: to  <code>runwb2 -oglmesa</code> and exit the editor, saving the changes.  Now REFRESH
 ::: the Jupyter desktop by pressing the key combination <i>control-R</i>.  The new icon should now
-::: appear in the desktop along with the original workbench icon. Double click it to start workbench.
+::: appear in the desktop along with the original Workbench icon. Double-click on it to start Workbench.
 ::: The new icon will persist for future sessions until manually deleted with the command
 ::: <code>rm -f ~/Desktop/workbench-mesa.desktop</code>.
 
+<div class="mw-translate-fuzzy">
 <b>Nœud de calcul (avec GPU)</b>
+</div>
 
-::: Click to load ansys/2025R1 (or newer version) in the Desktop left hand side menu
-::: Click the Workbench (VNC) icon located in the Jupyter Lab desktop center window
+::: Click to load ansys/2025R1 (or newer version) in the Desktop left-hand side menu.
+::: Click the Workbench (VNC) icon located in the JupyterLab desktop centre window.
 
 === Ensight ===
 ::: <code>module load StdEnv/2023 ansys/2022R2; A=222; B=5.12.6</code>
 ::: <code>export LD_LIBRARY_PATH=$EBROOTANSYS/v$A/CEI/apex$A/machines/linux_2.6_64/qt-$B/lib</code>
 ::: <code>ensight -X</code>
 
+<div class="mw-translate-fuzzy">
 === Rocky ===
 ::: <code>module load StdEnv/2023 ansys/2025R2.04</code> (or 2025R1, 2025R1.02, 2025R2)
 ::: <code>Rocky</code> The Rocky command starts rocky in standalone gui mode
@@ -1501,6 +1526,7 @@ If <code>I_MPI_HYDRA_BOOTSTRAP=ssh</code> is not set properly on nibi when fluen
 ::: <code>RockySchedular</code> Gui to interactively submit/run jobs on present node (untested)
 ::: o The ansys module handles reading your ~/licenses/ansys.lic file
 ::: o The SHARCNET ansys license includes Rocky thus free to use
+</div>
 
 == Electronics ==
 
@@ -1517,7 +1543,9 @@ La licence Ansys de SHARCNET est gratuite pour une utilisation académique par l
 Rocky et LS-DYNA sont aussi maintenant inclus dans la licence SHARCNET. Lumerical acquis par ANSYS en 2020 n'est pas disponible en ce moment, mais est installé avec les modules Ansys récents et peut donc être utilisé  avec d'autres serveurs Ansys configurés en conséquence.  SpaceClaim sous Linux n'est pas installé sur nos systèmes, mais peut techniquement être utilisé avec la licence SHARCNET. Un groupe de licences anshpc de 1986 est inclus dans la licence SHARCNET pour prendre en charge les grandes tâches parallèles avec la plupart des produits Ansys.  Avant d'exécuter de longues tâches, il est préférable d'effectuer des tests de scalabilité. Les tâches parallèles qui utilisent moins de 50% en CPU seront probablement signalées par le système et examinées par notre équipe technique.
 </div>  
 
+<div class="mw-translate-fuzzy">
 unset SLURM_GTIDS
+</div>
 
 <span id="License_limits"></span>
 <div class="mw-translate-fuzzy">
@@ -1608,39 +1636,55 @@ Si vous remarquez que des licences sont utilisées sans justification avec votre
 Configurez d'abord votre fichier <code>~/.licenses/ansys.lic</code> pour l'orienter vers le serveur de licence où se trouve une licence valide pour Ansys Mechanical.  Vous devez faire ceci sur tous les systèmes où vous utiliserez le logiciel.
 </div>  
 
-<span id="Enable_Additive"></span>
+<span id="Enabling_Additive"></span>
+<div class="mw-translate-fuzzy">
 == Activer Additive ==
+</div>
 
 <div class="mw-translate-fuzzy">
 Nous décrivons ici comment obtenir l'extension ACT de Ansys Additive Manufacturing pour l'utiliser dans votre projet. Les étapes suivantes doivent être effectuées pour chaque version de module Ansys sur chacune des grappes où l'extension sera utilisée. Les extensions nécessaires à votre projet doivent aussi être installées sur la ou les grappes, tel que décrit ci-dessous. Si vous recevez des avertissements à l'effet que des extensions dont vous n'avez pas besoin sont manquantes, par exemple ANSYSMotion, désinstallez-les à partir de votre projet.
 </div>
 
+<div class="mw-translate-fuzzy">
 === Télécharger l'extension ===
 * téléchargez AdditiveWizard.wbex à partir de https://catalog.ansys.com/
 * téléversez AdditiveWizard.wbex sur la grappe où vous allez l'utiliser
+</div>
 
+<div class="mw-translate-fuzzy">
 === Lancer Workbench ===
 * Voir la section Workbench dans[[ANSYS/fr#Mode_graphique|Mode graphique plus haut]].
 * Dans l'interface Workbench, ouvrez votre fichier de projet avec File -> Open.
+</div>
 
+<div class="mw-translate-fuzzy">
 ===  Ouvrir le gestionnaire d'extensions ===
 * Cliquez sur la page ACT Start pour faire afficher l'onglet de la page ACT Home.
 * Cliquez sur Manage Extensions pour ouvrir le gestionnaire d'extensions.
+</div>
 
+<div class="mw-translate-fuzzy">
 === Installer l'extension ===
 * Cliquez sur la boîte avec le signe + sous la barre de recherche.
 * Sélectionnez et installez votre fichier AdditiveWizard.wbex.
+</div>
 
+<div class="mw-translate-fuzzy">
 === Charger l'extension ===
 * Cliquez pour sélectionner la boîte AdditiveWizard, ce qui charge l'extension uniquement pour la session en cours.
 * Cliquez sur la flèche dans le coin droit au bas de la boîte AdditiveWizard et sélectionnez <i>Load extension</i>, ce qui charge l'extension pour la session en cours et pour les sessions futures.
+</div>
 
+<div class="mw-translate-fuzzy">
 === Supprimer l'extension ===
 * Cliquez pour désélectionner la boîte AdditiveWizard, ce qui supprime l'extension pour la session en cours.
 * Cliquez sur la flèche dans le coin droit au bas de la boîte AdditiveWizard et sélectionnez <I>Do not load as default</i>, ce qui empêche le chargement de l'extension pour les futures sessions.
+</div>
 
-<span id="Run_Additive"></span>
+<span id="Running_Additive"></span>
+<div class="mw-translate-fuzzy">
 == Exécuter Additive ==
+</div>
 
 === OnDemand ===
 
@@ -1648,15 +1692,19 @@ Nous décrivons ici comment obtenir l'extension ACT de Ansys Additive Manufactur
 Vous pouvez exécuter une seule tâche Ansys Additive Manufacturing dans une session graphique OnDemand comme suit&nbsp;:
 </div>
 
+<div class="mw-translate-fuzzy">
 * Lancez Workbench comme décrit ci-dessus dans <i>Additive Manufacturing -> Activer Additive</i>.
 * Cliquez sur <i>File -> Open</i> et sélectionnez <i>test.wbpj</i> puis cliquez sur <i>Open</i>.
 * Cliquez sur <i>View -> Reset workspace</i> si votre écran est gris.
 * Lancez <i>Mechanical, Clear Generated Data</i>, sélectionnez  <i>Distributed</i>, spécifiez <i>Cores</i>.
 * Cliquez sur <i>File -> Save Project -> Solve</i>.
+</div>
 
+<div class="mw-translate-fuzzy">
 Vérifiez l'utilisation :
 * Ouvrez un autre terminal et lancez <code>top -u $USER</code> OU <code>ps u -u $USER | grep ansys</code>.
 * Terminez les processus non nécessaires créés par des tâches précédentes avec  <code>pkill -9 -e -u $USER -f "ansys|mwrpcss|mwfwrapper|ENGINE"</code>.
+</div>
 
 <div class="mw-translate-fuzzy">
 Veuillez noter que des processus persistants peuvent bloquer les licences entre les sessions de connexion gra-vdi ou provoquer d'autres erreurs inhabituelles lors de la tentative de démarrage de l'interface graphique sur gra-vdi. Bien que cela soit rare, un processus peut rester en mémoire si une session d'interface graphique Ansys (Fluent, Workbench, etc.) n'est pas correctement terminée avant que vncviewer ne soit terminé manuellement ou de manière inattendue, par exemple en raison d'une panne de réseau temporaire ou d'un système de fichiers bloqué. Dans ce dernier cas, les processus peuvent ne pas être tués tant que l'accès normal au disque n'est pas rétabli.
@@ -1665,15 +1713,21 @@ Veuillez noter que des processus persistants peuvent bloquer les licences entre 
 <span id="Cluster"></span>
 === Grappe ===
 
+<div class="mw-translate-fuzzy">
 Préparation du projet
+</div>
 
+<div class="mw-translate-fuzzy">
 Certaines préparations doivent être effectuées avant de soumettre un projet Additive nouvellement téléchargé dans la file d'attente d'une grappe avec <code>sbatch scriptname</code>. Pour commencer, ouvrez votre simulation avec l'interface graphique de Workbench (comme décrit ci-dessus dans <i>Additive Manufacturing -> Activer Additive</i>) dans le même répertoire que celui à partir duquel votre tâche sera soumise, puis enregistrez-la à nouveau. Assurez-vous d'utiliser la même version du module Ansys qui sera utilisé pour la tâche. Créez ensuite un script Slurm (comme expliqué dans le paragraphe pour Workbench dans la section <i>Soumettre des tâches en lot sur nos grappes</I> ci-dessus). Pour effectuer des études paramétriques, remplacez <code>Update()</code> par <code>UpdateAllDesignPoints()</code> dans le script Slurm. Déterminez le nombre optimal de cœurs et de mémoire en soumettant plusieurs courtes tâches de test. Pour éviter d'avoir à effacer manuellement la solution <b>et</b> recréer tous les points de conception dans Workbench entre chaque exécution de test, soit 1. remplacez <code>Save(Overwrite=True)</code> par <code>Save (Overwrite=False)</code>; ou 2. enregistrez une copie du fichier YOURPROJECT.wbpj d'origine et du répertoire YOURPROJECT_files correspondant. Vous pouvez aussi créer puis exécuter manuellement un fichier de relecture sur la grappe dans le répertoire de cas de test entre chaque exécution, en notant qu'un seul fichier de relecture peut être utilisé dans différents répertoires en l'ouvrant dans un éditeur de texte et en modifiant le paramètre interne FilePath.
+</div>
 
  module load ansys/2019R3
  rm -f test_files/.lock
  runwb2 -R myreplay.wbjn
 
+<div class="mw-translate-fuzzy">
 Utilisation des ressources
+</div>
 
 <div class="mw-translate-fuzzy">
 Après quelques minutes, vous pouvez obtenir un instantané de l'utilisation des ressources par la tâche en cours d'exécution sur le ou les nœuds de calcul avec la commande <tt>srun</tt>. Le script pour 8 cœurs ci-dessous produit le résultat suivant où on remarque que l'ordonnanceur a choisi 2 nœuds.
@@ -1691,7 +1745,9 @@ Après quelques minutes, vous pouvez obtenir un instantané de l'utilisation des
   4305 demo   20   0 2729436 263204 100932 R 100.0  0.2  1:06.88  ansys.e
   4306 demo   20   0 2734720 431532  95180 R 100.0  0.3  1:06.57  ansys.e
 
+<div class="mw-translate-fuzzy">
 Tests de scalabilité
+</div>
 
 <div class="mw-translate-fuzzy">
 Une fois la tâche complétée, son ''Job Wall-clock time'' peut être obtenu avec <code>seff jobid</code>. Cette valeur peut être utilisée pour effectuer des tests de scalabilité en soumettant de courtes tâches d'abord puis en doublant le nombre de cœurs. Tant que le Wall-clock time  diminue d'environ 50%, vous pouvez continuer de doubler le nombre de cœurs.
@@ -1700,7 +1756,7 @@ Une fois la tâche complétée, son ''Job Wall-clock time'' peut être obtenu av
 <span id="Help_resources"></span>
 = Aide =
 
-The official full documentation for recent versions Ansys 202[4|5]R[1|2] is available [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/main_page.html?lang=en here].  Documentation for older versions such as Ansys 2023R[1|2] however requires [https://ansyshelp.ansys.com/ login].  Developer documentation can be found in the Ansys Developer [https://developer.ansys.com Portal]. Additional learning resources include the Ansys HowTo [https://www.youtube.com/@AnsysHowTo/videos videos], the Ansys Educator [https://innovationspace.ansys.com/educator-hub/ Educator Hub] and the Ansys Webinar [https://www.ansys.com/events/ansys-academic-webinar-series series].
+The official full documentation for recent versions Ansys 202[4|5]R[1|2] is available [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/main_page.html?lang=en here].  Documentation for older versions such as Ansys 2023R[1|2] however requires [https://ansyshelp.ansys.com/ login].  Developer documentation can be found in the [https://developer.ansys.com Ansys Developer Portal]. Additional learning resources include the [https://www.youtube.com/@AnsysHowTo/videos Ansys HowTo videos], the [https://innovationspace.ansys.com/educator-hub/ Ansys Educator Hub] and the [https://www.ansys.com/events/ansys-academic-webinar-series Ansys Webinar series].
 
 <div class="mw-translate-fuzzy">
 #module load ansys/2021R1
