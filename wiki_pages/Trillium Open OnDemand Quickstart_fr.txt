@@ -10,7 +10,7 @@ Cette page décrit le service Open OnDemand sur Trillium.  Pour l'information g�
  
 = Porter un environnement virtuel sur Open OnDemand =
 
-'''IMPORTANT : En raison du changement de système d’exploitation et de pile logicielle, vos noyaux d’environnement virtuel Python existants risquent de ne pas fonctionner immédiatement sur le site OnDemand. Vous devriez pouvoir activer vos environnements Python dans un terminal Trillium (voir [[Trillium Open OnDemand Quickstart/fr#Accès_via_terminal|Accès via terminal]] ci-dessous), avec tous les modules Trillium requis chargés, puis exécuter la commande <b><code>venv2jup</code></b> pour les rendre fonctionnels.'''
+'''IMPORTANT : En raison du changement de système d’exploitation et de pile logicielle, vos noyaux d’environnement virtuel Python existants risquent de ne pas fonctionner immédiatement sur le site OnDemand. Vous devriez pouvoir activer vos environnements Python dans un terminal Trillium (voir [[Trillium Open OnDemand Quickstart/fr#Accès_via_terminal|Accès via terminal]] ci-dessous), avec tous les modules Trillium requis chargés, puis exécuter la commande <b><code>venv2jup</code></b> pour les rendre fonctionnels. Pour toutes les instructions, voir [[Trillium Open OnDemand Quickstart/fr#Configurer_JupyterLab|Configurer JupyterLab]].''''''
 
 =Introduction=
 
@@ -92,7 +92,7 @@ Si vous souhaitez mettre fin à la tâche pour une quelconque raison, vous pouve
 <span id="Installed_applications"></span>
 ==Applications installées==
 
-Les appplications suivantes sont prises en charge&nbsp;:
+Les applications suivantes sont prises en charge&nbsp;:
 
 * [https://jupyter.org JupyterLab/Notebook]
 * [https://posit.co/products/open-source/rstudio/?sid=1 Rstudio]
@@ -111,6 +111,44 @@ Pour faire installer d'autres applications, écrivez à [mailto:support@scinet.u
 * [https://youtu.be/XRozBBKwA8c?si=Xxvu96XYVMNHocq8&t=2469 JupyterLab, tutoriel vidéo de SciNet (en anglais)]
 * [https://youtu.be/XRozBBKwA8c?si=qvh56f5fvJpp5jrg&t=3117 Bureau, tutoriel vidéo de SciNet (en anglais)]
 
+<span id="JupyterLab_Configuration"></span>
+==Configurer JupyterLab==
+
+[[Image:ood-software-modules.png|thumb|right|600px|link=Special:FilePath/ood-software-modules.png|Figure 7 ‒ Modules logiciels.]]
+
+Il y a deux façons d'exécuter JupyterLab.
+
+'''Option 1''' : Utiliser Python 3 par défaut (ipykernel)
+
+Le noyau par défaut inclut les paquets Python préinstallés suivants&nbsp;: numpy, redis, jwcrypto, jupyterlmod, matplotlib, h5py, cython, pandas, ipympl, jupyterlab_favorites et jupyter-resource-usage. Vous pouvez démarrer une session JupyterLab avec ce noyau et utiliser ces paquets sans configuration supplémentaire. Si vous souhaitez utiliser d'autres paquets, vous pouvez charger les modules requis avant de démarrer votre noyau via l'onglet ''Software Modules'', situé à l'extrême gauche de l'interface (voir figure 7). Si votre noyau est déjà en cours d'exécution, vous devrez l'arrêter puis le redémarrer pour que les modifications soient prises en compte. Pour ce faire, cliquez sur ''Kernel > Shut Down Kernel'' dans le menu du haut.
+
+Pour utiliser un paquet Python qui n'est pas installé par défaut ou qui n'est pas inclus en tant que module logiciel, vous pouvez créer un environnement virtuel Python avec les paquets requis installés et l'exécuter en tant que noyau JupyterLab (voir l'option 2 ci-dessous).
+
+'''Option 2''' : Travailler dans un 
+[[Python/fr#Créer_et_utiliser_un_environnement_virtuel_Python|environnement virtuel Python]] que vous avez créé.
+
+À partir d'un terminal (lancé soit dans JupyterLab, soit en cliquant sur ''Cluster→ Accès à l'interface Trillium'' dans la barre de navigation OnDemand), vous pouvez créer votre propre environnement virtuel Python et installer les paquets nécessaires. Par exemple, pour créer un environnement virtuel nommé ''myenv'' et installer le paquet numpy, exécutez
+
+{{Commands2
+|prompt=[username@tri-login01]$
+|module load python/3.14.2
+|virtualenv --no-download ~/.virtualenvs/myenv
+|source ~/.virtualenvs/myenv/bin/activate
+}}
+{{Commands2
+|prompt=(myenv)[username@tri-login01]$
+|pip install numpy
+}} 
+
+Pour convertir cela en noyau JupyterLab, exécutez la commande suivante à partir de l'environnement virtuel activé.
+
+{{Commands2
+|prompt=(myenv)[username@tri-login01]$
+|venv2jup
+}} 
+
+Au lancement d'une session JupyterLab, votre environnement virtuel ''myenv'' apparaîtra comme option du noyau.
+
 <span id="Running_an_application_GUI"></span>
 =Interfaces graphiques=
 
@@ -128,7 +166,7 @@ L'interface graphique d'Octave devrait maintenant apparaître dans l'environneme
 
 * [https://youtu.be/XRozBBKwA8c?si=qvh56f5fvJpp5jrg&t=3117 Interface Octave, tutoriel vidéo de SciNet (en anglais)]
 
-[[Image:ood-desktop-octave.png|thumb|centre|600px|link=Special:FilePath/ood-desktop-octave.png|Figure 7 ‒ Interface pour Octave dans Trillium Desktop]]
+[[Image:ood-desktop-octave.png|thumb|centre|600px|link=Special:FilePath/ood-desktop-octave.png|Figure 8 ‒ Interface pour Octave dans Trillium Desktop]]
 
 <span id="Job_submission"></span>
 =Soumettre une tâche=
@@ -138,7 +176,7 @@ Open OnDemand offre également une interface qui permet de soumettre des tâches
 L'application [https://github.com/RIKEN-RCCS/OpenComposer Open Composer] offre plusieurs scripts modèles que vous pouvez soumettre directement à l'ordonnanceur. Elle offre aussi sous l'onglet ''History'', une interface pour faire le suivi des tâches que vous avez soumises.<br>
 Vous avez accès à Open Composer sous le menu déroulant  ''Jobs'' ou en cliquant sur un modèle de script.
 
-[[Image:ood-oc-shortcuts.png|thumb|right|600px|link=Special:FilePath/ood-oc-shortcuts.png|Figure 8 ‒  Raccourcis Open Composer]]
+[[Image:ood-oc-shortcuts.png|thumb|right|600px|link=Special:FilePath/ood-oc-shortcuts.png|Figure 9 ‒  Raccourcis Open Composer]]
 
 Une fois le modèle sélectionné, la page de soumission de tâche est affichée. Celle-ci est en deux parties&nbsp;: les paramètres de la tâche à gauche et le script à droite. Les paramètres vous permettent de contrôler les ressources utilisées, comme le nombre de nœuds, le nombre de tâches par nœud, la durée d'exécution et le nom du fichier de sortie. Le script affiche le texte qui sera soumis à l'ordonnanceur. Toute modification apportée aux paramètres se reflète automatiquement dans le script. Vous pouvez également modifier le script directement.
 
@@ -151,9 +189,11 @@ Les champs dans le haut de la page servent à modifier la manière dont la tâch
 
 Une fois que votre script est bien défini, cliquez sur le bouton ''Submit'' pour soumettre la tâche à l'ordonnanceur et enregistrer le script dans ''Script Location''. Si tout se passe bien, un message de confirmation sera affiché, avec l'identifiant de la tâche. [[File:ood-oc-job-submit.png|400px|link=Special:FilePath/ood-oc-job-submit.png]].
 
-[[Image:ood-oc-job.png|thumb|center|600px|link=Special:FilePath/ood-oc-job.png|Figure 9 ‒ Éditeur Open Composer pour les scripts de tâches]]
+[[Image:ood-oc-job.png|thumb|center|600px|link=Special:FilePath/ood-oc-job.png|Figure 10 ‒ Éditeur Open Composer pour les scripts de tâches]]
 
 Remarque : Les scripts modèles sont des exemples de base que vous devrez adapter à vos besoins spécifiques, notamment en chargeant les modules requis et en spécifiant les fichiers d’entrée/sortie. Le script doit également respecter les limites imposées par l'ordonnanceur Slurm. Voir [[Trillium Quickstart/fr#Restrictions_particulières_à_Trillium|Restrictions particulières à Trillium]] pour plus d’information sur la rédaction des scripts.
+
+Pour des instructions détaillées sur Open Composer, voir [https://riken-rccs.github.io/OpenComposer/docs/manual.html le manuel d'utilisation].
 
 * [https://youtu.be/XRozBBKwA8c?si=r5vcEw-lgM7xSJ6_&t=4263 Open Composer, tutoriel vidéo de SciNet (en anglais)]
 
@@ -164,12 +204,12 @@ Sous l'onglet ''History'' se trouve la liste de toutes vos tâches, avec leur é
 
 * ''Job ID'' affiche la tâche dans [https://my.scinet.utoronto.ca/ my.SciNet] avec les statistiques de performance et des détails au sujet de Slurm. Le message ''Not found or not permitted'' paraît si la tâche est encore en attente ou si elle a été supprimée. 
 * ''Application'' affiche une fenêtre pour modifier le script du modèle utilisé.
-* ''Script Location'' ouvre une fenêtre de l'endroit où se trouve le script. Cliquez sur le petit icône de terminal pour ouvrir un terminal au même endroit.
+* ''Script Location'' ouvre une fenêtre de l'endroit où se trouve le script. Cliquez sur la petite icône de terminal pour ouvrir un terminal au même endroit.
 * ''Script Name'' affiche le script soumis à l'ordonnanceur.
 
 Pour modifier ou soumettre de nouveau une tâche déjà soumise, cliquez sur le script dans la colonne ''Script Name'' puis sur ''Load Parameters''. La page de soumission de la tâche sera affichée et vous pourrez faire les modifications voulues.
 
-[[Image:ood-oc-history.png|thumb|center|600px|link=Special:FilePath/ood-oc-history.png|Figure 10 ‒ Suivi des tâches avec Open Composer]]
+[[Image:ood-oc-history.png|thumb|center|600px|link=Special:FilePath/ood-oc-history.png|Figure 11 ‒ Suivi des tâches avec Open Composer]]
 
 <span id="Supported_applications"></span>
 ==Applications prises en charge==
@@ -190,12 +230,12 @@ Pour obtenir un aperçu de toutes vos tâches en attente, utilisez l'interface d
 
 * [https://youtu.be/XRozBBKwA8c?si=rf_JMYBFz9ytpkR_&t=1818 Tâches actives, tutoriel vidéo de SciNet (en anglais)]
 
-[[Image:ood-active-jobs.png|thumb|center|600px|link=Special:FilePath/ood-active-jobs.png|Figure 11 ‒ Tâches actives]]
+[[Image:ood-active-jobs.png|thumb|center|600px|link=Special:FilePath/ood-active-jobs.png|Figure 12 ‒ Tâches actives]]
 
 <span id="Terminal_access"></span>
 =Accès via terminal=
 
-[[Image:ood-terminal.png|thumb|right|600px|link=Special:FilePath/ood-terminal.png|Figure 12 ‒ Terminal]]
+[[Image:ood-terminal.png|thumb|right|600px|link=Special:FilePath/ood-terminal.png|Figure 13 ‒ Terminal]]
 
 Si vous préférez utiliser un terminal pour interagir avec la grappe, Open OnDemand met à votre disposition un terminal web pour accéder à l'interface ligne de commande. Pour ce faire, rendez-vous dans l'onglet ''Clusters'' et sélectionnez ''Trillium Shell Access''. Une nouvelle fenêtre de terminal s'ouvrira alors dans votre navigateur, où vous pouvez exécuter des commandes comme dans une session de terminal classique.
 
@@ -204,14 +244,14 @@ Si vous préférez utiliser un terminal pour interagir avec la grappe, Open OnDe
 =Modules logiciels=
 Trillium offre plusieurs logiciels accessibles via des modules. Ces modules peuvent être chargés dans vos sessions interactives, votre terminal ou vos scripts de tâches dans Open Composer. Vous pouvez consulter les modules disponibles et leurs versions grâce à l'application ''Module Browser'', sous l'onglet ''Clusters'' de la barre de navigation. Le navigateur de modules fournit également une commande à exécuter dans le terminal pour charger un module spécifique, ce qui peut s'avérer utile lors de la rédaction de scripts de tâches.
 
-[[Image:ood-module-browser.png|thumb|right|600px|link=Special:FilePath/ood-module-browser.png|Figure 13 ‒ Chercher un module]]
+[[Image:ood-module-browser.png|thumb|right|600px|link=Special:FilePath/ood-module-browser.png|Figure 14 ‒ Chercher un module]]
 
 <span id="Debugging_errors"></span>
 = Debogage =
 
-[[Image:ood-session-id.png|thumb|right|600px|link=Special:FilePath/ood-session-id.png|Figure 14 ‒ Accès aux journaux d'erreurs via la carte de session]]
+[[Image:ood-session-id.png|thumb|right|600px|link=Special:FilePath/ood-session-id.png|Figure 15 ‒ Accès aux journaux d'erreurs via la carte de session]]
 
-Si vous rencontrez des erreurs lors de l'utilisation d'une tâche interactive, vous pouvez consulter les fichiers de journalisation. Pour y accéder, rendez-vous sous l'onglet ''My Interactive Sessions'' et sélectionnez votre session active. Cliquez sur le lien <code>output.log</code> pour ouvrir un nouvel onglet affichant la sortie de votre tâche (voir figure 14). Ce fichier contient la sortie standard et les messages d'erreur générés par la tâche, ce qui peut vous aider à identifier les problèmes qui seraient survenus pendant la session. Si vous avez besoin d'assistance, cliquez sur le bouton [[File:ood-support-ticket.png|150px|link=Special:FilePath/ood-support-ticket.png]] qui se trouve dans la carte de la session. Veuillez inclure le fichier <code>output.log</code> et toute autre information pertinente afin de nous permettre de vous aider plus efficacement.
+Si vous rencontrez des erreurs lors de l'utilisation d'une tâche interactive, vous pouvez consulter les fichiers de journalisation. Pour y accéder, rendez-vous sous l'onglet ''My Interactive Sessions'' et sélectionnez votre session active. Cliquez sur le lien <code>output.log</code> pour ouvrir un nouvel onglet affichant la sortie de votre tâche (voir figure 15). Ce fichier contient la sortie standard et les messages d'erreur générés par la tâche, ce qui peut vous aider à identifier les problèmes qui seraient survenus pendant la session. Si vous avez besoin d'assistance, cliquez sur le bouton [[File:ood-support-ticket.png|150px|link=Special:FilePath/ood-support-ticket.png]] qui se trouve dans la carte de la session. Veuillez inclure le fichier <code>output.log</code> et toute autre information pertinente afin de nous permettre de vous aider plus efficacement.
 
 <span id="Video_tutorials"></span>
 = Tutoriels =
@@ -273,7 +313,7 @@ Vidéos de SciNet (en anglais)<br>
 
 <sup>1</sup> À l'intérieur des limites demandées.
 
-<sup>2</sup> Parce que les limites pour JupyterHub n'ont pas été implémentées très scrictement, elles peuvent temporairement être surpassées.
+<sup>2</sup> Parce que les limites pour JupyterHub n'ont pas été implémentées très strictement, elles peuvent temporairement être surpassées.
 
 <sup>3</sup> Demander les limites avant de lancer une application.
 
