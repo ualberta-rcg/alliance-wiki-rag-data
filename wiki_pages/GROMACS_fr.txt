@@ -137,12 +137,14 @@ Les versions suivantes sont disponibles :
 |}</tab>
 </tabs>
 
+<div class="mw-translate-fuzzy">
 <b>Remarques</b>
 * * [[File:Warning sign 16px.png|frameless|warning]] Les versions 2020.0 jusqu'à 2021.5 inclusivement contiennent un bogue quand elles sont utilisées avec des GPU de génération Volta ou plus récentes ( V100, T4, A100 et H100) avec l'option <code>-update gpu</code> de <code>mdrun</code> qui aurait pu perturber le calcul viriel et ainsi fausser le raccord de pression. Dans les notes de mise à jour de la version 2021.6 on peut lire :<ref>"Fix missing synchronization in CUDA update kernels" in GROMACS 2021.6 Release Notes [https://manual.gromacs.org/2021.6/release-notes/2021/2021.6.html#fix-missing-synchronization-in-cuda-update-kernels]</ref> <blockquote>[traduction libre] <i>La mise à jour  n'est pas activée par défaut sur le GPU et donc l'erreur ne peut se produire que dans les simulations où l'option <code>-update gpu</code> a été explicitement sélectionnée; même dans ce cas, l'erreur peut être rare car nous ne l'avons pas observée en pratique dans les tests que nous avons effectués.</i></blockquote> Vous trouverez plus d'information dans GitLab, au sujet  #4393 du projet GROMACS.<ref>Issue #4393 in GROMACS Project on GitLab.com [https://gitlab.com/gromacs/gromacs/-/issues/4393]</ref>
 *Les versions depuis 2020.4 ont été compilées pour [[Standard software environments/fr|l'environnement logiciel standard]]  <code>StdEnv/2020</code>.
 *Les versions 2018.7 et suivantes ont été compilées avec les compilateurs GCC et la bibliothèque MKL puisqu’ils améliorent légèrement la performance.
 *Les versions antérieures ont été compilées avec soit des compilateurs GCC et FFTW, soit avec des compilateurs Intel MKL avec des bibliothèques Open MPI 2.1.1 à partir de l'environnement par défaut, comme indiqué dans le tableau ci-dessus.
 *Les versions CPU (non GPU) sont disponibles en simple et double précisions à l'exception de 2019.3 (<b>&#8225;</b>), où la double précision n'est pas disponible pour AVX512.
+</div>
 
 Pour charger ces modules, utilisez la commande <code>module load</code> avec les noms indiqués dans le tableau ci-dessus, par exemple
 
@@ -384,10 +386,12 @@ La deuxième solution est d'utiliser une instance MIG (une fraction de GPU) plut
 == Préparation du système ==
 L'exécution d'une simulation requiert un fichier d'entrée binaire ''tpr'' (''portable binary run input file'') qui contient la structure de simulation de départ, la topologie moléculaire et l'ensemble des paramètres de simulation.
 
+<div class="mw-translate-fuzzy">
 La commande <code>gmx grompp</code> crée les fichiers tpr; pour les versions antérieures à 5.0, la commande est <code>grompp</code>. Vous avez besoin des fichiers suivants&nbsp;:
 * Le fichier de coordonnées avec la structure de départ; les formats de fichiers valides sont  ''.gro'', ''.pdb'' oo ''.cpt'' (point de contrôle GROMACS).
 * Le fichier de topologie du système au format ''top'';  celui-ci détermine le champ de force et la façon dont les paramètres du champ de force s'appliquent au système simulé. Les topologies des parties individuelles du système simulé (soit les molécules) sont placées dans des fichiers ''itp '' distincts et sont incluses dans le fichier ''top'' avec la commande <code>#include</code>.
 *  Le fichier ''mdp'' des paramètres d'exécution. Consultez le guide GROMACS pour la description détaillée des options.
+</div>
 
 Les fichiers ''trp'' sont portables et peuvent donc être groupés (''grompp-ed'') sur une grappe, copiés sur une autre grappe et utilisés comme fichier d'entrée pour ''mdrun''.  Utilisez toujours la même version GROMACS pour ''grompp'' et ''mdrun''.  Même si ''mdrun'' peut utiliser des fichiers ''tpr'' créés avec une version antérieure de ''grompp'', la simulation peut donner des résultats inattendus.
 
@@ -560,12 +564,16 @@ Idéalement, la performance s'accroît de façon linéaire avec le nombre de cœ
 <span id="MPI_processes_/_Slurm_tasks_/_Domain_decomposition"></span>
 == Processus MPI / Tâches Slurm / Décomposition des domaines ==
 
-La façon la plus simple d'augmenter le nombre de processus MPI (''MPI-ranks'' dans la documentation GROMACS) est d'utiliser les options Slurm <code>--ntasks</code> ou <code>--ntasks-per-node</code> Slurm dans le script.  
+<div class="mw-translate-fuzzy">
+La façon la plus simple d'augmenter le nombre de processus MPI (''MPI-ranks'' dans la documentation GROMACS) est d'utiliser les options Slurm <code>--ntasks</code> ou <code>--ntasks-per-node</code> Slurm dans le script.
+</div>
 
 GROMACS utilise la méthode de '''décomposition des domaines'''<ref name="perf-background" /> (DD) 
 pour distribuer sur plusieurs cœurs CPU la solution des interactions non liantes entre particules (PP). Ceci s'effectue en découpant en domaines la boite de simulation selon les axes X, Y et/ou Z  et en assignant chacun des domaines à un processus MPI.
 
+<div class="mw-translate-fuzzy">
 Ceci fonctionne bien jusqu'à ce que le temps exigé pour la communication devienne grand par rapport à la taille du domaine en termes de ''nombre de particules'' et de ''volume du domaine''. La scalabilité parallèle tombe loin sous 1 et dans les cas extrêmes, la performance diminue avec l'augmentation du nombre de domaines.
+</div>
 
 GROMACS peut répartir la charge de façon dynamique (''dynamic load balancing'') pour déplacer dans une certaine mesure les frontières des domaines afin d'empêcher que certains prennent beaucoup plus de temps à résoudre que d'autres. Le paramètre <code>mdrun</code> est présent par défaut.
 
@@ -576,11 +584,15 @@ Dans chaque direction, un domaine ne peut pas être plus petit que le plus long 
 
 La sommation d'Ewald (PME ou ''particle mesh Ewald method'') est souvent employée pour le calcul des interactions non liantes à distance, soit les interactions qui dépassent le rayon de coupure. Puisque cette méthode nécessite une communication globale, la performance peut se dégrader rapidement lorsque plusieurs processus MPI sont impliqués à la fois dans le calcul des interactions rapprochées protéine-protéine (PP) et des interactions à distance (PME). Pour éviter cette baisse de performance, des processus MPI traiteront uniquement des interactions PME.
 
+<div class="mw-translate-fuzzy">
 Avec un total de plus de 12 processus MPI, mdrun utilise par défaut une méthode heuristique pour attribuer ces processus au calcul des interactions PME. Le nombre de rangs PME peut être sélectionné manuellement avec le paramètre mdrun <code>-npme</code>.
+</div>
 
 Dans le cas d'un débalancement de charge important entre les rangs PP et PME (c'est-à-dire que les rangs PP travaillent plus que les rangs PME au cours d'une étape), le travail peut être redirigé des rangs PP aux rangs PME en augmentant le rayon de coupure. Ceci n'aura aucun effet sur le résultat puisque la somme des forces (ou énergies) des interactions rapprochées et de celles à distance demeure la même pour une étape particulière. À partir de la version 4.6, mdrun tente de faire ceci automatiquement, sauf si le paramètre <code>-notunepme</code> est utilisé.
 
+<div class="mw-translate-fuzzy">
 À partir de la version 2018, les interactions PME peuvent être redirigées vers un GPU (voir ci-dessous), mais la version 2018.1 présente toutefois plusieurs contraintes<ref name="gpu-pme-2018.1">[http://manual.gromacs.org/documentation/2018.1/user-guide/mdrun-performance.html#gpu-accelerated-calculation-of-pme GROMACS User-Guide: GPU accelerated calculation of PME]</ref> dont le fait qu'un seul rang GPU peut être dédié aux PME.
+</div>
 
 <span id="OpenMP_threads_/_CPUs-per-task"></span>
 == Fils OpenMP / Nombre de CPU par tâche ==
@@ -590,7 +602,9 @@ Aussi, définissez la variable <i>OMP_NUM_THREADS'</i> avec
 <code>export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"</code> (recommandé)
 ou le paramètre mdrun <code>-ntomp ${SLURM_CPUS_PER_TASK:-1}</code>.
 
+<div class="mw-translate-fuzzy">
 Selon les programmeurs de GROMACS le nombre optimal de fils OpenMP par processus MPI (CPU par tâche) se situe habituellement entre 2 et 6. Cependant, il vaut la peine d'augmenter le nombre de CPU par tâche dans le cas de tâches exécutées sur un nombre élevé de nœuds.
+</div>
 
 Surtout dans les cas où la méthode PME n'est pas employée, il n'est pas nécessaire de se soucier de ''PP-PME Load Imbalance''; nous pouvons sélectionner 2 ou 4 ''ntasks-per-node'' et définir ''cpus-per-task'' par une valeur où ''ntasks-per-node * cpus-per-task'' correspond au nombre de cœurs CPU dans un nœud de calcul.
 
@@ -703,17 +717,21 @@ Ils sont différents d'autres modules en ce qu'ils peuvent être utilisés uniqu
 
 Les ressources suivantes sont pour les simulations QM/MM avec cette combinaison de  GROMACS et CP2K.
 
+<div class="mw-translate-fuzzy">
 * Documentation GROMACS, [https://manual.gromacs.org/documentation/current/reference-manual/special/qmmm.html Hybrid Quantum-Classical simulations (QM/MM) with CP2K interface].
 * BioExcel, [https://docs.bioexcel.eu/qmmm_bpg/ CP2K QM/MM Best Practices Guide].
 * BioExcel, atelier [https://docs.bioexcel.eu/2021-04-22-qmmm-gromacs-cp2k/ QM/MM with GROMACS + CP2K]<br>Comprend un tutoriel sur comment préparer et faire exécuter des simulations QM/MM et des liens vers des vidéos théoriques sur YouTube. Le tutoriel est conçu pour les ressources de CIP de BioExcel (European Centre of Excellence for Computational Biomolecular Research), mais peut être suivi sur nos systèmes avec quelques légères modifications. <br>En particulier, il faut remplacer <code>gmx_cp2k</code> par <code>gmx_mpi</code> (mixte précision) ou <code>gmx_mpi_d</code> (double précision) et modifier les scripts de tâches qui sont aussi pris en charge par Slurm.
 :* [https://github.com/bioexcel/2022-06-16-gromacs-cp2k-tutorial GitHub Repository], comprend un fichier en exemple pour le tutoriel de BioExcel.
 * Site Web de CP2K, [https://www.cp2k.org/tools:gromacs GROMACS-CP2K integration].
+</div>
 
 == GROMACS-LS ==
 GROMACS-LS<ref name="Local_stress">[https://vanegaslab.org/software GROMACS-LS and MDStress library]</ref> et la bibliothèque MDStress library permettent le calcul de champs de contraintes locaux à partir de simulations de dynamique moléculaire.
 La bibliothèque MDStress est incluse dans le module GROMACS-LS.
 
+<div class="mw-translate-fuzzy">
 Le manuel [https://vanegaslab.org/files/Local_stress.pdf Local_stress.pdf] contient l'information sur la méthode ainsi que plusieurs publications pour référence.
+</div>
 
 L'appel de commandes telles que <code>gmx_LS mdrun -rerun</code> et <code>gmx_LS trjconv</code> nécessite un fichier <code>.tpr</code>.
 Si vous souhaitez analyser une trajectoire qui a été simulée avec une version plus récente de GROMACS (par exemple 2024), une version plus ancienne ne peut pas lire ce fichier .tpr car de nouvelles options sont ajoutées à la spécification de format à chaque version majeure (2018, 2019... 2024).
@@ -726,10 +744,13 @@ Par conséquent, GROMACS-LS 2016.3 peut être utilisé pour traiter des simulati
 
 Remarques :
 
+<div class="mw-translate-fuzzy">
 * Étant donné que le manuel a été écrit pour GROMACS-LS v4.5.5 et que les commandes de base ont changé dans la version 5, vous devez utiliser des commandes comme <code>gmx_LS mdrun</code> et <code>gmx_LS trjconv</code> au lieu de <code>mdrun_LS</code> et <code>trjconv_LS</code>.
 * GROMACS-LS nécessite d'être compilé en double précision, ne prend pas en charge MPI, l'accélération matérielle SIMD, ni les GPU et est donc beaucoup plus lent que la version non optimisée de GROMACS. Il ne peut utiliser qu'un seul cœur CPU.
 * Contrairement aux autres versions corrigées de GROMACS, les modules <code>gromacs-ls/2016.3</code> et <code>gromacs/2016.6</code> peuvent être chargés en même temps.
+</div>
 
+<div class="mw-translate-fuzzy">
 {| class="wikitable sortable"
 |-
 ! module || modules pour utiliser les CPUs !!  remarques
@@ -738,6 +759,7 @@ Remarques :
 |-
 | gromacs/2016.6    || <code>StdEnv/2023  gcc/12.3  openmpi/4.1.5  gromacs/2016.6</code>   || Ce module peut être utilisé pour préparer des fichier <i>tpr</i> en entrée pour GROMACS-LS.
 |}
+</div>
 
 == GROMACS-RAMD ==
 GROMACS-RAMD est un dérivé de GROMACS qui implémente la méthode RAMD (<i>Random Acceleration Molecular Dynamics</i>).<ref name="RAMD">[https://kbbox.h-its.org/toolbox/methods/molecular-simulation/random-acceleration-molecular-dynamics-ramd/ Information sur la méthode RAMD]</ref>
@@ -760,9 +782,11 @@ GROMACS-SWAXS<ref name="GROMACS-SWAXS">[https://biophys.uni-saarland.de/software
 est une version modifiée de GROMACS pour calculer des courbes de diffusion de rayons X ou de neutrons à petit et grand angles (SAXS/SANS)
 et pour effectuer des simulations de dynamique moléculaire pilotées par SAXS/SANS.
 
+<div class="mw-translate-fuzzy">
 Veuillez vous référer à la [https://cbjh.gitlab.io/gromacs-swaxs-docs/ documentation GROMACS-SWAXS] pour des tutoriels et pour 
 la description des fonctionnalités (options d'entrée et de sortie de mdrun, options mpd, utilisation des commandes <code>gmx genscatt</code>
 et <code>gmx genenv</code>) qui ont été ajoutées aux fonctionnalités GROMACS usuelles.
+</div>
 
 {| class="wikitable sortable"
 |-
@@ -779,10 +803,14 @@ et <code>gmx genenv</code>) qui ont été ajoutées aux fonctionnalités GROMACS
 
 G_MMPBSA<ref name="g_mmpbsa">[http://rashmikumari.github.io/g_mmpbsa/ Site Web G_MMPBSA]</ref> est un outil de calcul des composantes de l'énergie de liaison qui utilise la méthode MM-PBSA, à l'exception de la composante entropique et la contribution énergétique de chaque résidu, par l'utilisation de principes de décomposition de l'énergie.
 
+<div class="mw-translate-fuzzy">
 Le développement de G_MMPBSA semble s'être arrêté en avril 2016; il n'est donc compatible qu'avec GROMACS 5.1.x.
 Pour les versions plus récentes de GROMACS, vous pourriez utiliser gmx_MMPBSA<ref name="gmx_mmpbsa" /> (voir ci-dessous).
+</div>
 
+<div class="mw-translate-fuzzy">
 La version installée peut être chargée avec <code>module load  StdEnv/2016.4  gcc/5.4.0  g_mmpbsa/2016-04-19</code>. Il s'agit de la plus récente version constituée de la version 1.6 et de modifications la rendant compatible avec GROMACS 5.1.x; elle a été compilée avec <code>gromacs/5.1.5</code> et <code>apbs/1.3</code>.
+</div>
 
 Notez que G_MMPBSA  utilise des solvants implicites et que certaines études<ref name="Zhang2017">[http://pubs.acs.org/doi/abs/10.1021/acs.jctc.7b00169 Comparison of Implicit and Explicit Solvent Models for the Calculation of Solvation Free Energy in Organic Solvents]</ref> ont démontré que les méthodes de calcul des énergies libres liantes présentent certains problèmes de précision.
 
@@ -872,7 +900,9 @@ Test
 | gmx_MMPBSA_test -ng -n 4
 }}
 
+<div class="mw-translate-fuzzy">
 Heureusement, le test s'effectue rapidement et vous pouvez l'exécuter sur le nœud de connexion.
+</div>
 
 Par la suite, quand vous utiliserez gmx_MMPBSA dans une tâche, vous devrez charger les modules et activez l'environnement virtuel comme suit&nbsp;:
 {{Commands
