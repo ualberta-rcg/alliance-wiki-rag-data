@@ -2,13 +2,16 @@
 
 <translate>
 
+
 <!--T:1-->
 The Ansys software suite comes with multiple implementations of MPI to support parallel computation. Unfortunately, none of them support our [[Running jobs|Slurm scheduler]]. For this reason, we need special instructions on how to start a parallel job for each Ansys package. In the sections below, we give examples of submission scripts for some of the packages.  While Slurm scripts should work on all clusters, Trillium users may need to make some additional [https://docs.scinet.utoronto.ca/index.php changes covered here].
+
 
 
 <!--T:2-->
 == Fluent ==
 Typically, you would use the following procedure to run Fluent on one of our clusters:
+
 
 
 <!--T:3-->
@@ -20,9 +23,10 @@ Typically, you would use the following procedure to run Fluent on one of our clu
 # If jobs frequently fail to start due to license shortages and manual resubmission of failed jobs is not convenient, consider modifying your script to requeue your job (up to 4 times) as shown under the <i>by node + requeue</i> tab further below.  Be aware that doing this will also requeue simulations that fail due to other related issues (such as divergence), resulting in wasted compute time.  Therefore, it is strongly recommended to monitor and inspect each Slurm output file to confirm that each requeue attempt is license-related.  When it is determined that a job is requeued due to a simulation issue, immediately kill the job progression manually with <code>scancel jobid</code> and correct the problem.
 # After [[Running_jobs|running the job]], you can download the data file and import it back into Fluent with <i>File > Import > Data…</i>.
 
-=== Slurm scripts === <!--T:4-->  
+=== Slurm scripts === <!--T:4-->   
 
-==== General purpose ==== <!--T:5-->  
+==== General purpose ==== <!--T:5-->   
+
 
 
 <!--T:6-->
@@ -30,8 +34,10 @@ Most Fluent jobs should use the following <i>by node</i> script to minimize solu
 
 
 
+
 <!--T:7-->
 <tabs>
+
 
 
 
@@ -83,8 +89,10 @@ else
 fi
 }}
 <translate>
+
 <!--T:9-->
 </tab>
+
 
 
 
@@ -136,8 +144,10 @@ else
 fi
 }}
 <translate>
+
 <!--T:11-->
 </tab>
+
 
 
 <!--T:12-->
@@ -176,8 +186,10 @@ else
 fi
 }}
 <translate>
+
 <!--T:13-->
 </tab>
+
 
 
 <!--T:14-->
@@ -216,8 +228,10 @@ else
 fi
 }}
 <translate>
+
 <!--T:15-->
 </tab>
+
 
 
 
@@ -275,17 +289,21 @@ else
 fi
 }}
 <translate>
+
 <!--T:17-->
 </tab>
+
 
 
 <!--T:18-->
 </tabs>
 
-==== License requeue ==== <!--T:19-->  
+==== License requeue ==== <!--T:19-->   
+
 
 <!--T:20-->
 The scripts in this section should only be used with Fluent jobs that are known to complete normally without generating any errors in the output, but typically require multiple requeue attempts to check out licenses.  They are not recommended for Fluent jobs that may 1) run for a long time before crashing 2) run to completion but contain unresolved journal file warnings, since in both cases the simulations will be repeated from the beginning until the maximum number of requeue attempts specified by the <code>array</code> value is reached.  For these types of jobs, the general purpose scripts above should be used instead.
+
 
 
 <!--T:21-->
@@ -350,8 +368,10 @@ else
 fi
 }}
 <translate>
+
 <!--T:22-->
 </tab>
+
 
 
 <!--T:23-->
@@ -415,15 +435,18 @@ else
 fi
 }}
 <translate>
+
 <!--T:24-->
 </tab>
 </tabs>
 
-==== Solution restart ==== <!--T:25-->  
+==== Solution restart ==== <!--T:25-->   
+
 
 
 <!--T:26-->
 The following scripts are provided to automate restarting very large jobs that require more than the typical seven-day maximum runtime window available on most clusters. Jobs are restarted from the most recently saved timestep files. A fundamental requirement is that the first timestep can be completed within the requested job array time limit (specified at the top of your Slurm script) when starting a simulation from an initialized solution field. It is assumed that a standard fixed timestep size is being used. To begin, a working set of sample.cas, sample.dat and sample.jou files must be present. Next, edit your sample.jou file to contain <code>/solve/dual-time-iterate 1</code> and <code>/file/auto-save/data-frequency 1</code>. Then, create a restart journal file with <code>cp sample.jou sample-restart.jou</code> and edit the sample-restart.jou file to contain <code>/file/read-cas-data sample-restart</code> instead of <code>/file/read-cas-data sample</code>. Also comment out the initialization line with a semicolon, for example <code>;/solve/initialize/initialize-flow</code>. If your second and subsequent timesteps are known to run twice as fast as the initial timestep, edit the sample-restart.jou file to add <code>/solve/dual-time-iterate 2</code>. By adding this specification, the solution will only be restarted after two timesteps have been completed following the initial timestep. An output file for each timestep will still be saved in the output subdirectory. The value 2 is arbitrary but should be chosen so that the time for 2 steps fits within the job array time limit. Doing so minimizes the number of solution restarts which are computationally expensive. If the first timestep performed by sample.jou starts from a converged (previous) solution, choose 1 instead of 2, since likely all timesteps will require a similar amount of walltime to complete. Assuming 2 is chosen, the total time of simulation to be completed will be 1*Dt+2*Nrestart*Dt where Nrestart is the number of solution restarts specified in the script. The total number of timesteps (and hence the number of output files generated) will therefore be 1+2*Nrestart. The value for the time resource request should be chosen so that the initial timestep and subsequent timesteps will complete comfortably within the Slurm time window specifiable up to a maximum of <code>#SBATCH --time=07-00:00</code> days.
+
 
 
 <!--T:27-->
@@ -509,8 +532,10 @@ else
 fi
 }}
 <translate>
+
 <!--T:28-->
 </tab>
+
 
 
 <!--T:29-->
@@ -595,15 +620,18 @@ else
 fi
 }}
 <translate>
+
 <!--T:30-->
 </tab>
 </tabs>
 
-=== Journal files === <!--T:31-->  
+=== Journal files === <!--T:31-->   
+
 
 
 <!--T:32-->
 Fluent journal files can include basically any command from Fluent's Text User Interface (TUI); commands can be used to change simulation parameters like temperature, pressure, and flow speed. You can then run a series of simulations under different conditions with a single case file, by only changing the parameters in the journal file. Refer to the [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/corp/v242/en/flu_ug/flu_ug.html Fluent User's Guide] for more information, and a list of all commands that can be used.  The following journal files are set up with <code>/file/cff-files no</code> to use the legacy .cas/.dat file format (the default in module versions 2019R3 or older).  Set this to <code>/file/cff-files yes</code> instead to use the more efficient .cas.h5/.dat.h5 file format (the default in module versions 2020R1 or newer).
+
 
 
 <!--T:33-->
@@ -642,8 +670,10 @@ Fluent journal files can include basically any command from Fluent's Text User I
 /exit
 }}
 <translate>
+
 <!--T:34-->
 </tab>
+
 
 
 <!--T:35-->
@@ -687,8 +717,10 @@ Fluent journal files can include basically any command from Fluent's Text User I
 /exit
 }}
 <translate>
+
 <!--T:36-->
 </tab>
+
 
 
 <!--T:37-->
@@ -751,17 +783,20 @@ Fluent journal files can include basically any command from Fluent's Text User I
 /exit
 }}
 <translate>
+
 <!--T:38-->
 </tab>
 </tabs>
 
-=== UDFs === <!--T:39-->  
+=== UDFs === <!--T:39-->   
+
 
 
 <!--T:40-->
 The first step is to transfer your user-defined function or UDF (namely the sampleudf.c source file and any additional dependency files) to the cluster.  When uploading from a Windows machine, be sure the text mode setting of your transfer client is used, otherwise Fluent won't be able to read the file properly on the Linux cluster.  The UDF should be placed in the directory where your journal, cas, and dat files reside.  Next, add one of the following commands into your journal file before the commands that read in your simulation cas/dat files.   Regardless of whether you use the interpreted or compiled UDF approach,  before uploading your cas file onto the cluster, please check that neither the ''Interpreted UDFs'' dialog box or the ''UDF Library Manager'' dialog box are configured to use any UDF; this will ensure that only the journal file commands are in control when jobs are submitted.
 
-==== Interpreted ==== <!--T:41-->  
+==== Interpreted ==== <!--T:41-->   
+
 
 
 
@@ -770,10 +805,12 @@ To tell Fluent to interpret your UDF at runtime, add the following command line 
 
  
 
+
 <!--T:43-->
 define/user-defined/interpreted-functions "sampleudf.c" "cpp" 10000 no
 
-==== Compiled ==== <!--T:44-->  
+==== Compiled ==== <!--T:44-->   
+
 
 
 
@@ -782,8 +819,10 @@ To use this approach, your UDF must be compiled on an Alliance cluster at least 
 
  
 
+
 <!--T:46-->
 define/user-defined/compiled-functions compile libudf yes sampleudf.c "" ""
+
 
 
 
@@ -792,15 +831,18 @@ and/or
 
  
 
+
 <!--T:48-->
 define/user-defined/compiled-functions load libudf
 
-==== Parallel ==== <!--T:49-->  
+==== Parallel ==== <!--T:49-->   
+
 
 
 
 <!--T:50-->
 Before a UDF can be used with a Fluent parallel job (single node SMP and multinode MPI), it will need to be parallelized.  By doing this we control how/which processes (host and/or compute) run specific parts of the UDF code when Fluent is run in parallel on the cluster. The instrumenting procedure involves adding compiler directives, predicates, and reduction macros into your working serial UDF. Failure to do so will result in Fluent running slow at best, or immediately crashing at worst.  The end result will be a single UDF that runs efficiently when Fluent is used in both serial and parallel mode.  The topic is described in detail in [https://ansyshelp.ansys.com/public/account/secured?returnurl=//////Views/Secured/corp/v242/en/flu_udf/flu_udf_ChapParallelUDFUsage.html?q=parallel%20considerations Parallel Considerations]] .
+
 
 
 
@@ -822,14 +864,16 @@ where a basic manually created injection steady file format might look like
   (( 2.90e-02  5.00e-03 0.0 -1.00e-03  0.0  0.0  1.00e-04  2.93e+02  1.00e-06   0.0   0.0        0.0 ) injection-0:1 )
 Note that injection files for DPM simulations are generally set up for either steady or unsteady particle tracking where the format of the former is described in [https://ansyshelp.ansys.com/public/account/secured?returnurl=//////Views/Secured/corp/v242/en/flu_udf/flu_udf.html 2024R2 Fluent Customization Manual] <I>Part III: Solution Mode | Chapter 24: Modeling Discrete Phase | 24.3. Setting Initial Conditions for the Discrete Phase | 24.3.13 Point Properties for File Injections | 24.3.13.1 Steady File Format</I>.
 
-== CFX == <!--T:52-->  
+== CFX == <!--T:52-->   
 
-=== Slurm scripts === <!--T:53-->  
+=== Slurm scripts === <!--T:53-->   
+
 
 
 
 <!--T:54-->
 A summary of command-line options can be printed by running <code>cfx5solve -help</code> where the same module version loaded in your Slurm script should be first manually loaded.  By default <code>cfx5solve</code> will run in single precision (<code>-single</code>).  To run  in double precision add the <code>-double</code> option, noting that doing so will also double memory requirements.  By default <code>cfx5solve</code> can support meshes with up to 80 million elements (structured) or 200 million elements (unstructured).  For larger meshes with up to 2 billion elements, add the <code>-large</code> option.  Various combinations of these options can be specified for the Partitioner, Interpolator or Solver.  Consult the [https://ansyshelp.ansys.com/public/Views/Secured/corp/v251/en/pdf/Ansys_CFX-Solver_Manager_Users_Guide.pdf ANSYS CFX-Solver Manager User's Guide] for further details.
+
 
 
 
@@ -864,8 +908,10 @@ else
 fi
 }}
 <translate>
+
 <!--T:56-->
 </tab>
+
 
 
 
@@ -904,11 +950,13 @@ fi
 
 }}
 <translate>
+
 <!--T:58-->
 </tab>
 </tabs>
 
-== Workbench == <!--T:59-->  
+== Workbench == <!--T:59-->   
+
 
 
 <!--T:60-->
@@ -924,14 +972,17 @@ Before submitting a Workbench job to the queue with a Slurm script, you must ini
 # Quit Workbench and submit your job using one of the Slurm scripts shown below.
 
 
+
 <!--T:61-->
 Since a compute node with up to 96cores, 768GB memory and 8hours runtime can now be reserved for an OnDemand desktop session, consider running your Workbench simulations directly from within the Workbench native GUI when possible. This is a more intuitive option compared to submitting the job to the queue with a Slurm script.
 
-=== Slurm scripts === <!--T:62-->  
+=== Slurm scripts === <!--T:62-->   
+
 
 
 <!--T:63-->
 A project file can be submitted to the queue by customizing one of the following scripts and then running the <code>sbatch script-wbpj-202X.sh</code> command.
+
 
 
 <!--T:64-->
@@ -981,6 +1032,7 @@ export I_MPI_HYDRA_BOOTSTRAP=ssh
 runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 }}
 <translate>
+
 <!--T:65-->
 </tab>
 <tab name="Single node (StdEnv/2020)">
@@ -1031,8 +1083,10 @@ export I_MPI_HYDRA_BOOTSTRAP=ssh
 runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 }}
 <translate>
+
 <!--T:66-->
 </tab> 
+
 
 
 
@@ -1040,19 +1094,22 @@ runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 To avoid writing the solution when a running job successfully completes, change <code>Save(Overwrite=True)</code> to <code>Save(Overwrite=False)</code> in the last line of the above Slurm script.  Doing this makes it easier to determine how well the simulation scales when <code>#SBATCH --ntasks</code> is increased, since the initialized solution will not be overwritten by each test job.
 </tabs>
 
-== Mechanical == <!--T:68-->  
+== Mechanical == <!--T:68-->   
+
 
 
 
 <!--T:69-->
 The input file can be generated from within your interactive Workbench Mechanical session by clicking on <i>Solution -> Tools -> Write Input Files</i> then specifying <i>File name:</i> YOURAPDLFILE.inp and <i>Save as type:</i> APDL Input Files (*.inp).  APDL jobs can then be submitted to the queue with the <code>sbatch script-name.sh</code> command.
 
-=== Slurm scripts === <!--T:70-->  
+=== Slurm scripts === <!--T:70-->   
+
 
 
 
 <!--T:71-->
 In the following scripts, lines beginning with <code>##SBATCH</code> are commented.
+
 
 
 
@@ -1088,6 +1145,7 @@ mkdir outdir-$SLURM_JOBID
 mapdl -smp -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp
 }}
 <translate>
+
 <!--T:73-->
 </tab>
 <tab name="Distributed memory parallel (CPU)">
@@ -1129,6 +1187,7 @@ else
 fi
 }}
 <translate>
+
 <!--T:74-->
 </tab>
 <tab name="Shared memory parallel (GPU)">
@@ -1165,6 +1224,7 @@ export ANSGPU_PRINTDEVICES=1
 mapdl -smp -acc nvidia -na $SLURM_GPUS_ON_NODE -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID  -i YOURAPDLFILE.inp
 }}
 <translate>
+
 <!--T:75-->
 </tab>
 <tab name="Distributed memory parallel (GPU)">
@@ -1209,9 +1269,11 @@ else
 fi
 }}
 <translate>
+
 <!--T:76-->
 </tab>
 </tabs>
+
 
 
 
@@ -1220,18 +1282,21 @@ Ansys allocates 1024 MB total memory and 1024 MB database memory by default for 
 
  
  
+
 <!--T:78-->
 [gra-login2:~/testcase] cat YOURAPDLFILE.inp | grep version
  ! ANSYS input file written by Workbench version 2019 R3
 
-== Rocky == <!--T:79-->  
+== Rocky == <!--T:79-->   
+
 
 
 
 <!--T:80-->
 This section provides sample Slurm scripts to solve standalone non-coupled Rocky simulations in a cluster queue. Both scripts are configured with <code>RESUME=0</code> so simulations are solved from the beginning by default.  To restart a partially completed simulation, set <code>RESUME=1</code> and resubmit the script to the queue.  To get a full listing of command line options, run <code>Rocky -h</code> on the command line after loading the Ansys module.  Since a lock file is generated every time a simulation is started, only one job should be submitted at a time from the same directory. Regarding which script to use, while all simulations should be tested independently, for a basic test case the GPU only script was found to outperform the CPU only script by a factor of 3.5x. Further increases in resources beyond 6cpus (for the CPU only script) or 2cpu + 1g (1/7 of a H100 GPU for the GPU based script) provided no further speedup based on scaling testing for either script.   Given these results, it appears likely that the GPU-based script will provide significantly faster solution times compared to just using CPUs for other standalone Rocky simulations.  As shown in on each cluster wiki page or as summarized under [[Allocations and compute scheduling#Ratios_in_bundles|Ratios in bundles]], all clusters but Narval have H100 GPUs.  Therefore, when using the GPU script on Narval, the <code>--gpus</code> Slurm option should be changed to request an a100 GPYU instead.  Note that as of May 2026, only Rocky with the <code>ansys/2025R2|2.04</code> modules have been tested but not the <code>ansys/2025R1|1.02</code> modules yet.
 
-=== Slurm scripts === <!--T:81-->  
+=== Slurm scripts === <!--T:81-->   
+
 
 
 
@@ -1273,6 +1338,7 @@ else
 fi
 }}
 <translate>
+
 <!--T:83-->
 </tab>
 <tab name="GPU-based">
@@ -1312,11 +1378,13 @@ else
 fi
 }}
 <translate>
+
 <!--T:84-->
 </tab>
 </tabs>
 
-== Electronics == <!--T:85-->  
+== Electronics == <!--T:85-->   
+
 
 
 
