@@ -1,15 +1,10 @@
 <languages />
 
 
-
 Plusieurs implémentations MPI incluses dans la suite Ansys permettent le calcul parallèle, mais aucune n'est compatible avec l'ordonnanceur Slurm (voir [[Running_jobs/fr|Exécuter des tâches]]). Pour cette raison, il faut utiliser des directives particulières à chaque paquet Ansys pour lancer une tâche parallèle. Vous trouverez ci-dessous quelques scripts de soumission pour ce faire. Ils fonctionneront sur toutes les grappes, mais sur Trillium, vous devrez peut-être [https://docs.scinet.utoronto.ca/index.php faire certains ajustements].
-
-
 
 == Fluent ==
 La procédure suivante est habituellement utilisée pour exécuter Fluent sur nos grappes&nbsp;:
-
-
 
 # Sur votre ordinateur, préparez votre tâche avec Fluent du Ansys Workbench jusqu'au point où les calculs seraient exécutés.
 # Exportez le fichier de cas avec ''File > Export > Case…'' ou localisez le répertoire dans lequel Fluent enregistre les fichiers pour votre projet. Le nom des fichiers de cas a souvent un format tel que FFF-1.cas.gz.
@@ -25,18 +20,12 @@ La procédure suivante est habituellement utilisée pour exécuter Fluent sur no
 <span id="General_purpose"></span>
 ==== Utilisation générale ====   
 
-
-
 La plupart des tâches Fluent devraient utiliser le script ''par nœud'' ci-dessous pour minimiser le temps d'attente et maximiser la performance avec le moins de nœuds possible. Les tâches demandant beaucoup de cœurs CPU pourraient attendre moins longtemps dans la queue avec le script ''par cœur'', mais le démarrage d’une tâche utilisant plusieurs nœuds peut prendre beaucoup plus de temps, ce qui en diminue l'intérêt. Il faut aussi tenir compte du fait qu'exécuter des tâches intensives sur un nombre indéterminé de nœuds pouvant être très élevé fait en sorte que ces tâches seront beaucoup plus susceptibles de planter si un des nœuds de calcul fait défaut pendant la simulation. Les scripts suivants utilisent la mémoire partagée pour les tâches utilisant un seul nœud et la mémoire distribuée (avec MPI et l’interconnexion CHP appropriée) pour les tâches en utilisant plusieurs.
 
 Les deux onglets pour Narval peuvent ètre une alternative plus robuste si Fluent plante pendant la phase initiale de partitionnement automatique du maillage lors de l'utilisation des scripts Intel standards avec le solveur parallèle. L'autre option serait d'effectuer manuellement le partitionnement du maillage dans l'interface graphique de Fluent, puis d'essayer d'exécuter à nouveau la tâche sur la grappe avec les scripts Intel. Ainsi, vous pouvez inspecter les statistiques de partitionnement et spécifier la méthode pour obtenir un résultat optimal. Le nombre de partitions de maillage doit être un multiple entier du nombre de cœurs; pour une efficacité optimale, assurez-vous d'avoir au moins 10&nbsp;000 cellules par cœur.
 
 
-
-
 <tabs>
-
-
 
 
 <tab name="Plusieurs nœuds (par nœud)">
@@ -88,8 +77,6 @@ fi
 </tab>
 
 
-
-
 <tab name="Plusieurs nœuds (par cœur)">
 {{File
 |name=script-flu-bycore-intel.sh
@@ -139,7 +126,6 @@ fi
 </tab>
 
 
-
 <tab name="Plusieurs nœuds (par nœud, Narval)">
 {{File
 |name=script-flu-bynode-openmpi.sh
@@ -176,8 +162,6 @@ fi
 
 </tab>
 
-
-
 <tab name="Plusieurs nœuds (par cœur, Narval)">
 {{File
 |name=script-flu-bycore-openmpi.sh
@@ -213,8 +197,6 @@ fi
 }}
 
 </tab>
-
-
 
 
 <tab name="Plusieurs nœuds (par nœud, Trillium)">
@@ -271,16 +253,12 @@ fi
 
 </tab>
 
-
-
 </tabs>
 
 <span id="License_requeue"></span>
 ==== Remise en file d'attente pour obtenir la licence ====   
 
-
 Les scripts suivants ne doivent être utilisés qu'avec des tâches Fluent qui sont connues pour se terminer normalement sans générer d'erreurs en sortie, mais qui nécessitent généralement plusieurs tentatives de remise en file d'attente pour obtenir la licence. Ils ne sont pas recommandés pour les tâches Fluent qui peuvent 1) s'exécuter pendant une longue période avant de planter 2) s'exécuter jusqu'à la fin mais contenir des avertissements de journalisation; dans les deux cas, les simulations seront répétées depuis le début jusqu'à ce que le nombre maximal de tentatives de remise en file d'attente spécifié par la valeur array soit atteint. Pour ces types de tâches, les scripts à usage général (ci-dessus) doivent être utilisés.
-
 
 
 <tabs>
@@ -501,8 +479,6 @@ fi
 
 </tab>
 
-
-
 <tab name="Plusieurs nœuds (par cœur + redémarrage)">
 {{File
 |name=script-flu-bycore+restart.sh
@@ -589,11 +565,7 @@ fi
 <span id="Journal_files"></span>
 === Fichiers de journalisation ===   
 
-
-
 Les fichiers de journalisation peuvent contenir toutes les commandes de l'interface TUI (Text User Interface) de Fluent; elles peuvent être utilisées pour modifier des paramètres de simulation comme la température, la pression ou la vitesse du flux. Vous pouvez ainsi effectuer une série de simulations sous différentes conditions simplement en modifiant les paramètres du fichier de journalisation. Consultez le [https://ansyshelp.ansys.com/public/account/secured?returnurl=/Views/Secured/corp/v242/en/flu_ug/flu_ug.html guide d'utilisation de Fluent] pour plus d'information ainsi que pour connaître la liste des commandes. Les fichiers qui suivent sont configurés avec <code>/file/cff-file no</code> pour utiliser les formats de fichiers .cas/.dat qui sont les formats par défaut pour les modules jusqu'à 2019R3. Pour utiliser les formats .cas.h5/.dat.h5 plus efficaces des versions à partir de 2020R1, la configuration est <code>/file/cff-files yes</code>.
-
-
 
 <tabs>
 <tab name="Fichier de journalisation (stable, cas)">
@@ -630,8 +602,6 @@ Les fichiers de journalisation peuvent contenir toutes les commandes de l'interf
 }}
 
 </tab>
-
-
 
 <tab name="Fichier de journalisation (stable, cas + données)">
 {{File
@@ -673,8 +643,6 @@ Les fichiers de journalisation peuvent contenir toutes les commandes de l'interf
 }}
 
 </tab>
-
-
 
 <tab name="Fichier de journalisation (temporaire)">
 {{File
@@ -740,56 +708,30 @@ Les fichiers de journalisation peuvent contenir toutes les commandes de l'interf
 <span id="UDFs"></span>
 === Fonctions UDF ===   
 
-
-
 La première étape est de transférer vers la grappe votre UDF (''User-Defined Function''), soit le fichier source sampleudf.c et tous les fichiers de dépendance supplémentaires. Lors du téléchargement à partir d'une machine Windows, assurez-vous que le mode texte de votre client de transfert est utilisé, sinon Fluent ne pourra pas lire correctement le fichier sur la grappe qui, elle, exécute Linux. L'UDF doit être placée dans le répertoire où résident vos fichiers de journalisation, cas et dat. Ajoutez ensuite l'une des commandes suivantes dans votre fichier de journalisation avant les commandes qui lisent vos fichiers de simulation cas/dat. Que vous utilisiez l'approche UDF interprétée ou compilée, avant de télécharger votre fichier de cas, vérifiez que les boîtes de dialogue ''Interpreted UDFs'' et ''UDF Library Manager'' ne sont pas configurées pour utiliser un UDF; ceci garantira que lorsque les tâches sont soumises, seules les commandes du fichier de journalisation auront le contrôle.
 
 <span id="Interpreted"></span>
 ==== Interprété ====   
 
-
-
-
 Pour indiquer à Fluent d'interpréter votre UDF au moment de l'exécution, ajoutez la ligne de commande suivante dans votre fichier journal avant que les fichiers cas/dat soient lus ou initialisés. Remplacez le nom de fichier sampleudf.c par le nom de votre fichier source. La commande reste la même, que la simulation soit exécutée séquentiellement ou en parallèle. Pour vous assurer que l'UDF se trouve dans le même répertoire que le fichier de journalisation, ouvrez votre fichier cas dans l'interface graphique Fluent, supprimez toutes les définitions gérées et réenregistrez-le. Ceci garantira que seule la commande/méthode suivante est en contrôle lors de l'exécution de Fluent. Pour utiliser une UDF interprétée avec des tâches parallèles, elle devra être parallélisée comme décrit dans la section ci-dessous.
-
- 
-
 
 define/user-defined/interpreted-functions "sampleudf.c" "cpp" 10000 no
 
 <span id="Compiled"></span>
 ==== Compilé ====   
 
-
-
-
 Pour utiliser cette approche, votre UDF doit être compilée sur une de nos grappes au moins une fois. Ceci créera une structure de sous-répertoire libudf contenant la bibliothèque partagée libudf.so requise. Le répertoire libudf ne peut pas être simplement copié d'un système distant (comme votre ordinateur portable) vers l'Alliance car les dépendances de la bibliothèque partagée ne seront pas satisfaites, ce qui fera planter Fluent au démarrage. Cela dit, une fois que vous avez compilé votre UDF sur une de nos grappes, vous pouvez transférer la libudf nouvellement créée vers n'importe quelle autre de nos grappes, à condition que votre compte charge la même version du module d'environnement StdEnv. Une fois copiée, l'UDF peut être utilisée en supprimant le commentaire de la deuxième ligne (''load'') libudf ci-dessous dans votre fichier de journalisation quand une tâche est soumise. Les deux lignes libudf (''compile'' et ''load'') ne doivent pas être laissées sans commentaire lors de la soumission de tâches, sinon votre UDF sera automatiquement (re)compilée pour chaque tâche. Non seulement cette méthode est très inefficace, mais elle peut également entraîner des conflits de build de type ''racetime'' si plusieurs tâches sont exécutées à partir du même répertoire. Outre la configuration de votre fichier de journalisation pour construire votre UDF, l'interface graphique de Fluent peut également être utilisée. Pour ce faire, ajoutez le fichier source UDF dans la boîte de dialogue ''Compiled UDFs'', et cliquez sur ''Build''. Lorsque vous utilisez une UDF compilée avec des tâches parallèles, votre fichier source doit être parallélisé comme indiqué dans la section ci-dessous.
-
- 
-
 
 define/user-defined/compiled-functions compile libudf yes sampleudf.c "" ""
 
-
-
-
 et/ou
-
- 
-
 
 define/user-defined/compiled-functions load libudf
 
 <span id="Parallel"></span>
 ==== Parallèle ====   
 
-
-
-
 Avant qu'une UDF puisse être utilisée avec une tâche parallèle Fluent (SMP à nœud unique et MPI à nœuds multiples), elle doit être parallélisée. En procédant ainsi, nous contrôlons comment/quels processus (hôte et/ou calcul) exécutent des parties spécifiques du code UDF lorsque Fluent est exécuté en parallèle sur la grappe. La procédure d'instrumentation consiste à ajouter des directives de compilation, des prédicats et des macros de réduction dans votre UDF séquentielle. Si vous ne le faites pas, Fluent fonctionnera lentement, au mieux, ou plantera immédiatement, au pire. Le résultat final sera une UDF unique qui s'exécute efficacement lorsque Fluent est utilisé à la fois en mode séquentiel et en mode parallèle. Le sujet est décrit en détail dans [https://ansyshelp.ansys.com/public/account/secured?returnurl=//////Views/Secured/corp/v242/en/flu_udf/flu_udf_ChapParallelUDFUsage.html?q=parallel%20considerations Fluent Customization Manual, Part I: Chapter 7: Parallel Considerations]].
-
-
-
 
 ==== DPM ====
 Les UDF peuvent être utilisées pour personnaliser les modèles de phase discrète (DPM pour ''Discrete Phase Models'') comme décrit dans 
@@ -813,13 +755,7 @@ notant que les fichiers d'injection pour les simulations DPM sont généralement
 <span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===   
 
-
-
-
 Le résumé des options de ligne de commande peut être affiché avec <code>cfx5solve -help</code>. La version du module chargée dans votre script pour l'ordonnanceur doit d'abord être chargée manuellement. Par défaut, <code>cfx5solve</code> s'exécute en simple précision (<code>-single</code>). Pour exécuter <code>cfx5solve</code> en double précision, ajoutez l'option <code>-double</code>, sachant que cela doublera également les besoins en mémoire. Par défaut, <code>cfx5solve</code> prend en charge les maillages jusqu'à 80 millions d'éléments structurés ou 200 millions d'éléments non structurés. Pour les maillages plus grands (jusqu'à 2 milliards d'éléments), ajoutez l'option <code>-large</code>. Différentes combinaisons de ces options peuvent être uitilisées pour le partitionneur, l'interpolateur ou le solveur. Consultez [https://ansyshelp.ansys.com/public/Views/Secured/corp/v251/en/pdf/Ansys_CFX-Solver_Manager_Users_Guide.pdf Ansys CFX-Solver Manager User's Guide] pour plus de détails.
-
-
-
 
 <tabs>
 <tab name="Nœud simple">
@@ -851,9 +787,6 @@ fi
 }}
 
 </tab>
-
-
-
 
 <tab name="Plusieurs nœuds">
 {{File
@@ -893,8 +826,6 @@ fi
 
 == Workbench ==   
 
-
-
 Avant de soumettre une tâche Workbench à la file d'attente avec un script Slurm, vous devez l'initialiser une fois, comme décrit dans les étapes suivantes.<br>
 # Sur la grappe où vous soumettrez les tâches Workbench, [[Open OnDemand#Logging_into_the_Open_OnDemand_portal|OnDemand | ouvrez un bureau OnDemand]].
 # Une fois le bureau affiché, ouvrez une fenêtre de terminal et accédez au répertoire contenant votre fichier YOURPROJECT.wbpj.
@@ -906,18 +837,12 @@ Avant de soumettre une tâche Workbench à la file d'attente avec un script Slur
 # Dans la fenêtre contextuelle Ansys Workbench qui affiche ''The current project has been modified. Do you want to save it?'' cliquez sur ''No''. 
 # Quittez Workbench et soumettez la tâche avec un des scripts ci-dessous.
 
-
-
 Puisqu'il est désormais possible de réserver un nœud de calcul doté de jusqu'à 96 cœurs, 768Go de mémoire et 8 heures d'autonomie pour une session de bureau OnDemand, exécutez vos simulations Workbench directement de l'interface graphique native de Workbench lorsque cela est possible; il s'agit d'une option plus intuitive que de soumettre la tâche à la file d'attente via un script Slurm
 
 <span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===   
 
-
-
 Pour soumettre un fichier de projet à la queue, personnalisez les scripts suivants et lancez la commande <code>sbatch script-wbpj-202X.sh</code>.
-
-
 
 <tabs>
 <tab name="Nœud simple (StdEnv/2023)">
@@ -927,7 +852,6 @@ Pour soumettre un fichier de projet à la queue, personnalisez les scripts suiva
 |contents=
 #!/bin/bash
 
-
 #SBATCH --account=def-account
 #SBATCH --time=00-03:00                # Time (DD-HH:MM)
 #SBATCH --mem=16G                      # Specify total memory
@@ -936,17 +860,13 @@ Pour soumettre un fichier de projet à la queue, personnalisez les scripts suiva
 ##SBATCH --exclusive                   # Uncomment ONLY for scaling testing
 ##SBATCH --constraint=broadwell        # Uncomment to specify an available node type
 
-
 module load StdEnv/2023 ansys/2023R2   # OR newer Ansys module versions
-
 
 if [ "$SLURM_NNODES" == 1 ]; then
   MEMPAR=0                             # Set to 0 for SMP (shared memory parallel)
 else
   MEMPAR=1                             # Set to 1 for DMP (distributed memory parallel)
 fi
-
-
 
 rm -fv *_files/.lock
 MWFILE=~/.mw/Application\ Data/Ansys/`basename $(find $EBROOTANSYS/v* -maxdepth 0 -type d)`/SolveHandlers.xml
@@ -955,10 +875,8 @@ sed -re "s/(.Processors>+)[a-zA-Z0-9]*(<\/MaxNumber.)/\1$SLURM_NTASKS\2/" -i "$M
 sed -i "s!UserConfigured=\"0\"!UserConfigured=\"1\"!g" "$MWFILE"
 
 
-
 export KMP_AFFINITY=disabled
 export I_MPI_HYDRA_BOOTSTRAP=ssh
-
 
 
 runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
@@ -972,8 +890,6 @@ runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 |contents=
 #!/bin/bash
 
-
-
 #SBATCH --account=def-account
 #SBATCH --time=00-03:00                # Time (DD-HH:MM)
 #SBATCH --mem=16G                      # Specify total memory
@@ -982,11 +898,7 @@ runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 ##SBATCH --exclusive                   # Uncomment ONLY for scaling testing
 ##SBATCH --constraint=broadwell        # Uncomment to specify an available node type
 
-
-
 module load StdEnv/2020 ansys/2022R2   # OR older Ansys module versions
-
-
 
 if [ "$SLURM_NNODES" == 1 ]; then
   MEMPAR=0                             # Set to 0 for SMP (shared memory parallel)
@@ -994,27 +906,19 @@ else
   MEMPAR=1                             # Set to 1 for DMP (distributed memory parallel)
 fi
 
-
-
 rm -fv *_files/.lock
 MWFILE=~/.mw/Application\ Data/Ansys/`basename $(find $EBROOTANSYS/v* -maxdepth 0 -type d)`/SolveHandlers.xml
 sed -re "s/(.AnsysSolution>+)[a-zA-Z0-9]*(<\/Distribute.)/\1$MEMPAR\2/" -i "$MWFILE"
 sed -re "s/(.Processors>+)[a-zA-Z0-9]*(<\/MaxNumber.)/\1$SLURM_NTASKS\2/" -i "$MWFILE"
 sed -i "s!UserConfigured=\"0\"!UserConfigured=\"1\"!g" "$MWFILE"
 
-
-
 export KMP_AFFINITY=disabled
 export I_MPI_HYDRA_BOOTSTRAP=ssh
-
-
 
 runwb2 -B -E "Update();Save(Overwrite=True)" -F YOURPROJECT.wbpj
 }}
 
 </tab> 
-
-
 
 
 Pour ne pas écrire la solution lorsqu'une tâche en cours se termine avec succès, remplacez <code>Save(Overwrite=True)</code> par <code>Save(Overwrite=False)</code> dans la dernière ligne du script Slurm ci-dessus. Cela facilitera l'évaluation de la mise à l'échelle de la simulation lorsque la valeur de <code>#SBATCH --ntasks</code> est augmentée, car la solution initialisée ne sera pas écrasée par chaque tâche de test.
@@ -1023,19 +927,13 @@ Pour ne pas écrire la solution lorsqu'une tâche en cours se termine avec succ�
 == Mechanical ==   
 
 
-
-
 Le fichier d'entrée peut être généré dans votre session interactive Workbench Mechanical en cliquant sur ''Solution -> Tools -> Write Input Files'' et en spécifiant'' File name: pour YOURAPDLFILE.inp'' et <i>Save as type:</i> APDL Input Files (*.inp).. Les tâches APDL peuvent ensuite être soumises à la queue avec la commande <code>sbatch script-name.sh</code>.
 
 <span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===   
 
 
-
-
 Les lignes qui commencent par <code>##SBATCH</code> sont des commentaires.
-
-
 
 
 <tabs>
@@ -1052,18 +950,12 @@ Les lignes qui commencent par <code>##SBATCH</code> sont des commentaires.
 #SBATCH --tasks=8               # Specify number of cores
 #SBATCH --cpus-per-task=1       # Do not change
 
-
-
 module load StdEnv/2023
 #module load ansys/2023R2
 module load ansys/2024R1.03
 
-
-
 mkdir outdir-$SLURM_JOBID
 [[ "$CC_CLUSTER" = cedar ]] && export LD_LIBRARY_PATH=$EBROOTGCC/../lib/gcc
-
-
 
 mapdl -smp -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.inp
 }}
@@ -1083,21 +975,15 @@ mapdl -smp -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID -i YOURAPDLFILE.
 ##SBATCH --ntasks-per-node=4    # Specify cores per node (optional)
 #SBATCH --cpus-per-task=1       # Do not change
 
-
-
 module load StdEnv/2023
 #module load ansys/2023R2
 module load ansys/2024R1.03
-
-
 
 mkdir outdir-$SLURM_JOBID
 if [[ "$CC_CLUSTER" = cedar ]]; then
  ln -s $EBROOTGCC/../lib/gcc/libstdc++.so.6.0.29 $PWD/outdir-$SLURM_JOBID/libstdc++.so.6.0.29
  export LD_LIBRARY_PATH=$PWD/outdir-$SLURM_JOBID
 fi
-
-
 
 if [[ "$CC_CLUSTER" = beluga  ]]; then
   export KMP_AFFINITY=none
@@ -1124,18 +1010,12 @@ fi
 ##SBATCH --gpus-per-node=h100:1  # Temporarily required on mini-graham
 ##SBATCH --partition=debug       # Temporarily required on mini-graham
 
-
-
 module load StdEnv/2023
 #module load ansys/2023R2
 module load ansys/2024R1.03
 
-
-
 mkdir outdir-$SLURM_JOBID
 [[ "$CC_CLUSTER" = cedar ]] && export LD_LIBRARY_PATH=$EBROOTGCC/../lib/gcc
-
-
 
 export ANSGPU_PRINTDEVICES=1
 mapdl -smp -acc nvidia -na $SLURM_GPUS_ON_NODE -b nolist -np $SLURM_NTASKS -dir outdir-$SLURM_JOBID  -i YOURAPDLFILE.inp
@@ -1158,21 +1038,15 @@ mapdl -smp -acc nvidia -na $SLURM_GPUS_ON_NODE -b nolist -np $SLURM_NTASKS -dir 
 ##SBATCH --gpus-per-node=h100:1  # Temporarily required on mini-graham
 ##SBATCH --partition=debug       # Temporarily required on mini-graham
 
-
-
 module load StdEnv/2023
 #module load ansys/2023R2
 module load ansys/2024R1.03
-
-
 
 mkdir outdir-$SLURM_JOBID
 if [[ "$CC_CLUSTER" = cedar ]]; then
  ln -s $EBROOTGCC/../lib/gcc/libstdc++.so.6.0.29 $PWD/outdir-$SLURM_JOBID/libstdc++.so.6.0.29
  export LD_LIBRARY_PATH=$PWD/outdir-$SLURM_JOBID
 fi
-
-
 
 export ANSGPU_PRINTDEVICES=1
 if [[ "$CC_CLUSTER" = beluga  ]]; then 
@@ -1187,28 +1061,17 @@ fi
 </tabs>
 
 
-
-
 Par défaut, Ansys alloue aux tâches APDL 1024Mo de mémoire totale et 1024Mo de mémoire pour les bases de données. Ces valeurs peuvent être définies manuellement (ou modifiées) avec l'ajout des arguments<code>-m 1024</code> et/ou <code>-db 1024</code> sur la dernière ligne de commande mapdl des scripts ci-dessus. Si vous utilisez à distance un serveur de licence de votre établissement qui a plusieurs licences Ansys, il pourrait être nécessaire d'ajouter des arguments comme <code>-p aa_r</code> ou <code>-ppf anshpc</code>, selon le module que vous utilisez. Comme d'habitude, effectuez des tests détaillés de mise à l'échelle avant de lancer des tâches en production pour vous assurer que vous utilisez le nombre optimal de cœurs et la bonne quantité minimale de mémoire. Les scripts pour nœud simple avec mémoire parallèle partagée (SMP pour ''Shared Memory Parallel'') offriront une meilleure performance que les scripts pour plusieurs nœuds avec mémoire parallèle distribuée (DMP pour ''Distributed Memory Parallel'') et devraient être utilisés autant que possible. Pour prévenir les problèmes de compatibilité, le module qui est chargé dans votre script devrait idéalement correspondre à la version employée pour générer le fichier en entrée.
-
- 
- 
 
 [gra-login2:~/testcase] cat YOURAPDLFILE.inp | grep version
  ! ANSYS input file written by Workbench version 2019 R3
 
 == Rocky ==   
 
-
-
-
 Nous présentons ici des exemples de scripts Slurm pour résoudre des simulations Rocky autonomes et non couplées dans la file d'attente d'une grappe. Les deux scripts sont configurés avec <code>RESUME=0</code>, ce qui  par défaut permet de résoudre les simulations depuis le début. Pour redémarrer une simulation partiellement terminée, spécifiez <code>RESUME=1</code> et soumettez à nouveau le script à la file d'attente. Pour obtenir la liste complète des options de ligne de commande, exécutez <code>Rocky -h</code> après avoir chargé le module Ansys. Un fichier de verrouillage étant généré à chaque lancement de simulation, une seule tâche doit être soumise à la fois dans le même répertoire. Concernant le choix du script, bien que toutes les simulations doivent être testées indépendamment, pour un cas de test simple, le script utilisant uniquement le GPU s'est avéré 3,5 fois plus performant que le script utilisant uniquement le CPU. Des augmentations supplémentaires de ressources au-delà de 6 cœurs (pour le script utilisant uniquement le CPU) ou de 2 cœurs + 1Go (1/7 d'un GPU H100 pour le script utilisant le GPU) n'ont apporté aucun gain de vitesse supplémentaire, d'après les tests de passage à l'échelle pour l'un ou l'autre script. Au vu de ces résultats, il est probable que le script basé sur le GPU offre des temps de calcul nettement plus rapides que l'utilisation exclusive du CPU pour les autres simulations Rocky autonomes. Comme indiqué sur la page wiki de chaque grappe, ou résumé dans la section [[Allocations and compute scheduling/fr#Ratios_dans_les_bundles|Ratios dans les bundles]], toutes les grappes, à l'exception de Narval, sont équipées de GPU H100. Par conséquent, lors de l'utilisation du script GPU sur Narval, l'option Slurm <code>--gpus</code> doit être modifiée pour demander un GPU a100. Veuillez noter qu'en mai 2026, seuls les modules <code>ansys/2025R2|2.04</code> de Rocky ont été testés, et non les modules <code>ansys/2025R1|1.02</code>.
 
 <span id="Slurm_scripts"></span>
 === Scripts pour l'ordonnanceur Slurm ===   
-
-
-
 
 <tabs>
 <tab name="CPU seulement">
@@ -1218,24 +1081,16 @@ Nous présentons ici des exemples de scripts Slurm pour résoudre des simulation
 |contents=
 #!/bin/bash
 
-
-
 #SBATCH --account=account      # Specify account (def or rrg)
 #SBATCH --time=00-02:00        # Specify time (DD-HH:MM)
 #SBATCH --mem=24G              # Specify total memory for cores
 #SBATCH --cpus-per-task=6      # Specify number of cores to use
 #SBATCH --nodes=1              # Request one node (do not change)
 
-
-
 module load StdEnv/2023 ansys/2025R2.04   # Specify 2025R1 or newer versions
-
-
 
 INPUTFILE="mySim.rocky"                   # Specify input filename
 rm -f $INPUTFILE.lock                     # Removes old lock files
-
-
 
 RESUME=0                                  # Specify 0 or 1
 if [ $RESUME -eq 0 ]; then
@@ -1254,8 +1109,6 @@ fi
 |contents=
 #!/bin/bash
 
-
-
 #SBATCH --account=account      # Specify account (def or rrg)
 #SBATCH --time=00-01:00        # Specify time (DD-HH:MM)
 #SBATCH --mem=24G              # Specify total memory for cores
@@ -1263,16 +1116,10 @@ fi
 #SBATCH --gpus=h100_1g.10gb:1  # Specify a100_1g.5gb:1 on narval
 #SBATCH --nodes=1              # Request one node (do not change)
 
-
-
 module load StdEnv/2023 ansys/2025R2.04   # Specify 2025R1 or newer versions
-
-
 
 INPUTFILE="mySim.rocky"                   # Specify input filename
 rm -f $INPUTFILE.lock                     # Removes old lock files
-
-
 
 RESUME=0                                  # Specify 0 or 1
 if [ $RESUME -eq 0 ]; then
@@ -1287,8 +1134,5 @@ fi
 </tabs>
 
 == Electronics ==   
-
-
-
 
 Voir les exemples de scripts pour l'ordonnanceur dans [[AnsysEDT/fr|notre page wiki AnsysEDT]].
