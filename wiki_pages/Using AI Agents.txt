@@ -1,73 +1,75 @@
-<!--
 {{Draft}}
-Page proposée : Agents IA sur les grappes de l’Alliance/fr
-Version de travail : septembre 2026
+<!--
+Proposed page: Using AI Agents
+Working version: September 2026
 -->
-Les '''agents d’intelligence artificielle (IA)''' peuvent aider à lire et expliquer du code, modifier des fichiers, exécuter des commandes, préparer des scripts de soumission, analyser des journaux et soutenir le débogage. Sur une infrastructure de calcul partagé, leur utilisation demande toutefois de distinguer clairement le processus agentique, les ressources de calcul et le service de modèle utilisé. ==
-Cette page présente des '''principes techniques généraux''' pour l’utilisation d’agents IA sur les grappes de l’Alliance. Elle ne constitue pas une approbation institutionnelle d’un produit ou d’un fournisseur particulier.
 
-'''Important :''' À ce jour, l’Alliance n’a pas formulé de recommandation générale pour ou contre l’utilisation d’agents IA sur ses grappes. Le sujet est encore à l’étude. Les positions propres à un site ou à un partenaire régional doivent être distinguées des politiques générales de l’Alliance.
+'''Artificial intelligence (AI) agents''' can help read and explain code, modify files, run commands, prepare job submission scripts, analyze logs, and support debugging. On a shared computing infrastructure, however, their use requires a clear distinction between the agent process, the compute resources, and the model service being used.
 
-== Comprendre où s’exécute un agent IA ==
+This page presents '''general technical principles''' for using AI agents on Alliance clusters. It does not constitute institutional endorsement of any particular product or provider.
 
-Il faut distinguer au moins deux composants :
+'''Important:''' To date, the Alliance has not issued a general recommendation for or against the use of AI agents on its clusters. The topic is still under review. Positions specific to a site or regional partner should be distinguished from Alliance-wide policies.
 
-* le '''client agentique''', qui s’exécute dans l’environnement où l’agent est lancé;
-* le '''modèle de langage''', qui peut être fourni localement ou par un service externe, selon la configuration utilisée.
+== Understanding where an AI agent runs ==
 
-Un agent lancé avec le compte d’un utilisateur agit généralement avec les permissions accordées à ce compte. Il peut donc, selon son mode d’autorisation, lire des fichiers, exécuter des commandes ou préparer du contexte destiné au modèle.
+At least two components should be distinguished:
 
-Si l’agent est lancé sur un nœud de connexion, son processus s’exécute sur ce nœud. S’il est lancé dans une allocation interactive SLURM, son processus s’exécute sur le nœud de calcul alloué. Cette distinction est importante pour respecter les bonnes pratiques de calcul haute performance.
+* the '''agent client''', which runs in the environment where the agent is launched;
+* the '''language model''', which may be provided locally or through an external service, depending on the configuration.
 
-== Où exécuter un agent IA? ==
+An agent launched under a user's account generally operates with the permissions granted to that account. Depending on its authorization mode, it may therefore read files, run commands, or prepare context to be sent to the model.
+
+If the agent is launched on a login node, its process runs on that node. If it is launched within an interactive SLURM allocation, its process runs on the allocated compute node. This distinction is important for following high-performance computing best practices.
+
+== Where should an AI agent run? ==
 
 {| class="wikitable"
-! Emplacement
-! Usage recommandé
-! Remarques
+! Location
+! Recommended use
+! Notes
 |-
-| Poste local ou machine virtuelle
-| Souvent l’option la plus simple pour héberger l’agent.
-| L’agent fonctionne hors de la grappe et l’utilisateur se connecte ensuite aux ressources selon les mécanismes SSH, MFA et SLURM autorisés.
+| Local workstation or virtual machine
+| Often the simplest option for hosting the agent.
+| The agent runs outside the cluster, and the user then connects to Alliance resources using the authorized SSH, MFA, and SLURM mechanisms.
 |-
-| Nœud de connexion
-| À limiter aux opérations très légères.
-| Une utilisation prolongée ou des commandes agentiques coûteuses ne conviennent pas à un nœud de connexion.
+| Login node
+| Limit use to very lightweight operations.
+| Prolonged use or computationally expensive agent activity is not appropriate on a login node.
 |-
-| Nœud de calcul dans une allocation interactive
-| Adapté au développement, aux petits tests, à la validation et au débogage interactif.
-| L’utilisation reste soumise aux politiques locales et à la connectivité réseau disponible sur les nœuds de calcul.
+| Compute node within an interactive allocation
+| Suitable for development, small tests, validation, and interactive debugging.
+| Use remains subject to local policies and the network connectivity available from compute nodes.
 |-
-| Tâche batch SLURM
-| Méthode standard pour les calculs reproductibles, longs ou coûteux.
-| L’agent peut aider à préparer ou analyser la tâche, mais le calcul est géré par SLURM.
+| SLURM batch job
+| Standard method for reproducible, long-running, or computationally expensive workloads.
+| The agent may help prepare or analyze the job, but computation is managed by SLURM.
 |-
-| Nœud d’automatisation
-| Dépend du site.
-| À Calcul Québec, ces nœuds sont destinés à des plateformes déterministes entièrement contrôlées par l’utilisateur; un agent IA ne correspond pas à cette définition.
+| Automation node
+| Depends on the site.
+| At Calcul Québec, these nodes are intended for deterministic platforms fully controlled by the user; an AI agent does not meet this definition.
 |}
 
-== Utilisation avec SLURM ==
+== Using AI agents with SLURM ==
 
-Les charges de calcul intensives doivent être exécutées sur les nœuds de calcul au moyen du planificateur. Voir [[Running jobs/fr|Exécuter des tâches]] et [[What is a scheduler?/fr|Qu’est-ce qu’un ordonnanceur?]].
+Compute-intensive workloads must run on compute nodes through the scheduler. See [[Running jobs]] and [[What is a scheduler?]].
 
-Pour une utilisation interactive, demander d’abord une allocation, par exemple :
+For interactive use, first request an allocation, for example:
 
 <pre>
 salloc \
-  --account=<compte> \
+  --account=<account> \
   --time=01:00:00 \
   --cpus-per-task=2 \
   --mem=4G
 </pre>
 
-Puis ouvrir un shell dans l’allocation :
+Then open a shell within the allocation:
 
 <pre>
 srun --pty bash
 </pre>
 
-Vérifier ensuite que la session se trouve bien dans une allocation :
+Verify that the session is running inside an allocation:
 
 <pre>
 hostname
@@ -75,122 +77,122 @@ echo "$SLURM_JOB_ID"
 echo "$SLURM_CPUS_PER_TASK"
 </pre>
 
-Pour les expériences longues ou reproductibles, privilégier une tâche batch avec <code>sbatch</code>. L’agent peut aider à préparer le script, mais chaque directive <code>#SBATCH</code> devrait être vérifiée par l’utilisateur avant la soumission.
+For long-running or reproducible experiments, prefer a batch job submitted with <code>sbatch</code>. An agent can help prepare the script, but every <code>#SBATCH</code> directive should be reviewed by the user before submission.
 
-'''Fin de session :''' quitter l’agent et le shell interactif lorsqu’ils ne sont plus nécessaires, puis vérifier qu’aucune allocation inutile ne reste active avec :
+'''Ending the session:''' exit the agent and the interactive shell when they are no longer needed, then verify that no unnecessary allocation remains active:
 
 <pre>
 squeue -u "$USER"
 </pre>
 
-== Sécurité, confidentialité et protection des données ==
+== Security, privacy, and data protection ==
 
-=== Données sensibles ===
+=== Sensitive data ===
 
-Les ressources de calcul général de l’Alliance ne sont pas appropriées pour le stockage de données sensibles. Avant d’utiliser un agent IA, consulter [[Data protection, privacy, and confidentiality/fr|Protection des données, vie privée et confidentialité]] ainsi que les exigences de votre établissement et de votre projet.
+Alliance general-purpose computing resources are not appropriate for storing sensitive data. Before using an AI agent, consult [[Data protection, privacy, and confidentiality]] as well as the requirements of your institution and project.
 
-L’utilisation d’un agent IA ne change pas la classification ni les obligations applicables aux données.
+Using an AI agent does not change the classification of the data or the obligations that apply to it.
 
-=== Permissions entre utilisateurs ===
+=== Permissions between users ===
 
-Un agent lancé par un autre utilisateur ne contourne pas automatiquement les permissions du système de fichiers. Les contrôles Unix habituels continuent de s’appliquer.
+An agent launched by another user does not automatically bypass filesystem permissions. Standard Unix access controls continue to apply.
 
-La question est différente lorsqu’un utilisateur lance lui-même un agent : l’agent peut alors accéder aux ressources que le compte peut lire ou modifier, dans la mesure permise par son mode d’autorisation.
+The situation is different when a user launches an agent under their own account: the agent may then access resources that the account itself can read or modify, to the extent allowed by the agent's authorization mode.
 
-'''Distinction importante :''' « un autre utilisateur ne peut pas lire mes fichiers » et « mon propre agent peut accéder à des fichiers que mon compte peut lire » sont deux questions différentes.
+'''Important distinction:''' “another user cannot read my files” and “my own agent can access files that my account can read” are two different questions.
 
-=== Données transmises à un service externe ===
+=== Data sent to an external service ===
 
-Si le modèle est fourni par un service externe, certains éléments de contexte nécessaires au traitement peuvent quitter l’infrastructure locale, selon la configuration de l’outil.
+If the model is provided through an external service, some context required for processing may leave the local infrastructure, depending on the tool configuration.
 
-Avant toute utilisation :
+Before using an agent:
 
-* ne pas fournir de secrets, mots de passe, clés privées, jetons ou codes MFA dans un prompt;
-* limiter l’agent au répertoire de projet nécessaire;
-* éviter d’exposer des fichiers sans lien avec la tâche;
-* examiner les permissions demandées et les commandes proposées;
-* vérifier les politiques du fournisseur, de l’établissement et du projet;
-* ne pas utiliser l’agent avec des données dont les conditions d’utilisation externe ne sont pas clairement établies.
+* do not provide secrets, passwords, private keys, tokens, or MFA codes in a prompt;
+* restrict the agent to the project directory required for the task;
+* avoid exposing unrelated files;
+* review requested permissions and proposed commands;
+* verify the policies of the provider, institution, and project;
+* do not use the agent with data whose conditions for external processing are not clearly established.
 
-== Permissions et contrôle humain ==
+== Permissions and human oversight ==
 
-L’utilisateur reste responsable des commandes, modifications et calculs qu’il autorise.
+The user remains responsible for the commands, modifications, and computations they authorize.
 
-Une configuration prudente devrait notamment imposer les principes suivants :
+A cautious configuration should follow principles such as:
 
-# expliquer les actions prévues avant leur exécution;
-# ne pas lancer de calculs intensifs sur les nœuds de connexion;
-# utiliser SLURM pour les charges de calcul;
-# demander une confirmation avant de modifier des fichiers;
-# demander une confirmation avant d’installer des logiciels;
-# demander une confirmation avant de soumettre ou d’annuler des tâches;
-# ne jamais supprimer des données sans approbation explicite;
-# ne pas parcourir des répertoires sans lien avec le projet;
-# ne jamais afficher ou modifier des identifiants ou secrets;
-# résumer les actions réalisées.
+# explain planned actions before executing them;
+# do not run compute-intensive workloads on login nodes;
+# use SLURM for computational workloads;
+# request confirmation before modifying files;
+# request confirmation before installing software;
+# request confirmation before submitting or cancelling jobs;
+# never delete data without explicit approval;
+# do not browse directories unrelated to the project;
+# never display or modify credentials or secrets;
+# summarize the actions performed.
 
-== SSH, clés publiques et authentification multifacteur ==
+== SSH, public keys, and multifactor authentication ==
 
-Les clés SSH et l’authentification multifacteur peuvent correspondre à des étapes distinctes de l’authentification. Une clé publique acceptée ne signifie pas que l’étape MFA doit être contournée ou désactivée.
+SSH keys and multifactor authentication may correspond to separate authentication steps. An accepted public key does not mean that the MFA step should be bypassed or disabled.
 
-Voir [[SSH/fr|SSH]], [[SSH Keys/fr|Clés SSH]], [[Multifactor authentication/fr|Authentification multifacteur]] et [[Automation in the context of multifactor authentication/fr|Automatisation dans le contexte de l’authentification multifacteur]].
+See [[SSH]], [[SSH Keys]], [[Multifactor authentication]], and [[Automation in the context of multifactor authentication]].
 
-Lorsqu’un agent ou une application encapsule une connexion SSH, il faut vérifier que l’outil sait gérer une session interactive et le défi MFA. Si une connexion SSH classique fonctionne mais que l’intégration de l’application échoue, le problème peut provenir de la manière dont cette application gère l’interaction SSH ou le terminal.
+When an agent or application wraps an SSH connection, verify that the tool can handle an interactive session and the MFA challenge. If a standard SSH connection works but the application integration fails, the problem may be related to how the application handles SSH interaction or the terminal.
 
-Pour diagnostiquer la connexion depuis le même environnement que l’agent :
+To diagnose the connection from the same environment as the agent:
 
 <pre>
-ssh -v <username>@<grappe>.alliancecan.ca
+ssh -v <username>@<cluster>.alliancecan.ca
 </pre>
 
-Ne jamais joindre une clé privée, un mot de passe, un code MFA ou un jeton d’API à un ticket de soutien.
+Never attach a private key, password, MFA code, or API token to a support ticket.
 
-== Nœuds d’automatisation ==
+== Automation nodes ==
 
-Les règles applicables aux nœuds d’automatisation peuvent varier selon le site.
+Rules for automation nodes may vary by site.
 
-À Calcul Québec, la position communiquée est que ces nœuds doivent être utilisés par des plateformes déterministes et entièrement contrôlées par l’utilisateur. Un agent IA n’est pas considéré comme répondant à cette définition. Un déploiement persistant d’un agent sur ce type de nœud n’est donc pas approprié à Calcul Québec.
+At Calcul Québec, the communicated position is that these nodes must be used by deterministic platforms fully controlled by the user. An AI agent is not considered to meet this definition. A persistent deployment of an agent on this type of node is therefore not appropriate at Calcul Québec.
 
-Les architectures à privilégier sont plutôt :
+Preferred architectures are instead:
 
-* un poste local ou une VM qui héberge l’agent, avec connexion à la grappe par les mécanismes supportés;
-* une allocation interactive SLURM pour les essais interactifs sur un nœud de calcul, lorsque les politiques et la connectivité le permettent;
-* des tâches batch SLURM pour les calculs reproductibles ou coûteux.
+* a local workstation or VM hosting the agent, with connections to the cluster through supported mechanisms;
+* an interactive SLURM allocation for interactive testing on a compute node, when policies and connectivity allow it;
+* SLURM batch jobs for reproducible or computationally expensive workloads.
 
-== Bonnes pratiques ==
+== Best practices ==
 
-* Ne pas utiliser les nœuds de connexion pour des calculs ou une activité agentique intensive.
-* Utiliser SLURM pour les travaux CPU ou GPU.
-* Limiter l’agent au répertoire de projet nécessaire.
-* Conserver un contrôle humain sur les modifications, installations, suppressions et soumissions de tâches.
-* Ne jamais fournir de secrets à l’agent ou dans un ticket de soutien.
-* Vérifier les règles applicables aux données avant d’utiliser un modèle ou un service externe.
-* Valider indépendamment le code, les résultats scientifiques et les ressources SLURM suggérées par l’agent.
-* Documenter les versions des outils, bibliothèques et environnements pour assurer la reproductibilité.
-* Fermer les allocations interactives lorsqu’elles ne sont plus nécessaires.
+* Do not use login nodes for computation or intensive agent activity.
+* Use SLURM for CPU or GPU workloads.
+* Restrict the agent to the project directory needed for the task.
+* Maintain human oversight of modifications, installations, deletions, and job submissions.
+* Never provide secrets to the agent or in a support ticket.
+* Verify the applicable data rules before using an external model or service.
+* Independently validate code, scientific results, and SLURM resources suggested by the agent.
+* Document tool, library, and environment versions to support reproducibility.
+* Close interactive allocations when they are no longer needed.
 
-== Informations à fournir dans un ticket de soutien ==
+== Information to include in a support ticket ==
 
-Lorsque vous signalez un problème lié à un agent IA, fournir si possible :
+When reporting an issue related to an AI agent, provide, where possible:
 
-* le nom de la grappe;
-* l’emplacement où l’agent est exécuté : poste local, VM, nœud de connexion ou nœud de calcul;
-* le système d’exploitation et la version de l’outil;
-* la méthode de connexion SSH utilisée;
-* la présence ou non d’une allocation SLURM;
-* le message d’erreur exact, sans secret;
-* la sortie pertinente d’un diagnostic en lecture seule;
-* la différence observée entre une connexion SSH classique et la connexion initiée par l’agent, le cas échéant.
+* the cluster name;
+* where the agent is running: local workstation, VM, login node, or compute node;
+* the operating system and tool version;
+* the SSH connection method being used;
+* whether a SLURM allocation is active;
+* the exact error message, with secrets removed;
+* relevant output from read-only diagnostics;
+* the observed difference between a standard SSH connection and the connection initiated by the agent, if applicable.
 
-== Voir aussi ==
+== See also ==
 
-* [[Running jobs/fr|Exécuter des tâches]]
-* [[Best practices for job submission/fr|Bonnes pratiques pour la soumission de tâches]]
-* [[Data protection, privacy, and confidentiality/fr|Protection des données, vie privée et confidentialité]]
-* [[Multifactor authentication/fr|Authentification multifacteur]]
-* [[Automation in the context of multifactor authentication/fr|Automatisation dans le contexte de l’authentification multifacteur]]
-* [[SSH/fr|SSH]]
-* [[Claude sur les grappes de l’Alliance/fr|Claude sur les grappes de l’Alliance]]
+* [[Running jobs]]
+* [[Best practices for job submission]]
+* [[Data protection, privacy, and confidentiality]]
+* [[Multifactor authentication]]
+* [[Automation in the context of multifactor authentication]]
+* [[SSH]]
+* [[Getting started with Claude on Alliance clusters]]
 
 [[Category:AI and Machine Learning]]
 [[Category:Software]]
